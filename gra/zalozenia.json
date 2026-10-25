@@ -1,0 +1,70 @@
+{
+  "_opis": "Parametry mechanik gry, których nie widać wprost w grze REVAS. Każdy ma: wartosc, pewnosc (potwierdzone / skalibrowane / zalozenie) i zrodlo. Zmiana tu zmienia działanie silnika bez zmian w kodzie. Kalibracje: revas_gra/kalibracja/*.py, opis: WIEDZA_O_GRZE.md.",
+
+  "popyt": {
+    "elastycznosc_ceny": {"wartosc": 1.096, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; popyt × r^(−E1)"},
+    "elastycznosc_wzgledem_rynku": {"wartosc": 1.0035, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; popyt × exp(−E2·(r − średnie r firm oferujących usługę)); bez tego członu błąd 9,2%"},
+    "wykladnik_liczby_firm": {"wartosc": 0.247, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; popyt × n^(−K)"},
+    "mnoznik_bazowy": {"wartosc": 1.498, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; popyt roczny z instrukcji wystarcza (efekty usług nie poprawiają walidacji), brak różnicy poziomu między grami ATH i A/B/C (różnica 3%, walidacja lepsza bez niej)"},
+    "wspolczynniki_jakosci": {"wartosc": {"3": 1.0, "2": 0.654, "1": 0.616}, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; jakość = średnia ważona współczynników gwiazdek sprzętu i zasobów (lepsza od postaci liniowej w gwiazdkach); boty: sprzęt 2★, zasoby 1,35–1,96★ co miesiąc"},
+    "wagi_jakosci": {"wartosc": {"pracownicy": 0.0, "sprzet": 0.407, "zasoby": 0.593}, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; gwiazdki trenerów personalnych ATH (2,5 → 1,33 → 1,67) bez wpływu (współczynnik ≈ 0)"},
+    "wyposazenie_na_procent_klientow": {"wartosc": 0.073, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; popyt × (1 + κ · Σ % klientów oczekujących wyposażenia / 100); wyposażenie botów (0 → 340%) odczytane z tabel „posiadane wyposażenie”"},
+    "utrata_klientow": {"wartosc": 0.0, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py: utrata klientów po brakach w poprzednim miesiącu pogarsza walidację krzyżową (8,1% wobec 7,6%) – mechanizmu nie ma; spadek efektu firmy ATH tłumaczy wyposażenie botów i sezonowość XI–XII"},
+    "recepcja_1gw_mnoznik": {"wartosc": 1.0, "pewnosc": "zalozenie", "zrodlo": "wyłączone (1,0). ATH: cały sprzęt recepcji 1★ od października – efekt firmy spadł o ok. 15%, ale zbiega się z innym niewyjaśnionym spadkiem; liniowo dla 2★ psuje grę A/B/C (Apex, Vela z recepcją 2★: błąd 1,7% → 9,4%). Możliwy efekt tylko dla 1★ – do potwierdzenia"},
+    "korekta_miesiaca": {"wartosc": {"styczen": 1.0, "luty": 1.0, "marzec": 0.972, "kwiecien": 0.997, "maj": 0.924, "czerwiec": 0.903, "lipiec": 0.97, "sierpien": 1.001, "wrzesien": 0.989, "pazdziernik": 0.961, "listopad": 0.808, "grudzien": 0.796}, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) + gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%; mnożnik ponad sezonowość z instrukcji (luty = 1). Luty–październik w granicach ±10% (sezonowość z instrukcji działa, inne przesunięcia miesięcy wypadają gorzej), listopad–grudzień ok. −20% u wszystkich firm. Styczeń bez danych"},
+    "szum_proc": {"wartosc": 0.03, "pewnosc": "zalozenie", "zrodlo": "reszta modelu 4,5% zawiera błędy odczytu; losowe odchylenie popytu firmy na usługę (rozkład log-normalny, ziarno gry); 0 = wyłączone"},
+    "zaokraglenie": {"wartosc": "do_calych_klientow", "pewnosc": "potwierdzone", "zrodlo": "efektywność reklamy – różnice % między usługami wynikają z zaokrągleń"},
+    "postac_ceny": {"wartosc": "potega", "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py: popyt ∝ r^(−E1) (walidacja 6,3%) lepsze niż e^(−E1·(r−1)) (8,8%); r = cena po rabacie / cena preferowana"}
+  },
+
+  "reklama": {
+    "tradycyjna_nasycenie_k": {"wartosc": 2.2166, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py; wzrost = Σ_media A_kategorii · zasięg · ln(1 + k · emisje)"},
+    "tradycyjna_maks_kategorii": {"wartosc": {"billboard_ulotki": 0.011492, "prasa": 0.034957, "radio": 0.029501, "telewizja": 0.053354}, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py; A_kategorii (mnożone przez zasięg w % i ln(1 + k·emisje)); dopasowanie 0,15 pkt proc. na 8 miesiącach ATH"},
+    "internetowa_a": {"wartosc": 0.1898, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py: gra ATH czerwiec–grudzień; wzrost = a · (n / (n + c·(N − n)))^b, n – narzędzia firmy, N – aktywne narzędzia wszystkich firm; walidacja „zostaw miesiąc” 0,21 pkt proc. (sam udział n/N: 0,46)"},
+    "internetowa_b": {"wartosc": 2.7561, "pewnosc": "skalibrowane", "zrodlo": "jw."},
+    "sposob_laczenia": {"wartosc": "suma", "pewnosc": "zalozenie", "zrodlo": "popyt × (1 + wzrost tradycyjna + wzrost internetowa); gra raportuje oba wzrosty osobno"},
+    "tradycyjna_postac": {"wartosc": "log", "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py: 7 postaci porównanych walidacją „zostaw miesiąc” na 8 miesiącach ATH: ln(1 + k·emisje) w każdym medium 3,0 pkt proc., nasycenie wykładnicze 4,3, hiperbola 5,4, potęga 3,8, nasycenie sumy kategorii 11,0, liniowo 12,0"},
+    "internetowa_waga_konkurencji": {"wartosc": 0.3971, "pewnosc": "skalibrowane", "zrodlo": "jw.; narzędzie konkurenta waży ok. 0,4 własnego"}
+  },
+
+  "operacje": {
+    "godziny_pracownika": {"wartosc": 160, "pewnosc": "potwierdzone", "zrodlo": "dashboard r1"},
+    "godziny_sprzetu": {"wartosc": 160, "pewnosc": "potwierdzone", "zrodlo": "dashboard r1"},
+    "zajecia_zaokraglane_w_gore": {"wartosc": true, "pewnosc": "potwierdzone", "zrodlo": "wykorzystanie instruktora 80,3% (drużyna C, marzec)"},
+    "model_stanowisk": {"wartosc": "pula", "pewnosc": "potwierdzone", "zrodlo": "gra A/B/C online: Apex (luty) i Vela (marzec) prowadziły usługi, których sprzęt stał na nieobsadzonych stanowiskach; obłożenie sprzętu = godziny zajęć / (sztuki × 160 h), wykorzystanie prowadzących = godziny wszystkich usług zawodu / (osoby × 160 h) – co do 0,1 pkt proc. „stanowisko” = dawne założenie (sprzęt i prowadzący na tym samym stanowisku)"},
+    "kolejnosc_obslugi": {"wartosc": "proporcjonalnie", "pewnosc": "zalozenie", "zrodlo": "przy braku mocy przerobowych klienci usług na stanowisku obsługiwani proporcjonalnie do popytu"},
+    "braki_wykladnik_godzin": {"wartosc": -1.55, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py: przy braku zasobu obsłużeni ∝ popyt · (godziny zajęć)^α (ATH kwiecień – brak płynu, grudzień – brak napoju): błąd 19% wobec 32% przy podziale proporcjonalnym; cena, grupa i popyt nie poprawiają dopasowania"}
+  },
+
+  "finanse": {
+    "kapital_startowy": {"wartosc": 40000, "pewnosc": "potwierdzone", "zrodlo": "dashboard r1"},
+    "placa_minimalna": {"wartosc": 4806, "pewnosc": "potwierdzone", "zrodlo": "dashboard r1"},
+    "podatek_cit": {"wartosc": 0.19, "pewnosc": "potwierdzone", "zrodlo": "dashboard r1, KPiR (miesięcznie, bez rozliczania strat)"},
+    "zus_pracodawcy": {"wartosc": 0.19, "pewnosc": "potwierdzone", "zrodlo": "KPiR luty–maj"},
+    "utrzymanie_klubu": {"wartosc": 2000, "pewnosc": "potwierdzone", "zrodlo": "KPiR, stanowiska r9"},
+    "amortyzacja_prog": {"wartosc": 10000, "pewnosc": "potwierdzone", "zrodlo": "dashboard r1: ≤ próg 100% w koszty"},
+    "amortyzacja_powyzej_progu_miesiecznie": {"wartosc": 0.10, "pewnosc": "zalozenie", "zrodlo": "dashboard: 10%; nie wiadomo, czy miesięcznie – w fitness brak sprzętu > 10 000 PLN"},
+    "koszt_magazynowania": {"wartosc": 50, "pewnosc": "potwierdzone", "zrodlo": "KPiR: 50 PLN/mies., gdy zostaje zapas"},
+    "koszt_zwrotu": {"wartosc": 0.10, "pewnosc": "potwierdzone", "zrodlo": "dostawcy: koszt zwrotu 10%"},
+    "sprzedaz_sprzetu": {"wartosc": 0.5, "pewnosc": "skalibrowane", "zrodlo": "sprzedaż sprzętu r9: ≈ 50% ceny, w dół do 10 PLN"},
+    "sprzedaz_udogodnien": {"wartosc": 0.5, "pewnosc": "potwierdzone", "zrodlo": "udogodnienia r4, wyposażenie r9"},
+    "lokata_odsetki": {"wartosc": "proste_miesieczne", "pewnosc": "potwierdzone", "zrodlo": "3 lokaty ATH r9"},
+    "kredyt_odsetki": {"wartosc": "proste_miesieczne", "pewnosc": "potwierdzone", "zrodlo": "kredyt 100 PLN / 1 mies. / 10%: odsetki 0,83"},
+    "kredyt_odnawialny_automatyczny": {"wartosc": true, "pewnosc": "potwierdzone", "zrodlo": "instrukcja"}
+  },
+
+  "karta_wynikow": {
+    "wynik_ekonomiczny_dzielnik": {"wartosc": 20000, "pewnosc": "potwierdzone", "zrodlo": "ATH r3–r9: dochód netto / 20 000 = wynik ekonomiczny (7/7)"},
+    "zadowolenie_klientow": {"wartosc": {"stala": 0.8486, "ln_liczby_uslug": 0.1768, "limit_uslug": 6, "cena_wzgledem_rynku": -0.193, "utracona_poprzednio": -0.105, "jakosc": 0.2282, "wyposazenie_na_procent": 0.0, "reklamacje": 0.0}, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): 43 karty (ATH 3 firmy × 11 mies. z botami, A/B/C 5 × 2), zespoły z wagą 2: błąd zespoły 0,033, boty 0,042 (dawny wzór: zespoły 0,024, boty 0,090 – nie przenosił się na firmy o niższej jakości). jakosc = średni mnożnik jakości usług (gwiazdki sprzętu i zasobów jak w popycie); cena_wzgledem_rynku = cena / średnia cena firm (ważona klientami); utracona_poprzednio = udział utraconej sprzedaży w poprzednim miesiącu (ATH kwiecień −40% → maj −0,08; Vela)"},
+    "zadowolenie_pracownikow": {"wartosc": {"stala": 0.9464, "placa_wzgledem_preferowanej": 0.3162, "sprzet_na_gwiazdke": 0.0163, "udogodnienia_na_procent": 0.0009, "szkolenia_w_miesiacu_na_procent": 0.0, "udzial_umow_zlecenie": -0.0115, "zmiany_zatrudnienia": 0.0, "szkolenie_w_miesiacu": 0.0755}, "pewnosc": "skalibrowane", "zrodlo": "kalibracja_online.py (17 kart zespołów) + analiza_od_nowa.py: na 43 kartach z botami szkolenie działa jak włącznik – jedno lub dwa szkolenia w miesiącu dają tyle samo (+0,0755; Firma 1 z jednym szkoleniem = z dwoma), błąd 0,005 zamiast 0,009"},
+    "rozwoj_firmy": {"wartosc": {"stala": 0.5353, "majatek": 0.1062, "majatek_skala": 10000, "inwestycje_netto": 0.3389, "inwestycje_wzgledne": 1.192, "przyrost_uslug_i_pracownikow": 0.031, "wygladzanie": 0.0}, "pewnosc": "skalibrowane", "zrodlo": "analiza_od_nowa.py (2026-10-18): 21 kart (ATH luty–grudzień z wyprzedażą i odkupem sprzętu, A/B/C luty–marzec): rozwój = stala + majatek·ln(1 + M/skala) + inwestycje_netto·(zakupy − wartość sprzedanego)/max(M sprzed miesiąca, skala), M – majątek po cenach zakupu po odjęciu sprzedanego; błąd 0,089, LOO 0,106 (dawny wzór na tych danych: LOO 0,175). Sprzedaż sprzętu obniża rozwój (ATH wrzesień 0,554, październik 0,603). Niska pewność"},
+    "wskaznik_zadluzenia": {"wartosc": {"bez_kredytu": 1.0, "wzor": "1 − dług / (majątek + skumulowany dochód netto), min 0"}, "pewnosc": "zalozenie", "zrodlo": "instrukcja; Fruukulele z kredytem 0,2–0,6"}
+  },
+
+  "losowosc": {
+    "reklamacje": {"wartosc": "dwumianowo_ryzyko_pracownika", "pewnosc": "zalozenie", "zrodlo": "instrukcja: ryzyko reklamacji = prawdopodobieństwo wadliwej usługi; reklamacja zużywa zasoby ponownie (ATH: zużycie o 0,4–1% większe niż sprzedaż)"},
+    "reklamacje_mnoznik_ryzyka": {"wartosc": 0.15, "pewnosc": "skalibrowane", "zrodlo": "odtworzenie gry ATH (kalibracja/odtworzenie_ath.py): prawdopodobieństwo reklamacji = ryzyko pracownika × mnożnik; przy 1,0 zużycie zasobów było o 3,6% za duże, przy 0,15 błąd 0,4%"},
+    "ceny_dostawcow": {"wartosc": {"odchylenie": 0.044, "powrot_do_bazy": 0.6, "max_zmiana": 0.17}, "pewnosc": "skalibrowane", "zrodlo": "analiza_cen_dostawcow.py"},
+    "kandydaci": {"wartosc": {"rozrzut_pensji": 0.03}, "pewnosc": "zalozenie", "zrodlo": "te same osoby w różnych grach mają pensje różniące się o 2–4%"}
+  }
+}

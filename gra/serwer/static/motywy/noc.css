@@ -1,0 +1,212 @@
+/* Motyw „Siłownia nocą”.
+   Ciemna sala po godzinach: niebieskawy grafit, oświetlenie w kolorach działów (bursztyn – produkt i klient,
+   cyjan – majątek, lila – ludzie, zieleń – pieniądze, biel – ocena). Spokojne powierzchnie, mało ozdób.
+   Wyróżnik: kwoty jak na wyświetlaczu tablicy wyników, a oś rund jako rząd lampek (zielona zysk, czerwona strata). */
+
+:root[data-motyw="noc"] {
+  color-scheme: dark;
+  --sala: #151a21;
+  --plyta: #1d232c;
+  --plyta2: #252c37;
+  --szew: #323b48;
+  --swiatlo: #e6eaf0;
+  --przygaszone: #9aa4b2;
+  --bursztyn: #ffb547;
+  --cyjan: #4cc9e3;
+  --lila: #c4a2ff;
+  --zielen: #45d39f;
+  --czerwien: #ff6b70;
+  --wykres-paleta: #ffb547, #4cc9e3, #45d39f, #c4a2ff, #ff6b70, #e6eaf0, #8a6a3a, #2f7d8e;
+  --wykres-linia: #e6eaf0;
+  --wykres-utracona: #6b3b3e;
+  --wykres-tekst: #9aa4b2;
+  --wykres-siatka: rgba(230, 234, 240, .08);
+  --wykres-font: "Nunito Sans", sans-serif;
+  font-family: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  color: var(--swiatlo);
+}
+
+[data-motyw="noc"] {
+  & body, & [data-dzial] { --dzial: var(--swiatlo); --dzial-na: var(--sala); --dzial-tlo: rgba(230, 234, 240, .08); }
+  & [data-dzial="oferta"], & [data-dzial="sprzedaz"], & [data-dzial="marketing"] { --dzial: var(--bursztyn); --dzial-tlo: rgba(255, 181, 71, .12); }
+  & [data-dzial="inwestycje"], & [data-dzial="dostawcy"] { --dzial: var(--cyjan); --dzial-tlo: rgba(76, 201, 227, .12); }
+  & [data-dzial="hr"] { --dzial: var(--lila); --dzial-tlo: rgba(196, 162, 255, .13); }
+  & [data-dzial="finanse"] { --dzial: var(--zielen); --dzial-tlo: rgba(69, 211, 159, .12); }
+  & body, & [data-dzial] {
+    --pom: var(--dzial); --pom-ciemny: var(--dzial); --pom-jasny: var(--dzial-tlo); --pom-mgla: var(--dzial-tlo);
+    --czarny: var(--swiatlo); --tekst: var(--swiatlo); --szary: var(--przygaszone); --linia: var(--szew); --szary-jasny: var(--plyta2);
+    --zielony: var(--zielen); --zielony-jasny: rgba(69, 211, 159, .14); --czerwony: var(--czerwien); --czerwony-jasny: rgba(255, 107, 112, .14);
+    --niebieski: var(--cyjan); --zolty: var(--bursztyn); --karta: var(--plyta);
+  }
+
+  & body { background: var(--sala); color: var(--swiatlo); font-size: 14.5px; line-height: 1.5; }
+  & a { color: var(--dzial); }
+  & :focus-visible { outline: 2px solid var(--dzial); outline-offset: 2px; }
+  & h3 { color: var(--swiatlo); }
+
+  & .naglowek { height: 58px; background: var(--sala); border-bottom: 1px solid var(--szew); }
+  & .naglowek::before { display: none; }
+  & .logo { color: var(--swiatlo); font-family: "Chakra Petch", sans-serif; font-size: 19px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; line-height: 1; }
+  & .logo br { display: none; }
+  & .logo .serce { width: 32px; height: 32px; border: 1.5px solid var(--dzial); color: var(--dzial); }
+  & .logo .serce svg { stroke: currentColor; }
+  & .logo .firma { border-left-color: var(--szew); color: var(--przygaszone); font-family: "Nunito Sans", sans-serif; font-size: 15px;
+    font-weight: 600; letter-spacing: 0; text-transform: none; }
+  & .konto { text-transform: none; font-size: 14px; font-weight: 600; }
+  & .konto a { color: var(--swiatlo); }
+  & .konto a:hover { background: var(--plyta2); }
+  & .konto > span { color: var(--przygaszone); }
+  & .chip { background: var(--plyta2); color: var(--swiatlo); border-radius: 6px; font-size: 13px; }
+  & .chip.pom { background: var(--dzial-tlo); color: var(--dzial); }
+  & .chip.ok { background: rgba(69, 211, 159, .14); color: var(--zielen); }
+  & .wybor-motywu { color: var(--przygaszone); text-transform: none; font-size: 13px; font-weight: 600; }
+
+  & .menu { background: var(--sala); border-bottom: 1px solid var(--szew); box-shadow: none; }
+  & .menu .poz > a { color: var(--przygaszone); text-transform: none; font-size: 13px; font-weight: 600; letter-spacing: 0; }
+  & .menu .poz > a .ikona { color: var(--dzial); opacity: .75; }
+  & .menu .poz > a:hover { color: var(--swiatlo); }
+  & .menu .poz > a.aktywna { color: var(--swiatlo); border-bottom-color: var(--dzial); }
+  & .menu .poz > a.aktywna .ikona { opacity: 1; }
+  & .menu .wyslij > a, & .menu .wyslij > a.aktywna { color: var(--zielen); }
+  & .menu .wyslij > a .ikona { color: var(--zielen); }
+  & .menu .znaczek { background: var(--czerwien); color: var(--sala); }
+  & .menu .pod { background: var(--plyta2); border: 1px solid var(--szew); box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+  & .menu .pod a { color: var(--swiatlo); text-transform: none; font-size: 14px; font-weight: 600; }
+  & .menu .pod a .ikona { color: var(--dzial); }
+  & .menu .pod a:hover { background: var(--dzial-tlo); color: var(--swiatlo); }
+
+  & .scena { background: var(--sala); }
+  & .karta { background: var(--plyta); border: 1px solid var(--szew); box-shadow: none; }
+  & .karta-glowa { border-bottom-color: var(--szew); }
+  & .karta-glowa .tytul { color: var(--swiatlo); font-family: "Chakra Petch", sans-serif; font-size: 21px; font-weight: 600;
+    text-transform: none; letter-spacing: .01em; }
+  & .karta-glowa .tytul .ikona { color: var(--dzial); }
+
+  /* nawigator jak tablica wyników: R07 / 12 i rząd lampek */
+  & .nawigator { grid-template-columns: 36px 310px 36px; row-gap: 8px; }
+  & .nawigator .miesiac { font-family: "Chakra Petch", sans-serif; font-size: 17px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--swiatlo); }
+  & .nawigator .miesiac b { color: var(--dzial); }
+  & .strzalka { background: var(--plyta2); border-color: var(--szew); color: var(--swiatlo); border-radius: 8px; }
+  & .strzalka:hover { background: var(--dzial); border-color: var(--dzial); color: var(--sala); }
+  & .os-rund { grid-column: 1 / -1; display: flex; justify-content: center; gap: 5px; padding: 2px 0; }
+  & .runda-os { width: 18px; height: 7px; border-radius: 2px; background: var(--plyta2); box-shadow: inset 0 0 0 1px var(--szew); }
+  & .runda-os b { display: none; }
+  & .runda-os[data-akcja] { cursor: pointer; }
+  & .runda-os.rozegrana { background: var(--zielen); box-shadow: 0 0 6px rgba(69, 211, 159, .55); }
+  & .runda-os.strata { background: var(--czerwien); box-shadow: 0 0 6px rgba(255, 107, 112, .55); }
+  & .runda-os.biezaca { background: var(--sala); box-shadow: inset 0 0 0 1.5px var(--bursztyn); }
+  & .runda-os.ogladana { outline: 2px solid var(--swiatlo); outline-offset: 2px; }
+
+  & .przelacznik { background: var(--sala); border: 1px solid var(--szew); }
+  & .przelacznik a { color: var(--przygaszone); text-transform: none; font-size: 14px; }
+  & .przelacznik a.aktywny { background: var(--plyta2); color: var(--dzial); box-shadow: none; }
+
+  & .podzakladki { background: var(--plyta); border-bottom-color: var(--szew); }
+  & .podzakladki a { background: transparent; border-color: var(--szew); color: var(--przygaszone); text-transform: none; font-size: 13.5px; }
+  & .podzakladki a:hover { border-color: var(--dzial); color: var(--swiatlo); }
+  & .podzakladki a.aktywna { background: var(--dzial-tlo); border-color: var(--dzial); color: var(--dzial); }
+
+  /* pasek podsumowania – wyświetlacz */
+  & .podsumowanie { background: var(--sala); border-bottom-color: var(--szew); }
+  & .podsumowanie > div { border-right-color: var(--szew); padding: 14px 24px; }
+  & .podsumowanie .ikona { color: var(--przygaszone); }
+  & .podsumowanie .et { color: var(--przygaszone); text-transform: none; font-size: 13px; font-weight: 600; }
+  & .podsumowanie .wa { color: var(--dzial); font-family: "Chakra Petch", sans-serif; font-size: 25px; font-weight: 600; letter-spacing: .02em;
+    text-shadow: 0 0 14px var(--dzial-tlo); }
+  & .podsumowanie .wa.minus { color: var(--czerwien); }
+  & .podsumowanie .wa .chip { font-family: "Nunito Sans", sans-serif; font-size: 13px; text-shadow: none; }
+
+  & .info { color: var(--przygaszone); border-bottom-color: var(--szew); text-transform: none; font-size: 14px; font-weight: 600;
+    letter-spacing: 0; justify-content: flex-start; text-align: left; }
+  & .info .i { border-color: var(--dzial); color: var(--dzial); }
+
+  & .pasek { background: transparent; color: var(--swiatlo); text-align: left; text-transform: none; letter-spacing: .02em;
+    font-family: "Chakra Petch", sans-serif; font-size: 18px; font-weight: 600; padding: 0 0 8px 14px; border-radius: 0;
+    border-left: 3px solid var(--dzial); border-bottom: 1px solid var(--szew); }
+  & .pasek.ciemny { background: var(--sala); border: 1px solid var(--szew); border-left: 3px solid var(--dzial); border-radius: 8px;
+    padding: 12px 18px; font-size: 16px; }
+  & .pasek.ciemny .kwota { color: var(--dzial); font-size: 19px; }
+
+  & .kafel { background: var(--plyta2); border-color: var(--szew); box-shadow: none; transition: none; }
+  & .kafel:hover { box-shadow: none; }
+  & .kafel.wybrany { border-color: var(--dzial); box-shadow: inset 0 0 0 1px var(--dzial); }
+  & .kafel .kg { color: var(--swiatlo); border-bottom-color: var(--szew); text-transform: none; font-size: 14.5px; font-weight: 700; }
+  & .kafel .kg.kg-pelny { background: var(--dzial-tlo); color: var(--dzial); }
+  & .akcent { color: var(--dzial); }
+  & .wiersz { color: var(--przygaszone); text-transform: none; font-size: 13.5px; font-weight: 600; }
+  & .wiersz span:last-child { color: var(--swiatlo); }
+  & .sezon i { background: var(--dzial); opacity: .45; }
+  & .sezon i.ten { background: var(--swiatlo); opacity: 1; }
+  & .gwiazdki { color: var(--bursztyn); }
+  & .gwiazdki .p { color: var(--szew); }
+
+  & .btn { text-transform: none; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0; border-radius: 8px; }
+  & .btn.pom { background: var(--dzial); color: var(--sala); }
+  & .btn.pom:hover { background: var(--dzial); filter: brightness(1.1); box-shadow: none; }
+  & .btn.czarny { background: var(--swiatlo); color: var(--sala); }
+  & .btn.czarny:hover { background: #fff; }
+  & .btn.zielony { background: var(--zielen); color: var(--sala); }
+  & .btn.szary { background: var(--szew); color: var(--przygaszone); }
+  & .btn.jasny { background: transparent; border-color: var(--szew); color: var(--swiatlo); }
+  & .btn.jasny:hover { border-color: var(--dzial); color: var(--dzial); }
+  & input[type=number], & input[type=text], & input[type=password], & select { background: var(--sala); color: var(--swiatlo);
+    border-color: var(--szew); font-family: inherit; font-size: 14.5px; border-radius: 8px; }
+  & input:focus, & select:focus { border-color: var(--dzial); box-shadow: 0 0 0 3px var(--dzial-tlo); }
+  & input:disabled, & select:disabled { background: var(--plyta); color: var(--przygaszone); }
+  & label.pole { color: var(--przygaszone); text-transform: none; font-size: 13.5px; font-weight: 600; }
+
+  & .tab-wrap { background: var(--plyta2); border-color: var(--szew); }
+  & table.t th { background: var(--sala); color: var(--przygaszone); border-bottom-color: var(--szew); text-transform: none;
+    font-size: 13px; font-weight: 700; letter-spacing: 0; }
+  & table.t td { border-top-color: var(--szew); font-size: 14px; }
+  & table.t tbody tr:hover td { background: var(--dzial-tlo); }
+  & table.t tfoot td { background: var(--sala); border-top: 1px solid var(--dzial); color: var(--dzial); }
+  & .tabela-tytul { background: transparent; color: var(--swiatlo); justify-content: flex-start; text-transform: none; letter-spacing: .02em;
+    font-family: "Chakra Petch", sans-serif; font-size: 17px; font-weight: 600; padding: 0 0 8px 14px; margin-bottom: 10px;
+    border-left: 3px solid var(--dzial); border-radius: 0; }
+  & .tabela-tytul + .tab-wrap { border-top: 1px solid var(--szew); border-radius: var(--r); }
+  & .plus { color: var(--zielen); }
+  & .minus { color: var(--czerwien); }
+  & .wyrozniony { background: var(--dzial-tlo) !important; }
+
+  & .dash .kafel .kt { color: var(--swiatlo); font-family: "Chakra Petch", sans-serif; font-size: 30px; font-weight: 600; letter-spacing: .02em; }
+  & .dash .kafel .kg .ikona { color: var(--dzial); }
+  & .dash .maly-tekst { color: var(--przygaszone); font-family: "Nunito Sans", sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0; }
+  & .sekcja-tytul { color: var(--swiatlo); font-family: "Chakra Petch", sans-serif; font-size: 17px; font-weight: 600; text-transform: none; letter-spacing: .02em; }
+  & .plan a { background: var(--plyta2); border-color: var(--szew); color: var(--swiatlo); font-size: 14px; }
+  & .plan a:hover { border-color: var(--dzial); box-shadow: none; }
+  & .plan small { color: var(--przygaszone); font-size: 13px; }
+  & .plan .st.ok { background: rgba(69, 211, 159, .16); color: var(--zielen); }
+  & .plan .st.nie { background: rgba(255, 107, 112, .16); color: var(--czerwien); }
+  & .plan .st.inf { background: var(--szew); color: var(--swiatlo); }
+  & .awatar { background: var(--sala); border-color: var(--dzial); color: var(--dzial); font-family: "Chakra Petch", sans-serif; }
+  & .awatar.pusty { border-color: var(--szew); color: var(--szew); }
+
+  & .zaslona { background: rgba(5, 8, 12, .7); }
+  & .okno { background: var(--plyta); border: 1px solid var(--szew); }
+  & .okno .og { background: var(--sala); color: var(--swiatlo); border-bottom: 1px solid var(--szew); text-transform: none;
+    font-family: "Chakra Petch", sans-serif; font-size: 18px; }
+  & .blad { background: var(--plyta2); border-color: var(--szew); }
+  & .blad.czerwony { border-left-color: var(--czerwien); }
+  & .blad.pomaranczowy { border-left-color: var(--bursztyn); }
+  & .blad.niebieski { border-left-color: var(--cyjan); }
+  & .komunikat { background: var(--plyta2); border-color: var(--szew); color: var(--swiatlo); font-weight: 600; }
+  & .komunikat.ok { background: rgba(69, 211, 159, .1); border-color: rgba(69, 211, 159, .35); }
+  & .komunikat.zly { background: rgba(255, 107, 112, .1); border-color: rgba(255, 107, 112, .35); }
+  & .toast { background: var(--swiatlo); color: var(--sala); }
+  & .postep { background: var(--dzial); }
+  & .pigulka { text-transform: none; font-size: 12px; }
+  & .pigulka.ok { background: rgba(69, 211, 159, .16); color: var(--zielen); }
+  & .pigulka.nie { background: rgba(255, 107, 112, .16); color: var(--czerwien); }
+  & .pigulka.inf { background: var(--dzial-tlo); color: var(--dzial); }
+  & .wykres { background: var(--plyta2); border-color: var(--szew); }
+  & .podpowiedz { color: var(--przygaszone); font-size: 13px; }
+  & .stopka { color: #6b7584; font-size: 13px; }
+  & .ladowanie { color: var(--przygaszone); }
+
+  @media (max-width: 900px) {
+    & .naglowek { height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 16px; }
+  }
+}

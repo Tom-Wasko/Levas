@@ -1,0 +1,21 @@
+[project]
+name = "levas"
+version = "0.1.0"
+description = "Levas – symulacja biznesowa kebabu w Lublinie (na bazie lokalnego Revasa)"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["testy"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Kod przeniesiony z Revasa (długie linie, krótkie nazwy). Plik wypada z listy, gdy zostanie przepisany.
+"silnik/*.py" = ["E501", "E741", "B023", "B905", "E731"]
+"serwer/*.py" = ["E501", "E741", "B023", "B905", "E731"]
+"testy/*.py" = ["E501", "E741", "B023", "B905", "E731"]

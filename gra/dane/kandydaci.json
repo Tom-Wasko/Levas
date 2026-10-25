@@ -1,0 +1,242 @@
+[
+ {
+  "imie_nazwisko": "Małgorzata Miś",
+  "gwiazdki": 3,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 5280,
+  "koszt_rekrutacji": 400,
+  "koszt_odprawy": 2640,
+  "zadowolenie_klientow": 1.0,
+  "ryzyko_reklamacji": 0.03
+ },
+ {
+  "imie_nazwisko": "Michał Mroczkowski",
+  "gwiazdki": 3,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 5280,
+  "koszt_rekrutacji": 600,
+  "koszt_odprawy": 2112,
+  "zadowolenie_klientow": 0.98,
+  "ryzyko_reklamacji": 0.02
+ },
+ {
+  "imie_nazwisko": "Arkadiusz Rak",
+  "gwiazdki": 2,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 5170,
+  "koszt_rekrutacji": 500,
+  "koszt_odprawy": 2585,
+  "zadowolenie_klientow": 0.95,
+  "ryzyko_reklamacji": 0.04
+ },
+ {
+  "imie_nazwisko": "Katarzyna Prus",
+  "gwiazdki": 2,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 5170.0,
+  "koszt_rekrutacji": 250,
+  "koszt_odprawy": 2068.0,
+  "zadowolenie_klientow": 0.89,
+  "ryzyko_reklamacji": 0.05
+ },
+ {
+  "imie_nazwisko": "Paulina Nowak",
+  "gwiazdki": 2,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 5060.0,
+  "koszt_rekrutacji": 300,
+  "koszt_odprawy": 1518.0,
+  "zadowolenie_klientow": 0.87,
+  "ryzyko_reklamacji": 0.09
+ },
+ {
+  "imie_nazwisko": "Anna Jędrzejewska",
+  "gwiazdki": 1,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 4785.0,
+  "koszt_rekrutacji": 250,
+  "koszt_odprawy": 1675.0,
+  "zadowolenie_klientow": 0.73,
+  "ryzyko_reklamacji": 0.12
+ },
+ {
+  "imie_nazwisko": "Arkadiusz Smoła",
+  "gwiazdki": 1,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 4950.0,
+  "koszt_rekrutacji": 400,
+  "koszt_odprawy": 1485.0,
+  "zadowolenie_klientow": 0.77,
+  "ryzyko_reklamacji": 0.09
+ },
+ {
+  "imie_nazwisko": "Marzena Mazur",
+  "gwiazdki": 1,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 4840.0,
+  "koszt_rekrutacji": 200,
+  "koszt_odprawy": 1452.0,
+  "zadowolenie_klientow": 0.78,
+  "ryzyko_reklamacji": 0.13
+ },
+ {
+  "imie_nazwisko": "Renata Gałan",
+  "gwiazdki": 1,
+  "zawod": "Instruktor",
+  "pensja_preferowana": 4785.0,
+  "koszt_rekrutacji": 200,
+  "koszt_odprawy": 1436.0,
+  "zadowolenie_klientow": 0.7,
+  "ryzyko_reklamacji": 0.15
+ },
+ {
+  "imie_nazwisko": "Edyta Tarnowska",
+  "gwiazdki": 3,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 5390,
+  "koszt_rekrutacji": 400,
+  "koszt_odprawy": 2695,
+  "zadowolenie_klientow": 1.0,
+  "ryzyko_reklamacji": 0.01
+ },
+ {
+  "imie_nazwisko": "Małgorzata Tytus",
+  "gwiazdki": 3,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 5500,
+  "koszt_rekrutacji": 700,
+  "koszt_odprawy": 2750,
+  "zadowolenie_klientow": 0.99,
+  "ryzyko_reklamacji": 0.01
+ },
+ {
+  "imie_nazwisko": "Grażyna Małka",
+  "gwiazdki": 2,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 5005.0,
+  "koszt_rekrutacji": 200,
+  "koszt_odprawy": 1502.0,
+  "zadowolenie_klientow": 0.85,
+  "ryzyko_reklamacji": 0.07
+ },
+ {
+  "imie_nazwisko": "Marek Kopeć",
+  "gwiazdki": 2,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 5005.0,
+  "koszt_rekrutacji": 350,
+  "koszt_odprawy": 2002.0,
+  "zadowolenie_klientow": 0.8,
+  "ryzyko_reklamacji": 0.1
+ },
+ {
+  "imie_nazwisko": "Beata Lasota",
+  "gwiazdki": 1,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 4840.0,
+  "koszt_rekrutacji": 260,
+  "koszt_odprawy": 1452.0,
+  "zadowolenie_klientow": 0.73,
+  "ryzyko_reklamacji": 0.11
+ },
+ {
+  "imie_nazwisko": "Grzegorz Krokus",
+  "gwiazdki": 1,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 4840.0,
+  "koszt_rekrutacji": 300,
+  "koszt_odprawy": 1452.0,
+  "zadowolenie_klientow": 0.78,
+  "ryzyko_reklamacji": 0.09
+ },
+ {
+  "imie_nazwisko": "Krzysztof Woś",
+  "gwiazdki": 1,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 4950.0,
+  "koszt_rekrutacji": 500,
+  "koszt_odprawy": 2970.0,
+  "zadowolenie_klientow": 0.82,
+  "ryzyko_reklamacji": 0.06
+ },
+ {
+  "imie_nazwisko": "Marek Potocki",
+  "gwiazdki": 1,
+  "zawod": "Recepcjonista",
+  "pensja_preferowana": 4950.0,
+  "koszt_rekrutacji": 300,
+  "koszt_odprawy": 1485.0,
+  "zadowolenie_klientow": 0.81,
+  "ryzyko_reklamacji": 0.08
+ },
+ {
+  "imie_nazwisko": "Dawid Szymański",
+  "gwiazdki": 3,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 5390,
+  "koszt_rekrutacji": 600,
+  "koszt_odprawy": 2695,
+  "zadowolenie_klientow": 0.99,
+  "ryzyko_reklamacji": 0.01
+ },
+ {
+  "imie_nazwisko": "Grzegorz Mruka",
+  "gwiazdki": 2,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 5060.0,
+  "koszt_rekrutacji": 300,
+  "koszt_odprawy": 2024.0,
+  "zadowolenie_klientow": 0.89,
+  "ryzyko_reklamacji": 0.06
+ },
+ {
+  "imie_nazwisko": "Katarzyna Dziura",
+  "gwiazdki": 2,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 5005.0,
+  "koszt_rekrutacji": 500,
+  "koszt_odprawy": 1502.0,
+  "zadowolenie_klientow": 0.86,
+  "ryzyko_reklamacji": 0.06
+ },
+ {
+  "imie_nazwisko": "Piotr Piątek",
+  "gwiazdki": 2,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 5060.0,
+  "koszt_rekrutacji": 350,
+  "koszt_odprawy": 2024.0,
+  "zadowolenie_klientow": 0.8,
+  "ryzyko_reklamacji": 0.1
+ },
+ {
+  "imie_nazwisko": "Adrianna Kowalska",
+  "gwiazdki": 1,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 4785.0,
+  "koszt_rekrutacji": 200,
+  "koszt_odprawy": 1436.0,
+  "zadowolenie_klientow": 0.81,
+  "ryzyko_reklamacji": 0.1
+ },
+ {
+  "imie_nazwisko": "Marek Słoboda",
+  "gwiazdki": 1,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 4950.0,
+  "koszt_rekrutacji": 400,
+  "koszt_odprawy": 2475.0,
+  "zadowolenie_klientow": 0.8,
+  "ryzyko_reklamacji": 0.09
+ },
+ {
+  "imie_nazwisko": "Wiktoria Karoluk",
+  "gwiazdki": 1,
+  "zawod": "Trener personalny",
+  "pensja_preferowana": 4785.0,
+  "koszt_rekrutacji": 400,
+  "koszt_odprawy": 1436.0,
+  "zadowolenie_klientow": 0.82,
+  "ryzyko_reklamacji": 0.08
+ }
+]

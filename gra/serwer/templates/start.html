@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Klub Fitness – lista gier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styl.css">
+  <link rel="stylesheet" href="/static/motywy/talerze.css">
+  <link rel="stylesheet" href="/static/motywy/grafik.css">
+  <link rel="stylesheet" href="/static/motywy/noc.css">
+  <script src="/static/motyw.js"></script>
+</head>
+<body>
+  <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></div><div>Klub <br>Fitness</div><div class="firma">Lokalna gra</div></div>
+    <div class="konto"><span>REVAS – symulacja na własnym komputerze</span></div></header>
+  <main class="scena">
+    <div class="karta">
+      <div class="karta-glowa"><div class="tytul">Lista gier</div><div></div><div></div></div>
+      <div class="tresc"><div id="gry">Wczytywanie…</div>
+        <p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap"><label class="btn jasny">Wczytaj grę z pliku (.json)<input type="file" id="import" accept=".json" hidden></label></p></div>
+    </div>
+    <div class="karta" style="margin-top:24px">
+      <div class="karta-glowa"><div class="tytul">Nowa gra</div><div></div><div></div></div>
+      <div class="info"><span class="i">i</span><span>Dodaj firmy graczy (na tym komputerze) i boty komputerowe. Gra zaczyna się w styczniu (runda 1) z kapitałem 40 000 PLN.</span></div>
+      <div class="tresc">
+        <div class="dwie">
+          <label class="pole">Nazwa gry<input type="text" id="nazwa" value="Trening"></label>
+          <label class="pole">Liczba rund (miesięcy)<input type="number" id="rundy" min="2" max="12" value="12"></label>
+          <label class="pole">Ziarno losowości (puste = losowe)<input type="text" id="ziarno" placeholder="np. 2026"></label>
+          <label class="pole">Kredyt odnawialny<select id="kredyt">
+            <option value="jednoczesnie">jak w oficjalnej grze – przychody i wydatki jednocześnie (kredyt tylko na niedobór miesiąca)</option>
+            <option value="na_biezaco">na bieżąco – zakupy opłacane przed wpływem przychodów</option></select></label>
+          <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">prawdziwe z gry (luty–czerwiec), dalej generowane</option>
+            <option value="losowe">wszystkie generowane</option></select></label>
+        </div>
+        <div class="tabela-tytul">Firmy na rynku</div>
+        <div class="tab-wrap"><table class="t" id="firmy"><thead><tr><th class="l">Nazwa firmy</th><th>Prowadzi</th><th></th></tr></thead><tbody></tbody></table></div>
+        <p style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn jasny" id="dodaj-gracza">+ Gracz</button><button class="btn jasny" id="dodaj-bota">+ Bot</button>
+          <button class="btn pom" id="utworz" style="margin-left:auto">Utwórz grę</button></p>
+        <p class="podpowiedz">Strategie botów: Zrównoważony (cena ~92%, jakość ★★), Tani masowy (~78%, ★), Premium (~108%, ★★★, wyposażenie, szkolenia),
+          Agresywny marketing (~80%, ★★★, dużo reklamy), Naśladowca (średnia cen rynku, ★★).</p>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    const STRATEGIE = {{ strategie|tojson }};
+    const tb = document.querySelector("#firmy tbody");
+    const opcje = (wybrana) => `<option value="">Gracz</option>` + Object.entries(STRATEGIE).map(([k, n]) => `<option value="${k}" ${k === wybrana ? "selected" : ""}>Bot: ${n}</option>`).join("");
+    function wiersz(nazwa, bot) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td class="l"><input type="text" value="${nazwa}"></td><td><select>${opcje(bot)}</select></td><td><button class="btn jasny maly">Usuń</button></td>`;
+      tr.querySelector("button").onclick = () => tr.remove();
+      tb.appendChild(tr);
+    }
+    wiersz("Moja firma", ""); wiersz("Firma 1", "zrownowazony"); wiersz("Firma 2", "tani");
+    document.getElementById("dodaj-gracza").onclick = () => wiersz(`Gracz ${tb.children.length + 1}`, "");
+    document.getElementById("dodaj-bota").onclick = () => wiersz(`Firma ${tb.children.length}`, "zrownowazony");
+    document.getElementById("utworz").onclick = async () => {
+      const firmy = [...tb.children].map((tr) => ({ nazwa: tr.querySelector("input").value, bot: tr.querySelector("select").value || null }));
+      const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
+        ziarno: document.getElementById("ziarno").value, ceny_dostawcow: document.getElementById("ceny").value, firmy,
+        kredyt_odnawialny: document.getElementById("kredyt").value }) });
+      const j = await r.json();
+      if (!r.ok) return alert(j.blad);
+      location.href = `/gra/${j.id}`;
+    };
+    async function lista() {
+      const gry = await (await fetch("/api/gry")).json();
+      document.getElementById("gry").innerHTML = gry.length ? `<div class="tab-wrap"><table class="t"><thead><tr><th class="l">Gra</th><th>Runda</th><th>Firmy</th><th></th></tr></thead><tbody>
+        ${gry.map((g) => `<tr><td class="l"><a href="/gra/${g.id}"><b>${g.nazwa}</b></a></td><td>${g.runda > g.liczba_rund ? "zakończona" : `${g.runda} / ${g.liczba_rund}`}</td>
+          <td>${g.firmy.map((f) => f.bot ? `${f.nazwa} <span class="podpowiedz">(bot)</span>` : `<b>${f.nazwa}</b>`).join(", ")}</td>
+          <td><a class="btn pom maly" href="/gra/${g.id}">Graj</a> <a class="btn jasny maly" href="/api/gry/${g.id}/eksport">Pobierz plik</a>
+          <button class="btn jasny maly" onclick="usun('${g.id}')">Usuń</button></td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="podpowiedz">Nie ma jeszcze żadnej gry – utwórz nową poniżej.</p>`;
+    }
+    window.usun = async function (id) { if (confirm("Usunąć grę?")) { await fetch(`/api/gry/${id}`, { method: "DELETE" }); lista(); } };
+    document.getElementById("import").onchange = async (e) => {
+      const f = new FormData(); f.append("plik", e.target.files[0]);
+      const r = await fetch("/api/gry/import", { method: "POST", body: f }); const j = await r.json();
+      if (!r.ok) return alert(j.blad);
+      location.href = `/gra/${j.id}`;
+    };
+    lista();
+  </script>
+</body>
+</html>

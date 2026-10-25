@@ -1,0 +1,42 @@
+{
+ "Napój izotoniczny": {
+  "opakowanie": 24,
+  "jednostka": "szt.",
+  "typ_opakowania": "opakowanie",
+  "srednie_ceny": {
+   "1": 25,
+   "2": 28,
+   "3": 31
+  }
+ },
+ "Płyn do dezynfekcji": {
+  "opakowanie": 5000,
+  "jednostka": "ml",
+  "typ_opakowania": "pojemnik",
+  "srednie_ceny": {
+   "1": 50,
+   "2": 54,
+   "3": 60
+  }
+ },
+ "Ręcznik papierowy": {
+  "opakowanie": 1000,
+  "jednostka": "szt.",
+  "typ_opakowania": "opakowanie",
+  "srednie_ceny": {
+   "1": 34,
+   "2": 38,
+   "3": 40
+  }
+ },
+ "Woda": {
+  "opakowanie": 20,
+  "jednostka": "szt.",
+  "typ_opakowania": "opakowanie",
+  "srednie_ceny": {
+   "1": 20,
+   "2": 22,
+   "3": 27
+  }
+ }
+}
