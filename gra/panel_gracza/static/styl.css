@@ -286,3 +286,9 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .karta-konto { max-width: 480px; }
 .logowanie { display: grid; gap: 12px; }
 .zapamietaj { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+/* drużyna (F3a.2): kto zapisał decyzje, skład drużyny */
+.podsumowanie .et.kto { margin-top: 2px; text-transform: none; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sklad { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 6px 0 14px; }
+.osoba-druzyny { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.osoba-druzyny .inicjaly { width: 28px; height: 28px; border-radius: 50%; display: inline-grid; place-items: center;
+  background: var(--pom); color: #fff; font-size: 11px; font-weight: 700; }

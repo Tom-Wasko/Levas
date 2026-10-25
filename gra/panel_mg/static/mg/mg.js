@@ -1,24 +1,27 @@
-// Panel mistrza gry: zakładka Decyzje (kto wysłał, zamknięcie i cofnięcie rundy) i Wyniki (ranking, wykresy).
-// Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg).
-import { esc, info, licz, nazwaRundy, okno, skrotRundy, tabela, toast, ustawKalendarz, wsk, wyczyscWykresy, wykres, zamknijOkno, zl }
+// Panel mistrza gry: zakładki Decyzje (kto wysłał, zamknięcie i cofnięcie rundy), Wyniki (ranking, wykresy)
+// i Drużyny (skład 1–4 uczniów, konta uczniów).
+// Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg), GET /api/gry/<id>/druzyny.
+import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, toast, ustawKalendarz, wsk, wyczyscWykresy, wykres,
+  zamknijOkno, zl }
   from "/static/zakladki/wspolne.js";
 
 const ID = JSON.parse(document.getElementById("id-gry").textContent);
 const URL_GRY = `/api/gry/${encodeURIComponent(ID)}`;
 const ODSWIEZANIE_MS = 15000;  // nowe wysłane decyzje drużyn
-const S = { p: null, tryb: "decyzje" };
+const S = { p: null, druzyny: null, tryb: "decyzje" };
 const karta = document.getElementById("karta");
 
 const csrf = () => document.cookie.match(/(?:^|; )csrftoken=([^;]*)/)?.[1] ?? "";
-async function api(url, metoda = "GET") {
-  const r = await fetch(url, { method: metoda, headers: { "X-CSRFToken": csrf() } });
+async function api(url, metoda = "GET", dane = undefined) {
+  const r = await fetch(url, { method: metoda, headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() },
+    body: dane === undefined ? undefined : JSON.stringify(dane) });
   const j = await r.json();
   if (!r.ok) throw new Error(j.blad || "Błąd serwera.");
   return j;
 }
 
 async function wczytaj() {
-  S.p = await api(`${URL_GRY}/mg`);
+  [S.p, S.druzyny] = await Promise.all([api(`${URL_GRY}/mg`), api(`${URL_GRY}/druzyny`)]);
   ustawKalendarz(S.p.gra.kalendarz);
   if (!S.p.historia.length) S.tryb = "decyzje";
   rysuj();
@@ -32,19 +35,22 @@ function rysuj() {
   const zakladka = (t, nazwa, wylaczona = false) =>
     `<a class="${S.tryb === t ? "aktywny" : ""} ${wylaczona ? "wylaczony" : ""}" data-akcja="tryb" data-t="${t}">${nazwa}</a>`;
   karta.innerHTML = `<div class="karta-glowa"><div class="tytul">${tytul}</div><div></div>
-      <div class="przelacznik">${zakladka("decyzje", "Decyzje")}${zakladka("wyniki", "Wyniki", !historia.length)}</div></div>
-    <div class="tresc">${S.tryb === "decyzje" ? decyzje() : wyniki()}</div>`;
+      <div class="przelacznik">${zakladka("decyzje", "Decyzje")}${zakladka("wyniki", "Wyniki", !historia.length)}${zakladka("druzyny", "Drużyny")}</div></div>
+    <div class="tresc">${{ decyzje, wyniki, druzyny }[S.tryb]()}</div>`;
   if (S.tryb === "wyniki") wykresy();
 }
 
 // --- Decyzje: kto wysłał, zamknięcie rundy -----------------------------------------------------------------------
 const strona = (f) => `/gra/${encodeURIComponent(ID)}/${encodeURIComponent(f.nazwa)}`;
-const prowadzi = (f) => f.bot ? `bot: ${esc(f.strategia || f.bot)}` : "drużyna";
+const prowadzi = (f) => f.bot ? `bot: ${esc(f.strategia || f.bot)}`
+  : f.sklad?.length ? esc(f.sklad.map((o) => o.nazwa).join(", ")) : `<a data-akcja="tryb" data-t="druzyny">dopisz uczniów</a>`;
 
 function statusDecyzji(f, gra) {
   if (gra.zakonczona) return "–";
   if (f.bot) return `<span class="chip">decyduje przy zamknięciu</span>`;
-  return f.wyslane ? `<span class="chip ok">✓ wysłane</span>` : `<span class="chip pom">czeka</span>`;
+  const a = f.autorzy || {};
+  if (f.wyslane) return `<span class="chip ok" title="${a.wyslal ? `Wysłane przez: ${esc(a.wyslal.nazwa)}, ${godzina(a.wyslal.kiedy)}` : ""}">✓ wysłane</span>`;
+  return `<span class="chip pom" title="${a.zapisal ? `Ostatni zapis: ${esc(a.zapisal.nazwa)}, ${godzina(a.zapisal.kiedy)}` : "Brak zapisanych decyzji"}">czeka</span>`;
 }
 
 function decyzje() {
@@ -87,6 +93,40 @@ function potwierdzCofniecie() {
     <button class="btn pom" data-akcja="cofnij-tak">Cofnij rundę</button>` });
 }
 
+// --- Drużyny: skład (1–4 uczniów), nowe konta i hasła ------------------------------------------------------------
+function druzyny() {
+  const { druzyny: lista, uczniowie, maks } = S.druzyny;
+  const zajeci = new Set(lista.flatMap((d) => d.sklad.map((o) => o.login)));
+  const wolni = uczniowie.filter((o) => !zajeci.has(o.login));
+  const wiersze = lista.map((d) => {
+    const osoby = d.sklad.map((o) => `<span class="osoba-mg" title="login: ${esc(o.login)}"><span class="inicjaly">${inicjaly(o.nazwa)}</span>${esc(o.nazwa)}
+      <a data-akcja="haslo" data-login="${esc(o.login)}" title="Nadaj nowe hasło">hasło</a><a data-akcja="usun-z" data-f="${esc(d.firma)}" data-login="${esc(o.login)}" title="Usuń z drużyny">✕</a></span>`).join("");
+    const dodaj = d.sklad.length >= maks ? `<span class="podpowiedz">pełna (${maks} os.)</span>`
+      : wolni.length ? `<select data-f="${esc(d.firma)}"><option value="">– uczeń –</option>${wolni.map((o) =>
+        `<option value="${esc(o.login)}">${esc(o.nazwa)}${o.nazwa !== o.login ? ` (${esc(o.login)})` : ""}</option>`).join("")}</select>
+        <button class="btn jasny maly" data-akcja="dodaj-do" data-f="${esc(d.firma)}">Dodaj</button>`
+      : `<span class="podpowiedz">brak wolnych kont – załóż poniżej</span>`;
+    return [`<b>${esc(d.firma)}</b>`, osoby || `<span class="podpowiedz">nikt – drużynę prowadzi na razie mistrz gry</span>`, dodaj];
+  });
+  const adres = `${location.origin}/konta/login/`;
+  return `${info(`Drużyna to 1–${maks} uczniów prowadzących jedną firmę. Uczeń widzi tylko swoją drużynę i gra w jednej drużynie w grze.
+      Uczniowie logują się na <b>${esc(adres)}</b>.`)}
+    ${tabela("Skład drużyn", ["Drużyna (firma)", "Uczniowie", "Dopisz"], wiersze, { klasy: ["l", "l", "l"] })}
+    <div class="tabela-tytul">Nowe konta uczniów</div>
+    <p class="podpowiedz">Jedna osoba w wierszu (imię i nazwisko). Login powstanie z imienia i nazwiska, hasło jest losowe –
+      zobaczysz je tylko raz, potem możesz nadać nowe („hasło” przy uczniu). Konta Microsoft zakładają się same przy pierwszym logowaniu.</p>
+    <textarea id="nowe-osoby" rows="4" placeholder="Ala Nowak&#10;Jan Kowalski"></textarea>
+    <p><button class="btn pom" data-akcja="nowe-konta">Załóż konta</button></p>`;
+}
+
+function pokazHasla(konta, tytul) {
+  const wiersze = konta.map((k) => [esc(k.nazwa), `<b>${esc(k.login)}</b>`, `<code class="haslo">${esc(k.haslo)}</code>`]);
+  okno(tytul, `<p>Przekaż uczniom login i hasło (adres: <b>${esc(location.origin)}/konta/login/</b>).
+      Po zamknięciu tego okna haseł nie da się odczytać – można tylko nadać nowe.</p>
+    ${tabela(null, ["Uczeń", "Login", "Hasło"], wiersze, { klasy: ["l", "l", "l"] })}`,
+  { przyciski: `<button class="btn jasny" data-akcja="drukuj">Drukuj</button><button class="btn pom" data-akcja="zamknij-okno">Gotowe</button>` });
+}
+
 // --- Wyniki: ranking i wykresy -----------------------------------------------------------------------------------
 function wyniki() {
   const { firmy, historia } = S.p;
@@ -115,6 +155,26 @@ function wykresy() {
 // --- akcje -------------------------------------------------------------------------------------------------------
 async function wykonaj(akcja, el) {
   if (akcja === "tryb") { S.tryb = el.dataset.t; return rysuj(); }
+  if (akcja === "drukuj") return window.print();
+  if (akcja === "dodaj-do" || akcja === "usun-z") {
+    const f = el.dataset.f;
+    const login = akcja === "dodaj-do" ? document.querySelector(`select[data-f="${CSS.escape(f)}"]`).value : el.dataset.login;
+    if (!login) return toast("Wybierz ucznia z listy.");
+    S.druzyny = await api(`${URL_GRY}/druzyny/${encodeURIComponent(f)}`, "POST", { [akcja === "dodaj-do" ? "dodaj" : "usun"]: login });
+    return wczytaj();
+  }
+  if (akcja === "nowe-konta") {
+    const osoby = document.getElementById("nowe-osoby").value.split("\n").map((x) => x.trim()).filter(Boolean);
+    if (!osoby.length) return toast("Wpisz imię i nazwisko co najmniej jednej osoby.");
+    const j = await api("/api/konta", "POST", { osoby });
+    pokazHasla(j.konta, j.konta.length === 1 ? "Nowe konto" : `Nowe konta (${j.konta.length})`);
+    S.druzyny = await api(`${URL_GRY}/druzyny`);
+    return rysuj();
+  }
+  if (akcja === "haslo") {
+    const j = await api(`/api/konta/${encodeURIComponent(el.dataset.login)}/haslo`, "POST");
+    return pokazHasla([j], "Nowe hasło");
+  }
   if (akcja === "zamknij-okno") return zamknijOkno();
   if (akcja === "odswiez") return wczytaj();
   if (akcja === "zamknij") return potwierdzZamkniecie();
@@ -137,7 +197,7 @@ document.addEventListener("click", (e) => {
 
 // drużyny wysyłają decyzje ze swoich stron – odświeżamy, gdy nie jest otwarte okno
 setInterval(() => {
-  if (S.tryb === "decyzje" && !document.querySelector(".zaslona") && !document.hidden) wczytaj().catch(() => {});
+  if (S.tryb === "decyzje" && !document.querySelector(".zaslona") && !document.hidden) wczytaj().catch(() => {});  // Drużyny: bez odświeżania (wpisywanie)
 }, ODSWIEZANIE_MS);
 
 wczytaj().catch((b) => { karta.innerHTML = `<div class="tresc">${info(esc(b.message))}</div>`; });

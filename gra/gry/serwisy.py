@@ -1,9 +1,9 @@
 """Gry w bazie: wczytanie do silnika, zapis decyzji, lista gier.
 
 Silnik trzyma decyzje jako {runda: {firma: decyzje, "_przeliczona": bool, "_wyslane": [...],
-"_warianty": {...}}}. W bazie klucze z podkreśleniem są polami `Runda`, a decyzje firm – wierszami
-`Decyzja`. Wczytane gry zostają w pamięci (z policzonymi stanami rund), dopóki nie zmieni się
-`Gra.zmieniono`.
+"_warianty": {...}, "_autorzy": {...}}}. W bazie klucze z podkreśleniem są polami `Runda`,
+a decyzje firm – wierszami `Decyzja`. Wczytane gry zostają w pamięci (z policzonymi stanami
+rund), dopóki nie zmieni się `Gra.zmieniono`.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from .models import Decyzja, Gra, Runda
 _blokada = threading.RLock()
 _pamiec: dict[str, tuple[object, GraSilnika]] = {}
 
-KLUCZE_RUNDY = {"_przeliczona", "_wyslane", "_warianty"}
+KLUCZE_RUNDY = {"_przeliczona", "_wyslane", "_warianty", "_autorzy"}
 
 
 def nowy_id(nazwa: str) -> str:
@@ -49,6 +49,8 @@ def wczytaj(id_: str) -> GraSilnika:
             d["_wyslane"] = list(r.wyslane)
         if r.warianty:
             d["_warianty"] = r.warianty
+        if r.autorzy:
+            d["_autorzy"] = r.autorzy
         decyzje[r.numer] = d
     g = GraSilnika(obj.konfiguracja, decyzje)
     _pamiec[id_] = (obj.zmieniono, g)
@@ -71,6 +73,7 @@ def zapisz(id_: str, g: GraSilnika) -> None:
                 przeliczona=bool(d.get("_przeliczona")),
                 wyslane=list(d.get("_wyslane", [])),
                 warianty=d.get("_warianty", {}),
+                autorzy=d.get("_autorzy", {}),
             )
             Decyzja.objects.bulk_create(
                 Decyzja(runda=r, firma=f, dane=v) for f, v in d.items() if not f.startswith("_")

@@ -6,4 +6,13 @@
 .wiecej summary { cursor: pointer; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--szary); margin-bottom: 10px; }
 .blad-formularza { color: var(--czerwony); font-weight: 700; }
 .przyciski-mg { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 6px; }
+.osoba-mg { display: inline-flex; align-items: center; gap: 6px; margin: 3px 14px 3px 0; font-weight: 600; white-space: nowrap; }
+.osoba-mg .inicjaly { width: 24px; height: 24px; border-radius: 50%; display: inline-grid; place-items: center;
+  background: var(--pom); color: #fff; font-size: 10px; font-weight: 700; }
+.osoba-mg a { cursor: pointer; color: var(--szary); font-weight: 400; font-size: 12px; }
+.osoba-mg a:hover { color: var(--czerwony); }
+#nowe-osoby { width: 100%; max-width: 520px; font: inherit; padding: 8px 10px; border: 1px solid var(--linia); border-radius: 8px; }
+code.haslo { font-size: 15px; letter-spacing: 1px; }
+@media print { body > *:not(.zaslona) { display: none !important; } .zaslona { position: static; background: none; }
+  .okno { box-shadow: none; max-height: none; } .og .x, .ost { display: none; } }
 .wykresy-mg { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 18px; }

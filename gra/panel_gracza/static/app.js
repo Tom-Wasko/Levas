@@ -1,5 +1,5 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
-import { esc, info, nazwaRundy, OKRES, okno, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
+import { esc, godzina, info, nazwaRundy, OKRES, okno, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
   from "./zakladki/wspolne.js";
 import ZAKLADKI, { IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
@@ -56,7 +56,10 @@ async function zmien(fn) {
   S.zapis = S.zapis.then(async () => {
     const nr = ++S.nrZapytania;
     try {
-      const v = await api(`/api/gry/${GRA}/decyzje/${encodeURIComponent(FIRMA)}`, { method: "PUT", body: JSON.stringify(S.d) });
+      // wersja: ktoś z drużyny zapisał w międzyczasie → 409 i wczytanie jego decyzji (bez nadpisania)
+      const wersja = S.v.druzyna?.autorzy?.wersja ?? "";
+      const v = await api(`/api/gry/${GRA}/decyzje/${encodeURIComponent(FIRMA)}?wersja=${wersja}`,
+        { method: "PUT", body: JSON.stringify(S.d) });
       if (nr === S.nrZapytania) ustaw(v);
     } catch (e) { toast(e.message); await wczytaj(); }
   });
@@ -105,7 +108,21 @@ function podsumowanie(v) {
     <div>${ikona("wykres")}<div><div class="et">Koszty decyzji tej rundy</div><div class="wa">${zl(koszty)}</div></div></div>
     <div><a data-zakladka-k="lista_bledow">${ikona("uwaga")}</a><div><div class="et">Poważne braki</div>
       <div class="wa ${czerwone ? "minus" : ""}"><a data-zakladka-k="lista_bledow">${czerwone ? `${czerwone} – zobacz listę` : "brak"}</a></div></div></div>
-    <div>${ikona("zegar")}<div><div class="et">Decyzje rundy ${v.runda}</div><div class="wa">${status}</div></div></div></div>`;
+    <div>${ikona("zegar")}<div><div class="et">Decyzje rundy ${v.runda}</div><div class="wa">${status}</div>${ostatniZapis(v)}</div></div></div>`;
+}
+
+// drużyna kilku osób: kto ostatnio zapisał decyzje
+function ostatniZapis(v) {
+  const z = v.druzyna?.autorzy?.zapisal;
+  if (!z || (v.druzyna.sklad || []).length < 2) return "";
+  return `<div class="et kto" title="Ostatni zapis decyzji drużyny">${esc(z.nazwa)}, ${godzina(z.kiedy)}</div>`;
+}
+
+function chipDruzyny(v) {
+  const sklad = v.druzyna?.sklad || [];
+  if (!sklad.length) return "";
+  const imiona = sklad.map((o) => o.nazwa.split(" ")[0]);
+  return `<span class="chip" title="Drużyna: ${esc(sklad.map((o) => o.nazwa).join(", "))}">${ikona("osoba", 14)}${esc(imiona.join(", "))}</span>`;
 }
 
 // Oś rund: każda runda to jeden element (w motywach: talerz na sztandze, kolumna grafiku, pole tablicy wyników).
@@ -162,7 +179,7 @@ function rysuj() {
   document.body.dataset.dzial = grupa ? grupa.klucz : "dashboard";
   document.getElementById("nazwa-firmy").textContent = v.dashboard.nazwa;
   const st = document.getElementById("status-gry");
-  st.innerHTML = `<span class="chip">${esc(v.gra.nazwa)}</span><span class="chip pom">${ikona("portfel", 14)}${zl(v.dashboard.saldo)}</span>`
+  st.innerHTML = `<span class="chip">${esc(v.gra.nazwa)}</span>${chipDruzyny(v)}<span class="chip pom">${ikona("portfel", 14)}${zl(v.dashboard.saldo)}</span>`
     + (v.gra.zakonczona ? `<span class="chip">Gra zakończona</span>` : v.wyslane && v.edycja
       ? `<span class="chip ok">Czekamy na: ${esc(v.gra.brakujace.join(", ") || "–")}</span>` : "");
   const c = ctx();
@@ -267,3 +284,26 @@ window.addEventListener("hashchange", () => {
   if (ZAKLADKI[h] && h !== S.zakladka) { S.zakladka = h; S.tryb = tryb === "wyniki" ? "wyniki" : "decyzje"; rysuj(); }
 });
 export { S, okno, kluczZakladki };
+
+// --- drużyna: zmiany innych osób i przeliczenie rundy pojawiają się same -------------------------
+const ODSWIEZANIE_MS = 20000;
+async function sprawdzZmiany() {
+  const v = S.v;
+  if (!v || document.hidden || document.querySelector(".zaslona") || v.gra.zakonczona) return;
+  if (v.runda !== v.gra.runda) return;  // podgląd poprzedniej rundy
+  const st = await api(`/api/gry/${GRA}/stan/${encodeURIComponent(FIRMA)}`);
+  const pisze = document.activeElement?.matches?.("#karta input, #karta select, #karta textarea");
+  if (st.runda !== v.gra.runda) {
+    toast(`Runda ${v.gra.runda} przeliczona – teraz ${nazwaRundy(st.runda)}.`);
+    return wczytaj(null);
+  }
+  const wersja = v.druzyna?.autorzy?.wersja ?? 0;
+  const wyslaneTeraz = st.wyslane.join("|"), wyslanePrzed = v.gra.wyslane.join("|");
+  if ((st.wersja !== wersja || wyslaneTeraz !== wyslanePrzed) && !pisze) {
+    if (st.wersja !== wersja && st.zapisal && st.zapisal.login !== KONTO) toast(`${st.zapisal.nazwa} zmienia decyzje drużyny – widok odświeżony.`);
+    await S.zapis;
+    return wczytaj();
+  }
+}
+setInterval(() => sprawdzZmiany().catch(() => {}), ODSWIEZANIE_MS);
+

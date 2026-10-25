@@ -15,4 +15,6 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 ## Krok 3a, 3b, 4
 - [x] F3a.1 Konta – `konta/` (django-allauth): logowanie na każdej stronie, własny login (konta zakłada mistrz gry: komenda `konto`, panel Konta `/admin/`), konto Microsoft po ustawieniu `LEVAS_MS_*`; role mistrz gry (grupa `mistrz_gry`) / uczeń; drużyny `gry.Druzyna` (gra + firma + uczniowie); uczeń widzi tylko swoje gry i firmy, zarządzanie grą tylko dla mistrza gry; gra lokalna (`graj`) loguje się sama; test dostępu `test_uczen_nie_odczyta_cudzej_druzyny`
 
-Zadania F3a.2–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3a.2 Drużyny – skład 1–4 uczniów (uczeń w jednej drużynie gry; pilnuje tego API i panel Konta), zakładka **Drużyny** w panelu mistrza gry (dopisywanie, usuwanie, konta uczniów z losowym hasłem, nowe hasło, druk), decyzje drużyny: kto zapisał / wysłał (`Runda.autorzy`), wersja decyzji – 409 przy jednoczesnej zmianie, odświeżanie strony drużyny co 20 s (`/stan`); test `test_cztery_druzyny_i_boty_w_jednej_grze`
+
+Zadania F3a.3–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

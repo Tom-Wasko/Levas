@@ -78,3 +78,12 @@ _brak_
   - mistrz gry nadal może zmieniać decyzje drużyn ze strony firmy – „tylko do odczytu” z [[Zarys aplikacji]] dojdzie w F3a.14,
   - **gra na własnym komputerze** (`start.bat` → `graj`) loguje się sama na lokalne konto mistrza gry `lokalny`, tylko dla zapytań z tego komputera – żeby gra jednoosobowa działała jak dotąd; sam `runserver` wymaga logowania,
   - sprawdzone: pytest (72) i ruff na zielono, strony przez curl na żywym serwerze (logowanie, przekierowania, 401, gra lokalna).
+- 26.10 0:30 – F3a.2 gotowe: drużyny. Decyzje **do potwierdzenia**:
+  - uczeń jest w jednej drużynie danej gry (w innej grze może być w innej); limit 4 osób pilnuje API, zakładka i panel Konta,
+  - uczniów dopisuje mistrz gry w nowej zakładce **Drużyny** gry (obok Decyzji i Wyników) – lista wolnych kont + „Dodaj”, ✕ usuwa,
+  - konta zakładane hurtem z listy imion i nazwisk: login `imie.nazwisko` bez polskich znaków (`ala.nowak2`, gdy zajęty), losowe hasło 8 znaków bez mylących znaków (l/1, o/0), widoczne **tylko raz** w oknie z drukiem; potem tylko „nowe hasło” (nie dla kont mistrza gry),
+  - decyzje wysyła **dowolna** osoba z drużyny za całą drużynę (bez głosowania / zatwierdzania przez kapitana); strona pokazuje, kto ostatnio zapisał i kto wysłał,
+  - dwie osoby naraz: zapis na starszej wersji niż ostatni zapis **innej** osoby → 409 z komunikatem „Ala Nowak zmienia teraz decyzje drużyny…”, strona wczytuje aktualne decyzje (swoje szybkie zapisy nigdy nie kolidują),
+  - strona drużyny co 20 s pyta o stan (`/stan`) i odświeża się sama po zmianie kolegi, wysłaniu albo przeliczeniu rundy – ale nie w trakcie wpisywania,
+  - drużyna bez uczniów: prowadzi ją mistrz gry (jak dotąd); w Decyzjach link „dopisz uczniów”,
+  - sprawdzone: pytest (79) i ruff na zielono; panel mistrza gry (Decyzje, Drużyny, okno z hasłami) i strona drużyny obejrzane w Chrome bez okna (zrzuty ekranu przez DevTools, osobna kopia bazy) – bez błędów JS.

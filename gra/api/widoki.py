@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from datetime import datetime
 from functools import wraps
 
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from gry import serwisy
 from gry.models import Gra
+from konta import druzyny
 from konta.role import gry_ucznia, jest_mg, moze_firme
 from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
@@ -21,6 +25,7 @@ from silnik.runda import przelicz_runde
 from .prezentacja import katalogi, przeglad_mg, widok
 
 MAKS_KAPITAL = 10_000_000  # zł – górna granica kapitału startowego w nowej grze
+MAKS_NOWYCH_KONT = 60  # kont uczniów naraz (lista klasy)
 
 
 def odpowiedz(dane, status: int = 200) -> JsonResponse:
@@ -143,7 +148,94 @@ def api_gry(request):
 @tylko_mg
 def api_mg(request, id_):
     """Widok mistrza gry: runda, decyzje drużyn, wyniki wszystkich firm."""
-    return odpowiedz(przeglad_mg(serwisy.wczytaj(id_)))
+    g = serwisy.wczytaj(id_)
+    p = przeglad_mg(g)
+    sklad = druzyny.sklad(id_)
+    for f in p["firmy"]:
+        if not f["bot"]:
+            f["sklad"] = sklad.get(f["nazwa"], [])
+            f["autorzy"] = druzyny.autorzy(g, f["nazwa"])
+    return odpowiedz(p)
+
+
+def _sklad_gry(id_: str, g: GraSilnika) -> dict:
+    sklad = druzyny.sklad(id_)
+    return {
+        "druzyny": [
+            {"firma": f["nazwa"], "sklad": sklad.get(f["nazwa"], [])}
+            for f in g.konfiguracja["firmy"]
+            if not f["bot"]
+        ],
+        "uczniowie": druzyny.uczniowie(),
+        "maks": druzyny.MAKS_CZLONKOW,
+    }
+
+
+@require_GET
+@api
+@tylko_mg
+def api_druzyny(request, id_):
+    """Skład drużyn gry i konta uczniów do dopisania."""
+    return odpowiedz(_sklad_gry(id_, serwisy.wczytaj(id_)))
+
+
+@require_POST
+@api
+@tylko_mg
+def api_druzyna(request, id_, firma):
+    """{"dodaj": login} albo {"usun": login} – zmiana składu drużyny."""
+    g = serwisy.wczytaj(id_)
+    if firma not in {f["nazwa"] for f in g.konfiguracja["firmy"] if not f["bot"]}:
+        raise BladZapytania("Nie ma takiej drużyny w grze.", 404)
+    d = cialo(request)
+    try:
+        if d.get("dodaj"):
+            druzyny.dodaj(id_, firma, str(d["dodaj"]))
+        elif d.get("usun"):
+            druzyny.usun(id_, firma, str(d["usun"]))
+        else:
+            raise BladZapytania("Podaj login do dodania albo usunięcia.")
+    except ValidationError as e:
+        raise BladZapytania(" ".join(e.messages)) from e
+    return odpowiedz(_sklad_gry(id_, g))
+
+
+@require_POST
+@api
+@tylko_mg
+def api_konta(request):
+    """{"osoby": ["Imię Nazwisko", ...]} – konta uczniów z losowymi hasłami do przekazania."""
+    osoby = [str(o).strip() for o in cialo(request).get("osoby", []) if str(o).strip()]
+    if not osoby:
+        raise BladZapytania("Wpisz imię i nazwisko co najmniej jednej osoby.")
+    if len(osoby) > MAKS_NOWYCH_KONT:
+        raise BladZapytania(f"Najwyżej {MAKS_NOWYCH_KONT} kont naraz.")
+    konta = []
+    for imie in osoby:
+        try:
+            user, haslo = druzyny.nowe_konto(druzyny.wolny_login(imie), imie)
+        except ValidationError as e:
+            raise BladZapytania(f"{imie}: {' '.join(e.messages)}") from e
+        konta.append({**druzyny.osoba(user), "haslo": haslo})
+    return odpowiedz({"konta": konta})
+
+
+@require_POST
+@api
+@tylko_mg
+def api_nowe_haslo(request, login):
+    """Nowe losowe hasło ucznia (zapomniane hasło)."""
+    from django.contrib.auth import get_user_model
+
+    user = get_user_model().objects.filter(username=login).first()
+    if user is None:
+        raise BladZapytania("Nie ma takiego konta.", 404)
+    if jest_mg(user):
+        raise BladZapytania("Hasło mistrza gry zmienia się w panelu Konta.", 403)
+    haslo = druzyny.nowe_haslo()
+    user.set_password(haslo)
+    user.save(update_fields=["password"])
+    return odpowiedz({**druzyny.osoba(user), "haslo": haslo})
 
 
 @require_http_methods(["DELETE"])
@@ -160,7 +252,53 @@ def api_widok(request, id_, firma):
     g = serwisy.wczytaj(id_)
     sprawdz_firme(request, id_, g, firma)
     runda = request.GET.get("runda", "")
-    return odpowiedz(widok(g, firma, int(runda) if runda.isdigit() else None))
+    v = widok(g, firma, int(runda) if runda.isdigit() else None)
+    return odpowiedz(_z_druzyna(v, id_, g, firma))
+
+
+def _z_druzyna(v: dict, id_: str, g: GraSilnika, firma: str) -> dict:
+    """Do widoku firmy: skład drużyny i kto ostatnio zapisał / wysłał decyzje."""
+    v["druzyna"] = {
+        "sklad": druzyny.sklad(id_).get(firma, []),
+        "autorzy": druzyny.autorzy(g, firma),
+    }
+    return v
+
+
+@require_GET
+@api
+def api_stan(request, id_, firma):
+    """Lekki stan do odświeżania strony drużyny: runda, wersja decyzji, ostatni zapis, wysłane."""
+    g = serwisy.wczytaj(id_)
+    sprawdz_firme(request, id_, g, firma)
+    a = druzyny.autorzy(g, firma)
+    return odpowiedz(
+        {
+            "runda": g.runda,
+            "wersja": a["wersja"],
+            "zapisal": a.get("zapisal"),
+            "wyslane": [] if g.zakonczona else g.wyslane(),
+        }
+    )
+
+
+def _sprawdz_wersje(request, g: GraSilnika, firma: str) -> None:
+    """Dwie osoby z drużyny zmieniają decyzje naraz: zapis na starej wersji odrzucamy (409)."""
+    wersja = request.GET.get("wersja", "")
+    a = druzyny.autorzy(g, firma)
+    zapisal = a.get("zapisal") or {}
+    if (
+        not wersja.isdigit()
+        or int(wersja) == a["wersja"]
+        or zapisal.get("login") == request.user.username
+    ):
+        return
+    kiedy = timezone.localtime(datetime.fromisoformat(zapisal["kiedy"])).strftime("%H:%M")
+    raise BladZapytania(
+        f"{zapisal['nazwa']} zmienia teraz decyzje drużyny (zapis o {kiedy}). "
+        "Wczytano aktualne decyzje – powtórz swoją zmianę.",
+        409,
+    )
 
 
 @require_http_methods(["PUT"])
@@ -173,8 +311,10 @@ def api_decyzje(request, id_, firma):
             raise BladZapytania("Gra jest zakończona.")
         if firma in g.wyslane():
             raise BladZapytania("Decyzje są wysłane – najpierw wróć do podejmowania decyzji.")
+        _sprawdz_wersje(request, g, firma)
         g.ustaw_decyzje(firma, d)
-    return odpowiedz(widok(g, firma))
+        druzyny.autor(g, firma, request.user)
+    return odpowiedz(_z_druzyna(widok(g, firma), id_, g, firma))
 
 
 @require_POST
@@ -185,10 +325,11 @@ def api_wyslij(request, id_, firma):
     with serwisy.zmiana(id_) as g:
         sprawdz_firme(request, id_, g, firma)
         g.wyslij(firma, wyslane)
+        druzyny.autor(g, firma, request.user, wyslal=wyslane)
         if wyslane and not g.brakujace() and not g.zakonczona:
             g.przelicz()
             przeliczono = True
-    v = widok(g, firma)
+    v = _z_druzyna(widok(g, firma), id_, g, firma)
     v["przeliczono"] = przeliczono
     return odpowiedz(v)
 

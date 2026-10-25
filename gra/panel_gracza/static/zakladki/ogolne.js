@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji, analiza (podgląd wyniku rundy).
-import { esc, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, godzina, inicjaly, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -109,6 +109,14 @@ export const lista_bledow = {
   akcje: { popraw: (el, c) => c.idz(el.dataset.z, "decyzje") },
 };
 
+const kto = (a, przed) => a ? `${przed} ${esc(a.nazwa)} (${godzina(a.kiedy)})` : "";
+function skladDruzyny(v) {
+  const sklad = v.druzyna?.sklad || [];
+  if (!sklad.length) return "";
+  return `<div class="tabela-tytul">Twoja drużyna – ${esc(v.firma)}</div>
+    <p class="sklad">${sklad.map((o) => `<span class="osoba-druzyny"><span class="inicjaly">${inicjaly(o.nazwa)}</span>${esc(o.nazwa)}</span>`).join("")}</p>`;
+}
+
 export const wyslij = {
   tytul: "Wyślij decyzje", ikona: "✉", odblokowanie: (v) => !v.gra.zakonczona,
   decyzje({ v }) {
@@ -118,10 +126,13 @@ export const wyslij = {
     if (!v.edycja) return `<div class="komunikat">To podgląd poprzedniej rundy.</div>`;
     return `${czerwone ? `<div class="komunikat zly">Na liście błędów jest ${czerwone} poważnych uwag. Możesz mimo to wysłać decyzje.</div>` : ""}
       ${v.wyslane
-        ? `<div class="komunikat ok">Decyzje wysłane. Runda przeliczy się, gdy wszyscy gracze wyślą decyzje.</div>
+        ? `<div class="komunikat ok">Decyzje wysłane${kto(v.druzyna?.autorzy?.wyslal, " przez")}. Runda przeliczy się, gdy wszystkie drużyny wyślą decyzje.</div>
            <button class="btn czarny" data-akcja="cofnij-wyslanie">Wróć do podejmowania decyzji w bieżącej rundzie</button>`
-        : `<p>Po wysłaniu decyzji gra czeka, aż wszyscy gracze wyślą swoje. Wtedy runda przelicza się automatycznie
-           (boty decydują same).</p><button class="btn zielony" data-akcja="wyslij">Wyślij decyzje</button>`}
+        : `<p>Po wysłaniu decyzji gra czeka, aż wszystkie drużyny wyślą swoje. Wtedy runda przelicza się automatycznie
+           (boty decydują same).${(v.druzyna?.sklad || []).length > 1 ? " Decyzje wysyła jedna osoba za całą drużynę." : ""}</p>
+           ${v.druzyna?.autorzy?.zapisal ? `<p class="podpowiedz">Ostatni zapis decyzji${kto(v.druzyna.autorzy.zapisal, ":")}.</p>` : ""}
+           <button class="btn zielony" data-akcja="wyslij">Wyślij decyzje</button>`}
+      ${skladDruzyny(v)}
       ${ludzie.length > 1 ? `<div class="tabela-tytul">Drużyny</div><div class="tab-wrap"><table class="t">${stan}</table></div>` : ""}
       ${window.MG ? `${ludzie.length > 1 ? `<p><button class="btn jasny" data-akcja="wymus">Przelicz rundę bez czekania (brakujące drużyny: zapisane decyzje)</button></p>` : ""}
       <hr style="margin:28px 0;border:0;border-top:1px solid var(--linia)">

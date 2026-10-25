@@ -32,16 +32,26 @@ dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 **Panel mistrza gry** – http://127.0.0.1:8765/mg/ (tylko rola mistrza gry): nowa gra
 (drużyny, liczba rund, kapitał startowy, boty tak/nie i które strategie), a w grze zakładki **Decyzje** (które
 drużyny wysłały decyzje, *Zamknij rundę* – także bez decyzji wszystkich, *Cofnij rundę*, strona każdej firmy,
-plik gry) i **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund).
-Runda zamyka się sama, gdy wszystkie drużyny wyślą decyzje.
+plik gry), **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund)
+i **Drużyny** (skład drużyn, nowe konta uczniów, nowe hasło). Runda zamyka się sama, gdy wszystkie drużyny
+wyślą decyzje.
+
+**Drużyny.** Drużyna to 1–4 uczniów prowadzących jedną firmę; uczeń gra w jednej drużynie danej gry (w innej
+grze może być w innej). Mistrz gry wpisuje w zakładce *Drużyny* listę imion i nazwisk – powstają konta z loginem
+`imie.nazwisko` (bez polskich znaków, `ala.nowak2`, gdy zajęty) i losowym 8-znakowym hasłem, pokazanym raz
+(okno można wydrukować); zapomniane hasło – „hasło” przy uczniu. Każdy z drużyny zmienia i wysyła decyzje za
+całą drużynę; strona pokazuje, kto ostatnio zapisał i kto wysłał. Gdy dwie osoby zmieniają decyzje naraz, zapis
+na starszej wersji jest odrzucany (409) i strona wczytuje decyzje kolegi – nic się nie nadpisuje po cichu.
+Strona drużyny co 20 s sprawdza zmiany (`GET /api/gry/<id>/stan/<firma>`) i sama się odświeża, także po
+przeliczeniu rundy. Drużynę bez uczniów prowadzi mistrz gry.
 
 ### Konta i role
 
 Każda strona wymaga logowania (`/konta/login/`, django-allauth). Role:
 
 - **mistrz gry** – grupa `mistrz_gry` albo superużytkownik: zakłada gry, prowadzi rundy, widzi wszystkie
-  drużyny, zakłada konta uczniów i dopisuje ich do drużyn w panelu **Konta** (`/admin/`: Użytkownicy;
-  Gry → gra → drużyny),
+  drużyny, zakłada konta uczniów i dopisuje ich do drużyn w zakładce **Drużyny** gry (albo w panelu **Konta**
+  `/admin/`: Użytkownicy; Gry → gra → drużyny – ten sam limit 4 osób),
 - **uczeń** – każde inne konto: widzi tylko gry i firmy swoich drużyn (strona i API: 403 dla cudzej firmy),
   nie zamyka ani nie cofa rund.
 
