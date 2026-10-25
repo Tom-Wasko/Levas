@@ -1,7 +1,7 @@
 // Inwestycje: stanowiska, sprzęt, wyposażenie dla klientów.
 import { esc, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
 
-const TYPY = { instruktor: "Stanowiska dla instruktorów/trenerów", recepcja: "Stanowiska dla recepcjonistów" };
+const TYPY = ["kuchnia", "kasa"];  // nazwy typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const suma = (pozycje, start) => pozycje.filter((p) => p.opis.startsWith(start)).reduce((s, p) => s + p.pozostale, 0);
 
 export const stanowiska = {
@@ -11,12 +11,12 @@ export const stanowiska = {
     const pakiety = kat.oferty.stanowiska.pakiety;
     const nowe = v.decyzje.stanowiska || {};
     const koszt = suma(v.koszty_decyzji, "Uruchomienie stanowiska");
-    let html = `<div class="pasek ciemny"><span>Miesięczny koszt utrzymania klubu: <span class="kwota">${zl(kat.parametry.utrzymanie_klubu)}</span></span>
+    let html = `<div class="pasek ciemny"><span>Miesięczny koszt utrzymania lokalu: <span class="kwota">${zl(kat.parametry.utrzymanie_klubu)}</span></span>
       <span>Nowe stanowiska: <span class="kwota">${zl(koszt)}</span></span></div><div class="dwie" style="margin-top:20px">`;
-    for (const typ of ["instruktor", "recepcja"]) {
+    for (const typ of TYPY) {
       const maja = v.stan_przed.stanowiska.filter((s) => s.typ === typ).length;
       html += `<div class="kafel"><div class="kg kg-pelny">
-        Liczba posiadanych ${typ === "instruktor" ? "stanowisk dla trenera/instruktora" : "stanowisk recepcjonisty"}: <span style="font-size:22px">${maja}</span></div><div class="kt">
+        ${esc(kat.oferty.stanowiska.typy[typ].nazwa)} – liczba posiadanych: <span style="font-size:22px">${maja}</span></div><div class="kt">
         ${Object.entries(pakiety).map(([n, c]) => `<div class="wiersz" style="align-items:center;padding:10px 0;border-bottom:1px solid var(--linia)">
           <span>Koszt uruchomienia (${n} ${n === "1" ? "stanowiska" : "stanowisk"})</span><span>${zl(c)}</span>
           ${+nowe[typ] === +n ? `<button class="btn zielony maly" data-akcja="pakiet" data-t="${typ}" data-n="0" ${edycja ? "" : "disabled"}>✓ Wybrano</button>`
@@ -36,24 +36,24 @@ function sprzetStanowiska(v, typ, nr) {
 
 export const sprzet = {
   tytul: "Sprzęt", tytulPelny: "Inwestycje - sprzęt", ikona: "⚙", odblokowanie: "inwestycje_sprzet",
-  info: "Kup sprzęt potrzebny do świadczenia wybranych przez Ciebie usług. Sprzęt kupuje się na konkretne stanowisko.",
+  info: "Kup sprzęt potrzebny do przygotowania wybranych przez Ciebie dań. Sprzęt kupuje się na konkretne stanowisko.",
   decyzje({ v, kat, edycja }) {
     const koszt = suma(v.koszty_decyzji, "Koszt zakupu: ");
     const utrz = v.stan.stanowiska.reduce((s, st) => s + Object.entries(st.sprzet).reduce((a, [n, q]) => a + kat.sprzet[n].utrzymanie[q], 0), 0);
     let html = `<div class="pasek ciemny"><span>Koszty całkowite zakupu: <span class="kwota">${zl(koszt)}</span></span>
       <span>Koszt utrzymania sprzętu: <span class="kwota">${zl(utrz)}</span> / mies.</span></div>`;
-    for (const typ of ["instruktor", "recepcja"]) {
+    for (const typ of TYPY) {
       const st = v.stan.stanowiska.filter((s) => s.typ === typ);
-      html += `<div class="pasek">${TYPY[typ]}</div>`;
+      html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}</div>`;
       if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Inwestycje → Stanowiska.</p>`; continue; }
       html += `<div class="siatka">${st.map((s) => {
         const { przed } = sprzetStanowiska(v, typ, s.nr);
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
         const lista = Object.entries(s.sprzet).map(([n, q]) => `<div class="wiersz"><span>${esc(n)}</span><span>${gw(q)}${n in przed ? "" : ' <span class="pigulka inf">nowy</span>'}</span></div>`).join("")
           || `<p class="podpowiedz">Brak sprzętu</p>`;
-        const uslugi = typ === "instruktor" ? Object.entries(kat.uslugi).filter(([, u]) => u.sprzet.every((n) => n in s.sprzet)).map(([k]) => nazwaUslugi(kat, k)) : [];
+        const uslugi = typ === "kuchnia" ? Object.entries(kat.uslugi).filter(([, u]) => u.sprzet.every((n) => n in s.sprzet)).map(([k]) => nazwaUslugi(kat, k)) : [];
         return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}<span class="podpowiedz">${p ? esc(p.imie_nazwisko) : "bez pracownika"}</span></div>
-          <div class="kt">${lista}${uslugi.length ? `<p class="podpowiedz">Można prowadzić: ${uslugi.map(esc).join(", ")}</p>` : ""}</div>
+          <div class="kt">${lista}${uslugi.length ? `<p class="podpowiedz">Można przygotować: ${uslugi.map(esc).join(", ")}</p>` : ""}</div>
           <div class="kd"><button class="btn czarny" data-akcja="kup-sprzet" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Kup sprzęt</button>
           ${Object.keys(przed).length ? `<button class="btn pom" data-akcja="sprzedaj-sprzet" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Sprzedaj sprzęt</button>` : ""}</div></div>`;
       }).join("")}</div>`;
@@ -61,13 +61,13 @@ export const sprzet = {
     return html;
   },
   wyniki({ v, kat }) {
-    const own = (v.wyniki?.sprzet || []).map((s) => [`${s.typ === "recepcja" ? "Recepcja" : "Instr./trener"} nr ${s.stanowisko}`, esc(s.nazwa), gw(s.jakosc), proc(s.oblozenie)]);
+    const own = (v.wyniki?.sprzet || []).map((s) => [`${esc(kat.oferty.stanowiska.typy[s.typ]?.kto || s.typ)} nr ${s.stanowisko}`, esc(s.nazwa), gw(s.jakosc), proc(s.oblozenie)]);
     const firmy = Object.keys(v.rynek?.sprzet || {});
     const ile = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => licz(v.rynek.sprzet[f][q])),
       licz([1, 2, 3].reduce((a, q) => a + v.rynek.sprzet[f][q], 0))]);
     return tabela("Liczba i jakość sprzętów", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★", "Razem"], ile, { klasy: ["l"] })
       + tabela("Obłożenie sprzętu (Twoja firma)", ["Stanowisko", "Sprzęt", "Jakość", "Obłożenie"], own, { klasy: ["l", "l"] })
-      + `<p class="podpowiedz">Obłożenie = godziny zajęć z użyciem sprzętu / 160 h. 100% oznacza, że sprzęt nie mógł obsłużyć kolejnych klientów.</p>`;
+      + `<p class="podpowiedz">Obłożenie = godziny pracy sprzętu / 160 h. 100% oznacza, że sprzęt nie mógł obsłużyć kolejnych klientów.</p>`;
   },
   akcje: {
     "kup-sprzet": (el, c) => oknoZakupu(c, el.dataset.t, +el.dataset.n),
@@ -83,7 +83,7 @@ export const sprzet = {
     "kup-komplet": async (el, c) => {
       const { t, n } = el.dataset;
       const u = document.getElementById("komplet-usluga").value, q = +document.getElementById("komplet-jakosc").value;
-      const nazwy = t === "recepcja" ? c.kat.sprzet_recepcji : c.kat.uslugi[u].sprzet;
+      const nazwy = t === "kasa" ? c.kat.sprzet_kasy : c.kat.uslugi[u].sprzet;
       const { teraz } = sprzetStanowiska(c.v, t, +n);
       const brak = nazwy.filter((x) => !(x in teraz));
       if (!brak.length) return toast("Stanowisko ma już cały ten sprzęt.");
@@ -105,8 +105,7 @@ export const sprzet = {
 function oknoZakupu(c, typ, nr) {
   const { v, kat } = c;
   const { teraz, przed } = sprzetStanowiska(v, typ, nr);
-  const dla = typ === "recepcja" ? "recepcja" : "instruktor";
-  const nazwy = Object.keys(kat.sprzet).filter((n) => kat.sprzet[n].dla === dla);
+  const nazwy = Object.keys(kat.sprzet).filter((n) => kat.sprzet[n].dla === typ);
   const wiersze = [];
   for (const n of nazwy) for (const q of [1, 2, 3]) {
     const kupione = (v.decyzje.sprzet_kup || []).some((x) => x.typ === typ && x.nr === nr && x.nazwa === n && x.jakosc === q);
@@ -114,13 +113,13 @@ function oknoZakupu(c, typ, nr) {
     const przycisk = posiadany ? `<span class="pigulka ok">w posiadaniu ${gw(przed[n])}</span>`
       : kupione ? `<button class="btn zielony maly" data-akcja="kup-poz" data-t="${typ}" data-n="${nr}" data-nazwa="${esc(n)}" data-q="0">✓ Kupione</button>`
       : `<button class="btn pom maly" data-akcja="kup-poz" data-t="${typ}" data-n="${nr}" data-nazwa="${esc(n)}" data-q="${q}" ${n in teraz ? "disabled" : ""}>Kup</button>`;
-    wiersze.push([esc(n), gw(q), typ === "recepcja" ? "Recepcjonista" : "Instruktor/Trener", zl(kat.sprzet[n].ceny[q]), zl(kat.sprzet[n].utrzymanie[q]), przycisk]);
+    wiersze.push([esc(n), gw(q), esc(kat.oferty.stanowiska.typy[typ].kto), zl(kat.sprzet[n].ceny[q]), zl(kat.sprzet[n].utrzymanie[q]), przycisk]);
   }
   const uslugi = Object.entries(kat.uslugi).map(([k, u]) => `<option value="${k}">${esc(u.nazwa)}</option>`).join("");
   const komplet = `<div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px">
-    ${typ === "instruktor" ? `<label class="pole" style="flex:1">Komplet sprzętu dla usługi<select id="komplet-usluga">${uslugi}</select></label>` : `<input type="hidden" id="komplet-usluga" value="">`}
+    ${typ === "kuchnia" ? `<label class="pole" style="flex:1">Komplet sprzętu dla dania<select id="komplet-usluga">${uslugi}</select></label>` : `<input type="hidden" id="komplet-usluga" value="">`}
     <label class="pole">Jakość<select id="komplet-jakosc"><option value="3">★★★ wysoka</option><option value="2">★★ średnia</option><option value="1">★ niska</option></select></label>
-    <button class="btn czarny" data-akcja="kup-komplet" data-t="${typ}" data-n="${nr}">Kup brakujący ${typ === "recepcja" ? "komplet recepcji" : "komplet"}</button></div>`;
+    <button class="btn czarny" data-akcja="kup-komplet" data-t="${typ}" data-n="${nr}">Kup brakujący ${typ === "kasa" ? "komplet kasy" : "komplet"}</button></div>`;
   okno(`Zakup sprzętu na stanowisko „Stanowisko nr ${nr}”`, komplet + tabela(null,
     ["Nazwa sprzętu", "Jakość", "Wykorzystanie sprzętu", "Koszt zakupu", "Koszt utrzymania", ""], wiersze, { klasy: ["l"] }),
     { przyciski: `<button class="btn pom" data-akcja="zamknij-okno">OK</button>` });
@@ -139,7 +138,7 @@ function oknoSprzedazy(c, typ, nr) {
 
 export const wyposazenie = {
   tytul: "Wyposażenie", tytulPelny: "Inwestycje - wyposażenie", ikona: "☕", odblokowanie: "inwestycje_wyposazenie",
-  info: "Kup dodatkowe wyposażenie dla klientów Twojej firmy. Wyposażenie podnosi zadowolenie klientów i przyciąga ich do klubu.",
+  info: "Kup dodatkowe wyposażenie dla klientów Twojej firmy. Wyposażenie podnosi zadowolenie klientów i przyciąga ich do lokalu.",
   decyzje(c) { return kafleUdogodnien(c, "wyposazenie", "klientów"); },
   wyniki({ v }) {
     const w = Object.entries(v.rynek?.wyposazenie || {}).map(([f, n]) => [esc(nazwaFirmy(v, f)), licz(n)]);

@@ -38,7 +38,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
 
 
 def katalogi(dane: Dane) -> dict:
-    return {"uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_recepcji": dane.sprzet_recepcji, "zasoby": dane.zasoby,
+    return {"uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_kasy": dane.sprzet_kasy, "zawody": dane.zawody, "zasoby": dane.zasoby,
             "oferty": dane.katalog_ofert, "placa_minimalna": dane.z["finanse"]["placa_minimalna"],
             "parametry": {"kapital": dane.z["finanse"]["kapital_startowy"], "godziny": dane.z["operacje"]["godziny_pracownika"],
                           "cit": dane.z["finanse"]["podatek_cit"], "zus": dane.z["finanse"]["zus_pracodawcy"],

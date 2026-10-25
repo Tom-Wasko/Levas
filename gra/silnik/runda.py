@@ -18,7 +18,7 @@ from copy import deepcopy
 import numpy as np
 
 from . import karta as kw
-from .dane import INSTRUKTOR, MIESIACE_NAZWY, RECEPCJONISTA, Dane
+from .dane import KUCHNIA, MIESIACE_NAZWY, Dane
 from .decyzje import lista_bledow, zastosuj
 from .dostawcy import ceny_miesiaca
 from .finanse import (
@@ -34,7 +34,7 @@ from .finanse import (
 from .kandydaci import dodaj_nowych
 from .losowosc import strumien
 from .model import Firma, StanGry, do_slownika, grosze
-from .operacje import jakosc_uslugi, obsluz, recepcjonisci
+from .operacje import jakosc_uslugi, kasjerzy, obsluz
 from .rynek import (
     mnoznik_firmy,
     mnoznik_jakosci,
@@ -102,7 +102,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["reklama"] = {"tradycyjna": reklama, "internetowa": reklama_int}
             wyp = mnoznik_wyposazenia(dane, f.wyposazenie)
             mn_firmy = mnoznik_firmy(dane, f)
-            rec = recepcjonisci(dane, f)
+            rec = kasjerzy(dane, f)
             for u in f.oferta:
                 if u not in f.ceny or not rec:
                     continue
@@ -127,7 +127,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             popyt[nazwa] = {u: v[nazwa]["popyt"] for u, v in rynek.items() if nazwa in v}
             obsluga[nazwa] = obsluz(dane, s.firmy[nazwa], popyt[nazwa], ziarno, r)
             for u, k in obsluga[nazwa]["obsluzeni"].items():
-                ksieguj(s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], f"Sprzedaż usługi: {dane.uslugi[u]['nazwa']}",
+                ksieguj(s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], f"Sprzedaż: {dane.uslugi[u]['nazwa']}",
                         k * oferty[u][nazwa]["cena"], "przychod")
     else:
         rynek = {}
@@ -153,7 +153,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         narz = dane.pozycje("narzedzia_internetowe")
         for n in f.internet:
             ksieguj(f, ks, rach, f"Utrzymanie reklamy internetowej: {n}", narz[n]["utrzymanie"])
-        ksieguj(f, ks, rach, "Miesięczny koszt utrzymania klubu", z["finanse"]["utrzymanie_klubu"])
+        ksieguj(f, ks, rach, "Miesięczny koszt utrzymania lokalu", z["finanse"]["utrzymanie_klubu"])
 
         zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach)
         if sum(f.magazyn.values()) > 1e-6:
@@ -237,12 +237,11 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
     godz = z["operacje"]["godziny_pracownika"]
     prac = []
     for p in f.pracownicy.values():
-        typ = "recepcja" if p.zawod == RECEPCJONISTA else "instruktor"
-        if obsluga and typ == "instruktor":
+        if obsluga and dane.typ_zawodu(p.zawod) == KUCHNIA:
             uzycie = obsluga["godziny_stanowisk"].get(p.stanowisko, 0.0) / godz
         elif obsluga:
             n = max(1, obsluga["liczba_recepcjonistow"])
-            uzycie = obsluga["godziny_recepcji"] / n / godz if p.stanowisko in [s.nr for s in recepcjonisci(dane, f)] else 0.0
+            uzycie = obsluga["godziny_recepcji"] / n / godz if p.stanowisko in [s.nr for s in kasjerzy(dane, f)] else 0.0
         else:
             uzycie = 0.0
         prac.append({**do_slownika(p), "wykorzystanie": round(min(1.0, uzycie), 4)})
@@ -252,10 +251,10 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
     sprzet = []
     for st in f.stanowiska:
         for n, q in st.sprzet.items():
-            if st.typ == "instruktor":
+            if st.typ == KUCHNIA:
                 h = obsluga["godziny_sprzetu"].get(f"{st.nr}|{n}", 0.0) if obsluga else 0.0
             else:
-                rec = obsluga and st.pracownik and st.nr in [x.nr for x in recepcjonisci(dane, f)]
+                rec = obsluga and st.pracownik and st.nr in [x.nr for x in kasjerzy(dane, f)]
                 h = obsluga["godziny_recepcji"] / max(1, obsluga["liczba_recepcjonistow"]) if rec else 0.0
             sprzet.append({"stanowisko": st.nr, "typ": st.typ, "nazwa": n, "jakosc": q,
                            "oblozenie": round(min(1.0, h / z["operacje"]["godziny_sprzetu"]), 4)})
@@ -353,7 +352,7 @@ def _rynek_publiczny(dane: Dane, s: StanGry, r: int, oferty, popyt, wyniki, decy
            "udogodnienia": {}, "wyposazenie": {}, "reklama_tradycyjna": {}, "reklama_internetowa": {}, "karta": {}}
     for n in firmy:
         f, w = s.firmy[n], wyniki[n]
-        for zawod in (INSTRUKTOR, "Trener personalny", RECEPCJONISTA):
+        for zawod in dane.zawody:
             ps = [p for p in w["pracownicy"] if p["zawod"] == zawod]
             pub["pracownicy"].setdefault(n, {})[zawod] = {g: sum(p["gwiazdki"] == g for p in ps) for g in (1, 2, 3)}
             pub["wynagrodzenia"].setdefault(n, {})[zawod] = round(float(np.mean([p["pensja"] for p in ps])), 0) if ps else None

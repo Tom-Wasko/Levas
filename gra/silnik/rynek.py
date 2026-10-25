@@ -13,7 +13,7 @@ import math
 
 import numpy as np
 
-from .dane import MIESIACE, Dane
+from .dane import KASA, MIESIACE, Dane
 from .losowosc import strumien
 
 
@@ -76,9 +76,9 @@ def mnoznik_wyposazenia(dane: Dane, wyposazenie: list[str]) -> float:
 def mnoznik_firmy(dane: Dane, firma) -> float:
     """Czynniki całej firmy poza reklamą i wyposażeniem – oba wyłączone w dane/zalozenia.yaml (analiza_od_nowa.py):
     - baza klientów: trwała utrata klientów po utraconej sprzedaży (utrata_klientow; hipoteza odrzucona – 0),
-    - sprzęt recepcji: cały 1★ → × recepcja_1gw_mnoznik (1,0), wartości pośrednie liniowo."""
+    - sprzęt kasy (w REVAS recepcji): cały 1★ → × recepcja_1gw_mnoznik (1,0), wartości pośrednie liniowo."""
     p = dane.z["popyt"]
-    jak = [q for st in firma.stanowiska_typu("recepcja") for q in st.sprzet.values()]
+    jak = [q for st in firma.stanowiska_typu(KASA) for q in st.sprzet.values()]
     sr = sum(jak) / len(jak) if jak else 3.0
     rec = 1 - (1 - p["recepcja_1gw_mnoznik"]) * (3 - min(3.0, max(1.0, sr))) / 2
     return firma.baza_klientow * rec

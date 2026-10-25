@@ -1,4 +1,4 @@
-// Rejestr zakładek i układ menu (jak w REVAS Klub Fitness).
+// Rejestr zakładek i układ menu (układ jak w REVAS).
 import { analiza, dashboard, karta_wynikow, lista_bledow, wyslij } from "./ogolne.js";
 import { oferta } from "./oferta.js";
 import { sprzet, stanowiska, wyposazenie } from "./inwestycje.js";

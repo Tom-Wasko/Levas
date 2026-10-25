@@ -1,8 +1,8 @@
 # Boty
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku), jakość, docelowa liczba usług, pokrycie
-  popytu, wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia.'
-zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C)
+opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku), jakość, docelowa liczba dań, pokrycie popytu,
+  wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia.'
+zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C), liczba dań dopasowana do menu kebaba
 ustawienia:
   bufor_gotowki: 30000
   cena_nasladowcy_bez_danych: 0.95
@@ -11,10 +11,10 @@ ustawienia:
   zapas_zasobow: 1.05
 strategie:
   zrownowazony:
-    nazwa: Zrównoważony
+    nazwa: Kebab u Zrównoważonego
     cena: 0.92
     jakosc: 2
-    uslugi: 9
+    uslugi: 6
     pokrycie: 0.9
     wyposazenie: 2
     udogodnienia: 2
@@ -22,10 +22,10 @@ strategie:
     internet: []
     szkolenia: 0
   tani:
-    nazwa: Tani masowy
+    nazwa: Tani Kebab Nocny
     cena: 0.78
     jakosc: 1
-    uslugi: 12
+    uslugi: 8
     pokrycie: 0.85
     wyposazenie: 0
     udogodnienia: 0
@@ -35,30 +35,30 @@ strategie:
     - Informacje na forach internetowych
     szkolenia: 0
   premium:
-    nazwa: Premium
+    nazwa: Kebab Premium
     cena: 1.08
     jakosc: 3
-    uslugi: 8
+    uslugi: 5
     pokrycie: 1.0
     wyposazenie: 6
     udogodnienia: 9
     reklama:
-      Super Fit (dziennik): 6
+      Smaki Lublina (dziennik): 6
     internet:
     - Strona www firmy
     szkolenia: 2
   agresywny:
-    nazwa: Agresywny marketing
+    nazwa: Kebab Głośny Marketing
     cena: 0.8
     jakosc: 3
-    uslugi: 12
+    uslugi: 8
     pokrycie: 1.0
     wyposazenie: 6
     udogodnienia: 6
     reklama:
       Ulotki: 20
       Ekrany LED: 11
-      Super Fit (dziennik): 14
+      Smaki Lublina (dziennik): 14
       Radio Fakty: 21
     internet:
     - Strona www firmy
@@ -66,10 +66,10 @@ strategie:
     - Informacje na forach internetowych
     szkolenia: 2
   nasladowca:
-    nazwa: Naśladowca
+    nazwa: Kebab Naśladowca
     cena: null
     jakosc: 2
-    uslugi: 9
+    uslugi: 6
     pokrycie: 0.9
     wyposazenie: 3
     udogodnienia: 3

@@ -2,8 +2,7 @@
 import { esc, gw, inicjaly, licz, nazwaFirmy, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
 
-const ZAWODY_STANOWISKA = { instruktor: ["Instruktor", "Trener personalny"], recepcja: ["Recepcjonista"] };
-const ZAWODY = ["Instruktor", "Trener personalny", "Recepcjonista"];
+const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const UMOWY = { prace: "Umowa o pracę", zlecenie: "Umowa zlecenie" };
 
 function kosztWynagrodzen(v, kat) {
@@ -12,13 +11,13 @@ function kosztWynagrodzen(v, kat) {
 
 export const zatrudnienie = {
   tytul: "Zatrudnienie", tytulPelny: "HR - zatrudnienie", ikona: "☺", odblokowanie: "hr_zatrudnienie",
-  info: "Zatrudnij pracowników potrzebnych do świadczenia wybranych usług. Pracownik potrzebuje stanowiska (Inwestycje → Stanowiska).",
+  info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Inwestycje → Stanowiska).",
   decyzje({ v, kat, edycja }) {
     let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(kosztWynagrodzen(v, kat), true)}</span> brutto (z ZUS pracodawcy)</span></div>`;
     if (v.nieudane_zatrudnienia?.length) html += `<div class="komunikat zly">Część kandydatów zatrudniła już inna firma – wybierz innych.</div>`;
-    for (const typ of ["instruktor", "recepcja"]) {
+    for (const typ of TYPY) {
       const st = v.stan.stanowiska.filter((s) => s.typ === typ);
-      html += `<div class="pasek">${typ === "instruktor" ? "Stanowiska dla instruktorów/trenerów" : "Stanowiska dla recepcjonistów"}</div>`;
+      html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}</div>`;
       if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Inwestycje → Stanowiska.</p>`; continue; }
       html += `<div class="siatka waska">${st.map((s) => {
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
@@ -33,8 +32,8 @@ export const zatrudnienie = {
     }
     return html;
   },
-  wyniki({ v }) {
-    const r = v.rynek;
+  wyniki({ v, kat }) {
+    const r = v.rynek, ZAWODY = kat.zawody;
     const firmy = Object.keys(r.pracownicy || {});
     const liczba = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...ZAWODY.map((z) => {
       const g = r.pracownicy[f][z]; const n = g[1] + g[2] + g[3];
@@ -83,15 +82,15 @@ export const zatrudnienie = {
   },
 };
 
-function oknoKandydatow({ v }, typ, nr) {
-  const zawody = ZAWODY_STANOWISKA[typ];
+function oknoKandydatow({ v, kat }, typ, nr) {
+  const typy = kat.oferty.stanowiska.typy, zawody = typy[typ].zawody;
   const lista = v.kandydaci.filter((k) => zawody.includes(k.zawod)).sort((a, b) => b.zadowolenie_klientow - a.zadowolenie_klientow);
   const w = lista.map((k) => [esc(k.imie_nazwisko), gw(k.gwiazdki), esc(k.zawod), licz(k.pensja_preferowana), licz(k.koszt_rekrutacji),
     licz(k.koszt_odprawy), proc(k.zadowolenie_klientow, 0), proc(k.ryzyko_reklamacji, 0),
     `<button class="btn pom maly" data-akcja="zatrudnij" data-k="${esc(k.id)}" data-t="${typ}" data-n="${nr}">Zatrudnij +</button>`]);
   okno(`Zatrudnienie na „Stanowisko nr ${nr}”`, tabela(null, ["Imię i nazwisko", "Doświadczenie", "Zawód", "Preferowane wynagrodzenie",
     "Koszty rekrutacji", "Koszt odprawy", "Zadowolenie klientów", "Ryzyko reklamacji", "Akcje"], w, { klasy: ["l"] })
-    + `<p class="podpowiedz">Instruktor prowadzi zajęcia grupowe i trening siłowy, trener personalny – treningi personalne.</p>`);
+    + `<p class="podpowiedz">${TYPY.map((t) => `${esc(typy[t].kto)}: ${typy[t].zawody.map(esc).join(", ")}`).join(" · ")}</p>`);
 }
 
 function oknoZatrudnienia({ v, kat }, id, typ, nr) {

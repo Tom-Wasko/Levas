@@ -1,4 +1,4 @@
-// Dostawcy: zakup zasobów, magazyn, zwroty.
+// Dostawcy: zakup składników, magazyn, zwroty.
 import { esc, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
 
 const stan = (v, z, q) => v.stan_przed.magazyn[`${z}|${q}`] || 0;
@@ -22,7 +22,7 @@ function najtansze(ceny) {
 
 export const dostawcy = {
   tytul: "Dostawcy", ikona: "⛟", odblokowanie: "dostawcy",
-  info: "Kup zasoby potrzebne do świadczenia wybranych usług. Zasoby możesz kupować u jednego lub kilku dostawców. Niezużyte zostają w magazynie.",
+  info: "Kup składniki potrzebne do wybranych dań. Składniki możesz kupować u jednego lub kilku dostawców. Niezużyte zostają w magazynie.",
   decyzje({ v, kat, edycja }) {
     const ceny = v.ceny_dostawcow;
     const koszt = (v.decyzje.zamowienia || []).reduce((s, z) => s + (ceny[z.dostawca]?.[z.zasob]?.[z.jakosc] || 0) * z.ilosc, 0);
@@ -49,10 +49,10 @@ export const dostawcy = {
       html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">
         <div class="wiersz"><span>Koszt zwrotu</span><span>${Math.round(kat.parametry.koszt_zwrotu * 100)}%</span></div>
         <div class="wiersz"><span>Koszt magazynowania</span><span>${zl2(kat.parametry.koszt_magazynowania)}</span></div>
-        <label class="pole" style="margin-top:8px">Zwrot zasobów nadmiarowych
+        <label class="pole" style="margin-top:8px">Zwrot składników nadmiarowych
           <select data-zmiana="zwrot" data-d="${esc(d)}" ${edycja ? "" : "disabled"}><option value="0" ${zwrot ? "" : "selected"}>Nie – zostają w magazynie</option>
           <option value="1" ${zwrot ? "selected" : ""}>Tak – zwrot niezużytych (koszt 10%)</option></select></label></div>
-        <div class="kd"><button class="btn czarny" data-akcja="baza" data-d="${esc(d)}">Baza zasobów</button>
+        <div class="kd"><button class="btn czarny" data-akcja="baza" data-d="${esc(d)}">Baza składników</button>
         <div class="wiersz"><span>Zamówienie</span><span>${zl2(wartosc)}</span></div></div></div>`;
     }
     return html + `</div>`;
@@ -63,9 +63,9 @@ export const dostawcy = {
     const suma = (v.wyniki?.zasoby || []).reduce((s, x) => s + x.wartosc, 0);
     const firmy = Object.keys(v.rynek?.jakosc_zasobow || {});
     const jak = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => ulamek(v.rynek.jakosc_zasobow[f][q]))]);
-    return tabela("Zasoby", ["Nazwa zasobu", "Jakość", "Magazyn na początek miesiąca", "Zamówione", "Wykorzystane", "Zwroty",
+    return tabela("Składniki", ["Składnik", "Jakość", "Magazyn na początek miesiąca", "Zamówione", "Wykorzystane", "Zwroty",
       "Magazyn na koniec miesiąca", "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", "", "", zl2(suma)] })
-      + tabela("Jakość zasobów (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
+      + tabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`;
   },
   po({ v }, tryb) {
@@ -114,7 +114,7 @@ function oknoBazy({ v, kat, edycja }, dost) {
       `<input type="number" class="krotkie" min="0" step="1" value="${zam ? zam.ilosc : 0}" data-zmiana="ilosc" data-d="${esc(dost)}" data-z="${esc(z)}" data-q="${q}" ${edycja ? "" : "disabled"}>`,
       zl2((zam ? zam.ilosc : 0) * c)]);
   }
-  okno(`Dostawca „${esc(dost)}”`, tabela(null, ["Nazwa zasobu", "Jakość", "Zasoby na magazynie", "Cena", "Zamówienie (opakowania)", "Wartość"], w, { klasy: ["l"] })
+  okno(`Dostawca „${esc(dost)}”`, tabela(null, ["Składnik", "Jakość", "Na magazynie", "Cena", "Zamówienie (opakowania)", "Wartość"], w, { klasy: ["l"] })
     + `<p class="podpowiedz">Ceny w tym miesiącu. Ilości wpisujesz w opakowaniach (np. napój: opakowanie 24 szt.).</p>`,
     { przyciski: `<button class="btn pom" data-akcja="zamknij-okno">Zapisz</button>` });
 }

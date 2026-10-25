@@ -78,7 +78,7 @@ class Pracownik(Model):
 
 class Stanowisko(Model):
     nr: int
-    typ: str                      # "instruktor" (instruktor/trener) albo "recepcja"
+    typ: str                      # "kuchnia" albo "kasa" (silnik/dane.py: TYPY_STANOWISK)
     sprzet: dict[str, int] = Field(default_factory=dict)   # nazwa → jakość 1–3
     pracownik: str | None = None
     od_rundy: int = 0

@@ -14,15 +14,15 @@ function planRundy(v, kat) {
   const ile = (typ) => st.stanowiska.filter((s) => s.typ === typ).length;
   const zaw = (tekst) => braki.some((b) => b.includes(tekst));
   const punkty = [
-    ["oferta", "Oferta", Object.keys(st.oferta).length > 0, `${Object.keys(st.oferta).length} usług w ofercie`],
-    ["stanowiska", "Stanowiska", ile("instruktor") > 0 && ile("recepcja") > 0, `${ile("instruktor")} instr./trener · ${ile("recepcja")} recepcja`],
+    ["oferta", "Oferta", Object.keys(st.oferta).length > 0, `${Object.keys(st.oferta).length} dań w menu`],
+    ["stanowiska", "Stanowiska", ile("kuchnia") > 0 && ile("kasa") > 0, `${ile("kuchnia")} kuchnia · ${ile("kasa")} kasa`],
     ["bank", "Bank i biuro", !!st.bank && !!st.biuro, st.bank && st.biuro ? `${st.bank} · ${st.biuro}` : "wybierz bank i biuro"],
   ];
   if (r >= 2) punkty.push(
-    ["sprzet", "Sprzęt i prowadzący", Object.keys(st.oferta).length > 0 && !zaw("stanowiska z prowadzącym"), zaw("stanowiska z prowadzącym") ? "brakuje sprzętu lub prowadzącego" : "wszystkie usługi mają stanowisko"],
-    ["zatrudnienie", "Recepcja", !zaw("recepcjonisty"), zaw("recepcjonisty") ? "brak recepcjonisty z kompletem sprzętu" : "jest"],
-    ["dostawcy", "Zasoby", !zaw("brak zasobu"), zaw("brak zasobu") ? "brak zasobów w magazynie" : "w magazynie"],
-    ["sprzedaz", "Ceny", !zaw("włączona do sprzedaży"), zaw("włączona do sprzedaży") ? "nie wszystkie usługi mają cenę" : "ustawione"]);
+    ["sprzet", "Sprzęt i kuchnia", Object.keys(st.oferta).length > 0 && !zaw("stanowiska z pracownikiem"), zaw("stanowiska z pracownikiem") ? "brakuje sprzętu lub kucharza" : "wszystkie dania mają stanowisko"],
+    ["zatrudnienie", "Kasa", !zaw("obsadzonego stanowiska"), zaw("obsadzonego stanowiska") ? "brak kasjera z kompletem sprzętu" : "jest"],
+    ["dostawcy", "Składniki", !zaw("brak składnika"), zaw("brak składnika") ? "brak składników w magazynie" : "w magazynie"],
+    ["sprzedaz", "Ceny", !zaw("włączone do sprzedaży"), zaw("włączone do sprzedaży") ? "nie wszystkie dania mają cenę" : "ustawione"]);
   const html = punkty.map(([k, n, ok, opis]) => `<a data-zakladka-k="${k}"><span class="st ${ok ? "ok" : "nie"}">${ok ? "✓" : "!"}</span>
     <span>${n}<small>${esc(opis)}</small></span></a>`).join("");
   return `<div class="sekcja-tytul">Plan rundy ${r} (${esc(v.miesiac)})</div><div class="plan">${html}
@@ -171,7 +171,7 @@ export const analiza = {
     html += tabela("Porównanie wariantów (przewidywanie)", ["", ...p.map((x) => esc(x.nazwa))],
       METRYKI.map(([n, f]) => [n, ...p.map((x) => f(x.wyniki))]), { klasy: ["l"] });
     const uslugi = [...new Set(p.flatMap((x) => Object.keys(x.wyniki.sprzedaz)))];
-    html += tabela("Sprzedaż usług: popyt / obsłużeni (przewidywanie)", ["Usługa", ...p.map((x) => esc(x.nazwa))],
+    html += tabela("Sprzedaż dań: popyt / obsłużeni (przewidywanie)", ["Danie", ...p.map((x) => esc(x.nazwa))],
       uslugi.map((u) => [esc(nazwaUslugi(kat, u)), ...p.map((x) => { const s = x.wyniki.sprzedaz[u];
         return s ? `${licz(s.popyt)} / ${licz(s.sprzedaz)}${s.utracona ? ` <span class="minus">(−${licz(s.utracona)}: ${esc(s.przyczyna)})</span>` : ""}` : "–"; })]), { klasy: ["l"] });
     return html + `<div class="wykres"><canvas id="w-warianty"></canvas></div>`;

@@ -1,7 +1,7 @@
-// Oferta: wybór usług i prognoza popytu.
+// Oferta: wybór dań (menu) i prognoza popytu.
 import { esc, gw, licz, nazwaUslugi, okno, tabela, toast, wykres, zl } from "./wspolne.js";
 
-const KATEGORIE = ["Zajęcia grupowe", "Trening personalny", "Trening siłowy"];
+const kategorie = (kat) => [...new Set(Object.values(kat.uslugi).map((u) => u.kategoria))];  // kolejność jak w uslugi.yaml
 const JAK = { 1: "Niska", 2: "Średnia", 3: "Wysoka" };
 
 function sezon(u, miesiac) {
@@ -17,17 +17,17 @@ const limitNowych = (kat, r) => r === 1 ? kat.oferty.rundy.uslugi_w_rundzie_1
 export const oferta = {
   tytul: "Oferta", ikona: "⚑", odblokowanie: "oferta",
   info: ({ v, kat }) => v.runda === 1
-    ? `Wybierz usługi, które chcesz świadczyć w Twojej firmie i określ ich popyt miesięczny. W pierwszej rundzie można wybrać tylko ${kat.oferty.rundy.uslugi_startowe.map((u) => nazwaUslugi(kat, u)).join(", ")}.`
-    : v.runda < kat.oferty.rundy.nowe_uslugi_od_rundy ? "W rundzie 2 sprzedajesz usługi wybrane w rundzie 1. Nowe usługi można dodawać od rundy 3."
-    : `Wybierz usługi, które chcesz świadczyć w Twojej firmie i określ ich popyt miesięczny. W każdej rundzie będzie można uruchamiać maksymalnie ${kat.oferty.rundy.nowe_uslugi_na_runde} nowe usługi.`,
+    ? `Wybierz dania do menu i określ ich popyt miesięczny. W pierwszej rundzie można wybrać tylko ${kat.oferty.rundy.uslugi_startowe.map((u) => nazwaUslugi(kat, u)).join(", ")}.`
+    : v.runda < kat.oferty.rundy.nowe_uslugi_od_rundy ? "W rundzie 2 sprzedajesz dania wybrane w rundzie 1. Nowe dania można dodawać od rundy 3."
+    : `Wybierz dania do menu i określ ich popyt miesięczny. W każdej rundzie będzie można uruchamiać maksymalnie ${kat.oferty.rundy.nowe_uslugi_na_runde} nowe dania.`,
   decyzje({ v, kat, edycja }) {
     const wybrane = v.stan.oferta, przed = v.stan_przed.oferta, r = v.runda;
     const m = r === 1 ? 1 : r - 1;
     const limit = limitNowych(kat, r);
     const nowe = Object.keys(wybrane).filter((u) => !(u in przed)).length;
-    let html = `<div class="komunikat">Nowe usługi w tej rundzie: <b>${nowe} / ${limit}</b>. Prognozowany popyt = popyt roczny / 12 × sezonowość
+    let html = `<div class="komunikat">Nowe dania w tej rundzie: <b>${nowe} / ${limit}</b>. Prognozowany popyt = popyt roczny / 12 × sezonowość
       (${r === 1 ? "prognoza na luty – sprzedaż zaczyna się w rundzie 2" : `miesiąc: ${v.miesiac}`}).</div>`;
-    for (const k of KATEGORIE) {
+    for (const k of kategorie(kat)) {
       const uslugi = Object.entries(kat.uslugi).filter(([, u]) => u.kategoria === k);
       html += `<div class="pasek">${k}</div><div class="siatka trojka">`;
       for (const [klucz, u] of uslugi) {
@@ -35,14 +35,14 @@ export const oferta = {
         const dozwolona = (r > 1 || kat.oferty.rundy.uslugi_startowe.includes(klucz)) && (klucz in przed || nowe < limit || jest);
         const baza = prognozaBazowa(u, m);
         html += `<div class="kafel ${jest ? "wybrany" : ""}">
-          <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(wejście jednorazowe)</span></span>${sezon(u, m)}</div>
+          <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span>${sezon(u, m)}</div>
           <div class="kt">
             <div class="wiersz"><span>Popyt roczny</span><span>${licz(u.popyt_roczny)}</span></div>
             <div class="wiersz"><span>Preferowana cena</span><span>${zl(u.cena_preferowana)}</span></div>
-            <div class="wiersz"><span>Liczba godzin instruktora/trenera</span><span>${u.godziny_prowadzacego} H</span></div>
-            <div class="wiersz"><span>Liczba godzin recepcjonisty</span><span>${u.godziny_recepcji} H</span></div>
-            ${u.grupa > 1 ? `<div class="wiersz"><span>Liczba osób w grupie</span><span>${u.grupa}</span></div>` : ""}
-            <div class="wiersz"><span>Prowadzący</span><span>${esc(u.prowadzacy)}</span></div>
+            <div class="wiersz"><span>Czas przygotowania</span><span>${Math.round(u.godziny_prowadzacego * 600) / 10} min</span></div>
+            <div class="wiersz"><span>Czas obsługi przy kasie</span><span>${Math.round(u.godziny_recepcji * 600) / 10} min</span></div>
+            ${u.grupa > 1 ? `<div class="wiersz"><span>Porcji naraz</span><span>${u.grupa}</span></div>` : ""}
+            <div class="wiersz"><span>Przygotowuje</span><span>${esc(u.prowadzacy)}</span></div>
           </div>
           <div class="kd">
             <button class="btn pom" data-akcja="szczegoly-uslugi" data-u="${klucz}">Więcej szczegółów</button>
@@ -61,7 +61,7 @@ export const oferta = {
     const sp = v.wyniki?.sprzedaz || {};
     const w = Object.entries(sp).map(([u, s]) => [esc(nazwaUslugi(kat, u)), licz(s.prognoza), licz(s.popyt),
       s.popyt > s.prognoza ? `<span class="plus">+${licz(s.popyt - s.prognoza)}</span>` : `<span class="minus">${licz(s.popyt - s.prognoza)}</span>`]);
-    return `${tabela("Prognozowany popyt vs popyt", ["Nazwa usługi", "Prognozowany popyt (na miesiąc)", "Popyt", "Różnica"], w, { klasy: ["l"] })}
+    return `${tabela("Prognozowany popyt vs popyt", ["Danie", "Prognozowany popyt (na miesiąc)", "Popyt", "Różnica"], w, { klasy: ["l"] })}
       <div class="wykres"><canvas id="w-prognoza"></canvas></div>`;
   },
   po({ v, kat }, tryb) {
@@ -74,19 +74,19 @@ export const oferta = {
   akcje: {
     "szczegoly-uslugi": (el, { kat }) => {
       const u = kat.uslugi[el.dataset.u];
-      const sprzet = u.sprzet.map((n) => [esc(n), "Instruktor/Trener", "100%", ...[1, 2, 3].map((q) => zl(kat.sprzet[n].ceny[q]))]);
+      const sprzet = u.sprzet.map((n) => [esc(n), esc(kat.oferty.stanowiska.typy.kuchnia.kto), "100%", ...[1, 2, 3].map((q) => zl(kat.sprzet[n].ceny[q]))]);
       const pensje = [[esc(u.prowadzacy), "100%", ...["niska", "srednia", "wysoka"].map((q) => zl(u.pensje_rynkowe[q]))]];
       const zasoby = Object.entries(u.zasoby).map(([n, ile]) => {
         const z = kat.zasoby[n];
         return [esc(n), `${ile} ${z.jednostka}`, `${z.typ_opakowania} (${licz(z.opakowanie)} ${z.jednostka})`,
           ...[1, 2, 3].map((q) => zl(z.srednie_ceny[q], true))];
       });
-      okno(`Wymagania dotyczące usługi – ${esc(u.nazwa)}`,
+      okno(`Wymagania dotyczące dania – ${esc(u.nazwa)}`,
         tabela("Sprzęt", ["Nazwa", "Dla", "Zapotrzebowanie", "★ Niska", "★★ Średnia", "★★★ Wysoka"], sprzet, { klasy: ["l"] })
         + tabela("Pracownicy", ["Typ", "Zaangażowanie", "Wynagrodzenie ★", "★★", "★★★"], pensje, { klasy: ["l"] })
-        + tabela("Zasoby na klienta", ["Nazwa", "Zapotrzebowanie na klienta", "Opakowanie", "Średnia cena ★", "★★", "★★★"], zasoby, { klasy: ["l"] })
-        + `<p class="podpowiedz">Recepcja: ${u.godziny_recepcji} h na klienta, recepcjonista z kompletem sprzętu recepcji (${kat.sprzet_recepcji.join(", ")}).
-           Dokładne ceny zasobów są w zakładce Dostawcy.</p>`);
+        + tabela("Składniki na porcję", ["Nazwa", "Zużycie na porcję", "Opakowanie", "Średnia cena ★", "★★", "★★★"], zasoby, { klasy: ["l"] })
+        + `<p class="podpowiedz">${esc(kat.oferty.stanowiska.typy.kasa.kto)}: ${u.godziny_recepcji} h na klienta, pracownik z kompletem sprzętu
+           (${kat.sprzet_kasy.map(esc).join(", ")}). Dokładne ceny składników są w zakładce Dostawcy.</p>`);
     },
     usluga: async (el, c) => {
       const u = el.dataset.u, r = c.v.runda;
@@ -94,9 +94,9 @@ export const oferta = {
       if (u in of) delete of[u];
       else {
         const limit = limitNowych(c.kat, r);
-        // limit dotyczy przyrostu liczby usług (usunięta usługa zwalnia miejsce na nową)
+        // limit dotyczy przyrostu liczby dań (usunięte danie zwalnia miejsce na nowe)
         const przyrost = Object.keys(of).length - Object.keys(c.v.stan_przed.oferta).length;
-        if (!(u in c.v.stan_przed.oferta) && przyrost >= limit) return toast(`W tej rundzie liczba usług może wzrosnąć najwyżej o ${limit}.`);
+        if (!(u in c.v.stan_przed.oferta) && przyrost >= limit) return toast(`W tej rundzie liczba dań może wzrosnąć najwyżej o ${limit}.`);
         of[u] = prognozaBazowa(c.kat.uslugi[u], r === 1 ? 1 : r - 1);
       }
       await c.zmien((d) => { d.oferta = of; });

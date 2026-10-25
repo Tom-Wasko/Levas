@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from silnik import dane as modul_danych
-from silnik.dane import KATALOG_DANYCH, Dane, sprawdz
+from silnik.dane import KATALOG_DANYCH, KATALOG_REVAS, Dane, sprawdz
 
 SILNIK = Path(modul_danych.__file__).parent
 
@@ -33,6 +33,7 @@ def _zmien(kat: Path, plik: str, zmiana) -> None:
 
 def test_dane_gry_sa_poprawne():
     assert sprawdz() == []
+    assert sprawdz(KATALOG_REVAS) == []   # wzorzec REVAS (fitness) do testów mechaniki
 
 
 def test_kazdy_plik_ma_opis_i_zrodlo():
@@ -52,9 +53,9 @@ def test_kazdy_plik_ma_opis_i_zrodlo():
     ("plik", "zmiana", "oczekiwany"),
     [
         ("uslugi.yaml", lambda d: d.pop("zrodlo"), "uslugi.yaml: zrodlo"),
-        ("sprzet.yaml", lambda d: d["sprzet"]["Atlas"].update(kolor="czerwony"), "kolor"),
-        ("uslugi.yaml", lambda d: d["uslugi"]["joga"]["sprzet"].append("Rożen"), "Rożen"),
-        ("uslugi.yaml", lambda d: d["uslugi"]["joga"]["zasoby"].update({"Lawasz": 1}), "Lawasz"),
+        ("sprzet.yaml", lambda d: d["sprzet"]["Rożen"].update(kolor="czerwony"), "kolor"),
+        ("uslugi.yaml", lambda d: d["uslugi"]["falafel"]["sprzet"].append("Kasa fiskalna"), "Kasa fiskalna"),
+        ("uslugi.yaml", lambda d: d["uslugi"]["falafel"]["zasoby"].update({"Lawasz": 1}), "Lawasz"),
         ("katalog.yaml", lambda d: d["banki"].pop("zrodlo"), "katalog.yaml: banki.zrodlo"),
         ("kandydaci.yaml", lambda d: d["losowanie"]["gwiazdki"].update({"3": 0.5}), "sumować"),
         (

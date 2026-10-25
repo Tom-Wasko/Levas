@@ -2,9 +2,9 @@
 (function () {
   var MOTYWY = [
     ["klasyczny", "Klasyczny REVAS"],
-    ["talerze", "Talerze olimpijskie"],
-    ["grafik", "Grafik zajęć"],
-    ["noc", "Siłownia nocą"],
+    ["talerze", "Talerze z kebabem"],
+    ["grafik", "Grafik zmian"],
+    ["noc", "Kebab nocą"],
   ];
   var KLUCZ = "revas-motyw";
   var znane = function (m) { return MOTYWY.some(function (x) { return x[0] === m; }); };

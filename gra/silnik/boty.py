@@ -7,20 +7,18 @@ docelowa liczba usług, pokrycie popytu, inwestycje w wyposażenie i udogodnieni
 """
 from __future__ import annotations
 
-from .dane import INSTRUKTOR, RECEPCJONISTA, TRENER, Dane
+from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_miesiaca
 from .losowosc import strumien
 from .model import Firma, StanGry
 from .planowanie import (
+    kasjerzy_potrzebni,
     oczekiwany_popyt,
-    recepcjonisci_potrzebni,
     stanowiska_potrzebne,
     zamowienie_zasobow,
 )
 from .rynek import mnoznik_wyposazenia
-
-ZAWOD_STANOWISKA = {INSTRUKTOR: "instruktor", TRENER: "instruktor", RECEPCJONISTA: "recepcja"}
 
 
 def _ranking_uslug(dane: Dane) -> list[str]:
@@ -81,7 +79,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
 
     # stanowiska prowadzących: osobne dla każdej usługi (komplet sprzętu usługi)
     nowe_inst, nowe_rec = [], 0
-    istniejace = f.stanowiska_typu("instruktor")
+    istniejace = f.stanowiska_typu(KUCHNIA)
     wolne = [s for s in istniejace if not s.sprzet]
     nastepny = len(istniejace) + 1
     for u in oferta:
@@ -97,21 +95,21 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             else:
                 break
             for n in dane.uslugi[u]["sprzet"]:
-                d["sprzet_kup"].append({"typ": "instruktor", "nr": cel, "nazwa": n, "jakosc": q})
+                d["sprzet_kup"].append({"typ": KUCHNIA, "nr": cel, "nazwa": n, "jakosc": q})
             d.setdefault("_obsada", []).append({"nr": cel, "zawod": dane.uslugi[u]["prowadzacy"]})
-    # recepcja
-    rec = f.stanowiska_typu("recepcja")
-    potrzeba_rec = max(1, recepcjonisci_potrzebni(dane, klienci))
+    # kasa
+    rec = f.stanowiska_typu(KASA)
+    potrzeba_rec = max(1, kasjerzy_potrzebni(dane, klienci))
     nowe_rec = min(dane.maks_nowych_stanowisk, max(0, potrzeba_rec - len(rec)))
     for s in rec:  # stanowiska kupione wcześniej (np. w rundzie 1, gdy sprzęt był jeszcze niedostępny)
-        for n in dane.sprzet_recepcji:
+        for n in dane.sprzet_kasy:
             if n not in s.sprzet:
-                d["sprzet_kup"].append({"typ": "recepcja", "nr": s.nr, "nazwa": n, "jakosc": q})
+                d["sprzet_kup"].append({"typ": KASA, "nr": s.nr, "nazwa": n, "jakosc": q})
     for i in range(nowe_rec):
         nr = len(rec) + i + 1
-        for n in dane.sprzet_recepcji:
-            d["sprzet_kup"].append({"typ": "recepcja", "nr": nr, "nazwa": n, "jakosc": q})
-    d["stanowiska"] = {"instruktor": len(nowe_inst), "recepcja": nowe_rec}
+        for n in dane.sprzet_kasy:
+            d["sprzet_kup"].append({"typ": KASA, "nr": nr, "nazwa": n, "jakosc": q})
+    d["stanowiska"] = {KUCHNIA: len(nowe_inst), KASA: nowe_rec}
 
     # zatrudnienie (od rundy 2): stanowiska bez pracownika, które mają (albo dostają) sprzęt
     if "hr_zatrudnienie" in odbl:
@@ -121,11 +119,12 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         for s in istniejace:
             if not s.pracownik and s.sprzet and s.nr not in obsada:
                 zawod = next((dane.uslugi[u]["prowadzacy"] for u in dane.uslugi
-                              if all(n in s.sprzet for n in dane.uslugi[u]["sprzet"])), INSTRUKTOR)
+                              if all(n in s.sprzet for n in dane.uslugi[u]["sprzet"])), dane.zawody_typu(KUCHNIA)[0])
                 obsada[s.nr] = zawod
-        cele = [("instruktor", nr, zawod) for nr, zawod in sorted(obsada.items())]
-        cele += [("recepcja", s.nr, RECEPCJONISTA) for s in rec if not s.pracownik]
-        cele += [("recepcja", len(rec) + i + 1, RECEPCJONISTA) for i in range(nowe_rec)]
+        kasjer = dane.zawody_typu(KASA)[0]
+        cele = [(KUCHNIA, nr, zawod) for nr, zawod in sorted(obsada.items())]
+        cele += [(KASA, s.nr, kasjer) for s in rec if not s.pracownik]
+        cele += [(KASA, len(rec) + i + 1, kasjer) for i in range(nowe_rec)]
         for typ, nr, zawod in cele:
             kandydaci = [k for k in pula if k["zawod"] == zawod]
             if not kandydaci:

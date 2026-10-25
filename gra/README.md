@@ -1,8 +1,8 @@
 # Levas – gra
 
 Symulacja biznesowa kebabu w Lublinie, budowana na bazie lokalnego Revasa („Klub fitness”). Na razie (krok 2
-[planu](../notatki/Plan%20implementacji.md)) to nadal gra Revasa przeniesiona na Django – przebranżowienie na kebab
-i rundy tygodniowe dojdą w kolejnych zadaniach (postęp: [`POSTEP.md`](../POSTEP.md)).
+[planu](../notatki/Plan%20implementacji.md)) to mechanika Revasa na Django z danymi kebaba (dania, kucharze, kasa,
+składniki, dostawcy jedzenia); rundy tygodniowe dojdą w kolejnym zadaniu (postęp: [`POSTEP.md`](../POSTEP.md)).
 
 ## Uruchomienie
 
@@ -22,13 +22,13 @@ Ręcznie (z folderu `gra`):
 
 ## Jak się gra
 
-Strona startowa → „Nowa gra”: firmy graczy (na tym komputerze) i boty (Zrównoważony, Tani masowy, Premium,
-Agresywny marketing, Naśladowca). Zakładki są jak w Revasie: Oferta → Inwestycje → HR → Dostawcy → Marketing →
+Strona startowa → „Nowa gra”: firmy graczy (na tym komputerze) i boty (zrównoważony, tani, premium,
+agresywny marketing, naśladowca). Zakładki są jak w Revasie: Oferta (menu) → Inwestycje → HR → Dostawcy → Marketing →
 Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik **Decyzje / Wyniki** pokazuje wyniki
 poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
-**Wygląd** (lista w nagłówku): klasyczny, *Talerze*, *Grafik*, *Noc* – pliki `panel_gracza/static/motywy/*.css`,
+**Wygląd** (lista w nagłówku): klasyczny, *Talerze z kebabem*, *Grafik zmian*, *Kebab nocą* – pliki `panel_gracza/static/motywy/*.css`,
 przełącznik `panel_gracza/static/motyw.js`.
 
 ## Budowa
@@ -36,11 +36,26 @@ przełącznik `panel_gracza/static/motyw.js`.
 | Folder | Co zawiera |
 |---|---|
 | `silnik/` | silnik gry (czysty Python, bez Django): rynek, operacje, finanse, karta wyników, boty |
-| `dane/*.yaml` | dane gry i założenia (niepewne parametry), każdy z `zrodlo`; sprawdzenie: `python -m silnik.dane sprawdz` |
+| `dane/*.yaml` | dane gry (kebab) i założenia (niepewne parametry), każdy z `zrodlo`; sprawdzenie: `python -m silnik.dane sprawdz` |
+| `dane_revas/` | dane oryginalnego Revasa (fitness) – wzorzec, na którym testy sprawdzają mechanikę: `python -m silnik.dane sprawdz dane_revas` |
 | `levas/` | projekt Django (ustawienia, adresy) |
 | `gry/` | modele `Gra`, `Runda`, `Decyzja` (event sourcing: konfiguracja + decyzje, stan liczy silnik) i `serwisy.py` |
 | `api/` | widoki JSON dla zakładek (`widoki.py`) i budowa widoku rundy (`prezentacja.py`) |
 | `panel_gracza/` | strony gracza, zakładki w czystym JS (`static/zakladki/`), Chart.js, komenda `graj` |
 | `testy/` | pytest (mechaniki Revasa, zasady rund, API) |
 
-`WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik.
+`WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (liczby z gier – w `dane_revas/`).
+
+### Słownik: nazwy w kodzie a kebab
+
+Silnik i klucze danych mają jeszcze nazwy z Revasa (zmiana nazw razem z przebudową w kroku 3a):
+
+| W kodzie i danych | W grze |
+|---|---|
+| usługa (`uslugi`, `oferta`) | danie |
+| zasób (`zasoby`) | składnik |
+| prowadzący, `godziny_prowadzacego` | kucharz, czas kuchni na porcję |
+| recepcja, `godziny_recepcji`, `liczba_recepcjonistow` | kasa, czas przy kasie, liczba kasjerów |
+| `grupa` | porcji naraz (w kebabie 1) |
+| `utrzymanie_klubu` | utrzymanie lokalu |
+| stanowisko typu `kuchnia` / `kasa` | stanowisko kuchenne / kasowe (nazwy i zawody: `katalog.yaml` → `stanowiska.typy`) |

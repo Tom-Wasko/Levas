@@ -57,7 +57,7 @@ class PlikUslug(Plik):
 
 
 class Sprzet(Schemat):
-    dla: Literal["instruktor", "recepcja"]
+    dla: Literal["kuchnia", "kasa"]
     ceny: dict[Jakosc, float]
     utrzymanie: dict[Jakosc, float]
 
@@ -158,8 +158,24 @@ class Rundy(Sekcja):
     nowe_uslugi_od_rundy: int = Field(ge=1)
 
 
+class TypStanowiska(Schemat):
+    nazwa: str  # nagłówek w zakładkach, np. „Stanowiska kuchenne”
+    kto: str  # krótka nazwa, np. „Kuchnia”
+    zawody: list[str] = Field(min_length=1)
+
+
 class Stanowiska(Sekcja):
     pakiety: dict[str, float]  # liczba nowych stanowisk → cena pakietu
+    typy: dict[Literal["kuchnia", "kasa"], TypStanowiska]
+
+    @model_validator(mode="after")
+    def _typy(self) -> Stanowiska:
+        if set(self.typy) != {"kuchnia", "kasa"}:
+            raise ValueError("potrzebne są oba typy stanowisk: kuchnia i kasa")
+        zawody = [z for t in self.typy.values() for z in t.zawody]
+        if len(zawody) != len(set(zawody)):
+            raise ValueError("zawód może należeć tylko do jednego typu stanowiska")
+        return self
 
 
 class Udogodnienie(Schemat):

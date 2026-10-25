@@ -3,10 +3,10 @@ import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl, zl2 } fro
 
 export const sprzedaz = {
   tytul: "Sprzedaż", ikona: "🛒", odblokowanie: "sprzedaz",
-  info: "Ustal ceny usług gotowych do sprzedaży. Usługa jest gotowa, gdy masz sprzęt, pracowników, recepcję i zasoby. Klient płaci cenę pomniejszoną o rabat.",
+  info: "Ustal ceny dań gotowych do sprzedaży. Danie jest gotowe, gdy masz sprzęt, pracowników, obsadzoną kasę i składniki. Klient płaci cenę pomniejszoną o rabat.",
   decyzje({ v, kat, edycja }) {
     const gotowe = v.stan.gotowe_uslugi, ceny = v.stan.ceny;
-    if (!Object.keys(v.stan.oferta).length) return `<div class="komunikat">Najpierw wybierz usługi w zakładce Oferta.</div>`;
+    if (!Object.keys(v.stan.oferta).length) return `<div class="komunikat">Najpierw wybierz dania w zakładce Oferta.</div>`;
     const rynek = v.rynek?.ceny || {};
     const w = Object.keys(v.stan.oferta).map((u) => {
       const k = kat.uslugi[u], c = ceny[u], braki = gotowe[u] || [];
@@ -20,8 +20,8 @@ export const sprzedaz = {
         wl ? `<input type="number" class="krotkie" min="0" step="0.5" value="${c.rabat}" data-zmiana="rabat" data-u="${u}" ${edycja ? "" : "disabled"}>` : "",
         wl ? `${zl2(c.cena - c.rabat)} <span class="podpowiedz">(${proc((c.cena - c.rabat) / k.cena_preferowana, 0)} pref.)</span>` : ""];
     });
-    return tabela(null, ["Usługa", "Preferowana cena", "Średnia cena konkurencji (poprz. runda)", "Sprzedaż", "Cena", "Rabat", "Cena dla klienta"], w, { klasy: ["l"] })
-      + `<p class="podpowiedz">Cena wpływa na popyt i na zadowolenie klientów. Niższa cena od konkurencji przyciąga klientów, a im więcej firm oferuje usługę, tym mniej klientów przypada na każdą.</p>`;
+    return tabela(null, ["Danie", "Preferowana cena", "Średnia cena konkurencji (poprz. runda)", "Sprzedaż", "Cena", "Rabat", "Cena dla klienta"], w, { klasy: ["l"] })
+      + `<p class="podpowiedz">Cena wpływa na popyt i na zadowolenie klientów. Niższa cena od konkurencji przyciąga klientów, a im więcej lokali ma danie w menu, tym mniej klientów przypada na każdą.</p>`;
   },
   wyniki({ v, kat }) {
     const r = v.rynek, firmy = Object.keys(r.firmy);
@@ -32,14 +32,14 @@ export const sprzedaz = {
     const own = Object.entries(sp).map(([u, s]) => [esc(nazwaUslugi(kat, u)), licz(s.popyt), licz(s.sprzedaz),
       s.utracona ? `<span class="minus">${licz(s.utracona)}</span>` : "0", esc(s.przyczyna), licz(s.reklamacje), zl(s.przychod)]);
     const nag = firmy.map((f) => `${f === v.firma ? "<u>" : ""}${esc(r.firmy[f])}${f === v.firma ? "</u>" : ""}`);
-    return tabela("Zestawienie popytu na usługi", ["Nazwa usługi", ...nag], popyt, { klasy: ["l"] })
+    return tabela("Zestawienie popytu na dania", ["Danie", ...nag], popyt, { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-popyt"></canvas></div>`
-      + tabela("Sprzedaż vs utracona sprzedaż", ["Nazwa usługi", "Popyt", "Sprzedaż", "Utracona sprzedaż", "Przyczyna", "Reklamacje", "Przychód"], own,
+      + tabela("Sprzedaż vs utracona sprzedaż", ["Danie", "Popyt", "Sprzedaż", "Utracona sprzedaż", "Przyczyna", "Reklamacje", "Przychód"], own,
         { klasy: ["l"], stopka: ["Razem", licz(Object.values(sp).reduce((a, s) => a + s.popyt, 0)), licz(Object.values(sp).reduce((a, s) => a + s.sprzedaz, 0)),
           licz(Object.values(sp).reduce((a, s) => a + s.utracona, 0)), "", licz(Object.values(sp).reduce((a, s) => a + s.reklamacje, 0)),
           zl(Object.values(sp).reduce((a, s) => a + s.przychod, 0))] })
       + `<div class="wykres"><canvas id="w-sprzedaz"></canvas></div>`
-      + tabela("Ceny usług z rabatem", ["Nazwa usługi", ...nag], ceny, { klasy: ["l"] });
+      + tabela("Ceny dań z rabatem", ["Danie", ...nag], ceny, { klasy: ["l"] });
   },
   po({ v, kat }, tryb) {
     if (tryb !== "wyniki") return;

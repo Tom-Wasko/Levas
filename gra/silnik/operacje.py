@@ -1,12 +1,15 @@
 """Obsługa klientów firmy w miesiącu: ilu klientów da się obsłużyć przy danym sprzęcie, pracownikach i zasobach.
 
+W kodzie zostały nazwy z Revasa: usługa = danie, zasób = składnik, prowadzący = kucharz, recepcja = kasa.
+
 Zasady (WIEDZA_O_GRZE.md, rozdz. 5–7):
-- stanowisko instruktora/trenera = 1 prowadzący, 160 h; usługę można prowadzić na stanowisku, gdy prowadzący ma
-  właściwy zawód, a na stanowisku jest cały sprzęt usługi; sprzęt stanowiska jest wspólny dla jego usług,
-- zajęcia = ⌈klienci / osób w grupie⌉ (trening personalny: grupa 1), godziny = zajęcia × godziny zajęć,
+- stanowisko kuchni = 1 prowadzący, 160 h; usługę można prowadzić na stanowisku, gdy prowadzący ma właściwy
+  zawód, a na stanowisku jest cały sprzęt usługi; sprzęt stanowiska jest wspólny dla jego usług,
+- porcje = ⌈klienci / osób w grupie⌉ (kebab: grupa 1; w Revasie zajęcia grupowe), godziny = porcje × godziny,
 - przy braku godzin klienci są obsługiwani proporcjonalnie (najpierw równy odsetek popytu, potem jak najwięcej),
 - zasoby: zużycie na klienta z magazynu (opakowania, ułamki); brak zasobu ogranicza sprzedaż,
-- recepcja: 0,08 h na klienta, 160 h na recepcjonistę z kompletem sprzętu recepcji; liczona po zużyciu zasobów
+- recepcja (kasa): godziny na klienta z danych, 160 h na kasjera z kompletem sprzętu kasy; liczona po zużyciu
+  zasobów
   (klienci utraceni przez brak recepcji zużywają zasoby – gra ATH, luty i maj),
 - reklamacje: każdy obsłużony klient z prawdopodobieństwem = ryzyko reklamacji prowadzącego × mnożnik (0,15,
   skalibrowany na zużyciu zasobów w grze ATH); reklamacja zużywa
@@ -19,7 +22,7 @@ import math
 import numpy as np
 from scipy.optimize import linprog
 
-from .dane import INSTRUKTOR, RECEPCJONISTA, Dane
+from .dane import KASA, KUCHNIA, Dane
 from .losowosc import strumien
 from .model import Firma, Stanowisko
 
@@ -35,8 +38,8 @@ def model_puli(dane: Dane) -> bool:
 
 
 def sztuki_sprzetu(firma: Firma, nazwa: str) -> list[int]:
-    """Jakości wszystkich sztuk danego sprzętu w klubie (stanowiska instruktorów/trenerów)."""
-    return [s.sprzet[nazwa] for s in firma.stanowiska_typu("instruktor") if nazwa in s.sprzet]
+    """Jakości wszystkich sztuk danego sprzętu w lokalu (stanowiska kuchenne)."""
+    return [s.sprzet[nazwa] for s in firma.stanowiska_typu(KUCHNIA) if nazwa in s.sprzet]
 
 
 def stanowiska_uslugi(dane: Dane, firma: Firma, usluga: str) -> list[Stanowisko]:
@@ -47,17 +50,18 @@ def stanowiska_uslugi(dane: Dane, firma: Firma, usluga: str) -> list[Stanowisko]
     if pula and not all(sztuki_sprzetu(firma, n) for n in u["sprzet"]):
         return []
     wynik = []
-    for s in firma.stanowiska_typu("instruktor"):
+    for s in firma.stanowiska_typu(KUCHNIA):
         p = firma.pracownik_stanowiska(s)
         if p and p.zawod == u["prowadzacy"] and (pula or all(n in s.sprzet for n in u["sprzet"])):
             wynik.append(s)
     return wynik
 
 
-def recepcjonisci(dane: Dane, firma: Firma) -> list[Stanowisko]:
-    return [s for s in firma.stanowiska_typu("recepcja")
-            if (p := firma.pracownik_stanowiska(s)) and p.zawod == RECEPCJONISTA
-            and all(n in s.sprzet for n in dane.sprzet_recepcji)]
+def kasjerzy(dane: Dane, firma: Firma) -> list[Stanowisko]:
+    """Obsadzone stanowiska kasy z kompletem sprzętu kasy."""
+    return [s for s in firma.stanowiska_typu(KASA)
+            if (p := firma.pracownik_stanowiska(s)) and p.zawod in dane.zawody_typu(KASA)
+            and all(n in s.sprzet for n in dane.sprzet_kasy)]
 
 
 def jakosc_uslugi(dane: Dane, firma: Firma, usluga: str) -> tuple[float, float, float] | None:
@@ -68,9 +72,10 @@ def jakosc_uslugi(dane: Dane, firma: Firma, usluga: str) -> tuple[float, float, 
     u = dane.uslugi[usluga]
     prac = float(np.mean([firma.pracownik_stanowiska(s).gwiazdki for s in st]))
     if model_puli(dane):
-        sprz = float(np.mean([q for n in u["sprzet"] for q in sztuki_sprzetu(firma, n)]))
+        jak = [q for n in u["sprzet"] for q in sztuki_sprzetu(firma, n)]
     else:
-        sprz = float(np.mean([s.sprzet[n] for s in st for n in u["sprzet"]]))
+        jak = [s.sprzet[n] for s in st for n in u["sprzet"]]
+    sprz = float(np.mean(jak)) if jak else 3.0       # danie bez sprzętu (np. dodatek)
     zas = []
     for nazwa in u["zasoby"]:
         ilosci = {q: firma.magazyn.get(f"{nazwa}|{q}", 0.0) for q in (1, 2, 3)}
@@ -117,7 +122,7 @@ def _przydziel_godziny(potrzeby: dict[str, float], mozliwe: dict[str, list[int]]
 def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) -> dict:
     """Ilu klientów firma obsłuży. Zmienia magazyn (zużycie). Zwraca szczegóły do wyników."""
     godz_prac = dane.z["operacje"]["godziny_pracownika"]
-    stanowiska = firma.stanowiska_typu("instruktor")
+    stanowiska = firma.stanowiska_typu(KUCHNIA)
     indeks = {s.nr: i for i, s in enumerate(stanowiska)}
     mozliwe = {u: [indeks[s.nr] for s in stanowiska_uslugi(dane, firma, u)] for u in popyt}
     zajecia_potrzebne = {u: math.ceil(d / dane.uslugi[u]["grupa"] - EPS) for u, d in popyt.items()}
@@ -138,7 +143,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) 
         zajecia = math.floor(godziny[u] / h + 1e-6) if h else 0
         obsluzeni[u] = min(d, zajecia * g)
         if obsluzeni[u] < d:
-            przyczyna[u] = "pracownicy/sprzęt" if mozliwe[u] else "brak stanowiska z prowadzącym i sprzętem"
+            przyczyna[u] = "pracownicy/sprzęt" if mozliwe[u] else "brak stanowiska z pracownikiem i sprzętem"
 
     # zasoby: ilu klientów wystarczy (wspólne zasoby dzielone proporcjonalnie do potrzeb)
     potrzeba = {}
@@ -186,7 +191,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) 
 
     # recepcja – po zużyciu zasobów: klienci utraceni przez brak recepcji zużyli już zasoby
     # (gra ATH: luty i maj – zużycie napoju = popyt + ok. 0,5%, a nie sprzedaż)
-    rec = recepcjonisci(dane, firma)
+    rec = kasjerzy(dane, firma)
     godz_rec = len(rec) * godz_prac
     potrzebne_rec = sum(obsluzeni[u] * dane.uslugi[u]["godziny_recepcji"] for u in popyt)
     if potrzebne_rec > godz_rec + EPS:
@@ -194,7 +199,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) 
         for u in popyt:
             nowe = math.floor(obsluzeni[u] * skala + EPS)
             if nowe < obsluzeni[u]:
-                przyczyna[u] = "recepcja"
+                przyczyna[u] = "kasa"
             obsluzeni[u] = nowe
 
     # wykorzystanie czasu i obłożenie sprzętu (godziny zajęć na stanowisku)
@@ -254,4 +259,4 @@ def _zuzyj(firma: Firma, zuzycie: dict[str, float]) -> dict[str, dict]:
     return wynik
 
 
-__all__ = ["obsluz", "jakosc_uslugi", "stanowiska_uslugi", "recepcjonisci", "INSTRUKTOR"]
+__all__ = ["obsluz", "jakosc_uslugi", "stanowiska_uslugi", "kasjerzy"]

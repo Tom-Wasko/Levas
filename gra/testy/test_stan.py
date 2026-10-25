@@ -27,7 +27,7 @@ pracownicy = st.builds(
     Pracownik,
     id=NAZWY,
     imie_nazwisko=NAZWY,
-    zawod=st.sampled_from(["Instruktor", "Recepcjonista"]),
+    zawod=st.sampled_from(["Kucharz", "Kasjer"]),
     gwiazdki=st.integers(1, 3),
     pensja_preferowana_gr=KWOTY,
     koszt_rekrutacji_gr=KWOTY,

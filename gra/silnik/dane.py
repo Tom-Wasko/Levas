@@ -19,13 +19,16 @@ from .schematy import SCHEMATY, sprawdz_zalozenia
 
 KATALOG_GRY = Path(__file__).resolve().parents[1]
 KATALOG_DANYCH = KATALOG_GRY / "dane"
+KATALOG_REVAS = KATALOG_GRY / "dane_revas"   # dane oryginalnej gry REVAS (fitness) – wzorzec do testów mechaniki
 
 MIESIACE = ["styczen", "luty", "marzec", "kwiecien", "maj", "czerwiec", "lipiec", "sierpien", "wrzesien",
             "pazdziernik", "listopad", "grudzien"]
 MIESIACE_NAZWY = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień",
                   "Październik", "Listopad", "Grudzień"]
-INSTRUKTOR, TRENER, RECEPCJONISTA = "Instruktor", "Trener personalny", "Recepcjonista"
-ZAWODY = (INSTRUKTOR, TRENER, RECEPCJONISTA)
+# Typy stanowisk (budowa modelu): kuchnia – pracownicy przygotowują dania, kasa – obsługa klientów.
+# Nazwy i zawody typów są w katalog.yaml: stanowiska.typy.
+KUCHNIA, KASA = "kuchnia", "kasa"
+TYPY_STANOWISK = (KUCHNIA, KASA)
 
 _Loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
@@ -58,13 +61,26 @@ class Dane:
         self.kandydaci: list = p["kandydaci.yaml"]["znani"]
         self.rynek_pracy: dict = p["kandydaci.yaml"]
         self.katalog_ofert: dict = p["katalog.yaml"]
+        self.typy_stanowisk: dict = self.katalog_ofert["stanowiska"]["typy"]
         self.boty: dict = p["boty.yaml"]
         self.zalozenia_pelne: dict = p["zalozenia.yaml"]
         self.z: dict = _wartosci(self.zalozenia_pelne)
 
     @cached_property
-    def sprzet_recepcji(self) -> list[str]:
-        return [n for n, s in self.sprzet.items() if s["dla"] == "recepcja"]
+    def sprzet_kasy(self) -> list[str]:
+        return [n for n, s in self.sprzet.items() if s["dla"] == KASA]
+
+    @cached_property
+    def zawody(self) -> list[str]:
+        """Wszystkie zawody: najpierw kuchni, potem kasy (kolejność jak w raportach)."""
+        return [z for t in TYPY_STANOWISK for z in self.typy_stanowisk[t]["zawody"]]
+
+    def zawody_typu(self, typ: str) -> list[str]:
+        return self.typy_stanowisk[typ]["zawody"]
+
+    def typ_zawodu(self, zawod: str) -> str:
+        """Typ stanowiska, na którym pracuje zawód."""
+        return KASA if zawod in self.zawody_typu(KASA) else KUCHNIA
 
     @cached_property
     def wersja(self) -> str:
@@ -121,13 +137,13 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
 
     for u, x in d.uslugi.items():
         for n in x["sprzet"]:
-            if d.sprzet.get(n, {}).get("dla") != "instruktor":
-                brak(n, f"uslugi.yaml: {u}", "sprzęt instruktora", "sprzet.yaml")
+            if d.sprzet.get(n, {}).get("dla") != KUCHNIA:
+                brak(n, f"uslugi.yaml: {u}", "sprzęt kuchni", "sprzet.yaml")
         for z in x["zasoby"]:
             if z not in d.zasoby:
                 brak(z, f"uslugi.yaml: {u}", "zasób", "zasoby.yaml")
-        if x["prowadzacy"] not in ZAWODY:
-            brak(x["prowadzacy"], f"uslugi.yaml: {u}", "zawód", "silnik/dane.py ZAWODY")
+        if x["prowadzacy"] not in d.zawody_typu(KUCHNIA):
+            brak(x["prowadzacy"], f"uslugi.yaml: {u}", "zawód kuchni", "katalog.yaml: stanowiska.typy")
     for m, ceny in d.dostawcy.items():
         if m not in MIESIACE:
             brak(m, "dostawcy.yaml: ceny", "miesiąc", "MIESIACE")
@@ -140,8 +156,8 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
         if dost not in wszyscy:
             brak(dost, "dostawcy.yaml: pierwsi", "dostawca", "dostawcy.yaml: ceny")
     for k in d.kandydaci:
-        if k["zawod"] not in ZAWODY:
-            brak(k["zawod"], f"kandydaci.yaml: {k['imie_nazwisko']}", "zawód", "silnik/dane.py ZAWODY")
+        if k["zawod"] not in d.zawody:
+            brak(k["zawod"], f"kandydaci.yaml: {k['imie_nazwisko']}", "zawód", "katalog.yaml: stanowiska.typy")
     for u in d.katalog_ofert["rundy"]["uslugi_startowe"]:
         if u not in d.uslugi:
             brak(u, "katalog.yaml: rundy.uslugi_startowe", "usługa", "uslugi.yaml")

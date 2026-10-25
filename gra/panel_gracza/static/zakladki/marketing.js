@@ -16,7 +16,7 @@ function efekty(v, kat) {
 
 export const tradycyjny = {
   tytul: "Tradycyjny", tytulPelny: "Marketing - tradycyjny", ikona: "📣", odblokowanie: "marketing_tradycyjny",
-  info: "Podejmij decyzję o promowaniu Twojej firmy w mediach tradycyjnych. Reklama zwiększa popyt na wszystkie usługi w tym miesiącu.",
+  info: "Podejmij decyzję o promowaniu Twojej firmy w mediach tradycyjnych. Reklama zwiększa popyt na wszystkie dania w tym miesiącu.",
   decyzje({ v, kat, edycja }) {
     const em = v.decyzje.reklama_tradycyjna || {};
     const media = kat.oferty.media_tradycyjne.pozycje;
@@ -44,7 +44,7 @@ export const tradycyjny = {
     const w = Object.entries(r.reklama_tradycyjna || {}).map(([f, k]) => [esc(nazwaFirmy(v, f)), zl(k)]);
     const ef = v.wyniki?.reklama?.tradycyjna;
     return tabela("Wydatki na reklamę tradycyjną", ["Nazwa firmy", "Wydatki na reklamę"], w, { klasy: ["l"] })
-      + tabela(`Efektywność reklamy – wzrost popytu w wyniku wydatków na reklamę: ${proc(ef ?? 0, 2)}`, ["Nazwa usługi", "Popyt"], efekty(v, kat), { klasy: ["l"] })
+      + tabela(`Efektywność reklamy – wzrost popytu w wyniku wydatków na reklamę: ${proc(ef ?? 0, 2)}`, ["Danie", "Popyt"], efekty(v, kat), { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-rekl"></canvas></div>`;
   },
   po({ v }, tryb) {
@@ -78,7 +78,7 @@ export const internetowy = {
     const w = Object.entries(v.rynek.reklama_internetowa || {}).map(([f, k]) => [esc(nazwaFirmy(v, f)), zl(k)]);
     const ef = v.wyniki?.reklama?.internetowa;
     return tabela("Nakłady na marketing interaktywny", ["Nazwa firmy", "Wydatki"], w, { klasy: ["l"] })
-      + tabela(`Efektywność reklamy – wzrost popytu w wyniku wydatków na reklamę: ${proc(ef ?? 0, 2)}`, ["Nazwa usługi", "Popyt"], efekty(v, kat), { klasy: ["l"] });
+      + tabela(`Efektywność reklamy – wzrost popytu w wyniku wydatków na reklamę: ${proc(ef ?? 0, 2)}`, ["Danie", "Popyt"], efekty(v, kat), { klasy: ["l"] });
   },
   akcje: {
     internet: (el, c) => c.zmien((d) => {

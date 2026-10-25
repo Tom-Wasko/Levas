@@ -33,7 +33,7 @@ def stanowiska_potrzebne(dane: Dane, usluga: str, klienci: float) -> int:
     return math.ceil(godziny_uslugi(dane, usluga, klienci) / dane.z["operacje"]["godziny_pracownika"] - 1e-9)
 
 
-def recepcjonisci_potrzebni(dane: Dane, klienci: dict[str, float]) -> int:
+def kasjerzy_potrzebni(dane: Dane, klienci: dict[str, float]) -> int:
     h = sum(k * dane.uslugi[u]["godziny_recepcji"] for u, k in klienci.items())
     return math.ceil(h / dane.z["operacje"]["godziny_pracownika"] - 1e-9) if h > 0 else 0
 

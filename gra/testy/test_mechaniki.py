@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from silnik import Gra  # noqa: E402
-from silnik.dane import dane_domyslne  # noqa: E402
+from silnik.dane import KATALOG_REVAS, Dane  # noqa: E402
 from silnik.finanse import Ksiega, Rachunek, bank_koniec_miesiaca, bank_poczatek_miesiaca  # noqa: E402
 from silnik.karta import karta, wskaznik_zadluzenia  # noqa: E402
 from silnik.model import Firma, Pracownik, Stanowisko  # noqa: E402
@@ -16,7 +16,7 @@ from silnik.operacje import obsluz  # noqa: E402
 from silnik.planowanie import oczekiwany_popyt  # noqa: E402
 from silnik.rynek import koszt_emisji, wzrost_reklamy_internetowej, wzrost_reklamy_tradycyjnej  # noqa: E402
 
-D = dane_domyslne()
+D = Dane(KATALOG_REVAS)  # dane gry REVAS (fitness): testy liczą na liczbach z prawdziwych gier
 
 
 def _pracownik(id_, zawod, nr, gw=3):
@@ -29,8 +29,8 @@ def firma_c_marzec() -> Firma:
     """Drużyna C (gra A/B/C/Apex/Vela), marzec: 1 instruktor (step, TBC, zumba na jednym stanowisku), 1 recepcjonista."""
     f = Firma(nazwa="C")
     sprzet = set(D.uslugi["step"]["sprzet"]) | set(D.uslugi["tbc"]["sprzet"]) | set(D.uslugi["zumba"]["sprzet"])
-    f.stanowiska = [Stanowisko(nr=1, typ="instruktor", sprzet={n: 3 for n in sprzet}, pracownik="i1"),
-                    Stanowisko(nr=1, typ="recepcja", sprzet={n: 3 for n in D.sprzet_recepcji}, pracownik="r1")]
+    f.stanowiska = [Stanowisko(nr=1, typ="kuchnia", sprzet={n: 3 for n in sprzet}, pracownik="i1"),
+                    Stanowisko(nr=1, typ="kasa", sprzet={n: 3 for n in D.sprzet_kasy}, pracownik="r1")]
     f.pracownicy = {"i1": _pracownik("i1", "Instruktor", 1), "r1": _pracownik("r1", "Recepcjonista", 1)}
     f.magazyn = {"Napój izotoniczny|3": 100, "Płyn do dezynfekcji|3": 10, "Ręcznik papierowy|3": 20}
     f.wartosc_magazynu_gr = {k: v * 3000 for k, v in f.magazyn.items()}
@@ -128,7 +128,7 @@ def test_popyt_abc_marzec():
 
 def test_deterministycznosc_i_zapis(tmp_path):
     def gra():
-        g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "agresywny")], liczba_rund=4, ziarno=7)
+        g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "agresywny")], liczba_rund=4, ziarno=7, dane=D)
         for _ in range(4):
             g.przelicz()
         return g
@@ -136,7 +136,7 @@ def test_deterministycznosc_i_zapis(tmp_path):
     assert g1.stan(4).wyniki[4]["A"]["kpir"] == g2.stan(4).wyniki[4]["A"]["kpir"]
     plik = tmp_path / "gra.json"
     g1.zapisz(plik)
-    g3 = Gra.wczytaj(plik)
+    g3 = Gra.wczytaj(plik, D)
     assert g3.stan(4).firmy["B"].gotowka == g1.stan(4).firmy["B"].gotowka
 
 
@@ -178,9 +178,9 @@ def test_brak_zasobu_najpierw_krotsze_zajecia():
     # ATH grudzień: przy braku napoju bodybuilding (1 h) obsłużony w większym odsetku niż joga (1,5 h)
     f = firma_c_marzec()
     sprzet = set(D.uslugi["bodybuilding"]["sprzet"]) | set(D.uslugi["joga"]["sprzet"])
-    f.stanowiska = [Stanowisko(nr=1, typ="instruktor", sprzet={n: 3 for n in sprzet}, pracownik="i1"),
-                    Stanowisko(nr=2, typ="instruktor", sprzet={n: 3 for n in sprzet}, pracownik="i2"),
-                    Stanowisko(nr=1, typ="recepcja", sprzet={n: 3 for n in D.sprzet_recepcji}, pracownik="r1")]
+    f.stanowiska = [Stanowisko(nr=1, typ="kuchnia", sprzet={n: 3 for n in sprzet}, pracownik="i1"),
+                    Stanowisko(nr=2, typ="kuchnia", sprzet={n: 3 for n in sprzet}, pracownik="i2"),
+                    Stanowisko(nr=1, typ="kasa", sprzet={n: 3 for n in D.sprzet_kasy}, pracownik="r1")]
     f.pracownicy["i2"] = _pracownik("i2", "Instruktor", 2)
     f.magazyn["Napój izotoniczny|3"] = 10          # 240 klientów
     w = obsluz(D, f, {"bodybuilding": 300, "joga": 300}, ziarno=1, runda=6)

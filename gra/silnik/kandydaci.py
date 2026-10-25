@@ -1,4 +1,4 @@
-"""Rynek pracy: kandydaci na instruktorów, trenerów personalnych i recepcjonistów.
+"""Rynek pracy: kandydaci we wszystkich zawodach z katalog.yaml (stanowiska.typy).
 
 Pula na start = znane osoby z gier (dane/kandydaci.yaml: znani, pensje z rozrzutem jak między grami) + osoby
 wygenerowane z rozkładów obserwowanych w grze (kandydaci.yaml: losowanie – pensja, zadowolenie klientów i ryzyko
@@ -7,7 +7,7 @@ bez własnych pracowników (gra A/B/C: te same osoby zatrudnione przez drużyny 
 """
 from __future__ import annotations
 
-from .dane import ZAWODY, Dane
+from .dane import Dane
 from .losowosc import strumien
 
 
@@ -49,7 +49,7 @@ def pula_startowa(dane: Dane, ziarno) -> list[dict]:
         o["wiek"] = int(rng.integers(*dane.rynek_pracy["losowanie"]["wiek"]))
         uzyte.add(o["imie_nazwisko"])
         pula.append(o)
-    for zawod in ZAWODY:
+    for zawod in dane.zawody:
         for j in range(dane.rynek_pracy["losowanie"]["na_start"]):
             pula.append(_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g0-{zawod[:3]}-{j}", uzyte))
     return pula
@@ -59,5 +59,5 @@ def dodaj_nowych(dane: Dane, pula: list[dict], ziarno, runda: int) -> list[dict]
     rng = strumien(ziarno, runda, "kandydaci")
     uzyte = {o["imie_nazwisko"] for o in pula}
     nowi = [_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g{runda}-{zawod[:3]}-{j}", uzyte)
-            for zawod in ZAWODY for j in range(dane.rynek_pracy["losowanie"]["co_runde"])]
+            for zawod in dane.zawody for j in range(dane.rynek_pracy["losowanie"]["co_runde"])]
     return pula + nowi

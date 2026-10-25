@@ -4,7 +4,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     nazwa, misja
     oferta:            {usługa: prognoza popytu}           – pełna lista usług w ofercie
     sprzedaz:          {usługa: {"cena", "rabat"}}          – usługi włączone do sprzedaży
-    stanowiska:        {"instruktor": 0–5, "recepcja": 0–5} – nowe stanowiska (pakiet)
+    stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet)
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
     zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
@@ -26,12 +26,10 @@ from __future__ import annotations
 
 import math
 
-from .dane import RECEPCJONISTA, Dane
+from .dane import KASA, KUCHNIA, Dane
 from .finanse import Ksiega, Rachunek, ksieguj
 from .model import Cena, Firma, Pracownik, Stanowisko, grosze
-from .operacje import recepcjonisci, stanowiska_uslugi
-
-TYPY = {"instruktor": "stanowiska dla instruktorów/trenerów", "recepcja": "stanowiska dla recepcjonistów"}
+from .operacje import kasjerzy, stanowiska_uslugi
 
 
 def limit_nowych_uslug(dane: Dane, runda: int, obecnie: int = 0) -> int:
@@ -103,14 +101,13 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     pakiety = dane.katalog_ofert["stanowiska"]["pakiety"]
     for typ, n in (d.get("stanowiska") or {}).items():
         n = int(n or 0)
-        if n <= 0:
+        if n <= 0 or typ not in dane.typy_stanowisk:
             continue
         n = min(n, dane.maks_nowych_stanowisk)
         start = len(firma.stanowiska_typu(typ))
         for i in range(n):
             firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda))
-        nazwa = "recepcjonisty" if typ == "recepcja" else "trenera/instruktora"
-        ksieguj(firma, ksiega, rachunek, f"Uruchomienie stanowiska dla {nazwa}", pakiety[str(n)])
+        ksieguj(firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}", pakiety[str(n)])
         firma.majatek += pakiety[str(n)]
         info["inwestycje"] += pakiety[str(n)]
 
@@ -130,7 +127,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         info_s = dane.sprzet.get(s["nazwa"])
         if not st or not info_s or s["nazwa"] in st.sprzet:
             continue
-        if (info_s["dla"] == "recepcja") != (st.typ == "recepcja"):
+        if info_s["dla"] != st.typ:
             continue
         q = int(s.get("jakosc", 3))
         cena = info_s["ceny"][str(q)]
@@ -143,7 +140,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     for pid in d.get("zwolnij", []) if kadry_ok else []:
         p = firma.pracownicy.pop(pid, None)
         if p:
-            st = firma.stanowisko("recepcja" if p.zawod == RECEPCJONISTA else "instruktor", p.stanowisko)
+            st = firma.stanowisko(dane.typ_zawodu(p.zawod), p.stanowisko)
             if st:
                 st.pracownik = None
             ksieguj(firma, ksiega, rachunek, f"Koszt zwolnienia {p.imie_nazwisko}", p.koszt_odprawy)   # opis jak w KPiR gry
@@ -170,7 +167,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         if not kandydat or not st or st.pracownik:
             info.setdefault("nieudane_zatrudnienia", []).append(z)
             continue
-        if (kandydat["zawod"] == RECEPCJONISTA) != (st.typ == "recepcja"):
+        if dane.typ_zawodu(kandydat["zawod"]) != st.typ:
             continue
         p = Pracownik(id=kandydat["id"], imie_nazwisko=kandydat["imie_nazwisko"], zawod=kandydat["zawod"],
                       gwiazdki=kandydat["gwiazdki"], pensja_preferowana=kandydat["pensja_preferowana"],
@@ -251,20 +248,22 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
 
 
 def gotowe_uslugi(dane: Dane, firma: Firma) -> dict[str, list[str]]:
-    """Dla usług z oferty: lista braków (pusta = usługa może być sprzedawana)."""
+    """Dla dań z oferty: lista braków (pusta = danie może być sprzedawane)."""
     braki = {}
-    rec = recepcjonisci(dane, firma)
+    rec = kasjerzy(dane, firma)
+    kuchnia, kasa = dane.typy_stanowisk[KUCHNIA]["kto"], dane.typy_stanowisk[KASA]["kto"]
     for u in firma.oferta:
         b = []
         if not stanowiska_uslugi(dane, firma, u):
-            b.append(f"brak stanowiska z prowadzącym ({dane.uslugi[u]['prowadzacy'].lower()}) i całym sprzętem usługi")
+            b.append(f"brak stanowiska z pracownikiem ({kuchnia.lower()}: {dane.uslugi[u]['prowadzacy'].lower()}) "
+                     "i całym sprzętem dania")
         if not rec:
-            b.append("brak recepcjonisty z kompletem sprzętu recepcji")
+            b.append(f"brak obsadzonego stanowiska ({kasa.lower()}) z kompletem sprzętu")
         if u not in firma.ceny:
-            b.append("usługa nie jest włączona do sprzedaży (brak ceny)")
+            b.append("nie jest włączone do sprzedaży (brak ceny)")
         for z in dane.uslugi[u]["zasoby"]:
             if sum(firma.magazyn.get(f"{z}|{q}", 0) for q in (1, 2, 3)) <= 1e-9:
-                b.append(f"brak zasobu: {z}")
+                b.append(f"brak składnika: {z}")
         braki[u] = b
     return braki
 
@@ -284,10 +283,10 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
     if runda == 1:
         spoza = [u for u in (d.get("oferta") or {}) if u not in rundy["uslugi_startowe"]]
         if spoza:
-            dodaj("czerwony", "oferta", "W rundzie 1 można wybrać tylko usługi: "
+            dodaj("czerwony", "oferta", "W rundzie 1 można wybrać tylko dania: "
                   + ", ".join(dane.uslugi[u]["nazwa"] for u in rundy["uslugi_startowe"]) + ".")
     if przyrost > limit or (d.get("oferta") and set(d["oferta"]) - set(firma.oferta)):
-        dodaj("czerwony", "oferta", f"W tej rundzie liczba usług może wzrosnąć najwyżej o {limit} – nadmiarowe nie zostały dodane.")
+        dodaj("czerwony", "oferta", f"W tej rundzie liczba dań może wzrosnąć najwyżej o {limit} – nadmiarowe nie zostały dodane.")
     if not firma.bank and not d.get("bank"):
         dodaj("czerwony", "finanse_bank", "Nie wybrano banku.")
     if not firma.biuro and not d.get("biuro"):

@@ -2,7 +2,7 @@
 import { esc, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
 
 const GRUPY = [
-  ["Zakup zasobów", (p) => p.towary],
+  ["Zakup składników", (p) => p.towary],
   ["Wynagrodzenia", (p) => p.wynagrodzenia],
   ["Składki ZUS pracodawcy", (p) => p.opis.startsWith("Składki ZUS") ? p.pozostale : 0],
   ["Rekrutacja i odprawy", (p) => /^Koszt (zatrudnienia|odprawy)/.test(p.opis) ? p.pozostale : 0],
@@ -12,7 +12,7 @@ const GRUPY = [
   ["Utrzymanie sprzętu, udogodnień i wyposażenia", (p) => /^Koszty utrzymania/.test(p.opis) ? p.pozostale : 0],
   ["Marketing", (p) => /reklam/i.test(p.opis) ? p.pozostale : 0],
   ["Szkolenia", (p) => p.opis.startsWith("Szkolenie") ? p.pozostale : 0],
-  ["Utrzymanie klubu i magazynu", (p) => /utrzymania klubu|magazynowania/.test(p.opis) ? p.pozostale : 0],
+  ["Utrzymanie lokalu i magazynu", (p) => /utrzymania lokalu|magazynowania/.test(p.opis) ? p.pozostale : 0],
   ["Bank (opłaty, odsetki)", (p) => /^(Opłata za konto|Odsetki)/.test(p.opis) ? p.pozostale : 0],
   ["Biuro rachunkowe", (p) => /biura rachunkowego|kadrowo/.test(p.opis) ? p.pozostale : 0],
 ];
@@ -58,7 +58,7 @@ export const kpir = {
     const w = k.pozycje.map((p, i) => [i + 1, esc(p.opis), zl2(p.przychod), zl2(p.przychod_pozostaly), zl2(p.przychod + p.przychod_pozostaly),
       zl2(p.towary), zl2(p.wynagrodzenia), zl2(p.pozostale), zl2(p.wynagrodzenia + p.pozostale)]);
     const s = (f) => k.pozycje.reduce((a, p) => a + f(p), 0);
-    return tabela(null, ["Lp.", "Opis zdarzenia gospodarczego", "Wartość sprzedanych usług", "Pozostałe przychody", "Razem przychód",
+    return tabela(null, ["Lp.", "Opis zdarzenia gospodarczego", "Wartość sprzedanych towarów i usług", "Pozostałe przychody", "Razem przychód",
       "Zakup towarów i materiałów", "Wynagrodzenia", "Pozostałe wydatki", "Razem wydatki"], w,
       { klasy: ["", "l", "r", "r", "r", "r", "r", "r", "r"], stopka: ["", "Suma", zl2(s((p) => p.przychod)), zl2(s((p) => p.przychod_pozostaly)),
         zl2(k.przychody), zl2(k.towary), zl2(k.wynagrodzenia), zl2(k.pozostale), zl2(k.wynagrodzenia + k.pozostale)] })
