@@ -39,7 +39,7 @@ def recepcjonisci_potrzebni(dane: Dane, klienci: dict[str, float]) -> int:
 
 
 def zamowienie_zasobow(dane: Dane, firma: Firma, klienci: dict[str, float], ceny_dostawcow: dict, jakosc: int,
-                       zapas: float = 1.05) -> list[dict]:
+                       zapas: float) -> list[dict]:
     """Zamówienia (u najtańszych dostawców w danej jakości), żeby starczyło na `klienci` × zapas."""
     potrzeba = {}
     for u, k in klienci.items():

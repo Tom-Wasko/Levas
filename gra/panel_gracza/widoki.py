@@ -8,7 +8,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from gry import serwisy
 from gry.models import Gra
-from silnik.boty import STRATEGIE
+from silnik.dane import dane_domyslne
 
 
 def _gra(id_: str):
@@ -20,7 +20,7 @@ def _gra(id_: str):
 
 @ensure_csrf_cookie
 def start(request):
-    strategie = {k: v["nazwa"] for k, v in STRATEGIE.items()}
+    strategie = {k: v["nazwa"] for k, v in dane_domyslne().boty["strategie"].items()}
     return render(request, "panel_gracza/start.html", {"strategie": strategie})
 
 

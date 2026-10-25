@@ -18,7 +18,7 @@ from copy import deepcopy
 import numpy as np
 
 from . import karta as kw
-from .dane import INSTRUKTOR, MIESIACE_NAZWY, RECEPCJONISTA, ZASOBY_KOLEJNOSC, Dane
+from .dane import INSTRUKTOR, MIESIACE_NAZWY, RECEPCJONISTA, Dane
 from .decyzje import lista_bledow, zastosuj
 from .dostawcy import ceny_miesiaca
 from .finanse import (
@@ -55,7 +55,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     ziarno = konfiguracja["ziarno"]
     z = dane.z
     if r >= 2:
-        s.kandydaci = dodaj_nowych(s.kandydaci, ziarno, r)
+        s.kandydaci = dodaj_nowych(dane, s.kandydaci, ziarno, r)
     ceny_dost = ceny_miesiaca(dane, ziarno, m, konfiguracja.get("ceny_dostawcow", "dane"))
     nazwy = sorted(s.firmy)
     kolejnosc = list(generator(ziarno, "kolejnosc", r).permutation(nazwy))
@@ -268,8 +268,9 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
         for zk in zakupy:
             k = f"{zk['zasob']}|{int(zk['jakosc'])}"
             zamowione[k] = zamowione.get(k, 0.0) + float(zk["ilosc"])
+    kolejnosc_zasobow = list(dane.zasoby)
     klucze = sorted(set(start["magazyn"]) | set(f.magazyn) | set(zamowione),
-                    key=lambda k: (ZASOBY_KOLEJNOSC.index(k.split("|")[0]), k))
+                    key=lambda k: (kolejnosc_zasobow.index(k.split("|")[0]), k))
     zuzyte = obsluga["zuzyte_zasoby"] if obsluga else {}
     for k in klucze:
         nazwa, q = k.split("|")

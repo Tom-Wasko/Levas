@@ -17,6 +17,7 @@ Ręcznie (z folderu `gra`):
 .venv\Scripts\python manage.py runserver 8765  # sam serwer (z przeładowaniem po zmianie kodu)
 .venv\Scripts\python -m pytest -q
 .venv\Scripts\python -m ruff check .
+.venv\Scripts\python -m silnik.dane sprawdz     # dane/*.yaml: schematy i odwołania
 ```
 
 ## Jak się gra
@@ -35,7 +36,7 @@ przełącznik `panel_gracza/static/motyw.js`.
 | Folder | Co zawiera |
 |---|---|
 | `silnik/` | silnik gry (czysty Python, bez Django): rynek, operacje, finanse, karta wyników, boty |
-| `dane/`, `zalozenia.json` | dane i niepewne parametry gry |
+| `dane/*.yaml` | dane gry i założenia (niepewne parametry), każdy z `zrodlo`; sprawdzenie: `python -m silnik.dane sprawdz` |
 | `levas/` | projekt Django (ustawienia, adresy) |
 | `gry/` | modele `Gra`, `Runda`, `Decyzja` (event sourcing: konfiguracja + decyzje, stan liczy silnik) i `serwisy.py` |
 | `api/` | widoki JSON dla zakładek (`widoki.py`) i budowa widoku rundy (`prezentacja.py`) |

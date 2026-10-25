@@ -3,7 +3,7 @@
 Miesiące z danymi (luty–czerwiec) – prawdziwe ceny z gry (chyba że gra ma ustawione ceny losowe).
 Pozostałe – baza serii (średnia z danych) × (1 + odchylenie), odchylenie losowe z ziarnem gry
 (analiza: ceny wahają się wokół stałej bazy, odchylenie std ≈ 5,7%, zmiana m/m ≤ 17%).
-Dostępni dostawcy: do marca trzech (FullService, InterShop, OfficeShop), od kwietnia sześciu.
+Dostępni dostawcy: do marca trzech (dostawcy.yaml: pierwsi), od kwietnia wszyscy (wszyscy_od_miesiaca).
 """
 from __future__ import annotations
 
@@ -13,9 +13,6 @@ import numpy as np
 
 from .dane import MIESIACE, Dane
 from .losowosc import generator
-
-PIERWSI = ("FullService", "InterShop", "OfficeShop")
-OD_KWIETNIA = 3  # indeks miesiąca, od którego są wszyscy dostawcy
 
 
 @lru_cache(maxsize=4)
@@ -41,9 +38,9 @@ def ceny_miesiaca(dane: Dane, ziarno, miesiac: int, tryb: str = "dane") -> dict:
     rng = generator(ziarno, "dostawcy", miesiac)
     wynik = {}
     for (d, z, q), s in sorted(_serie(dane).items()):
-        if miesiac < OD_KWIETNIA and d not in PIERWSI:
+        if miesiac < dane.dostawcy_wszyscy_od and d not in dane.dostawcy_pierwsi:
             continue
-        e = float(np.clip(rng.normal(0, odch["odchylenie"] * 1.3), -odch["max_zmiana"], odch["max_zmiana"]))
+        e = float(np.clip(rng.normal(0, odch["odchylenie"] * odch["mnoznik_odchylenia"]), -odch["max_zmiana"], odch["max_zmiana"]))
         cena = s["baza"] * (1 + e)
         wynik.setdefault(d, {}).setdefault(z, {})[q] = float(round(cena)) if s["calkowite"] else round(cena, 2)
     return wynik

@@ -116,7 +116,7 @@ popyt = popyt roczny / 12 × sezonowość                       ✔ (step, marze
 - **Elastyczność cenowa:** przy niezmienionych cenach konkurentów to około E₁ + E₂·(1 − 1/n), np. 2,0 przy 3 firmach. Wcześniejsze E ≈ 2,5 mieszało cenę z różnicami między firmami.
 - **Jakość ✔ (≈):** Vela (2/2,5/2★), Apex (1,33/1,75/1★) i boty ATH (1,5/2/2★) pasują do współczynników z dokładnością 2–3%.
 - **Wyposażenie ≈:** po zakupie WiFi, parkingu i terminala (kwiecień) popyt ATH wzrósł o 13–16%.
-- **Korekta miesiąca ? (niska pewność):** wspólny wzrost popytu botów latem (lipiec–sierpień +25%). Najpewniej sezonowość była odczytana niedokładnie z małego wykresu. Wartości są w `zalozenia.json`.
+- **Korekta miesiąca ? (niska pewność):** wspólny wzrost popytu botów latem (lipiec–sierpień +25%). Najpewniej sezonowość była odczytana niedokładnie z małego wykresu. Wartości są w `dane/zalozenia.yaml`.
 - **Boty w grze ATH:** Firma 1 i Firma 2 to boty prowadzącego („bot1”, „bot2” w Twoich notatkach).
 - **Popyt zaokrąglany do całych klientów** ✔. Różnice „wzrostu popytu przez reklamę” między usługami (np. 9,8% vs 10,9%) wynikają z zaokrągleń przy małych liczbach klientów.
 - **Zużycie zasobów** jest o 0,4–1% większe niż liczba obsłużonych klientów (ATH luty–sierpień). To reklamacje (usługa wykonana ponownie). Silnik: prawdopodobieństwo = ryzyko reklamacji pracownika × 0,15 ≈ (odtworzenie ATH: przy samym ryzyku zużycie było o 3,6% za duże).
@@ -219,7 +219,7 @@ r4 – klimatyzacja, fotel do masażu, roślinność; r8 – głośnik, lodówka
 
 ### 6.5 Szkolenia ✔ (oferta) / ≈ (efekt)
 Trzy firmy szkoleniowe: Edu for Fitness (90% zadowolonych klientów), Gym Masters (83%), Akademia Zdrowia (80%).
-12 szkoleń z % oczekujących pracowników i cenami w każdej firmie (`dane/katalog.json`). Przykłady: Creative yoga (90%,
+12 szkoleń z % oczekujących pracowników i cenami w każdej firmie (`dane/katalog.yaml`). Przykłady: Creative yoga (90%,
 2100–2500 PLN), Crossfit master (90%), Trening metaboliczny (89%).
 KPiR ATH: lipiec „Szkolenie w firmie: Edu for fitness” 4800 PLN (trening metaboliczny 2300 + stretching 2500), sierpień 3300 PLN
 (crossfit master 1600 + fit with ball 1700). Zadowolenie pracowników ATH i botów wzrosło w tych miesiącach o 0,07 i nie
@@ -302,7 +302,7 @@ Wartość magazynu gra liczy metodą **FIFO** ✔ (ATH lipiec: płyn 4,283 op. �
 - Kredyt: rata miesięczna. Kredyt odnawialny uruchamiany automatycznie przy braku gotówki i spłacany z nadwyżki w kolejnych miesiącach. Szczegóły (maks. kwota, okresy) ?.
 - ✔ (użytkownik) W oficjalnej grze przychody i wydatki miesiąca dzieją się jednocześnie – kredyt odnawialny pobierany tylko na niedobór (wydatki > saldo + przychody). W grze lokalnej opcja `kredyt_odnawialny` w konfiguracji: `jednoczesnie` (domyślnie, jak w oryginale) albo `na_biezaco` (zakupy z decyzji opłacane przed wpływem przychodów).
 - W styczniu w KPiR opłata za konto = 15 PLN (bank wybrany w r1).
-- ✔ (użytkownik) Dostępność banków: od rundy 1 MBP Bank, Beauty Bank, Euro Biznes Bank; pozostałe od rundy 4 (`od_rundy` w dane/katalog.json).
+- ✔ (użytkownik) Dostępność banków: od rundy 1 MBP Bank, Beauty Bank, Euro Biznes Bank; pozostałe od rundy 4 (`od_rundy` w dane/katalog.yaml).
 
 ### Dostępność marketingu (✔ użytkownik)
 - Tradycyjny: runda 5 – Billboard/Ulotki i Prasa; runda 6 – Radio; runda 7 – Telewizja.
@@ -442,7 +442,7 @@ Pełny opis i wykresy: `SPRAWOZDANIE_ODTWORZENIA.html` (artefakt), skrypty: `kal
 wyników; po raz pierwszy z wyposażeniem, udogodnieniami, reklamą, narzędziami i jakością zasobów botów. Wybór wzorów:
 walidacja krzyżowa (prognoza danych pominiętych przy dopasowaniu).
 
-| Mechanizm | Obowiązuje (zalozenia.json) | Zmiana wobec rozdz. 4, 10, 11, 16 |
+| Mechanizm | Obowiązuje (dane/zalozenia.yaml) | Zmiana wobec rozdz. 4, 10, 11, 16 |
 |---|---|---|
 | Cena w popycie | r^−1,096 · e^(−1,004·(r − r̄)) · n^−0,247, M = 1,498 | postać potęgowa zamiast e^(−1,41(r−1)) |
 | Sezonowość | z instrukcji; korekta luty–październik 0,90–1,00, listopad 0,808, grudzień 0,796 | **dawne +20% we IX–X było wyposażeniem botów** |

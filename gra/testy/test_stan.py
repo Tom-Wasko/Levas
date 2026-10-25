@@ -6,7 +6,7 @@ from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from silnik import Gra
-from silnik.boty import STRATEGIE
+from silnik.dane import dane_domyslne
 from silnik.model import (
     WERSJA_STANU,
     Cena,
@@ -98,7 +98,7 @@ def _gra(ziarno: int, boty: list[str], rundy: int) -> Gra:
 @settings(max_examples=6, deadline=None, suppress_health_check=[HealthCheck.too_slow])
 @given(
     ziarno=st.integers(0, 10**9),
-    boty=st.lists(st.sampled_from(sorted(STRATEGIE)), min_size=1, max_size=4),
+    boty=st.lists(st.sampled_from(sorted(dane_domyslne().boty["strategie"])), min_size=1, max_size=4),
 )
 def test_to_samo_ziarno_i_decyzje_daja_ten_sam_wynik(ziarno, boty):
     a, b = _gra(ziarno, boty, 3), _gra(ziarno, boty, 3)

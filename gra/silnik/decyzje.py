@@ -105,7 +105,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         n = int(n or 0)
         if n <= 0:
             continue
-        n = min(n, 5)
+        n = min(n, dane.maks_nowych_stanowisk)
         start = len(firma.stanowiska_typu(typ))
         for i in range(n):
             firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda))

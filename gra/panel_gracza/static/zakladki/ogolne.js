@@ -79,7 +79,7 @@ export const karta_wynikow = {
       <div class="wykres"><canvas id="w-karta"></canvas></div>
       <div class="wykres"><canvas id="w-historia"></canvas></div>
       <p class="podpowiedz">Wynik działalności = iloczyn pozostałych wskaźników (0 przy stracie). Wynik ekonomiczny = dochód netto / 20 000 PLN.
-      Zadowolenie i rozwój liczone są ze skalibrowanych wzorów (zalozenia.json) – mogą odbiegać od prawdziwej gry.</p>`;
+      Zadowolenie i rozwój liczone są ze skalibrowanych wzorów (dane/zalozenia.yaml) – mogą odbiegać od prawdziwej gry.</p>`;
   },
   po({ v }) {
     const karty = skumulowana ? v.karta_skumulowana : v.rynek.karta;

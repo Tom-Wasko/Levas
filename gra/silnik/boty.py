@@ -2,7 +2,7 @@
 po poprzedniej rundzie i danych publicznych rynku. Deterministyczne (ziarno gry), więc w grze przez GitHub
 każdy komputer liczy je sam.
 
-Strategie (parametry w STRATEGIE): cena w % ceny preferowanej, jakość (gwiazdki sprzętu, zasobów, pracowników),
+Strategie (dane/boty.yaml: strategie): cena w % ceny preferowanej, jakość (gwiazdki sprzętu, zasobów, pracowników),
 docelowa liczba usług, pokrycie popytu, inwestycje w wyposażenie i udogodnienia, reklama, szkolenia.
 """
 from __future__ import annotations
@@ -20,22 +20,6 @@ from .planowanie import (
 )
 from .rynek import mnoznik_wyposazenia
 
-STRATEGIE = {
-    "zrownowazony": {"nazwa": "Zrównoważony", "cena": 0.92, "jakosc": 2, "uslugi": 9, "pokrycie": 0.9,
-                     "wyposazenie": 2, "udogodnienia": 2, "reklama": {}, "internet": [], "szkolenia": 0},
-    "tani": {"nazwa": "Tani masowy", "cena": 0.78, "jakosc": 1, "uslugi": 12, "pokrycie": 0.85,
-             "wyposazenie": 0, "udogodnienia": 0, "reklama": {"Ulotki": 10}, "internet": ["Informacje na forach internetowych"],
-             "szkolenia": 0},
-    "premium": {"nazwa": "Premium", "cena": 1.08, "jakosc": 3, "uslugi": 8, "pokrycie": 1.0,
-                "wyposazenie": 6, "udogodnienia": 9, "reklama": {"Super Fit (dziennik)": 6}, "internet": ["Strona www firmy"],
-                "szkolenia": 2},
-    "agresywny": {"nazwa": "Agresywny marketing", "cena": 0.80, "jakosc": 3, "uslugi": 12, "pokrycie": 1.0,
-                  "wyposazenie": 6, "udogodnienia": 6,
-                  "reklama": {"Ulotki": 20, "Ekrany LED": 11, "Super Fit (dziennik)": 14, "Radio Fakty": 21},
-                  "internet": ["Strona www firmy", "Profil na Facebook", "Informacje na forach internetowych"], "szkolenia": 2},
-    "nasladowca": {"nazwa": "Naśladowca", "cena": None, "jakosc": 2, "uslugi": 9, "pokrycie": 0.9,
-                   "wyposazenie": 3, "udogodnienia": 3, "reklama": {}, "internet": [], "szkolenia": 1},
-}
 ZAWOD_STANOWISKA = {INSTRUKTOR: "instruktor", TRENER: "instruktor", RECEPCJONISTA: "recepcja"}
 
 
@@ -50,12 +34,15 @@ def _cena(dane: Dane, strategia: dict, stan: StanGry, u: str, runda: int) -> flo
     wsp = strategia["cena"]
     if wsp is None:  # naśladowca: średnia cen rynku z poprzedniej rundy
         ceny = stan.rynek.get(runda - 1, {}).get("ceny", {}).get(u, {})
-        wsp = (sum(ceny.values()) / len(ceny) / pref) if ceny else 0.95
-    return round(pref * wsp * 2) / 2
+        wsp = (sum(ceny.values()) / len(ceny) / pref) if ceny else dane.boty["ustawienia"]["cena_nasladowcy_bez_danych"]
+    krok = dane.boty["ustawienia"]["krok_ceny"]
+    return round(pref * wsp / krok) * krok
 
 
 def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict) -> dict:
-    st = STRATEGIE.get(strategia_klucz, STRATEGIE["zrownowazony"])
+    strategie = dane.boty["strategie"]
+    st = strategie.get(strategia_klucz, strategie["zrownowazony"])
+    ust = dane.boty["ustawienia"]
     f: Firma = stan.firmy[nazwa]
     q = st["jakosc"]
     m = runda - 1
@@ -103,7 +90,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         for _ in range(max(0, potrzeba - len(maja))):
             if wolne:
                 cel = wolne.pop(0).nr
-            elif len(nowe_inst) < 5:
+            elif len(nowe_inst) < dane.maks_nowych_stanowisk:
                 cel = nastepny
                 nowe_inst.append(u)
                 nastepny += 1
@@ -115,7 +102,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     # recepcja
     rec = f.stanowiska_typu("recepcja")
     potrzeba_rec = max(1, recepcjonisci_potrzebni(dane, klienci))
-    nowe_rec = min(5, max(0, potrzeba_rec - len(rec)))
+    nowe_rec = min(dane.maks_nowych_stanowisk, max(0, potrzeba_rec - len(rec)))
     for s in rec:  # stanowiska kupione wcześniej (np. w rundzie 1, gdy sprzęt był jeszcze niedostępny)
         for n in dane.sprzet_recepcji:
             if n not in s.sprzet:
@@ -143,7 +130,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             kandydaci = [k for k in pula if k["zawod"] == zawod]
             if not kandydaci:
                 continue
-            najlepsi = sorted(kandydaci, key=lambda k: (abs(k["gwiazdki"] - q), k["pensja_preferowana"]))[:3]
+            najlepsi = sorted(kandydaci, key=lambda k: (abs(k["gwiazdki"] - q), k["pensja_preferowana"]))[:ust["losuj_z_najlepszych_kandydatow"]]
             k = najlepsi[int(rng.integers(len(najlepsi)))]
             pula.remove(k)
             d["zatrudnij"].append({"kandydat": k["id"], "typ": typ, "nr": nr, "pensja": k["pensja_preferowana"],
@@ -154,10 +141,10 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:
         ceny_d = ceny_miesiaca(dane, konf["ziarno"], m, konf.get("ceny_dostawcow", "dane"))
-        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q)
+        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"])
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka)
-    bufor = f.gotowka > 30000
+    bufor = f.gotowka > ust["bufor_gotowki"]
     if "inwestycje_wyposazenie" in odbl and bufor:
         d["wyposazenie_kup"] = [p["nazwa"] for p in sorted(dane.pozycje("wyposazenie").values(), key=lambda p: -p["procent"])
                                 if p["od_rundy"] <= runda and p["nazwa"] not in f.wyposazenie][:max(0, st["wyposazenie"] - len(f.wyposazenie))]

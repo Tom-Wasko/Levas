@@ -1,4 +1,4 @@
-"""Popyt firm na usługi (model skalibrowany w kalibracja/kalibracja_popytu.py, parametry w zalozenia.json).
+"""Popyt firm na usługi (model skalibrowany w kalibracja/kalibracja_popytu.py, parametry w dane/zalozenia.yaml).
 
 popyt = popyt roczny / 12 × sezonowość × korekta miesiąca × mnożnik bazowy
         × jakość (0,4 pracownicy + 0,4 sprzęt + 0,2 zasoby)
@@ -74,7 +74,7 @@ def mnoznik_wyposazenia(dane: Dane, wyposazenie: list[str]) -> float:
 
 
 def mnoznik_firmy(dane: Dane, firma) -> float:
-    """Czynniki całej firmy poza reklamą i wyposażeniem – oba wyłączone w zalozenia.json (analiza_od_nowa.py):
+    """Czynniki całej firmy poza reklamą i wyposażeniem – oba wyłączone w dane/zalozenia.yaml (analiza_od_nowa.py):
     - baza klientów: trwała utrata klientów po utraconej sprzedaży (utrata_klientow; hipoteza odrzucona – 0),
     - sprzęt recepcji: cały 1★ → × recepcja_1gw_mnoznik (1,0), wartości pośrednie liniowo."""
     p = dane.z["popyt"]

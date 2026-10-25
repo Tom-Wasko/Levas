@@ -1,4 +1,4 @@
-"""Karta wyników: 5 wskaźników i wynik działalności (iloczyn). Wzory i parametry: zalozenia.json → karta_wynikow.
+"""Karta wyników: 5 wskaźników i wynik działalności (iloczyn). Wzory i parametry: dane/zalozenia.yaml → karta_wynikow.
 
 - wynik ekonomiczny = dochód netto / 20 000 (potwierdzone na 7 rundach gry ATH),
 - wynik działalności = iloczyn wskaźników; 0, gdy wynik ekonomiczny < 0,
