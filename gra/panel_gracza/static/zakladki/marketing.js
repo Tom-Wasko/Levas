@@ -1,5 +1,5 @@
 // Marketing tradycyjny i internetowy.
-import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, OKRES, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
 
 const KATEGORIE = { billboard_ulotki: "Billboard / ulotki", prasa: "Prasa", radio: "Radio", telewizja: "Telewizja" };
 
@@ -16,7 +16,7 @@ function efekty(v, kat) {
 
 export const tradycyjny = {
   tytul: "Tradycyjny", tytulPelny: "Marketing - tradycyjny", ikona: "📣", odblokowanie: "marketing_tradycyjny",
-  info: "Podejmij decyzję o promowaniu Twojej firmy w mediach tradycyjnych. Reklama zwiększa popyt na wszystkie dania w tym miesiącu.",
+  info: () => `Podejmij decyzję o promowaniu Twojej firmy w mediach tradycyjnych. Reklama zwiększa popyt na wszystkie dania w tym ${OKRES.miejscownik}.`,
   decyzje({ v, kat, edycja }) {
     const em = v.decyzje.reklama_tradycyjna || {};
     const media = kat.oferty.media_tradycyjne.pozycje;
@@ -57,18 +57,18 @@ export const tradycyjny = {
 
 export const internetowy = {
   tytul: "Internetowy", tytulPelny: "Marketing - internetowy", ikona: "⌨", odblokowanie: "marketing_internetowy",
-  info: "Uruchom narzędzia reklamy internetowej. Uruchomienie kosztuje jednorazowo, utrzymanie co miesiąc. Efekt jest największy w miesiącu uruchomienia.",
+  info: () => `Uruchom narzędzia reklamy internetowej. Uruchomienie kosztuje jednorazowo, utrzymanie co rundę. Efekt jest największy w rundzie uruchomienia.`,
   decyzje({ v, kat, edycja }) {
     const narz = kat.oferty.narzedzia_internetowe.pozycje;
     const przed = v.stan_przed.internet, teraz = v.stan.internet;
     const uruch = narz.filter((n) => n.nazwa in teraz && !(n.nazwa in przed)).reduce((s, n) => s + n.uruchomienie, 0);
     const utrz = narz.filter((n) => n.nazwa in teraz).reduce((s, n) => s + n.utrzymanie, 0);
-    return `<div class="pasek ciemny"><span>Koszt uruchomienia: <span class="kwota">${zl(uruch)}</span></span><span>Koszt utrzymania: <span class="kwota">${zl(utrz)}</span> / mies.</span></div>
+    return `<div class="pasek ciemny"><span>Koszt uruchomienia: <span class="kwota">${zl(uruch)}</span></span><span>Koszt utrzymania: <span class="kwota">${zl(naRunde(utrz))}</span>${naOkres()}</span></div>
       <div class="siatka trojka" style="margin-top:18px">${narz.map((n) => {
         const ma = n.nazwa in teraz, mial = n.nazwa in przed, dost = (n.od_rundy || 1) <= v.runda;
         return `<div class="kafel ${ma ? "wybrany" : ""} ${dost ? "" : "niedostepny"}"><div class="kg">${esc(n.nazwa)}${n.zalozenie ? '<span class="pigulka inf" title="koszt szacunkowy">≈</span>' : ""}</div><div class="kt">
           <div class="wiersz"><span>Koszt uruchomienia</span><span>${zl(n.uruchomienie)}</span></div>
-          <div class="wiersz"><span>Koszt utrzymania</span><span>${zl(n.utrzymanie)}</span></div>
+          <div class="wiersz"><span>Koszt utrzymania</span><span>${zl(naRunde(n.utrzymanie))}${naOkres()}</span></div>
           ${mial ? `<div class="wiersz"><span>Uruchomione</span><span>runda ${przed[n.nazwa]}</span></div>` : ""}</div>
           <div class="kd"><button class="btn ${ma ? (mial ? "pom" : "zielony") : "czarny"}" data-akcja="internet" data-n="${esc(n.nazwa)}" ${edycja && dost ? "" : "disabled"}>
             ${!dost ? `Dostępne od rundy ${n.od_rundy}` : ma ? (mial ? "Wyłącz" : "✓ Wybrano") : mial ? "✓ Wyłączone (włącz)" : "Wybierz"}</button></div></div>`;

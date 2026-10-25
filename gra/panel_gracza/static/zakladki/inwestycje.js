@@ -1,5 +1,5 @@
 // Inwestycje: stanowiska, sprzęt, wyposażenie dla klientów.
-import { esc, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const suma = (pozycje, start) => pozycje.filter((p) => p.opis.startsWith(start)).reduce((s, p) => s + p.pozostale, 0);
@@ -11,7 +11,7 @@ export const stanowiska = {
     const pakiety = kat.oferty.stanowiska.pakiety;
     const nowe = v.decyzje.stanowiska || {};
     const koszt = suma(v.koszty_decyzji, "Uruchomienie stanowiska");
-    let html = `<div class="pasek ciemny"><span>Miesięczny koszt utrzymania lokalu: <span class="kwota">${zl(kat.parametry.utrzymanie_klubu)}</span></span>
+    let html = `<div class="pasek ciemny"><span>${OKRES.przymiotnik} koszt utrzymania lokalu: <span class="kwota">${zl(naRunde(kat.parametry.utrzymanie_klubu))}</span></span>
       <span>Nowe stanowiska: <span class="kwota">${zl(koszt)}</span></span></div><div class="dwie" style="margin-top:20px">`;
     for (const typ of TYPY) {
       const maja = v.stan_przed.stanowiska.filter((s) => s.typ === typ).length;
@@ -41,7 +41,7 @@ export const sprzet = {
     const koszt = suma(v.koszty_decyzji, "Koszt zakupu: ");
     const utrz = v.stan.stanowiska.reduce((s, st) => s + Object.entries(st.sprzet).reduce((a, [n, q]) => a + kat.sprzet[n].utrzymanie[q], 0), 0);
     let html = `<div class="pasek ciemny"><span>Koszty całkowite zakupu: <span class="kwota">${zl(koszt)}</span></span>
-      <span>Koszt utrzymania sprzętu: <span class="kwota">${zl(utrz)}</span> / mies.</span></div>`;
+      <span>Koszt utrzymania sprzętu: <span class="kwota">${zl(naRunde(utrz))}</span>${naOkres()}</span></div>`;
     for (const typ of TYPY) {
       const st = v.stan.stanowiska.filter((s) => s.typ === typ);
       html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}</div>`;
@@ -113,7 +113,7 @@ function oknoZakupu(c, typ, nr) {
     const przycisk = posiadany ? `<span class="pigulka ok">w posiadaniu ${gw(przed[n])}</span>`
       : kupione ? `<button class="btn zielony maly" data-akcja="kup-poz" data-t="${typ}" data-n="${nr}" data-nazwa="${esc(n)}" data-q="0">✓ Kupione</button>`
       : `<button class="btn pom maly" data-akcja="kup-poz" data-t="${typ}" data-n="${nr}" data-nazwa="${esc(n)}" data-q="${q}" ${n in teraz ? "disabled" : ""}>Kup</button>`;
-    wiersze.push([esc(n), gw(q), esc(kat.oferty.stanowiska.typy[typ].kto), zl(kat.sprzet[n].ceny[q]), zl(kat.sprzet[n].utrzymanie[q]), przycisk]);
+    wiersze.push([esc(n), gw(q), esc(kat.oferty.stanowiska.typy[typ].kto), zl(kat.sprzet[n].ceny[q]), zl(naRunde(kat.sprzet[n].utrzymanie[q])), przycisk]);
   }
   const uslugi = Object.entries(kat.uslugi).map(([k, u]) => `<option value="${k}">${esc(u.nazwa)}</option>`).join("");
   const komplet = `<div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px">
@@ -121,7 +121,7 @@ function oknoZakupu(c, typ, nr) {
     <label class="pole">Jakość<select id="komplet-jakosc"><option value="3">★★★ wysoka</option><option value="2">★★ średnia</option><option value="1">★ niska</option></select></label>
     <button class="btn czarny" data-akcja="kup-komplet" data-t="${typ}" data-n="${nr}">Kup brakujący ${typ === "kasa" ? "komplet kasy" : "komplet"}</button></div>`;
   okno(`Zakup sprzętu na stanowisko „Stanowisko nr ${nr}”`, komplet + tabela(null,
-    ["Nazwa sprzętu", "Jakość", "Wykorzystanie sprzętu", "Koszt zakupu", "Koszt utrzymania", ""], wiersze, { klasy: ["l"] }),
+    ["Nazwa sprzętu", "Jakość", "Wykorzystanie sprzętu", "Koszt zakupu", `Koszt utrzymania${naOkres()}`, ""], wiersze, { klasy: ["l"] }),
     { przyciski: `<button class="btn pom" data-akcja="zamknij-okno">OK</button>` });
 }
 
@@ -129,10 +129,10 @@ function oknoSprzedazy(c, typ, nr) {
   const { v, kat } = c;
   const { przed } = sprzetStanowiska(v, typ, nr);
   const sprzedawane = (v.decyzje.sprzet_sprzedaj || []).filter((x) => x.typ === typ && x.nr === nr).map((x) => x.nazwa);
-  const w = Object.entries(przed).map(([n, q]) => [esc(n), gw(q), zl(v.ceny_sprzedazy_sprzetu[n][q]), zl(kat.sprzet[n].utrzymanie[q]),
+  const w = Object.entries(przed).map(([n, q]) => [esc(n), gw(q), zl(v.ceny_sprzedazy_sprzetu[n][q]), zl(naRunde(kat.sprzet[n].utrzymanie[q])),
     `<button class="btn ${sprzedawane.includes(n) ? "zielony" : "pom"} maly" data-akcja="sprzedaj-poz" data-t="${typ}" data-n="${nr}" data-nazwa="${esc(n)}">${sprzedawane.includes(n) ? "✓ Sprzedane" : "Sprzedaj"}</button>`]);
   const przychod = Object.entries(przed).filter(([n]) => sprzedawane.includes(n)).reduce((s, [n, q]) => s + v.ceny_sprzedazy_sprzetu[n][q], 0);
-  okno(`Sprzedaż sprzętu ze stanowiska „Stanowisko nr ${nr}”`, tabela(null, ["Nazwa", "Jakość", "Przychody ze sprzedaży", "Koszt utrzymania", ""], w, { klasy: ["l"] })
+  okno(`Sprzedaż sprzętu ze stanowiska „Stanowisko nr ${nr}”`, tabela(null, ["Nazwa", "Jakość", "Przychody ze sprzedaży", `Koszt utrzymania${naOkres()}`, ""], w, { klasy: ["l"] })
     + `<p><b>Przychody ze sprzedaży: ${zl(przychod)}</b></p>`, { przyciski: `<button class="btn pom" data-akcja="zamknij-okno">OK</button>` });
 }
 
@@ -154,7 +154,7 @@ export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
   const utrz = pozycje.filter((p) => teraz.includes(p.nazwa)).reduce((s, p) => s + p.utrzymanie, 0);
   const sprzedaz = pozycje.filter((p) => przed.includes(p.nazwa) && !teraz.includes(p.nazwa)).reduce((s, p) => s + p.cena / 2, 0);
   return `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl(kupno)}</span></span>
-    <span>Koszt utrzymania: <span class="kwota">${zl(utrz)}</span></span><span>Przychody ze sprzedaży: <span class="kwota">${zl(sprzedaz)}</span></span></div>
+    <span>Koszt utrzymania: <span class="kwota">${zl(naRunde(utrz))}</span>${naOkres()}</span><span>Przychody ze sprzedaży: <span class="kwota">${zl(sprzedaz)}</span></span></div>
     <div class="siatka trojka" style="margin-top:20px">${pozycje.map((p) => {
       const mial = przed.includes(p.nazwa), ma = teraz.includes(p.nazwa);
       const przycisk = mial
@@ -162,7 +162,7 @@ export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
         : `<button class="btn ${ma ? "zielony" : "czarny"}" data-akcja="kup-udog" data-r="${rodzaj}" data-nazwa="${esc(p.nazwa)}" ${edycja ? "" : "disabled"}>${ma ? "✓ Wybrano" : "Wybierz"}</button>`;
       return `<div class="kafel ${ma ? "wybrany" : ""}"><div class="kg">${esc(p.nazwa)}<span class="pigulka inf" title="% ${kogo} oczekujących">${p.procent}%</span></div>
         <div class="kt"><div class="wiersz"><span>${mial ? "Cena sprzedaży" : "Cena zakupu"}</span><span>${zl(mial ? p.cena / 2 : p.cena)}</span></div>
-        <div class="wiersz"><span>Koszt utrzymania</span><span>${zl(p.utrzymanie)}</span></div>
+        <div class="wiersz"><span>Koszt utrzymania</span><span>${zl(naRunde(p.utrzymanie))}${naOkres()}</span></div>
         <div class="wiersz"><span>% ${kogo} oczekujących</span><span>${p.procent}%</span></div></div><div class="kd">${przycisk}</div></div>`;
     }).join("")}</div>`;
 }

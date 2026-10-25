@@ -43,6 +43,18 @@ def test_strony_i_statyki(client):
     assert finders.find("app.js") and finders.find("zakladki/index.js")
 
 
+def test_domyslna_gra_tygodniowa(client):
+    strona = client.get("/").content.decode()
+    assert 'value="26"' in strona and "100 000 PLN" in strona
+    id_ = _nowa(client, liczba_rund="")
+    v = client.get(_url(id_, "widok")).json()
+    kal = v["gra"]["kalendarz"]
+    assert v["gra"]["liczba_rund"] == 26 and kal["rund_w_roku"] == 52 and len(kal["nazwy"]) == 26
+    assert v["miesiac"] == kal["nazwy"][0] and kal["nazwy"][0].startswith("Tydzień 1")
+    st = {s["typ"] for s in v["stan"]["stanowiska"]}
+    assert st == {"kuchnia", "kasa"}  # gotowy lokal na start
+
+
 def test_nowa_gra_walidacja(client):
     def blad(firmy):
         r = client.post("/api/gry", {"firmy": firmy}, content_type="application/json")

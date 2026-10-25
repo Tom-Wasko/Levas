@@ -1,5 +1,6 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
-import { esc, info, MIESIACE, okno, toast, wyczyscWykresy, zamknijOkno, zl } from "./zakladki/wspolne.js";
+import { esc, info, nazwaRundy, OKRES, okno, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
+  from "./zakladki/wspolne.js";
 import ZAKLADKI, { IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
 
@@ -37,6 +38,7 @@ async function wczytaj(runda = S.runda) {
 
 function ustaw(v) {
   S.v = v;
+  ustawKalendarz(v.gra.kalendarz);
   S.runda = v.runda;
   S.d = kopia(v.decyzje);
   const z = ZAKLADKI[S.zakladka];
@@ -113,11 +115,12 @@ function osRund(v, runda) {
   let html = "";
   for (let r = lmin; r <= v.gra.liczba_rund; r++) {
     const rozegrana = r < v.gra.runda, strata = dochod[r] != null && dochod[r] < 0;
-    const opis = dochod[r] != null ? `${MIESIACE[r - 1]}: dochód netto ${zl(dochod[r])}`
-      : rozegrana ? `${MIESIACE[r - 1]}: rozegrana` : r === v.gra.runda ? `${MIESIACE[r - 1]}: bieżąca runda` : `${MIESIACE[r - 1]}: przed Tobą`;
+    const n = nazwaRundy(r);
+    const opis = dochod[r] != null ? `${n}: dochód netto ${zl(dochod[r])}`
+      : rozegrana ? `${n}: rozegrana` : r === v.gra.runda ? `${n}: bieżąca runda` : `${n}: przed Tobą`;
     const kl = [rozegrana ? "rozegrana" : "", strata ? "strata" : "", r === v.gra.runda && !v.gra.zakonczona ? "biezaca" : "",
       r === runda ? "ogladana" : "", r > lmax ? "przyszla" : ""].filter(Boolean).join(" ");
-    html += `<span class="runda-os ${kl}" data-r="${r}" ${r <= lmax ? `data-akcja="runda-idz"` : ""} title="${esc(opis)}"><b>${MIESIACE[r - 1].slice(0, 3)}</b></span>`;
+    html += `<span class="runda-os ${kl}" data-r="${r}" ${r <= lmax ? `data-akcja="runda-idz"` : ""} title="${esc(opis)}"><b>${esc(skrotRundy(r))}</b></span>`;
   }
   return `<div class="os-rund" aria-label="Rundy gry">${html}</div>`;
 }
@@ -128,7 +131,7 @@ function glowa(v, z, tryb, decyzje, wyniki, runda) {
       <div class="tytul">${ikona(IKONY[S.zakladka])}${z.tytulPelny || z.tytul}</div>
       <div class="nawigator">
         <span class="strzalka ${runda <= lmin ? "wylaczona" : ""}" data-akcja="runda" data-d="-1" title="Poprzednia runda">${ikona("lewo", 18)}</span>
-        <span class="miesiac" id="nawigator-miesiac">${MIESIACE[runda - 1]} (<b>runda nr ${runda}</b>)${runda === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}</span>
+        <span class="miesiac" id="nawigator-miesiac">${esc(nazwaRundy(runda))} (<b>runda nr ${runda}</b>)${runda === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}</span>
         <span class="strzalka ${runda >= lmax ? "wylaczona" : ""}" data-akcja="runda" data-d="1" title="Następna runda">${ikona("prawo", 18)}</span>
         ${osRund(v, runda)}
       </div>
@@ -167,7 +170,7 @@ function rysuj() {
   const tryb = S.tryb === "wyniki" && wyniki ? "wyniki" : decyzje ? "decyzje" : "wyniki";
   const tresc = tryb === "wyniki" ? z.wyniki(c) : z.decyzje(c);
   const podglad = !v.edycja && v.runda < v.gra.runda
-    ? `<div class="komunikat">Podgląd rundy ${v.runda} (${v.miesiac}) – decyzje z tej rundy są tylko do odczytu. Wyniki pokazują skutki poprzedniego miesiąca.</div>` : "";
+    ? `<div class="komunikat">Podgląd rundy ${v.runda} (${v.miesiac}) – decyzje z tej rundy są tylko do odczytu. Wyniki pokazują skutki poprzedniego ${OKRES.dopelniacz}.</div>` : "";
   const wyslane = v.edycja && v.wyslane && tryb === "decyzje" && S.zakladka !== "wyslij"
     ? `<div class="komunikat ok">Decyzje tej rundy są wysłane. Aby je zmienić, wróć do podejmowania decyzji w zakładce „Wyślij decyzje”.</div>` : "";
   document.getElementById("karta").innerHTML = glowa(v, z, tryb, decyzje, wyniki, v.runda) + podzakladki()
@@ -180,7 +183,7 @@ function rysuj() {
   window.scrollTo({ top: przewiniecie });
 }
 
-// strzałki miesięcy: natychmiastowa zmiana napisu, wczytanie po krótkiej pauzie (można klikać szybko)
+// strzałki rund: natychmiastowa zmiana napisu, wczytanie po krótkiej pauzie (można klikać szybko)
 function przesunRunde(o) { idzDoRundy((S.celRundy ?? S.v.runda) + o); }
 
 function idzDoRundy(r) {
@@ -190,7 +193,7 @@ function idzDoRundy(r) {
   S.celRundy = cel;
   document.querySelectorAll(".os-rund .runda-os").forEach((s) => s.classList.toggle("ogladana", +s.dataset.r === cel));
   const napis = document.getElementById("nawigator-miesiac");
-  if (napis) napis.innerHTML = `${MIESIACE[cel - 1]} (<b>runda nr ${cel}</b>)${cel === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}`;
+  if (napis) napis.innerHTML = `${esc(nazwaRundy(cel))} (<b>runda nr ${cel}</b>)${cel === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}`;
   document.querySelectorAll(".nawigator .strzalka").forEach((s) => {
     s.classList.toggle("wylaczona", (+s.dataset.d < 0 && cel <= lmin) || (+s.dataset.d > 0 && cel >= lmax));
   });

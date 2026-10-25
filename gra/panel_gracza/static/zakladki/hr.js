@@ -1,5 +1,5 @@
 // HR: zatrudnienie, udogodnienia, szkolenia.
-import { esc, gw, inicjaly, licz, nazwaFirmy, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
@@ -13,7 +13,7 @@ export const zatrudnienie = {
   tytul: "Zatrudnienie", tytulPelny: "HR - zatrudnienie", ikona: "☺", odblokowanie: "hr_zatrudnienie",
   info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Inwestycje → Stanowiska).",
   decyzje({ v, kat, edycja }) {
-    let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(kosztWynagrodzen(v, kat), true)}</span> brutto (z ZUS pracodawcy)</span></div>`;
+    let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(naRunde(kosztWynagrodzen(v, kat)), true)}</span>${naOkres()} brutto (z ZUS pracodawcy; pensje w umowach – miesięczne)</span></div>`;
     if (v.nieudane_zatrudnienia?.length) html += `<div class="komunikat zly">Część kandydatów zatrudniła już inna firma – wybierz innych.</div>`;
     for (const typ of TYPY) {
       const st = v.stan.stanowiska.filter((s) => s.typ === typ);
@@ -141,7 +141,7 @@ export const udogodnienia = {
 
 export const szkolenia = {
   tytul: "Szkolenia", tytulPelny: "HR - szkolenia", ikona: "✎", odblokowanie: "hr_szkolenia",
-  info: "Zapewnij swoim pracownikom możliwości rozwoju i zaoferuj im udział w szkoleniach (szkolenie obejmuje wszystkich pracowników, działa w tym miesiącu).",
+  info: () => `Zapewnij swoim pracownikom możliwości rozwoju i zaoferuj im udział w szkoleniach (szkolenie obejmuje wszystkich pracowników, działa w tym ${OKRES.miejscownik}).`,
   decyzje({ v, kat, edycja }) {
     const s = kat.oferty.szkolenia, wyb = v.decyzje.szkolenia || [];
     const koszt = wyb.reduce((a, x) => { const p = s.pozycje.find((q) => q.nazwa === x.szkolenie); const i = s.firmy.findIndex((f) => f.nazwa === x.firma); return a + (p && i >= 0 ? p.ceny[i] : 0); }, 0);

@@ -22,16 +22,16 @@
     </div>
     <div class="karta" style="margin-top:24px">
       <div class="karta-glowa"><div class="tytul">Nowa gra</div><div></div><div></div></div>
-      <div class="info"><span class="i">i</span><span>Dodaj firmy graczy (na tym komputerze) i boty komputerowe. Gra zaczyna się w styczniu (runda 1) z kapitałem 40 000 PLN.</span></div>
+      <div class="info"><span class="i">i</span><span>Dodaj firmy graczy (na tym komputerze) i boty komputerowe. Runda to {{ kalendarz.okres }}. Gra zaczyna się w rundzie 1 – {{ kalendarz.pierwsza }} – z kapitałem {{ kapital }} PLN i gotowym lokalem.</span></div>
       <div class="tresc">
         <div class="dwie">
           <label class="pole">Nazwa gry<input type="text" id="nazwa" value="Trening"></label>
-          <label class="pole">Liczba rund (miesięcy)<input type="number" id="rundy" min="2" max="12" value="12"></label>
+          <label class="pole">Liczba rund ({{ kalendarz.mnoga }})<input type="number" id="rundy" min="2" max="{{ kalendarz.maks }}" value="{{ kalendarz.domyslna }}"></label>
           <label class="pole">Ziarno losowości (puste = losowe)<input type="text" id="ziarno" placeholder="np. 2026"></label>
           <label class="pole">Kredyt odnawialny<select id="kredyt">
-            <option value="jednoczesnie">jak w oficjalnej grze – przychody i wydatki jednocześnie (kredyt tylko na niedobór miesiąca)</option>
+            <option value="jednoczesnie">jak w oficjalnej grze – przychody i wydatki jednocześnie (kredyt tylko na niedobór na koniec rundy)</option>
             <option value="na_biezaco">na bieżąco – zakupy opłacane przed wpływem przychodów</option></select></label>
-          <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">prawdziwe z gry (luty–czerwiec), dalej generowane</option>
+          <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">z danych gry (pierwsze rundy), dalej generowane</option>
             <option value="losowe">wszystkie generowane</option></select></label>
         </div>
         <div class="tabela-tytul">Firmy na rynku</div>

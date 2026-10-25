@@ -7,6 +7,7 @@ nie zmienia wyników gry. Uruchomienie: `python -m silnik.dane sprawdz`.
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -148,7 +149,23 @@ class Sekcja(Schemat):
     zrodlo: str = Zrodlo
 
 
+class Kalendarz(Sekcja):
+    """Długość rundy: tydzień (52 rundy w roku) albo miesiąc (12); start = pierwszy dzień rundy 1."""
+    okres: Literal["tydzien", "miesiac"]
+    rund_w_roku: int
+    start: date
+
+    @model_validator(mode="after")
+    def _okres(self) -> Kalendarz:
+        if self.rund_w_roku != {"tydzien": 52, "miesiac": 12}[self.okres]:
+            raise ValueError("rund_w_roku: tydzień → 52, miesiąc → 12")
+        if self.okres == "miesiac" and self.start.day != 1:
+            raise ValueError("runda miesięczna zaczyna się pierwszego dnia miesiąca")
+        return self
+
+
 class Rundy(Sekcja):
+    kalendarz: Kalendarz
     domyslna_liczba: int = Field(gt=0)
     odblokowanie: dict[str, list[str]]
     uslugi_w_rundzie_1: int = Field(ge=0)
@@ -164,9 +181,15 @@ class TypStanowiska(Schemat):
     zawody: list[str] = Field(min_length=1)
 
 
+class StanowiskoStartowe(Schemat):
+    typ: Literal["kuchnia", "kasa"]
+    sprzet: dict[str, int] = Field(default_factory=dict)  # nazwa → jakość 1–3
+
+
 class Stanowiska(Sekcja):
     pakiety: dict[str, float]  # liczba nowych stanowisk → cena pakietu
     typy: dict[Literal["kuchnia", "kasa"], TypStanowiska]
+    startowe: list[StanowiskoStartowe] = Field(default_factory=list)  # gotowy lokal: stanowiska na start, za darmo
 
     @model_validator(mode="after")
     def _typy(self) -> Stanowiska:

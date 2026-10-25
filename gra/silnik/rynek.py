@@ -86,7 +86,7 @@ def mnoznik_firmy(dane: Dane, firma) -> float:
 
 def popyt_bazowy(dane: Dane, usluga: str, miesiac: int) -> float:
     u = dane.uslugi[usluga]
-    return u["popyt_roczny"] / 12 * u["sezonowosc"][miesiac]
+    return u["popyt_roczny"] / dane.rund_w_roku * u["sezonowosc"][miesiac]
 
 
 def popyt_rynku(dane: Dane, oferty: dict[str, dict[str, dict]], miesiac: int, ziarno, runda: int) -> dict[str, dict[str, dict]]:

@@ -1,7 +1,20 @@
 // Wspólne funkcje interfejsu: formatowanie, okna dialogowe, wykresy.
 
-export const MIESIACE = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień",
-  "Październik", "Listopad", "Grudzień"];
+// Kalendarz rund (katalog.yaml: rundy.kalendarz) – ustawiany z widoku gry (v.gra.kalendarz) przy każdym wczytaniu.
+// Kwoty miesięczne z danych (utrzymanie, czynsz) silnik księguje na rundę: naRunde.
+export const OKRES = { mianownik: "miesiąc", dopelniacz: "miesiąca", miejscownik: "miesiącu", skrot: "mies.",
+  przymiotnik: "Miesięczny", mnoga: "miesiące", rund_w_roku: 12 };
+let KAL = null;
+export function ustawKalendarz(k) {
+  if (!k) return;
+  KAL = k;
+  Object.assign(OKRES, k.okres, { rund_w_roku: k.rund_w_roku });
+}
+export const nazwaRundy = (r) => KAL?.nazwy[r - 1] ?? `Runda ${r}`;
+export const skrotRundy = (r) => KAL?.skroty[r - 1] ?? `R${r}`;
+export const miesiacRundy = (r) => KAL?.miesiace[r - 1] ?? (r - 1) % 12;
+export const naRunde = (kwotaMiesieczna) => OKRES.rund_w_roku === 12 ? kwotaMiesieczna : kwotaMiesieczna * 12 / OKRES.rund_w_roku;
+export const naOkres = () => ` / ${OKRES.skrot}`;
 
 const fmt = (min, max) => new Intl.NumberFormat("pl-PL", { minimumFractionDigits: min, maximumFractionDigits: max });
 const F0 = fmt(0, 0), F2 = fmt(2, 2), F3 = fmt(0, 3);

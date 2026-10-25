@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .dane import Dane, dane_domyslne
 from .kandydaci import pula_startowa
-from .model import Firma, StanGry, firma_z_slownika
+from .model import Firma, StanGry, Stanowisko, firma_z_slownika
 
 WERSJA_SILNIKA = "1.1"  # 1.1: kwoty w groszach
 
@@ -62,6 +62,11 @@ class Gra:
         kapital = self.dane.z["finanse"]["kapital_startowy"]
         firmy = {f["nazwa"]: Firma(nazwa=f["nazwa"], bot=f["bot"], nazwa_wyswietlana=f["nazwa"], gotowka=kapital)
                  for f in self.konfiguracja["firmy"]}
+        # gotowy lokal: stanowiska ze sprzętem na start (katalog.yaml: stanowiska.startowe), bez kosztu
+        for f in firmy.values():
+            for st in self.dane.katalog_ofert["stanowiska"].get("startowe", []):
+                f.stanowiska.append(Stanowisko(nr=len(f.stanowiska_typu(st["typ"])) + 1, typ=st["typ"],
+                                               sprzet=dict(st["sprzet"])))
         imp = self.konfiguracja.get("import")
         if imp:
             for nazwa, d in imp.get("firmy", {}).items():

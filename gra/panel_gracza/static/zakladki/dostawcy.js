@@ -1,5 +1,5 @@
 // Dostawcy: zakup składników, magazyn, zwroty.
-import { esc, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
 
 const stan = (v, z, q) => v.stan_przed.magazyn[`${z}|${q}`] || 0;
 const zamowienie = (v, d, z, q) => (v.decyzje.zamowienia || []).find((x) => x.dostawca === d && x.zasob === z && +x.jakosc === q);
@@ -63,8 +63,8 @@ export const dostawcy = {
     const suma = (v.wyniki?.zasoby || []).reduce((s, x) => s + x.wartosc, 0);
     const firmy = Object.keys(v.rynek?.jakosc_zasobow || {});
     const jak = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => ulamek(v.rynek.jakosc_zasobow[f][q]))]);
-    return tabela("Składniki", ["Składnik", "Jakość", "Magazyn na początek miesiąca", "Zamówione", "Wykorzystane", "Zwroty",
-      "Magazyn na koniec miesiąca", "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", "", "", zl2(suma)] })
+    return tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", "Zwroty",
+      `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", "", "", zl2(suma)] })
       + tabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`;
   },
@@ -115,6 +115,6 @@ function oknoBazy({ v, kat, edycja }, dost) {
       zl2((zam ? zam.ilosc : 0) * c)]);
   }
   okno(`Dostawca „${esc(dost)}”`, tabela(null, ["Składnik", "Jakość", "Na magazynie", "Cena", "Zamówienie (opakowania)", "Wartość"], w, { klasy: ["l"] })
-    + `<p class="podpowiedz">Ceny w tym miesiącu. Ilości wpisujesz w opakowaniach (np. napój: opakowanie 24 szt.).</p>`,
+    + `<p class="podpowiedz">Ceny w tym ${OKRES.miejscownik}. Ilości wpisujesz w opakowaniach (np. napój: opakowanie 24 szt.).</p>`,
     { przyciski: `<button class="btn pom" data-akcja="zamknij-okno">Zapisz</button>` });
 }

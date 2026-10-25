@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji, analiza (podgląd wyniku rundy).
-import { esc, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -49,8 +49,9 @@ export const dashboard = {
         ${rynek ? `<div class="podpowiedz">${rynek}</div>` : ""}</div>`)}
       ${kafel("Dochód netto", "wykres", `<span class="${d.dochod_netto < 0 ? "minus" : ""}">${zl(d.dochod_netto)}</span>`)}
       ${kafel("Saldo konta", "portfel", zl(d.saldo))}
-      ${kafel("Minimalne wynagrodzenie brutto", "zatrudnienie", `${licz(kat.placa_minimalna)} PLN / miesiąc`)}
-      ${kafel("Czas pracy pracownika i sprzętów", "zegar", `<div>${p.godziny}H / MIESIĄC<div class="maly-tekst">Otwarte: 9:00–17:00</div></div>`)}
+      ${kafel("Minimalne wynagrodzenie brutto", "zatrudnienie", `${licz(kat.placa_minimalna)} PLN / miesiąc`
+        + (OKRES.rund_w_roku === 12 ? "" : `<div class="maly-tekst">≈ ${licz(naRunde(kat.placa_minimalna))} PLN${naOkres()}</div>`))}
+      ${kafel("Czas pracy pracownika i sprzętów", "zegar", `<div>${p.godziny}H / ${OKRES.mianownik.toUpperCase()}<div class="maly-tekst">Otwarte: 9:00–17:00</div></div>`)}
       ${kafel("Stawki amortyzacji", "procent", `<div class="maly-tekst">Sprzęt powyżej ${licz(p.amortyzacja_prog)} PLN: 10%<br>Sprzęt do ${licz(p.amortyzacja_prog)} PLN: 100%</div>`)}
       ${kafel("Pozostałe informacje", "finanse", `<div class="maly-tekst">Podatek dochodowy ${proc(p.cit, 0)}<br>Składki ZUS pracodawcy ${proc(p.zus, 0)}
         <br>Kredyt odnawialny: ${v.gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "jak w grze (jednocześnie)"}
@@ -59,7 +60,7 @@ export const dashboard = {
   },
   po({ v }) {
     const h = v.historia || [];
-    if (h.length > 1) wykres("w-dash", "bar", h.map((x) => x.miesiac), [{ label: "Dochód netto", data: h.map((x) => x.dochod_netto) },
+    if (h.length > 1) wykres("w-dash", "bar", h.map((x) => x.skrot || x.miesiac), [{ label: "Dochód netto", data: h.map((x) => x.dochod_netto) },
       { label: "Saldo konta", data: h.map((x) => x.gotowka), type: "line", kolor: "--wykres-linia" }]);
   },
 };
@@ -86,7 +87,7 @@ export const karta_wynikow = {
     const firmy = Object.keys(karty || {});
     wykres("w-karta", "bar", WSKAZNIKI.map(([, n]) => n), firmy.map((f) => ({ label: nazwaFirmy(v, f), data: WSKAZNIKI.map(([k]) => karty[f][k]) })));
     const h = (v.historia || []).filter((x) => x.karta);
-    wykres("w-historia", "line", h.map((x) => x.miesiac), [{ label: "Twój wynik działalności", data: h.map((x) => x.karta.wynik_dzialalnosci) },
+    wykres("w-historia", "line", h.map((x) => x.skrot || x.miesiac), [{ label: "Twój wynik działalności", data: h.map((x) => x.karta.wynik_dzialalnosci) },
       { label: "Wynik ekonomiczny", data: h.map((x) => x.karta.wynik_ekonomiczny) }]);
   },
   akcje: { "karta-skum": (el, c) => { skumulowana = el.dataset.s === "1"; c.idz("karta_wynikow", "wyniki"); } },

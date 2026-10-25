@@ -18,9 +18,9 @@ from copy import deepcopy
 import numpy as np
 
 from . import karta as kw
-from .dane import KUCHNIA, MIESIACE_NAZWY, Dane
+from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
-from .dostawcy import ceny_miesiaca
+from .dostawcy import ceny_rundy
 from .finanse import (
     Ksiega,
     Rachunek,
@@ -51,12 +51,12 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     """Zwraca nowy stan po rundzie stan.runda + 1 (stan wejściowy nie jest zmieniany)."""
     s = deepcopy(stan)
     r = stan.runda + 1
-    m = r - 1
+    m = dane.miesiac_rundy(r)  # sezonowość popytu
     ziarno = konfiguracja["ziarno"]
     z = dane.z
     if r >= 2:
         s.kandydaci = dodaj_nowych(dane, s.kandydaci, ziarno, r)
-    ceny_dost = ceny_miesiaca(dane, ziarno, m, konfiguracja.get("ceny_dostawcow", "dane"))
+    ceny_dost = ceny_rundy(dane, ziarno, r, konfiguracja.get("ceny_dostawcow", "dane"))
     nazwy = sorted(s.firmy)
     kolejnosc = list(strumien(ziarno, r, "kolejnosc").permutation(nazwy))
 
@@ -132,7 +132,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     else:
         rynek = {}
 
-    # --- koszty miesiąca, bank, podatek --------------------------------------------------------
+    # --- koszty rundy, bank, podatek -----------------------------------------------------------
+    # pensje, utrzymanie, czynsz i opłaty są w danych miesięczne – dane.na_runde przelicza je na rundę
     wyniki = {}
     for nazwa in nazwy:
         f, ks, rach = s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa]
@@ -143,28 +144,32 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         for p in f.pracownicy.values():
             if p.premia > 0:
                 ksieguj(f, ks, rach, f"Bonus dla pracownika: {p.imie_nazwisko}", p.premia, "wynagrodzenia")
-        ksieguj(f, ks, rach, "Wynagrodzenia pracowników", sum(p.pensja for p in f.pracownicy.values()), "wynagrodzenia")
-        ksieguj(f, ks, rach, "Składki ZUS pracodawcy", sum(p.pensja for p in etat) * z["finanse"]["zus_pracodawcy"])
+        ksieguj(f, ks, rach, "Wynagrodzenia pracowników", dane.na_runde(sum(p.pensja for p in f.pracownicy.values())),
+                "wynagrodzenia")
+        ksieguj(f, ks, rach, "Składki ZUS pracodawcy",
+                dane.na_runde(sum(p.pensja for p in etat)) * z["finanse"]["zus_pracodawcy"])
         utrz_sprzetu = sum(dane.sprzet[n]["utrzymanie"][str(q)] for st in f.stanowiska for n, q in st.sprzet.items())
-        ksieguj(f, ks, rach, "Koszty utrzymania sprzętu", utrz_sprzetu)
+        ksieguj(f, ks, rach, "Koszty utrzymania sprzętu", dane.na_runde(utrz_sprzetu))
         ud, wy = dane.pozycje("udogodnienia"), dane.pozycje("wyposazenie")
         ksieguj(f, ks, rach, "Koszty utrzymania udogodnień i benefitów",
-                sum(ud[n]["utrzymanie"] for n in f.udogodnienia) + sum(wy[n]["utrzymanie"] for n in f.wyposazenie))
+                dane.na_runde(sum(ud[n]["utrzymanie"] for n in f.udogodnienia)
+                              + sum(wy[n]["utrzymanie"] for n in f.wyposazenie)))
         narz = dane.pozycje("narzedzia_internetowe")
         for n in f.internet:
-            ksieguj(f, ks, rach, f"Utrzymanie reklamy internetowej: {n}", narz[n]["utrzymanie"])
-        ksieguj(f, ks, rach, "Miesięczny koszt utrzymania lokalu", z["finanse"]["utrzymanie_klubu"])
+            ksieguj(f, ks, rach, f"Utrzymanie reklamy internetowej: {n}", dane.na_runde(narz[n]["utrzymanie"]))
+        ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
+                dane.na_runde(z["finanse"]["utrzymanie_klubu"]))
 
         zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach)
         if sum(f.magazyn.values()) > 1e-6:
-            ksieguj(f, ks, rach, "Koszt magazynowania", z["finanse"]["koszt_magazynowania"])
+            ksieguj(f, ks, rach, "Koszt magazynowania", dane.na_runde(z["finanse"]["koszt_magazynowania"]))
         if f.bank:
-            bank_koniec_miesiaca(f, dane.pozycje("banki")[f.bank], r, ks, rach)
+            bank_koniec_miesiaca(f, dane.pozycje("banki")[f.bank], r, ks, rach, dane.rund_w_roku)
         if f.biuro:
             b = dane.pozycje("biura_rachunkowe")[f.biuro]
             ksieguj(f, ks, rach, "Koszt biura rachunkowego", (len(ks.pozycje) + 1) * b["ksiegowanie"])
             ksieguj(f, ks, rach, "Obsługa kadrowo-płacowa",
-                    len(etat) * b["etat"] + (len(f.pracownicy) - len(etat)) * b["zlecenie"])
+                    dane.na_runde(len(etat) * b["etat"] + (len(f.pracownicy) - len(etat)) * b["zlecenie"]))
         podatek = ks.podatek(z["finanse"]["podatek_cit"])
         rach.zapisz(f, "Podatek dochodowy", -podatek)
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
@@ -216,7 +221,7 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
 def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, obsluga, oferty, rynek, start, zwroty,
                   bledy, netto) -> dict:
     z = dane.z
-    w = {"runda": r, "miesiac": MIESIACE_NAZWY[r - 1], "kpir": ks.do_slownika(z["finanse"]["podatek_cit"]),
+    w = {"runda": r, "miesiac": dane.nazwa_rundy(r), "kpir": ks.do_slownika(z["finanse"]["podatek_cit"]),
          "rachunek": rach.operacje, "gotowka": f.gotowka, "kredyt_odnawialny": f.kredyt_odnawialny,
          "zadluzenie": zadluzenie(f), "lokaty": sum(l.kwota for l in f.lokaty), "lista_bledow": bledy,
          "reklama": info.get("reklama", {})}

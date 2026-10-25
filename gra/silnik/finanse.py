@@ -106,13 +106,16 @@ def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, 
     return info
 
 
-def bank_koniec_miesiaca(firma: Firma, bank: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> None:
-    """Raty i odsetki kredytów, odsetki kredytu odnawialnego, zakończone lokaty, opłata za konto."""
-    ksieguj(firma, ksiega, rachunek, "Opłata za konto", bank["konto"] + bank["karta"])
+def bank_koniec_miesiaca(firma: Firma, bank: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek,
+                         rund_w_roku: int = 12) -> None:
+    """Raty i odsetki kredytów, odsetki kredytu odnawialnego, zakończone lokaty, opłata za konto (koniec rundy).
+    Oprocentowanie roczne dzielone na rundy; okresy kredytów i lokat (pole `miesiecy`) liczone w rundach."""
+    oplata = bank["konto"] + bank["karta"]  # miesięczna
+    ksieguj(firma, ksiega, rachunek, "Opłata za konto", oplata if rund_w_roku == 12 else round(oplata * 12 / rund_w_roku, 2))
     for k in list(firma.kredyty):
         if k.od_rundy == runda:
             continue
-        odsetki = round(k.pozostalo * k.oprocentowanie / 12, 2)
+        odsetki = round(k.pozostalo * k.oprocentowanie / rund_w_roku, 2)
         rata = round(min(k.pozostalo, k.kwota / k.miesiecy), 2)
         ksieguj(firma, ksiega, rachunek, f"Odsetki od kredytu nr {k.id}", odsetki)
         rachunek.zapisz(firma, f"Rata kapitałowa kredytu nr {k.id}", -rata)
@@ -121,12 +124,12 @@ def bank_koniec_miesiaca(firma: Firma, bank: dict, runda: int, ksiega: Ksiega, r
             firma.kredyty.remove(k)
     if firma.kredyt_odnawialny > 0:
         ksieguj(firma, ksiega, rachunek, "Odsetki od kredytu odnawialnego",
-                round(firma.kredyt_odnawialny * bank["kredyt_odnawialny"] / 12, 2))
+                round(firma.kredyt_odnawialny * bank["kredyt_odnawialny"] / rund_w_roku, 2))
     for l in list(firma.lokaty):
         # lokata na n miesięcy założona w miesiącu m kończy się z końcem miesiąca m + n − 1 (KPiR ATH, listopad:
         # „Lokata (Luty − Grudzień)” na 10 mies. i „Lokata (Listopad)” na 1 mies. – odsetki obu w listopadzie)
         if runda >= l.od_rundy + l.miesiecy - 1:
-            odsetki = round(l.kwota * l.oprocentowanie * l.miesiecy / 12, 2)
+            odsetki = round(l.kwota * l.oprocentowanie * l.miesiecy / rund_w_roku, 2)
             firma.lokaty.remove(l)
             rachunek.zapisz(firma, f"Zakończenie lokaty nr {l.id}", l.kwota)
             ksieguj(firma, ksiega, rachunek, f"Odsetki od lokaty nr {l.id}", odsetki, "przychod_pozostaly")
@@ -159,5 +162,5 @@ def zadluzenie(firma: Firma) -> float:
     return round(sum(k.pozostalo for k in firma.kredyty) + firma.kredyt_odnawialny, 2)
 
 
-def odsetki_naliczone_lokat(firma: Firma, runda: int) -> float:
-    return round(sum(l.kwota * l.oprocentowanie * max(0, runda - l.od_rundy) / 12 for l in firma.lokaty), 2)
+def odsetki_naliczone_lokat(firma: Firma, runda: int, rund_w_roku: int = 12) -> float:
+    return round(sum(l.kwota * l.oprocentowanie * max(0, runda - l.od_rundy) / rund_w_roku for l in firma.lokaty), 2)

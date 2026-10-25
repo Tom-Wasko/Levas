@@ -1,5 +1,5 @@
 // Finanse: raport finansowy, KPiR, bank, biuro rachunkowe.
-import { esc, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
+import { esc, OKRES, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
 
 const GRUPY = [
   ["Zakup składników", (p) => p.towary],
@@ -26,7 +26,7 @@ function koszty(k) {
 
 export const raport = {
   tytul: "Raport finansowy", tytulPelny: "Finanse - raport finansowy", ikona: "📊", odblokowanie: (v) => v.runda >= 2,
-  info: "Podsumowanie wyników finansowych poprzedniego miesiąca i wszystkich dotychczasowych rund.",
+  info: () => `Podsumowanie wyników finansowych poprzedniego ${OKRES.dopelniacz} i wszystkich dotychczasowych rund.`,
   wyniki({ v }) {
     const k = v.wyniki.kpir;
     const przych = k.pozycje.filter((p) => p.przychod || p.przychod_pozostaly).map((p) => [esc(p.opis), zl2(p.przychod + p.przychod_pozostaly)]);
@@ -36,16 +36,16 @@ export const raport = {
     return `<div class="dwie">
       <div>${tabela("Przychody", ["Pozycja", "Kwota"], przych, { klasy: ["l", "r"], stopka: ["Razem", zl2(k.przychody)] })}</div>
       <div>${tabela("Koszty", ["Pozycja", "Kwota"], kos, { klasy: ["l", "r"], stopka: ["Razem", zl2(k.koszty)] })}</div></div>
-      ${tabela("Wynik", ["", "Ostatni miesiąc", "Wszystkie rundy"], [
+      ${tabela("Wynik", ["", `Ostatni ${OKRES.mianownik}`, "Wszystkie rundy"], [
         ["Dochód do opodatkowania", zl2(k.dochod), ""], ["Podatek dochodowy", zl2(k.podatek), ""],
         ["<b>Dochód netto</b>", `<b>${zl2(k.dochod_netto)}</b>`, `<b>${zl2(skum)}</b>`],
-        ["Saldo konta na koniec miesiąca", zl2(v.wyniki.gotowka), ""], ["Lokaty", zl2(v.wyniki.lokaty), ""],
+        [`Saldo konta na koniec ${OKRES.dopelniacz}`, zl2(v.wyniki.gotowka), ""], ["Lokaty", zl2(v.wyniki.lokaty), ""],
         ["Zadłużenie (kredyty)", zl2(v.wyniki.zadluzenie), ""]], { klasy: ["l", "r", "r"] })}
       <div class="wykres"><canvas id="w-wynik"></canvas></div>`;
   },
   po({ v }) {
     const h = v.historia || [];
-    wykres("w-wynik", "bar", h.map((x) => x.miesiac), [{ label: "Dochód netto", data: h.map((x) => x.dochod_netto) },
+    wykres("w-wynik", "bar", h.map((x) => x.skrot || x.miesiac), [{ label: "Dochód netto", data: h.map((x) => x.dochod_netto) },
       { label: "Saldo konta", data: h.map((x) => x.gotowka), type: "line" }]);
   },
 };
@@ -92,23 +92,23 @@ export const bank = {
     if (zakladkaBanku === "historia") {
       const op = v.wyniki?.rachunek || [];
       html += tabela(null, ["Operacja", "Kwota", "Saldo"], op.map((o) => [esc(o.opis), `<span class="${o.kwota < 0 ? "minus" : "plus"}">${zl2(o.kwota)}</span>`, zl2(o.saldo)]), { klasy: ["l", "r", "r"] })
-        + `<p class="podpowiedz">Historia rachunku z poprzedniego miesiąca.</p>`;
+        + `<p class="podpowiedz">Historia rachunku z poprzedniego ${OKRES.dopelniacz}.</p>`;
     } else if (zakladkaBanku === "lokaty") {
       const doKonca = v.gra.liczba_rund - v.runda;
       const zerw = v.decyzje.lokaty_zerwij || [];
-      html += tabela(null, ["Nazwa", "Miesiąc założenia", "Okres", "Oprocentowanie", "Kwota", ""], v.stan_przed.lokaty.map((l) => [`Lokata nr ${l.id}`, `runda ${l.od_rundy}`,
-        `${l.miesiecy} mies.`, proc(l.oprocentowanie, 2), zl2(l.kwota), `<button class="btn ${zerw.includes(l.id) ? "zielony" : "czarny"} maly" data-akcja="zerwij" data-id="${l.id}" ${edycja ? "" : "disabled"}>${zerw.includes(l.id) ? "✓ Zerwana" : "Zerwij"}</button>`]), { klasy: ["l"] })
-        + ((v.decyzje.lokaty_zaloz || []).length ? `<p>Nowe lokaty w tej rundzie: ${(v.decyzje.lokaty_zaloz || []).map((l, i) => `${zl(l.kwota)} na ${l.miesiecy} mies. <a href="#" data-akcja="usun-lokate" data-i="${i}">usuń</a>`).join(", ")}</p>` : "")
+      html += tabela(null, ["Nazwa", "Runda założenia", "Okres", "Oprocentowanie", "Kwota", ""], v.stan_przed.lokaty.map((l) => [`Lokata nr ${l.id}`, `runda ${l.od_rundy}`,
+        `${l.miesiecy} ${OKRES.skrot}`, proc(l.oprocentowanie, 2), zl2(l.kwota), `<button class="btn ${zerw.includes(l.id) ? "zielony" : "czarny"} maly" data-akcja="zerwij" data-id="${l.id}" ${edycja ? "" : "disabled"}>${zerw.includes(l.id) ? "✓ Zerwana" : "Zerwij"}</button>`]), { klasy: ["l"] })
+        + ((v.decyzje.lokaty_zaloz || []).length ? `<p>Nowe lokaty w tej rundzie: ${(v.decyzje.lokaty_zaloz || []).map((l, i) => `${zl(l.kwota)} na ${l.miesiecy} ${OKRES.skrot} <a href="#" data-akcja="usun-lokate" data-i="${i}">usuń</a>`).join(", ")}</p>` : "")
         + (doKonca >= 1 ? `<p><button class="btn zielony" data-akcja="nowa-lokata" data-max="${doKonca}" ${edycja ? "" : "disabled"}>Załóż lokatę</button>
           <span class="podpowiedz">Odsetki ${proc(b.lokata, 0)} rocznie, wypłacane na koniec okresu (najpóźniej w ostatniej rundzie). Zerwanie = utrata odsetek.</span></p>` : "");
     } else if (zakladkaBanku === "kredyt") {
       const spl = v.decyzje.kredyty_splac || [];
-      html += tabela(null, ["Nazwa", "Miesiąc zaciągnięcia", "Kwota", "Okres", "Rata kapitałowa", "Do spłaty", ""], v.stan_przed.kredyty.map((k) => [`Kredyt nr ${k.id}`,
-        `runda ${k.od_rundy}`, zl2(k.kwota), `${k.miesiecy} mies.`, zl2(k.kwota / k.miesiecy), zl2(k.pozostalo),
+      html += tabela(null, ["Nazwa", "Runda zaciągnięcia", "Kwota", "Okres", "Rata kapitałowa", "Do spłaty", ""], v.stan_przed.kredyty.map((k) => [`Kredyt nr ${k.id}`,
+        `runda ${k.od_rundy}`, zl2(k.kwota), `${k.miesiecy} ${OKRES.skrot}`, zl2(k.kwota / k.miesiecy), zl2(k.pozostalo),
         `<button class="btn ${spl.includes(k.id) ? "zielony" : "czarny"} maly" data-akcja="splac" data-id="${k.id}" ${edycja ? "" : "disabled"}>${spl.includes(k.id) ? "✓ Spłacony" : "Spłać"}</button>`]), { klasy: ["l"] })
-        + ((v.decyzje.kredyty_wez || []).length ? `<p>Nowe kredyty: ${(v.decyzje.kredyty_wez || []).map((k, i) => `${zl(k.kwota)} na ${k.miesiecy} mies. <a href="#" data-akcja="usun-kredyt" data-i="${i}">usuń</a>`).join(", ")}</p>` : "")
+        + ((v.decyzje.kredyty_wez || []).length ? `<p>Nowe kredyty: ${(v.decyzje.kredyty_wez || []).map((k, i) => `${zl(k.kwota)} na ${k.miesiecy} ${OKRES.skrot} <a href="#" data-akcja="usun-kredyt" data-i="${i}">usuń</a>`).join(", ")}</p>` : "")
         + `<p><button class="btn zielony" data-akcja="nowy-kredyt" ${edycja ? "" : "disabled"}>Weź kredyt</button>
-          <span class="podpowiedz">Oprocentowanie ${proc(b.kredyt, 0)} rocznie, raty kapitałowe równe + odsetki od pozostałej kwoty, od następnego miesiąca.</span></p>`;
+          <span class="podpowiedz">Oprocentowanie ${proc(b.kredyt, 0)} rocznie, raty kapitałowe równe + odsetki od pozostałej kwoty, od następnej rundy.</span></p>`;
     } else {
       html += tabela(null, ["", "Kwota"], [["Aktualny stan zadłużenia", zl2(v.stan_przed.kredyt_odnawialny)], ["Oprocentowanie", proc(b.kredyt_odnawialny, 0)]], { klasy: ["l", "r"] })
         + `<p class="podpowiedz">Kredyt odnawialny uruchamia się sam, gdy zabraknie gotówki, i jest spłacany automatycznie z nadwyżki gotówki.</p>`;
@@ -125,7 +125,7 @@ export const bank = {
     "usun-lokate": (el, c, e) => { e.preventDefault(); return c.zmien((d) => { d.lokaty_zaloz.splice(+el.dataset.i, 1); }); },
     "usun-kredyt": (el, c, e) => { e.preventDefault(); return c.zmien((d) => { d.kredyty_wez.splice(+el.dataset.i, 1); }); },
     "nowa-lokata": (el, c) => okno("Zakładanie lokaty", `<div class="dwie"><label class="pole">Kwota lokaty<input type="number" id="l-kwota" min="1" step="100" value="${Math.max(0, Math.floor(c.v.stan.gotowka))}"></label>
-      <label class="pole">Okres (miesiące)<input type="number" id="l-mies" min="1" max="${el.dataset.max}" value="1"></label></div>
+      <label class="pole">Okres (${OKRES.mnoga})<input type="number" id="l-mies" min="1" max="${el.dataset.max}" value="1"></label></div>
       <p class="podpowiedz">Dostępne saldo: ${zl2(c.v.stan.gotowka)}. Pieniądze na lokacie nie są dostępne na bieżące wydatki.</p>`,
       { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Zamknij</button><button class="btn zielony" data-akcja="zaloz" data-max="${el.dataset.max}">Załóż</button>` }),
     zaloz: async (el, c) => {
@@ -135,7 +135,7 @@ export const bank = {
       await c.zmien((d) => { d.lokaty_zaloz = [...(d.lokaty_zaloz || []), { kwota, miesiecy: m }]; });
     },
     "nowy-kredyt": (el, c) => okno("Kredyt", `<div class="dwie"><label class="pole">Kwota kredytu<input type="number" id="k-kwota" min="100" step="1000" value="10000"></label>
-      <label class="pole">Okres (miesiące)<input type="number" id="k-mies" min="1" max="${c.kat.oferty.banki.kredyt_maks_miesiecy}" value="6"></label></div>
+      <label class="pole">Okres (${OKRES.mnoga})<input type="number" id="k-mies" min="1" max="${c.kat.oferty.banki.kredyt_maks_miesiecy}" value="6"></label></div>
       <p class="podpowiedz">Kredyt obniża wskaźnik zadłużenia w karcie wyników.</p>`,
       { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Zamknij</button><button class="btn zielony" data-akcja="wez-kredyt">Weź kredyt</button>` }),
     "wez-kredyt": async (el, c) => {

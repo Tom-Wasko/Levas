@@ -139,13 +139,13 @@ reklama:
     zrodlo: jw.; narzędzie konkurenta waży ok. 0,4 własnego
 operacje:
   godziny_pracownika:
-    wartosc: 160
-    pewnosc: potwierdzone
-    zrodlo: dashboard r1
+    wartosc: 40
+    pewnosc: zalozenie
+    zrodlo: 'F2.7: etat 40 h w tygodniu (runda = tydzień); Revas: 160 h w miesiącu'
   godziny_sprzetu:
-    wartosc: 160
-    pewnosc: potwierdzone
-    zrodlo: dashboard r1
+    wartosc: 40
+    pewnosc: zalozenie
+    zrodlo: 'F2.7: jak etat – 40 h sprzętu w tygodniu; Revas: 160 h w miesiącu'
   zajecia_zaokraglane_w_gore:
     wartosc: true
     pewnosc: potwierdzone
@@ -169,9 +169,9 @@ operacje:
       dopasowania'
 finanse:
   kapital_startowy:
-    wartosc: 40000
-    pewnosc: potwierdzone
-    zrodlo: dashboard r1
+    wartosc: 100000
+    pewnosc: zalozenie
+    zrodlo: 'notatka „Ustalenia gry”: kapitał startowy 100 000 zł'
   placa_minimalna:
     wartosc: 4806
     pewnosc: potwierdzone
@@ -226,9 +226,9 @@ finanse:
     zrodlo: instrukcja
 karta_wynikow:
   wynik_ekonomiczny_dzielnik:
-    wartosc: 20000
-    pewnosc: potwierdzone
-    zrodlo: 'ATH r3–r9: dochód netto / 20 000 = wynik ekonomiczny (7/7)'
+    wartosc: 4615
+    pewnosc: zalozenie
+    zrodlo: 'F2.7: 20 000 z Revasa (ATH r3–r9, dochód miesięczny) × 12/52 – ta sama skala dla dochodu tygodniowego'
   zadowolenie_klientow:
     wartosc:
       stala: 0.8486

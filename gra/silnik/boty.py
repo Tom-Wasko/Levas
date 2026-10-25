@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
-from .dostawcy import ceny_miesiaca
+from .dostawcy import ceny_rundy
 from .losowosc import strumien
 from .model import Firma, StanGry
 from .planowanie import (
@@ -43,7 +43,6 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     ust = dane.boty["ustawienia"]
     f: Firma = stan.firmy[nazwa]
     q = st["jakosc"]
-    m = runda - 1
     rundy = dane.katalog_ofert["rundy"]
     odbl = dane.odblokowane(runda)
     d: dict = {"zatrudnij": [], "sprzet_kup": [], "zamowienia": []}
@@ -61,8 +60,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             if u not in oferta:
                 oferta.append(u)
 
-    # oczekiwany popyt w miesiącu, w którym usługi będą sprzedawane (runda 1 planuje luty)
-    m_sprz = max(m, 1)
+    # oczekiwany popyt w rundzie, w której usługi będą sprzedawane (runda 1 planuje rundę 2)
+    m_sprz = dane.miesiac_rundy(max(runda, 2))
     pub = stan.rynek.get(runda - 1, {})
     wyp = mnoznik_wyposazenia(dane, f.wyposazenie)
     ceny, klienci = {}, {}
@@ -139,7 +138,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
 
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:
-        ceny_d = ceny_miesiaca(dane, konf["ziarno"], m, konf.get("ceny_dostawcow", "dane"))
+        ceny_d = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
         d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"])
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka)

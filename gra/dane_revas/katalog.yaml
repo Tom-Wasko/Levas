@@ -4,6 +4,11 @@ opis: 'Stałe oferty gry (ceny, koszty utrzymania, zasięgi). Źródła: materia
   WIEDZA_O_GRZE.md.'
 rundy:
   zrodlo: instrukcja gry REVAS (zakładki odblokowywane w kolejnych rundach) i ustalenia z użytkownikiem
+  kalendarz:
+    okres: miesiac
+    rund_w_roku: 12
+    start: 2026-01-01
+    zrodlo: instrukcja gry REVAS – runda 1 = styczeń, gra trwa rok
   domyslna_liczba: 12
   odblokowanie:
     '1':
@@ -41,6 +46,7 @@ rundy:
   nowe_uslugi_od_rundy: 3
 stanowiska:
   zrodlo: stanowiska r9 + KPiR styczeń–czerwiec (gra ATH); działają w rundzie zakupu
+  startowe: []
   pakiety:
     '1': 1000
     '2': 1800

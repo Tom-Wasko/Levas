@@ -96,7 +96,7 @@ def api_gry(request):
     g = GraSilnika.nowa(
         d.get("nazwa") or "Gra",
         firmy,
-        int(d.get("liczba_rund") or 12),
+        int(d["liczba_rund"]) if d.get("liczba_rund") else None,  # brak – domyślna z danych
         int(ziarno) if str(ziarno or "").strip().isdigit() else None,
         ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
         kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),

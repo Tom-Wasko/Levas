@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import sys
+from datetime import date, timedelta
 from functools import cached_property, lru_cache
 from pathlib import Path
 
@@ -25,6 +26,13 @@ MIESIACE = ["styczen", "luty", "marzec", "kwiecien", "maj", "czerwiec", "lipiec"
             "pazdziernik", "listopad", "grudzien"]
 MIESIACE_NAZWY = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień",
                   "Październik", "Listopad", "Grudzień"]
+# Słowa okresu rundy (katalog.yaml: rundy.kalendarz.okres)
+OKRESY = {
+    "tydzien": {"mianownik": "tydzień", "dopelniacz": "tygodnia", "miejscownik": "tygodniu", "skrot": "tydz.",
+                "przymiotnik": "Tygodniowy", "mnoga": "tygodnie"},
+    "miesiac": {"mianownik": "miesiąc", "dopelniacz": "miesiąca", "miejscownik": "miesiącu", "skrot": "mies.",
+                "przymiotnik": "Miesięczny", "mnoga": "miesiące"},
+}
 # Typy stanowisk (budowa modelu): kuchnia – pracownicy przygotowują dania, kasa – obsługa klientów.
 # Nazwy i zawody typów są w katalog.yaml: stanowiska.typy.
 KUCHNIA, KASA = "kuchnia", "kasa"
@@ -61,6 +69,8 @@ class Dane:
         self.kandydaci: list = p["kandydaci.yaml"]["znani"]
         self.rynek_pracy: dict = p["kandydaci.yaml"]
         self.katalog_ofert: dict = p["katalog.yaml"]
+        kal = self.katalog_ofert["rundy"]["kalendarz"]
+        kal["start"] = str(kal["start"])  # YAML daje datę – w słownikach (i JSON-ie dla strony) tekst ISO
         self.typy_stanowisk: dict = self.katalog_ofert["stanowiska"]["typy"]
         self.boty: dict = p["boty.yaml"]
         self.zalozenia_pelne: dict = p["zalozenia.yaml"]
@@ -94,6 +104,57 @@ class Dane:
     def maks_nowych_stanowisk(self) -> int:
         """Największy pakiet stanowisk kupowany w jednej rundzie."""
         return max(int(n) for n in self.katalog_ofert["stanowiska"]["pakiety"])
+
+    # --- kalendarz rund -------------------------------------------------------------------------
+    # Dane (pensje, czynsz, utrzymanie, opłaty) są w złotych na miesiąc; silnik księguje je na rundę (na_runde).
+    @property
+    def kalendarz(self) -> dict:
+        return self.katalog_ofert["rundy"]["kalendarz"]
+
+    @property
+    def rund_w_roku(self) -> int:
+        return int(self.kalendarz["rund_w_roku"])
+
+    @property
+    def tygodniowe(self) -> bool:
+        return self.kalendarz["okres"] == "tydzien"
+
+    @property
+    def okres(self) -> dict[str, str]:
+        """Słowa okresu rundy, np. {"mianownik": "tydzień", "dopelniacz": "tygodnia", …}."""
+        return OKRESY[self.kalendarz["okres"]]
+
+    def na_runde(self, kwota_miesieczna: float) -> float:
+        """Kwota miesięczna z danych przeliczona na jedną rundę (runda miesięczna – bez zmian)."""
+        if self.rund_w_roku == 12:
+            return kwota_miesieczna
+        return round(kwota_miesieczna * 12 / self.rund_w_roku, 2)
+
+    def data_rundy(self, runda: int) -> date:
+        """Pierwszy dzień rundy."""
+        s = date.fromisoformat(self.kalendarz["start"])
+        if self.tygodniowe:
+            return s + timedelta(days=7 * (runda - 1))
+        m = s.month - 1 + runda - 1
+        return date(s.year + m // 12, m % 12 + 1, 1)
+
+    def miesiac_rundy(self, runda: int) -> int:
+        """Miesiąc rundy (0 = styczeń) – do sezonowości i cen dostawców; tydzień należy do miesiąca swojego czwartku."""
+        d = self.data_rundy(runda)
+        return ((d + timedelta(days=3)) if self.tygodniowe else d).month - 1
+
+    def nazwa_rundy(self, runda: int) -> str:
+        """„Tydzień 3 (19–25.10)” albo „Luty”."""
+        if not self.tygodniowe:
+            return MIESIACE_NAZWY[self.miesiac_rundy(runda)]
+        a = self.data_rundy(runda)
+        b = a + timedelta(days=6)
+        od = f"{a.day}" if a.month == b.month else f"{a.day}.{a.month:02d}"
+        return f"Tydzień {runda} ({od}–{b.day}.{b.month:02d})"
+
+    def skrot_rundy(self, runda: int) -> str:
+        """Etykieta osi wykresów: „T3” albo „Lut”."""
+        return f"T{runda}" if self.tygodniowe else MIESIACE_NAZWY[self.miesiac_rundy(runda)][:3]
 
     def odblokowane(self, runda: int) -> set[str]:
         wynik = set()
@@ -158,6 +219,12 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
     for k in d.kandydaci:
         if k["zawod"] not in d.zawody:
             brak(k["zawod"], f"kandydaci.yaml: {k['imie_nazwisko']}", "zawód", "katalog.yaml: stanowiska.typy")
+    for i, st in enumerate(d.katalog_ofert["stanowiska"].get("startowe", [])):
+        for n, q in st["sprzet"].items():
+            if d.sprzet.get(n, {}).get("dla") != st["typ"]:
+                brak(n, f"katalog.yaml: stanowiska.startowe[{i}]", f"sprzęt typu {st['typ']}", "sprzet.yaml")
+            elif str(q) not in d.sprzet[n]["ceny"]:
+                brak(str(q), f"katalog.yaml: stanowiska.startowe[{i}].{n}", "jakość", "sprzet.yaml")
     for u in d.katalog_ofert["rundy"]["uslugi_startowe"]:
         if u not in d.uslugi:
             brak(u, "katalog.yaml: rundy.uslugi_startowe", "usługa", "uslugi.yaml")

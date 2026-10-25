@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from silnik.dane import MIESIACE_NAZWY, Dane
+from silnik.dane import Dane
 from silnik.decyzje import (
     cena_sprzedazy_sprzetu,
     gotowe_uslugi,
@@ -11,7 +11,7 @@ from silnik.decyzje import (
     lista_bledow,
     zastosuj,
 )
-from silnik.dostawcy import ceny_miesiaca
+from silnik.dostawcy import ceny_rundy
 from silnik.finanse import Ksiega, Rachunek
 from silnik.gra import Gra
 from silnik.model import Firma, do_slownika
@@ -31,10 +31,18 @@ def stan_po_szkicu(gra: Gra, firma: str):
     d = gra.szkic(firma)
     ks, rach = Ksiega(), Rachunek()
     poprzednia_oferta = list(f.oferta)
-    info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_miesiaca(gra.dane, gra.konfiguracja["ziarno"], r - 1,
-                                                                     gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach)
+    info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_rundy(gra.dane, gra.konfiguracja["ziarno"], r,
+                                                                  gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach)
     bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"))
     return stan, f, ks, info, bledy
+
+
+def kalendarz(dane: Dane, liczba_rund: int) -> dict:
+    """Nazwy rund dla strony: okres („tydzień”/„miesiąc” w przypadkach), nazwy i skróty rund 1…liczba_rund."""
+    rundy = range(1, liczba_rund + 1)
+    return {"okres": dane.okres, "tygodniowe": dane.tygodniowe, "rund_w_roku": dane.rund_w_roku,
+            "nazwy": [dane.nazwa_rundy(r) for r in rundy], "skroty": [dane.skrot_rundy(r) for r in rundy],
+            "miesiace": [dane.miesiac_rundy(r) for r in rundy]}
 
 
 def katalogi(dane: Dane) -> dict:
@@ -44,6 +52,7 @@ def katalogi(dane: Dane) -> dict:
                           "cit": dane.z["finanse"]["podatek_cit"], "zus": dane.z["finanse"]["zus_pracodawcy"],
                           "amortyzacja_prog": dane.z["finanse"]["amortyzacja_prog"],
                           "utrzymanie_klubu": dane.z["finanse"]["utrzymanie_klubu"],
+                          "na_runde": 12 / dane.rund_w_roku, "rund_w_roku": dane.rund_w_roku,
                           "koszt_zwrotu": dane.z["finanse"]["koszt_zwrotu"], "koszt_magazynowania": dane.z["finanse"]["koszt_magazynowania"],
                           "sprzedaz_sprzetu": dane.z["finanse"]["sprzedaz_sprzetu"]}}
 
@@ -74,8 +83,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "zakonczona": gra.zakonczona, "firmy": gra.konfiguracja["firmy"], "wyslane": gra.wyslane(),
                  "brakujace": gra.brakujace(), "ziarno": gra.konfiguracja["ziarno"], "runda_startowa": gra.runda_startowa,
                  "konkurenci_stali": gra.konfiguracja.get("konkurenci_stali", []),
-                 "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie")},
-         "firma": firma, "runda": runda, "miesiac": MIESIACE_NAZWY[runda - 1], "edycja": edycja,
+                 "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
+                 "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
+         "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja,
          "odblokowane": sorted(dane.odblokowane(runda))}
 
     if edycja:
@@ -99,7 +109,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     v["lista_bledow"] = bledy
     v["kandydaci"] = (kandydaci_firmy(stan.kandydaci, f) if edycja
                       else kandydaci_firmy(poprzedni.kandydaci, poprzedni.firmy[firma]))
-    v["ceny_dostawcow"] = ceny_miesiaca(dane, gra.konfiguracja["ziarno"], runda - 1, gra.konfiguracja.get("ceny_dostawcow", "dane"))
+    v["ceny_dostawcow"] = ceny_rundy(dane, gra.konfiguracja["ziarno"], runda, gra.konfiguracja.get("ceny_dostawcow", "dane"))
     v["ceny_sprzedazy_sprzetu"] = {n: {q: cena_sprzedazy_sprzetu(dane, c) for q, c in s["ceny"].items()}
                                    for n, s in dane.sprzet.items()}
 
@@ -109,7 +119,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["wyniki"] = w.get(firma)
         v["rynek"] = poprzedni.rynek.get(runda - 1)
         v["karta_skumulowana"] = karta_skumulowana(gra, runda - 1) if runda - 1 >= 2 else {}
-        v["historia"] = [{"runda": r, "miesiac": MIESIACE_NAZWY[r - 1], "karta": poprzedni.wyniki[r][firma].get("karta"),
+        v["historia"] = [{"runda": r, "miesiac": dane.nazwa_rundy(r), "skrot": dane.skrot_rundy(r), "karta": poprzedni.wyniki[r][firma].get("karta"),
                           "dochod_netto": poprzedni.wyniki[r][firma]["kpir"]["dochod_netto"],
                           "gotowka": poprzedni.wyniki[r][firma]["gotowka"]}
                          for r in range(1, runda) if r in poprzedni.wyniki]

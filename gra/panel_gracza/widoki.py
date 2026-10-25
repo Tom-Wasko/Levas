@@ -20,8 +20,18 @@ def _gra(id_: str):
 
 @ensure_csrf_cookie
 def start(request):
-    strategie = {k: v["nazwa"] for k, v in dane_domyslne().boty["strategie"].items()}
-    return render(request, "panel_gracza/start.html", {"strategie": strategie})
+    dane = dane_domyslne()
+    strategie = {k: v["nazwa"] for k, v in dane.boty["strategie"].items()}
+    kalendarz = {
+        "pierwsza": dane.nazwa_rundy(1),
+        "okres": dane.okres["mianownik"],
+        "mnoga": dane.okres["mnoga"],
+        "domyslna": dane.katalog_ofert["rundy"]["domyslna_liczba"],
+        "maks": dane.rund_w_roku,
+    }
+    kapital = f"{dane.z['finanse']['kapital_startowy']:,.0f}".replace(",", "\u00a0")
+    kontekst = {"strategie": strategie, "kalendarz": kalendarz, "kapital": kapital}
+    return render(request, "panel_gracza/start.html", kontekst)
 
 
 @ensure_csrf_cookie

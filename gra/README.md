@@ -46,6 +46,17 @@ przełącznik `panel_gracza/static/motyw.js`.
 
 `WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (liczby z gier – w `dane_revas/`).
 
+### Kalendarz rund
+
+`katalog.yaml` → `rundy.kalendarz`: okres (`tydzien` / `miesiac`), rund w roku, data startu. Kebab: runda = tydzień,
+26 rund od 5.10.2026, 100 000 zł i gotowy lokal (`stanowiska.startowe`: kuchnia z rożnem, frytownicą i lodówką,
+kasa). Revas (`dane_revas/`): runda = miesiąc od stycznia. Kwoty w danych są **miesięczne** (pensje, czynsz,
+utrzymanie) – silnik księguje je na rundę przez `Dane.na_runde` (× 12 / rund w roku); oprocentowanie roczne dzieli
+się przez rundy w roku, okresy lokat i kredytów liczą się w rundach, sezonowość – według miesiąca rundy
+(`Dane.miesiac_rundy`, tydzień należy do miesiąca swojego czwartku). Koszty jednorazowe (zakupy, rekrutacja,
+reklama, księgowość za dokument) się nie skalują. Runda 1 to przygotowanie – sprzedaż od rundy 2. Strona gracza
+dostaje kalendarz w `v.gra.kalendarz` (`wspolne.js`: `nazwaRundy`, `naRunde`, `OKRES`).
+
 ### Słownik: nazwy w kodzie a kebab
 
 Silnik i klucze danych mają jeszcze nazwy z Revasa (zmiana nazw razem z przebudową w kroku 3a):

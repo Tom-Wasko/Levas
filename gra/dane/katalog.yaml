@@ -4,7 +4,13 @@ opis: Stałe oferty gry (ceny, koszty utrzymania, zasięgi). Liczby z gier REVAS
   na kebab (F2.6).
 rundy:
   zrodlo: instrukcja gry REVAS (zakładki odblokowywane w kolejnych rundach) i ustalenia z użytkownikiem
-  domyslna_liczba: 12
+  kalendarz:
+    okres: tydzien
+    rund_w_roku: 52
+    start: 2026-10-05
+    zrodlo: 'notatka „Ustalenia gry”: runda = 1 tydzień; start – założenie F2.7: poniedziałek na początku roku
+      akademickiego (studenci w Lublinie)'
+  domyslna_liczba: 26
   odblokowanie:
     '1':
     - nazwa_firmy
@@ -39,7 +45,19 @@ rundy:
   nowe_uslugi_na_runde: 3
   nowe_uslugi_od_rundy: 3
 stanowiska:
-  zrodlo: stanowiska r9 + KPiR styczeń–czerwiec (gra ATH); działają w rundzie zakupu
+  zrodlo: 'stanowiska r9 + KPiR styczeń–czerwiec (gra ATH); działają w rundzie zakupu. startowe – plan F2.7: jeden
+    gotowy lokal na start (kuchnia z rożnem, frytownicą i lodówką, kasa), jakość podstawowa'
+  startowe:
+  - typ: kuchnia
+    sprzet:
+      Rożen: 1
+      Frytownica: 1
+      Lodówka na napoje: 1
+  - typ: kasa
+    sprzet:
+      Kasa fiskalna: 1
+      Lada z witryną: 1
+      Tablica menu: 1
   pakiety:
     '1': 1000
     '2': 1800
@@ -352,7 +370,7 @@ banki:
     kredyt_odnawialny: 0.1
     kredyt: 0.11
     od_rundy: 4
-  kredyt_maks_miesiecy: 12
+  kredyt_maks_miesiecy: 26  # w rundach (tygodniach) – F2.7
   lokata_konczy_sie_najpozniej_w_ostatniej_rundzie: true
 biura_rachunkowe:
   zrodlo: 'Finanse – biuro rachunkowe r1 (gra A_B_C) i r9 (gra ATH, 6 biur); KPiR: dokument = każda pozycja KPiR poza obsługą

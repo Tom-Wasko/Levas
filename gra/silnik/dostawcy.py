@@ -27,15 +27,24 @@ def _serie(dane: Dane) -> dict[tuple[str, str, str], dict]:
     return {k: {"baza": float(np.mean(v)), "calkowite": all(float(c).is_integer() for c in v)} for k, v in serie.items()}
 
 
-def ceny_miesiaca(dane: Dane, ziarno, miesiac: int, tryb: str = "dane") -> dict:
-    """{dostawca: {zasób: {"1": cena, "2": …, "3": …}}} dla miesiąca (indeks 0 = styczeń)."""
+def ceny_rundy(dane: Dane, ziarno, runda: int, tryb: str = "dane") -> dict:
+    """Ceny dostawców w rundzie. Runda 1 to przygotowanie lokalu (bez sprzedaży i zakupów) – brak ofert.
+    Rundy tygodniowe: ceny z danych dla miesiąca rundy, poza nimi losowanie co tydzień."""
+    if runda <= 1:
+        return {}
+    return ceny_miesiaca(dane, ziarno, dane.miesiac_rundy(runda), tryb, runda if dane.tygodniowe else None)
+
+
+def ceny_miesiaca(dane: Dane, ziarno, miesiac: int, tryb: str = "dane", klucz: int | None = None) -> dict:
+    """{dostawca: {zasób: {"1": cena, "2": …, "3": …}}} dla miesiąca (indeks 0 = styczeń).
+    klucz – numer losowania (rundy tygodniowe: runda); brak = miesiąc, a styczeń (runda 1 Revasa) bez ofert."""
     nazwa = MIESIACE[miesiac]
     if tryb == "dane" and nazwa in dane.dostawcy:
         return dane.dostawcy[nazwa]
-    if miesiac == 0:
+    if miesiac == 0 and klucz is None:
         return {}
     odch = dane.z["losowosc"]["ceny_dostawcow"]
-    rng = strumien(ziarno, miesiac, "dostawcy")
+    rng = strumien(ziarno, miesiac if klucz is None else klucz, "dostawcy")
     wynik = {}
     for (d, z, q), s in sorted(_serie(dane).items()):
         if miesiac < dane.dostawcy_wszyscy_od and d not in dane.dostawcy_pierwsi:
