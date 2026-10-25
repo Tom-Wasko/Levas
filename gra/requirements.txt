@@ -1,5 +1,6 @@
-flask>=3.0
+django>=5.2,<5.3
 numpy>=2.0
 scipy>=1.13
 pytest>=8.0
+pytest-django>=4.9
 ruff>=0.6

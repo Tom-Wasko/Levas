@@ -12,10 +12,13 @@ document.body.appendChild(postep);
 let aktywne = 0;
 function trwa(tak) { aktywne += tak ? 1 : -1; postep.classList.toggle("trwa", aktywne > 0); }
 
+// Token CSRF Django (ciasteczko ustawia strona gry).
+const csrf = () => document.cookie.match(/(?:^|; )csrftoken=([^;]*)/)?.[1] ?? "";
+
 async function api(sciezka, opcje = {}) {
   trwa(true);
   try {
-    const r = await fetch(sciezka, { headers: { "Content-Type": "application/json" }, ...opcje });
+    const r = await fetch(sciezka, { headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() }, ...opcje });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(j.blad || `Błąd ${r.status}`);
     return j;

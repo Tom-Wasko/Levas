@@ -21,7 +21,8 @@
   <nav class="menu" id="menu"></nav>
   <main class="scena"><div class="karta" id="karta"><div class="ladowanie">Wczytywanie…</div></div></main>
   <div class="stopka">Lokalna symulacja na wzór REVAS Klub Fitness · mechaniki i założenia: revas_gra/WIEDZA_O_GRZE.md, zalozenia.json</div>
-  <script>window.GRA = {{ id|tojson }}; window.FIRMA = {{ firma|tojson }};</script>
+  {{ id|json_script:"id-gry" }}{{ firma|json_script:"id-firmy" }}
+  <script>window.GRA = JSON.parse(document.getElementById("id-gry").textContent); window.FIRMA = JSON.parse(document.getElementById("id-firmy").textContent);</script>
   <script type="module" src="/static/app.js"></script>
 </body>
 </html>

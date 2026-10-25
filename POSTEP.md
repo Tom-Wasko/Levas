@@ -4,7 +4,7 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 
 ## Krok 2 – kopia Revasa i przebudowa pod Levas
 - [x] F2.1 Kopia `revas_gra` → `gra/` (bez kalibracji, gry przez GitHub, importu stanu i raportów), pyproject + ruff, testy przechodzą
-- [ ] F2.2 Django zamiast Flaska
+- [x] F2.2 Django zamiast Flaska: aplikacje `gry/` (modele Gra/Runda/Decyzja w SQLite), `api/` (widoki JSON), `panel_gracza/` (strony, zakładki JS bez zmian, komenda `graj`); CSRF w zapytaniach JS; testy API
 - [ ] F2.3 Model pydantic, grosze, `WERSJA_STANU`
 - [ ] F2.4 Dane w YAML ze schematami i `zrodlo`
 - [ ] F2.5 Nazwane strumienie losowości (PCG64)

@@ -18,7 +18,7 @@
     <div class="karta-glowa"><div class="tytul">Którą firmą grasz?</div><div></div><div></div></div>
     <div class="tresc"><div class="siatka">
       {% for f in ludzie %}<div class="kafel"><div class="kg">{{ f }}</div><div class="kd" style="padding-top:14px">
-        <a class="btn pom" href="/gra/{{ id }}/{{ f }}">Graj jako {{ f }}</a></div></div>{% endfor %}
+        <a class="btn pom" href="/gra/{{ id|urlencode }}/{{ f|urlencode:'' }}">Graj jako {{ f }}</a></div></div>{% endfor %}
     </div><p class="podpowiedz">Gra na jednym komputerze: każdy gracz wybiera swoją firmę, podejmuje decyzje i klika „Wyślij decyzje”.
       Runda przelicza się, gdy wszyscy wyślą.</p></div>
   </div></main>

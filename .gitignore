@@ -6,4 +6,4 @@ __pycache__/
 gra/zapisy/
 gra/lokalne.json
 *.sqlite3
-.obsidian/workspace*.json
+**/.obsidian/workspace*.json

@@ -1,5 +1,5 @@
 @echo off
-rem Lokalna gra REVAS Klub Fitness - uruchomienie (podwojne klikniecie).
+rem Levas - uruchomienie lokalnej gry (podwojne klikniecie).
 cd /d "%~dp0"
 if not exist ".venv\Scripts\python.exe" (
   echo Pierwsze uruchomienie: tworze srodowisko Pythona i instaluje pakiety...
@@ -8,5 +8,6 @@ if not exist ".venv\Scripts\python.exe" (
   ".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt
 )
 echo Gra startuje: http://127.0.0.1:8765  (zamknij to okno, aby zakonczyc)
-".venv\Scripts\python.exe" -m serwer.app
+if not exist ".venv\Lib\site-packages\django" ".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt
+".venv\Scripts\python.exe" manage.py graj
 pause

@@ -44,8 +44,10 @@
       </div>
     </div>
   </main>
+  {{ strategie|json_script:"strategie" }}
   <script type="module">
-    const STRATEGIE = {{ strategie|tojson }};
+    const STRATEGIE = JSON.parse(document.getElementById("strategie").textContent);
+    const csrf = () => document.cookie.match(/(?:^|; )csrftoken=([^;]*)/)?.[1] ?? "";
     const tb = document.querySelector("#firmy tbody");
     const opcje = (wybrana) => `<option value="">Gracz</option>` + Object.entries(STRATEGIE).map(([k, n]) => `<option value="${k}" ${k === wybrana ? "selected" : ""}>Bot: ${n}</option>`).join("");
     function wiersz(nazwa, bot) {
@@ -59,7 +61,7 @@
     document.getElementById("dodaj-bota").onclick = () => wiersz(`Firma ${tb.children.length}`, "zrownowazony");
     document.getElementById("utworz").onclick = async () => {
       const firmy = [...tb.children].map((tr) => ({ nazwa: tr.querySelector("input").value, bot: tr.querySelector("select").value || null }));
-      const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+      const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() }, body: JSON.stringify({
         nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
         ziarno: document.getElementById("ziarno").value, ceny_dostawcow: document.getElementById("ceny").value, firmy,
         kredyt_odnawialny: document.getElementById("kredyt").value }) });
@@ -76,10 +78,10 @@
           <button class="btn jasny maly" onclick="usun('${g.id}')">Usuń</button></td></tr>`).join("")}</tbody></table></div>`
         : `<p class="podpowiedz">Nie ma jeszcze żadnej gry – utwórz nową poniżej.</p>`;
     }
-    window.usun = async function (id) { if (confirm("Usunąć grę?")) { await fetch(`/api/gry/${id}`, { method: "DELETE" }); lista(); } };
+    window.usun = async function (id) { if (confirm("Usunąć grę?")) { await fetch(`/api/gry/${id}`, { method: "DELETE", headers: { "X-CSRFToken": csrf() } }); lista(); } };
     document.getElementById("import").onchange = async (e) => {
       const f = new FormData(); f.append("plik", e.target.files[0]);
-      const r = await fetch("/api/gry/import", { method: "POST", body: f }); const j = await r.json();
+      const r = await fetch("/api/gry/import", { method: "POST", body: f, headers: { "X-CSRFToken": csrf() } }); const j = await r.json();
       if (!r.ok) return alert(j.blad);
       location.href = `/gra/${j.id}`;
     };
