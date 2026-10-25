@@ -16,7 +16,10 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
 
 ## Otwarte pytania (czekają na odpowiedź)
 
-_brak_
+1. **Gdzie jest kod starego Levasa?** Plan zakłada przeniesienie modułów i danych z `Pulpit/Levas/levas_gra`
+   (strefy, lokale, sklepy, banki, podatki 2026, parki, kalendarz, PCG64), ale tego folderu nie ma na dysku,
+   a repo `Tom-Wasko/Levas-stary` ma tylko notatki. Do czasu odpowiedzi: F2.5 (PCG64) piszę od zera,
+   a dane do F3a biorę z notatek. (zadane: 25.10 21:50, do wysłania w poniedziałek o 6:00)
 
 ## Odłożone zadania
 
@@ -25,3 +28,4 @@ _brak_
 ## Dziennik
 
 - 25.10 21:15 – start; plan zaktualizowany (prototyp mapy w F3a.3); zaczynam F2.3 (pydantic + grosze).
+- 25.10 21:45 – F2.3 gotowe (`95bd126`): pydantic, grosze, testy hypothesis; wyniki botów bez zmian. Start F2.4.
