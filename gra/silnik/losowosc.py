@@ -1,15 +1,35 @@
-"""Losowość z ziarnem: ten sam (ziarno gry, runda, firma, zdarzenie) zawsze daje te same liczby.
+"""Jedyne źródło losowości w grze: nazwane strumienie `numpy.random.Generator(PCG64)`.
 
-Każde zdarzenie dostaje własny generator, więc kolejność obliczeń nie zmienia wyników – ważne w grze
-wieloosobowej, gdzie każdy komputer przelicza rundę sam.
+Strumień wyznaczają (ziarno gry, runda, cel, klucze), np. `strumien(ziarno, 3, "popyt", firma, danie)`.
+Ziarno strumienia to pełny skrót SHA-256 tych wartości (przez `SeedSequence`), więc:
+- ten sam strumień zawsze daje te same liczby, na każdym komputerze – ważne w grze wieloosobowej, gdzie
+  każdy przelicza rundę sam;
+- kolejność obliczeń nie zmienia wyników – każde zdarzenie ma własny strumień;
+- dodanie nowego losowania nie przesuwa liczb w innych strumieniach.
+
+Cele są wymienione w `CELE` – literówka w nazwie celu to błąd, a nie cicho inny strumień.
+Poza tym modułem silnik nie używa `numpy.random` ani `random` (pilnuje tego test).
 """
 from __future__ import annotations
 
 import hashlib
+import json
 
 import numpy as np
 
+CELE = frozenset({
+    "bot",         # decyzje bota: runda, nazwa firmy
+    "dostawcy",    # ceny dostawców w trybie losowym: runda = miesiąc (0 = styczeń)
+    "kandydaci",   # rynek pracy: runda 0 = pula startowa
+    "kolejnosc",   # kolejność firm w rundzie
+    "popyt",       # szum popytu: runda, firma, usługa
+    "reklamacje",  # reklamacje: runda, firma, usługa
+})
 
-def generator(ziarno: int | str, *klucze) -> np.random.Generator:
-    tekst = "|".join(str(k) for k in (ziarno, *klucze))
-    return np.random.default_rng(int.from_bytes(hashlib.sha256(tekst.encode("utf-8")).digest()[:8], "little"))
+
+def strumien(ziarno: int | str, runda: int, cel: str, *klucze: int | str) -> np.random.Generator:
+    if cel not in CELE:
+        raise ValueError(f"nieznany cel losowania {cel!r} – dopisz go do CELE w silnik/losowosc.py")
+    tekst = json.dumps([ziarno, runda, cel, *klucze], ensure_ascii=False)
+    skrot = hashlib.sha256(tekst.encode("utf-8")).digest()
+    return np.random.Generator(np.random.PCG64(np.random.SeedSequence(int.from_bytes(skrot, "little"))))

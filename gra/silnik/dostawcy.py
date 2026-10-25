@@ -12,7 +12,7 @@ from functools import lru_cache
 import numpy as np
 
 from .dane import MIESIACE, Dane
-from .losowosc import generator
+from .losowosc import strumien
 
 
 @lru_cache(maxsize=4)
@@ -35,7 +35,7 @@ def ceny_miesiaca(dane: Dane, ziarno, miesiac: int, tryb: str = "dane") -> dict:
     if miesiac == 0:
         return {}
     odch = dane.z["losowosc"]["ceny_dostawcow"]
-    rng = generator(ziarno, "dostawcy", miesiac)
+    rng = strumien(ziarno, miesiac, "dostawcy")
     wynik = {}
     for (d, z, q), s in sorted(_serie(dane).items()):
         if miesiac < dane.dostawcy_wszyscy_od and d not in dane.dostawcy_pierwsi:

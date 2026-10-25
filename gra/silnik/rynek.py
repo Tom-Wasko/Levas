@@ -14,7 +14,7 @@ import math
 import numpy as np
 
 from .dane import MIESIACE, Dane
-from .losowosc import generator
+from .losowosc import strumien
 
 
 def wspolczynnik_gwiazdek(gwiazdki: float, wsp: dict) -> float:
@@ -111,7 +111,7 @@ def popyt_rynku(dane: Dane, oferty: dict[str, dict[str, dict]], miesiac: int, zi
             cena = wlasna * math.exp(-E2 * (r[f] - r_sr)) * n ** (-K)
             szum = 1.0
             if p["szum_proc"] > 0:
-                szum = float(np.exp(generator(ziarno, "popyt", runda, f, usluga).normal(0, p["szum_proc"])))
+                szum = float(np.exp(strumien(ziarno, runda, "popyt", f, usluga).normal(0, p["szum_proc"])))
             firma = o.get("mnoznik_firmy", 1.0)
             wartosc = baza * korekta * p["mnoznik_bazowy"] * q * cena * o["wyposazenie"] * (1 + o["reklama"]) * firma * szum
             wynik[usluga][f] = {

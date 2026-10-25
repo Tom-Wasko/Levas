@@ -15,7 +15,7 @@ SILNIK = Path(modul_danych.__file__).parent
 
 # Liczby, które mogą być w kodzie silnika, bo opisują budowę modelu, a nie grę: indeksy i kroki, jakość
 # 1–3, procent, 12 miesięcy w roku, grosze, dokładność zaokrągleń i porównań, limity pętli numerycznych.
-DOZWOLONE_LICZBY = {0, 1, 2, 3, 4, 8, 9, 10, 12, 50, 60, 100, 0.005, 0.01, 1e-9, 1e-7, 1e-6, 1e6}
+DOZWOLONE_LICZBY = {0, 1, 2, 3, 4, 9, 10, 12, 50, 60, 100, 0.005, 0.01, 1e-9, 1e-7, 1e-6, 1e6}
 
 
 def _kopia(tmp_path: Path) -> Path:

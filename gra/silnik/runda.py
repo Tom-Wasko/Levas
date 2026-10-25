@@ -32,7 +32,7 @@ from .finanse import (
     zadluzenie,
 )
 from .kandydaci import dodaj_nowych
-from .losowosc import generator
+from .losowosc import strumien
 from .model import Firma, StanGry, do_slownika, grosze
 from .operacje import jakosc_uslugi, obsluz, recepcjonisci
 from .rynek import (
@@ -58,7 +58,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         s.kandydaci = dodaj_nowych(dane, s.kandydaci, ziarno, r)
     ceny_dost = ceny_miesiaca(dane, ziarno, m, konfiguracja.get("ceny_dostawcow", "dane"))
     nazwy = sorted(s.firmy)
-    kolejnosc = list(generator(ziarno, "kolejnosc", r).permutation(nazwy))
+    kolejnosc = list(strumien(ziarno, r, "kolejnosc").permutation(nazwy))
 
     ksiegi, rachunki, info, bledy, start, odnawialny = {}, {}, {}, {}, {}, {}
     # "jednoczesnie" (jak w oficjalnej grze): przychody i wydatki miesiąca rozliczane razem – kredyt odnawialny tylko

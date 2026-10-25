@@ -10,7 +10,7 @@ from __future__ import annotations
 from .dane import INSTRUKTOR, RECEPCJONISTA, TRENER, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_miesiaca
-from .losowosc import generator
+from .losowosc import strumien
 from .model import Firma, StanGry
 from .planowanie import (
     oczekiwany_popyt,
@@ -116,7 +116,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     # zatrudnienie (od rundy 2): stanowiska bez pracownika, które mają (albo dostają) sprzęt
     if "hr_zatrudnienie" in odbl:
         pula = kandydaci_firmy(stan.kandydaci, stan.firmy[nazwa])
-        rng = generator(konf["ziarno"], "bot", runda, nazwa)
+        rng = strumien(konf["ziarno"], runda, "bot", nazwa)
         obsada = {o["nr"]: o["zawod"] for o in d.pop("_obsada", [])}
         for s in istniejace:
             if not s.pracownik and s.sprzet and s.nr not in obsada:

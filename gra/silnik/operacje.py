@@ -20,7 +20,7 @@ import numpy as np
 from scipy.optimize import linprog
 
 from .dane import INSTRUKTOR, RECEPCJONISTA, Dane
-from .losowosc import generator
+from .losowosc import strumien
 from .model import Firma, Stanowisko
 
 EPS = 1e-9
@@ -176,7 +176,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) 
     for u, k in obsluzeni.items():
         st = [stanowiska[i] for i in mozliwe[u]]
         ryzyko = mnoznik * float(np.mean([firma.pracownik_stanowiska(s).ryzyko_reklamacji for s in st])) if st else 0.0
-        reklamacje[u] = int(generator(ziarno, "reklamacje", runda, firma.nazwa, u).binomial(k, ryzyko)) if k else 0
+        reklamacje[u] = int(strumien(ziarno, runda, "reklamacje", firma.nazwa, u).binomial(k, ryzyko)) if k else 0
 
     zuzycie = {}
     for u in obsluzeni:

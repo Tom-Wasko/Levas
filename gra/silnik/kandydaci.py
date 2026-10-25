@@ -8,7 +8,7 @@ bez własnych pracowników (gra A/B/C: te same osoby zatrudnione przez drużyny 
 from __future__ import annotations
 
 from .dane import ZAWODY, Dane
-from .losowosc import generator
+from .losowosc import strumien
 
 
 def _osoba(dane: Dane, rng, zawod: str, gwiazdki: int, id_: str, uzyte: set[str]) -> dict:
@@ -38,7 +38,7 @@ def _gwiazdki(dane: Dane, rng) -> int:
 
 
 def pula_startowa(dane: Dane, ziarno) -> list[dict]:
-    rng = generator(ziarno, "kandydaci", 0)
+    rng = strumien(ziarno, 0, "kandydaci")
     rozrzut = dane.z["losowosc"]["kandydaci"]["rozrzut_pensji"]
     krok = dane.rynek_pracy["losowanie"]["krok_pensji"]
     uzyte, pula = set(), []
@@ -56,7 +56,7 @@ def pula_startowa(dane: Dane, ziarno) -> list[dict]:
 
 
 def dodaj_nowych(dane: Dane, pula: list[dict], ziarno, runda: int) -> list[dict]:
-    rng = generator(ziarno, "kandydaci", runda)
+    rng = strumien(ziarno, runda, "kandydaci")
     uzyte = {o["imie_nazwisko"] for o in pula}
     nowi = [_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g{runda}-{zawod[:3]}-{j}", uzyte)
             for zawod in ZAWODY for j in range(dane.rynek_pracy["losowanie"]["co_runde"])]
