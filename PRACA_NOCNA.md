@@ -91,7 +91,7 @@ _brak_
   - nowe gry są domyślnie **z lokalami** (drużyna zaczyna bez lokalu i stanowisk); stare zapisy gier i opcja
     „Lokale: nie” w panelu mistrza gry – gotowy lokal na start jak dotąd,
   - mapa napisana od zera (pytanie 1 – brak `levas_gra`): 10 stref Lublina (Stare Miasto, Centrum, Akademickie,
-    LSM/Czuby, Politechnika, Dworzec, Czechów, Felin, Zemborzyce, Zygmuntowskie), 33 lokale z fikcyjnymi nazwami
+    LSM/Czuby, Politechnika, Dworzec, Czechów, Felin, Zemborzyce, Zygmuntowskie), 38 lokali z fikcyjnymi nazwami
     (bez prawdziwych marek), budynki: bank, ratusz, urząd skarbowy, dostawcy, agencje reklamowe, szkolenia, park, zalew,
   - ceny: czynsz, cena kupna i media według stawek stref × metraż (moje założenia, `zrodlo` w danych) – kalibracja w kroku 5,
   - najem: kaucja = 2 × czynsz miesięczny, potem czynsz co tydzień (KPiR); kupno, kaucja i budowa to ruchy na rachunku,
