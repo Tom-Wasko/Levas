@@ -29,11 +29,37 @@ Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik
 poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
-**Panel mistrza gry** – http://127.0.0.1:8765/mg/ (na razie bez logowania – tryb deweloperski): nowa gra
+**Panel mistrza gry** – http://127.0.0.1:8765/mg/ (tylko rola mistrza gry): nowa gra
 (drużyny, liczba rund, kapitał startowy, boty tak/nie i które strategie), a w grze zakładki **Decyzje** (które
 drużyny wysłały decyzje, *Zamknij rundę* – także bez decyzji wszystkich, *Cofnij rundę*, strona każdej firmy,
 plik gry) i **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund).
 Runda zamyka się sama, gdy wszystkie drużyny wyślą decyzje.
+
+### Konta i role
+
+Każda strona wymaga logowania (`/konta/login/`, django-allauth). Role:
+
+- **mistrz gry** – grupa `mistrz_gry` albo superużytkownik: zakłada gry, prowadzi rundy, widzi wszystkie
+  drużyny, zakłada konta uczniów i dopisuje ich do drużyn w panelu **Konta** (`/admin/`: Użytkownicy;
+  Gry → gra → drużyny),
+- **uczeń** – każde inne konto: widzi tylko gry i firmy swoich drużyn (strona i API: 403 dla cudzej firmy),
+  nie zamyka ani nie cofa rund.
+
+Konta z własnym loginem zakłada mistrz gry (samodzielna rejestracja wyłączona, `LEVAS_REJESTRACJA=1` ją
+włącza):
+
+```
+.venv\Scripts\python manage.py konto pani-ania --mg --imie "Anna Kowalska"   # mistrz gry (hasło z pytania)
+.venv\Scripts\python manage.py konto ala --imie "Ala Nowak"                  # uczeń
+```
+
+**Konto Microsoft (szkolne):** zarejestruj aplikację w Microsoft Entra ID (adres przekierowania
+`http(s)://<serwer>/konta/microsoft/login/callback/`) i ustaw zmienne `LEVAS_MS_CLIENT_ID`,
+`LEVAS_MS_SECRET` i `LEVAS_MS_TENANT` (identyfikator dzierżawy szkoły – logują się tylko jej konta). Bez nich
+przycisk Microsoft się nie pokazuje. Pierwsze logowanie zakłada konto ucznia.
+
+**Gra na własnym komputerze** (`start.bat`, `manage.py graj`) loguje się sama na lokalne konto mistrza gry
+`lokalny` – tylko z tego komputera. Sam `runserver` wymaga logowania.
 
 **Wygląd** (lista w nagłówku): klasyczny, *Talerze z kebabem*, *Grafik zmian*, *Kebab nocą* – pliki `panel_gracza/static/motywy/*.css`,
 przełącznik `panel_gracza/static/motyw.js`.
@@ -49,6 +75,7 @@ przełącznik `panel_gracza/static/motyw.js`.
 | `gry/` | modele `Gra`, `Runda`, `Decyzja` (event sourcing: konfiguracja + decyzje, stan liczy silnik) i `serwisy.py` |
 | `api/` | widoki JSON dla zakładek (`widoki.py`) i budowa widoku rundy (`prezentacja.py`) |
 | `panel_gracza/` | strony gracza, zakładki w czystym JS (`static/zakladki/`), Chart.js, komenda `graj` |
+| `konta/` | logowanie (django-allauth: własny login, konto Microsoft), role uczeń / mistrz gry (`role.py`), komenda `konto` |
 | `panel_mg/` | panel mistrza gry (`/mg/`): nowa gra, prowadzenie rund, wyniki drużyn; dane z `GET /api/gry/<id>/mg` |
 | `testy/` | pytest (mechaniki Revasa, zasady rund, API) |
 

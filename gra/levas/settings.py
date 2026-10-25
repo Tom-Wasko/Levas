@@ -24,8 +24,27 @@ SECRET_KEY = _klucz()
 DEBUG = os.environ.get("LEVAS_DEBUG", "1") == "1"
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
 
+# Logowanie kontem Microsoft (szkolnym): aplikacja zarejestrowana w Microsoft Entra ID, adres
+# przekierowania http(s)://<serwer>/konta/microsoft/login/callback/. Bez LEVAS_MS_CLIENT_ID – tylko
+# własny login i hasło. LEVAS_MS_TENANT: identyfikator dzierżawy szkoły (tylko jej konta).
+MICROSOFT = {
+    "client_id": os.environ.get("LEVAS_MS_CLIENT_ID", ""),
+    "secret": os.environ.get("LEVAS_MS_SECRET", ""),
+    "tenant": os.environ.get("LEVAS_MS_TENANT", "organizations"),
+}
+
 INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
     "django.contrib.staticfiles",
+    "konta",  # przed allauth: własne szablony logowania
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.microsoft",
     "gry",
     "api",
     "panel_gracza",
@@ -34,9 +53,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+    "konta.middleware.LogowanieWymagane",
 ]
 
 ROOT_URLCONF = "levas.urls"
@@ -47,7 +71,14 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
         "APP_DIRS": True,
-        "OPTIONS": {"context_processors": ["django.template.context_processors.request"]},
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "konta.kontekst.konto",
+            ]
+        },
     }
 ]
 
@@ -65,6 +96,34 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+
+# --- konta (konta/, django-allauth) ---
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+LOGIN_URL = "/konta/login/"
+LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/konta/login/"
+ACCOUNT_LOGIN_METHODS = {"username"}
+ACCOUNT_SIGNUP_FIELDS = ["username*", "password1*", "password2*"]
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_ADAPTER = "konta.adaptery.Konta"
+SOCIALACCOUNT_ADAPTER = "konta.adaptery.KontaMicrosoft"
+SOCIALACCOUNT_PROVIDERS = {
+    "microsoft": {
+        "TENANT": MICROSOFT["tenant"],
+        "APPS": [{"client_id": MICROSOFT["client_id"], "secret": MICROSOFT["secret"]}]
+        if MICROSOFT["client_id"]
+        else [],  # bez aplikacji przycisk Microsoft się nie pokazuje
+    }
+}
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # gra nie wysyła poczty
+# Własne konta zakłada mistrz gry (`manage.py konto`, panel administracyjny); LEVAS_REJESTRACJA=1
+# otwiera samodzielną rejestrację.
+LEVAS_REJESTRACJA = os.environ.get("LEVAS_REJESTRACJA") == "1"
+# Gra na własnym komputerze (`manage.py graj`): automatyczne lokalne konto mistrza gry.
+LEVAS_LOKALNIE = os.environ.get("LEVAS_LOKALNIE") == "1"
 
 # Plik gry przy imporcie może mieć kilka MB (decyzje wszystkich rund).
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024

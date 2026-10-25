@@ -122,11 +122,12 @@ export const wyslij = {
            <button class="btn czarny" data-akcja="cofnij-wyslanie">Wróć do podejmowania decyzji w bieżącej rundzie</button>`
         : `<p>Po wysłaniu decyzji gra czeka, aż wszyscy gracze wyślą swoje. Wtedy runda przelicza się automatycznie
            (boty decydują same).</p><button class="btn zielony" data-akcja="wyslij">Wyślij decyzje</button>`}
-      ${ludzie.length > 1 ? `<div class="tabela-tytul">Gracze</div><div class="tab-wrap"><table class="t">${stan}</table></div>
-        <p><button class="btn jasny" data-akcja="wymus">Przelicz rundę bez czekania (brakujący gracze: puste decyzje)</button></p>` : ""}
+      ${ludzie.length > 1 ? `<div class="tabela-tytul">Drużyny</div><div class="tab-wrap"><table class="t">${stan}</table></div>` : ""}
+      ${window.MG ? `${ludzie.length > 1 ? `<p><button class="btn jasny" data-akcja="wymus">Przelicz rundę bez czekania (brakujące drużyny: zapisane decyzje)</button></p>` : ""}
       <hr style="margin:28px 0;border:0;border-top:1px solid var(--linia)">
-      <p class="podpowiedz">Tryb treningowy: możesz cofnąć ostatnią przeliczoną rundę i zmienić swoje decyzje (decyzje botów zostaną policzone od nowa).</p>
-      <button class="btn jasny" data-akcja="cofnij-runde" ${v.gra.runda > (v.gra.runda_startowa || 1) ? "" : "disabled"}>Cofnij ostatnią rundę</button>`;
+      <p class="podpowiedz">Mistrz gry: możesz cofnąć ostatnią przeliczoną rundę i zmienić decyzje (decyzje botów zostaną policzone od nowa).</p>
+      <button class="btn jasny" data-akcja="cofnij-runde" ${v.gra.runda > (v.gra.runda_startowa || 1) ? "" : "disabled"}>Cofnij ostatnią rundę</button>`
+      : `<p class="podpowiedz">Rundę może też zamknąć mistrz gry – drużyny bez wysłanych decyzji zagrają wtedy decyzjami zapisanymi do tej pory.</p>`}`;
   },
   akcje: {
     wyslij: async (el, c) => {

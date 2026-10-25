@@ -1,0 +1,21 @@
+{% extends "konta/_strona.html" %}
+{% load socialaccount %}
+{% block head_title %}logowanie{% endblock %}
+{% block tytul %}Zaloguj się{% endblock %}
+{% block content %}
+  {% get_providers as dostawcy %}
+  {% for d in dostawcy %}{% if d.id == "microsoft" %}
+    <form method="post" action="{% provider_login_url 'microsoft' process='login' %}">{% csrf_token %}{{ redirect_field }}
+      <button class="btn pom" type="submit">Zaloguj kontem Microsoft (szkolnym)</button></form>
+    <p class="podpowiedz">albo własnym loginem i hasłem od mistrza gry:</p>
+  {% endif %}{% endfor %}
+  {% if form.non_field_errors %}<div class="komunikat zly">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>{% endif %}
+  <form method="post" action="{% url 'account_login' %}" class="logowanie">{% csrf_token %}
+    <label class="pole">Login<input type="text" name="login" autocomplete="username" required autofocus value="{{ form.login.value|default:'' }}"></label>
+    <label class="pole">Hasło<input type="password" name="password" autocomplete="current-password" required></label>
+    <label class="zapamietaj"><input type="checkbox" name="remember"> Zapamiętaj mnie na tym komputerze</label>
+    {{ redirect_field }}
+    <p><button class="btn pom" type="submit">Zaloguj</button></p>
+  </form>
+  <p class="podpowiedz">Konto zakłada mistrz gry. Nie pamiętasz hasła? Poproś mistrza gry o nowe.</p>
+{% endblock %}

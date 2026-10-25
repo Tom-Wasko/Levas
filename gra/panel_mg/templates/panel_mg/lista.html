@@ -14,7 +14,7 @@
 </head>
 <body>
   <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma">Mistrz gry</div></div>
-    <div class="konto"><span>Panel mistrza gry – bez logowania (tryb deweloperski)</span><a href="/">Strona graczy</a></div></header>
+    <div class="konto"><a href="/">Strona graczy</a>{% include "konta/_konto.html" with bez_mg=True %}</div></header>
   <main class="scena">
     <div class="karta">
       <div class="karta-glowa"><div class="tytul">Gry</div><div></div><div></div></div>
@@ -22,7 +22,7 @@
     </div>
     <div class="karta" style="margin-top:24px">
       <div class="karta-glowa"><div class="tytul">Nowa gra</div><div></div><div></div></div>
-      <div class="info"><span class="i">i</span><span>Drużyny grają na jednym rynku (na razie na tym komputerze – konta i logowanie w kroku 3a).
+      <div class="info"><span class="i">i</span><span>Drużyny grają na jednym rynku. Uczniów do drużyn dopisujesz w panelu „Konta” (Gry → drużyny gry).
         Boty to firmy komputerowe – konkurencja dla drużyn. Runda 1 – {{ ustawienia.pierwsza }} – to przygotowanie lokalu, sprzedaż zaczyna się w rundzie 2.</span></div>
       <div class="tresc">
         <div class="dwie">

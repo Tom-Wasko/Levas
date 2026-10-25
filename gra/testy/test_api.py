@@ -152,8 +152,9 @@ def test_odczyt_z_bazy_daje_ten_sam_stan(client):
     assert client.get(_url(id_, "widok") + "?runda=3").json() == przed
 
 
-def test_csrf_wymagany_poza_testami():
+def test_csrf_wymagany_poza_testami(mistrz):
     c = Client(enforce_csrf_checks=True)
+    c.force_login(mistrz)
     assert c.post("/api/gry", {}, content_type="application/json").status_code == 403
     c.get("/")
     token = c.cookies["csrftoken"].value

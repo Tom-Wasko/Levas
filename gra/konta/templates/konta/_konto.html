@@ -1,0 +1,3 @@
+{% if konto %}<span class="uzytkownik" title="{{ konto.login }}">{{ konto.nazwa }}{% if konto.mg %} · mistrz gry{% endif %}</span>
+{% if konto.mg and not bez_mg %}<a href="/mg/">Panel mistrza gry</a>{% endif %}{% if konto.mg and not konto.lokalne %}<a href="/admin/">Konta</a>{% endif %}
+{% if not konto.lokalne %}<form method="post" action="/konta/logout/" class="wyloguj">{% csrf_token %}<button type="submit">Wyloguj</button></form>{% endif %}{% endif %}

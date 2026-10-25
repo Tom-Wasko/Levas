@@ -13,4 +13,6 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 - [x] F2.8 Podstawowy panel mistrza gry – `panel_mg/` pod `/mg/` (bez logowania): nowa gra (drużyny, rundy, kapitał startowy – nowa opcja gry `kapital_startowy`, boty tak/nie i wybór strategii), zakładki Decyzje (kto wysłał, zamknięcie rundy także bez decyzji wszystkich, cofnięcie, strony firm, plik gry; odświeżanie co 15 s) i Wyniki (ranking według średniej karty wyników, dochód, gotówka, zadłużenie, wykresy); `GET /api/gry/<id>/mg`; link z listy gier
 
 ## Krok 3a, 3b, 4
-Zadania F3a.1–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3a.1 Konta – `konta/` (django-allauth): logowanie na każdej stronie, własny login (konta zakłada mistrz gry: komenda `konto`, panel Konta `/admin/`), konto Microsoft po ustawieniu `LEVAS_MS_*`; role mistrz gry (grupa `mistrz_gry`) / uczeń; drużyny `gry.Druzyna` (gra + firma + uczniowie); uczeń widzi tylko swoje gry i firmy, zarządzanie grą tylko dla mistrza gry; gra lokalna (`graj`) loguje się sama; test dostępu `test_uczen_nie_odczyta_cudzej_druzyny`
+
+Zadania F3a.2–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

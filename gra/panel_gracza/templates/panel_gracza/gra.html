@@ -16,13 +16,13 @@
 <body>
   <header class="naglowek">
     <div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma" id="nazwa-firmy">{{ firma }}</div></div>
-    <div class="konto"><span id="status-gry"></span><a href="/">Lista gier</a></div>
+    <div class="konto"><span id="status-gry"></span><a href="/">Lista gier</a>{% include "konta/_konto.html" %}</div>
   </header>
   <nav class="menu" id="menu"></nav>
   <main class="scena"><div class="karta" id="karta"><div class="ladowanie">Wczytywanie…</div></div></main>
   <div class="stopka">Levas – symulacja lokalu z kebabem na wzór REVAS · mechaniki i założenia: WIEDZA_O_GRZE.md, dane/*.yaml</div>
-  {{ id|json_script:"id-gry" }}{{ firma|json_script:"id-firmy" }}
-  <script>window.GRA = JSON.parse(document.getElementById("id-gry").textContent); window.FIRMA = JSON.parse(document.getElementById("id-firmy").textContent);</script>
+  {{ id|json_script:"id-gry" }}{{ firma|json_script:"id-firmy" }}{{ mg|json_script:"mg" }}
+  <script>window.GRA = JSON.parse(document.getElementById("id-gry").textContent); window.FIRMA = JSON.parse(document.getElementById("id-firmy").textContent); window.MG = JSON.parse(document.getElementById("mg").textContent);</script>
   <script type="module" src="/static/app.js"></script>
 </body>
 </html>

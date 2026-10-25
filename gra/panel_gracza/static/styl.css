@@ -276,3 +276,13 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
   .scena { padding: 14px 8px 40px; }
   .tresc { padding: 16px 14px 22px; }
 }
+
+/* konto w nagłówku i strony logowania (konta/) */
+.konto .uzytkownik { color: var(--szary); text-transform: none; font-weight: 600; font-size: 12px; }
+.konto .wyloguj { display: inline; margin: 0; }
+.konto .wyloguj button { font: inherit; text-transform: inherit; color: var(--czarny); background: none; border: 0;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.konto .wyloguj button:hover { background: var(--szary-jasny); }
+.karta-konto { max-width: 480px; }
+.logowanie { display: grid; gap: 12px; }
+.zapamietaj { display: flex; align-items: center; gap: 8px; font-size: 13px; }

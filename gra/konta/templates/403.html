@@ -1,0 +1,7 @@
+{% extends "konta/_strona.html" %}
+{% block head_title %}brak dostępu{% endblock %}
+{% block tytul %}Brak dostępu{% endblock %}
+{% block content %}
+  <div class="komunikat zly">{{ exception|default:"Nie masz dostępu do tej strony." }}</div>
+  <p><a class="btn pom" href="/">Wróć do listy gier</a></p>
+{% endblock %}

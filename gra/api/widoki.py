@@ -12,6 +12,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from gry import serwisy
 from gry.models import Gra
+from konta.role import gry_ucznia, jest_mg, moze_firme
 from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
@@ -53,6 +54,18 @@ def api(widok_):
     return opakowanie
 
 
+def tylko_mg(widok_):
+    """Zarządzanie grą (nowa gra, zamknięcie i cofnięcie rundy, plik gry) – tylko mistrz gry."""
+
+    @wraps(widok_)
+    def opakowanie(request, *args, **kwargs):
+        if not jest_mg(request.user):
+            raise BladZapytania("Tylko mistrz gry może to zrobić.", 403)
+        return widok_(request, *args, **kwargs)
+
+    return opakowanie
+
+
 def cialo(request, wymagane: bool = True) -> dict:
     try:
         d = json.loads(request.body or b"{}")
@@ -65,9 +78,11 @@ def cialo(request, wymagane: bool = True) -> dict:
     return d
 
 
-def sprawdz_firme(g: GraSilnika, firma: str) -> None:
+def sprawdz_firme(request, id_: str, g: GraSilnika, firma: str) -> None:
     if firma not in {f["nazwa"] for f in g.konfiguracja["firmy"]}:
         raise BladZapytania("Nie ma takiej firmy w grze.", 404)
+    if not moze_firme(request.user, id_, firma):
+        raise BladZapytania("To nie jest firma Twojej drużyny.", 403)
 
 
 def _warianty(g: GraSilnika, firma: str) -> dict:
@@ -84,7 +99,13 @@ def api_katalogi(request):
 @api
 def api_gry(request):
     if request.method == "GET":
-        return odpowiedz(serwisy.lista())
+        gry = serwisy.lista()
+        if not jest_mg(request.user):
+            moje = gry_ucznia(request.user)
+            gry = [g for g in gry if g["id"] in moje]
+        return odpowiedz(gry)
+    if not jest_mg(request.user):
+        return blad("Tylko mistrz gry zakłada gry.", 403)
     d = cialo(request)
     wiersze = [f for f in d.get("firmy", []) if str(f.get("nazwa", "")).strip()]
     firmy = [(f["nazwa"].strip(), f.get("bot") or None) for f in wiersze]
@@ -119,6 +140,7 @@ def api_gry(request):
 
 @require_GET
 @api
+@tylko_mg
 def api_mg(request, id_):
     """Widok mistrza gry: runda, decyzje drużyn, wyniki wszystkich firm."""
     return odpowiedz(przeglad_mg(serwisy.wczytaj(id_)))
@@ -126,6 +148,7 @@ def api_mg(request, id_):
 
 @require_http_methods(["DELETE"])
 @api
+@tylko_mg
 def api_usun(request, id_):
     serwisy.usun(id_)
     return odpowiedz({"ok": True})
@@ -135,7 +158,7 @@ def api_usun(request, id_):
 @api
 def api_widok(request, id_, firma):
     g = serwisy.wczytaj(id_)
-    sprawdz_firme(g, firma)
+    sprawdz_firme(request, id_, g, firma)
     runda = request.GET.get("runda", "")
     return odpowiedz(widok(g, firma, int(runda) if runda.isdigit() else None))
 
@@ -145,7 +168,7 @@ def api_widok(request, id_, firma):
 def api_decyzje(request, id_, firma):
     d = cialo(request)
     with serwisy.zmiana(id_) as g:
-        sprawdz_firme(g, firma)
+        sprawdz_firme(request, id_, g, firma)
         if g.zakonczona:
             raise BladZapytania("Gra jest zakończona.")
         if firma in g.wyslane():
@@ -160,7 +183,7 @@ def api_wyslij(request, id_, firma):
     wyslane = bool(cialo(request, wymagane=False).get("wyslane", True))
     przeliczono = False
     with serwisy.zmiana(id_) as g:
-        sprawdz_firme(g, firma)
+        sprawdz_firme(request, id_, g, firma)
         g.wyslij(firma, wyslane)
         if wyslane and not g.brakujace() and not g.zakonczona:
             g.przelicz()
@@ -172,6 +195,7 @@ def api_wyslij(request, id_, firma):
 
 @require_POST
 @api
+@tylko_mg
 def api_przelicz(request, id_):
     with serwisy.zmiana(id_) as g:
         if g.zakonczona:
@@ -182,6 +206,7 @@ def api_przelicz(request, id_):
 
 @require_POST
 @api
+@tylko_mg
 def api_cofnij(request, id_):
     with serwisy.zmiana(id_) as g:
         g.cofnij()
@@ -199,7 +224,7 @@ def api_warianty(request, id_, firma):
         if not nazwa:
             return blad("Podaj nazwę wariantu.")
     with serwisy.zmiana(id_) as g:
-        sprawdz_firme(g, firma)
+        sprawdz_firme(request, id_, g, firma)
         if request.method == "PUT":
             _warianty(g, firma)[nazwa] = d.get("decyzje") or deepcopy(g.szkic(firma))
         else:
@@ -211,7 +236,7 @@ def api_warianty(request, id_, firma):
 @api
 def api_dane_wariantu(request, id_, firma):
     g = serwisy.wczytaj(id_)
-    sprawdz_firme(g, firma)
+    sprawdz_firme(request, id_, g, firma)
     zapisane = g.decyzje.get(g.runda, {}).get("_warianty", {}).get(firma, {})
     w = zapisane.get(request.GET.get("nazwa", ""))
     return odpowiedz(w) if w is not None else blad("Nie ma takiego wariantu.", 404)
@@ -224,7 +249,7 @@ def api_podglad(request, id_, firma):
     pozostali gracze – według swoich roboczych decyzji.
     Body: {"warianty": [nazwa wariantu albo "biezace"]} – domyślnie bieżące."""
     g = serwisy.wczytaj(id_)
-    sprawdz_firme(g, firma)
+    sprawdz_firme(request, id_, g, firma)
     if g.zakonczona:
         return blad("Gra jest zakończona.")
     kopia = g.kopia()
@@ -258,6 +283,7 @@ def api_podglad(request, id_, firma):
 
 @require_GET
 @api
+@tylko_mg
 def api_eksport(request, id_):
     g = serwisy.wczytaj(id_)
     tresc = json.dumps(g.do_slownika(), ensure_ascii=False, indent=1)
@@ -268,6 +294,7 @@ def api_eksport(request, id_):
 
 @require_POST
 @api
+@tylko_mg
 def api_import(request):
     plik = request.FILES.get("plik")
     if not plik:

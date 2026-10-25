@@ -25,6 +25,11 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    tygodniem przygotowań bez sprzedaży (jak w Revasie). Czy data i tydzień przygotowań są dobre? Zmiana to tylko
    `rundy.kalendarz.start` w `dane/katalog.yaml`. (zadane: 25.10 22:20, do wysłania w poniedziałek o 6:00)
 
+3. **Logowanie kontem Microsoft (F3a.1).** Kod jest gotowy, ale potrzebna jest aplikacja zarejestrowana
+   w Microsoft Entra ID szkoły (identyfikator klienta, sekret, identyfikator dzierżawy) – to zrobi administrator
+   szkolnego Microsoft 365 albo Ty, jeśli masz dostęp. Czy mam przygotować krótką instrukcję krok po kroku?
+   Do tego czasu działa własny login i hasło. (zadane: 26.10 0:40, do wysłania w poniedziałek o 6:00)
+
 ## Odłożone zadania
 
 _brak_
@@ -56,10 +61,20 @@ _brak_
   - gra botów (26 tyg.): dochód netto od −74 tys. (agresywny marketing – reklamy jednorazowe nie są skalowane, więc tygodniowo są drogie) do +267 tys. (premium); kalibracja w kroku 5,
   - strona gracza: nazwy tygodni („Tydzień 3 (19–25.10)”, skróty T1…T26) w nawigatorze i na wykresach, koszty utrzymania „/ tydz.”, liczba rund i kapitał na stronie startowej z danych.
 - 25.10 22:22 – start F2.8 (podstawowy panel mistrza gry).
-- 25.10 22:50 – F2.8 gotowe: podstawowy panel mistrza gry pod `/mg/` (link z listy gier). Decyzje (do przejrzenia):
+- 25.10 22:25 – F2.8 gotowe: podstawowy panel mistrza gry pod `/mg/` (link z listy gier). Decyzje (do przejrzenia):
   - bez logowania (tryb deweloperski, jak w planie) – każdy z dostępem do strony otworzy panel; role i konta w F3a.1,
   - nowa gra: drużyny (domyślnie „Drużyna 1–4”), rundy, kapitał startowy (nowa opcja gry `kapital_startowy`, puste = z danych), boty tak/nie z wyborem strategii (firma bota nazywa się jak strategia, np. „Tani Kebab Nocny”); kredyt i ceny dostawców w „Więcej ustawień”,
   - w grze zakładki **Decyzje** (kto wysłał, zamknięcie rundy także bez decyzji wszystkich – drużyna gra wtedy zapisanym szkicem, cofnięcie, plik gry; odświeżanie co 15 s) i **Wyniki** (ranking wg średniej karty wyników z rund od 2 jak w Revasie, dochód, gotówka, zadłużenie, wykresy),
   - „podgląd drużyn” = przycisk „Strona firmy” otwiera stronę gracza tej firmy – mistrz gry widzi wszystko, ale może też zmieniać decyzje (do czasu ról w F3a.1),
   - przeglądarka (rozszerzenie Chrome) nie była połączona – stronę sprawdziłem testami Django i uruchomieniem skryptu panelu w node na sztucznym DOM; warto raz kliknąć `/mg/` ręcznie,
   - **koniec kroku 2**: test `test_koniec_kroku_2_cala_gra` – drużyna + 5 botów grają 26 tygodni, mistrz gry zamyka rundy przez API; pytest i ruff na zielono. Popyt nadal algorytmem Revasa (zgodnie z planem).
+- 26.10 0:40 – F3a.1 gotowe: konta i role (`konta/`, django-allauth 65). Decyzje **do potwierdzenia**:
+  - logowanie wymagane na każdej stronie; API bez logowania odpowiada 401, strony przekierowują na `/konta/login/`,
+  - rola mistrza gry = grupa `mistrz_gry` (albo superużytkownik), każde inne konto to uczeń,
+  - konta z własnym loginem zakłada mistrz gry (komenda `manage.py konto` albo panel Konta = panel administracyjny Django `/admin/`); samodzielna rejestracja wyłączona (`LEVAS_REJESTRACJA=1` włącza),
+  - konto Microsoft: pierwsze logowanie samo zakłada konto ucznia; dostęp ogranicza dzierżawa szkoły (`LEVAS_MS_TENANT`) – pytanie 3,
+  - drużyny: model `gry.Druzyna` (gra + firma + uczniowie); w F3a.1 uczniów dopisuje się w panelu Konta (Gry → gra → drużyny), wygodne przypisywanie w panelu mistrza gry w F3a.2,
+  - uczeń widzi tylko gry i firmy swoich drużyn (strona i API – 403), nie zakłada gier, nie zamyka ani nie cofa rund, nie pobiera pliku gry (są w nim decyzje innych drużyn),
+  - mistrz gry nadal może zmieniać decyzje drużyn ze strony firmy – „tylko do odczytu” z [[Zarys aplikacji]] dojdzie w F3a.14,
+  - **gra na własnym komputerze** (`start.bat` → `graj`) loguje się sama na lokalne konto mistrza gry `lokalny`, tylko dla zapytań z tego komputera – żeby gra jednoosobowa działała jak dotąd; sam `runserver` wymaga logowania,
+  - sprawdzone: pytest (72) i ruff na zielono, strony przez curl na żywym serwerze (logowanie, przekierowania, 401, gra lokalna).

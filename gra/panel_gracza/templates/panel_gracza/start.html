@@ -12,15 +12,15 @@
   <script src="/static/motyw.js"></script>
 </head>
 <body>
-  <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma">Lokalna gra</div></div>
-    <div class="konto"><span>REVAS – symulacja na własnym komputerze</span><a href="/mg/">Panel mistrza gry</a></div></header>
+  <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma">{% if mg %}Lista gier{% else %}Twoje gry{% endif %}</div></div>
+    <div class="konto">{% include "konta/_konto.html" %}</div></header>
   <main class="scena">
     <div class="karta">
       <div class="karta-glowa"><div class="tytul">Lista gier</div><div></div><div></div></div>
       <div class="tresc"><div id="gry">Wczytywanie…</div>
-        <p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap"><label class="btn jasny">Wczytaj grę z pliku (.json)<input type="file" id="import" accept=".json" hidden></label></p></div>
+        {% if mg %}<p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap"><label class="btn jasny">Wczytaj grę z pliku (.json)<input type="file" id="import" accept=".json" hidden></label></p>{% endif %}</div>
     </div>
-    <div class="karta" style="margin-top:24px">
+    {% if mg %}    <div class="karta" style="margin-top:24px">
       <div class="karta-glowa"><div class="tytul">Nowa gra</div><div></div><div></div></div>
       <div class="info"><span class="i">i</span><span>Dodaj firmy graczy (na tym komputerze) i boty komputerowe. Runda to {{ kalendarz.okres }}. Gra zaczyna się w rundzie 1 – {{ kalendarz.pierwsza }} – z kapitałem {{ kapital }} PLN i gotowym lokalem.</span></div>
       <div class="tresc">
@@ -43,10 +43,13 @@
           Agresywny marketing (~80%, ★★★, dużo reklamy), Naśladowca (średnia cen rynku, ★★).</p>
       </div>
     </div>
+    {% endif %}
   </main>
+  {{ mg|json_script:"mg" }}
   {{ strategie|json_script:"strategie" }}
   <script type="module">
     const STRATEGIE = JSON.parse(document.getElementById("strategie").textContent);
+    const MG = JSON.parse(document.getElementById("mg").textContent);
     const csrf = () => document.cookie.match(/(?:^|; )csrftoken=([^;]*)/)?.[1] ?? "";
     const tb = document.querySelector("#firmy tbody");
     const opcje = (wybrana) => `<option value="">Gracz</option>` + Object.entries(STRATEGIE).map(([k, n]) => `<option value="${k}" ${k === wybrana ? "selected" : ""}>Bot: ${n}</option>`).join("");
@@ -56,6 +59,7 @@
       tr.querySelector("button").onclick = () => tr.remove();
       tb.appendChild(tr);
     }
+    if (MG) {
     wiersz("Moja firma", ""); wiersz("Firma 1", "zrownowazony"); wiersz("Firma 2", "tani");
     document.getElementById("dodaj-gracza").onclick = () => wiersz(`Gracz ${tb.children.length + 1}`, "");
     document.getElementById("dodaj-bota").onclick = () => wiersz(`Firma ${tb.children.length}`, "zrownowazony");
@@ -69,17 +73,18 @@
       if (!r.ok) return alert(j.blad);
       location.href = `/gra/${j.id}`;
     };
+    }
     async function lista() {
       const gry = await (await fetch("/api/gry")).json();
       document.getElementById("gry").innerHTML = gry.length ? `<div class="tab-wrap"><table class="t"><thead><tr><th class="l">Gra</th><th>Runda</th><th>Firmy</th><th></th></tr></thead><tbody>
         ${gry.map((g) => `<tr><td class="l"><a href="/gra/${g.id}"><b>${g.nazwa}</b></a></td><td>${g.runda > g.liczba_rund ? "zakończona" : `${g.runda} / ${g.liczba_rund}`}</td>
           <td>${g.firmy.map((f) => f.bot ? `${f.nazwa} <span class="podpowiedz">(bot)</span>` : `<b>${f.nazwa}</b>`).join(", ")}</td>
-          <td><a class="btn pom maly" href="/gra/${g.id}">Graj</a> <a class="btn jasny maly" href="/api/gry/${g.id}/eksport">Pobierz plik</a>
-          <button class="btn jasny maly" onclick="usun('${g.id}')">Usuń</button></td></tr>`).join("")}</tbody></table></div>`
-        : `<p class="podpowiedz">Nie ma jeszcze żadnej gry – utwórz nową poniżej.</p>`;
+          <td><a class="btn pom maly" href="/gra/${g.id}">Graj</a> ${MG ? `<a class="btn jasny maly" href="/api/gry/${g.id}/eksport">Pobierz plik</a>
+          <button class="btn jasny maly" onclick="usun('${g.id}')">Usuń</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="podpowiedz">${MG ? "Nie ma jeszcze żadnej gry – utwórz nową poniżej." : "Nie jesteś jeszcze w żadnej drużynie – mistrz gry dopisze Cię do drużyny."}</p>`;
     }
     window.usun = async function (id) { if (confirm("Usunąć grę?")) { await fetch(`/api/gry/${id}`, { method: "DELETE", headers: { "X-CSRFToken": csrf() } }); lista(); } };
-    document.getElementById("import").onchange = async (e) => {
+    if (MG) document.getElementById("import").onchange = async (e) => {
       const f = new FormData(); f.append("plik", e.target.files[0]);
       const r = await fetch("/api/gry/import", { method: "POST", body: f, headers: { "X-CSRFToken": csrf() } }); const j = await r.json();
       if (!r.ok) return alert(j.blad);

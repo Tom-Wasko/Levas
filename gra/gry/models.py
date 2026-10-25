@@ -1,5 +1,6 @@
 """Zapis gry (event sourcing): konfiguracja + decyzje firm w rundach. Stan liczy silnik od nowa."""
 
+from django.conf import settings
 from django.db import models
 
 
@@ -44,3 +45,21 @@ class Decyzja(models.Model):
 
     def __str__(self) -> str:
         return f"{self.runda} {self.firma}"
+
+
+class Druzyna(models.Model):
+    """Uczniowie prowadzący firmę w grze. Uczeń widzi tylko gry i firmy swoich drużyn."""
+
+    gra = models.ForeignKey(Gra, on_delete=models.CASCADE, related_name="druzyny")
+    firma = models.CharField(max_length=100)
+    czlonkowie = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="druzyny", blank=True, verbose_name="uczniowie"
+    )
+
+    class Meta:
+        verbose_name = "drużyna"
+        verbose_name_plural = "drużyny"
+        constraints = [models.UniqueConstraint(fields=["gra", "firma"], name="druzyna_unikalna")]
+
+    def __str__(self) -> str:
+        return f"{self.firma} ({self.gra_id})"

@@ -3,6 +3,7 @@
 import threading
 import webbrowser
 
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
@@ -16,6 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, port, bez_przegladarki, **opcje):
         call_command("migrate", interactive=False, verbosity=0)
+        settings.LEVAS_LOKALNIE = True  # bez logowania: lokalne konto mistrza gry (konta/)
         adres = f"http://127.0.0.1:{port}/"
         if not bez_przegladarki:
             threading.Timer(1.5, webbrowser.open, [adres]).start()
