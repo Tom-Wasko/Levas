@@ -39,6 +39,8 @@ class Gra:
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "jednoczesnie"),
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja}
+        if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych
+            konf["kapital_startowy"] = float(opcje["kapital_startowy"])
         return cls(konf, {}, dane)
 
     def do_slownika(self) -> dict:
@@ -58,8 +60,12 @@ class Gra:
         """Pierwsza runda gry: 1 albo runda, od której gra startuje z zaimportowanego stanu prawdziwej gry."""
         return int(self.konfiguracja.get("import", {}).get("runda", 1))
 
+    @property
+    def kapital_startowy(self) -> float:
+        return self.konfiguracja.get("kapital_startowy", self.dane.z["finanse"]["kapital_startowy"])
+
     def stan_poczatkowy(self) -> StanGry:
-        kapital = self.dane.z["finanse"]["kapital_startowy"]
+        kapital = self.kapital_startowy
         firmy = {f["nazwa"]: Firma(nazwa=f["nazwa"], bot=f["bot"], nazwa_wyswietlana=f["nazwa"], gotowka=kapital)
                  for f in self.konfiguracja["firmy"]}
         # gotowy lokal: stanowiska ze sprzętem na start (katalog.yaml: stanowiska.startowe), bez kosztu

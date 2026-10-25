@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Levas Kebab – panel mistrza gry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styl.css">
+  <link rel="stylesheet" href="/static/motywy/talerze.css">
+  <link rel="stylesheet" href="/static/motywy/grafik.css">
+  <link rel="stylesheet" href="/static/motywy/noc.css">
+  <link rel="stylesheet" href="/static/mg/mg.css">
+  <script src="/static/motyw.js"></script>
+</head>
+<body>
+  <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma">Mistrz gry</div></div>
+    <div class="konto"><span>Panel mistrza gry – bez logowania (tryb deweloperski)</span><a href="/">Strona graczy</a></div></header>
+  <main class="scena">
+    <div class="karta">
+      <div class="karta-glowa"><div class="tytul">Gry</div><div></div><div></div></div>
+      <div class="tresc"><div id="gry">Wczytywanie…</div></div>
+    </div>
+    <div class="karta" style="margin-top:24px">
+      <div class="karta-glowa"><div class="tytul">Nowa gra</div><div></div><div></div></div>
+      <div class="info"><span class="i">i</span><span>Drużyny grają na jednym rynku (na razie na tym komputerze – konta i logowanie w kroku 3a).
+        Boty to firmy komputerowe – konkurencja dla drużyn. Runda 1 – {{ ustawienia.pierwsza }} – to przygotowanie lokalu, sprzedaż zaczyna się w rundzie 2.</span></div>
+      <div class="tresc">
+        <div class="dwie">
+          <label class="pole">Nazwa gry<input type="text" id="nazwa" value="Klasa 3B"></label>
+          <label class="pole">Liczba rund ({{ ustawienia.mnoga }})<input type="number" id="rundy" min="2" max="{{ ustawienia.maks_rund }}" value="{{ ustawienia.rundy }}"></label>
+          <label class="pole">Kapitał startowy (PLN)<input type="number" id="kapital" min="1" step="1000" value="{{ ustawienia.kapital|floatformat:0 }}"></label>
+          <label class="pole">Ziarno losowości (puste = losowe)<input type="text" id="ziarno" placeholder="np. 2026"></label>
+        </div>
+        <div class="tabela-tytul">Drużyny</div>
+        <div class="tab-wrap"><table class="t" id="druzyny"><thead><tr><th class="l">Nazwa drużyny (firmy)</th><th></th></tr></thead><tbody></tbody></table></div>
+        <p><button class="btn jasny" id="dodaj">+ Drużyna</button></p>
+        <div class="tabela-tytul"><label class="przelacz-boty"><input type="checkbox" id="boty" checked> Boty na rynku</label></div>
+        <div id="lista-botow" class="boty-wybor"></div>
+        <details class="wiecej"><summary>Więcej ustawień</summary>
+          <div class="dwie">
+            <label class="pole">Kredyt odnawialny<select id="kredyt">
+              <option value="jednoczesnie">jak w oficjalnej grze – kredyt tylko na niedobór na koniec rundy</option>
+              <option value="na_biezaco">na bieżąco – zakupy opłacane przed wpływem przychodów</option></select></label>
+            <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">z danych gry (pierwsze rundy), dalej generowane</option>
+              <option value="losowe">wszystkie generowane</option></select></label>
+          </div>
+        </details>
+        <p style="display:flex"><button class="btn pom" id="utworz" style="margin-left:auto">Utwórz grę</button></p>
+        <p class="blad-formularza" id="blad" hidden></p>
+      </div>
+    </div>
+  </main>
+  {{ ustawienia|json_script:"ustawienia" }}
+  <script type="module">
+    import { esc, tabela } from "/static/zakladki/wspolne.js";
+    const U = JSON.parse(document.getElementById("ustawienia").textContent);
+    const csrf = () => document.cookie.match(/(?:^|; )csrftoken=([^;]*)/)?.[1] ?? "";
+    const tb = document.querySelector("#druzyny tbody");
+    function druzyna(nazwa) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td class="l"><input type="text" value="${esc(nazwa)}"></td><td><button class="btn jasny maly">Usuń</button></td>`;
+      tr.querySelector("button").onclick = () => tr.remove();
+      tb.appendChild(tr);
+    }
+    ["Drużyna 1", "Drużyna 2", "Drużyna 3", "Drużyna 4"].forEach(druzyna);
+    document.getElementById("dodaj").onclick = () => druzyna(`Drużyna ${tb.children.length + 1}`);
+    const lb = document.getElementById("lista-botow");
+    lb.innerHTML = Object.entries(U.strategie).map(([k, n]) =>
+      `<label><input type="checkbox" value="${esc(k)}" checked> ${esc(n)}</label>`).join("");
+    const boty = document.getElementById("boty");
+    boty.onchange = () => lb.classList.toggle("wylaczone", !boty.checked);
+    const pokazBlad = (t) => { const b = document.getElementById("blad"); b.textContent = t; b.hidden = !t; };
+
+    document.getElementById("utworz").onclick = async () => {
+      pokazBlad("");
+      const firmy = [...tb.children].map((tr) => ({ nazwa: tr.querySelector("input").value, bot: null }));
+      if (boty.checked) for (const c of lb.querySelectorAll("input:checked")) firmy.push({ nazwa: U.strategie[c.value], bot: c.value });
+      const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() }, body: JSON.stringify({
+        nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
+        kapital_startowy: document.getElementById("kapital").value, ziarno: document.getElementById("ziarno").value,
+        ceny_dostawcow: document.getElementById("ceny").value, kredyt_odnawialny: document.getElementById("kredyt").value, firmy }) });
+      const j = await r.json();
+      if (!r.ok) return pokazBlad(j.blad);
+      location.href = `/mg/gra/${encodeURIComponent(j.id)}`;
+    };
+
+    async function lista() {
+      const gry = await (await fetch("/api/gry")).json();
+      const wiersze = gry.map((g) => {
+        const druzyny = g.firmy.filter((f) => !f.bot).length, b = g.firmy.length - druzyny;
+        const id = encodeURIComponent(g.id);
+        return [`<a href="/mg/gra/${id}"><b>${esc(g.nazwa)}</b></a>`,
+          g.runda > g.liczba_rund ? "zakończona" : `${g.runda} / ${g.liczba_rund}`, `${druzyny}${b ? ` + ${b} ${b === 1 ? "bot" : b < 5 ? "boty" : "botów"}` : ""}`,
+          `<a class="btn pom maly" href="/mg/gra/${id}">Prowadź</a> <a class="btn jasny maly" href="/api/gry/${id}/eksport">Pobierz plik</a>`];
+      });
+      document.getElementById("gry").innerHTML = gry.length ? tabela(null, ["Gra", "Runda", "Drużyny", ""], wiersze, { klasy: ["l"] })
+        : `<p class="podpowiedz">Nie ma jeszcze żadnej gry – utwórz nową poniżej.</p>`;
+    }
+    lista();
+  </script>
+</body>
+</html>

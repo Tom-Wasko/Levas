@@ -17,7 +17,9 @@ from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
 from silnik.runda import przelicz_runde
 
-from .prezentacja import katalogi, widok
+from .prezentacja import katalogi, przeglad_mg, widok
+
+MAKS_KAPITAL = 10_000_000  # zł – górna granica kapitału startowego w nowej grze
 
 
 def odpowiedz(dane, status: int = 200) -> JsonResponse:
@@ -93,6 +95,16 @@ def api_gry(request):
     if not any(b is None for _, b in firmy):
         return blad("Co najmniej jedna firma musi być prowadzona przez gracza.")
     ziarno = d.get("ziarno")
+    kapital = d.get("kapital_startowy")
+    if kapital not in (None, ""):
+        try:
+            kapital = float(kapital)
+        except (TypeError, ValueError):
+            return blad("Kapitał startowy musi być liczbą.")
+        if not 0 < kapital <= MAKS_KAPITAL:
+            return blad(f"Kapitał startowy: od 1 do {MAKS_KAPITAL:,.0f} PLN.".replace(",", " "))
+    else:
+        kapital = None
     g = GraSilnika.nowa(
         d.get("nazwa") or "Gra",
         firmy,
@@ -100,8 +112,16 @@ def api_gry(request):
         int(ziarno) if str(ziarno or "").strip().isdigit() else None,
         ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
         kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),
+        kapital_startowy=kapital,
     )
     return odpowiedz({"id": serwisy.utworz(g)})
+
+
+@require_GET
+@api
+def api_mg(request, id_):
+    """Widok mistrza gry: runda, decyzje drużyn, wyniki wszystkich firm."""
+    return odpowiedz(przeglad_mg(serwisy.wczytaj(id_)))
 
 
 @require_http_methods(["DELETE"])

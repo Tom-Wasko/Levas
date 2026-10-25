@@ -1,0 +1,9 @@
+/* Panel mistrza gry – dodatki do styl.css */
+.boty-wybor { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 4px 0 14px; }
+.boty-wybor label, .przelacz-boty { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.boty-wybor.wylaczone { opacity: .4; pointer-events: none; }
+.wiecej { margin: 8px 0 4px; }
+.wiecej summary { cursor: pointer; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--szary); margin-bottom: 10px; }
+.blad-formularza { color: var(--czerwony); font-weight: 700; }
+.przyciski-mg { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 6px; }
+.wykresy-mg { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 18px; }

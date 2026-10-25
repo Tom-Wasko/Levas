@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "gry",
     "api",
     "panel_gracza",
+    "panel_mg",
 ]
 
 MIDDLEWARE = [

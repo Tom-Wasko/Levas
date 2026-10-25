@@ -139,3 +139,47 @@ def _dashboard(gra: Gra, firma: str, runda: int, poprzedni) -> dict:
         ranking = sorted(karty, key=lambda n: -karty[n]["wynik_dzialalnosci"])
         d["miejsce"] = ranking.index(firma) + 1 if firma in ranking else None
     return d
+
+
+def przeglad_mg(gra: Gra) -> dict:
+    """Widok mistrza gry: bieżąca runda, kto wysłał decyzje, wyniki i ranking wszystkich firm, historia rund."""
+    dane, konf = gra.dane, gra.konfiguracja
+    r = gra.runda
+    ostatnia = r - 1  # ostatnia przeliczona runda
+    stan = gra.stan(ostatnia)
+    wyslane = set(gra.wyslane())
+    strategie = dane.boty["strategie"]
+    skum = karta_skumulowana(gra, ostatnia)
+    karta_ost = stan.rynek.get(ostatnia, {}).get("karta", {}) if ostatnia >= 2 else {}
+    rundy = [x for x in range(gra.runda_startowa, ostatnia + 1) if x in stan.wyniki]
+    firmy = []
+    for f in konf["firmy"]:
+        n = f["nazwa"]
+        fs = stan.firmy[n]
+        wyn = [stan.wyniki[x][n]["kpir"]["dochod_netto"] for x in rundy if n in stan.wyniki[x]]
+        firmy.append({
+            "nazwa": n, "bot": f["bot"], "strategia": strategie.get(f["bot"], {}).get("nazwa") if f["bot"] else None,
+            "wyslane": None if f["bot"] else n in wyslane,
+            "gotowka": fs.gotowka,
+            "zadluzenie": sum(k.pozostalo for k in fs.kredyty) + fs.kredyt_odnawialny,
+            "lokaty": sum(lk.kwota for lk in fs.lokaty),
+            "pracownicy": len(fs.pracownicy), "stanowiska": len(fs.stanowiska),
+            "dochod_ostatni": wyn[-1] if wyn else None, "dochod_suma": round(sum(wyn), 2),
+            "wynik_ostatni": karta_ost.get(n, {}).get("wynik_dzialalnosci"),
+            "wynik_skumulowany": skum.get(n, {}).get("wynik_dzialalnosci"),
+        })
+    ranking = sorted((f for f in firmy if f["wynik_skumulowany"] is not None), key=lambda f: -f["wynik_skumulowany"])
+    for i, f in enumerate(ranking):
+        f["miejsce"] = i + 1
+    return {
+        "gra": {"nazwa": konf["nazwa"], "runda": r, "liczba_rund": konf["liczba_rund"], "zakonczona": gra.zakonczona,
+                "ziarno": konf["ziarno"], "kapital": gra.kapital_startowy,
+                "kredyt_odnawialny": konf.get("kredyt_odnawialny", "jednoczesnie"),
+                "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
+                "brakujace": [] if gra.zakonczona else gra.brakujace(),
+                "kalendarz": kalendarz(dane, konf["liczba_rund"])},
+        "firmy": firmy,
+        "historia": [{"runda": x, "skrot": dane.skrot_rundy(x),
+                      "dochod": {n: w["kpir"]["dochod_netto"] for n, w in stan.wyniki[x].items()},
+                      "gotowka": {n: w["gotowka"] for n, w in stan.wyniki[x].items()}} for x in rundy],
+    }

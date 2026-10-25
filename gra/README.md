@@ -2,7 +2,8 @@
 
 Symulacja biznesowa kebabu w Lublinie, budowana na bazie lokalnego Revasa („Klub fitness”). Na razie (krok 2
 [planu](../notatki/Plan%20implementacji.md)) to mechanika Revasa na Django z danymi kebaba (dania, kucharze, kasa,
-składniki, dostawcy jedzenia); rundy tygodniowe dojdą w kolejnym zadaniu (postęp: [`POSTEP.md`](../POSTEP.md)).
+składniki, dostawcy jedzenia), rundami tygodniowymi (26 tygodni) i podstawowym panelem mistrza gry
+(postęp: [`POSTEP.md`](../POSTEP.md)).
 
 ## Uruchomienie
 
@@ -28,6 +29,12 @@ Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik
 poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
+**Panel mistrza gry** – http://127.0.0.1:8765/mg/ (na razie bez logowania – tryb deweloperski): nowa gra
+(drużyny, liczba rund, kapitał startowy, boty tak/nie i które strategie), a w grze zakładki **Decyzje** (które
+drużyny wysłały decyzje, *Zamknij rundę* – także bez decyzji wszystkich, *Cofnij rundę*, strona każdej firmy,
+plik gry) i **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund).
+Runda zamyka się sama, gdy wszystkie drużyny wyślą decyzje.
+
 **Wygląd** (lista w nagłówku): klasyczny, *Talerze z kebabem*, *Grafik zmian*, *Kebab nocą* – pliki `panel_gracza/static/motywy/*.css`,
 przełącznik `panel_gracza/static/motyw.js`.
 
@@ -42,6 +49,7 @@ przełącznik `panel_gracza/static/motyw.js`.
 | `gry/` | modele `Gra`, `Runda`, `Decyzja` (event sourcing: konfiguracja + decyzje, stan liczy silnik) i `serwisy.py` |
 | `api/` | widoki JSON dla zakładek (`widoki.py`) i budowa widoku rundy (`prezentacja.py`) |
 | `panel_gracza/` | strony gracza, zakładki w czystym JS (`static/zakladki/`), Chart.js, komenda `graj` |
+| `panel_mg/` | panel mistrza gry (`/mg/`): nowa gra, prowadzenie rund, wyniki drużyn; dane z `GET /api/gry/<id>/mg` |
 | `testy/` | pytest (mechaniki Revasa, zasady rund, API) |
 
 `WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (liczby z gier – w `dane_revas/`).

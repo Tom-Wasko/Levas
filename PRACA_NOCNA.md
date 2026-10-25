@@ -45,7 +45,7 @@ _brak_
   - 3 fikcyjni dostawcy: Piekarnia Koziołek (pieczywo), Mięsny Bazar Zamojski (mięso, warzywa, sosy) – taniej, węższa oferta; Hurtownia Lubelska Spiżarnia – wszystko,
   - nazwy mediów, szkoleń i firm szkoleniowych przerobione na gastronomię (fikcyjne), liczby z Revasa bez zmian; `zalozenia.yaml` bez zmian,
   - gra botów (12 mies.): dochód netto 0,45–0,78 mln zł na firmę (Revas: 0,8–2,4 mln) – rząd wielkości ten sam, balans przy rundach tygodniowych.
-- 25.10 22:20 – F2.7 gotowe: rundy tygodniowe. Decyzje (do przejrzenia):
+- 25.10 22:20 – F2.7 gotowe (`35f28eb`): rundy tygodniowe. Decyzje (do przejrzenia):
   - kalendarz w danych (`katalog.yaml` → `rundy.kalendarz`), silnik działa na tygodniach i na miesiącach; Revas (`dane_revas/`) nadal miesięczny – jego testy i wyniki bez zmian,
   - kwoty w danych zostają **miesięczne** (pensje w umowach, czynsz, utrzymanie) – silnik księguje je na tydzień (× 12/52); oprocentowanie roczne / 52; okresy lokat i kredytów w tygodniach (kredyt do 26 tyg.); koszty jednorazowe (zakupy, rekrutacja, premie, księgowość za dokument, emisje reklam) bez skalowania,
   - **założenie:** start 5.10.2026 (poniedziałek, początek roku akademickiego) – do pytania w poniedziałek; runda 1 nadal tydzień przygotowań bez sprzedaży (jak w Revasie),
@@ -55,3 +55,11 @@ _brak_
   - etat i sprzęt 40 h / tydzień, kapitał 100 000 zł, wynik ekonomiczny = dochód / 4615 (20 000 × 12/52),
   - gra botów (26 tyg.): dochód netto od −74 tys. (agresywny marketing – reklamy jednorazowe nie są skalowane, więc tygodniowo są drogie) do +267 tys. (premium); kalibracja w kroku 5,
   - strona gracza: nazwy tygodni („Tydzień 3 (19–25.10)”, skróty T1…T26) w nawigatorze i na wykresach, koszty utrzymania „/ tydz.”, liczba rund i kapitał na stronie startowej z danych.
+- 25.10 22:22 – start F2.8 (podstawowy panel mistrza gry).
+- 25.10 22:50 – F2.8 gotowe: podstawowy panel mistrza gry pod `/mg/` (link z listy gier). Decyzje (do przejrzenia):
+  - bez logowania (tryb deweloperski, jak w planie) – każdy z dostępem do strony otworzy panel; role i konta w F3a.1,
+  - nowa gra: drużyny (domyślnie „Drużyna 1–4”), rundy, kapitał startowy (nowa opcja gry `kapital_startowy`, puste = z danych), boty tak/nie z wyborem strategii (firma bota nazywa się jak strategia, np. „Tani Kebab Nocny”); kredyt i ceny dostawców w „Więcej ustawień”,
+  - w grze zakładki **Decyzje** (kto wysłał, zamknięcie rundy także bez decyzji wszystkich – drużyna gra wtedy zapisanym szkicem, cofnięcie, plik gry; odświeżanie co 15 s) i **Wyniki** (ranking wg średniej karty wyników z rund od 2 jak w Revasie, dochód, gotówka, zadłużenie, wykresy),
+  - „podgląd drużyn” = przycisk „Strona firmy” otwiera stronę gracza tej firmy – mistrz gry widzi wszystko, ale może też zmieniać decyzje (do czasu ról w F3a.1),
+  - przeglądarka (rozszerzenie Chrome) nie była połączona – stronę sprawdziłem testami Django i uruchomieniem skryptu panelu w node na sztucznym DOM; warto raz kliknąć `/mg/` ręcznie,
+  - **koniec kroku 2**: test `test_koniec_kroku_2_cala_gra` – drużyna + 5 botów grają 26 tygodni, mistrz gry zamyka rundy przez API; pytest i ruff na zielono. Popyt nadal algorytmem Revasa (zgodnie z planem).
