@@ -244,10 +244,11 @@ def _zuzyj(firma: Firma, zuzycie: dict[str, float]) -> dict[str, dict]:
             if stan <= EPS or pozostalo <= EPS:
                 continue
             bierz = min(stan, pozostalo)
-            cena = firma.wartosc_magazynu.get(k, 0.0) / stan
+            wart = firma.wartosc_magazynu_gr.get(k, 0)
+            zdejmij = wart if stan - bierz <= EPS else round(wart * bierz / stan)
             firma.magazyn[k] = stan - bierz
-            firma.wartosc_magazynu[k] = firma.wartosc_magazynu.get(k, 0.0) - bierz * cena
-            wartosc += bierz * cena
+            firma.wartosc_magazynu_gr[k] = wart - zdejmij
+            wartosc += zdejmij / 100
             pozostalo -= bierz
         wynik[nazwa] = {"ilosc": ile - max(pozostalo, 0.0), "wartosc": wartosc}
     return wynik

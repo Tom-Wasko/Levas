@@ -88,7 +88,8 @@ def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, 
             info["splacone_kredyty"].append(kredyt.id)
     for d in decyzje.get("kredyty_wez", []):
         firma.licznik += 1
-        kredyt = Kredyt(firma.licznik, float(d["kwota"]), bank["kredyt"], runda, int(d["miesiecy"]), float(d["kwota"]))
+        kredyt = Kredyt(id=firma.licznik, kwota=float(d["kwota"]), oprocentowanie=bank["kredyt"], od_rundy=runda,
+                        miesiecy=int(d["miesiecy"]), pozostalo=float(d["kwota"]))
         firma.kredyty.append(kredyt)
         rachunek.zapisz(firma, f"Kredyt nr {kredyt.id}", kredyt.kwota)
         info["nowe_kredyty"].append(kredyt.id)
@@ -97,7 +98,8 @@ def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, 
         if kwota <= 0:
             continue
         firma.licznik += 1
-        lokata = Lokata(firma.licznik, kwota, bank["lokata"], runda, int(d["miesiecy"]))
+        lokata = Lokata(id=firma.licznik, kwota=kwota, oprocentowanie=bank["lokata"], od_rundy=runda,
+                        miesiecy=int(d["miesiecy"]))
         firma.lokaty.append(lokata)
         rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id}", -kwota)
         info["nowe_lokaty"].append(lokata.id)

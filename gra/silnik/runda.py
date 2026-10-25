@@ -33,7 +33,7 @@ from .finanse import (
 )
 from .kandydaci import dodaj_nowych
 from .losowosc import generator
-from .model import Firma, StanGry, do_slownika
+from .model import Firma, StanGry, do_slownika, grosze
 from .operacje import jakosc_uslugi, obsluz, recepcjonisci
 from .rynek import (
     mnoznik_firmy,
@@ -109,7 +109,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 q = jakosc_uslugi(dane, f, u)
                 if q is None:
                     continue
-                cena = max(0.01, f.ceny[u]["cena"] - f.ceny[u]["rabat"])
+                cena = max(0.01, f.ceny[u].cena - f.ceny[u].rabat)
                 oferty.setdefault(u, {})[nazwa] = {"cena": cena, "jakosc": q, "wyposazenie": wyp,
                                                    "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy}
         for k in stali:
@@ -198,7 +198,7 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
             if ile <= 0:
                 continue
             f.magazyn[k] -= ile
-            f.wartosc_magazynu[k] = max(0.0, f.wartosc_magazynu.get(k, 0.0) - ile * zk["cena"])
+            f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
             wartosc += ile * zk["cena"]
             wynik[zk["zasob"]] = wynik.get(zk["zasob"], 0.0) + ile
         if wartosc <= 0:
@@ -228,7 +228,7 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
             o = oferty[u][f.nazwa]
             sprzedaz[u] = {"popyt": d, "prognoza": f.oferta.get(u, 0), "sprzedaz": obsluga["obsluzeni"][u],
                            "utracona": obsluga["utracona"][u], "przyczyna": obsluga["przyczyna"].get(u, ""),
-                           "cena": f.ceny[u]["cena"], "rabat": f.ceny[u]["rabat"], "cena_po_rabacie": o["cena"],
+                           "cena": f.ceny[u].cena, "rabat": f.ceny[u].rabat, "cena_po_rabacie": o["cena"],
                            "przychod": round(obsluga["obsluzeni"][u] * o["cena"], 2), "reklamacje": obsluga["reklamacje"][u],
                            "jakosc": o["jakosc"], "skladniki_popytu": rynek[u][f.nazwa]["skladniki"]}
     w["sprzedaz"] = sprzedaz
@@ -281,7 +281,7 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
             continue
         zasoby.append({"zasob": nazwa, "jakosc": int(q), "poczatek": round(pocz, 3), "zamowione": round(zam, 3),
                        "wykorzystane": round(wykorzystane, 3), "zwroty": round(zw, 3), "koniec": round(kon, 3),
-                       "wartosc": round(f.wartosc_magazynu.get(k, 0.0), 2)})
+                       "wartosc": f.wartosc_magazynu(k)})
     for nazwa, ile in zwroty.items():
         for row in zasoby:
             if row["zasob"] == nazwa and row["zamowione"] > 0:

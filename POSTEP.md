@@ -5,7 +5,7 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 ## Krok 2 – kopia Revasa i przebudowa pod Levas
 - [x] F2.1 Kopia `revas_gra` → `gra/` (bez kalibracji, gry przez GitHub, importu stanu i raportów), pyproject + ruff, testy przechodzą
 - [x] F2.2 Django zamiast Flaska: aplikacje `gry/` (modele Gra/Runda/Decyzja w SQLite), `api/` (widoki JSON), `panel_gracza/` (strony, zakładki JS bez zmian, komenda `graj`); CSRF w zapytaniach JS; testy API
-- [ ] F2.3 Model pydantic, grosze, `WERSJA_STANU`
+- [x] F2.3 Model pydantic, grosze, `WERSJA_STANU` – modele stanu w pydantic (`extra="forbid"`), kwoty jako int grosze (pola `…_gr`, silnik liczy w złotych przez właściwości zaokrąglające do grosza), widok w złotych dla zakładek (`do_slownika`), testy własności (hypothesis): zapis → odczyt, to samo ziarno = ten sam wynik; wyniki gry botów bez zmian
 - [ ] F2.4 Dane w YAML ze schematami i `zrodlo`
 - [ ] F2.5 Nazwane strumienie losowości (PCG64)
 - [ ] F2.6 Kebab zamiast klubu fitness

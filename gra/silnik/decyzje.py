@@ -28,7 +28,7 @@ import math
 
 from .dane import RECEPCJONISTA, Dane
 from .finanse import Ksiega, Rachunek, ksieguj
-from .model import Firma, Pracownik, Stanowisko
+from .model import Cena, Firma, Pracownik, Stanowisko, grosze
 from .operacje import recepcjonisci, stanowiska_uslugi
 
 TYPY = {"instruktor": "stanowiska dla instruktorów/trenerów", "recepcja": "stanowiska dla recepcjonistów"}
@@ -92,7 +92,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             if u not in firma.uslugi_kiedykolwiek:
                 firma.uslugi_kiedykolwiek.append(u)
     if "sprzedaz" in d and "sprzedaz" in odbl:
-        firma.ceny = {u: {"cena": float(c["cena"]), "rabat": float(c.get("rabat", 0) or 0)}
+        firma.ceny = {u: Cena(cena=float(c["cena"]), rabat=float(c.get("rabat", 0) or 0))
                       for u, c in d["sprzedaz"].items() if c and c.get("cena")}
     if d.get("bank") and d["bank"] in dane.dostepne("banki", runda):
         firma.bank = d["bank"]
@@ -108,7 +108,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         n = min(n, 5)
         start = len(firma.stanowiska_typu(typ))
         for i in range(n):
-            firma.stanowiska.append(Stanowisko(start + i + 1, typ, od_rundy=runda))
+            firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda))
         nazwa = "recepcjonisty" if typ == "recepcja" else "trenera/instruktora"
         ksieguj(firma, ksiega, rachunek, f"Uruchomienie stanowiska dla {nazwa}", pakiety[str(n)])
         firma.majatek += pakiety[str(n)]
@@ -192,7 +192,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             continue
         k = f"{z['zasob']}|{int(z['jakosc'])}"
         firma.magazyn[k] = firma.magazyn.get(k, 0.0) + ilosc
-        firma.wartosc_magazynu[k] = firma.wartosc_magazynu.get(k, 0.0) + ilosc * cena
+        firma.wartosc_magazynu_gr[k] = firma.wartosc_magazynu_gr.get(k, 0) + grosze(ilosc * cena)
         zakupy[z["dostawca"]] = zakupy.get(z["dostawca"], 0.0) + ilosc * cena
         info["zakupy_zasobow"].setdefault(z["dostawca"], []).append({**z, "cena": cena, "wartosc": round(ilosc * cena, 2)})
     for dostawca, kwota in zakupy.items():

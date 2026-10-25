@@ -20,18 +20,20 @@ D = dane_domyslne()
 
 
 def _pracownik(id_, zawod, nr, gw=3):
-    return Pracownik(id_, id_, zawod, gw, 5300, 400, 2650, 0.95, 0.0, pensja=5300, stanowisko=nr)
+    return Pracownik(id=id_, imie_nazwisko=id_, zawod=zawod, gwiazdki=gw, pensja_preferowana=5300,
+                     koszt_rekrutacji=400, koszt_odprawy=2650, zadowolenie_klientow=0.95,
+                     ryzyko_reklamacji=0.0, pensja=5300, stanowisko=nr)
 
 
 def firma_c_marzec() -> Firma:
     """Drużyna C (gra A/B/C/Apex/Vela), marzec: 1 instruktor (step, TBC, zumba na jednym stanowisku), 1 recepcjonista."""
-    f = Firma("C")
+    f = Firma(nazwa="C")
     sprzet = set(D.uslugi["step"]["sprzet"]) | set(D.uslugi["tbc"]["sprzet"]) | set(D.uslugi["zumba"]["sprzet"])
-    f.stanowiska = [Stanowisko(1, "instruktor", {n: 3 for n in sprzet}, "i1"),
-                    Stanowisko(1, "recepcja", {n: 3 for n in D.sprzet_recepcji}, "r1")]
+    f.stanowiska = [Stanowisko(nr=1, typ="instruktor", sprzet={n: 3 for n in sprzet}, pracownik="i1"),
+                    Stanowisko(nr=1, typ="recepcja", sprzet={n: 3 for n in D.sprzet_recepcji}, pracownik="r1")]
     f.pracownicy = {"i1": _pracownik("i1", "Instruktor", 1), "r1": _pracownik("r1", "Recepcjonista", 1)}
     f.magazyn = {"Napój izotoniczny|3": 100, "Płyn do dezynfekcji|3": 10, "Ręcznik papierowy|3": 20}
-    f.wartosc_magazynu = {k: v * 30 for k, v in f.magazyn.items()}
+    f.wartosc_magazynu_gr = {k: v * 3000 for k, v in f.magazyn.items()}
     return f
 
 
@@ -85,7 +87,7 @@ def test_wynik_ekonomiczny_ath():
 
 def test_lokata_i_kredyt():
     bank = D.pozycje("banki")["Gaz Bank"]
-    f = Firma("X", gotowka=600000)
+    f = Firma(nazwa="X", gotowka=600000)
     k, r = Ksiega(), Rachunek()
     bank_poczatek_miesiaca(f, bank, {"lokaty_zaloz": [{"kwota": 500000, "miesiecy": 4}],
                                      "kredyty_wez": [{"kwota": 100, "miesiecy": 1}]}, 8, k, r)
@@ -164,7 +166,7 @@ def test_wskaznik_zadluzenia_ath_pazdziernik():
 def test_lokata_konczy_sie_w_ostatnim_miesiacu():
     # ATH: lokata na 10 mies. z lutego i lokata na 1 mies. z listopada – odsetki obu w KPiR listopada
     bank = D.pozycje("banki")["Gaz Bank"]
-    f = Firma("X", gotowka=100000)
+    f = Firma(nazwa="X", gotowka=100000)
     k, r = Ksiega(), Rachunek()
     bank_poczatek_miesiaca(f, bank, {"lokaty_zaloz": [{"kwota": 50000, "miesiecy": 1}]}, 11, k, r)
     bank_koniec_miesiaca(f, bank, 11, k, r)
@@ -176,9 +178,9 @@ def test_brak_zasobu_najpierw_krotsze_zajecia():
     # ATH grudzień: przy braku napoju bodybuilding (1 h) obsłużony w większym odsetku niż joga (1,5 h)
     f = firma_c_marzec()
     sprzet = set(D.uslugi["bodybuilding"]["sprzet"]) | set(D.uslugi["joga"]["sprzet"])
-    f.stanowiska = [Stanowisko(1, "instruktor", {n: 3 for n in sprzet}, "i1"),
-                    Stanowisko(2, "instruktor", {n: 3 for n in sprzet}, "i2"),
-                    Stanowisko(1, "recepcja", {n: 3 for n in D.sprzet_recepcji}, "r1")]
+    f.stanowiska = [Stanowisko(nr=1, typ="instruktor", sprzet={n: 3 for n in sprzet}, pracownik="i1"),
+                    Stanowisko(nr=2, typ="instruktor", sprzet={n: 3 for n in sprzet}, pracownik="i2"),
+                    Stanowisko(nr=1, typ="recepcja", sprzet={n: 3 for n in D.sprzet_recepcji}, pracownik="r1")]
     f.pracownicy["i2"] = _pracownik("i2", "Instruktor", 2)
     f.magazyn["Napój izotoniczny|3"] = 10          # 240 klientów
     w = obsluz(D, f, {"bodybuilding": 300, "joga": 300}, ziarno=1, runda=6)

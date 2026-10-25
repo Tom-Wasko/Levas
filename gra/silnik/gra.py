@@ -18,7 +18,7 @@ from .dane import Dane, dane_domyslne
 from .kandydaci import pula_startowa
 from .model import Firma, StanGry, firma_z_slownika
 
-WERSJA_SILNIKA = "1.0"
+WERSJA_SILNIKA = "1.1"  # 1.1: kwoty w groszach
 
 
 class Gra:
@@ -68,7 +68,8 @@ class Gra:
                 f = firma_z_slownika(d)
                 f.bot = firmy[nazwa].bot
                 firmy[nazwa] = f
-        return StanGry(self.runda_startowa - 1, firmy, pula_startowa(self.dane, self.konfiguracja["ziarno"]))
+        return StanGry(runda=self.runda_startowa - 1, firmy=firmy,
+                       kandydaci=pula_startowa(self.dane, self.konfiguracja["ziarno"]))
 
     @property
     def runda(self) -> int:

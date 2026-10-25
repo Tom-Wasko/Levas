@@ -16,7 +16,7 @@ D = dane_domyslne()
 def test_banki_od_rundy():
     assert set(D.dostepne("banki", 1)) == {"MBP Bank", "Beauty Bank", "Euro Biznes Bank"}
     assert len(D.dostepne("banki", 4)) == 6
-    f = Firma("X")
+    f = Firma(nazwa="X")
     zastosuj(D, f, {"bank": "Gaz Bank"}, 1, [], {}, Ksiega(), Rachunek())
     assert f.bank is None
     zastosuj(D, f, {"bank": "Gaz Bank"}, 4, [], {}, Ksiega(), Rachunek())
@@ -30,7 +30,7 @@ def test_media_i_internet_od_rundy():
     assert len(D.dostepne("narzedzia_internetowe", 6)) == 6 and "Profil na Facebook" in D.dostepne("narzedzia_internetowe", 6)
     assert len(D.dostepne("narzedzia_internetowe", 7)) == 9
     k = Ksiega()
-    zastosuj(D, Firma("X"), {"reklama_tradycyjna": {"Fitness TV": 1, "Radio Fakty": 10, "Ulotki": 4}}, 5, [], {}, k, Rachunek())
+    zastosuj(D, Firma(nazwa="X"), {"reklama_tradycyjna": {"Fitness TV": 1, "Radio Fakty": 10, "Ulotki": 4}}, 5, [], {}, k, Rachunek())
     assert [p["opis"] for p in k.pozycje] == ["Reklama tradycyjna: Ulotki"]
 
 
@@ -59,7 +59,7 @@ def test_tryby_kredytu_odnawialnego():
 
 def test_limit_uslug_dotyczy_przyrostu():
     # gra ATH, marzec: z 3 usług (step, TBC, zumba) na 6 – 5 nowych, 2 usunięte
-    f = Firma("ATH", oferta={"step": 1, "tbc": 1, "zumba": 1})
+    f = Firma(nazwa="ATH", oferta={"step": 1, "tbc": 1, "zumba": 1})
     nowa = {u: 1 for u in ("bodybuilding", "crossfit", "joga", "kettlebell_trening", "pilates", "tbc")}
     zastosuj(D, f, {"oferta": nowa}, 3, [], {}, Ksiega(), Rachunek())
     assert set(f.oferta) == set(nowa)
