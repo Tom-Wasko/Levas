@@ -1,0 +1,216 @@
+{
+  "main": {
+    "id": "5460c27761225e3c",
+    "type": "split",
+    "children": [
+      {
+        "id": "910599bb3f663d2b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d0b074e8f446a9f7",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Technologia.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Technologia"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "81e2c3ffbd660c42",
+    "type": "split",
+    "children": [
+      {
+        "id": "890717fd9d2f07ff",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fedc2a2e2fe1a876",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "51c3dc9db9f1391c",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "63fa459f7e7a7229",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b2749eccb15078fd",
+    "type": "split",
+    "children": [
+      {
+        "id": "a682ca15e4f950be",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8bbbb87ebe2707c7",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Plan działania.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "2c5207d0a3031072",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Plan działania.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "f174e3e4469f3021",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "660e283e693874ac",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "838089e0793ddaf2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Plan działania.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "d0b074e8f446a9f7",
+  "lastOpenFiles": [
+    "Zdarzenia i historie.md",
+    "Różnice Revas – Levas.md",
+    "Prawidła świata.md",
+    "Technologia.md",
+    "Ustalenia gry.md",
+    "Zarys aplikacji.md",
+    "Plan implementacji.md",
+    "Plan implementacji.md.tmp.1204.6a2c6162a3a1",
+    "Plan implementacji.md.tmp.1204.041574b7d725",
+    "Menu i składniki.md.tmp.1204.4736bdb4f3b8",
+    "Menu i składniki.md.tmp.1204.483109d4e8a8",
+    "Plan działania.md",
+    "Menu i składniki.md",
+    "Główny obraz.md",
+    "Elementy mapy.md",
+    "Artstyle.md",
+    "Plan implementacji.md.tmp.1204.d72c51f202be",
+    "Technologia.md.tmp.1204.8abd8a9d5a5b",
+    "Menu i składniki.md.tmp.1204.e9e939318ea4",
+    "Elementy mapy.md.tmp.1204.fd173c06eda4",
+    "Art-style.md",
+    "Pytania.md"
+  ]
+}
