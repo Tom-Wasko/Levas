@@ -16,7 +16,7 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from .schematy import SCHEMATY, sprawdz_zalozenia
+from .schematy import SCHEMATY, SCHEMATY_MAPY, sprawdz_zalozenia
 
 KATALOG_GRY = Path(__file__).resolve().parents[1]
 KATALOG_DANYCH = KATALOG_GRY / "dane"
@@ -54,6 +54,15 @@ def _wartosci(wezel):
     return wezel
 
 
+def _wczytaj_mape(katalog: Path) -> dict | None:
+    """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
+    if not (katalog / "strefy.yaml").exists():
+        return None
+    st, lo, bu = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
+            "lokale": lo["lokale"], "budynki": bu["budynki"]}
+
+
 class Dane:
     def __init__(self, katalog: Path = KATALOG_DANYCH):
         self.katalog = katalog
@@ -75,6 +84,12 @@ class Dane:
         self.boty: dict = p["boty.yaml"]
         self.zalozenia_pelne: dict = p["zalozenia.yaml"]
         self.z: dict = _wartosci(self.zalozenia_pelne)
+        self.mapa: dict | None = _wczytaj_mape(katalog / "mapa")
+
+    @cached_property
+    def lokale(self) -> dict[str, dict]:
+        """Lokale z mapy po id (pusty słownik, gdy dane nie mają mapy)."""
+        return {lok["id"]: lok for lok in self.mapa["lokale"]} if self.mapa else {}
 
     @cached_property
     def sprzet_kasy(self) -> list[str]:
@@ -96,7 +111,7 @@ class Dane:
     def wersja(self) -> str:
         """Skrót danych i założeń – w grze wieloosobowej wszyscy muszą mieć ten sam."""
         h = hashlib.sha256()
-        for plik in sorted(self.katalog.glob("*.yaml")):
+        for plik in sorted([*self.katalog.glob("*.yaml"), *self.katalog.glob("mapa/*.yaml")]):
             h.update(plik.read_bytes())
         return h.hexdigest()[:12]
 
@@ -188,6 +203,17 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
             for b in e.errors():
                 bledy.append(f"{nazwa}: {'.'.join(map(str, b['loc']))}: {b['msg']}")
     bledy += sprawdz_zalozenia(pliki["zalozenia.yaml"])
+    mapa = katalog / "mapa"
+    if mapa.exists():
+        for nazwa, schemat in SCHEMATY_MAPY.items():
+            if not (mapa / nazwa).exists():
+                bledy.append(f"brak pliku dane/mapa/{nazwa}")
+                continue
+            try:
+                schemat.model_validate(_wczytaj(mapa / nazwa))
+            except ValidationError as e:
+                for b in e.errors():
+                    bledy.append(f"mapa/{nazwa}: {'.'.join(map(str, b['loc']))}: {b['msg']}")
     if bledy:
         return bledy
 
@@ -236,6 +262,65 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
         for n in st["internet"]:
             if n not in narzedzia:
                 brak(n, f"boty.yaml: {s}.internet", "narzędzie", "katalog.yaml: narzedzia_internetowe")
+    if d.mapa:
+        bledy += _sprawdz_mape(d, brak)
+    return bledy
+
+
+def _sprawdz_mape(d: Dane, brak) -> list[str]:
+    """Odwołania mapy: strefy, zestawy (sprzęt i miejsca), położenie na siatce bez nakładania się."""
+    bledy = []
+    m = d.mapa
+    sz, gl = m["siatka"]["szer"], m["siatka"]["gl"]
+    pola: dict[tuple[int, int], str] = {}
+
+    def poloz(co: str, strefa: str, x: int, y: int, w: int = 1, h: int = 1):
+        if strefa not in m["strefy"]:
+            brak(strefa, co, "strefa", "mapa/strefy.yaml")
+            return
+        r = m["strefy"][strefa]["mapa"]
+        if not (r["x"] <= x and x + w <= r["x"] + r["szer"] and r["y"] <= y and y + h <= r["y"] + r["gl"]):
+            bledy.append(f"{co}: pole ({x}, {y}) poza strefą {strefa}")
+        for px in range(x, x + w):
+            for py in range(y, y + h):
+                if (px, py) in pola:
+                    bledy.append(f"{co}: pole ({px}, {py}) zajmuje już {pola[(px, py)]}")
+                pola[(px, py)] = co
+
+    for s, x in m["strefy"].items():
+        r = x["mapa"]
+        if r["x"] + r["szer"] > sz or r["y"] + r["gl"] > gl:
+            bledy.append(f"mapa/strefy.yaml: {s}: strefa wychodzi poza siatkę {sz}×{gl}")
+    for k, z in m["zestawy"].items():
+        for i, st in enumerate(z["stanowiska"]):
+            for n, q in st["sprzet"].items():
+                if d.sprzet.get(n, {}).get("dla") != st["typ"]:
+                    brak(n, f"mapa/lokale.yaml: zestawy.{k}[{i}]", f"sprzęt typu {st['typ']}", "sprzet.yaml")
+                elif str(q) not in d.sprzet[n]["ceny"]:
+                    brak(str(q), f"mapa/lokale.yaml: zestawy.{k}[{i}].{n}", "jakość", "sprzet.yaml")
+    ids = set()
+    for lok in m["lokale"]:
+        co = f"mapa/lokale.yaml: {lok['id']}"
+        if lok["id"] in ids:
+            bledy.append(f"{co}: powtórzone id")
+        ids.add(lok["id"])
+        if lok.get("zestaw"):
+            if lok["zestaw"] not in m["zestawy"]:
+                brak(lok["zestaw"], co, "zestaw", "mapa/lokale.yaml: zestawy")
+            else:
+                for typ in TYPY_STANOWISK:
+                    n = sum(st["typ"] == typ for st in m["zestawy"][lok["zestaw"]]["stanowiska"])
+                    if n > lok["miejsca"][typ]:
+                        bledy.append(f"{co}: zestaw {lok['zestaw']} ma {n} stanowisk typu {typ}, "
+                                     f"lokal mieści {lok['miejsca'][typ]}")
+        poloz(co, lok["strefa"], lok["mapa"]["x"], lok["mapa"]["y"])
+    for b in m["budynki"]:
+        co = f"mapa/budynki.yaml: {b['id']}"
+        if b["id"] in ids:
+            bledy.append(f"{co}: powtórzone id")
+        ids.add(b["id"])
+        r = b["mapa"]
+        poloz(co, b["strefa"], r["x"], r["y"], r["szer"], r["gl"])
     return bledy
 
 

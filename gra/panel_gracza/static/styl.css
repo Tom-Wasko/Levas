@@ -292,3 +292,17 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .osoba-druzyny { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
 .osoba-druzyny .inicjaly { width: 28px; height: 28px; border-radius: 50%; display: inline-grid; place-items: center;
   background: var(--pom); color: #fff; font-size: 11px; font-weight: 700; }
+
+/* --- Lokale i mapa miasta (prototyp F3a.3) --- */
+.strefa-tytul { display: flex; align-items: baseline; gap: 10px; margin: 22px 0 10px; font-size: 15px; }
+.strefa-tytul .kropka { width: 12px; height: 12px; border-radius: 3px; display: inline-block; align-self: center; }
+.mapa-ramka { background: linear-gradient(#f4f8ef, #e9f0e1); border: 1px solid var(--linia); border-radius: var(--r); padding: 8px; overflow: auto; }
+.mapa-svg { width: 100%; min-width: 720px; height: auto; display: block; }
+.mapa-svg .klik { cursor: pointer; transition: transform .12s, filter .12s; }
+.mapa-svg .klik:hover { filter: brightness(1.12) drop-shadow(0 2px 3px rgba(0,0,0,.35)); transform: translateY(-2px); }
+.mapa-svg .strefa-napis { font: 700 10px/1 var(--font, sans-serif); text-transform: uppercase; letter-spacing: .06em; fill: rgba(30,30,30,.7);
+  text-anchor: middle; paint-order: stroke; stroke: rgba(255,255,255,.8); stroke-width: 3px; pointer-events: none; }
+.mapa-svg .lokal-wolny polygon:last-of-type { stroke-width: 1.2; }
+.mapa-legenda { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; font-size: 12px; color: var(--szary, #666); }
+.mapa-legenda i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0,0,0,.25); }
+.menu .poz.mapa { margin-right: 8px; padding-right: 8px; border-right: 1px solid var(--linia); }

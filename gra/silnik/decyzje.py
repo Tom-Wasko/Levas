@@ -4,7 +4,9 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     nazwa, misja
     oferta:            {usługa: prognoza popytu}           – pełna lista usług w ofercie
     sprzedaz:          {usługa: {"cena", "rabat"}}          – usługi włączone do sprzedaży
-    stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet)
+    lokal:             {"id", "forma": "najem" | "kupno"}   – nowy lokal z mapy (gra z lokalami; silnik/lokale.py)
+    stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet; w grze z lokalami najwyżej
+                                                              tyle, ile wolnych miejsc w działających lokalach)
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
     zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
@@ -28,6 +30,8 @@ import math
 
 from .dane import KASA, KUCHNIA, Dane
 from .finanse import Ksiega, Rachunek, ksieguj
+from .lokale import bledy as bledy_lokali
+from .lokale import wolne_miejsca
 from .model import Cena, Firma, Pracownik, Stanowisko, grosze
 from .operacje import kasjerzy, stanowiska_uslugi
 
@@ -66,8 +70,10 @@ def kandydaci_firmy(pula: list[dict], firma: Firma) -> list[dict]:
 
 
 def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ceny_dostawcow: dict,
-             ksiega: Ksiega, rachunek: Rachunek) -> dict:
-    """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów)."""
+             ksiega: Ksiega, rachunek: Rachunek, lokale: bool = False) -> dict:
+    """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów).
+    `lokale` – gra z lokalami: nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany
+    wcześniej, w silnik/lokale.py: wybierz)."""
     info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
@@ -99,14 +105,21 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
 
     # stanowiska (działają od razu)
     pakiety = dane.katalog_ofert["stanowiska"]["pakiety"]
+    miejsca = wolne_miejsca(dane, firma, runda) if lokale else None
     for typ, n in (d.get("stanowiska") or {}).items():
         n = int(n or 0)
         if n <= 0 or typ not in dane.typy_stanowisk:
             continue
         n = min(n, dane.maks_nowych_stanowisk)
+        if miejsca is not None and n > len(miejsca[typ]):
+            info.setdefault("odrzucone_stanowiska", {})[typ] = n - len(miejsca[typ])
+            n = len(miejsca[typ])
+            if n == 0:
+                continue
         start = len(firma.stanowiska_typu(typ))
         for i in range(n):
-            firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda))
+            firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda,
+                                               lokal=miejsca[typ][i] if miejsca is not None else None))
         ksieguj(firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}", pakiety[str(n)])
         firma.majatek += pakiety[str(n)]
         info["inwestycje"] += pakiety[str(n)]
@@ -115,7 +128,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     sprzet_ok, kadry_ok = "inwestycje_sprzet" in odbl, "hr_zatrudnienie" in odbl
     for s in d.get("sprzet_sprzedaj", []) if sprzet_ok else []:
         st = firma.stanowisko(s["typ"], int(s["nr"]))
-        if st and s["nazwa"] in st.sprzet:
+        if st and s["nazwa"] in st.sprzet and s["nazwa"] not in st.sprzet_wynajmujacego:
             q = st.sprzet.pop(s["nazwa"])
             ksieguj(firma, ksiega, rachunek, f"Sprzedaż sprzętu: {s['nazwa']}",
                     cena_sprzedazy_sprzetu(dane, dane.sprzet[s["nazwa"]]["ceny"][str(q)]), "przychod_pozostaly")
@@ -269,12 +282,20 @@ def gotowe_uslugi(dane: Dane, firma: Firma) -> dict[str, list[str]]:
 
 
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
-                 tryb_kredytu: str = "jednoczesnie") -> list[dict]:
-    """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne)."""
+                 tryb_kredytu: str = "jednoczesnie", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
+    """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
+    `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/lokale.py: wybierz; None – gra bez lokali),
+    `info` – wynik `zastosuj` (odrzucone stanowiska)."""
     wynik = []
 
     def dodaj(poziom, zakladka, tekst):
         wynik.append({"poziom": poziom, "zakladka": zakladka, "tekst": tekst})
+
+    if lokal is not None:
+        bledy_lokali(dane, firma, runda, lokal, dodaj)
+        for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
+            dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
+                  "– nie zostały uruchomione. Weź większy lub kolejny lokal.")
 
     rundy = dane.katalog_ofert["rundy"]
     oferta = d.get("oferta") or firma.oferta

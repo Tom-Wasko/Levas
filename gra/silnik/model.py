@@ -82,6 +82,23 @@ class Stanowisko(Model):
     sprzet: dict[str, int] = Field(default_factory=dict)   # nazwa → jakość 1–3
     pracownik: str | None = None
     od_rundy: int = 0
+    lokal: str | None = None      # id lokalu (dane/mapa/lokale.yaml); None – gra bez lokali
+    sprzet_wynajmujacego: list[str] = Field(default_factory=list)   # sprzęt z najmu lokalu – nie do sprzedania
+
+
+class Lokal(Model):
+    """Lokal drużyny (dane: dane/mapa/lokale.yaml)."""
+    id: str
+    forma: str                    # "najem" albo "kupno"
+    od_rundy: int                 # runda wynajęcia / zakupu
+    dziala_od: int                # pierwsza runda sprzedaży (po urządzeniu lub budowie)
+    czynsz_gr: int = 0            # miesięczny (najem)
+    kaucja_gr: int = 0
+    cena_gr: int = 0              # cena zakupu (kupno)
+
+    czynsz = _kwota("czynsz")
+    kaucja = _kwota("kaucja")
+    cena = _kwota("cena")
 
 
 class Lokata(Model):
@@ -122,6 +139,7 @@ class Firma(Model):
     misja: str = ""
     gotowka_gr: int = 0
     stanowiska: list[Stanowisko] = Field(default_factory=list)
+    lokale: list[Lokal] = Field(default_factory=list)
     pracownicy: dict[str, Pracownik] = Field(default_factory=dict)
     magazyn: dict[str, float] = Field(default_factory=dict)           # "zasób|jakość" → opakowania
     wartosc_magazynu_gr: dict[str, int] = Field(default_factory=dict) # "zasób|jakość" → grosze (średni koszt)

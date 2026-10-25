@@ -93,7 +93,7 @@ export const karta_wynikow = {
   akcje: { "karta-skum": (el, c) => { skumulowana = el.dataset.s === "1"; c.idz("karta_wynikow", "wyniki"); } },
 };
 
-const DOKAD = { oferta: "oferta", finanse_bank: "bank", finanse_biuro: "biuro", hr_zatrudnienie: "zatrudnienie",
+const DOKAD = { lokale: "lokale", stanowiska: "stanowiska", oferta: "oferta", finanse_bank: "bank", finanse_biuro: "biuro", hr_zatrudnienie: "zatrudnienie",
   inwestycje_sprzet: "sprzet", dostawcy: "dostawcy", sprzedaz: "sprzedaz" };
 
 export const lista_bledow = {

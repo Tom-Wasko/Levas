@@ -139,6 +139,7 @@ def api_gry(request):
         ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
         kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),
         kapital_startowy=kapital,
+        lokale=d.get("lokale", True) not in (False, "nie", "0", 0),
     )
     return odpowiedz({"id": serwisy.utworz(g)})
 

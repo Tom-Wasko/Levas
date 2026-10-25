@@ -16,9 +16,10 @@ from pathlib import Path
 
 from .dane import Dane, dane_domyslne
 from .kandydaci import pula_startowa
+from .lokale import tryb_lokali
 from .model import Firma, StanGry, Stanowisko, firma_z_slownika
 
-WERSJA_SILNIKA = "1.1"  # 1.1: kwoty w groszach
+WERSJA_SILNIKA = "1.2"  # 1.1: kwoty w groszach; 1.2: lokale na mapie miasta
 
 
 class Gra:
@@ -38,7 +39,9 @@ class Gra:
                 "firmy": [{"nazwa": n, "bot": b} for n, b in firmy],
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "jednoczesnie"),
-                "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja}
+                "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,
+                # lokale z mapy miasta (dane/mapa); bez nich – jeden gotowy lokal na start (jak w REVAS)
+                "lokale": bool(opcje.get("lokale", dane.mapa is not None)) and dane.mapa is not None}
         if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych
             konf["kapital_startowy"] = float(opcje["kapital_startowy"])
         return cls(konf, {}, dane)
@@ -68,8 +71,9 @@ class Gra:
         kapital = self.kapital_startowy
         firmy = {f["nazwa"]: Firma(nazwa=f["nazwa"], bot=f["bot"], nazwa_wyswietlana=f["nazwa"], gotowka=kapital)
                  for f in self.konfiguracja["firmy"]}
-        # gotowy lokal: stanowiska ze sprzętem na start (katalog.yaml: stanowiska.startowe), bez kosztu
-        for f in firmy.values():
+        # gra bez lokali: gotowy lokal ze stanowiskami i sprzętem na start (katalog.yaml: stanowiska.startowe),
+        # bez kosztu; w grze z lokalami drużyna zaczyna bez lokalu
+        for f in ([] if tryb_lokali(self.dane, self.konfiguracja) else firmy.values()):
             for st in self.dane.katalog_ofert["stanowiska"].get("startowe", []):
                 f.stanowiska.append(Stanowisko(nr=len(f.stanowiska_typu(st["typ"])) + 1, typ=st["typ"],
                                                sprzet=dict(st["sprzet"])))

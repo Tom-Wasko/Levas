@@ -87,3 +87,24 @@ _brak_
   - strona drużyny co 20 s pyta o stan (`/stan`) i odświeża się sama po zmianie kolegi, wysłaniu albo przeliczeniu rundy – ale nie w trakcie wpisywania,
   - drużyna bez uczniów: prowadzi ją mistrz gry (jak dotąd); w Decyzjach link „dopisz uczniów”,
   - sprawdzone: pytest (79) i ruff na zielono; panel mistrza gry (Decyzje, Drużyny, okno z hasłami) i strona drużyny obejrzane w Chrome bez okna (zrzuty ekranu przez DevTools, osobna kopia bazy) – bez błędów JS.
+- 26.10 1:00 – F3a.3 gotowe: strefy, lokale i prototyp mapy miasta. Decyzje **do potwierdzenia**:
+  - nowe gry są domyślnie **z lokalami** (drużyna zaczyna bez lokalu i stanowisk); stare zapisy gier i opcja
+    „Lokale: nie” w panelu mistrza gry – gotowy lokal na start jak dotąd,
+  - mapa napisana od zera (pytanie 1 – brak `levas_gra`): 10 stref Lublina (Stare Miasto, Centrum, Akademickie,
+    LSM/Czuby, Politechnika, Dworzec, Czechów, Felin, Zemborzyce, Zygmuntowskie), 33 lokale z fikcyjnymi nazwami
+    (bez prawdziwych marek), budynki: bank, ratusz, urząd skarbowy, dostawcy, agencje reklamowe, szkolenia, park, zalew,
+  - ceny: czynsz, cena kupna i media według stawek stref × metraż (moje założenia, `zrodlo` w danych) – kalibracja w kroku 5,
+  - najem: kaucja = 2 × czynsz miesięczny, potem czynsz co tydzień (KPiR); kupno, kaucja i budowa to ruchy na rachunku,
+    nie koszty KPiR (dlatego w „Kosztach decyzji” lokal = 0 zł); kupiony lokal nie liczy się jeszcze do majątku –
+    tylko sprzęt z zestawu (bilans w F3a.6),
+  - gotowy lokal działa od razu (przy najmie sprzęt wynajmującego – nie do sprzedania), lokal do urządzenia – od
+    następnej rundy (adaptacja w KPiR), działka – budowa 3–4 rund w równych ratach, potem lokal bez sprzętu,
+  - stanowiska tylko w działających lokalach, tyle ile miejsc (kuchnia / kasa); ponad limit – czerwony błąd,
+  - dwie drużyny chcą ten sam lokal w jednej rundzie – dostaje firma wcześniej w (losowej) kolejności rundy,
+  - kolejny lokal co 3 rundy; wyprowadzka, sprzedaż lokalu i zwrot kaucji – później (F3a.6 / krok 5),
+  - boty biorą jeden gotowy lokal w najmie (wybór według strategii),
+  - mapa to prototyp obok menu (pierwsza pozycja „Mapa miasta”, `#mapa`): izometryczny SVG, kliknięcie budynku →
+    zakładka, lokalu → opis i Wynajmij / Kup, własnego lokalu → zakładki firmy,
+  - gra botów 26 tyg. z lokalami: dochód netto od −69 tys. (agresywny) do 242 tys. (premium) – podobnie jak bez lokali,
+  - sprawdzone: pytest (89) i ruff na zielono, mapa i zakładka Lokale obejrzane w Chrome bez okna (zrzuty ekranu).
+

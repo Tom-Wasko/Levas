@@ -22,6 +22,7 @@ CELE = frozenset({
     "dostawcy",    # ceny dostawców w trybie losowym: runda = miesiąc (0 = styczeń)
     "kandydaci",   # rynek pracy: runda 0 = pula startowa
     "kolejnosc",   # kolejność firm w rundzie
+    "lokal",       # wybór lokalu przez bota: runda, nazwa firmy
     "popyt",       # szum popytu: runda, firma, usługa
     "reklamacje",  # reklamacje: runda, firma, usługa
 })

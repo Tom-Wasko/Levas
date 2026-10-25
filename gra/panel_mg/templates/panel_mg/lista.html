@@ -43,6 +43,9 @@
               <option value="na_biezaco">na bieżąco – zakupy opłacane przed wpływem przychodów</option></select></label>
             <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">z danych gry (pierwsze rundy), dalej generowane</option>
               <option value="losowe">wszystkie generowane</option></select></label>
+            <label class="pole">Lokale<select id="lokale">
+              <option value="tak">drużyny wybierają lokale na mapie miasta (Levas)</option>
+              <option value="nie">jeden gotowy lokal na start (jak w REVAS)</option></select></label>
           </div>
         </details>
         <p style="display:flex"><button class="btn pom" id="utworz" style="margin-left:auto">Utwórz grę</button></p>
@@ -78,7 +81,8 @@
       const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() }, body: JSON.stringify({
         nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
         kapital_startowy: document.getElementById("kapital").value, ziarno: document.getElementById("ziarno").value,
-        ceny_dostawcow: document.getElementById("ceny").value, kredyt_odnawialny: document.getElementById("kredyt").value, firmy }) });
+        ceny_dostawcow: document.getElementById("ceny").value, kredyt_odnawialny: document.getElementById("kredyt").value,
+        lokale: document.getElementById("lokale").value, firmy }) });
       const j = await r.json();
       if (!r.ok) return pokazBlad(j.blad);
       location.href = `/mg/gra/${encodeURIComponent(j.id)}`;

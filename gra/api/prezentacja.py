@@ -14,6 +14,15 @@ from silnik.decyzje import (
 from silnik.dostawcy import ceny_rundy
 from silnik.finanse import Ksiega, Rachunek
 from silnik.gra import Gra
+from silnik.lokale import (
+    dostepne,
+    koszt_wejscia,
+    runda_nowego_lokalu,
+    stan_lokali,
+    tryb_lokali,
+    wybierz,
+    zajete,
+)
 from silnik.model import Firma, do_slownika
 
 
@@ -31,9 +40,15 @@ def stan_po_szkicu(gra: Gra, firma: str):
     d = gra.szkic(firma)
     ks, rach = Ksiega(), Rachunek()
     poprzednia_oferta = list(f.oferta)
+    lokale = tryb_lokali(gra.dane, gra.konfiguracja)
+    # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
+    lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach) if lokale else None
     info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_rundy(gra.dane, gra.konfiguracja["ziarno"], r,
-                                                                  gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach)
-    bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"))
+                                                                  gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach,
+                    lokale)
+    info["lokal"] = lokal
+    bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
+                         lokal, info)
     return stan, f, ks, info, bledy
 
 
@@ -46,7 +61,7 @@ def kalendarz(dane: Dane, liczba_rund: int) -> dict:
 
 
 def katalogi(dane: Dane) -> dict:
-    return {"uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_kasy": dane.sprzet_kasy, "zawody": dane.zawody, "zasoby": dane.zasoby,
+    return {"mapa": dane.mapa, "uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_kasy": dane.sprzet_kasy, "zawody": dane.zawody, "zasoby": dane.zasoby,
             "oferty": dane.katalog_ofert, "placa_minimalna": dane.z["finanse"]["placa_minimalna"],
             "parametry": {"kapital": dane.z["finanse"]["kapital_startowy"], "godziny": dane.z["operacje"]["godziny_pracownika"],
                           "cit": dane.z["finanse"]["podatek_cit"], "zus": dane.z["finanse"]["zus_pracodawcy"],
@@ -84,6 +99,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "brakujace": gra.brakujace(), "ziarno": gra.konfiguracja["ziarno"], "runda_startowa": gra.runda_startowa,
                  "konkurenci_stali": gra.konfiguracja.get("konkurenci_stali", []),
                  "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
+                 "lokale": tryb_lokali(dane, gra.konfiguracja),
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja,
          "odblokowane": sorted(dane.odblokowane(runda))}
@@ -124,7 +140,24 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                           "gotowka": poprzedni.wyniki[r][firma]["gotowka"]}
                          for r in range(1, runda) if r in poprzedni.wyniki]
     v["dashboard"] = _dashboard(gra, firma, runda, poprzedni)
+    if tryb_lokali(dane, gra.konfiguracja):
+        v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
     return v
+
+
+def _lokale(gra: Gra, firma: str, runda: int, f: Firma, poprzedni, stan, info: dict | None) -> dict:
+    """Zakładka Lokale i mapa: wolne lokale na początku rundy (z kosztem wejścia), kto zajmuje które lokale,
+    lokale firmy po decyzjach i wynik decyzji o lokalu."""
+    dane = gra.dane
+    zaj = zajete(poprzedni.firmy)
+    decyzja = info.get("lokal") if info is not None else stan.wyniki.get(runda, {}).get(firma, {}).get("lokal_decyzja")
+    return {"oferta": [{**lok, "wejscie": {fm: koszt_wejscia(dane, lok, fm) for fm in ("najem", "kupno")
+                                          if lok.get("czynsz" if fm == "najem" else "cena")}}
+                       for lok in dostepne(dane, runda, zaj)],
+            "zajete": zajete(stan.firmy) if info is None else zaj,
+            "moje": stan_lokali(dane, f, runda),
+            "nowy_od": runda_nowego_lokalu(dane, poprzedni.firmy[firma]),
+            "decyzja": decyzja}
 
 
 def _dashboard(gra: Gra, firma: str, runda: int, poprzedni) -> dict:
@@ -176,6 +209,7 @@ def przeglad_mg(gra: Gra) -> dict:
                 "ziarno": konf["ziarno"], "kapital": gra.kapital_startowy,
                 "kredyt_odnawialny": konf.get("kredyt_odnawialny", "jednoczesnie"),
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
+                "lokale": tryb_lokali(dane, konf),
                 "brakujace": [] if gra.zakonczona else gra.brakujace(),
                 "kalendarz": kalendarz(dane, konf["liczba_rund"])},
         "firmy": firmy,

@@ -71,13 +71,14 @@ function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "fun
 const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd));
 const kluczZakladki = (z) => Object.keys(ZAKLADKI).find((k) => ZAKLADKI[k] === z);
 
-const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wyslane, zmien, api, wczytaj, ustaw,
+const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wyslane, zmien, api, wczytaj, ustaw, rysuj,
+  dostepna: (k) => !!ZAKLADKI[k] && dostepna(ZAKLADKI[k]), tytulZakladki: (k) => ZAKLADKI[k]?.tytul ?? k,
   idz: (k, tryb) => { S.zakladka = k; S.tryb = tryb || (ZAKLADKI[k].decyzje ? "decyzje" : "wyniki"); rysuj(); } });
 
 // --- rysowanie ---------------------------------------------------------------------------------
 function rysujMenu() {
   const czerwone = S.v.lista_bledow.filter((b) => b.poziom === "czerwony").length;
-  document.getElementById("menu").innerHTML = MENU.map((poz) => {
+  document.getElementById("menu").innerHTML = MENU.filter((poz) => !ZAKLADKI[poz.klucz]?.ukryta?.(S.v)).map((poz) => {
     const z = ZAKLADKI[poz.klucz] || {};
     const pod = poz.pod ? `<div class="pod">${poz.pod.map((k) => `<a data-zakladka="${k}" class="${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"} ${k === S.zakladka ? "aktywna" : ""}">
       ${ikona(IKONY[k], 18)}${ZAKLADKI[k].tytul}${!dostepna(ZAKLADKI[k]) && OD_RUNDY[k] ? `<span class="od">od rundy ${OD_RUNDY[k]}</span>` : ""}</a>`).join("")}</div>` : "";

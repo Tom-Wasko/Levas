@@ -1,7 +1,7 @@
 """Przeliczenie jednej rundy dla wszystkich firm.
 
 Runda r = miesiąc r (1 = styczeń). Kolejność jak w KPiR i banku gry:
- 1. decyzje: stanowiska, sprzęt, kadry, zasoby, udogodnienia, wyposażenie, reklama, szkolenia (każda firma
+ 1. decyzje: lokal (gra z lokalami: wspólna pula, pierwszeństwo wg kolejności rundy), stanowiska, sprzęt, kadry, zasoby, udogodnienia, wyposażenie, reklama, szkolenia (każda firma
     widzi pełną listę kandydatów – ta sama osoba może pracować w kilku firmach, jak w grze A/B/C),
  2. bank: nowe lokaty i kredyty, zerwania, spłaty,
  3. od rundy 2: popyt rynku → obsługa klientów → przychody,
@@ -18,6 +18,7 @@ from copy import deepcopy
 import numpy as np
 
 from . import karta as kw
+from . import lokale as lk
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
 from .dostawcy import ceny_rundy
@@ -64,6 +65,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     # "jednoczesnie" (jak w oficjalnej grze): przychody i wydatki miesiąca rozliczane razem – kredyt odnawialny tylko
     # na niedobór na koniec miesiąca; "na_biezaco": wydatki z decyzji opłacane przed wpływem przychodów
     tryb_kredytu = konfiguracja.get("kredyt_odnawialny", "jednoczesnie")
+    tryb_lokali = lk.tryb_lokali(dane, konfiguracja)
+    zajete = lk.zajete(s.firmy)
     for nazwa in kolejnosc:
         f = s.firmy[nazwa]
         d = decyzje.get(nazwa, {})
@@ -80,8 +83,10 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             f.bank = d["bank"]
         bank_info = bank_poczatek_miesiaca(f, dane.pozycje("banki")[f.bank], d, r, ksiegi[nazwa], rachunki[nazwa]) \
             if f.bank else None
-        info[nazwa] = zastosuj(dane, f, d, r, s.kandydaci, ceny_dost, ksiegi[nazwa], rachunki[nazwa])
-        bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu)
+        lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa]) if tryb_lokali else None
+        info[nazwa] = zastosuj(dane, f, d, r, s.kandydaci, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
+        bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
+        info[nazwa]["lokal"] = lokal
         if bank_info is not None:
             info[nazwa]["bank"] = bank_info
         odnawialny[nazwa] = uruchom_odnawialny(f, rachunki[nazwa]) if tryb_kredytu == "na_biezaco" else 0.0
@@ -157,8 +162,11 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         narz = dane.pozycje("narzedzia_internetowe")
         for n in f.internet:
             ksieguj(f, ks, rach, f"Utrzymanie reklamy internetowej: {n}", dane.na_runde(narz[n]["utrzymanie"]))
-        ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
-                dane.na_runde(z["finanse"]["utrzymanie_klubu"]))
+        if tryb_lokali:
+            lk.koszty_rundy(dane, f, r, ks, rach)
+        else:
+            ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
+                    dane.na_runde(z["finanse"]["utrzymanie_klubu"]))
 
         zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach)
         if sum(f.magazyn.values()) > 1e-6:
@@ -177,11 +185,16 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         f.skumulowany_dochod_netto = round(f.skumulowany_dochod_netto + netto, 2)
         wyniki[nazwa] = _wyniki_firmy(dane, f, r, ks, rach, info[nazwa], popyt.get(nazwa, {}),
                                       obsluga.get(nazwa), oferty, rynek, start[nazwa], zwroty, bledy[nazwa], netto)
+        if tryb_lokali:
+            wyniki[nazwa]["lokale"] = lk.stan_lokali(dane, f, r)
+            wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
 
     s.runda = r
     s.wyniki[r] = wyniki
     s.rynek[r] = _rynek_publiczny(dane, s, r, oferty, popyt, wyniki,
                                   {"_konkurenci_stali": konfiguracja.get("konkurenci_stali"), "_rynek": rynek})
+    if tryb_lokali:  # kto zajmuje który lokal (mapa miasta, zakładka Lokale – wyniki)
+        s.rynek[r]["lokale"] = lk.zajete(s.firmy)
     return s
 
 

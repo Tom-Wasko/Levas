@@ -24,6 +24,8 @@ const P = {
   kpir: '<path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5v-17z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M8 7h8M8 11h6"/>',
   bank: '<path d="M3 10h18L12 4 3 10zM5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>',
   biuro: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
+  mapa: '<path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>',
+  lokale: '<path d="M3 21h18M4 21V10l8-6 8 6v11"/><path d="M9 21v-5h6v5"/><path d="M3 10h18"/>',
   lewo: '<path d="M15 18l-6-6 6-6"/>',
   prawo: '<path d="M9 18l6-6-6-6"/>',
   ok: '<path d="M20 6 9 17l-5-5"/>',

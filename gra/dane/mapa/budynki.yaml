@@ -1,0 +1,293 @@
+# Budynki na mapie miasta – kliknięcie otwiera zakładkę gry
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Budynki na mapie: każdy prowadzi do zakładki gry (zakladka – klucz z panel_gracza/static/zakladki/index.js;
+  null = jeszcze bez zakładki). Własny lokal drużyny otwiera okno z zakładkami firmy. mapa: pola siatki.'
+zrodlo: notatka „Elementy mapy” (banki w dwóch rzędach po trzy, dostawcy, sklepy, parki, agencje, urząd); nazwy
+  banków, biur, dostawców i firm szkoleniowych z katalog.yaml i dostawcy.yaml
+budynki:
+- id: bank_1
+  nazwa: MBP Bank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – konto, lokaty i kredyty.
+  zakladka: bank
+  mapa:
+    x: 8
+    y: 8
+    szer: 1
+    gl: 1
+- id: bank_2
+  nazwa: Beauty Bank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – konto, lokaty i kredyty.
+  zakladka: bank
+  mapa:
+    x: 9
+    y: 8
+    szer: 1
+    gl: 1
+- id: bank_3
+  nazwa: Euro Biznes Bank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – konto, lokaty i kredyty.
+  zakladka: bank
+  mapa:
+    x: 10
+    y: 8
+    szer: 1
+    gl: 1
+- id: bank_4
+  nazwa: Gaz Bank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – konto, lokaty i kredyty.
+  zakladka: bank
+  mapa:
+    x: 8
+    y: 9
+    szer: 1
+    gl: 1
+- id: bank_5
+  nazwa: IT Bank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – konto, lokaty i kredyty.
+  zakladka: bank
+  mapa:
+    x: 9
+    y: 9
+    szer: 1
+    gl: 1
+- id: bank_6
+  nazwa: Brand Bank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – konto, lokaty i kredyty.
+  zakladka: bank
+  mapa:
+    x: 10
+    y: 9
+    szer: 1
+    gl: 1
+- id: biura
+  nazwa: Kamienica biur rachunkowych
+  rodzaj: biuro
+  strefa: stare_miasto
+  opis: 'Sześć biur rachunkowych pod jednym dachem: Prefix, Plus, Seven, Rachmistrz, Krak i Petra.'
+  zakladka: biuro
+  mapa:
+    x: 13
+    y: 8
+    szer: 2
+    gl: 1
+- id: ratusz
+  nazwa: Ratusz i Sanepid
+  rodzaj: urzad
+  strefa: stare_miasto
+  opis: Urzędnik sprawdzi, czego brakuje w twoich decyzjach (Lista błędów).
+  zakladka: lista_bledow
+  mapa:
+    x: 11
+    y: 5
+    szer: 2
+    gl: 2
+- id: poczta
+  nazwa: Poczta Główna
+  rodzaj: poczta
+  strefa: centrum
+  opis: Tu wysyłasz decyzje rundy – list polecony do mistrza gry.
+  zakladka: wyslij
+  mapa:
+    x: 6
+    y: 5
+    szer: 2
+    gl: 1
+- id: agencja_nieruchomosci
+  nazwa: Biuro nieruchomości „Klucz”
+  rodzaj: nieruchomosci
+  strefa: centrum
+  opis: Wszystkie wolne lokale i działki w mieście w jednym katalogu.
+  zakladka: lokale
+  mapa:
+    x: 10
+    y: 5
+    szer: 1
+    gl: 1
+- id: agencja_pracy
+  nazwa: Agencja pracy „Ręce do Rożna”
+  rodzaj: praca
+  strefa: centrum
+  opis: Kandydaci do kuchni i na kasę.
+  zakladka: zatrudnienie
+  mapa:
+    x: 6
+    y: 7
+    szer: 1
+    gl: 1
+- id: piekarnia
+  nazwa: Piekarnia Koziołek
+  rodzaj: dostawca
+  strefa: stare_miasto
+  opis: Świeże bułki i pita codziennie rano.
+  zakladka: dostawcy
+  mapa:
+    x: 14
+    y: 5
+    szer: 1
+    gl: 1
+- id: bazar
+  nazwa: Mięsny Bazar Zamojski
+  rodzaj: dostawca
+  strefa: dworzec
+  opis: Mięso na kebab i drób.
+  zakladka: dostawcy
+  mapa:
+    x: 7
+    y: 10
+    szer: 2
+    gl: 1
+- id: hurtownia
+  nazwa: Hurtownia Lubelska Spiżarnia
+  rodzaj: dostawca
+  strefa: felin
+  opis: 'Wszystko w dużych opakowaniach: warzywa, sosy, frytki, napoje.'
+  zakladka: dostawcy
+  mapa:
+    x: 17
+    y: 2
+    szer: 2
+    gl: 2
+- id: sprzet_gastro
+  nazwa: Hurtownia sprzętu gastronomicznego
+  rodzaj: sklep
+  strefa: felin
+  opis: Rożny, frytownice, lodówki i kasy fiskalne.
+  zakladka: sprzet
+  mapa:
+    x: 15
+    y: 5
+    szer: 2
+    gl: 1
+- id: market_budowlany
+  nazwa: Market budowlany
+  rodzaj: sklep
+  strefa: lsm_czuby
+  opis: Stoliki, krzesła, telewizor z meczami – wyposażenie sali dla klientów.
+  zakladka: wyposazenie
+  mapa:
+    x: 0
+    y: 18
+    szer: 2
+    gl: 2
+- id: stolarnia
+  nazwa: Stolarnia „Lada i Syn”
+  rodzaj: sklep
+  strefa: zygmuntowskie
+  opis: Buduje nowe stanowiska kuchenne i kasowe w twoim lokalu.
+  zakladka: stanowiska
+  mapa:
+    x: 16
+    y: 13
+    szer: 2
+    gl: 1
+- id: galeria
+  nazwa: Galeria „Pod Zegarem”
+  rodzaj: sklep
+  strefa: centrum
+  opis: Ekspresy, fotele do masażu i inne udogodnienia dla załogi.
+  zakladka: udogodnienia
+  mapa:
+    x: 9
+    y: 5
+    szer: 1
+    gl: 1
+- id: akademia
+  nazwa: Akademia Gastro
+  rodzaj: szkola
+  strefa: politechnika
+  opis: 'Szkolenia: Akademia Gastro, Mistrzowie Rożna i Sanepid bez Stresu.'
+  zakladka: szkolenia
+  mapa:
+    x: 0
+    y: 10
+    szer: 2
+    gl: 1
+- id: drukarnia
+  nazwa: Drukarnia „Papier Przyjmie”
+  rodzaj: reklama
+  strefa: akademickie
+  opis: Ulotki, billboardy, radio i prasa – reklama tradycyjna.
+  zakladka: tradycyjny
+  mapa:
+    x: 4
+    y: 5
+    szer: 1
+    gl: 1
+- id: agencja_lajk
+  nazwa: Agencja „Lajk i Spółka”
+  rodzaj: reklama
+  strefa: akademickie
+  opis: Strona www, profile w mediach społecznościowych, aplikacja – reklama w internecie.
+  zakladka: internetowy
+  mapa:
+    x: 5
+    y: 5
+    szer: 1
+    gl: 1
+- id: uczelnia
+  nazwa: Pracownia Analiz UMCS
+  rodzaj: uczelnia
+  strefa: akademickie
+  opis: Studenci ekonomii policzą, co się opłaca (Analiza).
+  zakladka: analiza
+  mapa:
+    x: 0
+    y: 5
+    szer: 2
+    gl: 2
+- id: redakcja
+  nazwa: Redakcja „Kuriera Kebabowego”
+  rodzaj: media
+  strefa: centrum
+  opis: Ranking firm miasta – karta wyników.
+  zakladka: karta_wynikow
+  mapa:
+    x: 6
+    y: 9
+    szer: 1
+    gl: 1
+- id: ogrod_saski
+  nazwa: Ogród Saski
+  rodzaj: park
+  strefa: akademickie
+  opis: Park – wkrótce cotygodniowe wydarzenia dla wszystkich drużyn.
+  zakladka: null
+  mapa:
+    x: 2
+    y: 8
+    szer: 2
+    gl: 2
+- id: park_ludowy
+  nazwa: Park Ludowy
+  rodzaj: park
+  strefa: zygmuntowskie
+  opis: Park – wkrótce cotygodniowe wydarzenia dla wszystkich drużyn.
+  zakladka: null
+  mapa:
+    x: 12
+    y: 13
+    szer: 2
+    gl: 2
+- id: zalew
+  nazwa: Zalew Zemborzycki
+  rodzaj: woda
+  strefa: zemborzyce
+  opis: Plaża, żaglówki i wędkarze. Wydarzenia nad wodą – wkrótce.
+  zakladka: null
+  mapa:
+    x: 11
+    y: 17
+    szer: 4
+    gl: 3

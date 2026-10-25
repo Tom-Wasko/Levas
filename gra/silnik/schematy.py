@@ -360,6 +360,127 @@ def sprawdz_zalozenia(drzewo: dict, sciezka: str = "") -> list[str]:
     return bledy
 
 
+# --- mapa/*.yaml (strefy, lokale, budynki; katalog opcjonalny – bez niego gra działa bez lokali) ---
+
+
+class Prostokat(Schemat):
+    x: int = Field(ge=0)
+    y: int = Field(ge=0)
+    szer: int = Field(default=1, ge=1)
+    gl: int = Field(default=1, ge=1)
+
+
+class Siatka(Schemat):
+    szer: int = Field(gt=0)
+    gl: int = Field(gt=0)
+
+
+class Strefa(Schemat):
+    nazwa: str
+    opis: str
+    klienci: str
+    kolor: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
+    mapa: Prostokat
+    czynsz_m2: float = Field(gt=0)
+
+
+class PlikStref(Plik):
+    siatka: Siatka
+    strefy: dict[str, Strefa]
+
+
+class StanowiskoZestawu(Schemat):
+    typ: Literal["kuchnia", "kasa"]
+    sprzet: dict[str, int]
+
+
+class Zestaw(Schemat):
+    nazwa: str
+    opis: str
+    stanowiska: list[StanowiskoZestawu] = Field(min_length=1)
+
+
+class ZasadyLokali(Schemat):
+    nowy_lokal_co_rund: int = Field(ge=1)
+    kaucja_miesiecy: float = Field(ge=0)
+    urzadzanie_rund: int = Field(ge=0)
+
+
+class Miejsca(Schemat):
+    kuchnia: int = Field(ge=1)
+    kasa: int = Field(ge=1)
+
+
+class Pole(Schemat):
+    x: int = Field(ge=0)
+    y: int = Field(ge=0)
+
+
+class Lokal(Schemat):
+    id: str = Field(pattern=r"^[a-z0-9_]+$")
+    nazwa: str
+    strefa: str
+    typ: Literal["gotowy", "niewyposazony", "dzialka"]
+    adres: str
+    opis: str
+    metraz: int = Field(gt=0)
+    miejsca: Miejsca
+    zestaw: str | None = None
+    czynsz: float | None = Field(default=None, gt=0)
+    cena: float | None = Field(default=None, gt=0)
+    adaptacja: float | None = Field(default=None, ge=0)
+    budowa_rund: int | None = Field(default=None, ge=1)
+    koszt_budowy: float | None = Field(default=None, ge=0)
+    utrzymanie: float = Field(ge=0)
+    tylko_kupno: bool = False
+    wlasciciel: str | None = None
+    od_rundy: int = Field(default=1, ge=1)
+    mapa: Pole
+
+    @model_validator(mode="after")
+    def _typ(self):
+        if self.czynsz is None and self.cena is None:
+            raise ValueError("lokal musi mieć czynsz (najem) albo cenę (kupno)")
+        if self.typ == "gotowy" and not self.zestaw:
+            raise ValueError("lokal gotowy musi mieć zestaw sprzętu")
+        if self.typ != "gotowy" and self.zestaw:
+            raise ValueError("zestaw sprzętu ma tylko lokal gotowy")
+        if self.typ == "niewyposazony" and self.adaptacja is None:
+            raise ValueError("lokal niewyposażony musi mieć koszt adaptacji")
+        if self.typ == "dzialka" and (self.cena is None or self.czynsz is not None or not self.budowa_rund
+                                      or self.koszt_budowy is None):
+            raise ValueError("działka: tylko kupno (cena, bez czynszu), budowa_rund i koszt_budowy")
+        if self.tylko_kupno and (self.cena is None or self.czynsz is not None):
+            raise ValueError("tylko_kupno: cena bez czynszu")
+        return self
+
+
+class PlikLokali(Plik):
+    zasady: ZasadyLokali
+    zestawy: dict[str, Zestaw]
+    lokale: list[Lokal] = Field(min_length=1)
+
+
+class Budynek(Schemat):
+    id: str = Field(pattern=r"^[a-z0-9_]+$")
+    nazwa: str
+    rodzaj: str
+    strefa: str
+    opis: str
+    zakladka: str | None
+    mapa: Prostokat
+
+
+class PlikBudynkow(Plik):
+    budynki: list[Budynek]
+
+
+SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
+    "strefy.yaml": PlikStref,
+    "lokale.yaml": PlikLokali,
+    "budynki.yaml": PlikBudynkow,
+}
+
 SCHEMATY: dict[str, type[BaseModel]] = {
     "uslugi.yaml": PlikUslug,
     "sprzet.yaml": PlikSprzetu,

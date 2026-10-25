@@ -17,4 +17,6 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 
 - [x] F3a.2 Drużyny – skład 1–4 uczniów (uczeń w jednej drużynie gry; pilnuje tego API i panel Konta), zakładka **Drużyny** w panelu mistrza gry (dopisywanie, usuwanie, konta uczniów z losowym hasłem, nowe hasło, druk), decyzje drużyny: kto zapisał / wysłał (`Runda.autorzy`), wersja decyzji – 409 przy jednoczesnej zmianie, odświeżanie strony drużyny co 20 s (`/stan`); test `test_cztery_druzyny_i_boty_w_jednej_grze`
 
-Zadania F3a.3–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3a.3 Strefy i lokale, prototyp mapy miasta – mapa Lublina w danych (`dane/mapa/`: 10 stref, 33 lokale – gotowe, do urządzenia, działki, budynki instytucji); drużyna zaczyna bez lokalu i wybiera go: najem (kaucja + czynsz co tydzień) albo kupno, działka – budowa w ratach; wspólna pula lokali (konflikt w rundzie rozstrzyga kolejność rundy), kolejny lokal co 3 rundy; stanowiska tylko na miejscach w działających lokalach; czynsz i media zamiast stałego utrzymania lokalu; boty wynajmują gotowe lokale; zakładka **Lokale** (Decyzje + Wyniki) i **Mapa miasta** (izometryczna, obok menu: budynki → zakładki, lokale → najem/kupno); opcja gry `lokale` (bez – gotowy lokal jak w REVAS); testy `test_lokale.py`
+
+Zadania F3a.4–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

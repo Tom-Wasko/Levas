@@ -7,9 +7,13 @@ docelowa liczba usług, pokrycie popytu, inwestycje w wyposażenie i udogodnieni
 """
 from __future__ import annotations
 
+from copy import deepcopy
+
+from . import lokale as lk
 from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_rundy
+from .finanse import Ksiega, Rachunek
 from .losowosc import strumien
 from .model import Firma, StanGry
 from .planowanie import (
@@ -37,6 +41,24 @@ def _cena(dane: Dane, strategia: dict, stan: StanGry, u: str, runda: int) -> flo
     return round(pref * wsp / krok) * krok
 
 
+def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict) -> dict | None:
+    """Gotowy lokal do najmu wg strategii: tani – najniższy czynsz, premium – Stare Miasto i Centrum, inni – środek
+    stawki. Losowanie spośród trzech najlepszych (ziarno gry), żeby boty nie biły się zawsze o ten sam lokal."""
+    wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy)) if lok["typ"] == "gotowy" and lok.get("czynsz")]
+    if not wolne:
+        return None
+    if strategia_klucz == "tani":
+        wolne.sort(key=lambda lok: lok["czynsz"])
+    elif strategia_klucz == "premium":
+        wolne.sort(key=lambda lok: (lok["strefa"] not in ("stare_miasto", "centrum"), -lok["miejsca"]["kuchnia"], lok["czynsz"]))
+    else:
+        sr = sorted(lok["czynsz"] for lok in wolne)[len(wolne) // 2]
+        wolne.sort(key=lambda lok: (abs(lok["czynsz"] - sr), lok["id"]))
+    najlepsze = wolne[:3]
+    lok = najlepsze[int(strumien(konf["ziarno"], runda, "lokal", nazwa).integers(len(najlepsze)))]
+    return {"id": lok["id"], "forma": "najem"}
+
+
 def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict) -> dict:
     strategie = dane.boty["strategie"]
     st = strategie.get(strategia_klucz, strategie["zrownowazony"])
@@ -46,6 +68,16 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     rundy = dane.katalog_ofert["rundy"]
     odbl = dane.odblokowane(runda)
     d: dict = {"zatrudnij": [], "sprzet_kup": [], "zamowienia": []}
+    lokale = lk.tryb_lokali(dane, konf)
+    if lokale and not f.lokale:
+        # bez lokalu: najem gotowego lokalu; dalsze decyzje liczone tak, jakby lokal już był (przegrany spór o lokal
+        # – stanowiska odrzucone, ponowna próba w następnej rundzie)
+        d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf)
+        if d["lokal"] is None:
+            return d
+        f = deepcopy(f)
+        lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
+    miejsca = lk.wolne_miejsca(dane, f, runda) if lokale else None
     if not f.bank:
         d["bank"] = min(dane.dostepne("banki", runda).values(), key=lambda b: b["konto"] + b["karta"])["nazwa"]
     if not f.biuro:
@@ -87,7 +119,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         for _ in range(max(0, potrzeba - len(maja))):
             if wolne:
                 cel = wolne.pop(0).nr
-            elif len(nowe_inst) < dane.maks_nowych_stanowisk:
+            elif len(nowe_inst) < dane.maks_nowych_stanowisk and (miejsca is None or len(nowe_inst) < len(miejsca[KUCHNIA])):
                 cel = nastepny
                 nowe_inst.append(u)
                 nastepny += 1
@@ -100,6 +132,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     rec = f.stanowiska_typu(KASA)
     potrzeba_rec = max(1, kasjerzy_potrzebni(dane, klienci))
     nowe_rec = min(dane.maks_nowych_stanowisk, max(0, potrzeba_rec - len(rec)))
+    if miejsca is not None:
+        nowe_rec = min(nowe_rec, len(miejsca[KASA]))
     for s in rec:  # stanowiska kupione wcześniej (np. w rundzie 1, gdy sprzęt był jeszcze niedostępny)
         for n in dane.sprzet_kasy:
             if n not in s.sprzet:
