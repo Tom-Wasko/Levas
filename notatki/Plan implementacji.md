@@ -2,7 +2,7 @@
 
 # Plan implementacji – kroki 1–4
 
-Plan technicznej części [[Plan działania]]: od opisu projektu do pełnej gry gotowej do kalibracji. Mapa, układ UI i ilustracje (kroki 8–10) oraz kalibracja (krok 5) są poza tym planem.
+Plan technicznej części [[Plan działania]]: od opisu projektu do pełnej gry gotowej do kalibracji. Pełna mapa, układ UI i ilustracje (kroki 8–10) oraz kalibracja (krok 5) są poza tym planem; w 3a powstaje tylko prototyp mapy (F3a.3).
 
 ## 1. Cel i ustalenia
 - **Cel kroków 1–4:** grywalny Levas w przeglądarce – drużyny i boty prowadzą kebaby na wspólnym rynku Lublina przez 26 tygodni, z prawdziwą księgowością JDG i kartą wyników Revasa. Wygląd: zakładki w stylu Revasa.
@@ -97,7 +97,7 @@ Cel: wspólny rynek Lublina z prawdziwą księgowością – minimum, w które d
 |---|---|---|---|
 | F3a.1 Konta | `konta/`: własny login + konto Microsoft (django-allauth), role uczeń / mistrz gry, uczeń widzi tylko swoją drużynę | nowe | test dostępu: uczeń nie odczyta cudzej drużyny |
 | F3a.2 Drużyny | drużyny 1–4 osób, wiele firm w jednej grze, decyzje drużyny, zamknięcie rundy po decyzjach wszystkich albo przez mistrza | model Revasa (`StanGry.firmy`) | 4 drużyny + boty w jednej grze |
-| F3a.3 Strefy i lokale | 10 stref, globalna pula lokali, 3 typy, najem i kupno, czas budowy 3–4 / 1 / 0 rund, lokal Tymka, limit co 3 rundy | `lokale.py`, `dane/mapa/` | lokal zajęty przez drużynę znika innym |
+| F3a.3 Strefy i lokale | 10 stref, globalna pula lokali, 3 typy, najem i kupno, czas budowy 3–4 / 1 / 0 rund, lokal Tymka, limit co 3 rundy; **prototyp mapy miasta** (izometryczne SVG wg [[Artstyle]], strefy i budynki z [[Elementy mapy]]) obok zwykłego menu jako alternatywa – kliknięcie budynku otwiera jego zakładkę | `lokale.py`, `dane/mapa/` | lokal zajęty przez drużynę znika innym; z mapy da się dojść do każdej zakładki |
 | F3a.4 Popyt strefowy | pula klientów strefy × kalendarz → wybór lokalu (cena, jakość, odległość, zadowolenie; reklama w F3b), dni w tygodniu, obsługa i utracona sprzedaż; zastępuje popyt Revasa | `popyt.py`, `operacje.py` + operacje Revasa | dwa lokale w jednej strefie dzielą klientów |
 | F3a.5 Menu i świeżość | stała lista dań, jakość dania, partie, terminy w dniach, FIFO, chłodnia i zamrażarka, straty, mrożona pita jako zamiennik; raport sprzedaży, braków i strat dzień po dniu | `menu.py`, `swiezosc.py` | test: przeterminowana partia trafia do strat, nie do sprzedaży |
 | F3a.6 Dostawcy i sprzęt | dyskonty, hurtownie, producent mięsa, piekarnia (codziennie); decyzja = plan dostaw na 7 dni (ilość na każdy dzień dostawy); odbiór osobisty, gazetki; sklepy budowlane; sprzęt kuchenny i amortyzacja | `zakupy.py`, `sprzet.py`, `srodki_trwale.py`, `dane/sklepy/` | zamówienie przychodzi w zaplanowany dzień; bułki z poniedziałku są wyrzucane we wtorek wieczorem |
@@ -145,7 +145,7 @@ Każde zadanie kończy się testami i przejściem pełnej gry botów. Dla F3b.7 
 - Giełda – kolega (`gielda/` zostaje pustym zaczepem).
 - Własne kampanie reklamowe, głosowanie, własne receptury i porcje.
 - Gra przez GitHub, kalibracja na danych z oficjalnego Revasa, import prawdziwej gry.
-- Mapa, układ UI i ilustracje – kroki 8–10.
+- Pełna mapa, układ UI i ilustracje – kroki 8–10 (w 3a tylko prototyp mapy).
 
 ## 11. Do decyzji później (nie blokuje kroków 2 i 3a)
 - Serwer produkcyjny (hosting).
