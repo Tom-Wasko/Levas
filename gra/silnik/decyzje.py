@@ -24,6 +24,8 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
     reklama_tradycyjna:{medium: liczba emisji}
     internet_uruchom / internet_wylacz: [narzędzie]
+    kampanie:          [{"agencja", "kanal", "strefa"}]     – gra z lokalami: agencje reklamowe zamiast dwóch
+                                                              powyższych (silnik/reklama.py, dane/mapa/reklama.yaml)
     szkolenia:         [{"firma", "szkolenie"}]
     bank, biuro:       nazwa (z lokalami biuro: id z dane/mapa/biura.yaml albo "samodzielnie")
     ksiegowosc:        {"zapisy": {id dokumentu: {"kolumna", "stawka"}}, "deklaracja": {"vat", "pit", "zdrowotna"}}
@@ -39,6 +41,7 @@ from datetime import timedelta
 from . import biuro as bo
 from . import czas_wlasciciela as cw
 from . import limity as lm
+from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import srodki_trwale as st_trwale
@@ -304,14 +307,17 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                 firma.majatek += pozycje[n]["cena"]
                 info["inwestycje"] += pozycje[n]["cena"]
 
-    # marketing
-    if "marketing_tradycyjny" in odbl:
+    # marketing (gra z lokalami: kampanie agencji reklamowych zamiast reklamy z Revasa)
+    agencje = lokale and rk.zasady(dane) is not None
+    if agencje:
+        info["kampanie"] = rk.zamow(dane, firma, d, runda, ksiega, rachunek)
+    if "marketing_tradycyjny" in odbl and not agencje:
         from .rynek import koszt_emisji
         media = dane.dostepne("media_tradycyjne", runda)
         for medium, emisje in (d.get("reklama_tradycyjna") or {}).items():
             if medium in media and int(emisje or 0) > 0:
                 ksieguj(firma, ksiega, rachunek, f"Reklama tradycyjna: {medium}", koszt_emisji(media[medium], int(emisje)))
-    if "marketing_internetowy" in odbl:
+    if "marketing_internetowy" in odbl and not agencje:
         narzedzia = dane.dostepne("narzedzia_internetowe", runda)
         for n in d.get("internet_wylacz", []):
             firma.internet.pop(n, None)
@@ -375,6 +381,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("czerwony", "dostawcy", tekst)
         for tekst in (info or {}).get("uwagi_rynku_pracy", []):
             dodaj("czerwony", "zatrudnienie", tekst)
+        for tekst in ((info or {}).get("kampanie") or {}).get("uwagi", []):
+            dodaj("czerwony", rk.ZAKLADKA, tekst)
         for b in bo.bledy(dane, firma, d):
             dodaj(b["poziom"], b["zakladka"], b["tekst"])
         # przekroczenia odrzuca zapis decyzji (API), a przeliczenie przycina – tu czerwone są w uwagach rynku pracy i lokali

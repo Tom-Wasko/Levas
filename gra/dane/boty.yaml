@@ -1,10 +1,14 @@
 # Boty
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku), jakość, docelowa liczba dań, pokrycie popytu,
-  wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia.'
+  wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia; gra z lokalami: kampanie
+  (agencja/kanał z mapa/reklama.yaml) zamiast reklamy i internetu, bufor_kampanii – gotówka po kampaniach,
+  min_sila_kampanii – słabszej kampanii (po powtórkach) bot nie zamawia.'
 zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C), liczba dań dopasowana do menu kebaba
 ustawienia:
   bufor_gotowki: 30000
+  bufor_kampanii: 12000
+  min_sila_kampanii: 0.5
   cena_nasladowcy_bez_danych: 0.95
   krok_ceny: 0.5
   losuj_z_najlepszych_kandydatow: 3
@@ -34,6 +38,8 @@ strategie:
     reklama: {}
     internet: []
     szkolenia: 0
+    kampanie:
+    - papier_przyjmie/ulotki
   tani:
     nazwa: Tani Kebab Nocny
     cena: 0.78
@@ -47,6 +53,9 @@ strategie:
     internet:
     - Informacje na forach internetowych
     szkolenia: 0
+    kampanie:
+    - papier_przyjmie/ulotki
+    - lajk/grupa_osiedlowa
   premium:
     nazwa: Kebab Premium
     cena: 1.08
@@ -60,6 +69,9 @@ strategie:
     internet:
     - Strona www firmy
     szkolenia: 2
+    kampanie:
+    - lajk/influencer
+    - fala_koziolka/billboard
   agresywny:
     nazwa: Kebab Głośny Marketing
     cena: 0.8
@@ -78,6 +90,12 @@ strategie:
     - Profil na Facebook
     - Informacje na forach internetowych
     szkolenia: 2
+    kampanie:
+    - papier_przyjmie/plakaty
+    - lajk/influencer
+    - fala_koziolka/radio
+    - kozi_grod/degustacja
+    - kozi_grod/noc_kebaba
   nasladowca:
     nazwa: Kebab Naśladowca
     cena: null

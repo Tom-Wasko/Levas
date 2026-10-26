@@ -1,0 +1,158 @@
+# Agencje reklamowe na mapie miasta (F3b.2) – kampanie z listy: agencja × kanał × strefa
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Agencje reklamowe gry z lokalami (silnik/reklama.py). Kampania trwa `rundy` rund od rundy zamówienia; w tym
+  czasie poszerza pulę klientów strefy (pula – ułamek, korzystają wszystkie lokale, najwięcej reklamujący się) i podnosi
+  atrakcyjność firmy u mieszkańców strefy (przyciaganie – ułamek, odbiera klientów konkurencji). Koszt netto (VAT 23%)
+  płatny z góry: przy zasięgu „strefa” koszt × pula strefy z mapa/popyt.yaml (więcej ludzi – drożej), przy zasięgu
+  „miasto” – koszt bez mnożnika, efekt w każdej strefie. Agencja należy do rodzaju kanału: kilka drużyn w tym samym
+  rodzaju i strefie w tej samej rundzie się zagłusza. model: zagluszanie – efekt × 1 / (1 + zagluszanie × (n − 1)),
+  n – liczba firm z trwającą kampanią tego rodzaju w strefie; nasycenie – każda wcześniejsza kampania firmy w tym
+  samym kanale i strefie w ostatnich okno_nasycenia rundach osłabia nową o ten ułamek (× (1 − nasycenie)^k);
+  wygasanie – po końcu kampanii efekt spada co rundę × wygasanie, aż będzie mniejszy niż prog_wygasania.
+  teksty – komiczne raporty agencji po rundzie ({strefa} – nazwa strefy).'
+zrodlo: 'notatka „Elementy mapy” (kilka agencji, każda z własnymi kanałami: ulotki i plakaty, internet i social media,
+  radio i billboardy, lokalne wydarzenia; kampanie z listy; reklama poszerza pulę i odbiera klientów konkurencji; ten
+  sam kanał w tej samej strefie osłabia kampanie) i „Ustalenia gry” (runda 3 – część kanałów, runda 5 – wszystkie);
+  liczby – założenie F3b.2 (kampania ok. 2–15% tygodniowego utargu lokalu, efekt kilka–kilkanaście procent)'
+model:
+  zagluszanie: 0.5
+  nasycenie: 0.3
+  okno_nasycenia: 4
+  wygasanie: 0.5
+  prog_wygasania: 0.1
+agencje:
+  papier_przyjmie:
+    nazwa: Drukarnia „Papier Przyjmie”
+    budynek: drukarnia
+    rodzaj: druk
+    opis: Pan Zdzisław drukuje wszystko, co się da złożyć na pół. Toner kupuje hurtowo, przecinki – detalicznie.
+    kanaly:
+      ulotki:
+        nazwa: Ulotki za wycieraczki
+        od_rundy: 3
+        zasieg: strefa
+        rundy: 1
+        koszt: 300
+        pula: 0.02
+        przyciaganie: 0.06
+        teksty:
+        - 'Roznosiciel Kacper rozdał w strefie {strefa} 2 000 ulotek, w tym 400 jednemu panu, który „zbiera na rozpałkę”.
+          Reszta trafiła za wycieraczki, do skrzynek i – według świadków – do paszczy psa sąsiada. Pies od tamtej pory
+          zatrzymuje się przed Twoim lokalem.'
+        - 'Ulotki w strefie {strefa} wydrukowano z literówką „Kebap z podwójnym mięsem i podwójnym sosem i podwójną
+          literówką”. Paradoksalnie ludzie robili zdjęcia i wysyłali znajomym. Pan Zdzisław twierdzi, że to celowe.'
+      plakaty:
+        nazwa: Plakaty na słupach ogłoszeniowych
+        od_rundy: 3
+        zasieg: strefa
+        rundy: 2
+        koszt: 600
+        pula: 0.02
+        przyciaganie: 0.08
+        teksty:
+        - 'Plakaty w strefie {strefa} wiszą na każdym słupie między ogłoszeniem „Zaginął kot Mruczek” a „Znaleziono kota,
+          chyba Mruczek”. Twój kebab wygląda na nich apetyczniej niż oba koty razem.'
+        - 'Klej do plakatów okazał się tak mocny, że służby miejskie w strefie {strefa} poddały się po trzech próbach.
+          Plakat zostanie tam prawdopodobnie do 2031 roku. Agencja nie dolicza za to ani grosza.'
+  lajk:
+    nazwa: Agencja „Lajk i Spółka”
+    budynek: agencja_lajk
+    rodzaj: internet
+    opis: Trzech studentów, dwa ringlighty i jeden iPhone z pękniętym ekranem. Mówią o sobie „boutique social media
+      house”.
+    kanaly:
+      grupa_osiedlowa:
+        nazwa: Posty na grupach osiedlowych
+        od_rundy: 3
+        zasieg: strefa
+        rundy: 1
+        koszt: 250
+        pula: 0.01
+        przyciaganie: 0.05
+        teksty:
+        - 'Post na grupie „Strefa {strefa} – Uwaga, Policja / Sprzedam / Oddam” zebrał 214 komentarzy. 180 to kłótnia
+          o to, czy kebab może mieć ananasa. Wygrałeś: wszyscy już znają nazwę lokalu.'
+        - 'Administratorka grupy osiedlowej w strefie {strefa} usunęła post jako reklamę, po czym sama zamówiła u Ciebie
+          dwa kebaby i wrzuciła zdjęcie z podpisem „Polecam, nie reklama”. Zasięg: trzy razy większy.'
+      influencer:
+        nazwa: Influencerka „Kebabowa Królowa” (TikTok)
+        od_rundy: 5
+        zasieg: strefa
+        rundy: 2
+        koszt: 1500
+        pula: 0.04
+        przyciaganie: 0.15
+        teksty:
+        - 'Kebabowa Królowa nagrała w strefie {strefa} 47 ujęć jednego gryza w zwolnionym tempie. Sos kapnął jej na
+          kamerę, co podbiło film do 300 tysięcy wyświetleń. Komentarz numer jeden: „gdzie to jest, jadę”.'
+        - 'Filmik „Oceniam kebaby w strefie {strefa} na ślepo” skończył się dla Ciebie notą 9/10 („minus punkt, bo
+          serwetki za cienkie”). Kupiłeś grubsze serwetki. Agencja chce za to osobny bonus.'
+  fala_koziolka:
+    nazwa: Radio i billboardy „Fala Koziołka”
+    budynek: fala_koziolka
+    rodzaj: radio_billboard
+    opis: 'Rozgłośnia, która gra wyłącznie disco polo i prognozę pogody, plus trzy billboardy przy rondach. Jingiel
+      nagrywa właściciel, a chórki – jego teściowa.'
+    kanaly:
+      billboard:
+        nazwa: Billboard przy rondzie
+        od_rundy: 5
+        zasieg: strefa
+        rundy: 3
+        koszt: 1200
+        pula: 0.03
+        przyciaganie: 0.1
+        teksty:
+        - 'Billboard przy rondzie w strefie {strefa} jest tak duży, że kierowcy robią dodatkowe kółko, żeby doczytać
+          menu. Korki wzrosły o 4%, sprzedaż – też. Drogowcy pytają, czy możesz zmniejszyć czcionkę.'
+        - 'Na billboardzie w strefie {strefa} ktoś domalował kebabowi wąsy. Agencja uważa, że „dodało to charakteru”,
+          i wysłała Ci fakturę za „pakiet street-art”. Fakturę grzecznie odrzuciłeś.'
+      radio:
+        nazwa: Spot w radiu „Fala Koziołka”
+        od_rundy: 5
+        zasieg: miasto
+        rundy: 2
+        koszt: 2500
+        pula: 0.015
+        przyciaganie: 0.05
+        teksty:
+        - 'Spot leciał między „Majteczkami w kropeczki” a prognozą pogody. Lektor tak przejął się rolą, że wymienił
+          wszystkie sosy z nazwy, a potem jeszcze raz, bo „słuchacze mogli nie dosłyszeć”. Cały Lublin nuci jingiel.'
+        - 'W radiowym konkursie „Zgadnij, co jest w sosie czosnkowym” nikt nie zgadł (czosnek). Nagroda – kebab
+          w Twoim lokalu – i tak zrobiła Ci reklamę w całym mieście.'
+  kozi_grod:
+    nazwa: Agencja eventowa „Kozi Gród Events”
+    budynek: kozi_grod_events
+    rodzaj: wydarzenia
+    opis: Organizują festyny, otrzęsiny i jedną imprezę, o której nikt nie chce mówić. Mają własnego Koziołka
+      w przebraniu (rozmiar XXL).
+    kanaly:
+      degustacja:
+        nazwa: Degustacja na festynie osiedlowym
+        od_rundy: 3
+        zasieg: strefa
+        rundy: 1
+        koszt: 700
+        pula: 0.03
+        przyciaganie: 0.1
+        teksty:
+        - 'Na festynie w strefie {strefa} Twoje stoisko stało między dmuchanym zamkiem a kołem gospodyń wiejskich.
+          Panie z koła najpierw patrzyły podejrzliwie, potem wzięły przepis na sos. Wymiana: przepis na pierogi.'
+        - 'Degustacja w strefie {strefa}: Koziołek w przebraniu zjadł 11 próbek, zanim ktokolwiek inny podszedł.
+          Dzieci uznały, że skoro Koziołek je, to musi być dobre. Kolejka ustawiła się do końca festynu.'
+      noc_kebaba:
+        nazwa: Noc Kebaba na otrzęsinach
+        od_rundy: 5
+        zasieg: strefa
+        strefy:
+        - akademickie
+        - politechnika
+        rundy: 1
+        koszt: 2500
+        pula: 0.08
+        przyciaganie: 0.2
+        teksty:
+        - 'Noc Kebaba w strefie {strefa}: DJ grał do trzeciej, Ty kroiłeś do czwartej. Pierwszy rok studiów już wie,
+          gdzie się je po kolokwium. Ktoś z politechniki zaproponował, żeby zrobić z tego przedmiot obieralny.'
+        - 'Na otrzęsinach w strefie {strefa} starosta roku ogłosił Twój kebab „oficjalnym posiłkiem sesji”. Dziekan
+          podobno nie protestował, bo dostał porcję bez cebuli.'

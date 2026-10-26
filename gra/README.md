@@ -34,7 +34,11 @@ właściciela, gotówkę albo porcje, ciąg dalszy przychodzi w kolejnych rundac
 `dane/zdarzenia/magazyn.yaml`, `zalozenia.yaml` → `magazyn`): w grze z lokalami nie ma kosztu magazynowania ani zwrotów
 do dostawcy – co nie zmieści się w chłodni i zamrażarce lokalu, jedzie do wynajętej chłodni (za litr, krótszy termin);
 towar w wynajmie i przeterminowane jedzenie zwiększają szansę kontroli sanepidu (mandat poza KPiR, mniej klientów),
-a duży zapas z krótkim terminem może wywołać telefon z banku żywności. **Analiza** liczy przewidywany wynik rundy
+a duży zapas z krótkim terminem może wywołać telefon z banku żywności. **Agencje reklamowe** (`silnik/reklama.py`,
+`dane/mapa/reklama.yaml`): w grze z lokalami zamiast reklamy tradycyjnej i internetowej z Revasa – cztery agencje na
+mapie (druk, internet, radio i billboardy, wydarzenia), kampania = agencja × kanał × strefa; poszerza pulę klientów
+strefy i przyciąga jej mieszkańców do firmy, kampanie tego samego rodzaju w strefie się zagłuszają, powtórka zaraz
+po poprzedniej działa słabiej, po końcu efekt wygasa. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
 **Panel mistrza gry** – http://127.0.0.1:8765/mg/ (tylko rola mistrza gry): nowa gra

@@ -83,9 +83,12 @@ const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wysl
   idz: (k, tryb) => { S.zakladka = k; S.tryb = tryb || (ZAKLADKI[k].decyzje ? "decyzje" : "wyniki"); rysuj(); } });
 
 // --- rysowanie ---------------------------------------------------------------------------------
+const widocznePod = (pod) => pod.filter((k) => !ZAKLADKI[k]?.ukryta?.(S.v));
+
 function rysujMenu() {
   const czerwone = S.v.lista_bledow.filter((b) => b.poziom === "czerwony").length;
-  document.getElementById("menu").innerHTML = MENU.filter((poz) => !ZAKLADKI[poz.klucz]?.ukryta?.(S.v)).map((poz) => {
+  document.getElementById("menu").innerHTML = MENU.filter((poz) => !ZAKLADKI[poz.klucz]?.ukryta?.(S.v))
+    .map((poz) => poz.pod ? { ...poz, pod: widocznePod(poz.pod) } : poz).map((poz) => {
     const z = ZAKLADKI[poz.klucz] || {};
     const pod = poz.pod ? `<div class="pod">${poz.pod.map((k) => `<a data-zakladka="${k}" class="${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"} ${k === S.zakladka ? "aktywna" : ""}">
       ${ikona(IKONY[k], 18)}${ZAKLADKI[k].tytul}${!dostepna(ZAKLADKI[k]) && OD_RUNDY[k] ? `<span class="od">od rundy ${OD_RUNDY[k]}</span>` : ""}</a>`).join("")}</div>` : "";
@@ -102,7 +105,7 @@ function rysujMenu() {
 function podzakladki() {
   const grupa = MENU.find((p) => (p.pod || []).includes(S.zakladka));
   if (!grupa) return "";
-  return `<div class="podzakladki">${grupa.pod.map((k) => `<a data-zakladka="${k}" data-pod="1" class="${k === S.zakladka ? "aktywna" : ""} ${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"}">
+  return `<div class="podzakladki">${widocznePod(grupa.pod).map((k) => `<a data-zakladka="${k}" data-pod="1" class="${k === S.zakladka ? "aktywna" : ""} ${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"}">
     ${ikona(IKONY[k], 16)}${ZAKLADKI[k].tytul}</a>`).join("")}</div>`;
 }
 

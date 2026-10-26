@@ -27,6 +27,7 @@ from . import lokale as lk
 from . import magazyn as mag
 from . import menu
 from . import popyt as pp
+from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import zdarzenia as zd
@@ -151,6 +152,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     # --- rynek i sprzedaż ----------------------------------------------------------------------
     popyt, obsluga, oferty = {}, {}, {}
     strefowy = None
+    agencje = tryb_lokali and rk.zasady(dane) is not None   # agencje reklamowe zamiast reklamy z Revasa
+    kampanie = rk.efekty_rundy(dane, s.firmy, r, ziarno) if agencje else None
     if r >= 2:
         oferty_lok = {}
         stali = konfiguracja.get("konkurenci_stali", [])
@@ -163,6 +166,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             emisje = {n: e for n, e in (d.get("reklama_tradycyjna") or {}).items() if n in media}
             reklama = wzrost_reklamy_tradycyjnej(dane, emisje) if "marketing_tradycyjny" in dane.odblokowane(r) else 0.0
             reklama_int = wzrost_reklamy_internetowej(dane, f.internet, r, narzedzia_rynku)
+            if agencje:
+                reklama = reklama_int = 0.0
             info[nazwa]["reklama"] = {"tradycyjna": reklama, "internetowa": reklama_int}
             wyp = mnoznik_wyposazenia(dane, f.wyposazenie)
             mn_firmy = mnoznik_firmy(dane, f)
@@ -173,7 +178,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 ceny = {u: max(0.01, f.ceny[u].cena - f.ceny[u].rabat) for u in f.oferta if u in f.ceny}
                 oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, ceny, {
                     "wyposazenie": wyp, "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy,
-                    "zadowolenie": pp.mnoznik_zadowolenia(dane, zk)})
+                    "zadowolenie": pp.mnoznik_zadowolenia(dane, zk),
+                    "reklama_strefy": (kampanie or {}).get("firmy", {}).get(nazwa, {})})
                 continue
             rec = kasjerzy(dane, f)
             for u in f.oferta:
@@ -196,7 +202,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                                                           "wyposazenie": float(k.get("wyposazenie", 1.0)),
                                                           "reklama": rekl_k}
         if tryb_lokali:
-            strefowy = pp.rynek_lokali(dane, s.firmy, oferty_lok, r, ziarno)
+            strefowy = pp.rynek_lokali(dane, s.firmy, oferty_lok, r, ziarno, (kampanie or {}).get("pula"))
             popyt, obsluga, rynek = strefowy["popyt"], strefowy["obsluga"], strefowy["rynek"]
             for nazwa, lokale in oferty_lok.items():  # oferta firmy: jakość lokalu z największym popytem dania
                 for u in popyt[nazwa]:
@@ -300,6 +306,10 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej
             wyniki[nazwa]["rynek_pracy"] = info[nazwa].get("rynek_pracy")
             wyniki[nazwa]["srodki_trwale"] = ewidencja(f)
+            if agencje:
+                wyniki[nazwa]["reklama_agencje"] = {"zamowione": (info[nazwa].get("kampanie") or {}).get("zamowione", []),
+                                                    "kampanie": kampanie["kampanie"].get(nazwa, []),
+                                                    "pula_stref": kampanie["pula"]}
             wyniki[nazwa]["bank"] = {"poczatek": info[nazwa].get("bank"), "koniec": bank_koniec,
                                      "leasing": info[nazwa].get("leasing"), "historia": bk.historia(f, r),
                                      "debet_ponad_limit": bk.debet_ponad_limit(dane, f)}
@@ -319,6 +329,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         s.rynek[r]["lokale"] = lk.zajete(s.firmy)
         if strefowy:
             s.rynek[r]["strefy"] = strefowy["strefy"]
+        if kampanie:   # reklamy widać na mieście: kto, gdzie i za ile
+            s.rynek[r]["kampanie"] = rk.publiczne(dane, kampanie)
     return s
 
 

@@ -13,6 +13,7 @@ from . import banki as bk
 from . import biuro as bo
 from . import lokale as lk
 from . import popyt as pp
+from . import reklama as rk
 from . import rynek_pracy as rp
 from . import zdarzenia as zd
 from .dane import KASA, KUCHNIA, Dane
@@ -62,6 +63,26 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
     najlepsze = wolne[:3]
     lok = najlepsze[int(strumien(konf["ziarno"], runda, "lokal", nazwa).integers(len(najlepsze)))]
     return {"id": lok["id"], "forma": "najem"}
+
+
+def _kampanie(dane: Dane, f: Firma, st: dict, runda: int, ust: dict) -> list[dict]:
+    """Kampanie ze strategii w strefach własnych lokali: dostępne, nietrwające, nie za słabe po powtórkach, a po
+    zapłacie zostaje bufor gotówki."""
+    strefy = sorted({dane.lokale[lok.id]["strefa"] for lok in f.lokale})
+    wynik, wydatki = [], 0.0
+    for x in st.get("kampanie", []) if strefy else []:
+        a, _, k = x.partition("/")
+        kan = rk.kanal(dane, a, k)
+        if kan is None or kan["od_rundy"] > runda:
+            continue
+        for s in [None] if kan["zasieg"] == "miasto" else [z for z in strefy if z in rk.strefy_kanalu(dane, kan)]:
+            koszt = rk.brutto(dane, rk.koszt(dane, kan, s))
+            if rk.trwa(f, a, k, s, runda) or rk.sila_nowej(dane, f, a, k, s, runda) < ust["min_sila_kampanii"] \
+                    or f.gotowka - wydatki - koszt < ust["bufor_kampanii"]:
+                continue
+            wynik.append({"agencja": a, "kanal": k, "strefa": s})
+            wydatki += koszt
+    return wynik
 
 
 def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict) -> dict:
@@ -203,9 +224,12 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if "hr_udogodnienia" in odbl and bufor:
         d["udogodnienia_kup"] = [p["nazwa"] for p in sorted(dane.pozycje("udogodnienia").values(), key=lambda p: p["cena"] / p["procent"])
                                  if p["od_rundy"] <= runda and p["nazwa"] not in f.udogodnienia][:max(0, st["udogodnienia"] - len(f.udogodnienia))]
-    if "marketing_tradycyjny" in odbl and bufor:
+    agencje = lokale and rk.zasady(dane) is not None   # gra z lokalami: kampanie agencji zamiast reklamy z Revasa
+    if agencje:
+        d["kampanie"] = _kampanie(dane, f, st, runda, ust)
+    if "marketing_tradycyjny" in odbl and bufor and not agencje:
         d["reklama_tradycyjna"] = {n: e for n, e in st["reklama"].items() if n in dane.dostepne("media_tradycyjne", runda)}
-    if "marketing_internetowy" in odbl and bufor:
+    if "marketing_internetowy" in odbl and bufor and not agencje:
         d["internet_uruchom"] = [n for n in st["internet"] if n not in f.internet and n in dane.dostepne("narzedzia_internetowe", runda)]
     if "hr_szkolenia" in odbl and bufor and st["szkolenia"]:
         szk = dane.katalog_ofert["szkolenia"]

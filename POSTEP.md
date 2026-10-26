@@ -57,5 +57,17 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   +5% popytu, podziękowanie w następnej rundzie); zwroty i koszt magazynowania ukryte w zakładce Dostawcy;
   zakładka **Świeżość**: Decyzje – nadmiar do wynajmu dzień po dniu i ryzyko kontroli, Wyniki – wynajęte partie i
   karta kontroli; testy `test_magazyn.py`, `test_swiezosc.py`
+- [x] F3b.2 Agencje reklamowe (gra z lokalami) – `dane/mapa/reklama.yaml`: 4 agencje na mapie (drukarnia „Papier
+  Przyjmie”, „Lajk i Spółka”, „Fala Koziołka”, „Kozi Gród Events” – 2 nowe budynki), 8 kanałów (od rundy 3 część,
+  od rundy 5 wszystkie), zasięg strefa albo całe miasto (radio), Noc Kebaba tylko w strefach akademickich, komiczne
+  raporty agencji; `silnik/reklama.py`: zamówienie `kampanie: [{agencja, kanal, strefa}]` z góry (koszt × pula strefy,
+  VAT 23%), kampania trwa N rund, poszerza pulę strefy (`popyt.pule`, korzystają wszyscy) i przyciąga mieszkańców
+  strefy (`reklama_strefy` w `popyt.atrakcyjnosc`), zagłuszanie przez inne firmy z kampanią tego samego rodzaju
+  w strefie, nasycenie przy powtórkach w oknie 4 rund, wygasanie ×0,5 po końcu; reklama tradycyjna i internetowa
+  z Revasa wyłączona w grze z lokalami (zakładki ukryte, boty kupują kampanie ze strategii – `boty.yaml: kampanie`,
+  `bufor_kampanii`, `min_sila_kampanii`); prognoza popytu uwzględnia kampanie; dane rynku: kto i za ile się
+  reklamował; zakładka **Agencje reklamowe** w Marketingu (Decyzje: agencje, kanały, koszt i siła w wybranej
+  strefie, konkurencja; Wyniki: raporty agencji, efekty kampanii, kampanie na mieście z wykresem); podzakładki
+  ukryte w menu nie są pokazywane; test `test_reklama.py`
 
-Zadania F3b.2–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+Zadania F3b.3–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

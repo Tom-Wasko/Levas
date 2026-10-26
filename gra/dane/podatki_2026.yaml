@@ -42,6 +42,8 @@ vat:
     stawka: 0.23
   - zawiera: reklamy internetowej
     stawka: 0.23
+  - zawiera: Kampania reklamowa
+    stawka: 0.23
   - zawiera: Szkolenie
     stawka: 0.23
   - zawiera: Koszty utrzymania

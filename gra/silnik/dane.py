@@ -24,6 +24,7 @@ from .schematy import (
     PlikBankow,
     PlikBiur,
     PlikHarpagona,
+    PlikReklamy,
     sprawdz_zalozenia,
 )
 
@@ -67,14 +68,15 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
     if not (katalog / "strefy.yaml").exists():
         return None
-    st, lo, bu, po, me, ba, ha, bi = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    st, lo, bu, po, me, ba, ha, bi, re = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
             "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po},
             "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")},
             "banki": PlikBankow.model_validate(ba).model_dump(exclude={"opis", "zrodlo"}),  # z domyślnymi polami
             "harpagon": PlikHarpagona.model_validate(ha).model_dump(exclude={"opis", "zrodlo"}),
-            "biura": PlikBiur.model_validate(bi).model_dump(exclude={"opis", "zrodlo"})}
+            "biura": PlikBiur.model_validate(bi).model_dump(exclude={"opis", "zrodlo"}),
+            "reklama": PlikReklamy.model_validate(re).model_dump(exclude={"opis", "zrodlo"})}
 
 
 def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
@@ -328,6 +330,12 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
                 brak(n, f"boty.yaml: {s}.internet", "narzędzie", "katalog.yaml: narzedzia_internetowe")
     if d.mapa:
         bledy += _sprawdz_mape(d, brak)
+        agencje = d.mapa["reklama"]["agencje"]
+        for s, st in d.boty["strategie"].items():
+            for x in st.get("kampanie", []):
+                a, _, k = x.partition("/")
+                if k not in (agencje.get(a) or {}).get("kanaly", {}):
+                    brak(x, f"boty.yaml: {s}.kampanie", "kampania (agencja/kanał)", "mapa/reklama.yaml")
     return bledy
 
 
@@ -385,6 +393,20 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
         ids.add(b["id"])
         r = b["mapa"]
         poloz(co, b["strefa"], r["x"], r["y"], r["szer"], r["gl"])
+    budynki = {b["id"]: b for b in m["budynki"]}
+    for a, ag in m["reklama"]["agencje"].items():
+        co = f"mapa/reklama.yaml: agencje.{a}"
+        if ag["budynek"] not in budynki:
+            brak(ag["budynek"], co, "budynek", "mapa/budynki.yaml")
+        elif budynki[ag["budynek"]]["zakladka"] != "agencje":
+            bledy.append(f"{co}: budynek {ag['budynek']} nie prowadzi do zakładki agencje")
+        for k, kan in ag["kanaly"].items():
+            for s in kan["strefy"] or []:
+                if s not in m["strefy"]:
+                    brak(s, f"{co}.kanaly.{k}", "strefa", "mapa/strefy.yaml")
+            for t in kan["teksty"]:
+                if t.replace("{strefa}", "").count("{"):
+                    bledy.append(f"{co}.kanaly.{k}: tekst z nieznanym polem {{…}} (dozwolone: {{strefa}})")
     po = m["popyt"]
     for s in sorted(set(m["strefy"]) ^ set(po["strefy"])):
         bledy.append(f"mapa/popyt.yaml: strefa {s} " + ("bez popytu" if s in m["strefy"] else "nie ma jej w mapa/strefy.yaml"))

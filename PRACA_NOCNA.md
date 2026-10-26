@@ -106,6 +106,15 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    wyrzucone opakowanie mięsa to już ok. +14 pp. szansy kontroli – może za ostro? Gra bez lokali (`dane_revas/`)
    zostaje ze zwrotami i kosztem magazynowania. Czy tak? (zapisane 26.10)
 
+14. **Agencje reklamowe (F3b.2).** Liczby do sprawdzenia (`dane/mapa/reklama.yaml`): kampanie 250–2500 zł netto
+   (w strefie × pula strefy, więc w Centrum ok. 20% drożej), efekt: +1–8% puli strefy i +5–20% atrakcyjności u jej
+   mieszkańców; zagłuszanie – każda inna firma z kampanią tego samego **rodzaju** (druk / internet / radio
+   i billboardy / wydarzenia) w strefie dzieli efekt (×1/(1+0,5·n)); nasycenie −30% za każdą wcześniejszą kampanię
+   w tym kanale i strefie w ostatnich 4 rundach; wygasanie ×0,5 na rundę. Poszerzenie puli pomaga też konkurencji
+   w tej strefie (w teście kampania degustacji + ulotek: firma +4% popytu, sąsiad bez zmian). Radio działa w całym
+   mieście, ale słabiej. W grze z lokalami **nie ma** już reklamy tradycyjnej i internetowej z Revasa (zakładki
+   ukryte). Czy tak? (zapisane 26.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -319,3 +328,4 @@ _brak_
 - 26.10 – F3b.1 gotowe: eventy w parkach (14 historii, zakładka Zdarzenia); pytanie 12. Nowe polecenia użytkownika: kapitał 40 000 zł, sortowanie list, lodówki + sanepid zamiast kosztu magazynowania, bez zwrotów + event z bankiem żywności.
 - 26.10 – kapitał 40 000 zł, poprawione 4 notatki (zgoda użytkownika), sortowanie tabel i oferty lokali. Boty przy 40 000 zł nie schodzą poniżej ok. 18 000 zł gotówki (2 ziarna × 26 rund). Dalej: magazyn (wynajem chłodni, sanepid, bank żywności).
 - 26.10 – magazyn gotowy: wynajęta chłodnia, sanepid z mandatami poza KPiR, bank żywności, bez zwrotów i kosztu magazynowania w grze z lokalami; pytanie 13. Start F3b.2.
+- 26.10 – F3b.2 gotowe: agencje reklamowe (4 agencje, 8 kanałów, zagłuszanie, nasycenie, wygasanie), zakładka Agencje reklamowe, boty z kampaniami; pytanie 14. Start F3b.3 (promocje).

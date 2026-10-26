@@ -389,10 +389,13 @@ class Strategia(Schemat):
     reklama: dict[str, int]
     internet: list[str]
     szkolenia: int = Field(ge=0)
+    kampanie: list[str] = Field(default_factory=list)   # gra z lokalami: "agencja/kanał" z mapa/reklama.yaml
 
 
 class UstawieniaBotow(Schemat):
     bufor_gotowki: float
+    bufor_kampanii: float = Field(0, ge=0)   # gra z lokalami: gotówka, która musi zostać po kampaniach reklamowych
+    min_sila_kampanii: float = Field(0, ge=0, le=1)   # słabszej (po powtórkach – nasycenie) bot nie zamawia
     cena_nasladowcy_bez_danych: float = Field(gt=0)
     krok_ceny: float = Field(gt=0)
     losuj_z_najlepszych_kandydatow: int = Field(gt=0)
@@ -736,6 +739,42 @@ class PlikBiur(Plik):
         return self
 
 
+# --- mapa/reklama.yaml (agencje reklamowe, F3b.2) ---
+
+
+class KanalReklamy(Schemat):
+    nazwa: str
+    od_rundy: int = Field(ge=1)
+    zasieg: Literal["strefa", "miasto"]
+    strefy: list[str] | None = None      # tylko te strefy (brak – każda)
+    rundy: int = Field(ge=1)
+    koszt: float = Field(gt=0)           # netto; zasięg „strefa” – × pula strefy
+    pula: float = Field(ge=0, lt=1)
+    przyciaganie: float = Field(ge=0, lt=2)
+    teksty: list[str] = Field(min_length=1)
+
+
+class AgencjaReklamowa(Schemat):
+    nazwa: str
+    budynek: str
+    rodzaj: str
+    opis: str
+    kanaly: dict[str, KanalReklamy] = Field(min_length=1)
+
+
+class ModelReklamy(Schemat):
+    zagluszanie: float = Field(ge=0)
+    nasycenie: float = Field(ge=0, lt=1)
+    okno_nasycenia: int = Field(ge=1)
+    wygasanie: float = Field(ge=0, lt=1)
+    prog_wygasania: float = Field(gt=0, le=1)
+
+
+class PlikReklamy(Plik):
+    model: ModelReklamy
+    agencje: dict[str, AgencjaReklamowa] = Field(min_length=1)
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
@@ -745,6 +784,7 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "banki.yaml": PlikBankow,
     "harpagon.yaml": PlikHarpagona,
     "biura.yaml": PlikBiur,
+    "reklama.yaml": PlikReklamy,
 }
 
 # --- podatki_2026.yaml (gra z lokalami, F3a.11) ---
