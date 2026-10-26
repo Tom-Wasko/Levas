@@ -27,6 +27,7 @@ from . import lokale as lk
 from . import magazyn as mag
 from . import menu
 from . import popyt as pp
+from . import promocje as pm
 from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
@@ -180,6 +181,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                     "wyposazenie": wyp, "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy,
                     "zadowolenie": pp.mnoznik_zadowolenia(dane, zk),
                     "reklama_strefy": (kampanie or {}).get("firmy", {}).get(nazwa, {})})
+                pm.efekty_ofert(dane, f, oferty_lok[nazwa], r, pp.dni_rundy(dane, r))
                 continue
             rec = kasjerzy(dane, f)
             for u in f.oferta:
@@ -214,9 +216,14 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 popyt[nazwa] = {u: v[nazwa]["popyt"] for u, v in rynek.items() if nazwa in v}
                 obsluga[nazwa] = obsluz(dane, s.firmy[nazwa], popyt[nazwa], ziarno, r)
         for nazwa in nazwy:
+            promo = (strefowy or {}).get("promocje", {}).get(nazwa)   # przychód z rabatami promocji
             for u, k in obsluga[nazwa]["obsluzeni"].items():
                 ksieguj(s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], f"Sprzedaż: {dane.uslugi[u]['nazwa']}",
-                        k * oferty[u][nazwa]["cena"], "przychod", stawka=rz.stawka_sprzedazy(dane, u))
+                        promo["przychod"].get(u, 0.0) if promo else k * oferty[u][nazwa]["cena"], "przychod",
+                        stawka=rz.stawka_sprzedazy(dane, u))
+            if promo:
+                pm.ksieguj_sprzedaz(dane, s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], promo,
+                                    rz.stawka_sprzedazy(dane, "napoj") if "napoj" in dane.uslugi else None)
     else:
         rynek = {}
 
@@ -315,6 +322,12 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                                      "debet_ponad_limit": bk.debet_ponad_limit(dane, f)}
             wyniki[nazwa]["harpagon"] = {"poczatek": info[nazwa].get("harpagon"), "presja": info[nazwa].get("harpagon_presja"),
                                          "odsetki": info[nazwa].get("harpagon_odsetki"), "stan": lw.stan(dane, f, r + 1)}
+            if pm.zasady(dane):
+                promo = (strefowy or {}).get("promocje", {}).get(nazwa)
+                wyniki[nazwa]["promocje"] = pm.raport(dane, f, nazwa, r, promo, info[nazwa].get("promocje") or {}, ziarno)
+                for u, zl in (promo or {}).get("przychod", {}).items():
+                    if u in wyniki[nazwa]["sprzedaz"]:
+                        wyniki[nazwa]["sprzedaz"][u]["przychod"] = round(zl, 2)
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
                 wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]
@@ -331,6 +344,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             s.rynek[r]["strefy"] = strefowy["strefy"]
         if kampanie:   # reklamy widać na mieście: kto, gdzie i za ile
             s.rynek[r]["kampanie"] = rk.publiczne(dane, kampanie)
+        if pm.zasady(dane):   # promocje widać na drzwiach lokali
+            s.rynek[r]["promocje"] = pm.publiczne(dane, s.firmy)
     return s
 
 

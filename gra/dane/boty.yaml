@@ -3,12 +3,15 @@
 opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku), jakość, docelowa liczba dań, pokrycie popytu,
   wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia; gra z lokalami: kampanie
   (agencja/kanał z mapa/reklama.yaml) zamiast reklamy i internetu, bufor_kampanii – gotówka po kampaniach,
-  min_sila_kampanii – słabszej kampanii (po powtórkach) bot nie zamawia.'
+  min_sila_kampanii – słabszej kampanii (po powtórkach) bot nie zamawia; promocje (typ z mapa/promocje.yaml
+  i ozdobna nazwa) – na najdroższe danie w sprzedaży, nowe tylko z buforem gotówki, wszystkie wyłączone, gdy bot
+  obsłużył mniej niż min_obsluga_promocji popytu poprzedniej rundy.'
 zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C), liczba dań dopasowana do menu kebaba
 ustawienia:
   bufor_gotowki: 30000
   bufor_kampanii: 12000
   min_sila_kampanii: 0.5
+  min_obsluga_promocji: 0.9
   cena_nasladowcy_bez_danych: 0.95
   krok_ceny: 0.5
   losuj_z_najlepszych_kandydatow: 3
@@ -40,6 +43,8 @@ strategie:
     szkolenia: 0
     kampanie:
     - papier_przyjmie/ulotki
+    promocje:
+    - {typ: zestaw, nazwa: Zestaw Złotego Środka}
   tani:
     nazwa: Tani Kebab Nocny
     cena: 0.78
@@ -56,6 +61,9 @@ strategie:
     kampanie:
     - papier_przyjmie/ulotki
     - lajk/grupa_osiedlowa
+    promocje:
+    - {typ: happy_hours, nazwa: Tanie Godziny Nocnego}
+    - {typ: studencka, nazwa: Indeks Głodomora}
   premium:
     nazwa: Kebab Premium
     cena: 1.08
@@ -72,6 +80,8 @@ strategie:
     kampanie:
     - lajk/influencer
     - fala_koziolka/billboard
+    promocje:
+    - {typ: karta, nazwa: Złota Karta Sułtana}
   agresywny:
     nazwa: Kebab Głośny Marketing
     cena: 0.8
@@ -96,6 +106,9 @@ strategie:
     - fala_koziolka/radio
     - kozi_grod/degustacja
     - kozi_grod/noc_kebaba
+    promocje:
+    - {typ: dwa_za_jeden, nazwa: Podwójny Cios}
+    - {typ: happy_hours, nazwa: Godzina Szału}
   nasladowca:
     nazwa: Kebab Naśladowca
     cena: null

@@ -38,7 +38,10 @@ a duży zapas z krótkim terminem może wywołać telefon z banku żywności. **
 `dane/mapa/reklama.yaml`): w grze z lokalami zamiast reklamy tradycyjnej i internetowej z Revasa – cztery agencje na
 mapie (druk, internet, radio i billboardy, wydarzenia), kampania = agencja × kanał × strefa; poszerza pulę klientów
 strefy i przyciąga jej mieszkańców do firmy, kampanie tego samego rodzaju w strefie się zagłuszają, powtórka zaraz
-po poprzedniej działa słabiej, po końcu efekt wygasa. **Analiza** liczy przewidywany wynik rundy
+po poprzedniej działa słabiej, po końcu efekt wygasa. **Promocje** (`silnik/promocje.py`, `dane/mapa/promocje.yaml`):
+2 za 1, zestaw z napojem, happy hours, karta stałego klienta i zniżka studencka z własną, ozdobną nazwą drużyny;
+przyciągają objętych klientów (dni tygodnia, strefy), ale obcinają cenę (rabat, porcje gratis), trwają do
+wyłączenia, a ich siła z czasem słabnie albo (karta) rośnie. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
 **Panel mistrza gry** – http://127.0.0.1:8765/mg/ (tylko rola mistrza gry): nowa gra

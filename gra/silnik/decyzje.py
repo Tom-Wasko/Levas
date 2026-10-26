@@ -26,6 +26,8 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     internet_uruchom / internet_wylacz: [narzędzie]
     kampanie:          [{"agencja", "kanal", "strefa"}]     – gra z lokalami: agencje reklamowe zamiast dwóch
                                                               powyższych (silnik/reklama.py, dane/mapa/reklama.yaml)
+    promocje:          [{"typ", "nazwa", "danie"}]          – gra z lokalami: pełna lista włączonych promocji, nazwa
+                                                              ozdobna (silnik/promocje.py, dane/mapa/promocje.yaml)
     szkolenia:         [{"firma", "szkolenie"}]
     bank, biuro:       nazwa (z lokalami biuro: id z dane/mapa/biura.yaml albo "samodzielnie")
     ksiegowosc:        {"zapisy": {id dokumentu: {"kolumna", "stawka"}}, "deklaracja": {"vat", "pit", "zdrowotna"}}
@@ -41,6 +43,7 @@ from datetime import timedelta
 from . import biuro as bo
 from . import czas_wlasciciela as cw
 from . import limity as lm
+from . import promocje as pm
 from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
@@ -311,6 +314,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     agencje = lokale and rk.zasady(dane) is not None
     if agencje:
         info["kampanie"] = rk.zamow(dane, firma, d, runda, ksiega, rachunek)
+    if lokale and pm.zasady(dane):
+        info["promocje"] = pm.ustaw(dane, firma, d, runda, ksiega, rachunek)
     if "marketing_tradycyjny" in odbl and not agencje:
         from .rynek import koszt_emisji
         media = dane.dostepne("media_tradycyjne", runda)
@@ -383,6 +388,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("czerwony", "zatrudnienie", tekst)
         for tekst in ((info or {}).get("kampanie") or {}).get("uwagi", []):
             dodaj("czerwony", rk.ZAKLADKA, tekst)
+        for tekst in ((info or {}).get("promocje") or {}).get("uwagi", []):
+            dodaj("czerwony", pm.ZAKLADKA, tekst)
         for b in bo.bledy(dane, firma, d):
             dodaj(b["poziom"], b["zakladka"], b["tekst"])
         # przekroczenia odrzuca zapis decyzji (API), a przeliczenie przycina – tu czerwone są w uwagach rynku pracy i lokali

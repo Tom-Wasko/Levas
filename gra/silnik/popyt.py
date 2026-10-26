@@ -25,6 +25,7 @@ from datetime import date, timedelta
 import numpy as np
 
 from . import menu
+from . import promocje as pm
 from . import reklama as rk
 from . import swiezosc as sw
 from .dane import Dane
@@ -129,20 +130,36 @@ def atrakcyjnosc(dane: Dane, strefa_klienta: str, usluga: str, o: dict) -> float
             * (1 + o.get("reklama", 0.0) + (o.get("reklama_strefy") or {}).get(strefa_klienta, 0.0)))
 
 
+def _promocje_strefy(o: dict, strefa_klienta: str) -> list[dict]:
+    return [e for e in o.get("promocje") or () if e["strefy"] is None or strefa_klienta in e["strefy"]]
+
+
 def podzial(dane: Dane, pule_rundy: dict, oferty: dict[str, dict[tuple[str, str], dict]]) -> dict:
-    """Podział pul stref między lokale. oferty: {danie: {(firma, lokal): oferta}} (oferta jak w `atrakcyjnosc`).
-    Zwraca {(firma, lokal): {danie: {"dni": np.ndarray, "strefy": {strefa: suma}}}} – wartości ułamkowe."""
+    """Podział pul stref między lokale. oferty: {danie: {(firma, lokal): oferta}} (oferta jak w `atrakcyjnosc`,
+    opcjonalnie "promocje" – efekty z promocje.efekty_ofert: przyciąganie objętych klientów w dniach z maski).
+    Zwraca {(firma, lokal): {danie: {"dni": np.ndarray, "strefy": {strefa: suma}, "porcje": np.ndarray,
+    "objeci": {typ promocji: np.ndarray}}}} – wartości ułamkowe; porcje – klienci + porcje gratis (2 za 1)."""
     a0 = dane.mapa["popyt"]["model"]["opcja_zewnetrzna"]
     wynik: dict = {}
     for u, lokale in oferty.items():
         for z, pz in pule_rundy.items():
-            a = {k: atrakcyjnosc(dane, z, u, o) for k, o in lokale.items()}
+            a = {}
+            for k, o in lokale.items():
+                a[k] = atrakcyjnosc(dane, z, u, o)
+                for e in _promocje_strefy(o, z):
+                    a[k] = a[k] * (1 + e["przyciaganie"] * e["maska"])
             mianownik = a0 + sum(a.values())
             for k, ak in a.items():
                 klienci = pz[u] * ak / mianownik
-                w = wynik.setdefault(k, {}).setdefault(u, {"dni": np.zeros(len(pz[u])), "strefy": {}})
+                w = wynik.setdefault(k, {}).setdefault(u, {"dni": np.zeros(len(pz[u])), "strefy": {},
+                                                           "porcje": np.zeros(len(pz[u])), "objeci": {}})
                 w["dni"] = w["dni"] + klienci
+                w["porcje"] = w["porcje"] + klienci
                 w["strefy"][z] = float(klienci.sum())
+                for e in _promocje_strefy(lokale[k], z):
+                    objeci = klienci * e["maska"]
+                    w["objeci"][e["typ"]] = w["objeci"].get(e["typ"], 0.0) + objeci
+                    w["porcje"] = w["porcje"] + objeci * (e["porcje"] - 1)
     return wynik
 
 
@@ -173,8 +190,10 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                  reklama: dict[str, float] | None = None) -> dict:
     """Popyt i obsługa w grze z lokalami. oferty: {firma: {lokal: {danie: oferta}}} (z `oferty_lokali`).
     Zwraca {"popyt": {firma: {danie: n}}, "obsluga": {firma: wynik jak operacje.obsluz}, "klienci": {firma: …},
-    "rynek": {danie: {firma: {"popyt", "skladniki"}}}, "strefy": {…}, "swiezosc": {firma: …}} – dane do wyników
-    i zakładek „Klienci” oraz „Magazyn i świeżość”. reklama – poszerzenie pul stref (jak w `pule`)."""
+    "rynek": {danie: {firma: {"popyt", "skladniki"}}}, "strefy": {…}, "swiezosc": {firma: …},
+    "promocje": {firma z promocjami: {"przychod": {danie: zł brutto}, "doplaty", "koszt_dodatkow", "typy"}}} – dane do
+    wyników i zakładek „Klienci” oraz „Magazyn i świeżość”. reklama – poszerzenie pul stref (jak w `pule`).
+    Popyt i sprzedaż – w porcjach (2 za 1: dwie porcje na klienta)."""
     dni = dni_rundy(dane, runda)
     pr = pule(dane, runda, ziarno, reklama)
     po_daniach: dict = {}
@@ -184,7 +203,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                 po_daniach.setdefault(u, {})[(f, lok)] = o
     pod = podzial(dane, pr, po_daniach)
 
-    popyt, obsluga, klienci, rynek, swiezosc = {}, {}, {}, {}, {}
+    popyt, obsluga, klienci, rynek, swiezosc, promocje = {}, {}, {}, {}, {}, {}
     zrodla: dict[str, dict[str, float]] = {}
     for f, lokale in oferty.items():
         firma = firmy[f]
@@ -193,8 +212,11 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         lokale_wynik, przyczyny = [], {}
         laczna = {"obsluzeni": {}, "utracona": {}, "reklamacje": {}, "zuzyte_zasoby": {}, "godziny_stanowisk": {},
                   "godziny_recepcji": 0.0, "liczba_recepcjonistow": 0, "godziny_sprzetu": {}}
-        dzien_popyt = {lok: [{u: int(round(pod[(f, lok)][u]["dni"][i])) for u in dania} for i in range(len(dni))]
+        dzien_popyt = {lok: [{u: int(round(pod[(f, lok)][u]["porcje"][i])) for u in dania} for i in range(len(dni))]
                        for lok, dania in lokale.items()}
+        promo = None
+        if any(o.get("promocje") for dania in lokale.values() for o in dania.values()):
+            promo = promocje[f] = {"przychod": {}, "doplaty": 0.0, "koszt_dodatkow": 0.0, "typy": {}}
         widoki = {lok: widok_lokalu(firma, lok) for lok in lokale}
         sprzedaz_lokalu = {lok: 0 for lok in lokale}
         raport = _raport_swiezosci(dane, firma, dni)
@@ -230,6 +252,8 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     dzienne[u]["popyt"][i] += d[u]
                     dzienne[u]["sprzedaz"][i] += k
                     sprzedaz_lokalu[lok] += k
+                    if promo is not None:
+                        _rozlicz_promocje(promo, u, k, lokale[lok][u], pod[(f, lok)][u], i)
                     if o["utracona"][u]:
                         p = przyczyny.setdefault(u, {})
                         p[o["przyczyna"][u]] = p.get(o["przyczyna"][u], 0) + o["utracona"][u]
@@ -280,7 +304,23 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         strefy[z] = {"pula": sum(dzien), "dni": dzien,
                      "klienci": {f: int(round(x)) for f, x in sorted(zrodla.get(z, {}).items())}}
     return {"popyt": popyt, "obsluga": obsluga, "klienci": klienci, "rynek": rynek, "swiezosc": swiezosc,
-            "strefy": {"strefy": strefy, "dni": [d.isoformat() for d in dni], "wydarzenia": wydarzenia(dane, dni)}}
+            "strefy": {"strefy": strefy, "dni": [d.isoformat() for d in dni], "wydarzenia": wydarzenia(dane, dni)},
+            "promocje": promocje}
+
+
+def _rozlicz_promocje(promo: dict, u: str, k: int, o: dict, w: dict, i: int) -> None:
+    """Sprzedaż dania w lokalu w dniu i: przychód z rabatami promocji, dopłaty, koszt dodatków, liczby objętych."""
+    if not o.get("promocje"):
+        promo["przychod"][u] = promo["przychod"].get(u, 0.0) + k * o["cena"]
+        return
+    x = pm.rozlicz(k, o["cena"], float(w["dni"][i]), {t: float(v[i]) for t, v in w["objeci"].items()}, o["promocje"])
+    promo["przychod"][u] = promo["przychod"].get(u, 0.0) + x["przychod"]
+    promo["doplaty"] += x["doplaty"]
+    promo["koszt_dodatkow"] += x["koszt_dodatkow"]
+    for t, v in x["typy"].items():
+        acc = promo["typy"].setdefault(t, {})
+        for kl, n in v.items():
+            acc[kl] = acc.get(kl, 0.0) + n
 
 
 def _wiersz(n: int) -> dict:
@@ -309,7 +349,7 @@ def _zakoncz_raport(raport: dict) -> dict:
 
 def prognoza(dane: Dane, runda: int, oferty: dict[str, dict[str, dict]], firma: str,
              reklama: dict[str, float] | None = None) -> dict:
-    """Oczekiwany popyt (bez szumu) lokali firmy w rundzie: {"dania": {danie: n}, "lokale": {lokal: {danie: n}},
+    """Oczekiwany popyt w porcjach (bez szumu) lokali firmy w rundzie: {"dania": {danie: n}, "lokale": {lokal: {danie: n}},
     "dni": [n …]}. oferty jak w `rynek_lokali` – konkurenci z danych publicznych (ceny z poprzedniej rundy)."""
     po_daniach: dict = {}
     for f, lokale in oferty.items():
@@ -322,10 +362,10 @@ def prognoza(dane: Dane, runda: int, oferty: dict[str, dict[str, dict]], firma: 
         if f != firma:
             continue
         for u, w in x.items():
-            n = float(w["dni"].sum())
+            n = float(w["porcje"].sum())
             dania[u] = dania.get(u, 0.0) + n
             lokale.setdefault(lok, {})[u] = round(n, 1)
-            dni = w["dni"] if dni is None else dni + w["dni"]
+            dni = w["porcje"] if dni is None else dni + w["porcje"]
     return {"dania": {u: round(n, 1) for u, n in dania.items()}, "lokale": lokale,
             "dni": [round(float(x), 1) for x in dni] if dni is not None else []}
 
@@ -367,6 +407,8 @@ def oferty_konkurencji(dane: Dane, stan, runda: int, firma: str) -> dict[str, di
             for u in dania:
                 c = ceny.get(u, {}).get(n) or dane.uslugi[u]["cena_preferowana"] * dane.mapa["popyt"]["strefy"][strefa]["cena"]
                 wynik.setdefault(n, {}).setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": c, "jakosc": (2, 2, 2)}
+        if n in wynik:
+            pm.efekty_ofert(dane, g, wynik[n], runda, dni_rundy(dane, runda))   # promocje są widoczne na mieście
     return wynik
 
 
@@ -399,6 +441,7 @@ def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float 
             if q is None:
                 zalozone.append(f"{lok.id}|{u}")
             moje.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q or (2, 2, 2), **wspolne}
+    pm.efekty_ofert(dane, firma, moje, r, dni)
     prog = prognoza(dane, r, {**konkurencja, firma.nazwa: moje}, firma.nazwa, pula_rekl)
     w_menu = {lok: {u: o for u, o in x.items() if u in dania} for lok, x in moje.items()}
     prog["dni"] = prognoza(dane, r, {**konkurencja, firma.nazwa: w_menu}, firma.nazwa, pula_rekl)["dni"]  # tylko dania menu

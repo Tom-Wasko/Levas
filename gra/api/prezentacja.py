@@ -8,6 +8,7 @@ from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
 from silnik import lichwiarz as lw
 from silnik import magazyn as mag
+from silnik import promocje as pm
 from silnik import reklama as rk
 from silnik import rozliczenie as rz
 from silnik import rynek_pracy as rp
@@ -188,6 +189,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
         zam = ((info.get("kampanie") or {}) if edycja else (stan.wyniki[runda][firma].get("reklama_agencje") or {}))
         v["reklama"] = rk.widok(dane, f, runda, poprzedni.rynek.get(runda - 1), zam.get("zamowione"))
+        if pm.zasady(dane):
+            v["promocje"] = pm.widok(dane, f, runda, poprzedni.rynek.get(runda - 1),
+                                     info.get("promocje") if edycja else stan.wyniki[runda][firma].get("promocje"))
         if dane.zdarzenia:
             v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
         fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)

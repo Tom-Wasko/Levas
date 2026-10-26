@@ -13,6 +13,7 @@ from . import banki as bk
 from . import biuro as bo
 from . import lokale as lk
 from . import popyt as pp
+from . import promocje as pm
 from . import reklama as rk
 from . import rynek_pracy as rp
 from . import zdarzenia as zd
@@ -83,6 +84,29 @@ def _kampanie(dane: Dane, f: Firma, st: dict, runda: int, ust: dict) -> list[dic
             wynik.append({"agencja": a, "kanal": k, "strefa": s})
             wydatki += koszt
     return wynik
+
+
+def _promocje(dane: Dane, f: Firma, st: dict, runda: int, d: dict, bufor: bool, poprzednie: dict | None,
+              ust: dict) -> list[dict] | None:
+    """Promocje ze strategii (nowe tylko z buforem gotówki); danie – trwającej promocji albo najdroższe w sprzedaży.
+
+    Bot, który w poprzedniej rundzie nie obsłużył prawie całego popytu, promocje wyłącza – brakuje mu rąk albo
+    lokalu, więc promocja dałaby tylko rabat."""
+    R = pm.zasady(dane)
+    if not R or not f.lokale or runda < R["od_rundy"]:
+        return None
+    sp = (poprzednie or {}).get("sprzedaz", {}).values()
+    popyt = sum(v["popyt"] for v in sp)
+    if not popyt or sum(v["sprzedaz"] for v in sp) < ust["min_obsluga_promocji"] * popyt:   # bez danych – też nie
+        return []
+    sprz = d.get("sprzedaz") or {u: {"cena": c.cena} for u, c in f.ceny.items()}
+    trwa = {p.typ: p.danie for p in f.promocje}
+    wynik = []
+    for x in st.get("promocje", []):
+        danie = trwa.get(x["typ"]) if trwa.get(x["typ"]) in sprz else max(sprz, key=lambda u: sprz[u]["cena"], default=None)
+        if (x["typ"] in trwa or bufor) and danie:
+            wynik.append({"typ": x["typ"], "nazwa": x["nazwa"], "danie": danie})
+    return wynik[:R["limit_aktywnych"]]
 
 
 def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict) -> dict:
@@ -227,6 +251,9 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     agencje = lokale and rk.zasady(dane) is not None   # gra z lokalami: kampanie agencji zamiast reklamy z Revasa
     if agencje:
         d["kampanie"] = _kampanie(dane, f, st, runda, ust)
+    poprzednie = stan.wyniki.get(runda - 1, {}).get(nazwa)
+    if lokale and (promo := _promocje(dane, f, st, runda, d, bufor, poprzednie, ust)) is not None:
+        d["promocje"] = promo
     if "marketing_tradycyjny" in odbl and bufor and not agencje:
         d["reklama_tradycyjna"] = {n: e for n, e in st["reklama"].items() if n in dane.dostepne("media_tradycyjne", runda)}
     if "marketing_internetowy" in odbl and bufor and not agencje:

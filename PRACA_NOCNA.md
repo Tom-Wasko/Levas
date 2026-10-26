@@ -115,6 +115,16 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    mieście, ale słabiej. W grze z lokalami **nie ma** już reklamy tradycyjnej i internetowej z Revasa (zakładki
    ukryte). Czy tak? (zapisane 26.10)
 
+15. **Promocje (F3b.3).** Liczby do sprawdzenia (`dane/mapa/promocje.yaml`): 2 za 1 – przyciąganie +50% → min. +20%
+   (−8 pp./rundę), koszt włączenia 150 zł; zestaw – dopłata 4 zł brutto, napój 1,80 zł netto, +18% → +10%, 100 zł;
+   happy hours pn–czw −20%, +35% → +20%, 120 zł; karta −10%, +5% → +22% (+3 pp./rundę), 400 zł; zniżka studencka −15%,
+   +40% (stałe), tylko mieszkańcy Akademickich i Politechniki, 80 zł. Najwyżej 2 promocje naraz, od rundy 2.
+   Dopłata do zestawu idzie jako sprzedaż napoju (VAT 23%), nie dania (8%). Popyt w Wynikach przy 2 za 1 liczony
+   w porcjach (klient bierze dwie). Obserwacja: boty prawie zawsze mają za mało kuchni (obsługują 50–70% popytu),
+   a wtedy promocja tylko obcina cenę – w grze 4 botów promocje zmniejszały przychód o 5–30%; dlatego boty
+   włączają promocje dopiero, gdy w poprzedniej rundzie obsłużyły ≥ 90% popytu (w praktyce rzadko). To lekcja dla
+   graczy („promocja, gdy masz wolne moce”), ale może warto osłabić rabaty? Czy tak? (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -329,3 +339,6 @@ _brak_
 - 26.10 – kapitał 40 000 zł, poprawione 4 notatki (zgoda użytkownika), sortowanie tabel i oferty lokali. Boty przy 40 000 zł nie schodzą poniżej ok. 18 000 zł gotówki (2 ziarna × 26 rund). Dalej: magazyn (wynajem chłodni, sanepid, bank żywności).
 - 26.10 – magazyn gotowy: wynajęta chłodnia, sanepid z mandatami poza KPiR, bank żywności, bez zwrotów i kosztu magazynowania w grze z lokalami; pytanie 13. Start F3b.2.
 - 26.10 – F3b.2 gotowe: agencje reklamowe (4 agencje, 8 kanałów, zagłuszanie, nasycenie, wygasanie), zakładka Agencje reklamowe, boty z kampaniami; pytanie 14. Start F3b.3 (promocje).
+- 27.10 – F3b.3 gotowe: promocje (5 rodzajów z ozdobną nazwą, znużenie i przywiązanie, 2 za 1 z podwójnymi porcjami,
+  zestaw z dopłatą i VAT napoju), zakładka Promocje, boty z promocjami tylko przy wolnych mocach; pytanie 15.
+  Start F3b.4 (licytacje i przejęcia).

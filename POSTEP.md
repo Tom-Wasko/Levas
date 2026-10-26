@@ -70,4 +70,17 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   strefie, konkurencja; Wyniki: raporty agencji, efekty kampanii, kampanie na mieście z wykresem); podzakładki
   ukryte w menu nie są pokazywane; test `test_reklama.py`
 
-Zadania F3b.3–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3b.3 Promocje (gra z lokalami) – `dane/mapa/promocje.yaml`: 5 rodzajów (2 za 1 i zestaw z napojem na jedno
+  danie; happy hours pn–czw, karta stałego klienta, zniżka studencka dla stref Akademickie i Politechnika – na całe
+  menu), od rundy 2, najwyżej 2 naraz, każdy rodzaj raz; ozdobna nazwa drużyny (do 40 znaków, bez wpływu na wynik),
+  po 2 komiczne teksty na rodzaj; `silnik/promocje.py`: decyzja `promocje: [{typ, nazwa, danie}]` (pełna lista,
+  bez klucza – trwają), koszt włączenia netto + VAT 23% (KPiR – pozostałe), zmiana nazwy bez kosztu, zmiana dania =
+  nowa promocja, danie zdjęte ze sprzedaży wyłącza promocję; w popycie (`popyt.podzial`) przyciąganie ×(1 +
+  przyciąganie) u objętych klientów w dniach z maski, 2 za 1 – podwójne porcje (składniki i czas kuchni); przychód
+  z rabatami, dopłaty do zestawu jako sprzedaż napojów (VAT napoju), napoje do zestawów w towarach; znużenie
+  (przyciąganie spada co rundę) i przywiązanie (karta rośnie); dane rynku: promocje na mieście; boty ze strategii
+  (`boty.yaml: promocje`, `min_obsluga_promocji` – bez wolnych mocy promocji nie włączają); zakładka **Promocje**
+  w Marketingu (Decyzje: rodzaje z liczbami, włącz/wyłącz, nazwa, danie, konkurencja; Wyniki: komiczne teksty,
+  liczby promocji, promocje na mieście); test `test_promocje.py`
+
+Zadania F3b.4–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

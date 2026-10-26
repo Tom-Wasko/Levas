@@ -179,3 +179,77 @@ export const agencje = {
     }),
   },
 };
+
+function listaPromocji(v) {
+  return v.decyzje.promocje ?? (v.promocje?.aktywne || []).map(({ typ, nazwa, danie }) => ({ typ, nazwa, danie }));
+}
+
+function promocjaHtml(v, R, t, edycja) {
+  const lista = listaPromocji(v), moja = lista.find((x) => x.typ === t.id), akt = R.aktywne.find((x) => x.typ === t.id);
+  const dostepna = v.runda >= R.od_rundy, pelno = !moja && lista.length >= R.limit;
+  const dis = edycja && dostepna ? "" : "disabled";
+  const inni = Object.entries(R.konkurencja).filter(([, l]) => l.some((x) => x.typ === t.id)).map(([f]) => esc(nazwaFirmy(v, f)));
+  const wiersz = (a, b) => `<div class="wiersz"><span>${a}</span><span>${b}</span></div>`;
+  const przyc = t.przyrost ? `${proc(t.przyciaganie, 0)} → ${proc(t.przyrost < 0 ? t.przyciaganie_min : t.przyciaganie_max, 0)} (${t.przyrost < 0 ? "znużenie" : "przywiązanie"} ${proc(Math.abs(t.przyrost), 0)}/rundę)` : proc(t.przyciaganie, 0);
+  const przycisk = !dostepna ? `Dostępne od rundy ${R.od_rundy}` : moja ? "✓ Włączona (wyłącz)" : pelno ? `Limit ${R.limit} promocji` : "Włącz";
+  return `<div class="kafel ${moja ? "wybrany" : ""} ${dostepna ? "" : "niedostepny"}"><div class="kg">${esc(t.nazwa)}
+      <span class="pigulka inf">${t.zakres === "danie" ? "jedno danie" : "całe menu"}</span></div><div class="kt">
+    <p class="podpowiedz">${esc(t.opis)}</p>
+    ${t.rabat ? wiersz("Rabat dla objętych", proc(t.rabat, 0)) : ""}
+    ${t.porcje > 1 ? wiersz("Porcji na klienta", `${t.porcje} (składniki i kuchnia ×${t.porcje})`) : ""}
+    ${t.doplata ? wiersz("Dopłata klienta / koszt dodatku", `${zl(t.doplata)} / ${zl(t.koszt_dodatku)} netto`) : ""}
+    ${wiersz("Przyciąganie objętych klientów", `+${przyc}`)}
+    ${t.dni ? wiersz("Dni", esc(t.dni.join(", "))) : ""}
+    ${t.strefy ? wiersz("Klienci ze stref", esc(t.strefy.join(", "))) : ""}
+    ${wiersz("Koszt włączenia (netto)", zl(t.koszt_startu))}
+    ${akt ? wiersz("Trwa od rundy", `${akt.od_rundy}${akt.nowa ? " (nowa)" : ""}, teraz +${proc(akt.przyciaganie, 0)}`) : ""}
+    ${inni.length ? wiersz("U konkurencji (poprzednia runda)", inni.join(", ")) : ""}
+    ${moja ? `<label class="pole">Twoja nazwa promocji<input type="text" maxlength="${R.nazwa_max}" value="${esc(moja.nazwa)}" data-zmiana="promocja-nazwa" data-t="${t.id}" ${dis}></label>
+      ${t.zakres === "danie" ? `<label class="pole">Danie<select data-zmiana="promocja-danie" data-t="${t.id}" ${dis}>${R.dania.map((u) =>
+        `<option value="${u.id}" ${u.id === moja.danie ? "selected" : ""}>${esc(u.nazwa)}</option>`).join("")}</select></label>` : ""}` : ""}</div>
+    <div class="kd"><button class="btn ${moja ? "zielony" : "czarny"}" data-akcja="promocja" data-t="${t.id}" ${dis} ${pelno ? "disabled" : ""}>${przycisk}</button></div></div>`;
+}
+
+export const promocje = {
+  tytul: "Promocje", tytulPelny: "Marketing - promocje", ikona: "procent",
+  odblokowanie: (v) => !!v.promocje && v.runda >= v.promocje.od_rundy, ukryta: (v) => !v.promocje,
+  info: () => `Włącz promocję z listy i nadaj jej własną, ozdobną nazwę (nazwa nie wpływa na wynik – tylko na humor klientów).
+    Promocja przyciąga objętych nią klientów, ale obcina cenę: włączaj ją, gdy masz wolne ręce w kuchni i miejsca w lokalu.
+    Trwa, dopóki jej nie wyłączysz; zmiana nazwy jest darmowa, zmiana dania to nowa promocja (znów koszt włączenia).`,
+  decyzje({ v, edycja }) {
+    const R = v.promocje;
+    if (!R) return `<p class="podpowiedz">Promocje działają w grze z lokalami.</p>`;
+    const lista = listaPromocji(v);
+    let html = `<div class="pasek ciemny"><span>Włączone promocje: <span class="kwota">${lista.length} / ${R.limit}</span></span>
+      <span>Koszt nowych (netto): <span class="kwota">${zl((R.nowe || []).reduce((s, x) => s + (R.rodzaje.find((t) => t.id === x.typ)?.koszt_startu || 0), 0))}</span></span></div>`;
+    html += `<div class="siatka trojka" style="margin-top:10px">${R.rodzaje.map((t) => promocjaHtml(v, R, t, edycja)).join("")}</div>`;
+    return html;
+  },
+  wyniki({ v, kat }) {
+    const W = v.wyniki?.promocje;
+    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie z promocją.</p>`;
+    let html = W.promocje.filter((x) => x.tekst).map((x) => `<div class="kafel"><div class="kg">${esc(x.rodzaj)} „${esc(x.nazwa)}”</div>
+      <div class="kt"><p>${esc(x.tekst)}</p></div></div>`).join("");
+    html += W.promocje.length ? tabela("Twoje promocje w tej rundzie", ["Promocja", "Nazwa", "Danie", "Rund", "Przyciąganie", "Objętych porcji", "Rabat", "Porcje gratis", "Dopłaty", "Koszt dodatków"],
+      W.promocje.map((x) => [esc(x.rodzaj), `„${esc(x.nazwa)}”`, x.danie ? esc(nazwaUslugi(kat, x.danie)) : "całe menu", x.rund, `+${proc(x.przyciaganie, 0)}`,
+        licz(x.objeci), zl(x.rabat), licz(x.gratis), zl(x.doplaty), zl(x.koszt_dodatkow)]), { klasy: ["l", "l", "l"] })
+      : `<p class="podpowiedz">W tej rundzie nie działała żadna Twoja promocja.</p>`;
+    if (W.wylaczone?.length) html += `<p class="podpowiedz">Wyłączone: ${W.wylaczone.map((x) => `„${esc(x.nazwa)}”`).join(", ")}.</p>`;
+    const k = v.rynek?.promocje || {};
+    html += tabela("Promocje na mieście (plakaty na drzwiach lokali)", ["Firma", "Promocje"],
+      Object.entries(k).map(([f, l]) => [esc(nazwaFirmy(v, f)), l.map((y) => `${esc(y.rodzaj)} „${esc(y.nazwa)}”${y.danie ? ` – ${esc(nazwaUslugi(kat, y.danie))}` : ""}`).join(", ")]),
+      { klasy: ["l", "l"] });
+    return html;
+  },
+  zmiany: {
+    "promocja-nazwa": (el, c) => c.zmien((d) => { d.promocje = listaPromocji(c.v).map((x) => x.typ === el.dataset.t ? { ...x, nazwa: el.value } : x); }),
+    "promocja-danie": (el, c) => c.zmien((d) => { d.promocje = listaPromocji(c.v).map((x) => x.typ === el.dataset.t ? { ...x, danie: el.value } : x); }),
+  },
+  akcje: {
+    promocja: (el, c) => c.zmien((d) => {
+      const l = listaPromocji(c.v), t = c.v.promocje.rodzaje.find((x) => x.id === el.dataset.t);
+      d.promocje = l.some((x) => x.typ === t.id) ? l.filter((x) => x.typ !== t.id)
+        : [...l, { typ: t.id, nazwa: t.nazwa, danie: t.zakres === "danie" ? c.v.promocje.dania[0]?.id ?? null : null }];
+    }),
+  },
+};

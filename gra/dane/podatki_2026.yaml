@@ -44,6 +44,10 @@ vat:
     stawka: 0.23
   - zawiera: Kampania reklamowa
     stawka: 0.23
+  - zawiera: Materiały promocyjne
+    stawka: 0.23
+  - zawiera: Napoje do zestawów
+    stawka: 0.23
   - zawiera: Szkolenie
     stawka: 0.23
   - zawiera: Koszty utrzymania

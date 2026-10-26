@@ -378,6 +378,11 @@ class PlikKatalogu(Schemat):
 # --- boty.yaml ---
 
 
+class PromocjaBota(Schemat):
+    typ: str
+    nazwa: str
+
+
 class Strategia(Schemat):
     nazwa: str
     cena: float | None  # ułamek ceny preferowanej; None = średnia rynku z poprzedniej rundy
@@ -390,12 +395,15 @@ class Strategia(Schemat):
     internet: list[str]
     szkolenia: int = Field(ge=0)
     kampanie: list[str] = Field(default_factory=list)   # gra z lokalami: "agencja/kanał" z mapa/reklama.yaml
+    promocje: list[PromocjaBota] = Field(default_factory=list)   # gra z lokalami: typy z mapa/promocje.yaml
 
 
 class UstawieniaBotow(Schemat):
     bufor_gotowki: float
     bufor_kampanii: float = Field(0, ge=0)   # gra z lokalami: gotówka, która musi zostać po kampaniach reklamowych
     min_sila_kampanii: float = Field(0, ge=0, le=1)   # słabszej (po powtórkach – nasycenie) bot nie zamawia
+    min_obsluga_promocji: float = Field(1, ge=0, le=1)   # promocje tylko, gdy w poprzedniej rundzie obsłużył taką
+                                                          # część popytu (kuchnia nie nadąża – promocja tylko ucina cenę)
     cena_nasladowcy_bez_danych: float = Field(gt=0)
     krok_ceny: float = Field(gt=0)
     losuj_z_najlepszych_kandydatow: int = Field(gt=0)
@@ -775,6 +783,44 @@ class PlikReklamy(Plik):
     agencje: dict[str, AgencjaReklamowa] = Field(min_length=1)
 
 
+class TypPromocji(Schemat):
+    nazwa: str
+    opis: str
+    zakres: Literal["danie", "wszystkie"]
+    dni: list[int] | None = None                 # dni tygodnia (0 = poniedziałek); brak – wszystkie
+    strefy_klientow: list[str] | None = None     # klienci z tych stref; brak – wszyscy
+    rabat: float = Field(0, ge=0, lt=1)
+    porcje: int = Field(1, ge=1)
+    doplata: float = Field(0, ge=0)              # zł brutto ponad cenę dania
+    koszt_dodatku: float = Field(0, ge=0)        # zł netto za objętego klienta
+    przyciaganie: float = Field(ge=0, lt=2)
+    przyrost: float = 0                          # zmiana przyciągania z każdą rundą trwania
+    przyciaganie_min: float = Field(ge=0)
+    przyciaganie_max: float = Field(ge=0, lt=2)
+    koszt_startu: float = Field(ge=0)            # netto
+    teksty: list[str] = Field(min_length=1)
+
+    @field_validator("dni")
+    @classmethod
+    def _dni(cls, v):
+        if v is not None and (not v or any(not 0 <= d <= 6 for d in v) or len(set(v)) != len(v)):
+            raise ValueError("dni: różne liczby 0–6 (0 = poniedziałek)")
+        return v
+
+    @model_validator(mode="after")
+    def _przedzial(self):
+        if not self.przyciaganie_min <= self.przyciaganie <= self.przyciaganie_max:
+            raise ValueError("przyciaganie poza przyciaganie_min–przyciaganie_max")
+        return self
+
+
+class PlikPromocji(Plik):
+    od_rundy: int = Field(ge=1)
+    limit_aktywnych: int = Field(ge=1)
+    nazwa_max: int = Field(ge=1)
+    typy: dict[str, TypPromocji] = Field(min_length=1)
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
@@ -785,6 +831,7 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "harpagon.yaml": PlikHarpagona,
     "biura.yaml": PlikBiur,
     "reklama.yaml": PlikReklamy,
+    "promocje.yaml": PlikPromocji,
 }
 
 # --- podatki_2026.yaml (gra z lokalami, F3a.11) ---

@@ -258,6 +258,14 @@ class Kampania(Model):
     sila: float = 1.0             # po nasyceniu (wcześniejsze kampanie w tym kanale i strefie)
 
 
+class Promocja(Model):
+    """Promocja z listy (silnik/promocje.py): trwa od rundy od_rundy, dopóki drużyna jej nie wyłączy."""
+    typ: str
+    nazwa: str                    # ozdobna nazwa drużyny – bez wpływu na wynik
+    danie: str | None = None      # zakres „danie”
+    od_rundy: int
+
+
 class Firma(Model):
     nazwa: str
     bot: str | None = None
@@ -286,6 +294,7 @@ class Firma(Model):
     historie: list[OtwartaHistoria] = Field(default_factory=list)   # eventy w parkach: ciągi dalsze
     efekty: list[Efekt] = Field(default_factory=list)
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
+    promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
     deklaracja: dict | None = None    # samodzielna księgowość: dokumenty i poprawne kwoty rundy (silnik/biuro.py)
     kredyt_odnawialny_gr: int = 0
