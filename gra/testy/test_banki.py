@@ -3,7 +3,7 @@ banku, kredyt na start bez historii, inwestycyjny pod zastaw (przejęcie po zale
 
 from copy import deepcopy
 
-from test_lokale import _gra, _lokal, _runda
+from test_lokale import _gra, _lokal, _netto, _runda
 
 from silnik import banki as bk
 from silnik.dane import dane_domyslne
@@ -43,7 +43,7 @@ def test_konto_terminal_i_prowizja_od_kart():
     assert info["oplaty"] == {"konto": 0, "terminal": 0, "prowizja": round(10000 * u["udzial_kart"] * 0.0079, 2)}
     s = _runda(g)
     assert _kpir(s, 2, "B", "Opłata za konto firmowe (PKO BP)")[0]["pozostale"] == g.dane.na_runde(20)
-    assert _kpir(s, 2, "B", "Abonament terminala")[0]["pozostale"] == g.dane.na_runde(49)
+    assert _kpir(s, 2, "B", "Abonament terminala")[0]["pozostale"] == _netto(g.dane.na_runde(49))
 
 
 def test_kredyt_na_start_bez_historii_a_obrotowy_wymaga_historii():
@@ -128,10 +128,10 @@ def test_leasing_sprzetu_raty_w_koszty_bez_sprzedazy_i_wykup():
     lea = f.leasingi[0]
     assert f.stanowisko("kuchnia", 2).sprzet["Rożen"] == 3 and not f.srodki_trwale
     assert lea.rata == bk.rata_annuitetowa(7000 * 0.9, 0.075, 26, 52)
-    assert _kpir(s, 2, "A", "Opłata wstępna leasingu")[0]["pozostale"] == 700
+    assert _kpir(s, 2, "A", "Opłata wstępna leasingu")[0]["pozostale"] == _netto(700)
     s = _runda(g, A={"sprzet_sprzedaj": [{"typ": "kuchnia", "nr": 2, "nazwa": "Rożen"}]})
     assert "Rożen" in s.firmy["A"].stanowisko("kuchnia", 2).sprzet
-    assert _kpir(s, 3, "A", "Rata leasingowa")[0]["pozostale"] == lea.rata
+    assert _kpir(s, 3, "A", "Rata leasingowa")[0]["pozostale"] == _netto(lea.rata)
     f = deepcopy(s.firmy["A"])
     f.leasingi[0].pozostalo_rat = 1
     info = bk.koniec_rundy(g.dane, f, 4, Ksiega(), Rachunek())

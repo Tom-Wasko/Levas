@@ -23,6 +23,7 @@ from . import lichwiarz as lw
 from . import lokale as lk
 from . import menu
 from . import popyt as pp
+from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import swiezosc as sw
 from .dane import KUCHNIA, Dane
@@ -85,7 +86,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                         "pracownicy": len(f.pracownicy), "uslugi": len(f.oferta)}
         for p in f.pracownicy.values():
             p.premia = 0.0
-        ksiegi[nazwa], rachunki[nazwa] = Ksiega(), Rachunek()
+        ksiegi[nazwa], rachunki[nazwa] = Ksiega(vat=rz.reguly_vat(dane) if tryb_lokali else None), Rachunek()
         # lokaty i kredyty na początku miesiąca, przed zakupami (historia rachunku ATH, luty: opłata za konto → lokata
         # 30 000 z salda 33 564 → stanowisko, sprzęt, … – saldo w trakcie miesiąca może być ujemne); bank wybrany
         # w tej rundzie działa od razu (ATH maj: zmiana na Gaz Bank i lokata 7%)
@@ -187,7 +188,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         for nazwa in nazwy:
             for u, k in obsluga[nazwa]["obsluzeni"].items():
                 ksieguj(s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], f"Sprzedaż: {dane.uslugi[u]['nazwa']}",
-                        k * oferty[u][nazwa]["cena"], "przychod")
+                        k * oferty[u][nazwa]["cena"], "przychod", stawka=rz.stawka_sprzedazy(dane, u))
     else:
         rynek = {}
 
@@ -206,7 +207,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         ksieguj(f, ks, rach, "Wynagrodzenia pracowników", dane.na_runde(sum(p.pensja for p in f.pracownicy.values())),
                 "wynagrodzenia")
         ksieguj(f, ks, rach, "Składki ZUS pracodawcy",
-                dane.na_runde(sum(p.pensja for p in etat)) * z["finanse"]["zus_pracodawcy"])
+                dane.na_runde(sum(p.pensja for p in etat)) * rz.zus_pracodawcy(dane, tryb_lokali))
         utrz_sprzetu = sum(dane.sprzet[n]["utrzymanie"][str(q)] for st in f.stanowiska for n, q in st.sprzet.items())
         ksieguj(f, ks, rach, "Koszty utrzymania sprzętu", dane.na_runde(utrz_sprzetu))
         ud, wy = dane.pozycje("udogodnienia"), dane.pozycje("wyposazenie")
@@ -237,8 +238,12 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             ksieguj(f, ks, rach, "Koszt biura rachunkowego", (len(ks.pozycje) + 1) * b["ksiegowanie"])
             ksieguj(f, ks, rach, "Obsługa kadrowo-płacowa",
                     dane.na_runde(len(etat) * b["etat"] + (len(f.pracownicy) - len(etat)) * b["zlecenie"]))
-        podatek = ks.podatek(z["finanse"]["podatek_cit"])
-        rach.zapisz(f, "Podatek dochodowy", -podatek)
+        if tryb_lokali:   # JDG: składki właściciela, zaliczka PIT i VAT (silnik/rozliczenie.py)
+            info[nazwa]["rozliczenie"] = rz.rozlicz(dane, f, r, ks, rach)
+            podatek = info[nazwa]["rozliczenie"]["zaliczka"] + info[nazwa]["rozliczenie"]["zdrowotna"]
+        else:
+            podatek = ks.podatek(z["finanse"]["podatek_cit"])
+            rach.zapisz(f, "Podatek dochodowy", -podatek)
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
         if tryb_lokali:
             bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
@@ -286,7 +291,7 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
     for dostawca, zakupy in info["zakupy_zasobow"].items():
         if not (d.get("zwrot_nadmiaru") or {}).get(dostawca):
             continue
-        wartosc = 0.0
+        wartosc, stawki = 0.0, {}
         for zk in zakupy:
             k = f"{zk['zasob']}|{int(zk['jakosc'])}"
             ile = math.floor(min(float(zk["ilosc"]), f.magazyn.get(k, 0.0)) + 1e-9)
@@ -298,13 +303,17 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
                 f.magazyn[k] -= ile
                 f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
             wartosc += ile * zk["cena"]
+            sv = rz.stawka_zasobu(dane, zk["zasob"]) or 0.0
+            stawki[sv] = stawki.get(sv, 0.0) - ile * zk["cena"]
             wynik[zk["zasob"]] = wynik.get(zk["zasob"], 0.0) + ile
         if wartosc <= 0:
             continue
         opis_zakupu = f"Zakup zasobu od dostawcy: {dostawca}"
+        # z VAT: korekta w rejestrze zakupów (ujemny VAT naliczony), KPiR maleje o netto
+        vat = ks.zarejestruj(f"Korekta – zwrot zasobów do dostawcy: {dostawca}", stawki, False) if ks.vat is not None else 0.0
         for p in ks.pozycje:
             if p["opis"] == opis_zakupu:
-                p["towary"] = round(p["towary"] - wartosc, 2)
+                p["towary"] = round(p["towary"] - wartosc - vat, 2)
                 break
         rach.zapisz(f, f"Zwrot zasobów do dostawcy: {dostawca}", round(wartosc, 2))
         ksieguj(f, ks, rach, f"Koszt zwrotu zasobów do dostawcy:  {dostawca}", wartosc * koszt)
@@ -330,6 +339,9 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
          "rachunek": rach.operacje, "gotowka": f.gotowka, "kredyt_odnawialny": f.kredyt_odnawialny,
          "zadluzenie": zadluzenie(f), "lokaty": sum(l.kwota for l in f.lokaty), "lista_bledow": bledy,
          "reklama": info.get("reklama", {})}
+    if info.get("rozliczenie"):   # JDG: zamiast CIT – zaliczka PIT i składka zdrowotna; rejestr VAT
+        w["kpir"].update(podatek=round(ks.dochod - netto, 2), dochod_netto=netto)
+        w["rozliczenie"], w["vat"] = info["rozliczenie"], rz.rejestr(ks)
 
     # sprzedaż
     sprzedaz = {}

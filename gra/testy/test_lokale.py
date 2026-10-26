@@ -8,6 +8,7 @@ from test_dane import _kopia, _zmien
 
 from silnik import Gra
 from silnik.dane import dane_domyslne, sprawdz
+from silnik.finanse import vat_z_brutto
 
 INDEX_JS = Path(__file__).parents[1] / "panel_gracza" / "static" / "zakladki" / "index.js"
 
@@ -24,6 +25,11 @@ def _runda(g, **decyzje):
 
 def _lokal(id_, forma="najem"):
     return {"lokal": {"id": id_, "forma": forma}}
+
+
+def _netto(brutto, stawka=0.23):
+    """Kwota w KPiR gry z lokalami: ceny są brutto, VAT idzie do rejestru (F3a.11)."""
+    return round(brutto - vat_z_brutto(brutto, stawka), 2)
 
 
 def _rachunek(s, r, firma, poczatek):
@@ -48,7 +54,7 @@ def test_najem_gotowego_lokalu_kaucja_czynsz_i_sprzet_wynajmujacego():
     kaucja = dane.mapa["zasady"]["kaucja_miesiecy"] * lok["czynsz"]
     assert _rachunek(s, 1, "A", "Kaucja za lokal") == [-kaucja]
     kpir = {p["opis"]: p["pozostale"] for p in s.wyniki[1]["A"]["kpir"]["pozycje"]}
-    assert kpir[f"Czynsz najmu: {lok['adres']}"] == pytest.approx(dane.na_runde(lok["czynsz"]), abs=0.01)
+    assert kpir[f"Czynsz najmu: {lok['adres']}"] == pytest.approx(_netto(dane.na_runde(lok["czynsz"])), abs=0.01)
     assert any(o.startswith("Tygodniowy koszt utrzymania lokalu") for o in kpir)
     # zestaw sprzętu z lokalu: stanowiska działają od razu, sprzętu wynajmującego nie można sprzedać
     kuchnia = f.stanowisko("kuchnia", 1)

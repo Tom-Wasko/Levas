@@ -4,7 +4,7 @@ przypomnienia, odsetki karne, wizyty (szkody w lokalu, odpływ klientów, odejś
 from copy import deepcopy
 
 import numpy as np
-from test_lokale import _gra, _lokal, _rachunek, _runda
+from test_lokale import _gra, _lokal, _netto, _rachunek, _runda
 
 from silnik import lichwiarz as lw
 from silnik import zaleglosci as zg
@@ -80,7 +80,7 @@ def test_scenariusz_presji_krok_po_kroku():
         assert w["rodzaj"] in ("szkody", "klienci", "pracownik") and "{" not in w["tekst"]
         if w["rodzaj"] == "szkody":
             assert [p["pozostale"] for p in s.wyniki[r]["A"]["kpir"]["pozycje"]
-                    if p["opis"] == "Naprawa szkód w lokalu"] == [w["koszt"]]
+                    if p["opis"] == "Naprawa szkód w lokalu"] == [_netto(w["koszt"])]
     assert s.firmy["A"].harpagon.wizyty == 2
     assert not any(_kpir_harpagona(s, r, "A") for r in range(1, 10))
     s = _runda(g, A={"harpagon_splac": s.firmy["A"].harpagon.dlug})   # spłata kończy presję

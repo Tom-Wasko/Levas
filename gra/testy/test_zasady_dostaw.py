@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 import pytest
 from test_dane import _kopia, _zmien
-from test_lokale import _gra, _lokal, _runda
+from test_lokale import _gra, _lokal, _netto, _runda
 
 from silnik import dostawcy as dst
 from silnik import planowanie
@@ -84,7 +84,7 @@ def test_gra_odrzucone_zamowienie_i_oplata_za_dowoz():
     assert {(p.zasob, p.dostawa) for p in s.firmy["A"].partie if p.zasob != "Bułka"} == {("Tortilla", dni[3].isoformat())}
     assert any(b["poziom"] == "czerwony" and b["zakladka"] == "dostawcy" and "nie dowozi" in b["tekst"] for b in w["lista_bledow"])
     kpir = {p["opis"]: p for p in w["kpir"]["pozycje"]}
-    assert kpir["Koszt dostawy: Makro"]["pozostale"] == pytest.approx(79)
+    assert kpir["Koszt dostawy: Makro"]["pozostale"] == _netto(79)
     assert "Koszt dostawy: Piekarnia Koziołek" not in kpir                    # 10 worków bułek > 150 zł
     assert [(x["dostawca"], x["oplata"]) for x in w["dostawy"]["dostawy"]] == [(PIEKARNIA, 0), (MAKRO, 79)]
 

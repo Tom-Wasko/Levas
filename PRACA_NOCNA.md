@@ -51,6 +51,11 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    800–3000 zł w KPiR jako „Naprawa szkód w lokalu”, albo atrakcyjność lokali −30% w tej rundzie, albo odejście
    losowego pracownika bez wypowiedzenia). Dług u Harpagona nie wchodzi do wskaźnika zadłużenia w karcie wyników
    i boty z niego nie korzystają. Czy te wartości i zasady pasują? (zadane: 26.10)
+8. **Księgowość JDG (F3a.11).** Przyjąłem: wszystkie ceny w danych są brutto (VAT wydzielany z kwoty, także opłaty
+   banków i czynsz); rozliczenie VAT/PIT/ZUS co rundę (tydzień), nie co miesiąc; zdrowotna od dochodu tej rundy,
+   minimum 324,41 zł/mies.; ZUS społeczny preferencyjny 420,86 zł/mies. po 26 rundach ulgi (czyli w grze na 26 rund
+   go nie ma); kwoty ZUS 2026 z pamięci; lokal, działka i budowa budynku bez VAT; próg amortyzacji liczony od brutto.
+   Czy tak może zostać? (nie wysłane – okno pytań minęło; zapisane 26.10 18:25)
 
 ## Odłożone zadania
 
@@ -242,3 +247,8 @@ _brak_
   - pracownik odchodzi od razu, bez odprawy, wraca do puli kandydatów; wizyta „pracownik” tylko gdy jest kto odejść,
   - dług nie wlicza się do zadłużenia w karcie, boty nie pożyczają; kantor „U Harpagona” na mapie przy dworcu (8,12),
   - zakładka **Finanse → Harpagon** (Decyzje + Wyniki), test `test_harpagon.py`.
+
+26.10 18:20 – koniec pracy (po 15:50): F3a.11 przerwane w połowie – silnik, dane i testy gotowe (142 testy
+  przechodzą), zakładka `podatki.js` napisana, ale nie zarejestrowana; pytanie 8 zapisane, nie wysłane.
+  Zadania cron usunięte. Notatki bez zmian (w `notatki/Plan implementacji.md` git widzi tylko zmianę końców linii
+  – nie commituję jej).

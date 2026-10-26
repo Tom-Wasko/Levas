@@ -16,7 +16,14 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from .schematy import SCHEMATY, SCHEMATY_MAPY, PlikBankow, PlikHarpagona, sprawdz_zalozenia
+from .schematy import (
+    OPCJONALNE,
+    SCHEMATY,
+    SCHEMATY_MAPY,
+    PlikBankow,
+    PlikHarpagona,
+    sprawdz_zalozenia,
+)
 
 KATALOG_GRY = Path(__file__).resolve().parents[1]
 KATALOG_DANYCH = KATALOG_GRY / "dane"
@@ -90,6 +97,7 @@ class Dane:
         self.zalozenia_pelne: dict = p["zalozenia.yaml"]
         self.z: dict = _wartosci(self.zalozenia_pelne)
         self.mapa: dict | None = _wczytaj_mape(katalog / "mapa")
+        self.podatki: dict | None = _wartosci(p["podatki_2026.yaml"]) if "podatki_2026.yaml" in p else None   # JDG (F3a.11)
 
     @cached_property
     def lokale(self) -> dict[str, dict]:
@@ -196,12 +204,14 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
     """Błędy danych: brakujące pliki, schematy, założenia i odwołania między plikami (pusta lista = dane dobre)."""
     bledy = []
     for nazwa in [*SCHEMATY, "zalozenia.yaml"]:
-        if not (katalog / nazwa).exists():
+        if not (katalog / nazwa).exists() and nazwa not in OPCJONALNE:
             bledy.append(f"brak pliku dane/{nazwa}")
     if bledy:
         return bledy
     pliki = {p.name: _wczytaj(p) for p in sorted(katalog.glob("*.yaml"))}
     for nazwa, schemat in SCHEMATY.items():
+        if nazwa not in pliki:
+            continue
         try:
             schemat.model_validate(pliki[nazwa])
         except ValidationError as e:
@@ -227,6 +237,13 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
     def brak(co: str, gdzie: str, czego: str, plik: str):
         bledy.append(f"{gdzie}: {co} – nie ma w {plik} ({czego})")
 
+    vat = d.podatki["vat"] if d.podatki else {"sprzedaz": {"uslugi": {}}, "zasoby": {"zasoby": {}}}
+    for u in vat["sprzedaz"]["uslugi"]:
+        if u not in d.uslugi:
+            brak(u, "podatki_2026.yaml: vat.sprzedaz.uslugi", "usługa", "uslugi.yaml")
+    for z in vat["zasoby"]["zasoby"]:
+        if z not in d.zasoby:
+            brak(z, "podatki_2026.yaml: vat.zasoby.zasoby", "zasób", "zasoby.yaml")
     for u, x in d.uslugi.items():
         for n in x["sprzet"]:
             if d.sprzet.get(n, {}).get("dla") != KUCHNIA:

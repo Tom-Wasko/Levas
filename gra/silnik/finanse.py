@@ -6,19 +6,61 @@
 - CIT 19% od dodatniego dochodu miesiąca, bez rozliczania strat z poprzednich miesięcy,
 - lokaty i kredyty: odsetki proste (roczne / 12 za miesiąc); kredyt spłacany równymi ratami kapitałowymi,
 - kredyt odnawialny uruchamia się sam przy braku gotówki i jest spłacany, gdy gotówka wróci.
+
+Gra z lokalami (F3a.11, dane/podatki_2026.yaml): księga ma reguły VAT (`vat`). Kwoty w grze są brutto – `ksieguj`
+wydziela VAT (stawka podana albo z reguł po opisie), do KPiR idzie netto, do rejestru VAT podatek, a rachunek
+dostaje brutto. Pozycje bez ruchu gotówki (`Ksiega.dodaj`: amortyzacja) są bez VAT. CIT zastępuje rozliczenie
+JDG (silnik/rozliczenie.py).
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import ROUND_HALF_UP, Decimal
 
 from .model import Firma, Kredyt, Lokata
 
 KOLUMNY = ("przychod", "przychod_pozostaly", "towary", "wynagrodzenia", "pozostale")
 
 
+def do_grosza(x: float) -> float:
+    """Zaokrąglenie „handlowe” do grosza (połówka w górę), bez błędów binarnych floatów."""
+    return float(Decimal(str(x)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def do_zlotego(x: float) -> int:
+    """Kwoty w deklaracjach: do pełnych złotych (końcówki od 50 gr w górę)."""
+    return int(Decimal(str(x)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
+def vat_z_brutto(brutto: float, stawka: float) -> float:
+    return do_grosza(brutto * stawka / (1 + stawka))
+
+
 @dataclass
 class Ksiega:
     pozycje: list[dict] = field(default_factory=list)
+    vat: dict | None = None                       # reguły VAT (podatki_2026.yaml: vat) – gra z lokalami
+    rejestr_vat: list[dict] = field(default_factory=list)
+
+    def stawka_vat(self, opis: str) -> float:
+        """Stawka z reguł po fragmencie opisu (pierwsza pasująca); brak – zwolnione (0)."""
+        return next((r["stawka"] for r in self.vat["koszty"] if r["zawiera"] in opis), 0.0)
+
+    def zarejestruj(self, opis: str, stawki: dict[float, float], nalezny: bool) -> float:
+        """Wpisy do rejestru VAT (sprzedaży – należny, zakupów – naliczony) z kwot brutto wg stawek. Zwraca VAT."""
+        razem = 0.0
+        for stawka, brutto in stawki.items():
+            vat = vat_z_brutto(brutto, stawka)
+            if stawka <= 0 or abs(vat) < 0.005:
+                continue
+            self.rejestr_vat.append({"opis": opis, "stawka": stawka, "brutto": round(brutto, 2),
+                                     "netto": round(brutto - vat, 2), "vat": vat,
+                                     "rodzaj": "nalezny" if nalezny else "naliczony"})
+            razem += vat
+        return round(razem, 2)
+
+    def vat_suma(self, rodzaj: str) -> float:
+        return round(sum(w["vat"] for w in self.rejestr_vat if w["rodzaj"] == rodzaj), 2)
 
     def dodaj(self, opis: str, kwota: float, kolumna: str = "pozostale") -> None:
         if abs(kwota) < 0.005:
@@ -64,10 +106,18 @@ class Rachunek:
         self.operacje.append({"opis": opis, "kwota": round(kwota, 2), "saldo": firma.gotowka})
 
 
-def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: float, kolumna: str = "pozostale") -> None:
-    """Pozycja KPiR + ruch na rachunku (koszt zmniejsza gotówkę, przychód zwiększa)."""
-    ksiega.dodaj(opis, kwota, kolumna)
+def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: float, kolumna: str = "pozostale",
+            stawka: float | None = None, stawki: dict[float, float] | None = None) -> None:
+    """Pozycja KPiR + ruch na rachunku (koszt zmniejsza gotówkę, przychód zwiększa). Z regułami VAT kwota jest
+    brutto: `stawki` – części brutto wg stawek (zakup różnych składników), `stawka` – jedna stawka, bez nich – reguły."""
     znak = 1 if kolumna.startswith("przychod") else -1
+    if ksiega.vat is not None and abs(kwota) >= 0.005:
+        if stawki is None:
+            stawki = {ksiega.stawka_vat(opis) if stawka is None else stawka: kwota}
+        vat = ksiega.zarejestruj(opis, stawki, znak > 0)
+        ksiega.dodaj(opis, round(kwota - vat, 2), kolumna)
+    else:
+        ksiega.dodaj(opis, kwota, kolumna)
     rachunek.zapisz(firma, opis, znak * kwota)
 
 

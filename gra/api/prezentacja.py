@@ -6,6 +6,7 @@ from copy import deepcopy
 from silnik import banki as bk
 from silnik import czas_wlasciciela as cw
 from silnik import lichwiarz as lw
+from silnik import rozliczenie as rz
 from silnik import rynek_pracy as rp
 from silnik import swiezosc
 from silnik.dane import Dane
@@ -46,9 +47,9 @@ def stan_po_szkicu(gra: Gra, firma: str):
     stan = deepcopy(gra.stan(r - 1))
     f = stan.firmy[firma]
     d = gra.szkic(firma)
-    ks, rach = Ksiega(), Rachunek()
-    poprzednia_oferta = list(f.oferta)
     lokale = tryb_lokali(gra.dane, gra.konfiguracja)
+    ks, rach = Ksiega(vat=rz.reguly_vat(gra.dane) if lokale else None), Rachunek()
+    poprzednia_oferta = list(f.oferta)
     # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
     lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach) if lokale else None
     uwagi_rp = []
@@ -183,8 +184,25 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                          "decyzja": info.get("harpagon"),
                          "warunki": {k: u[k] for k in ("maks_kwota", "min_kwota", "oprocentowanie_rundy", "termin_rund",
                                                        "odsetki_karne_rundy", "karne_od", "wizyty_od")}}
+        v["podatki"] = _podatki(dane, fp, runda, rz.rejestr(ks) if edycja else stan.wyniki[runda][firma].get("vat"))
         v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
     return v
+
+
+def _podatki(dane: Dane, fp: Firma, runda: int, rejestr: dict | None) -> dict:
+    """JDG (F3a.11): stawki, stan rozliczeń na początku rundy i VAT z decyzji (szkic) albo z rundy (wyniki)."""
+    p, roz = dane.podatki, fp.rozliczenie
+    return {"rejestr": rejestr, "ulga_na_start": rz.ulga_na_start(dane, runda),
+            "stan": {"vat_nadwyzka": roz.vat_nadwyzka, "dochod": roz.dochod, "zaliczki": roz.zaliczki,
+                     "zdrowotna_odliczona": roz.zdrowotna_odliczona, "zaplacone": roz.zaplacone},
+            "parametry": {"pit": p["pit_liniowy"], "zdrowotna": p["zdrowotna"]["stawka"],
+                          "zdrowotna_minimum": dane.na_runde(p["zdrowotna"]["minimalna_miesieczna"]),
+                          "limit_odliczenia": p["zdrowotna"]["limit_odliczenia_roczny"],
+                          "spoleczne": dane.na_runde(p["zus_wlasciciela"]["spoleczne_miesieczne"]),
+                          "ulga_rund": p["zus_wlasciciela"]["ulga_na_start_rund"], "zus_pracodawcy": p["zus_pracodawcy"],
+                          "vat_uslug": {u: rz.stawka_sprzedazy(dane, u) for u in dane.uslugi},
+                          "vat_zasobow": {z: rz.stawka_zasobu(dane, z) for z in dane.zasoby},
+                          "vat_kosztow": p["vat"]["koszty"], "vat_srodkow_trwalych": p["vat"]["srodki_trwale"]}}
 
 
 def _agencja(gra: Gra, firma: str, runda: int, f: Firma, stan, edycja: bool) -> dict:

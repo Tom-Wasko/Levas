@@ -191,6 +191,21 @@ class PozyczkaHarpagona(Model):
     odsetki = _kwota("odsetki")
 
 
+class RozliczenieJDG(Model):
+    """Stan rozliczeń jednoosobowej działalności (gra z lokalami, silnik/rozliczenie.py) – narastająco od startu gry."""
+    vat_nadwyzka_gr: int = 0          # nadwyżka VAT naliczonego do przeniesienia na następną rundę
+    dochod_gr: int = 0                # dochód z KPiR narastająco (straty pomniejszają)
+    zdrowotna_odliczona_gr: int = 0   # zapłacona zdrowotna odliczona od dochodu (do limitu rocznego)
+    zaliczki_gr: int = 0              # wpłacone zaliczki na PIT
+    zaplacone_gr: int = 0             # razem wpłacone do urzędu i ZUS (VAT, PIT, składki właściciela)
+
+    vat_nadwyzka = _kwota("vat_nadwyzka")
+    dochod = _kwota("dochod")
+    zdrowotna_odliczona = _kwota("zdrowotna_odliczona")
+    zaliczki = _kwota("zaliczki")
+    zaplacone = _kwota("zaplacone")
+
+
 class Cena(Model):
     """Cena usługi i rabat (włączona sprzedaż)."""
     cena_gr: int
@@ -238,6 +253,7 @@ class Firma(Model):
     kredyty: list[Kredyt] = Field(default_factory=list)
     leasingi: list[Leasing] = Field(default_factory=list)
     harpagon: PozyczkaHarpagona | None = None
+    rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
     kredyt_odnawialny_gr: int = 0
     majatek_gr: int = 0               # suma inwestycji (sprzęt, stanowiska, udogodnienia, wyposażenie) – rozwój firmy
     rozwoj_poprzedni: float | None = None

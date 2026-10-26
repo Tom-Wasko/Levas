@@ -698,6 +698,52 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "harpagon.yaml": PlikHarpagona,
 }
 
+# --- podatki_2026.yaml (gra z lokalami, F3a.11) ---
+
+Stawka = Field(ge=0, lt=1)
+
+
+class Zdrowotna(Schemat):
+    stawka: float = Stawka
+    minimalna_miesieczna: float = Field(ge=0)
+    limit_odliczenia_roczny: float = Field(ge=0)
+
+
+class ZusWlasciciela(Schemat):
+    ulga_na_start_rund: int = Field(ge=0)
+    spoleczne_miesieczne: float = Field(ge=0)
+
+
+class VatSprzedazy(Schemat):
+    domyslna: float = Stawka
+    uslugi: dict[str, float] = {}
+
+
+class VatZasobow(Schemat):
+    domyslna: float = Stawka
+    zasoby: dict[str, float] = {}
+
+
+class RegulaVat(Schemat):
+    zawiera: str = Field(min_length=3)
+    stawka: float = Stawka
+
+
+class Vat(Schemat):
+    sprzedaz: VatSprzedazy
+    zasoby: VatZasobow
+    koszty: list[RegulaVat]
+    srodki_trwale: float = Stawka
+
+
+class PlikPodatkow(Plik):
+    pit_liniowy: float = Stawka
+    zdrowotna: Zdrowotna
+    zus_wlasciciela: ZusWlasciciela
+    vat: Vat
+    zus_pracodawcy: float = Stawka
+
+
 SCHEMATY: dict[str, type[BaseModel]] = {
     "uslugi.yaml": PlikUslug,
     "sprzet.yaml": PlikSprzetu,
@@ -706,4 +752,6 @@ SCHEMATY: dict[str, type[BaseModel]] = {
     "kandydaci.yaml": PlikKandydatow,
     "katalog.yaml": PlikKatalogu,
     "boty.yaml": PlikBotow,
+    "podatki_2026.yaml": PlikPodatkow,
 }
+OPCJONALNE = {"podatki_2026.yaml"}   # wzorzec Revasa (bez lokali) nie ma podatków JDG

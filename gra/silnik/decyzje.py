@@ -34,6 +34,7 @@ import math
 from datetime import timedelta
 
 from . import czas_wlasciciela as cw
+from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import srodki_trwale as st_trwale
 from . import swiezosc as sw
@@ -243,7 +244,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                                                                "kanal": kanal, "koszt": koszt, "pensja": p.pensja})
 
     # zasoby od dostawców
-    zakupy, zamowienia = {}, []
+    zakupy, zamowienia, stawki = {}, [], {}
     for z in d.get("zamowienia", []) if "dostawcy" in odbl else []:
         ilosc = float(z.get("ilosc") or 0)
         cena = cena_dostawcy(dane, ceny_dostawcow, z["dostawca"], z["zasob"], int(z["jakosc"]))
@@ -264,9 +265,11 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             firma.partie.append(sw.nowa_partia(dane, z["zasob"], int(z["jakosc"]), ilosc, cena,
                                                dane.data_rundy(runda) + timedelta(days=dzien), z["dostawca"], runda))
         zakupy[z["dostawca"]] = zakupy.get(z["dostawca"], 0.0) + ilosc * cena
+        s, sv = stawki.setdefault(z["dostawca"], {}), rz.stawka_zasobu(dane, z["zasob"]) or 0.0   # VAT wg składnika
+        s[sv] = s.get(sv, 0.0) + ilosc * cena
         info["zakupy_zasobow"].setdefault(z["dostawca"], []).append({**z, "cena": cena, "wartosc": round(ilosc * cena, 2)})
     for dostawca, kwota in zakupy.items():
-        ksieguj(firma, ksiega, rachunek, f"Zakup zasobu od dostawcy: {dostawca}", kwota, "towary")
+        ksieguj(firma, ksiega, rachunek, f"Zakup zasobu od dostawcy: {dostawca}", kwota, "towary", stawki=stawki[dostawca])
     for dostawca, kwota in info.get("dostawy", {}).get("oplaty", {}).items():
         ksieguj(firma, ksiega, rachunek, f"Koszt dostawy: {dostawca}", kwota)
 

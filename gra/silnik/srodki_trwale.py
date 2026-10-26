@@ -4,6 +4,7 @@ Kupiony lokal i wybudowany budynek oraz inwestycje od progu `amortyzacja_prog` (
 trafiają do ewidencji środków trwałych: zakup to ruch na rachunku, a koszt w KPiR rozkłada się liniowo – co rundę
 odpis amortyzacyjny według rocznej stawki (`amortyzacja_roczna`). Tańsze zakupy od razu w koszty (jak w Revasie).
 Grunt (działka) jest w ewidencji, ale się nie amortyzuje. Przy sprzedaży niezamortyzowana wartość idzie w koszty.
+Z VAT (F3a.11): zakup sprzętu, wyposażenia i stanowisk daje VAT naliczony, a do ewidencji trafia wartość netto.
 """
 
 from __future__ import annotations
@@ -28,7 +29,8 @@ def zakup(dane: Dane, firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: st
     """Zakup inwestycji: w grze z lokalami od progu – środek trwały, poniżej progu (i w grze Revas) – koszt od razu."""
     if lokale and cena >= dane.z["finanse"]["amortyzacja_prog"]:
         rachunek.zapisz(firma, opis, -cena)
-        przyjmij(dane, firma, nazwa, rodzaj, cena, runda)
+        vat = ksiega.zarejestruj(opis, {dane.podatki["vat"]["srodki_trwale"]: cena}, False) if ksiega.vat is not None else 0.0
+        przyjmij(dane, firma, nazwa, rodzaj, round(cena - vat, 2), runda)
     else:
         ksieguj(firma, ksiega, rachunek, opis, cena)
 
