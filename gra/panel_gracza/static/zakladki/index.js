@@ -9,12 +9,13 @@ import { sprzedaz } from "./sprzedaz.js";
 import { bank, biuro, kpir, raport } from "./finanse.js";
 import { lokale } from "./lokale.js";
 import { mapa } from "./mapa.js";
+import { klienci } from "./klienci.js";
 
-const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, oferta, stanowiska, sprzet, wyposazenie, zatrudnienie, udogodnienia, szkolenia,
+const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, klienci, oferta, stanowiska, sprzet, wyposazenie, zatrudnienie, udogodnienia, szkolenia,
   dostawcy, tradycyjny, internetowy, sprzedaz, raport, kpir, bank, biuro, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
-export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
+export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", zatrudnienie: "zatrudnienie", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy",
   tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", bank: "bank",
   biuro: "biuro", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
@@ -27,6 +28,7 @@ export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { klucz: "karta_wynikow", tytul: "Karta wyników", ikona: "karta" },
   { klucz: "lokale", tytul: "Lokale", ikona: "lokale" },
+  { klucz: "klienci", tytul: "Klienci i strefy", ikona: "klienci" },
   { klucz: "oferta", tytul: "Oferta", ikona: "oferta" },
   { klucz: "inwestycje", tytul: "Inwestycje", ikona: "inwestycje", pod: ["stanowiska", "sprzet", "wyposazenie"] },
   { klucz: "hr", tytul: "HR", ikona: "hr", pod: ["zatrudnienie", "udogodnienia", "szkolenia"] },

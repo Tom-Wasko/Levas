@@ -58,9 +58,10 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
     if not (katalog / "strefy.yaml").exists():
         return None
-    st, lo, bu = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    st, lo, bu, po = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
-            "lokale": lo["lokale"], "budynki": bu["budynki"]}
+            "lokale": lo["lokale"], "budynki": bu["budynki"],
+            "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po}}
 
 
 class Dane:
@@ -321,6 +322,13 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
         ids.add(b["id"])
         r = b["mapa"]
         poloz(co, b["strefa"], r["x"], r["y"], r["szer"], r["gl"])
+    po = m["popyt"]
+    for s in sorted(set(m["strefy"]) ^ set(po["strefy"])):
+        bledy.append(f"mapa/popyt.yaml: strefa {s} " + ("bez popytu" if s in m["strefy"] else "nie ma jej w mapa/strefy.yaml"))
+    for w in po.get("kalendarz", []):
+        for s in w["strefy"]:
+            if s != "wszystkie" and s not in m["strefy"]:
+                brak(s, f"mapa/popyt.yaml: kalendarz: {w['nazwa']}", "strefa", "mapa/strefy.yaml")
     return bledy
 
 

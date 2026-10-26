@@ -119,9 +119,11 @@ def _przydziel_godziny(potrzeby: dict[str, float], mozliwe: dict[str, list[int]]
     return wynik, na_stanowiskach
 
 
-def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) -> dict:
-    """Ilu klientów firma obsłuży. Zmienia magazyn (zużycie). Zwraca szczegóły do wyników."""
-    godz_prac = dane.z["operacje"]["godziny_pracownika"]
+def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
+           skala_godzin: float = 1.0, klucze: tuple = ()) -> dict:
+    """Ilu klientów firma obsłuży. Zmienia magazyn (zużycie). Zwraca szczegóły do wyników.
+    skala_godzin – część godzin rundy (obsługa dzień po dniu w popyt.py), klucze – do strumienia reklamacji."""
+    godz_prac = dane.z["operacje"]["godziny_pracownika"] * skala_godzin
     stanowiska = firma.stanowiska_typu(KUCHNIA)
     indeks = {s.nr: i for i, s in enumerate(stanowiska)}
     mozliwe = {u: [indeks[s.nr] for s in stanowiska_uslugi(dane, firma, u)] for u in popyt}
@@ -131,7 +133,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) 
     pula = model_puli(dane)
     wspolne = []
     if pula:
-        godz_sprz = dane.z["operacje"]["godziny_sprzetu"]
+        godz_sprz = dane.z["operacje"]["godziny_sprzetu"] * skala_godzin
         for nazwa in sorted({n for u in popyt for n in dane.uslugi[u]["sprzet"]}):
             wspolne.append(({u for u in popyt if nazwa in dane.uslugi[u]["sprzet"]},
                             len(sztuki_sprzetu(firma, nazwa)) * godz_sprz))
@@ -181,7 +183,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int) 
     for u, k in obsluzeni.items():
         st = [stanowiska[i] for i in mozliwe[u]]
         ryzyko = mnoznik * float(np.mean([firma.pracownik_stanowiska(s).ryzyko_reklamacji for s in st])) if st else 0.0
-        reklamacje[u] = int(strumien(ziarno, runda, "reklamacje", firma.nazwa, u).binomial(k, ryzyko)) if k else 0
+        reklamacje[u] = int(strumien(ziarno, runda, "reklamacje", firma.nazwa, u, *klucze).binomial(k, ryzyko)) if k else 0
 
     zuzycie = {}
     for u in obsluzeni:

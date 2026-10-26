@@ -107,4 +107,24 @@ _brak_
     zakładka, lokalu → opis i Wynajmij / Kup, własnego lokalu → zakładki firmy,
   - gra botów 26 tyg. z lokalami: dochód netto od −69 tys. (agresywny) do 242 tys. (premium) – podobnie jak bez lokali,
   - sprawdzone: pytest (89) i ruff na zielono, mapa i zakładka Lokale obejrzane w Chrome bez okna (zrzuty ekranu).
-
+- 26.10 1:20 – F3a.4 gotowe: popyt strefowy. Decyzje **do potwierdzenia**:
+  - każda strefa ma własną pulę klientów na danie i dzień: popyt roczny dania / 52 × sezonowość dania × pula strefy ×
+    miesiąc strefy (uczelnie latem puste, Zemborzyce latem pełne) × kalendarz × dzień tygodnia × szum ±8% –
+    sezonowość liczona podwójnie (danie i strefa) celowo,
+  - wybór lokalu – model logitowy: cena względem ceny strefy (Stare Miasto ×1,15, Akademickie ×0,88) z wrażliwością
+    strefy, jakość, odległość między strefami (zasięg 3 pola mapy), zadowolenie klientów firmy, wyposażenie, reklama
+    (mnożnik reklamy z Revasa zostaje do F3b); opcja zewnętrzna A0 = 1 – część klientów zawsze idzie poza grę,
+  - pule dobrane tak, że lokal 2★ po cenie strefy w Centrum bez konkurencji ma 400–1500 kebabów tygodniowo (rząd
+    wielkości firmy z Revasa); popyt na lokal często przekracza moc małych lokali – zachęta do rozbudowy,
+  - obsługa dzień po dniu: godziny pracowników i sprzętu dzielone równo na 7 dni (grafiki dzienne – później); zapasy
+    schodzą z tygodniowego magazynu (dostawy na dni – F3a.5+),
+  - sprzedaż od rundy 2 jak w Revasie; stali konkurenci z Revasa (`konkurenci_stali`) w grze z lokalami pominięci –
+    konkurencją są drużyny i boty, a resztę rynku zastępuje opcja zewnętrzna,
+  - prognoza dla drużyny: konkurenci z cenami z poprzedniej rundy i jakością 2★ (prawdziwej jakości nie widać); w
+    wynikach firmy jakość/oferta dania = lokal z największym popytem,
+  - kalendarz na razie podstawowy (9 wydarzeń z humorem: Wszystkich Świętych, 11 listopada, święta, Sylwester, sesja,
+    przerwa międzysemestralna, Walentynki); pełny kalendarz miejski – F3b.9,
+  - boty planują stanowiska i kasjerów na najmocniejszy dzień tygodnia (szczyt strefy),
+  - nowa zakładka **Klienci i strefy** w menu pod Lokalami (Decyzje + Wyniki), szacunek klientów na kafelkach lokali,
+  - sprawdzone: pytest (96) i ruff na zielono, `sprawdz` danych, zakładka wyrenderowana na prawdziwym widoku gry
+    botów (bez błędów, bez `undefined`/`NaN`); gra 4 botów 26 tyg. – ok. 6 s.

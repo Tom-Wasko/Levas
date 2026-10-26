@@ -11,6 +11,9 @@ function sezon(u, miesiac) {
 }
 
 export const prognozaBazowa = (u, miesiac) => Math.round((u.popyt_roczny / OKRES.rund_w_roku) * u.sezonowosc[miesiac]);
+// gra z lokalami: prognoza popytu strefowego dla lokali firmy (v.popyt, silnik/popyt.py); bez lokalu – 0
+const prognozaStrefowa = (v, klucz) => Math.round(v.popyt.prognoza.dania[klucz] || 0);
+const prognozaDania = (v, kat, klucz, m) => v.popyt ? prognozaStrefowa(v, klucz) : prognozaBazowa(kat.uslugi[klucz], m);
 // miesiąc (sezonowość), w którym sprzedaje się dania wybrane w rundzie r – runda 1 przygotowuje sprzedaż w rundzie 2
 const miesiacSprzedazy = (r) => miesiacRundy(Math.max(r, 2));
 const popytOkresu = () => `popyt ${OKRES.przymiotnik.toLowerCase()}`;
@@ -28,15 +31,17 @@ export const oferta = {
     const m = miesiacSprzedazy(r);
     const limit = limitNowych(kat, r);
     const nowe = Object.keys(wybrane).filter((u) => !(u in przed)).length;
-    let html = `<div class="komunikat">Nowe dania w tej rundzie: <b>${nowe} / ${limit}</b>. Prognozowany popyt = popyt roczny / ${OKRES.rund_w_roku} × sezonowość
-      (${r === 1 ? `prognoza na ${esc(nazwaRundy(2))} – sprzedaż zaczyna się w rundzie 2` : esc(v.miesiac)}).</div>`;
+    const okres = r === 1 ? `prognoza na ${esc(nazwaRundy(2))} – sprzedaż zaczyna się w rundzie 2` : esc(v.miesiac);
+    let html = `<div class="komunikat">Nowe dania w tej rundzie: <b>${nowe} / ${limit}</b>. ${v.popyt
+      ? `Podpowiedź prognozy – klienci stref, którzy wybraliby Twoje lokale przy obecnych cenach konkurencji (${okres}); szczegóły w zakładce <a data-zakladka-k="klienci">Klienci i strefy</a>.`
+      : `Prognozowany popyt = popyt roczny / ${OKRES.rund_w_roku} × sezonowość (${okres}).`}</div>`;
     for (const k of kategorie(kat)) {
       const uslugi = Object.entries(kat.uslugi).filter(([, u]) => u.kategoria === k);
       html += `<div class="pasek">${k}</div><div class="siatka trojka">`;
       for (const [klucz, u] of uslugi) {
         const jest = klucz in wybrane;
         const dozwolona = (r > 1 || kat.oferty.rundy.uslugi_startowe.includes(klucz)) && (klucz in przed || nowe < limit || jest);
-        const baza = prognozaBazowa(u, m);
+        const baza = prognozaDania(v, kat, klucz, m);
         html += `<div class="kafel ${jest ? "wybrany" : ""}">
           <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span>${sezon(u, m)}</div>
           <div class="kt">
@@ -53,7 +58,8 @@ export const oferta = {
                    : `<button class="btn czarny" data-akcja="usluga" data-u="${klucz}" ${edycja && dozwolona ? "" : "disabled"}>Wybierz</button>`}
             ${jest ? `<label class="pole">Prognozowany popyt (na ${OKRES.mianownik})
               <input type="number" min="0" step="1" value="${wybrane[klucz] || ""}" placeholder="${baza}" data-zmiana="prognoza" data-u="${klucz}" ${edycja ? "" : "disabled"}>
-              <span class="podpowiedz">Wg wzoru: ${licz(u.popyt_roczny)} / ${OKRES.rund_w_roku} × ${u.sezonowosc[m]} ≈ ${baza}</span></label>` : ""}
+              <span class="podpowiedz">${v.popyt ? `Klienci stref dla Twoich lokali ≈ ${licz(baza)}`
+                : `Wg wzoru: ${licz(u.popyt_roczny)} / ${OKRES.rund_w_roku} × ${u.sezonowosc[m]} ≈ ${baza}`}</span></label>` : ""}
           </div></div>`;
       }
       html += `</div>`;
@@ -100,7 +106,7 @@ export const oferta = {
         // limit dotyczy przyrostu liczby dań (usunięte danie zwalnia miejsce na nowe)
         const przyrost = Object.keys(of).length - Object.keys(c.v.stan_przed.oferta).length;
         if (!(u in c.v.stan_przed.oferta) && przyrost >= limit) return toast(`W tej rundzie liczba dań może wzrosnąć najwyżej o ${limit}.`);
-        of[u] = prognozaBazowa(c.kat.uslugi[u], miesiacSprzedazy(r));
+        of[u] = prognozaDania(c.v, c.kat, u, miesiacSprzedazy(r));
       }
       await c.zmien((d) => { d.oferta = of; });
     },

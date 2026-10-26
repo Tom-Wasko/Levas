@@ -50,10 +50,14 @@ export function przyciskiLokalu(v, d, lok, edycja) {
   }).join("");
 }
 
+// szacunek klientów nowego lokalu 2★ w strefie (popyt strefowy, zakładka Klienci i strefy)
+const potencjal = (v, lok) => v.popyt?.strefy[lok.strefa]
+  ? `<div class="wiersz"><span>Klienci – szacunek${naOkres()}</span><span>≈ ${licz(v.popyt.strefy[lok.strefa].potencjal)}</span></div>` : "";
+
 function kafelOferty(v, kat, d, lok, edycja) {
   const wyb = wybranyLokal(d)?.id === lok.id;
   return `<div class="kafel ${wyb ? "wybrany" : ""}"><div class="kg">${esc(lok.nazwa)}<span class="pigulka">${TYPY[lok.typ]}</span></div>
-    <div class="kt">${opisLokalu(kat, lok)}</div><div class="kd">${przyciskiLokalu(v, d, lok, edycja)}</div></div>`;
+    <div class="kt">${opisLokalu(kat, lok)}${potencjal(v, lok)}</div><div class="kd">${przyciskiLokalu(v, d, lok, edycja)}</div></div>`;
 }
 
 function mojeLokale(kat, moje) {

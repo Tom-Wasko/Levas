@@ -26,6 +26,7 @@ const P = {
   biuro: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
   mapa: '<path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>',
   lokale: '<path d="M3 21h18M4 21V10l8-6 8 6v11"/><path d="M9 21v-5h6v5"/><path d="M3 10h18"/>',
+  klienci: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.7.1 4.5 1.8 5 4.9"/>',
   lewo: '<path d="M15 18l-6-6 6-6"/>',
   prawo: '<path d="M9 18l6-6-6-6"/>',
   ok: '<path d="M20 6 9 17l-5-5"/>',

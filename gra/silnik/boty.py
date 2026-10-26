@@ -10,6 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from . import lokale as lk
+from . import popyt as pp
 from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_rundy
@@ -104,6 +105,14 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         r_inni = [c / dane.uslugi[u]["cena_preferowana"] for x, c in inni.items() if x != nazwa]
         r_sr = (sum(r_inni) + ceny[u] / dane.uslugi[u]["cena_preferowana"]) / (len(r_inni) + 1)
         klienci[u] = oczekiwany_popyt(dane, u, m_sprz, ceny[u], (q, q, q), n, r_sr, wyp) * st["pokrycie"]
+    szczyt = 1.0
+    if lokale:  # popyt strefowy: prognoza dla własnych lokali przy cenach konkurencji z poprzedniej rundy
+        r_sprz = max(runda, 2)
+        moje = {lok.id: {u: {"strefa": dane.lokale[lok.id]["strefa"], "cena": ceny[u], "jakosc": (q, q, q),
+                             "wyposazenie": wyp} for u in oferta} for lok in f.lokale if lok.dziala_od <= r_sprz}
+        prog = pp.prognoza(dane, r_sprz, {**pp.oferty_konkurencji(dane, stan, r_sprz, nazwa), nazwa: moje}, nazwa)
+        klienci = {u: prog["dania"].get(u, 0.0) * st["pokrycie"] for u in oferta}
+        szczyt = max([pp.szczyt(dane, dane.lokale[x]["strefa"], r_sprz) for x in moje] or [1.0])
     d["oferta"] = {u: int(round(klienci[u] / st["pokrycie"])) for u in oferta}
     if "sprzedaz" in odbl:
         d["sprzedaz"] = {u: {"cena": ceny[u], "rabat": 0} for u in oferta}
@@ -114,7 +123,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     wolne = [s for s in istniejace if not s.sprzet]
     nastepny = len(istniejace) + 1
     for u in oferta:
-        potrzeba = stanowiska_potrzebne(dane, u, klienci[u])
+        potrzeba = stanowiska_potrzebne(dane, u, klienci[u] * szczyt)  # obsługa dzień po dniu: obsada na szczyt
         maja = [s for s in istniejace if all(n in s.sprzet for n in dane.uslugi[u]["sprzet"])]
         for _ in range(max(0, potrzeba - len(maja))):
             if wolne:
@@ -130,7 +139,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             d.setdefault("_obsada", []).append({"nr": cel, "zawod": dane.uslugi[u]["prowadzacy"]})
     # kasa
     rec = f.stanowiska_typu(KASA)
-    potrzeba_rec = max(1, kasjerzy_potrzebni(dane, klienci))
+    potrzeba_rec = max(1, kasjerzy_potrzebni(dane, {u: k * szczyt for u, k in klienci.items()}))
     nowe_rec = min(dane.maks_nowych_stanowisk, max(0, potrzeba_rec - len(rec)))
     if miejsca is not None:
         nowe_rec = min(nowe_rec, len(miejsca[KASA]))

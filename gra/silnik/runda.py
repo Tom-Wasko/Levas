@@ -19,6 +19,7 @@ import numpy as np
 
 from . import karta as kw
 from . import lokale as lk
+from . import popyt as pp
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
 from .dostawcy import ceny_rundy
@@ -93,7 +94,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
 
     # --- rynek i sprzedaż ----------------------------------------------------------------------
     popyt, obsluga, oferty = {}, {}, {}
+    strefowy = None
     if r >= 2:
+        oferty_lok = {}
         stali = konfiguracja.get("konkurenci_stali", [])
         narzedzia_rynku = sum(sum(1 for od in s.firmy[n].internet.values() if od <= r) for n in nazwy) \
             + sum(len(k.get("internet", {})) for k in stali)
@@ -107,6 +110,13 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["reklama"] = {"tradycyjna": reklama, "internetowa": reklama_int}
             wyp = mnoznik_wyposazenia(dane, f.wyposazenie)
             mn_firmy = mnoznik_firmy(dane, f)
+            if tryb_lokali:  # popyt strefowy: oferty lokali (zadowolenie klientów z karty poprzedniej rundy)
+                zk = ((s.wyniki.get(r - 1) or {}).get(nazwa, {}).get("karta") or {}).get("zadowolenie_klientow")
+                ceny = {u: max(0.01, f.ceny[u].cena - f.ceny[u].rabat) for u in f.oferta if u in f.ceny}
+                oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, ceny, {
+                    "wyposazenie": wyp, "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy,
+                    "zadowolenie": pp.mnoznik_zadowolenia(dane, zk)})
+                continue
             rec = kasjerzy(dane, f)
             for u in f.oferta:
                 if u not in f.ceny or not rec:
@@ -117,7 +127,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 cena = max(0.01, f.ceny[u].cena - f.ceny[u].rabat)
                 oferty.setdefault(u, {})[nazwa] = {"cena": cena, "jakosc": q, "wyposazenie": wyp,
                                                    "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy}
-        for k in stali:
+        for k in ([] if tryb_lokali else stali):
             # konkurenci z prawdziwej gry: stałe ceny i jakość, bez finansów (tryb „co jeśli”, odtworzenie gry ATH);
             # "reklama" = wzrost z reklamy tradycyjnej, "internet" = {narzędzie: runda uruchomienia} (udział liczony tu)
             rekl_k = float(k.get("reklama", 0.0)) + (wzrost_reklamy_internetowej(dane, k["internet"], r, narzedzia_rynku)
@@ -127,10 +137,19 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                     oferty.setdefault(u, {})[k["nazwa"]] = {"cena": float(cena), "jakosc": tuple(k.get("jakosc", (2, 2, 2))),
                                                           "wyposazenie": float(k.get("wyposazenie", 1.0)),
                                                           "reklama": rekl_k}
-        rynek = popyt_rynku(dane, oferty, m, ziarno, r)
+        if tryb_lokali:
+            strefowy = pp.rynek_lokali(dane, s.firmy, oferty_lok, r, ziarno)
+            popyt, obsluga, rynek = strefowy["popyt"], strefowy["obsluga"], strefowy["rynek"]
+            for nazwa, lokale in oferty_lok.items():  # oferta firmy: jakość lokalu z największym popytem dania
+                for u in popyt[nazwa]:
+                    lok = max((x for x in lokale if u in lokale[x]), key=lambda x: rynek[u][nazwa]["skladniki"]["lokale"][x])
+                    oferty.setdefault(u, {})[nazwa] = lokale[lok][u]
+        else:
+            rynek = popyt_rynku(dane, oferty, m, ziarno, r)
+            for nazwa in nazwy:
+                popyt[nazwa] = {u: v[nazwa]["popyt"] for u, v in rynek.items() if nazwa in v}
+                obsluga[nazwa] = obsluz(dane, s.firmy[nazwa], popyt[nazwa], ziarno, r)
         for nazwa in nazwy:
-            popyt[nazwa] = {u: v[nazwa]["popyt"] for u, v in rynek.items() if nazwa in v}
-            obsluga[nazwa] = obsluz(dane, s.firmy[nazwa], popyt[nazwa], ziarno, r)
             for u, k in obsluga[nazwa]["obsluzeni"].items():
                 ksieguj(s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], f"Sprzedaż: {dane.uslugi[u]['nazwa']}",
                         k * oferty[u][nazwa]["cena"], "przychod")
@@ -188,6 +207,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:
             wyniki[nazwa]["lokale"] = lk.stan_lokali(dane, f, r)
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
+            if strefowy:
+                wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
 
     s.runda = r
     s.wyniki[r] = wyniki
@@ -195,6 +216,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                                   {"_konkurenci_stali": konfiguracja.get("konkurenci_stali"), "_rynek": rynek})
     if tryb_lokali:  # kto zajmuje który lokal (mapa miasta, zakładka Lokale – wyniki)
         s.rynek[r]["lokale"] = lk.zajete(s.firmy)
+        if strefowy:
+            s.rynek[r]["strefy"] = strefowy["strefy"]
     return s
 
 

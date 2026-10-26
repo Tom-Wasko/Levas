@@ -24,6 +24,7 @@ from silnik.lokale import (
     zajete,
 )
 from silnik.model import Firma, do_slownika
+from silnik.popyt import widok_popytu
 
 
 def _firma_slownik(f: Firma) -> dict:
@@ -142,6 +143,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     v["dashboard"] = _dashboard(gra, firma, runda, poprzedni)
     if tryb_lokali(dane, gra.konfiguracja):
         v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
+        zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
+        v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
     return v
 
 

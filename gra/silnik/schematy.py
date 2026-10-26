@@ -475,10 +475,48 @@ class PlikBudynkow(Plik):
     budynki: list[Budynek]
 
 
+class ModelPopytu(Schemat):
+    opcja_zewnetrzna: float = Field(gt=0)
+    elastycznosc_ceny: float = Field(ge=0)
+    zasieg: float = Field(gt=0)
+    szum_proc: float = Field(ge=0)
+    zadowolenie_odniesienie: float = Field(gt=0)
+    zadowolenie_wykladnik: float = Field(ge=0)
+
+
+class DniTygodnia(Schemat):
+    nazwy: list[str] = Field(min_length=7, max_length=7)
+    wagi: list[float] = Field(min_length=7, max_length=7)
+
+
+class PopytStrefy(Schemat):
+    pula: float = Field(ge=0)
+    cena: float = Field(gt=0)
+    wrazliwosc_ceny: float = Field(ge=0)
+    dni: list[float] | None = Field(default=None, min_length=7, max_length=7)
+    miesiace: list[float] | None = Field(default=None, min_length=12, max_length=12)
+
+
+class WydarzenieKalendarza(Schemat):
+    nazwa: str
+    opis: str
+    od: str = Field(pattern=r"^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")
+    do: str = Field(pattern=r"^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")
+    strefy: dict[str, float] = Field(min_length=1)
+
+
+class PlikPopytu(Plik):
+    model: ModelPopytu
+    dni_tygodnia: DniTygodnia
+    strefy: dict[str, PopytStrefy]
+    kalendarz: list[WydarzenieKalendarza] = []
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
     "budynki.yaml": PlikBudynkow,
+    "popyt.yaml": PlikPopytu,
 }
 
 SCHEMATY: dict[str, type[BaseModel]] = {
