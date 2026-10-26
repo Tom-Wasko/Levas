@@ -98,10 +98,10 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
     if forma == "najem":
         nowy.czynsz = lok["czynsz"]
         nowy.kaucja = dane.mapa["zasady"]["kaucja_miesiecy"] * lok["czynsz"]
-        rachunek.zapisz(firma, f"Kaucja za lokal: {lok['adres']}", -nowy.kaucja)
+        rachunek.zapisz(firma, f"Kaucja za lokal: {lok['adres']}", -nowy.kaucja, "kaucje")
     else:
         nowy.cena = lok["cena"]
-        rachunek.zapisz(firma, f"Zakup {'działki' if lok['typ'] == 'dzialka' else 'lokalu'}: {lok['adres']}", -nowy.cena)
+        rachunek.zapisz(firma, f"Zakup {'działki' if lok['typ'] == 'dzialka' else 'lokalu'}: {lok['adres']}", -nowy.cena, "inwestycje")
         przyjmij(dane, firma, f"{'Działka' if lok['typ'] == 'dzialka' else 'Lokal'}: {lok['adres']}",
                  "grunt" if lok["typ"] == "dzialka" else "lokal", nowy.cena, runda)
     if lok.get("adaptacja"):
@@ -143,7 +143,7 @@ def koszty_rundy(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek:
         elif d["typ"] == "dzialka":
             etap = runda - lok.od_rundy + 1
             rachunek.zapisz(firma, f"Budowa lokalu: {d['adres']} (etap {etap} z {d['budowa_rund']})",
-                            -d["koszt_budowy"] / d["budowa_rund"])
+                            -d["koszt_budowy"] / d["budowa_rund"], "inwestycje")
             if etap == d["budowa_rund"]:   # budynek gotowy – środek trwały (koszt budowy)
                 przyjmij(dane, firma, f"Budynek: {d['adres']}", "budynek", d["koszt_budowy"], runda)
 

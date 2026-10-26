@@ -25,6 +25,24 @@ function koszty(k) {
   return wynik.filter(([, x]) => Math.abs(x) > 0.004);
 }
 
+// Uzgodnienie kasy z KPiR (silnik/uzgodnienie.py): skąd wzięła się zmiana salda – metodą pośrednią.
+function uzgodnienieHtml(U) {
+  if (!U) return "";
+  const wiersze = [["Saldo konta na początku rundy", zl2(U.poczatek)],
+    ["+ przychody z KPiR", zl2(U.przychody)], ["− koszty z KPiR", zl2(-U.koszty)],
+    ...(U.bez_gotowki ? [["+ koszty bez wydatku (amortyzacja, niezamortyzowana wartość)", zl2(U.bez_gotowki)]] : []),
+    ...(U.vat_nalezny || U.vat_naliczony ? [["+ VAT należny (w cenach sprzedaży)", zl2(U.vat_nalezny)],
+      ["− VAT naliczony (w cenach zakupów)", zl2(-U.vat_naliczony)]] : []),
+    ...U.poza.map((p) => [`± ${esc(p.nazwa)}`, zl2(p.kwota)]),
+    ["<b>Saldo wyliczone</b>", `<b>${zl2(U.obliczona)}</b>`], ["Saldo konta na koniec rundy", zl2(U.koniec)]];
+  const ok = U.roznica === 0 && U.roznica_kpir === 0 && U.roznica_rachunku === 0;
+  return `<details><summary>Uzgodnienie kasy z KPiR – ${ok ? "zgodne co do grosza" : `<b>różnica ${zl2(U.roznica)}</b>`}</summary>`
+    + tabela(null, ["Skąd zmiana salda", "Kwota"], wiersze, { klasy: ["l", "r"], stopka: ["Różnica", zl2(U.roznica)] })
+    + `<p class="podpowiedz">Każda złotówka, która weszła na konto lub z niego wyszła, jest albo w KPiR (z VAT), albo
+      w jednej z operacji poza księgą – kredyty, lokaty, kaucje, inwestycje, podatki. Główna księgowa Levasu sprawdza to
+      co rundę i jeszcze ani razu nie zgubiła grosza. Twierdzi, że raz jeden grosz próbował uciec, ale go dogoniła.</p></details>`;
+}
+
 export const raport = {
   tytul: "Raport finansowy", tytulPelny: "Finanse - raport finansowy", ikona: "📊", odblokowanie: (v) => v.runda >= 2,
   info: () => `Podsumowanie wyników finansowych poprzedniego ${OKRES.dopelniacz} i wszystkich dotychczasowych rund.`,
@@ -42,6 +60,7 @@ export const raport = {
         ["<b>Dochód netto</b>", `<b>${zl2(k.dochod_netto)}</b>`, `<b>${zl2(skum)}</b>`],
         [`Saldo konta na koniec ${OKRES.dopelniacz}`, zl2(v.wyniki.gotowka), ""], ["Lokaty", zl2(v.wyniki.lokaty), ""],
         ["Zadłużenie (kredyty)", zl2(v.wyniki.zadluzenie), ""]], { klasy: ["l", "r", "r"] })}
+      ${uzgodnienieHtml(v.wyniki.uzgodnienie)}
       <div class="wykres"><canvas id="w-wynik"></canvas></div>`;
   },
   po({ v }) {

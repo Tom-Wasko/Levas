@@ -255,3 +255,7 @@ _brak_
 
 26.10 – F3a.11 dokończone na prośbę („start working until i say to stop”): zakładka **Finanse → Podatki**
   (Decyzje + Wyniki) zarejestrowana, KPiR pokazuje zaliczkę PIT i zdrowotną; render sprawdzony w node (rundy 1 i 4).
+
+26.10 – F3a.12 Uzgodnienie kasy: rodzaje operacji rachunku, `silnik/uzgodnienie.py`, sekcja w Raporcie, test
+  hypothesis. Test od razu złapał 4 prawdziwe błędy (3 × grosz z zaokrągleń, 1 × wywrotka gry przy zwrocie
+  ostatniej partii) – naprawione. Do potwierdzenia nic – to wewnętrzna kontrola silnika.

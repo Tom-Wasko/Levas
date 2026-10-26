@@ -52,6 +52,7 @@ from .rynek import (
     wzrost_reklamy_tradycyjnej,
 )
 from .srodki_trwale import amortyzuj, ewidencja
+from .uzgodnienie import uzgodnij
 
 EPS = 1e-9
 
@@ -243,7 +244,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             podatek = info[nazwa]["rozliczenie"]["zaliczka"] + info[nazwa]["rozliczenie"]["zdrowotna"]
         else:
             podatek = ks.podatek(z["finanse"]["podatek_cit"])
-            rach.zapisz(f, "Podatek dochodowy", -podatek)
+            rach.zapisz(f, "Podatek dochodowy", -podatek, "podatki")
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
         if tryb_lokali:
             bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
@@ -295,17 +296,20 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
         for zk in zakupy:
             k = f"{zk['zasob']}|{int(zk['jakosc'])}"
             ile = math.floor(min(float(zk["ilosc"]), f.magazyn.get(k, 0.0)) + 1e-9)
-            if f.partie:  # gra z lokalami: całe opakowania z partii tej rundy od tego dostawcy
+            z_partii = bool(f.partie)   # przed zwrotem – zwrot może zabrać ostatnią partię
+            if z_partii:  # gra z lokalami: całe opakowania z partii tej rundy od tego dostawcy
                 ile, _ = sw.zwroc(f, dostawca, zk["zasob"], int(zk["jakosc"]), runda, ile)
             if ile <= 0:
                 continue
-            if not f.partie:
+            if not z_partii:
                 f.magazyn[k] -= ile
                 f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
             wartosc += ile * zk["cena"]
             sv = rz.stawka_zasobu(dane, zk["zasob"]) or 0.0
             stawki[sv] = stawki.get(sv, 0.0) - ile * zk["cena"]
             wynik[zk["zasob"]] = wynik.get(zk["zasob"], 0.0) + ile
+        stawki = {sv: round(b, 2) for sv, b in stawki.items()}    # brutto co do grosza – kasa, VAT i KPiR z tej samej kwoty
+        wartosc = round(-sum(stawki.values()), 2)
         if wartosc <= 0:
             continue
         opis_zakupu = f"Zakup zasobu od dostawcy: {dostawca}"
@@ -315,7 +319,7 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
             if p["opis"] == opis_zakupu:
                 p["towary"] = round(p["towary"] - wartosc - vat, 2)
                 break
-        rach.zapisz(f, f"Zwrot zasobów do dostawcy: {dostawca}", round(wartosc, 2))
+        rach.zapisz(f, f"Zwrot zasobów do dostawcy: {dostawca}", wartosc, "korekta")
         ksieguj(f, ks, rach, f"Koszt zwrotu zasobów do dostawcy:  {dostawca}", wartosc * koszt)
     return wynik
 
@@ -338,7 +342,8 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
     w = {"runda": r, "miesiac": dane.nazwa_rundy(r), "kpir": ks.do_slownika(z["finanse"]["podatek_cit"]),
          "rachunek": rach.operacje, "gotowka": f.gotowka, "kredyt_odnawialny": f.kredyt_odnawialny,
          "zadluzenie": zadluzenie(f), "lokaty": sum(l.kwota for l in f.lokaty), "lista_bledow": bledy,
-         "reklama": info.get("reklama", {})}
+         "reklama": info.get("reklama", {}),
+         "uzgodnienie": uzgodnij(start["gotowka"], f.gotowka, ks, rach)}   # kasa = KPiR ± VAT ± poza KPiR
     if info.get("rozliczenie"):   # JDG: zamiast CIT – zaliczka PIT i składka zdrowotna; rejestr VAT
         w["kpir"].update(podatek=round(ks.dochod - netto, 2), dochod_netto=netto)
         w["rozliczenie"], w["vat"] = info["rozliczenie"], rz.rejestr(ks)

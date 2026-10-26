@@ -28,8 +28,8 @@ def zakup(dane: Dane, firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: st
           cena: float, runda: int, lokale: bool) -> None:
     """Zakup inwestycji: w grze z lokalami od progu – środek trwały, poniżej progu (i w grze Revas) – koszt od razu."""
     if lokale and cena >= dane.z["finanse"]["amortyzacja_prog"]:
-        rachunek.zapisz(firma, opis, -cena)
-        vat = ksiega.zarejestruj(opis, {dane.podatki["vat"]["srodki_trwale"]: cena}, False) if ksiega.vat is not None else 0.0
+        rachunek.zapisz(firma, opis, -cena, "inwestycje")
+        vat = ksiega.zarejestruj(opis, {dane.podatki["vat"]["srodki_trwale"]: cena}, False, inwestycja=True) if ksiega.vat is not None else 0.0
         przyjmij(dane, firma, nazwa, rodzaj, round(cena - vat, 2), runda)
     else:
         ksieguj(firma, ksiega, rachunek, opis, cena)
@@ -41,7 +41,8 @@ def sprzedaj(firma: Firma, nazwa: str, ksiega: Ksiega) -> bool:
     if st is None:
         return False
     firma.srodki_trwale.remove(st)
-    ksiega.dodaj(f"Niezamortyzowana wartość sprzedanego środka trwałego: {nazwa}", st.wartosc - st.umorzenie)
+    ksiega.dodaj(f"Niezamortyzowana wartość sprzedanego środka trwałego: {nazwa}", st.wartosc - st.umorzenie,
+                 bez_gotowki=True)
     return True
 
 
@@ -52,7 +53,7 @@ def amortyzuj(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega) -> None:
             continue
         odpis = min(round(st.wartosc * st.stawka / dane.rund_w_roku, 2), round(st.wartosc - st.umorzenie, 2))
         if odpis > 0:
-            ksiega.dodaj(f"Amortyzacja: {st.nazwa}", odpis)
+            ksiega.dodaj(f"Amortyzacja: {st.nazwa}", odpis, bez_gotowki=True)
             st.umorzenie = round(st.umorzenie + odpis, 2)
 
 

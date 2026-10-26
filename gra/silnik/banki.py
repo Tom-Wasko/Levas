@@ -124,7 +124,7 @@ def _przejmij_zastaw(dane: Dane, firma: Firma, k: Kredyt, runda: int, ksiega: Ks
     else:   # reszta długu zostaje jako kredyt bez zastawu (zaległość – rozłożona na pozostałe raty)
         k.pozostalo, k.zaleglosc, k.zalegle = round(dlug - wycena, 2), 0.0, 0
     if nadwyzka > 0:
-        rachunek.zapisz(firma, f"Nadwyżka z wyceny przejętego zastawu kredytu nr {k.id}", nadwyzka)
+        rachunek.zapisz(firma, f"Nadwyżka z wyceny przejętego zastawu kredytu nr {k.id}", nadwyzka, "kredyty")
     return {"kredyt": k.id, "bank": k.bank, "zastaw": opis, "wycena": wycena, "dlug": dlug, "nadwyzka": nadwyzka}
 
 
@@ -168,13 +168,13 @@ def poczatek_rundy(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: 
         lokata = next((x for x in firma.lokaty if x.id == lid), None)
         if lokata:
             firma.lokaty.remove(lokata)
-            rachunek.zapisz(firma, f"Zerwanie lokaty nr {lokata.id} (bez odsetek)", lokata.kwota)
+            rachunek.zapisz(firma, f"Zerwanie lokaty nr {lokata.id} (bez odsetek)", lokata.kwota, "lokaty")
             info["zerwane_lokaty"].append(lokata.id)
     for kid in decyzje.get("kredyty_splac", []):
         k = next((x for x in firma.kredyty if x.id == kid), None)
         if k and firma.gotowka >= k.pozostalo:
             firma.kredyty.remove(k)
-            rachunek.zapisz(firma, f"Spłata kredytu nr {k.id} ({k.bank})", -k.pozostalo)
+            rachunek.zapisz(firma, f"Spłata kredytu nr {k.id} ({k.bank})", -k.pozostalo, "kredyty")
             info["splacone_kredyty"].append(k.id)
         elif k:
             info["odrzucone"].append({"co": f"Spłata kredytu nr {k.id}", "powod": "za mało gotówki na koncie"})
@@ -190,7 +190,7 @@ def poczatek_rundy(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: 
                    miesiecy=int(d.get("rund") or d["miesiecy"]), pozostalo=kwota, bank=d["bank"],
                    produkt=produkt["produkt"], zastaw=d.get("zastaw", "") if produkt.get("zastaw") else "")
         firma.kredyty.append(k)
-        rachunek.zapisz(firma, f"{produkt['nazwa']} nr {k.id} ({k.bank})", kwota)
+        rachunek.zapisz(firma, f"{produkt['nazwa']} nr {k.id} ({k.bank})", kwota, "kredyty")
         ksieguj(firma, ksiega, rachunek, f"Prowizja za udzielenie kredytu nr {k.id} ({k.bank})",
                 round(kwota * produkt["prowizja"], 2))
         info["nowe_kredyty"].append(k.id)
@@ -208,7 +208,7 @@ def poczatek_rundy(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: 
         lokata = Lokata(id=firma.licznik, kwota=kwota, oprocentowanie=bank["lokaty"][rund], od_rundy=runda,
                         miesiecy=rund, bank=bank["nazwa"])
         firma.lokaty.append(lokata)
-        rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id} ({lokata.bank})", -kwota)
+        rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id} ({lokata.bank})", -kwota, "lokaty")
         info["nowe_lokaty"].append(lokata.id)
     return info
 
@@ -280,7 +280,7 @@ def koniec_rundy(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek:
         wiersz = {"kredyt": k.id, "bank": k.bank, "odsetki": odsetki, "rata": rata, "zaleglosc": k.zaleglosc}
         if _stac(dane, firma, odsetki + rata + k.zaleglosc):   # zaległe raty kapitałowe spłacane razem z bieżącą
             ksieguj(firma, ksiega, rachunek, f"Odsetki od kredytu nr {k.id} ({k.bank})", odsetki)
-            rachunek.zapisz(firma, f"Rata kapitałowa kredytu nr {k.id}", -(rata + k.zaleglosc))
+            rachunek.zapisz(firma, f"Rata kapitałowa kredytu nr {k.id}", -(rata + k.zaleglosc), "kredyty")
             k.pozostalo = round(k.pozostalo - rata - k.zaleglosc, 2)
             k.zaleglosc, k.zalegle = 0.0, 0
             wiersz["zaplacona"] = True
@@ -341,7 +341,7 @@ def koniec_rundy(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek:
         if runda >= lo.od_rundy + lo.miesiecy - 1:
             odsetki = round(lo.kwota * lo.oprocentowanie * lo.miesiecy / rwr, 2)
             firma.lokaty.remove(lo)
-            rachunek.zapisz(firma, f"Zakończenie lokaty nr {lo.id} ({lo.bank})", lo.kwota)
+            rachunek.zapisz(firma, f"Zakończenie lokaty nr {lo.id} ({lo.bank})", lo.kwota, "lokaty")
             ksieguj(firma, ksiega, rachunek, f"Odsetki od lokaty nr {lo.id} ({lo.bank})", odsetki, "przychod_pozostaly")
             info["lokaty"].append({"lokata": lo.id, "bank": lo.bank, "kwota": lo.kwota, "odsetki": odsetki})
     return info

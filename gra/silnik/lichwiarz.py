@@ -49,7 +49,7 @@ def stopa(dane: Dane, p: PozyczkaHarpagona, runda: int) -> float:
 
 def _gotowka(firma: Firma, rachunek: Rachunek, opis: str, kwota: float) -> None:
     n = len(rachunek.operacje)
-    rachunek.zapisz(firma, opis, kwota)
+    rachunek.zapisz(firma, opis, kwota, "harpagon")
     if len(rachunek.operacje) > n:
         rachunek.operacje[-1]["poza_ksiegami"] = True
 

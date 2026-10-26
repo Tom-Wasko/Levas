@@ -69,9 +69,9 @@ def rozlicz(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek: Rach
     vat = float(do_zlotego(saldo)) if saldo > 0 else 0.0
     roz.vat_nadwyzka = round(-saldo, 2) if saldo < 0 else 0.0
 
-    rachunek.zapisz(firma, "Składka zdrowotna właściciela", -zdrowotna)
-    rachunek.zapisz(firma, "Zaliczka na podatek dochodowy (PIT liniowy)", -zaliczka)
-    rachunek.zapisz(firma, "VAT do urzędu skarbowego", -vat)
+    rachunek.zapisz(firma, "Składka zdrowotna właściciela", -zdrowotna, "podatki")
+    rachunek.zapisz(firma, "Zaliczka na podatek dochodowy (PIT liniowy)", -zaliczka, "podatki")
+    rachunek.zapisz(firma, "VAT do urzędu skarbowego", -vat, "podatki")
     roz.zaplacone = round(roz.zaplacone + spoleczne + zdrowotna + zaliczka + vat, 2)
     return {"ulga_na_start": ulga, "zus_spoleczne": spoleczne,
             "zdrowotna": zdrowotna, "zdrowotna_minimum": minimum, "zdrowotna_odliczenie": odliczenie,

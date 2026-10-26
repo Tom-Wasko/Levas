@@ -20,6 +20,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from .model import Firma, Kredyt, Lokata
 
 KOLUMNY = ("przychod", "przychod_pozostaly", "towary", "wynagrodzenia", "pozostale")
+KOLUMNY_KOSZTOW = ("towary", "wynagrodzenia", "pozostale")
 
 
 def do_grosza(x: float) -> float:
@@ -46,8 +47,9 @@ class Ksiega:
         """Stawka z reguł po fragmencie opisu (pierwsza pasująca); brak – zwolnione (0)."""
         return next((r["stawka"] for r in self.vat["koszty"] if r["zawiera"] in opis), 0.0)
 
-    def zarejestruj(self, opis: str, stawki: dict[float, float], nalezny: bool) -> float:
-        """Wpisy do rejestru VAT (sprzedaży – należny, zakupów – naliczony) z kwot brutto wg stawek. Zwraca VAT."""
+    def zarejestruj(self, opis: str, stawki: dict[float, float], nalezny: bool, inwestycja: bool = False) -> float:
+        """Wpisy do rejestru VAT (sprzedaży – należny, zakupów – naliczony) z kwot brutto wg stawek. Zwraca VAT.
+        `inwestycja` – VAT od środka trwałego (zapłacony w kwocie inwestycji – osobno w uzgodnieniu kasy)."""
         razem = 0.0
         for stawka, brutto in stawki.items():
             vat = vat_z_brutto(brutto, stawka)
@@ -55,17 +57,19 @@ class Ksiega:
                 continue
             self.rejestr_vat.append({"opis": opis, "stawka": stawka, "brutto": round(brutto, 2),
                                      "netto": round(brutto - vat, 2), "vat": vat,
-                                     "rodzaj": "nalezny" if nalezny else "naliczony"})
+                                     "rodzaj": "nalezny" if nalezny else "naliczony", **({"inwestycja": True} if inwestycja else {})})
             razem += vat
         return round(razem, 2)
 
     def vat_suma(self, rodzaj: str) -> float:
         return round(sum(w["vat"] for w in self.rejestr_vat if w["rodzaj"] == rodzaj), 2)
 
-    def dodaj(self, opis: str, kwota: float, kolumna: str = "pozostale") -> None:
+    def dodaj(self, opis: str, kwota: float, kolumna: str = "pozostale", bez_gotowki: bool = False) -> None:
+        """Pozycja KPiR bez ruchu na rachunku (`bez_gotowki` – amortyzacja, niezamortyzowana wartość: koszt bez
+        wydatku, w uzgodnieniu kasy dodawany z powrotem)."""
         if abs(kwota) < 0.005:
             return
-        p = {"opis": opis, **{k: 0.0 for k in KOLUMNY}}
+        p = {"opis": opis, **{k: 0.0 for k in KOLUMNY}, **({"bez_gotowki": True} if bez_gotowki else {})}
         p[kolumna] = round(kwota, 2)
         self.pozycje.append(p)
 
@@ -94,16 +98,27 @@ class Ksiega:
                 "dochod_netto": round(self.dochod - self.podatek(stawka), 2)}
 
 
+# rodzaje operacji na rachunku: kpir – z zapisem w KPiR (ksieguj), korekta – zmienia istniejący zapis KPiR (zwrot
+# zasobów), reszta – poza KPiR
+RODZAJE_OPERACJI = {"kpir": "Zapisy w KPiR", "korekta": "Korekty zapisów w KPiR (zwroty zasobów)",
+                    "podatki": "Podatki i składki", "inwestycje": "Inwestycje (lokale, budowa, środki trwałe)",
+                    "kredyty": "Kredyty", "lokaty": "Lokaty", "kaucje": "Kaucje za lokale",
+                    "harpagon": "Harpagon (poza księgami)"}
+
+
 @dataclass
 class Rachunek:
-    """Historia rachunku bankowego w miesiącu (wpływy i wydatki gotówki)."""
+    """Historia rachunku bankowego w miesiącu (wpływy i wydatki gotówki). Każda operacja ma rodzaj (RODZAJE_OPERACJI)
+    – z niego uzgodnienie kasy z KPiR (silnik/uzgodnienie.py)."""
     operacje: list[dict] = field(default_factory=list)
 
-    def zapisz(self, firma: Firma, opis: str, kwota: float) -> None:
+    def zapisz(self, firma: Firma, opis: str, kwota: float, rodzaj: str) -> None:
+        assert rodzaj in RODZAJE_OPERACJI, rodzaj
+        kwota = round(kwota, 2)   # najpierw kwota operacji, potem saldo – saldo = suma operacji co do grosza
         if abs(kwota) < 0.005:
             return
         firma.gotowka = round(firma.gotowka + kwota, 2)
-        self.operacje.append({"opis": opis, "kwota": round(kwota, 2), "saldo": firma.gotowka})
+        self.operacje.append({"opis": opis, "kwota": kwota, "saldo": firma.gotowka, "rodzaj": rodzaj})
 
 
 def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: float, kolumna: str = "pozostale",
@@ -111,6 +126,7 @@ def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: 
     """Pozycja KPiR + ruch na rachunku (koszt zmniejsza gotówkę, przychód zwiększa). Z regułami VAT kwota jest
     brutto: `stawki` – części brutto wg stawek (zakup różnych składników), `stawka` – jedna stawka, bez nich – reguły."""
     znak = 1 if kolumna.startswith("przychod") else -1
+    kwota = do_grosza(kwota)     # raz, handlowo – ta sama kwota w KPiR (netto + VAT) i na rachunku
     if ksiega.vat is not None and abs(kwota) >= 0.005:
         if stawki is None:
             stawki = {ksiega.stawka_vat(opis) if stawka is None else stawka: kwota}
@@ -118,7 +134,7 @@ def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: 
         ksiega.dodaj(opis, round(kwota - vat, 2), kolumna)
     else:
         ksiega.dodaj(opis, kwota, kolumna)
-    rachunek.zapisz(firma, opis, znak * kwota)
+    rachunek.zapisz(firma, opis, znak * kwota, "kpir")
 
 
 def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> dict:
@@ -128,20 +144,20 @@ def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, 
         lokata = next((x for x in firma.lokaty if x.id == l), None)
         if lokata:
             firma.lokaty.remove(lokata)
-            rachunek.zapisz(firma, f"Zerwanie lokaty nr {lokata.id} (bez odsetek)", lokata.kwota)
+            rachunek.zapisz(firma, f"Zerwanie lokaty nr {lokata.id} (bez odsetek)", lokata.kwota, "lokaty")
             info["zerwane_lokaty"].append(lokata.id)
     for k in decyzje.get("kredyty_splac", []):
         kredyt = next((x for x in firma.kredyty if x.id == k), None)
         if kredyt and firma.gotowka >= kredyt.pozostalo:
             firma.kredyty.remove(kredyt)
-            rachunek.zapisz(firma, f"Spłata kredytu nr {kredyt.id}", -kredyt.pozostalo)
+            rachunek.zapisz(firma, f"Spłata kredytu nr {kredyt.id}", -kredyt.pozostalo, "kredyty")
             info["splacone_kredyty"].append(kredyt.id)
     for d in decyzje.get("kredyty_wez", []):
         firma.licznik += 1
         kredyt = Kredyt(id=firma.licznik, kwota=float(d["kwota"]), oprocentowanie=bank["kredyt"], od_rundy=runda,
                         miesiecy=int(d["miesiecy"]), pozostalo=float(d["kwota"]))
         firma.kredyty.append(kredyt)
-        rachunek.zapisz(firma, f"Kredyt nr {kredyt.id}", kredyt.kwota)
+        rachunek.zapisz(firma, f"Kredyt nr {kredyt.id}", kredyt.kwota, "kredyty")
         info["nowe_kredyty"].append(kredyt.id)
     for d in decyzje.get("lokaty_zaloz", []):
         kwota = min(float(d["kwota"]), max(0.0, firma.gotowka))
@@ -151,7 +167,7 @@ def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, 
         lokata = Lokata(id=firma.licznik, kwota=kwota, oprocentowanie=bank["lokata"], od_rundy=runda,
                         miesiecy=int(d["miesiecy"]))
         firma.lokaty.append(lokata)
-        rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id}", -kwota)
+        rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id}", -kwota, "lokaty")
         info["nowe_lokaty"].append(lokata.id)
     return info
 
@@ -168,7 +184,7 @@ def bank_koniec_miesiaca(firma: Firma, bank: dict, runda: int, ksiega: Ksiega, r
         odsetki = round(k.pozostalo * k.oprocentowanie / rund_w_roku, 2)
         rata = round(min(k.pozostalo, k.kwota / k.miesiecy), 2)
         ksieguj(firma, ksiega, rachunek, f"Odsetki od kredytu nr {k.id}", odsetki)
-        rachunek.zapisz(firma, f"Rata kapitałowa kredytu nr {k.id}", -rata)
+        rachunek.zapisz(firma, f"Rata kapitałowa kredytu nr {k.id}", -rata, "kredyty")
         k.pozostalo = round(k.pozostalo - rata, 2)
         if k.pozostalo <= 0.005:
             firma.kredyty.remove(k)
@@ -181,7 +197,7 @@ def bank_koniec_miesiaca(firma: Firma, bank: dict, runda: int, ksiega: Ksiega, r
         if runda >= l.od_rundy + l.miesiecy - 1:
             odsetki = round(l.kwota * l.oprocentowanie * l.miesiecy / rund_w_roku, 2)
             firma.lokaty.remove(l)
-            rachunek.zapisz(firma, f"Zakończenie lokaty nr {l.id}", l.kwota)
+            rachunek.zapisz(firma, f"Zakończenie lokaty nr {l.id}", l.kwota, "lokaty")
             ksieguj(firma, ksiega, rachunek, f"Odsetki od lokaty nr {l.id}", odsetki, "przychod_pozostaly")
 
 
@@ -191,7 +207,7 @@ def uruchom_odnawialny(firma: Firma, rachunek: Rachunek) -> float:
         return 0.0
     kwota = round(-firma.gotowka, 2)
     firma.kredyt_odnawialny = round(firma.kredyt_odnawialny + kwota, 2)
-    rachunek.zapisz(firma, "Uruchomienie kredytu odnawialnego", kwota)
+    rachunek.zapisz(firma, "Uruchomienie kredytu odnawialnego", kwota, "kredyty")
     return kwota
 
 
@@ -204,7 +220,7 @@ def wyrownaj_gotowke(firma: Firma, rachunek: Rachunek, pobrany_w_miesiacu: float
     if do_splaty > 0 and firma.gotowka > 0:
         splata = round(min(do_splaty, firma.gotowka), 2)
         firma.kredyt_odnawialny = round(firma.kredyt_odnawialny - splata, 2)
-        rachunek.zapisz(firma, "Spłata kredytu odnawialnego", -splata)
+        rachunek.zapisz(firma, "Spłata kredytu odnawialnego", -splata, "kredyty")
     return 0.0
 
 
