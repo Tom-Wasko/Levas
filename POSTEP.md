@@ -27,4 +27,6 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 
 - [x] F3a.7 Czas właściciela – pula godzin na rundę (`zalozenia.yaml`: `operacje.czas_wlasciciela`, 20 h), `silnik/czas_wlasciciela.py`; zużywa ją odbiór osobisty w dyskontach (kolejno po dniach), dzień zakupów bez wolnych godzin jest odrzucony – czerwony błąd na liście błędów (zakładka Dostawcy); nowa zakładka **Czas właściciela** (Decyzje: plan godzin rundy; Wyniki: wykorzystanie i odrzucone decyzje), podpowiedź w Dostawcach; test `test_czas_wlasciciela.py`
 
-Zadania F3a.8–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3a.8 Agencja pracy – `silnik/rynek_pracy.py`, `dane/kandydaci.yaml` (`agencja`): kanały rekrutacji pracuj.pl / agencja / headhunter (gwiazdki, opłata, mnożnik kosztu rekrutacji, czas właściciela, od rundy), wspólna pula kandydatów z licytacją (wyższa pensja, remis – losowanie), limit 3 nowych na rundę, podkupienie przez headhuntera z kontrofertą, okres wypowiedzenia wg stażu (`Pracownik.odchodzi`), zwolnieni wracają do puli; nowa zakładka **Rynek pracy** (Decyzje + Wyniki) w HR, wybór kanału w oknie zatrudnienia; test `test_rynek_pracy.py`
+
+Zadania F3a.9–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

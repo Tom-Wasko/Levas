@@ -168,6 +168,40 @@ losowanie:
   - 0.4
   - 0.5
   - 0.6
+agencja:
+  zrodlo: notatki „Elementy mapy” (Agencja pracy, limit 3), „Ustalenia gry” (odblokowanie, okres wypowiedzenia),
+    „Prawidła świata” (KP art. 36); opłaty, gwiazdki w kanałach i czas właściciela – założenie F3a.8
+  limit_nowych: 3
+  kanaly:
+    pracuj:
+      nazwa: pracuj.pl (ogłoszenie)
+      od_rundy: 1
+      gwiazdki: [1, 2]
+      oplata: 150
+      mnoznik_rekrutacji: 0
+      czas_wlasciciela: 2
+    agencja:
+      nazwa: Agencja pracy
+      od_rundy: 2
+      gwiazdki: [2, 3]
+      oplata: 0
+      mnoznik_rekrutacji: 1
+      czas_wlasciciela: 0
+    headhunter:
+      nazwa: Headhunter
+      od_rundy: 4
+      gwiazdki: [3]
+      oplata: 0
+      mnoznik_rekrutacji: 3
+      czas_wlasciciela: 0
+      podkupienie_czesc_pensji: 0.5
+  wypowiedzenie:
+  - staz_od: 0
+    rund: 2
+  - staz_od: 26
+    rund: 4
+  - staz_od: 156
+    rund: 13
 imiona_kobiet:
 - Anna
 - Katarzyna

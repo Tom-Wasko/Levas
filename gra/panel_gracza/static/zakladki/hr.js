@@ -54,9 +54,11 @@ export const zatrudnienie = {
     "potwierdz-zatrudnienie": async (el, c) => {
       const pensja = +document.getElementById("z-pensja").value, umowa = document.getElementById("z-umowa").value;
       if (pensja < c.kat.placa_minimalna) return toast(`Pensja nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);
-      const { k, t, n } = el.dataset;
+      const { k, t, n } = el.dataset, kanal = document.getElementById("z-kanal")?.value;
       zamknijOkno();
-      await c.zmien((d) => { d.zatrudnij = [...(d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n)), { kandydat: k, typ: t, nr: +n, pensja, umowa }]; });
+      await c.zmien((d) => {
+        d.zatrudnij = [...(d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n)), { kandydat: k, typ: t, nr: +n, pensja, umowa, ...(kanal ? { kanal } : {}) }];
+      });
     },
     profil: (el, c) => oknoProfilu(c, el.dataset.id),
     "zapisz-profil": async (el, c) => {
@@ -93,14 +95,26 @@ function oknoKandydatow({ v, kat }, typ, nr) {
     + `<p class="podpowiedz">${TYPY.map((t) => `${esc(typy[t].kto)}: ${typy[t].zawody.map(esc).join(", ")}`).join(" · ")}</p>`);
 }
 
+// gra z lokalami: kandydata szuka się przez kanał rekrutacji (zakładka Rynek pracy) – koszt i czas właściciela zależą od kanału
+function kanalyRekrutacji(v, k) {
+  const A = v.agencja;
+  if (!A) return "";
+  const opcje = (A.kanaly_kandydatow[k.id] || []).map((n) => {
+    const kn = A.kanaly[n], koszt = kn.oplata + kn.mnoznik_rekrutacji * k.koszt_rekrutacji;
+    return `<option value="${esc(n)}">${esc(kn.nazwa)} – ${zl(koszt)}${kn.czas_wlasciciela ? `, ${licz(kn.czas_wlasciciela, 1)} h czasu właściciela` : ""}</option>`;
+  }).join("");
+  return `<label class="pole">Kanał rekrutacji (<a data-zakladka-k="rynek_pracy">Rynek pracy</a>)<select id="z-kanal">${opcje}</select></label>
+    <p class="podpowiedz">Gdy kandydata chce kilka drużyn, wygrywa najwyższa pensja (remis – losowanie).</p>`;
+}
+
 function oknoZatrudnienia({ v, kat }, id, typ, nr) {
   const k = v.kandydaci.find((x) => x.id === id);
   okno(`Zatrudnienie: ${esc(k.imie_nazwisko)}`, `<p>${esc(k.zawod)} ${gw(k.gwiazdki)} · preferowane wynagrodzenie <b>${zl(k.pensja_preferowana)}</b>
-      · koszt rekrutacji ${zl(k.koszt_rekrutacji)}</p>
+      · ${v.agencja ? "bazowy " : ""}koszt rekrutacji ${zl(k.koszt_rekrutacji)}</p>
     <div class="dwie"><label class="pole">Wynagrodzenie brutto (min. ${licz(kat.placa_minimalna)} PLN)
       <input type="number" id="z-pensja" min="${kat.placa_minimalna}" step="10" value="${k.pensja_preferowana}"></label>
     <label class="pole">Forma zatrudnienia<select id="z-umowa"><option value="prace">Umowa o pracę (+${proc(kat.parametry.zus, 0)} ZUS pracodawcy)</option>
-      <option value="zlecenie">Umowa zlecenie</option></select></label></div>
+      <option value="zlecenie">Umowa zlecenie</option></select></label></div>${kanalyRekrutacji(v, k)}
     <p class="podpowiedz">Pensja wyższa od preferowanej i umowa o pracę podnoszą zadowolenie pracowników.</p>`,
     { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="potwierdz-zatrudnienie" data-k="${esc(id)}" data-t="${typ}" data-n="${nr}">Potwierdź</button>` });

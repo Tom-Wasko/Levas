@@ -12,19 +12,20 @@ import { mapa } from "./mapa.js";
 import { klienci } from "./klienci.js";
 import { swiezosc } from "./swiezosc.js";
 import { czas_wlasciciela } from "./czas.js";
+import { rynek_pracy } from "./rynek_pracy.js";
 
-const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, udogodnienia, szkolenia,
+const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
   dostawcy, swiezosc, czas_wlasciciela, tradycyjny, internetowy, sprzedaz, raport, kpir, bank, biuro, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
 export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
-  wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar",
+  wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", rynek_pracy: "rynek_pracy", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar",
   tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", bank: "bank",
   biuro: "biuro", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
 
 // od której rundy zakładka jest dostępna (podpowiedź w menu)
 export const OD_RUNDY = { karta_wynikow: 3, udogodnienia: 3, wyposazenie: 4, tradycyjny: 5, internetowy: 6, szkolenia: 7,
-  sprzet: 2, zatrudnienie: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2 };
+  sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2 };
 
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
@@ -33,7 +34,7 @@ export const MENU = [
   { klucz: "klienci", tytul: "Klienci i strefy", ikona: "klienci" },
   { klucz: "oferta", tytul: "Oferta", ikona: "oferta" },
   { klucz: "inwestycje", tytul: "Inwestycje", ikona: "inwestycje", pod: ["stanowiska", "sprzet", "wyposazenie", "srodki_trwale"] },
-  { klucz: "hr", tytul: "HR", ikona: "hr", pod: ["zatrudnienie", "udogodnienia", "szkolenia"] },
+  { klucz: "hr", tytul: "HR", ikona: "hr", pod: ["zatrudnienie", "rynek_pracy", "udogodnienia", "szkolenia"] },
   { klucz: "dostawcy", tytul: "Dostawcy", ikona: "dostawcy" },
   { klucz: "swiezosc", tytul: "Magazyn i świeżość", ikona: "swiezosc" },
   { klucz: "czas_wlasciciela", tytul: "Czas właściciela", ikona: "zegar" },

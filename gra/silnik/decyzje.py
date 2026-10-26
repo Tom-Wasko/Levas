@@ -10,6 +10,9 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
     zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
+                       gra z lokalami: opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/rynek_pracy.py)
+    podkup:            [{"pracownik", "firma", "pensja", "umowa"}]   – gra z lokalami: oferta przez headhuntera
+    kontroferty:       {id pracownika: pensja}              – odpowiedź na oferty innych firm (ta sama runda)
                        opcjonalnie "zastepca": true + "wzor": {"zawod", "gwiazdki"} – gdy kandydata zatrudni
                        wcześniej inna firma, zatrudniany jest najbardziej podobny
     zmiany:            {id pracownika: {"pensja", "umowa", "premia"}}
@@ -31,6 +34,7 @@ import math
 from datetime import timedelta
 
 from . import czas_wlasciciela as cw
+from . import rynek_pracy as rp
 from . import srodki_trwale as st_trwale
 from . import swiezosc as sw
 from .dane import KASA, KUCHNIA, Dane
@@ -73,6 +77,30 @@ def kandydaci_firmy(pula: list[dict], firma: Firma) -> list[dict]:
     A/B/C drużyny A i C zatrudniły w lutym te same osoby (Miś, Tarnowska), a Mroczkowskiego A w lutym, C w marcu."""
     zajeci = {p.imie_nazwisko for p in firma.pracownicy.values()}
     return [k for k in pula if k["id"] not in firma.pracownicy and k["imie_nazwisko"] not in zajeci]
+
+
+def _kanal(dane: Dane, kandydat: dict, wybrany: str | None, runda: int, czas: cw.Czas, info: dict) -> str | None:
+    """Kanał rekrutacji kandydata (gra z lokalami) i zajęcie czasu właściciela; None – nie da się zatrudnić."""
+    mozliwe = rp.kanaly_kandydata(dane, kandydat, runda)
+    if not mozliwe:
+        return None
+    kanaly = rp.kanaly(dane, runda)
+    uwagi = info.setdefault("uwagi_rynku_pracy", [])
+    if wybrany:
+        if wybrany not in mozliwe:
+            k = kanaly.get(wybrany)
+            uwagi.append(f"{kandydat['imie_nazwisko']}: kanał „{k['nazwa'] if k else wybrany}” "
+                         + (f"dostępny od rundy {k['od_rundy']}" if k and not k["dostepny"] else "nie obejmuje tego kandydata")
+                         + " – nie zatrudniono.")
+            return None
+        mozliwe = [wybrany]
+    for n in mozliwe:
+        h = kanaly[n]["czas_wlasciciela"]
+        if not h or czas.wez(h, f"{kanaly[n]['nazwa']}: wybór kandydata {kandydat['imie_nazwisko']}", "zatrudnienie"):
+            return n
+    uwagi.append(f"{kandydat['imie_nazwisko']}: brak czasu właściciela na rekrutację przez "
+                 f"{kanaly[mozliwe[-1]]['nazwa']} – nie zatrudniono.")
+    return None
 
 
 def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ceny_dostawcow: dict,
@@ -134,6 +162,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
 
     # sprzedaż i zakup sprzętu
     sprzet_ok, kadry_ok = "inwestycje_sprzet" in odbl, "hr_zatrudnienie" in odbl
+    czas = cw.nowy(dane) if lokale else None   # czas właściciela: pracuj.pl, potem odbiór osobisty w dyskontach
     for s in d.get("sprzet_sprzedaj", []) if sprzet_ok else []:
         st = firma.stanowisko(s["typ"], int(s["nr"]))
         if st and s["nazwa"] in st.sprzet and s["nazwa"] not in st.sprzet_wynajmujacego:
@@ -178,7 +207,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             p.umowa = zm["umowa"]
         p.premia = float(zm.get("premia", 0) or 0)
     for z in d.get("zatrudnij", []) if kadry_ok else []:
-        dostepni = kandydaci_firmy(pula, firma)
+        dostepni = kandydaci_firmy(rp.widoczni(dane, pula, runda) if lokale else pula, firma)
         kandydat = next((k for k in dostepni if k["id"] == z["kandydat"]), None)
         if kandydat is None and z.get("zastepca"):
             # kandydata nie ma na liście: najbardziej podobny (gwiazdki, potem pensja)
@@ -192,6 +221,13 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             continue
         if dane.typ_zawodu(kandydat["zawod"]) != st.typ:
             continue
+        koszt = kandydat["koszt_rekrutacji"]
+        if lokale:  # kanał rekrutacji: wskazany albo najtańszy, na który starcza czasu właściciela
+            kanal = _kanal(dane, kandydat, z.get("kanal"), runda, czas, info)
+            if kanal is None:
+                info.setdefault("nieudane_zatrudnienia", []).append(z)
+                continue
+            koszt = rp.koszt(dane, kanal, kandydat)
         p = Pracownik(id=kandydat["id"], imie_nazwisko=kandydat["imie_nazwisko"], zawod=kandydat["zawod"],
                       gwiazdki=kandydat["gwiazdki"], pensja_preferowana=kandydat["pensja_preferowana"],
                       koszt_rekrutacji=kandydat["koszt_rekrutacji"], koszt_odprawy=kandydat["koszt_odprawy"],
@@ -200,8 +236,11 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                       od_rundy=runda, stanowisko=st.nr)
         firma.pracownicy[p.id] = p
         st.pracownik = p.id
-        ksieguj(firma, ksiega, rachunek, f"Koszt zatrudnienia: {p.imie_nazwisko}", p.koszt_rekrutacji)
+        ksieguj(firma, ksiega, rachunek, f"Koszt zatrudnienia: {p.imie_nazwisko}", koszt)
         info["zatrudnieni"].append(p.id)
+        if lokale:
+            info.setdefault("kanaly_zatrudnienia", []).append({"pracownik": p.id, "imie_nazwisko": p.imie_nazwisko,
+                                                               "kanal": kanal, "koszt": koszt, "pensja": p.pensja})
 
     # zasoby od dostawców
     zakupy, zamowienia = {}, []
@@ -211,7 +250,6 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         if ilosc > 0 and cena is not None:
             zamowienia.append({**z, "ilosc": ilosc, "cena": cena})
     if lokale:  # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/dostawcy.py)
-        czas = cw.nowy(dane)
         zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
                                                     (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
         info["czas_wlasciciela"] = czas.podsumowanie()
@@ -323,6 +361,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj(poziom, "swiezosc", tekst)
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
+        for tekst in (info or {}).get("uwagi_rynku_pracy", []):
+            dodaj("czerwony", "zatrudnienie", tekst)
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

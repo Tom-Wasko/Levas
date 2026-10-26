@@ -53,6 +53,17 @@ class Model(BaseModel):
         return d
 
 
+class Odejscie(Model):
+    """Pracownik przyjął ofertę innej firmy (F3a.8): przechodzi do niej w rundzie `runda` (po okresie wypowiedzenia)."""
+    do: str
+    runda: int
+    pensja_gr: int
+    umowa: str = "prace"
+    od_rundy: int                 # runda przyjęcia oferty
+
+    pensja = _kwota("pensja")
+
+
 class Pracownik(Model):
     id: str
     imie_nazwisko: str
@@ -68,6 +79,7 @@ class Pracownik(Model):
     od_rundy: int = 0
     stanowisko: int = 0           # numer stanowiska (od 1) w grupie: instruktor/trener albo recepcja
     premia_gr: int = 0            # premia w bieżącej rundzie
+    odchodzi: Odejscie | None = None   # gra z lokalami: okres wypowiedzenia po przyjęciu oferty innej firmy
 
     pensja_preferowana = _kwota("pensja_preferowana")
     koszt_rekrutacji = _kwota("koszt_rekrutacji")

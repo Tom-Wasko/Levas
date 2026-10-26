@@ -11,6 +11,7 @@ from copy import deepcopy
 
 from . import lokale as lk
 from . import popyt as pp
+from . import rynek_pracy as rp
 from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_rundy
@@ -156,7 +157,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
 
     # zatrudnienie (od rundy 2): stanowiska bez pracownika, które mają (albo dostają) sprzęt
     if "hr_zatrudnienie" in odbl:
-        pula = kandydaci_firmy(stan.kandydaci, stan.firmy[nazwa])
+        pula = kandydaci_firmy(rp.widoczni(dane, stan.kandydaci, runda) if lokale else stan.kandydaci, stan.firmy[nazwa])
         rng = strumien(konf["ziarno"], runda, "bot", nazwa)
         obsada = {o["nr"]: o["zawod"] for o in d.pop("_obsada", [])}
         for s in istniejace:
@@ -168,6 +169,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         cele = [(KUCHNIA, nr, zawod) for nr, zawod in sorted(obsada.items())]
         cele += [(KASA, s.nr, kasjer) for s in rec if not s.pracownik]
         cele += [(KASA, len(rec) + i + 1, kasjer) for i in range(nowe_rec)]
+        if lokale:  # agencja pracy: najwyżej limit nowych na rundę, resztę bot zatrudni w kolejnych
+            cele = cele[: rp.ustawienia(dane)["limit_nowych"]]
         for typ, nr, zawod in cele:
             kandydaci = [k for k in pula if k["zawod"] == zawod]
             if not kandydaci:

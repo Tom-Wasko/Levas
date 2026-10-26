@@ -4,6 +4,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from silnik import czas_wlasciciela as cw
+from silnik import rynek_pracy as rp
 from silnik import swiezosc
 from silnik.dane import Dane
 from silnik.decyzje import (
@@ -48,12 +49,17 @@ def stan_po_szkicu(gra: Gra, firma: str):
     lokale = tryb_lokali(gra.dane, gra.konfiguracja)
     # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
     lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach) if lokale else None
+    uwagi_rp = []
+    if lokale:  # limit nowych i ważność ofert podkupienia (licytacje i odpowiedzi pracowników – dopiero w przeliczeniu)
+        dd, _, raport = rp.przed_decyzjami(gra.dane, deepcopy(stan), {firma: d}, r, gra.konfiguracja["ziarno"])
+        d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
     info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_rundy(gra.dane, gra.konfiguracja["ziarno"], r,
                                                                   gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach,
                     lokale)
     info["lokal"] = lokal
     bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
                          lokal, info)
+    bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
     return stan, f, ks, info, bledy
 
 
@@ -156,8 +162,26 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["srodki_trwale"] = ewidencja(f)
         v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
                                  else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
+        v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
+        v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)
         v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
     return v
+
+
+def _agencja(gra: Gra, firma: str, runda: int, f: Firma, stan, edycja: bool) -> dict:
+    """Zakładka Rynek pracy: kanały rekrutacji, pracownicy innych firm (headhunter), oferty dla moich pracowników
+    (zapisane decyzje innych firm w tej rundzie – do kontroferty), staż i okres wypowiedzenia moich pracowników."""
+    dane = gra.dane
+    u = rp.ustawienia(dane)
+    return {"kanaly": rp.kanaly(dane, runda), "limit": u["limit_nowych"], "wypowiedzenie": u["wypowiedzenie"],
+            "kanaly_kandydatow": {k["id"]: rp.kanaly_kandydata(dane, k, runda) for k in stan.kandydaci},
+            "headhunter": rp.headhunter_dostepny(dane, runda),
+            "cudzy": rp.pracownicy_rynku(dane, stan, firma, runda) if rp.headhunter_dostepny(dane, runda) else [],
+            "oferty_dla_mnie": rp.oferty_dla(gra.decyzje.get(runda, {}), f, firma) if edycja else [],
+            "moi": [{"id": p.id, "imie_nazwisko": p.imie_nazwisko, "zawod": p.zawod, "gwiazdki": p.gwiazdki, "pensja": p.pensja,
+                     "umowa": p.umowa, "staz": rp.staz(p, runda), "okres": rp.okres_wypowiedzenia(dane, p, runda),
+                     "odchodzi": do_slownika(p.odchodzi) if p.odchodzi else None}
+                    for p in sorted(f.pracownicy.values(), key=lambda p: p.id)]}
 
 
 def _lokale(gra: Gra, firma: str, runda: int, f: Firma, poprzedni, stan, info: dict | None) -> dict:

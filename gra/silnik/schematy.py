@@ -175,9 +175,39 @@ class Nazwisko(Schemat):
     k: str
 
 
+class KanalRekrutacji(Schemat):
+    nazwa: str
+    od_rundy: int = Field(ge=1)
+    gwiazdki: list[int] = Field(min_length=1)
+    oplata: float = Field(ge=0)                 # zł za zatrudnienie
+    mnoznik_rekrutacji: float = Field(ge=0)     # × koszt rekrutacji kandydata
+    czas_wlasciciela: float = Field(ge=0)       # godziny na zatrudnienie
+    podkupienie_czesc_pensji: float | None = Field(None, ge=0)   # headhunter: opłata za podkupienie (× pensja)
+
+
+class Wypowiedzenie(Schemat):
+    staz_od: int = Field(ge=0)                  # staż u obecnego pracodawcy w rundach
+    rund: int = Field(ge=0)
+
+
+class Agencja(Schemat):
+    zrodlo: str = Zrodlo
+    limit_nowych: int = Field(ge=1)
+    kanaly: dict[str, KanalRekrutacji]
+    wypowiedzenie: list[Wypowiedzenie] = Field(min_length=1)
+
+    @field_validator("kanaly")
+    @classmethod
+    def _headhunter(cls, v: dict[str, KanalRekrutacji]) -> dict[str, KanalRekrutacji]:
+        if "headhunter" not in v or v["headhunter"].podkupienie_czesc_pensji is None:
+            raise ValueError("kanał headhunter z podkupienie_czesc_pensji jest wymagany (podkupienia)")
+        return v
+
+
 class PlikKandydatow(Plik):
     znani: list[ZnanyKandydat]
     losowanie: Losowanie
+    agencja: Agencja | None = None  # kanały rekrutacji gry z lokalami (F3a.8); katalog Revasa ich nie ma
     imiona_kobiet: list[str] = Field(min_length=1)
     imiona_mezczyzn: list[str] = Field(min_length=1)
     nazwiska: list[Nazwisko] = Field(min_length=1)

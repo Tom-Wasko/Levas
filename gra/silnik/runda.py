@@ -21,6 +21,7 @@ from . import karta as kw
 from . import lokale as lk
 from . import menu
 from . import popyt as pp
+from . import rynek_pracy as rp
 from . import swiezosc as sw
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
@@ -71,6 +72,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     tryb_kredytu = konfiguracja.get("kredyt_odnawialny", "jednoczesnie")
     tryb_lokali = lk.tryb_lokali(dane, konfiguracja)
     zajete = lk.zajete(s.firmy)
+    rezerwacje, rynek_pracy = {}, {}
+    if tryb_lokali:  # agencja pracy: limit nowych, licytacje kandydatów, podkupienia i kontroferty (silnik/rynek_pracy.py)
+        decyzje, rezerwacje, rynek_pracy = rp.przed_decyzjami(dane, s, decyzje, r, ziarno)
     for nazwa in kolejnosc:
         f = s.firmy[nazwa]
         d = decyzje.get(nazwa, {})
@@ -88,12 +92,25 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         bank_info = bank_poczatek_miesiaca(f, dane.pozycje("banki")[f.bank], d, r, ksiegi[nazwa], rachunki[nazwa]) \
             if f.bank else None
         lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa]) if tryb_lokali else None
-        info[nazwa] = zastosuj(dane, f, d, r, s.kandydaci, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
+        przed = dict(f.pracownicy)
+        pula = rp.pula_dla(s.kandydaci, rezerwacje, nazwa) if tryb_lokali else s.kandydaci
+        info[nazwa] = zastosuj(dane, f, d, r, pula, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
+        if tryb_lokali:  # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
+            zatrudnieni = set(info[nazwa]["zatrudnieni"])
+            s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
+                + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
         bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
         info[nazwa]["lokal"] = lokal
         if bank_info is not None:
             info[nazwa]["bank"] = bank_info
         odnawialny[nazwa] = uruchom_odnawialny(f, rachunki[nazwa]) if tryb_kredytu == "na_biezaco" else 0.0
+
+    if tryb_lokali:  # przejścia pracowników po okresie wypowiedzenia, opłaty headhuntera
+        rp.po_decyzjach(dane, s, r, rynek_pracy, ksiegi, rachunki)
+        for nazwa in nazwy:
+            rynek_pracy[nazwa]["zatrudnieni"] = info[nazwa].get("kanaly_zatrudnienia", [])
+            info[nazwa]["rynek_pracy"] = rynek_pracy[nazwa]
+            bledy[nazwa] += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in rynek_pracy[nazwa]["uwagi"]]
 
     # --- rynek i sprzedaż ----------------------------------------------------------------------
     popyt, obsluga, oferty = {}, {}, {}
@@ -213,6 +230,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
+            wyniki[nazwa]["rynek_pracy"] = info[nazwa].get("rynek_pracy")
             wyniki[nazwa]["srodki_trwale"] = ewidencja(f)
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]

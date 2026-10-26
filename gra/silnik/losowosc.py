@@ -26,6 +26,7 @@ CELE = frozenset({
     "lokal",       # wybór lokalu przez bota: runda, nazwa firmy
     "popyt",       # szum popytu: runda, firma, usługa
     "reklamacje",  # reklamacje: runda, firma, usługa
+    "rynek_pracy", # remisy w licytacjach i ofertach podkupienia: runda, rodzaj, id osoby
 })
 
 

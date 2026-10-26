@@ -33,6 +33,12 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    właściciela, więc liczba osób w drużynie nie zmienia puli. Na razie zużywa ją tylko odbiór osobisty w dyskontach
    (1–1,5 h za dzień zakupów), później pracuj.pl i parki. Czy 20 h jest dobre i czy pula ma rosnąć z liczbą osób
    w drużynie? (zadane: 26.10 5:30, do wysłania w poniedziałek o 6:00)
+5. **Agencja pracy (F3a.8).** Przyjąłem: pracuj.pl – kandydaci 1–2★, 150 zł + 2 h czasu właściciela;
+   agencja – 2–3★, koszt = koszt rekrutacji kandydata; headhunter (od rundy 4) – 3★, 3 × koszt rekrutacji, a za
+   podkupienie 50% oferowanej pensji. Limit 3 nowych osób na rundę, okres wypowiedzenia 2/4/13 rund (staż od 0/26/156
+   rund). Staż liczę od zatrudnienia w grze – notatki mówią o „losowym stażu” kandydatów w puli; czy kandydaci
+   mają przychodzić z losowym stażem (wtedy ten staż liczy się do okresu wypowiedzenia)? Czy kwoty i gwiazdki pasują?
+   (zadane: 26.10 5:45, do wysłania w poniedziałek o 6:00)
 
 ## Odłożone zadania
 
@@ -183,3 +189,18 @@ _brak_
     odrzucony w całości, czerwony błąd w zakładce Dostawcy,
   - nowa zakładka **Czas właściciela** (Decyzje + Wyniki) w menu pod „Magazyn i świeżość”; pracuj.pl (F3a.8)
     i parki (F3b.1) dopiszą się do tej samej puli.
+- 26.10 5:45 – F3a.8 gotowe: agencja pracy i rynek pracy. Decyzje **do potwierdzenia** (pytanie 5):
+  - kanały: pracuj.pl (1–2★, 150 zł + 2 h czasu właściciela), agencja (2–3★, koszt rekrutacji), headhunter
+    (od rundy 4, 3★, 3 × koszt rekrutacji; podkupienie: 50% oferowanej pensji, płatne w rundzie przyjęcia oferty),
+    bez wskazania kanału – najtańszy dostępny; kandydat bez żadnego kanału nie jest widoczny,
+  - wspólna pula: kilka drużyn chce tego samego kandydata → wygrywa wyższa pensja, remis – losowanie; zwolniony wraca
+    do puli; kandydaci z puli dostępni od razu,
+  - limit 3 nowych osób na rundę (zatrudnienia + oferty podkupienia; zatrudnienia mają pierwszeństwo),
+  - podkupienie: pracownik przyjmuje najwyższą ofertę wyższą od pensji i kontroferty; kontroferta pracodawcy
+    w tej samej rundzie (oferty widać na żywo, gdy druga drużyna zapisze decyzje), wygrana kontroferta = nowa pensja;
+    odejście po okresie wypowiedzenia (umowa o pracę 2/4/13 rund wg stażu, zlecenie – od razu), w tym czasie nie można
+    go zwolnić; brak wolnego stanowiska u nowego pracodawcy w dniu przejścia → osoba wraca do puli,
+  - boty nie podkupują; staż liczony od zatrudnienia w grze (bez losowego stażu z puli – pytanie 5),
+  - nowa zakładka **Rynek pracy** (Decyzje: kanały, oferty dla moich pracowników + kontroferta, staż i okres
+    wypowiedzenia, headhunter; Wyniki: zatrudnieni z kanałem i kosztem, licytacje, oferty, odejścia i przyjścia)
+    w menu HR; w oknie zatrudnienia wybór kanału rekrutacji.
