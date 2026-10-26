@@ -1,6 +1,7 @@
 """Uzgodnienie kasy (F3a.12): w każdej rundzie każdej firmy gotówka zgadza się co do grosza z KPiR ± VAT ± operacjami
 poza KPiR (silnik/uzgodnienie.py). Losowe gry botów (hypothesis) – w grze z lokalami i bez; drużyna „H” gra jak bot,
-ale dokłada losowe decyzje finansowe: kredyty, lokaty, Harpagon, kupno lokalu i działki, sprzedaż sprzętu, zwroty."""
+ale dokłada losowe decyzje finansowe: kredyty, lokaty, Harpagon, kupno lokalu i działki, sprzedaż sprzętu, zwroty,
+a w grze z lokalami – biuro z mapy albo samodzielną księgowość z (czasem błędnymi) deklaracjami (silnik/biuro.py)."""
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -35,6 +36,8 @@ def _dodatki(draw, lokale: bool) -> dict:
     if lokale:
         if draw(st.booleans()):
             d["harpagon_wez" if draw(st.booleans()) else "harpagon_splac"] = draw(st.integers(500, 20000))
+        d["biuro"] = draw(st.sampled_from(["samodzielnie", "samodzielnie", "jks", "eksiegi", "halinka"]))
+        d["_deklaracja"] = draw(st.sampled_from(["brak", "dobra", "zla"]))
         if draw(st.integers(0, 3)) == 0:
             d["lokal"] = {"id": draw(st.sampled_from(LOKALE)), "forma": draw(st.sampled_from(["najem", "kupno"]))}
     return d
@@ -48,9 +51,25 @@ def _graj(lokale: bool, ziarno: int, strategie: list[str], dodatki: list[dict]):
         d = decyzje_bota(g.dane, g.stan(), "H", strategie[0], r, g.konfiguracja)
         if extra.pop("zwrot_nadmiaru", False):
             extra["zwrot_nadmiaru"] = {z["dostawca"]: True for z in d.get("zamowienia", []) if "dostawca" in z}
+        dk, tryb = g.stan().firmy["H"].deklaracja, extra.pop("_deklaracja", "brak")
+        if dk and tryb != "brak":
+            zle = tryb == "zla"
+            extra["ksiegowosc"] = {"zapisy": {x["id"]: {"kolumna": "towary" if zle else x["poprawne"]["kolumna"],
+                                                        "stawka": x["poprawne"]["stawka"]} for x in dk["dokumenty"]},
+                                   "deklaracja": {k: v * (1.5 if zle else 1) for k, v in dk["poprawne"].items()}}
         g.ustaw_decyzje("H", {**d, **extra})
         g.przelicz(wymus=True)
+        _dokumenty_pokrywaja_rachunek(g.stan(), r)
     return g.stan()
+
+
+def _dokumenty_pokrywaja_rachunek(s, r):
+    """Samodzielna księgowość: każda operacja rachunku jest w dokumentach rundy (kwota ze znakiem)."""
+    dk = s.firmy["H"].deklaracja
+    if dk:
+        z_dokumentow = sum(x["brutto"] * (1 if x["kierunek"] == "wplyw" else -1)
+                           for x in dk["dokumenty"] if x["kierunek"] != "brak")
+        assert round(z_dokumentow, 2) == round(sum(o["kwota"] for o in s.wyniki[r]["H"]["rachunek"]), 2)
 
 
 def _sprawdz(s):

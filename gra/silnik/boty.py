@@ -10,6 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from . import banki as bk
+from . import biuro as bo
 from . import lokale as lk
 from . import popyt as pp
 from . import rynek_pracy as rp
@@ -84,7 +85,9 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if not f.bank:
         d["bank"] = bk.najlepsze(dane)["konto"] if lokale else \
             min(dane.dostepne("banki", runda).values(), key=lambda b: b["konto"] + b["karta"])["nazwa"]
-    if not f.biuro:
+    if lokale and not (f.biuro and bo.poprawny_wybor(dane, f.biuro)):   # biura z mapy – najtańsze dla typowej rundy
+        d["biuro"] = bo.najtansze(dane, bo.ustawienia(dane)["szacunek_dokumentow"], 4, 0)
+    elif not f.biuro:
         d["biuro"] = min(dane.pozycje("biura_rachunkowe").values(), key=lambda b: b["etat"])["nazwa"]
 
     # usługi: start z usługami startowymi, potem po 3 nowe aż do celu

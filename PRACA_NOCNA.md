@@ -56,6 +56,19 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    minimum 324,41 zł/mies.; ZUS społeczny preferencyjny 420,86 zł/mies. po 26 rundach ulgi (czyli w grze na 26 rund
    go nie ma); kwoty ZUS 2026 z pamięci; lokal, działka i budowa budynku bez VAT; próg amortyzacji liczony od brutto.
    Czy tak może zostać? (nie wysłane – okno pytań minęło; zapisane 26.10 18:25)
+9. **Biura rachunkowe i samodzielna księgowość (F3a.13).** Przyjąłem:
+   - 5 biur (ceny brutto/mies., przeliczane na tydzień): J.K.Ś. 690 zł do 80 dok. + 4,92 zł, 4 osoby w kadrach
+     w cenie, bez błędów; Pod Trybunałem 6,15 zł/dok., min. 246 zł, ryzyko 3%; Pani Halinka 369 zł do 40 dok.
+     + 7,38 zł, ryzyko 6%; e-Księgi24.pl 3,69 zł/dok., min. 123 zł, ryzyko 12%, **bez OC** (błąd = mandat 200 zł);
+     Debet & Kredyt 984 zł bez limitu, bez błędów; kadry 18–74 zł za osobę,
+   - samodzielnie: deklaracje za rundę składa się w następnej (wtedy też jest płacony VAT/PIT/zdrowotna),
+     mandat 200 zł za każdą błędną deklarację (różnica od 1 zł – także nadpłata, z korektą do poprawnej kwoty),
+     500 zł za niezłożone; błędne zapisy w KPiR tylko wyjaśniane, bez kary; czas właściciela za księgowanie
+     niepobierany; ostatnia runda rozliczana od razu (nie ma rundy na deklarację),
+   - do złożenia deklaracji drużyna nie widzi KPiR, podatków i dochodu netto rundy (karta wyników tak),
+   - w deklaracji JS podpowiada stawkę VAT jednym wyborem na dokument (faktura z kilkoma stawkami – stawka
+     przeważająca, poprawna kwota VAT i tak jest w deklaracji).
+   Czy ceny, kary i zasady pasują? (zapisane 26.10)
 
 ## Odłożone zadania
 
@@ -259,3 +272,9 @@ _brak_
 26.10 – F3a.12 Uzgodnienie kasy: rodzaje operacji rachunku, `silnik/uzgodnienie.py`, sekcja w Raporcie, test
   hypothesis. Test od razu złapał 4 prawdziwe błędy (3 × grosz z zaokrągleń, 1 × wywrotka gry przy zwrocie
   ostatniej partii) – naprawione. Do potwierdzenia nic – to wewnętrzna kontrola silnika.
+
+26.10 – F3a.13 Biura rachunkowe z mapy i samodzielna księgowość (pytanie 9): 5 biur, opłata od dokumentów,
+  błędy biur z OC/bez OC, samodzielne księgowanie dokumentów i deklaracje sprawdzane w następnej rundzie,
+  ukrywanie wyników do czasu deklaracji; zakładka Biuro rachunkowe (Decyzje + Wyniki), JS-owe podsumowanie
+  deklaracji zgodne z silnikiem (42/42 przypadki); 154 testy. Rozszerzony test uzgodnienia złapał błąd: kredyt
+  odnawialny z końca rundy nie trafiał do dokumentów – naprawione.

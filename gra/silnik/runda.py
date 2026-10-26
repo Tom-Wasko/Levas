@@ -18,6 +18,7 @@ from copy import deepcopy
 import numpy as np
 
 from . import banki as bk
+from . import biuro as bo
 from . import karta as kw
 from . import lichwiarz as lw
 from . import lokale as lk
@@ -57,8 +58,10 @@ from .uzgodnienie import uzgodnij
 EPS = 1e-9
 
 
-def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfiguracja: dict) -> StanGry:
-    """Zwraca nowy stan po rundzie stan.runda + 1 (stan wejściowy nie jest zmieniany)."""
+def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfiguracja: dict,
+                   podglad: bool = False) -> StanGry:
+    """Zwraca nowy stan po rundzie stan.runda + 1 (stan wejściowy nie jest zmieniany).
+    `podglad` – „Analiza – co jeśli”: deklaracje samodzielnej księgowości nie są sprawdzane (silnik/biuro.py)."""
     s = deepcopy(stan)
     r = stan.runda + 1
     m = dane.miesiac_rundy(r)  # sezonowość popytu
@@ -91,6 +94,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         # lokaty i kredyty na początku miesiąca, przed zakupami (historia rachunku ATH, luty: opłata za konto → lokata
         # 30 000 z salda 33 564 → stanowisko, sprzęt, … – saldo w trakcie miesiąca może być ujemne); bank wybrany
         # w tej rundzie działa od razu (ATH maj: zmiana na Gaz Bank i lokata 7%)
+        if tryb_lokali:   # deklaracje za poprzednią rundę (samodzielna księgowość, silnik/biuro.py)
+            ksiegowosc = bo.rozlicz_deklaracje(dane, f, d, r, rachunki[nazwa], podglad)
         if tryb_lokali:   # sześć banków z mapy, produkty w dowolnym banku (silnik/banki.py)
             bank_info = bk.poczatek_rundy(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
             harpagon_info = lw.poczatek_rundy(dane, f, d, r, rachunki[nazwa])   # gotówka poza KPiR
@@ -104,6 +109,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         pula = rp.pula_dla(s.kandydaci, rezerwacje, nazwa) if tryb_lokali else s.kandydaci
         info[nazwa] = zastosuj(dane, f, d, r, pula, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
         if tryb_lokali:   # sprzęt w leasingu – na stanowiskach już z tej rundy
+            info[nazwa]["ksiegowosc"] = ksiegowosc
             info[nazwa]["leasing"] = bk.leasing_wez(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
             info[nazwa]["harpagon"] = harpagon_info
         if tryb_lokali:  # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
@@ -111,6 +117,11 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
                 + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
         bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
+        if tryb_lokali and (info[nazwa]["ksiegowosc"] or {}).get("kara"):
+            ksg = info[nazwa]["ksiegowosc"]
+            bledy[nazwa].append({"poziom": "czerwony", "zakladka": "finanse_biuro",
+                                 "tekst": f"Deklaracje za rundę {ksg['za_runde']}: mandat {ksg['kara']:.0f} zł"
+                                          + (" – niezłożone." if ksg["tryb"] == "brak" else " – błędne kwoty, urząd zrobił korektę.")})
         info[nazwa]["lokal"] = lokal
         if bank_info is not None:
             info[nazwa]["bank"] = bank_info
@@ -234,18 +245,27 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["harpagon_odsetki"] = lw.koniec_rundy(dane, f, r)   # doliczone do długu, poza KPiR
         elif f.bank:
             bank_koniec_miesiaca(f, dane.pozycje("banki")[f.bank], r, ks, rach, dane.rund_w_roku)
-        if f.biuro:
+        if tryb_lokali:   # biura z mapy albo samodzielna księgowość (silnik/biuro.py)
+            if f.biuro in bo.biura(dane):
+                info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, len(etat), len(f.pracownicy) - len(etat))
+        elif f.biuro:
             b = dane.pozycje("biura_rachunkowe")[f.biuro]
             ksieguj(f, ks, rach, "Koszt biura rachunkowego", (len(ks.pozycje) + 1) * b["ksiegowanie"])
             ksieguj(f, ks, rach, "Obsługa kadrowo-płacowa",
                     dane.na_runde(len(etat) * b["etat"] + (len(f.pracownicy) - len(etat)) * b["zlecenie"]))
         if tryb_lokali:   # JDG: składki właściciela, zaliczka PIT i VAT (silnik/rozliczenie.py)
-            info[nazwa]["rozliczenie"] = rz.rozlicz(dane, f, r, ks, rach)
+            samodzielnie = bo.zamknij_samodzielnie(f, r >= konfiguracja["liczba_rund"])
+            stan_przed = bo.stan_rozliczen(f)
+            info[nazwa]["rozliczenie"] = rz.rozlicz(dane, f, r, ks, rach, zaplac=not samodzielnie)
             podatek = info[nazwa]["rozliczenie"]["zaliczka"] + info[nazwa]["rozliczenie"]["zdrowotna"]
+            if not samodzielnie and "biuro" in info[nazwa]:
+                info[nazwa]["biuro"]["blad"] = bo.blad_biura(dane, f, nazwa, r, ziarno, rach)
         else:
             podatek = ks.podatek(z["finanse"]["podatek_cit"])
             rach.zapisz(f, "Podatek dochodowy", -podatek, "podatki")
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
+        if tryb_lokali and samodzielnie:   # dokumenty rundy – po ostatniej operacji (także kredycie odnawialnym)
+            bo.otworz(f, r, ks, rach, info[nazwa]["rozliczenie"], stan_przed)
         if tryb_lokali:
             bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
             bledy[nazwa] += lw.bledy(dane, f, info[nazwa].get("harpagon"), r + 1)
@@ -258,6 +278,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
+            wyniki[nazwa]["biuro"] = info[nazwa].get("biuro")
+            wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")
+            wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej
             wyniki[nazwa]["rynek_pracy"] = info[nazwa].get("rynek_pracy")
             wyniki[nazwa]["srodki_trwale"] = ewidencja(f)
             wyniki[nazwa]["bank"] = {"poczatek": info[nazwa].get("bank"), "koniec": bank_koniec,

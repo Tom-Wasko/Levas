@@ -688,6 +688,48 @@ class PlikHarpagona(Plik):
     wizyty: list[Wizyta] = Field(min_length=1)
 
 
+# --- mapa/biura.yaml (F3a.13) ---
+
+class KadryBiura(Schemat):
+    w_cenie: int = Field(ge=0)
+    etat: float = Field(ge=0)
+    zlecenie: float = Field(ge=0)
+
+
+class BiuroMapy(Schemat):
+    id: str
+    nazwa: str
+    wlasciciel: str | None = None
+    opis: str
+    ryczalt: float = Field(ge=0)
+    dokumenty_w_ryczalcie: int | None = Field(default=None, ge=0)   # None – bez limitu
+    za_dokument: float = Field(ge=0)
+    minimum: float = Field(ge=0)
+    kadry: KadryBiura
+    ryzyko_bledu: float = Field(ge=0, lt=1)
+    oc: bool
+
+
+class Samodzielna(Schemat):
+    kara_blad: float = Field(gt=0)
+    kara_brak: float = Field(gt=0)
+    opis: str
+
+
+class PlikBiur(Plik):
+    szacunek_dokumentow: int = Field(gt=0)
+    biura: list[BiuroMapy] = Field(min_length=1)
+    bledy: list[str] = Field(min_length=1)
+    samodzielna: Samodzielna
+
+    @model_validator(mode="after")
+    def _unikalne(self):
+        ids = [b.id for b in self.biura]
+        if len(ids) != len(set(ids)) or "samodzielnie" in ids:
+            raise ValueError("id biur muszą być unikalne (i różne od „samodzielnie”)")
+        return self
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
@@ -696,6 +738,7 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "menu.yaml": PlikMenu,
     "banki.yaml": PlikBankow,
     "harpagon.yaml": PlikHarpagona,
+    "biura.yaml": PlikBiur,
 }
 
 # --- podatki_2026.yaml (gra z lokalami, F3a.11) ---

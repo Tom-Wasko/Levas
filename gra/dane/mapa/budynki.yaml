@@ -75,7 +75,9 @@ budynki:
   nazwa: Kamienica biur rachunkowych
   rodzaj: biuro
   strefa: stare_miasto
-  opis: 'Sześć biur rachunkowych pod jednym dachem: Prefix, Plus, Seven, Rachmistrz, Krak i Petra.'
+  opis: 'Pięć biur rachunkowych pod jednym dachem (J.K.Ś. Jakuba Klimka-Ślęzaka, Pod Trybunałem, Pani Halinka,
+    e-Księgi24.pl, Debet & Kredyt) i pokój z biurkiem dla tych, którzy księgują sami. Na klatce schodowej
+    pachnie tonerem i drożdżówkami.'
   zakladka: biuro
   mapa:
     x: 13

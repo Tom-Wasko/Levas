@@ -4,6 +4,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from silnik import banki as bk
+from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
 from silnik import lichwiarz as lw
 from silnik import rozliczenie as rz
@@ -186,6 +187,15 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                                                        "odsetki_karne_rundy", "karne_od", "wizyty_od")}}
         v["podatki"] = _podatki(dane, fp, runda, rz.rejestr(ks) if edycja else stan.wyniki[runda][firma].get("vat"))
         v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
+        v["ksiegowosc"] = bo.widok(dane, fp, f, v["decyzje"], v.get("wyniki"))
+        if edycja and fp.deklaracja:   # samodzielna księgowość: wynik podatkowy dopiero po deklaracji drużyny
+            v["wyniki"] = bo.ukryj(v.get("wyniki"))
+            v["ksiegowosc"]["ukryte"] = True
+            if v.get("historia"):
+                v["historia"][-1]["dochod_netto"] = None
+            v["dashboard"]["dochod_netto"] = None
+            v["podatki"]["stan"] = fp.deklaracja["stan_przed"]
+            v["podatki"]["stan_przed_deklaracja"] = True
     return v
 
 

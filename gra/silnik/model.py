@@ -254,6 +254,7 @@ class Firma(Model):
     leasingi: list[Leasing] = Field(default_factory=list)
     harpagon: PozyczkaHarpagona | None = None
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
+    deklaracja: dict | None = None    # samodzielna księgowość: dokumenty i poprawne kwoty rundy (silnik/biuro.py)
     kredyt_odnawialny_gr: int = 0
     majatek_gr: int = 0               # suma inwestycji (sprzęt, stanowiska, udogodnienia, wyposażenie) – rozwój firmy
     rozwoj_poprzedni: float | None = None

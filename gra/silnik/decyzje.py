@@ -24,7 +24,9 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     reklama_tradycyjna:{medium: liczba emisji}
     internet_uruchom / internet_wylacz: [narzędzie]
     szkolenia:         [{"firma", "szkolenie"}]
-    bank, biuro:       nazwa
+    bank, biuro:       nazwa (z lokalami biuro: id z dane/mapa/biura.yaml albo "samodzielnie")
+    ksiegowosc:        {"zapisy": {id dokumentu: {"kolumna", "stawka"}}, "deklaracja": {"vat", "pit", "zdrowotna"}}
+                                                              – samodzielna księgowość za poprzednią rundę (biuro.py)
     lokaty_zaloz:      [{"kwota", "miesiecy"}];  lokaty_zerwij: [id]
     kredyty_wez:       [{"kwota", "miesiecy"}];  kredyty_splac: [id]
 """
@@ -33,6 +35,7 @@ from __future__ import annotations
 import math
 from datetime import timedelta
 
+from . import biuro as bo
 from . import czas_wlasciciela as cw
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
@@ -135,7 +138,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                       for u, c in d["sprzedaz"].items() if c and c.get("cena")}
     if d.get("bank") and d["bank"] in dane.dostepne("banki", runda):
         firma.bank = d["bank"]
-    if d.get("biuro"):
+    if d.get("biuro") and (not lokale or bo.poprawny_wybor(dane, d["biuro"])):   # z lokalami: biura z mapy
         firma.biuro = d["biuro"]
 
     # stanowiska (działają od razu)
@@ -366,6 +369,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("czerwony", "dostawcy", tekst)
         for tekst in (info or {}).get("uwagi_rynku_pracy", []):
             dodaj("czerwony", "zatrudnienie", tekst)
+        for b in bo.bledy(dane, firma, d):
+            dodaj(b["poziom"], b["zakladka"], b["tekst"])
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

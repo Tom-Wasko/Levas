@@ -21,6 +21,7 @@ from .schematy import (
     SCHEMATY,
     SCHEMATY_MAPY,
     PlikBankow,
+    PlikBiur,
     PlikHarpagona,
     sprawdz_zalozenia,
 )
@@ -65,13 +66,14 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
     if not (katalog / "strefy.yaml").exists():
         return None
-    st, lo, bu, po, me, ba, ha = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    st, lo, bu, po, me, ba, ha, bi = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
             "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po},
             "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")},
             "banki": PlikBankow.model_validate(ba).model_dump(exclude={"opis", "zrodlo"}),  # z domyślnymi polami
-            "harpagon": PlikHarpagona.model_validate(ha).model_dump(exclude={"opis", "zrodlo"})}
+            "harpagon": PlikHarpagona.model_validate(ha).model_dump(exclude={"opis", "zrodlo"}),
+            "biura": PlikBiur.model_validate(bi).model_dump(exclude={"opis", "zrodlo"})}
 
 
 class Dane:

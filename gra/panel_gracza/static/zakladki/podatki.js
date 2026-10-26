@@ -1,5 +1,6 @@
 // Podatki i ZUS jednoosobowej działalności (gra z lokalami, silnik/rozliczenie.py): rejestr VAT, składki
 // właściciela, zaliczka PIT liniowego – rozliczenie co rundę zamiast CIT Revasa. Ceny w grze są brutto.
+import { UKRYTE } from "./finanse.js";
 import { esc, nazwaUslugi, proc, tabela, zl2 } from "./wspolne.js";
 
 const RODZAJ = { nalezny: "należny (sprzedaż)", naliczony: "naliczony (zakupy)" };
@@ -54,6 +55,7 @@ export const podatki = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.rozliczenie;
+    if (v.wyniki?.kpir?.ukryte) return UKRYTE;
     if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
     return tabela("Rozliczenie rundy", ["Pozycja", "Kwota"], [
       ["Dochód z KPiR w rundzie", zl2(W.dochod)],

@@ -17,6 +17,7 @@ from gry import serwisy
 from gry.models import Gra
 from konta import druzyny
 from konta.role import gry_ucznia, jest_mg, moze_firme
+from silnik.biuro import ukryj
 from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
@@ -412,11 +413,14 @@ def api_podglad(request, id_, firma):
     for nazwa in nazwy:
         dec = deepcopy(baza)
         dec[firma] = g.szkic(firma) if nazwa == "biezace" else zapisane[nazwa]
-        s = przelicz_runde(kopia.dane, stan, dec, kopia.konfiguracja)
+        s = przelicz_runde(kopia.dane, stan, dec, kopia.konfiguracja, podglad=True)
+        w = s.wyniki[r][firma]
+        if s.firmy[firma].deklaracja:  # samodzielna księgowość: bez podatków rundy
+            w = ukryj(w, podglad=True)
         wyniki.append(
             {
                 "nazwa": "Bieżące decyzje" if nazwa == "biezace" else nazwa,
-                "wyniki": s.wyniki[r][firma],
+                "wyniki": w,
                 "rynek": s.rynek[r],
             }
         )
