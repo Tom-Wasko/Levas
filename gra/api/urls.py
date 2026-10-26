@@ -22,4 +22,6 @@ urlpatterns = [
     path("gry/<str:id_>/warianty-dane/<str:firma>", w.api_dane_wariantu),
     path("gry/<str:id_>/podglad/<str:firma>", w.api_podglad),
     path("gry/<str:id_>/eksport", w.api_eksport),
+    path("gry/<str:id_>/prowadzenie", w.api_prowadzenie),
+    path("gry/<str:id_>/<str:co>.csv", w.api_wyniki_csv),
 ]

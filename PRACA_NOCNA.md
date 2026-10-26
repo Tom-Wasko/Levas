@@ -69,6 +69,22 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    - w deklaracji JS podpowiada stawkę VAT jednym wyborem na dokument (faktura z kilkoma stawkami – stawka
      przeważająca, poprawna kwota VAT i tak jest w deklaracji).
    Czy ceny, kary i zasady pasują? (zapisane 26.10)
+10. **Panel mistrza gry (F3a.14).** Przyjąłem:
+   - zamykanie o ustalonej godzinie = tygodniowe terminy (dzień + godzina, np. wt 8:00 i czw 8:00); runda
+     zamyka się w pierwszym terminie po zamknięciu poprzedniej (zamknięta wcześniej ręcznie albo przez
+     wszystkie drużyny – następny termin liczony od tej chwili); potrzebna komenda `zamykaj_rundy` co kilka
+     minut (Harmonogram zadań) – serwer WWW sam z siebie nic nie uruchamia,
+   - pauza blokuje zmianę i wysyłanie decyzji oraz zamykanie rundy (ręczne i z harmonogramu), cofnięcie
+     rundy działa; po wznowieniu termin, który minął w czasie pauzy, nie zamyka rundy od razu,
+   - mistrz gry ogląda drużyny **z uczniami** tylko do odczytu (nawet przez API); drużyny bez uczniów
+     (i gra lokalna) prowadzi dalej sam – inaczej nie dałoby się grać na jednym komputerze,
+   - poziom botów zapisany i widoczny, ale **bez wpływu** do F4.4 – próba mnożników (ilość zakupów, reklama)
+     dawała odwrotne wyniki (łatwy bot zarabiał najwięcej, bo strategie przesadzają z zapasami i reklamą),
+     więc poziomy trzeba zrobić razem z poprawą botów,
+   - CSV: ranking (miejsce, firma, bot, średni wynik działalności, dochód razem, gotówka, zadłużenie, lokaty,
+     pracownicy) i wyniki firm w każdej rundzie (przychody, koszty, dochód netto, gotówka, zadłużenie, wynik
+     działalności); średnik i przecinek dziesiętny pod polskiego Excela.
+   Czy tak może zostać? (zapisane 26.10)
 
 ## Odłożone zadania
 
@@ -278,3 +294,4 @@ _brak_
   ukrywanie wyników do czasu deklaracji; zakładka Biuro rachunkowe (Decyzje + Wyniki), JS-owe podsumowanie
   deklaracji zgodne z silnikiem (42/42 przypadki); 154 testy. Rozszerzony test uzgodnienia złapał błąd: kredyt
   odnawialny z końca rundy nie trafiał do dokumentów – naprawione.
+- 26.10 – F3a.14 gotowe: panel mistrza gry (pauza, harmonogram zamykania rund z komendą `zamykaj_rundy`, podgląd drużyn tylko do odczytu, poziomy botów bez efektu do F4.4, eksport CSV); pytanie 10. Start F3a.15.

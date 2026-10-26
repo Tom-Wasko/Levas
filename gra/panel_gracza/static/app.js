@@ -49,8 +49,15 @@ function ustaw(v) {
 }
 
 // --- zmiana decyzji: fn modyfikuje roboczy szkic, potem zapis i odświeżenie widoku --------------
+// mistrz gry ogląda drużynę uczniów albo gra jest wstrzymana – decyzji nie można zmieniać (api/widoki.py: _moze_zmieniac)
+const blokada = (v) => v.tylko_odczyt ? "Podgląd mistrza gry – decyzje drużyny są tylko do odczytu."
+  : v.prowadzenie?.pauza && !v.gra.zakonczona ? "Gra jest wstrzymana przez mistrza gry – decyzje poczekają na wznowienie." : "";
+
+const terminKrotko = (iso) => new Date(iso).toLocaleString("pl-PL", { weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
+
 async function zmien(fn) {
   if (!S.v.edycja) return toast("Podgląd poprzedniej rundy – decyzji nie można zmieniać.");
+  if (blokada(S.v)) return toast(blokada(S.v));
   if (S.v.wyslane) return toast("Decyzje są wysłane. Wróć do podejmowania decyzji w zakładce „Wyślij decyzje”.");
   fn(S.d);
   S.zapis = S.zapis.then(async () => {
@@ -71,7 +78,7 @@ function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "fun
 const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd) && (!z.wynikiGdy || z.wynikiGdy(S.v)));
 const kluczZakladki = (z) => Object.keys(ZAKLADKI).find((k) => ZAKLADKI[k] === z);
 
-const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wyslane, zmien, api, wczytaj, ustaw, rysuj,
+const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wyslane && !blokada(S.v), zmien, api, wczytaj, ustaw, rysuj,
   dostepna: (k) => !!ZAKLADKI[k] && dostepna(ZAKLADKI[k]), tytulZakladki: (k) => ZAKLADKI[k]?.tytul ?? k,
   idz: (k, tryb) => { S.zakladka = k; S.tryb = tryb || (ZAKLADKI[k].decyzje ? "decyzje" : "wyniki"); rysuj(); } });
 
@@ -182,18 +189,21 @@ function rysuj() {
   const st = document.getElementById("status-gry");
   st.innerHTML = `<span class="chip">${esc(v.gra.nazwa)}</span>${chipDruzyny(v)}<span class="chip pom">${ikona("portfel", 14)}${zl(v.dashboard.saldo)}</span>`
     + (v.gra.zakonczona ? `<span class="chip">Gra zakończona</span>` : v.wyslane && v.edycja
-      ? `<span class="chip ok">Czekamy na: ${esc(v.gra.brakujace.join(", ") || "–")}</span>` : "");
+      ? `<span class="chip ok">Czekamy na: ${esc(v.gra.brakujace.join(", ") || "–")}</span>` : "")
+    + (!v.gra.zakonczona && v.prowadzenie?.pauza ? `<span class="chip pom">Gra wstrzymana</span>`
+      : !v.gra.zakonczona && v.prowadzenie?.termin ? `<span class="chip" title="Runda zamknie się sama o tej porze">Zamknięcie: ${esc(terminKrotko(v.prowadzenie.termin))}</span>` : "");
   const c = ctx();
   const wyniki = maWyniki(z), decyzje = !!z.decyzje;
   const tryb = S.tryb === "wyniki" && wyniki ? "wyniki" : decyzje ? "decyzje" : "wyniki";
   const tresc = tryb === "wyniki" ? z.wyniki(c) : z.decyzje(c);
   const podglad = !v.edycja && v.runda < v.gra.runda
     ? `<div class="komunikat">Podgląd rundy ${v.runda} (${v.miesiac}) – decyzje z tej rundy są tylko do odczytu. Wyniki pokazują skutki poprzedniego ${OKRES.dopelniacz}.</div>` : "";
-  const wyslane = v.edycja && v.wyslane && tryb === "decyzje" && S.zakladka !== "wyslij"
+  const zablokowane = v.edycja && blokada(v) && tryb === "decyzje" ? `<div class="komunikat">${esc(blokada(v))}</div>` : "";
+  const wyslane = !zablokowane && v.edycja && v.wyslane && tryb === "decyzje" && S.zakladka !== "wyslij"
     ? `<div class="komunikat ok">Decyzje tej rundy są wysłane. Aby je zmienić, wróć do podejmowania decyzji w zakładce „Wyślij decyzje”.</div>` : "";
   document.getElementById("karta").innerHTML = glowa(v, z, tryb, decyzje, wyniki, v.runda) + podzakladki()
     + (tryb === "decyzje" ? podsumowanie(v) : "")
-    + `${z.info ? info(typeof z.info === "function" ? z.info(c, tryb) : z.info) : ""}<div class="tresc">${podglad}${wyslane}${tresc}</div>`;
+    + `${z.info ? info(typeof z.info === "function" ? z.info(c, tryb) : z.info) : ""}<div class="tresc">${podglad}${zablokowane}${wyslane}${tresc}</div>`;
   history.replaceState(null, "", `#${S.zakladka}${tryb === "wyniki" ? "/wyniki" : ""}`);
   if (z.po) z.po(c, tryb);
   const pole = znajdzPole(fokus);
@@ -297,6 +307,11 @@ async function sprawdzZmiany() {
   if (st.runda !== v.gra.runda) {
     toast(`Runda ${v.gra.runda} przeliczona – teraz ${nazwaRundy(st.runda)}.`);
     return wczytaj(null);
+  }
+  if (st.pauza !== !!v.prowadzenie?.pauza || (st.termin ?? null) !== (v.prowadzenie?.termin ?? null)) {
+    toast(st.pauza ? "Mistrz gry wstrzymał grę." : st.pauza !== !!v.prowadzenie?.pauza ? "Mistrz gry wznowił grę." : "Zmienił się termin zamknięcia rundy.");
+    await S.zapis;
+    return wczytaj();
   }
   const wersja = v.druzyna?.autorzy?.wersja ?? 0;
   const wyslaneTeraz = st.wyslane.join("|"), wyslanePrzed = v.gra.wyslane.join("|");

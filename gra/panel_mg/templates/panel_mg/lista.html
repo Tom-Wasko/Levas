@@ -68,8 +68,11 @@
     ["Drużyna 1", "Drużyna 2", "Drużyna 3", "Drużyna 4"].forEach(druzyna);
     document.getElementById("dodaj").onclick = () => druzyna(`Drużyna ${tb.children.length + 1}`);
     const lb = document.getElementById("lista-botow");
+    const poziomy = Object.entries(U.poziomy || {});
+    const wyborPoziomu = () => poziomy.length ? ` <select class="poziom" title="Poziom bota">${poziomy.map(([k, n]) =>
+      `<option value="${esc(k)}"${k === "sredni" ? " selected" : ""}>${esc(n)}</option>`).join("")}</select>` : "";
     lb.innerHTML = Object.entries(U.strategie).map(([k, n]) =>
-      `<label><input type="checkbox" value="${esc(k)}" checked> ${esc(n)}</label>`).join("");
+      `<label><input type="checkbox" value="${esc(k)}" checked> ${esc(n)}${wyborPoziomu()}</label>`).join("");
     const boty = document.getElementById("boty");
     boty.onchange = () => lb.classList.toggle("wylaczone", !boty.checked);
     const pokazBlad = (t) => { const b = document.getElementById("blad"); b.textContent = t; b.hidden = !t; };
@@ -77,7 +80,8 @@
     document.getElementById("utworz").onclick = async () => {
       pokazBlad("");
       const firmy = [...tb.children].map((tr) => ({ nazwa: tr.querySelector("input").value, bot: null }));
-      if (boty.checked) for (const c of lb.querySelectorAll("input:checked")) firmy.push({ nazwa: U.strategie[c.value], bot: c.value });
+      if (boty.checked) for (const c of lb.querySelectorAll("input:checked"))
+        firmy.push({ nazwa: U.strategie[c.value], bot: c.value, poziom: c.parentElement.querySelector("select.poziom")?.value });
       const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() }, body: JSON.stringify({
         nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
         kapital_startowy: document.getElementById("kapital").value, ziarno: document.getElementById("ziarno").value,

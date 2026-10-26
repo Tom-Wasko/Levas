@@ -399,9 +399,15 @@ class UstawieniaBotow(Schemat):
     zapas_zasobow: float = Field(ge=1)
 
 
+class PoziomBota(Schemat):
+    nazwa: str
+    opis: str
+
+
 class PlikBotow(Plik):
     ustawienia: UstawieniaBotow
     strategie: dict[str, Strategia]
+    poziomy: dict[str, PoziomBota] | None = None
 
 
 # --- zalozenia.yaml ---

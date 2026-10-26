@@ -36,7 +36,8 @@ class Gra:
         dane = dane or dane_domyslne()
         konf = {"nazwa": nazwa, "ziarno": ziarno if ziarno is not None else secrets.randbelow(10**9),
                 "liczba_rund": liczba_rund or dane.katalog_ofert["rundy"]["domyslna_liczba"],
-                "firmy": [{"nazwa": n, "bot": b} for n, b in firmy],
+                "firmy": [{"nazwa": n, "bot": b, **({"poziom": opcje["poziomy"][n]} if b and n in opcje.get("poziomy", {})
+                                                    else {})} for n, b in firmy],
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "jednoczesnie"),
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,

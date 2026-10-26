@@ -1,8 +1,8 @@
-// Panel mistrza gry: zakładki Decyzje (kto wysłał, zamknięcie i cofnięcie rundy), Wyniki (ranking, wykresy)
-// i Drużyny (skład 1–4 uczniów, konta uczniów).
+// Panel mistrza gry: zakładki Decyzje (kto wysłał, zamknięcie i cofnięcie rundy, pauza, harmonogram zamykania rund,
+// poziomy botów), Wyniki (ranking, wykresy, eksport CSV) i Drużyny (skład 1–4 uczniów, konta uczniów).
 // Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg), GET /api/gry/<id>/druzyny.
-import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, toast, ustawKalendarz, wsk, wyczyscWykresy, wykres,
-  zamknijOkno, zl }
+import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, termin, toast, ustawKalendarz, wsk, wyczyscWykresy,
+  wykres, zamknijOkno, zl }
   from "/static/zakladki/wspolne.js";
 
 const ID = JSON.parse(document.getElementById("id-gry").textContent);
@@ -42,7 +42,13 @@ function rysuj() {
 
 // --- Decyzje: kto wysłał, zamknięcie rundy -----------------------------------------------------------------------
 const strona = (f) => `/gra/${encodeURIComponent(ID)}/${encodeURIComponent(f.nazwa)}`;
-const prowadzi = (f) => f.bot ? `bot: ${esc(f.strategia || f.bot)}`
+const poziomBota = (f) => {
+  const poziomy = Object.entries(S.p.prowadzenie.poziomy || {});
+  if (!poziomy.length || S.p.gra.zakonczona) return "";
+  return ` <select data-zmiana="poziom" data-f="${esc(f.nazwa)}" title="Poziom bota (od następnej rundy)">${poziomy.map(([k, n]) =>
+    `<option value="${esc(k)}"${k === (f.poziom || "sredni") ? " selected" : ""}>${esc(n)}</option>`).join("")}</select>`;
+};
+const prowadzi = (f) => f.bot ? `bot: ${esc(f.strategia || f.bot)}${poziomBota(f)}`
   : f.sklad?.length ? esc(f.sklad.map((o) => o.nazwa).join(", ")) : `<a data-akcja="tryb" data-t="druzyny">dopisz uczniów</a>`;
 
 function statusDecyzji(f, gra) {
@@ -54,12 +60,15 @@ function statusDecyzji(f, gra) {
 }
 
 function decyzje() {
-  const { gra, firmy } = S.p;
+  const { gra, firmy, prowadzenie: P } = S.p;
   const druzyny = firmy.filter((f) => !f.bot);
   const wyslaly = druzyny.filter((f) => f.wyslane).length;
+  const kiedy = P.termin ? ` Termin z harmonogramu: <b>${esc(termin(P.termin))}</b>.` : "";
   const opis = gra.zakonczona ? "Gra zakończona – wyniki w zakładce „Wyniki”."
-    : `Decyzje wysłało ${wyslaly} z ${druzyny.length} ${druzyny.length === 1 ? "drużyny" : "drużyn"}. Runda zamyka się sama, gdy wyślą wszystkie.
+    : P.pauza ? "<b>Gra wstrzymana.</b> Drużyny widzą decyzje, ale nie mogą ich zmieniać ani wysyłać, runda się nie zamyka. Wznów grę przyciskiem poniżej."
+    : `Decyzje wysłało ${wyslaly} z ${druzyny.length} ${druzyny.length === 1 ? "drużyny" : "drużyn"}. Runda zamyka się sama, gdy wyślą wszystkie.${kiedy}
        Możesz zamknąć ją wcześniej – drużyny bez wysłanych decyzji zagrają wtedy decyzjami zapisanymi do tej pory.`;
+  const harm = P.harmonogram.length ? esc(P.harmonogram_opis) : "brak – rundę zamykasz sam(a) albo zamyka się, gdy wyślą wszyscy";
   const wiersze = firmy.map((f) => [`<b>${esc(f.nazwa)}</b>`, prowadzi(f), statusDecyzji(f, gra), zl(f.gotowka),
     `<a class="btn jasny maly" href="${strona(f)}" target="_blank" rel="noopener">Strona firmy</a>`]);
   const ustawienia = [["Kapitał startowy", zl(gra.kapital)], ["Ziarno losowości", esc(gra.ziarno)],
@@ -68,10 +77,14 @@ function decyzje() {
   return `${info(opis)}
     ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", ""], wiersze, { klasy: ["l", "l"] })}
     <div class="przyciski-mg">
-      ${gra.zakonczona ? "" : `<button class="btn pom" data-akcja="zamknij">Zamknij rundę ${gra.runda}</button>`}
+      ${gra.zakonczona ? "" : `<button class="btn pom" data-akcja="zamknij" ${P.pauza ? "disabled" : ""}>Zamknij rundę ${gra.runda}</button>
+        <button class="btn jasny" data-akcja="pauza">${P.pauza ? "Wznów grę" : "Wstrzymaj grę"}</button>`}
       <button class="btn jasny" data-akcja="cofnij" ${gra.runda > 1 ? "" : "disabled"}>Cofnij rundę ${Math.max(gra.runda - 1, 1)}</button>
       <a class="btn jasny" href="${URL_GRY}/eksport">Pobierz plik gry</a>
       <button class="btn jasny" data-akcja="odswiez">Odśwież</button></div>
+    ${tabela("Prowadzenie gry", ["", ""], [["Zamykanie rund o stałej porze", `${harm}
+        ${gra.zakonczona ? "" : ` <a data-akcja="harmonogram">zmień</a>`}`], ["Najbliższy termin", P.pauza ? "– (gra wstrzymana)" : P.termin ? esc(termin(P.termin)) : "–"]],
+    { klasy: ["l", "l"] })}
     ${tabela("Ustawienia gry", ["", ""], ustawienia, { klasy: ["l", "l"] })}`;
 }
 
@@ -91,6 +104,21 @@ function potwierdzCofniecie() {
     decyzje botów zostaną podjęte od nowa).</p>`,
   { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
     <button class="btn pom" data-akcja="cofnij-tak">Cofnij rundę</button>` });
+}
+
+// harmonogram: tygodniowe terminy zamknięcia rundy (gry/harmonogram.py, komenda `zamykaj_rundy`)
+function wierszTerminu(t = { dzien: 0, godzina: "08:00" }) {
+  return `<div class="termin-mg"><select>${S.p.prowadzenie.dni.map((d, i) => `<option value="${i}"${i === t.dzien ? " selected" : ""}>${esc(d)}</option>`).join("")}</select>
+    <input type="time" value="${esc(t.godzina)}"> <a data-akcja="usun-termin" title="Usuń termin">✕</a></div>`;
+}
+
+function edytujHarmonogram() {
+  okno("Zamykanie rund o stałej porze", `<p>Runda zamknie się w pierwszym terminie po zamknięciu poprzedniej – tak, jakbyś kliknął(-ęła)
+      „Zamknij rundę”. Np. lekcje we wtorki i czwartki: terminy <b>wtorek 8:00</b> i <b>czwartek 8:00</b>. Brak terminów – rundy zamykasz sam(a).</p>
+    <p class="podpowiedz">Terminy działają, gdy na serwerze co kilka minut uruchamia się <code>python manage.py zamykaj_rundy</code> (README).</p>
+    <div id="terminy">${S.p.prowadzenie.harmonogram.map(wierszTerminu).join("")}</div>
+    <p><a data-akcja="dodaj-termin">+ termin</a></p>`,
+  { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button><button class="btn pom" data-akcja="zapisz-harmonogram">Zapisz</button>` });
 }
 
 // --- Drużyny: skład (1–4 uczniów), nowe konta i hasła ------------------------------------------------------------
@@ -137,6 +165,8 @@ function wyniki() {
     zl(f.lokaty), licz(f.pracownicy), licz(f.stanowiska)]);
   return `${info(`Ranking według wyniku działalności (karta wyników) – średnia z rund od 2, jak w Revasie.
       Ostatnia przeliczona runda: ${esc(nazwaRundy(ostatnia.runda))}.`)}
+    <p class="przyciski-mg"><a class="btn jasny" href="${URL_GRY}/ranking.csv">Ranking do arkusza (CSV)</a>
+      <a class="btn jasny" href="${URL_GRY}/wyniki.csv">Wyniki firm w rundach (CSV)</a></p>
     ${tabela("Ranking", ["Miejsce", "Firma", "Wynik działalności (średnia)", `Wynik działalności (${esc(skrotRundy(ostatnia.runda))})`,
       `Dochód netto (${esc(skrotRundy(ostatnia.runda))})`, "Dochód netto (suma)", "Gotówka", "Zadłużenie", "Lokaty", "Pracownicy", "Stanowiska"],
     wiersze, { klasy: ["", "l"] })}
@@ -176,6 +206,23 @@ async function wykonaj(akcja, el) {
     return pokazHasla([j], "Nowe hasło");
   }
   if (akcja === "zamknij-okno") return zamknijOkno();
+  if (akcja === "pauza") {
+    const pauza = !S.p.prowadzenie.pauza;
+    await api(`${URL_GRY}/prowadzenie`, "POST", { pauza });
+    toast(pauza ? "Gra wstrzymana – drużyny nie zmieniają decyzji." : "Gra wznowiona.");
+    return wczytaj();
+  }
+  if (akcja === "harmonogram") return edytujHarmonogram();
+  if (akcja === "dodaj-termin") return document.getElementById("terminy").insertAdjacentHTML("beforeend", wierszTerminu());
+  if (akcja === "usun-termin") return el.closest(".termin-mg").remove();
+  if (akcja === "zapisz-harmonogram") {
+    const harmonogram = [...document.querySelectorAll("#terminy .termin-mg")].map((w) =>
+      ({ dzien: +w.querySelector("select").value, godzina: w.querySelector("input").value }));
+    await api(`${URL_GRY}/prowadzenie`, "POST", { harmonogram });
+    zamknijOkno();
+    toast(harmonogram.length ? "Harmonogram zapisany." : "Harmonogram usunięty – rundy zamykasz sam(a).");
+    return wczytaj();
+  }
   if (akcja === "odswiez") return wczytaj();
   if (akcja === "zamknij") return potwierdzZamkniecie();
   if (akcja === "cofnij") return potwierdzCofniecie();
@@ -193,6 +240,14 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   e.preventDefault();
   wykonaj(el.dataset.akcja, el).catch((b) => toast(b.message));
+});
+
+document.addEventListener("change", (e) => {
+  const el = e.target.closest("[data-zmiana=poziom]");
+  if (!el) return;
+  api(`${URL_GRY}/prowadzenie`, "POST", { poziom: { firma: el.dataset.f, poziom: el.value } })
+    .then(() => { toast(`Poziom bota „${el.dataset.f}” zmieniony – od następnej rundy.`); return wczytaj(); })
+    .catch((b) => toast(b.message));
 });
 
 // drużyny wysyłają decyzje ze swoich stron – odświeżamy, gdy nie jest otwarte okno

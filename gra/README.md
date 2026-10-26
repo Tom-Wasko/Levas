@@ -34,7 +34,27 @@ dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 drużyny wysłały decyzje, *Zamknij rundę* – także bez decyzji wszystkich, *Cofnij rundę*, strona każdej firmy,
 plik gry), **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund)
 i **Drużyny** (skład drużyn, nowe konta uczniów, nowe hasło). Runda zamyka się sama, gdy wszystkie drużyny
-wyślą decyzje.
+wyślą decyzje. Przy zakładaniu gry każdy bot dostaje poziom (łatwy / średni / trudny – na razie zapisany, działa
+od F4.4), poziom można zmienić w trakcie gry (od następnej rundy).
+
+**Prowadzenie gry** (zakładka *Decyzje* panelu mistrza gry):
+
+- *Wstrzymaj grę* – drużyny widzą decyzje, ale ich nie zmieniają ani nie wysyłają, runda się nie zamyka
+  (cofnięcie rundy działa); *Wznów grę* liczy następny termin od chwili wznowienia,
+- *Zamykanie rund o stałej porze* – tygodniowe terminy (np. wtorek 8:00 i czwartek 8:00). Runda zamyka się
+  w pierwszym terminie po zamknięciu poprzedniej, jak po kliknięciu *Zamknij rundę*; drużyny widzą termin na
+  pasku i w *Wyślij decyzje*. Terminy zamyka komenda uruchamiana co kilka minut:
+
+  ```
+  .venv\Scripts\python manage.py zamykaj_rundy              # raz – np. w Harmonogramie zadań Windows co 5 min
+  .venv\Scripts\python manage.py zamykaj_rundy --petla 60   # albo w osobnym oknie: sprawdza co 60 s
+  ```
+
+  (Linux: `*/5 * * * * cd /sciezka/gra && .venv/bin/python manage.py zamykaj_rundy` w crontab),
+- strony drużyn uczniów mistrz gry ogląda **tylko do odczytu** (decyzje zmieniają i wysyłają uczniowie);
+  drużynę bez uczniów prowadzi sam,
+- *Wyniki* → eksport do arkusza: **Ranking (CSV)** i **Wyniki firm w rundach (CSV)** (średnik, przecinek
+  dziesiętny – otwiera się wprost w Excelu).
 
 **Drużyny.** Drużyna to 1–4 uczniów prowadzących jedną firmę; uczeń gra w jednej drużynie danej gry (w innej
 grze może być w innej). Mistrz gry wpisuje w zakładce *Drużyny* listę imion i nazwisk – powstają konta z loginem

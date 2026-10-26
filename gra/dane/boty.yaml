@@ -9,6 +9,19 @@ ustawienia:
   krok_ceny: 0.5
   losuj_z_najlepszych_kandydatow: 3
   zapas_zasobow: 1.05
+# Poziomy trudności: mistrz gry wybiera je dla każdego bota (konfiguracja gry: firmy[].poziom). Zachowanie botów
+# na poziomach – F4.4 (proste mnożniki pokrycia popytu, błędu ceny i reklamy dawały słabszemu botowi często WIĘKSZY
+# zysk, bo strategie z Revasa zamawiają za dużo i przepłacają reklamę – potrzebne prawdziwe planowanie).
+poziomy:
+  latwy:
+    nazwa: Łatwy
+    opis: proste reguły, łatwo go przegonić
+  sredni:
+    nazwa: Średni
+    opis: trzyma się swojej strategii
+  trudny:
+    nazwa: Trudny
+    opis: planuje zapasy, reklamę i lokale
 strategie:
   zrownowazony:
     nazwa: Kebab u Zrównoważonego

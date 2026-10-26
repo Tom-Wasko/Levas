@@ -77,7 +77,7 @@ def test_cztery_druzyny_i_boty_w_jednej_grze(client, gra):
     assert all(len(f["sklad"]) == 2 for f in ludzie) and len(mg["firmy"]) == 6
     # nowa runda: wysłanie z poprzedniej nie przechodzi dalej
     st = zaloguj(konta[0]["login"]).get(f"/api/gry/{gra}/stan/{DRUZYNY[0]}").json()
-    assert st == {"runda": 2, "wersja": 0, "zapisal": None, "wyslane": []}
+    assert st == {"runda": 2, "wersja": 0, "zapisal": None, "wyslane": [], "pauza": False, "termin": None}
 
 
 def test_najwyzej_4_osoby_i_jedna_druzyna_w_grze(client, gra):

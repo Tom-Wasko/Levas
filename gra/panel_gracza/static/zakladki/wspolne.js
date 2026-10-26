@@ -32,6 +32,9 @@ export const gw = (n) => {
 };
 // godzina z czasu ISO (zapis decyzji przez kogoś z drużyny)
 export const godzina = (iso) => iso ? new Date(iso).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "";
+// termin zamknięcia rundy z harmonogramu mistrza gry, np. „środa, 28 października, 08:00”
+export const termin = (iso) => iso ? new Date(iso).toLocaleString("pl-PL",
+  { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";
 export const inicjaly = (imie) => esc(String(imie || "?").split(" ").map((x) => x[0]).join("").slice(0, 2));
 
 export function info(tekst) {

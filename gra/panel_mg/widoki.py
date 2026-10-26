@@ -29,6 +29,7 @@ def lista(request):
     dane = dane_domyslne()
     ustawienia = {
         "strategie": {k: v["nazwa"] for k, v in dane.boty["strategie"].items()},
+        "poziomy": {k: v["nazwa"] for k, v in (dane.boty.get("poziomy") or {}).items()},
         "rundy": dane.katalog_ofert["rundy"]["domyslna_liczba"],
         "maks_rund": dane.rund_w_roku,
         "kapital": dane.z["finanse"]["kapital_startowy"],

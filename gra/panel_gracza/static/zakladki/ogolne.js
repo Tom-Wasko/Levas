@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji, analiza (podgląd wyniku rundy).
-import { esc, godzina, inicjaly, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, godzina, inicjaly, termin as terminSlownie, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -126,7 +126,17 @@ export const wyslij = {
     const ludzie = v.gra.firmy.filter((f) => !f.bot);
     const stan = ludzie.map((f) => `<tr><td class="l">${esc(f.nazwa)}</td><td>${v.gra.wyslane.includes(f.nazwa) ? '<span class="pigulka ok">wysłane</span>' : '<span class="pigulka nie">w trakcie</span>'}</td></tr>`).join("");
     if (!v.edycja) return `<div class="komunikat">To podgląd poprzedniej rundy.</div>`;
-    return `${czerwone ? `<div class="komunikat zly">Na liście błędów jest ${czerwone} poważnych uwag. Możesz mimo to wysłać decyzje.</div>` : ""}
+    const P = v.prowadzenie || {};
+    const termin = P.termin && !P.pauza ? `<p>Runda zamknie się sama: <b>${esc(terminSlownie(P.termin))}</b> – decyzje niewysłane do tej pory
+      zagrają w takiej postaci, w jakiej są zapisane.</p>` : "";
+    if (v.tylko_odczyt || P.pauza) {
+      return `<div class="komunikat">${v.tylko_odczyt ? "Podgląd mistrza gry – decyzje tej drużyny wysyłają uczniowie."
+        : "Gra jest wstrzymana przez mistrza gry – decyzji nie można teraz zmieniać ani wysyłać."}</div>
+        ${v.wyslane ? `<div class="komunikat ok">Decyzje wysłane${kto(v.druzyna?.autorzy?.wyslal, " przez")}.</div>` : ""}
+        ${termin}${skladDruzyny(v)}
+        ${ludzie.length > 1 ? `<div class="tabela-tytul">Drużyny</div><div class="tab-wrap"><table class="t">${stan}</table></div>` : ""}`;
+    }
+    return `${termin}${czerwone ? `<div class="komunikat zly">Na liście błędów jest ${czerwone} poważnych uwag. Możesz mimo to wysłać decyzje.</div>` : ""}
       ${v.wyslane
         ? `<div class="komunikat ok">Decyzje wysłane${kto(v.druzyna?.autorzy?.wyslal, " przez")}. Runda przeliczy się, gdy wszystkie drużyny wyślą decyzje.</div>
            <button class="btn czarny" data-akcja="cofnij-wyslanie">Wróć do podejmowania decyzji w bieżącej rundzie</button>`

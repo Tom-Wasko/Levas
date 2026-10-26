@@ -16,6 +16,7 @@ from contextlib import contextmanager
 
 from django.db import transaction
 from django.db.models import Max, Q
+from django.utils import timezone
 
 from silnik.gra import Gra as GraSilnika
 
@@ -59,9 +60,13 @@ def wczytaj(id_: str) -> GraSilnika:
 
 def zapisz(id_: str, g: GraSilnika) -> None:
     with transaction.atomic():
-        obj, _ = Gra.objects.update_or_create(
-            pk=id_, defaults={"nazwa": g.konfiguracja["nazwa"], "konfiguracja": g.konfiguracja}
-        )
+        przeliczone = sum(1 for d in g.decyzje.values() if d.get("_przeliczona"))
+        przed = Runda.objects.filter(gra_id=id_, przeliczona=True).count()
+        nowa = not Gra.objects.filter(pk=id_).exists()
+        defaults = {"nazwa": g.konfiguracja["nazwa"], "konfiguracja": g.konfiguracja}
+        if nowa or przeliczone != przed:  # zamknięta albo cofnięta runda – termin liczony od teraz
+            defaults["termin_od"] = timezone.now()
+        obj, _ = Gra.objects.update_or_create(pk=id_, defaults=defaults)
         obj.rundy.all().delete()
         for numer, d in sorted(g.decyzje.items()):
             nieznane = {k for k in d if k.startswith("_")} - KLUCZE_RUNDY

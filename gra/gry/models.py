@@ -10,6 +10,10 @@ class Gra(models.Model):
     konfiguracja = models.JSONField()
     utworzono = models.DateTimeField(auto_now_add=True)
     zmieniono = models.DateTimeField(auto_now=True)
+    # prowadzenie gry przez mistrza gry (poza silnikiem, bez wpływu na wyniki): gry/harmonogram.py
+    pauza = models.BooleanField(default=False)
+    harmonogram = models.JSONField(default=list, blank=True)  # [{"dzien": 0–6, "godzina": "HH:MM"}]
+    termin_od = models.DateTimeField(null=True, blank=True)  # start liczenia terminu rundy
 
     class Meta:
         verbose_name_plural = "gry"

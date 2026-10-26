@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 from copy import deepcopy
 from datetime import datetime
@@ -13,17 +15,18 @@ from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from gry import harmonogram as hg
 from gry import serwisy
 from gry.models import Gra
 from konta import druzyny
-from konta.role import gry_ucznia, jest_mg, moze_firme
+from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
 from silnik.biuro import ukryj
 from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
 from silnik.runda import przelicz_runde
 
-from .prezentacja import katalogi, przeglad_mg, widok
+from .prezentacja import katalogi, przeglad_mg, tabela_wynikow, widok
 
 MAKS_KAPITAL = 10_000_000  # zł – górna granica kapitału startowego w nowej grze
 MAKS_NOWYCH_KONT = 60  # kont uczniów naraz (lista klasy)
@@ -132,6 +135,10 @@ def api_gry(request):
             return blad(f"Kapitał startowy: od 1 do {MAKS_KAPITAL:,.0f} PLN.".replace(",", " "))
     else:
         kapital = None
+    znane = dane_domyslne().boty.get("poziomy") or {}
+    poziomy = {f["nazwa"].strip(): f["poziom"] for f in wiersze if f.get("bot") and f.get("poziom")}
+    if any(p not in znane for p in poziomy.values()):
+        return blad("Nie ma takiego poziomu botów.")
     g = GraSilnika.nowa(
         d.get("nazwa") or "Gra",
         firmy,
@@ -141,6 +148,7 @@ def api_gry(request):
         kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),
         kapital_startowy=kapital,
         lokale=d.get("lokale", True) not in (False, "nie", "0", 0),
+        poziomy=poziomy,
     )
     return odpowiedz({"id": serwisy.utworz(g)})
 
@@ -150,6 +158,10 @@ def api_gry(request):
 @tylko_mg
 def api_mg(request, id_):
     """Widok mistrza gry: runda, decyzje drużyn, wyniki wszystkich firm."""
+    return odpowiedz(_przeglad(id_))
+
+
+def _przeglad(id_: str) -> dict:
     g = serwisy.wczytaj(id_)
     p = przeglad_mg(g)
     sklad = druzyny.sklad(id_)
@@ -157,7 +169,34 @@ def api_mg(request, id_):
         if not f["bot"]:
             f["sklad"] = sklad.get(f["nazwa"], [])
             f["autorzy"] = druzyny.autorzy(g, f["nazwa"])
-    return odpowiedz(p)
+    p["prowadzenie"] = hg.prowadzenie(id_)
+    p["prowadzenie"]["dni"] = hg.DNI
+    poziomy = g.dane.boty.get("poziomy") or {}
+    p["prowadzenie"]["poziomy"] = {k: v["nazwa"] for k, v in poziomy.items()}
+    return p
+
+
+@require_POST
+@api
+@tylko_mg
+def api_prowadzenie(request, id_):
+    """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]}
+    albo {"poziom": {"firma", "poziom"}} (poziom bota)."""
+    d = cialo(request)
+    if "poziom" in d:
+        firma, poziom = (d["poziom"] or {}).get("firma"), (d["poziom"] or {}).get("poziom")
+        with serwisy.zmiana(id_) as g:
+            f = next((x for x in g.konfiguracja["firmy"] if x["nazwa"] == firma and x["bot"]), None)
+            if f is None:
+                raise BladZapytania("Nie ma takiego bota w grze.", 404)
+            if poziom not in (g.dane.boty.get("poziomy") or {}):
+                raise BladZapytania("Nie ma takiego poziomu botów.")
+            f["poziom"] = poziom  # od następnej rundy (zapisane decyzje botów zostają)
+    try:
+        hg.ustaw(id_, d.get("pauza"), d.get("harmonogram"))
+    except ValueError as e:
+        raise BladZapytania(str(e)) from e
+    return odpowiedz(_przeglad(id_))
 
 
 def _sklad_gry(id_: str, g: GraSilnika) -> dict:
@@ -255,16 +294,32 @@ def api_widok(request, id_, firma):
     sprawdz_firme(request, id_, g, firma)
     runda = request.GET.get("runda", "")
     v = widok(g, firma, int(runda) if runda.isdigit() else None)
-    return odpowiedz(_z_druzyna(v, id_, g, firma))
+    return odpowiedz(_z_druzyna(request, v, id_, g, firma))
 
 
-def _z_druzyna(v: dict, id_: str, g: GraSilnika, firma: str) -> dict:
-    """Do widoku firmy: skład drużyny i kto ostatnio zapisał / wysłał decyzje."""
-    v["druzyna"] = {
-        "sklad": druzyny.sklad(id_).get(firma, []),
-        "autorzy": druzyny.autorzy(g, firma),
-    }
+def _z_druzyna(request, v: dict, id_: str, g: GraSilnika, firma: str) -> dict:
+    """Do widoku firmy: skład drużyny, kto ostatnio zapisał / wysłał decyzje, pauza i termin
+    zamknięcia rundy, wgląd mistrza gry tylko do odczytu."""
+    sklad = druzyny.sklad(id_).get(firma, [])
+    v["druzyna"] = {"sklad": sklad, "autorzy": druzyny.autorzy(g, firma)}
+    v["prowadzenie"] = hg.prowadzenie(id_)
+    v["tylko_odczyt"] = _tylko_odczyt(request, id_, firma, sklad)
     return v
+
+
+def _tylko_odczyt(request, id_: str, firma: str, sklad: list | None = None) -> bool:
+    """Mistrz gry ogląda drużynę uczniów (nie swoją) – bez zmiany decyzji. Drużynę bez uczniów
+    (także w grze lokalnej) prowadzi mistrz gry."""
+    if not jest_mg(request.user) or firma in firmy_ucznia(request.user, id_):
+        return False
+    return bool(druzyny.sklad(id_).get(firma) if sklad is None else sklad)
+
+
+def _moze_zmieniac(request, id_: str, firma: str) -> None:
+    if _tylko_odczyt(request, id_, firma):
+        raise BladZapytania("Mistrz gry ogląda decyzje drużyny tylko do odczytu.", 403)
+    if hg.prowadzenie(id_)["pauza"]:
+        raise BladZapytania("Gra jest wstrzymana przez mistrza gry – poczekaj na wznowienie.")
 
 
 @require_GET
@@ -274,12 +329,15 @@ def api_stan(request, id_, firma):
     g = serwisy.wczytaj(id_)
     sprawdz_firme(request, id_, g, firma)
     a = druzyny.autorzy(g, firma)
+    p = hg.prowadzenie(id_)
     return odpowiedz(
         {
             "runda": g.runda,
             "wersja": a["wersja"],
             "zapisal": a.get("zapisal"),
             "wyslane": [] if g.zakonczona else g.wyslane(),
+            "pauza": p["pauza"],
+            "termin": p["termin"],
         }
     )
 
@@ -313,10 +371,11 @@ def api_decyzje(request, id_, firma):
             raise BladZapytania("Gra jest zakończona.")
         if firma in g.wyslane():
             raise BladZapytania("Decyzje są wysłane – najpierw wróć do podejmowania decyzji.")
+        _moze_zmieniac(request, id_, firma)
         _sprawdz_wersje(request, g, firma)
         g.ustaw_decyzje(firma, d)
         druzyny.autor(g, firma, request.user)
-    return odpowiedz(_z_druzyna(widok(g, firma), id_, g, firma))
+    return odpowiedz(_z_druzyna(request, widok(g, firma), id_, g, firma))
 
 
 @require_POST
@@ -326,12 +385,13 @@ def api_wyslij(request, id_, firma):
     przeliczono = False
     with serwisy.zmiana(id_) as g:
         sprawdz_firme(request, id_, g, firma)
+        _moze_zmieniac(request, id_, firma)
         g.wyslij(firma, wyslane)
         druzyny.autor(g, firma, request.user, wyslal=wyslane)
         if wyslane and not g.brakujace() and not g.zakonczona:
             g.przelicz()
             przeliczono = True
-    v = _z_druzyna(widok(g, firma), id_, g, firma)
+    v = _z_druzyna(request, widok(g, firma), id_, g, firma)
     v["przeliczono"] = przeliczono
     return odpowiedz(v)
 
@@ -343,6 +403,8 @@ def api_przelicz(request, id_):
     with serwisy.zmiana(id_) as g:
         if g.zakonczona:
             raise BladZapytania("Gra jest zakończona.")
+        if hg.prowadzenie(id_)["pauza"]:
+            raise BladZapytania("Gra jest wstrzymana – wznów ją, żeby zamknąć rundę.")
         g.przelicz(wymus=True)
     return odpowiedz({"ok": True, "runda": g.runda})
 
@@ -435,6 +497,25 @@ def api_eksport(request, id_):
     tresc = json.dumps(g.do_slownika(), ensure_ascii=False, indent=1)
     r = HttpResponse(tresc, content_type="application/json; charset=utf-8")
     r["Content-Disposition"] = content_disposition_header(True, f"{id_}.json")
+    return r
+
+
+@require_GET
+@api
+@tylko_mg
+def api_wyniki_csv(request, id_, co):
+    """Eksport wyników do arkusza: `wyniki` – firmy w rundach, `ranking` – ranking końcowy."""
+    g = serwisy.wczytaj(id_)
+    if co not in ("wyniki", "ranking"):
+        raise BladZapytania("Nie ma takiego eksportu.", 404)
+    naglowek, wiersze = tabela_wynikow(g, co)
+    plik = io.StringIO()
+    w = csv.writer(plik, delimiter=";", lineterminator="\r\n")  # Excel z polskimi ustawieniami
+    w.writerow(naglowek)
+    for wiersz in wiersze:
+        w.writerow([f"{x:.2f}".replace(".", ",") if isinstance(x, float) else x for x in wiersz])
+    r = HttpResponse("\ufeff" + plik.getvalue(), content_type="text/csv; charset=utf-8")
+    r["Content-Disposition"] = content_disposition_header(True, f"{id_}-{co}.csv")
     return r
 
 

@@ -16,3 +16,5 @@ code.haslo { font-size: 15px; letter-spacing: 1px; }
 @media print { body > *:not(.zaslona) { display: none !important; } .zaslona { position: static; background: none; }
   .okno { box-shadow: none; max-height: none; } .og .x, .ost { display: none; } }
 .wykresy-mg { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 18px; }
+.boty-wybor select.poziom { font-size: 12px; padding: 1px 4px; }
+.termin-mg { display: flex; align-items: center; gap: 8px; margin: 6px 0; }

@@ -260,6 +260,32 @@ def _dashboard(gra: Gra, firma: str, runda: int, poprzedni) -> dict:
     return d
 
 
+def tabela_wynikow(gra: Gra, co: str = "wyniki") -> tuple[list[str], list[list]]:
+    """Wyniki do arkusza (eksport CSV mistrza gry). `wyniki` – wiersz na firmę w każdej przeliczonej rundzie,
+    `ranking` – ranking po ostatniej przeliczonej rundzie (jak w panelu mistrza gry)."""
+    if co == "ranking":
+        p = przeglad_mg(gra)
+        firmy = sorted(p["firmy"], key=lambda f: (f.get("miejsce") is None, f.get("miejsce") or 0, f["nazwa"]))
+        return (["miejsce", "firma", "bot", "wynik działalności (średnia)", "dochód netto razem", "gotówka",
+                 "zadłużenie", "lokaty", "pracownicy"],
+                [[f.get("miejsce", ""), f["nazwa"], f["strategia"] or "", f["wynik_skumulowany"] if f["wynik_skumulowany"] is not None else "",
+                  f["dochod_suma"], f["gotowka"], f["zadluzenie"], f["lokaty"], f["pracownicy"]] for f in firmy])
+    ostatnia = gra.runda - 1
+    stan = gra.stan(ostatnia)
+    strategie = gra.dane.boty["strategie"]
+    boty = {f["nazwa"]: strategie.get(f["bot"], {}).get("nazwa", f["bot"]) for f in gra.konfiguracja["firmy"] if f["bot"]}
+    wiersze = []
+    for r in range(gra.runda_startowa, ostatnia + 1):
+        karta = stan.rynek.get(r, {}).get("karta", {})
+        for n, w in stan.wyniki.get(r, {}).items():
+            k = w["kpir"]
+            wynik = karta.get(n, {}).get("wynik_dzialalnosci")
+            wiersze.append([r, gra.dane.skrot_rundy(r), n, boty.get(n, ""), k["przychody"], k["koszty"], k["dochod_netto"],
+                            w["gotowka"], w["zadluzenie"], float(wynik) if wynik is not None else ""])
+    return (["runda", "tydzień", "firma", "bot", "przychody", "koszty", "dochód netto", "gotówka", "zadłużenie",
+             "wynik działalności"], wiersze)
+
+
 def przeglad_mg(gra: Gra) -> dict:
     """Widok mistrza gry: bieżąca runda, kto wysłał decyzje, wyniki i ranking wszystkich firm, historia rund."""
     dane, konf = gra.dane, gra.konfiguracja
@@ -278,6 +304,7 @@ def przeglad_mg(gra: Gra) -> dict:
         wyn = [stan.wyniki[x][n]["kpir"]["dochod_netto"] for x in rundy if n in stan.wyniki[x]]
         firmy.append({
             "nazwa": n, "bot": f["bot"], "strategia": strategie.get(f["bot"], {}).get("nazwa") if f["bot"] else None,
+            "poziom": f.get("poziom") if f["bot"] else None,
             "wyslane": None if f["bot"] else n in wyslane,
             "gotowka": fs.gotowka,
             "zadluzenie": sum(k.pozostalo for k in fs.kredyty) + fs.kredyt_odnawialny,
