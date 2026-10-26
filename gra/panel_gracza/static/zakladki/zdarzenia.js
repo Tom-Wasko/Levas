@@ -1,5 +1,6 @@
 // Zdarzenia – eventy w parkach (gra z lokalami, silnik/zdarzenia.py). Co rundę w jednym z parków zaczyna się historia,
-// ta sama dla wszystkich drużyn; każda drużyna wybiera reakcję (decyzja `zdarzenia: {historia: opcja}`).
+// ta sama dla wszystkich drużyn; każda drużyna wybiera reakcję (decyzja `zdarzenia: {historia: opcja}`). Do tego
+// historie jednej drużyny: bank żywności i wypadki w lokalu (silnik/awarie.py – szkody i polisy).
 import { esc, licz, proc, tabela, zl2 } from "./wspolne.js";
 
 function kosztTekst(k) {
@@ -16,6 +17,8 @@ function skutekTekst(s) {
   if (s.typ === "popyt") return `${esc(s.opis)}: popyt ${s.mnoznik >= 1 ? "+" : ""}${proc(s.mnoznik - 1, 0)} przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
   if (s.typ === "czas") return `${esc(s.opis)}: ${licz(s.godziny, 1)} h właściciela mniej przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
   if (s.typ === "oddaj_zapas") return `${esc(s.opis)}${s.oddane ? `: ${zl2(s.oddane)}` : ""} – znika z zaplecza (bez kosztu w KPiR, był kosztem przy zakupie)`;
+  if (s.typ === "szkoda") return `${esc(s.opis)}: szkoda <span class="minus">${zl2(-s.kwota)}</span>${s.odszkodowanie
+    ? `, odszkodowanie <span class="plus">${zl2(s.odszkodowanie)}</span>` : s.powod ? ` (${esc(s.powod)})` : ""}`;
   if (s.typ === "kandydat") return `${esc(s.opis)}: ${esc(s.kandydat.imie_nazwisko)} czeka na <a data-zakladka-k="rynek_pracy">rynku pracy</a>`;
   return esc(s.opis);
 }
@@ -31,7 +34,7 @@ function scenaHtml(s, wybor, edycja) {
         style="text-align:left;margin:4px 0;width:100%">${etykieta}</button>`
       : `<div class="wiersz"><span>${wybrana ? "▶ " : ""}${etykieta}</span></div>`;
   }).join("");
-  return `<div class="karta">${naglowek(s)}<p class="podpowiedz">${s.nowa ? (s.park ? "Nowe wydarzenie w parku" : "Nowe wydarzenie w lokalu") : "Ciąg dalszy"}</p>
+  return `<div class="karta">${naglowek(s)}<p class="podpowiedz">${s.nowa ? (s.park ? "Nowe wydarzenie w parku" : s.wypadek ? "Wypadek w lokalu" : "Nowe wydarzenie w lokalu") : "Ciąg dalszy"}</p>
     <p>${esc(s.tekst)}</p>${opcje}${skutkiHtml(s.skutki)}</div>`;
 }
 
@@ -49,10 +52,12 @@ function rozegranaHtml(w) {
 }
 
 export const zdarzenia = {
-  tytul: "Zdarzenia", tytulPelny: "Zdarzenia w parkach", ikona: "zdarzenia", odblokowanie: (v) => !!v.zdarzenia, ukryta: (v) => !v.zdarzenia,
+  tytul: "Zdarzenia", tytulPelny: "Zdarzenia i wypadki", ikona: "zdarzenia", odblokowanie: (v) => !!v.zdarzenia, ukryta: (v) => !v.zdarzenia,
   info: `Co tydzień w jednym z parków na <a data-zakladka-k="mapa">mapie miasta</a> dzieje się coś, co widzą wszystkie drużyny.
     Jak zareagujesz, zależy od Ciebie: reakcja może kosztować czas właściciela, gotówkę albo porcje jedzenia, a jej skutki
-    – pieniądze, klienci, nowy pracownik – bywają odłożone w czasie. Bez wyboru gra wybiera reakcję domyślną.`,
+    – pieniądze, klienci, nowy pracownik – bywają odłożone w czasie. Bez wyboru gra wybiera reakcję domyślną.
+    Czasem coś przytrafia się tylko Tobie – w lokalu. Wypadki kosztują, a część kosztów zwraca
+    <a data-zakladka-k="ubezpieczenia">polisa</a>, jeśli kupiłeś ją zawczasu.`,
   decyzje({ v, edycja }) {
     const Z = v.zdarzenia;
     if (!Z) return `<p class="podpowiedz">Brak danych.</p>`;

@@ -19,6 +19,7 @@ import numpy as np
 
 CELE = frozenset({
     "bot",         # decyzje bota: runda, nazwa firmy
+    "wypadki",     # wypadki w lokalu (silnik/awarie.py): runda, firma
     "biuro",       # błąd biura rachunkowego w deklaracji: runda, firma
     "dostawcy",    # ceny dostawców w trybie losowym: runda = miesiąc (0 = styczeń)
     "gazetki",     # promocje w gazetkach dyskontów: runda, dostawca

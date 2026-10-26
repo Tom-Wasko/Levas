@@ -9,9 +9,12 @@ rundę (z szansą, strumień „zdarzenia”). Skutki: gotówka (bez VAT), mnoż
 
 Poza parkami: historia „bank żywności” (`dane/zdarzenia/magazyn.yaml`, silnik/magazyn.py) – zaczyna się tylko w tej
 drużynie, która ma w lokalu dużo jedzenia z krótkim terminem; skutek oddaj_zapas zabiera te partie z magazynu.
+Wypadki w lokalu (`dane/zdarzenia/losowe.yaml`, silnik/awarie.py) – rzadkie historie jednej drużyny; skutek szkoda
+to koszt, który może pokryć polisa ubezpieczyciela.
 """
 from __future__ import annotations
 
+from . import awarie as aw
 from . import czas_wlasciciela as cw
 from . import magazyn as mag
 from .dane import Dane
@@ -31,9 +34,9 @@ def historie_parkow(dane: Dane) -> dict[str, dict]:
 
 
 def historie(dane: Dane) -> dict[str, dict]:
-    """Wszystkie historie: w parkach i bank żywności."""
+    """Wszystkie historie: w parkach, bank żywności i wypadki w lokalu."""
     b = mag.bank(dane)
-    return {**historie_parkow(dane), **({b["historia"]["id"]: b["historia"]} if b else {})}
+    return {**historie_parkow(dane), **({b["historia"]["id"]: b["historia"]} if b else {}), **aw.historie(dane)}
 
 
 def _tekst(dane: Dane, f: Firma, runda: int, h: dict, tekst: str) -> str:
@@ -53,7 +56,8 @@ def event_parku(dane: Dane, ziarno, runda: int) -> str | None:
 
 
 def aktywne(dane: Dane, f: Firma, runda: int, ziarno) -> list[OtwartaHistoria]:
-    """Sceny firmy w tej rundzie: event parku (gdy firma nie jest już w tej historii), bank żywności i ciągi dalsze."""
+    """Sceny firmy w tej rundzie: event parku (gdy firma nie jest już w tej historii), bank żywności, wypadek
+    w lokalu i ciągi dalsze."""
     wynik = [h for h in f.historie if h.runda <= runda]
     hid = event_parku(dane, ziarno, runda)
     if hid and all(h.historia != hid for h in f.historie):
@@ -61,6 +65,8 @@ def aktywne(dane: Dane, f: Firma, runda: int, ziarno) -> list[OtwartaHistoria]:
     if mag.startuje(dane, f, runda, ziarno):
         b = mag.bank(dane)["historia"]
         wynik.append(OtwartaHistoria(historia=b["id"], scena=b["start"], runda=runda))
+    if (wid := aw.startuje(dane, f, runda, ziarno)) and all(h.historia != wid for h in f.historie):
+        wynik.append(OtwartaHistoria(historia=wid, scena=historie(dane)[wid]["start"], runda=runda, zrodlo="wypadek"))
     return wynik
 
 
@@ -85,14 +91,17 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
     Zwraca {"sceny": [...], "bledy": [...], "kandydaci": [...]} – kandydaci do puli rynku pracy."""
     wybory = d.get("zdarzenia") or {}
     hs, kp = historie(dane), zasady(dane)["koszt_porcji"]
-    wynik = {"sceny": [], "bledy": [], "kandydaci": [], "oddane": []}
+    wynik = {"sceny": [], "bledy": [], "kandydaci": [], "oddane": [], "szkody": []}
     zostaja = [h for h in f.historie if h.runda > runda]
     for oh in aktywne(dane, f, runda, ziarno):
         h = hs.get(oh.historia)
         sc = h["sceny"].get(oh.scena) if h else None
         if sc is None:   # historia zniknęła z danych
             continue
+        if oh.zrodlo == "wypadek" and not podglad:
+            f.wypadki.setdefault(h["id"], runda)
         wpis = {"historia": h["id"], "tytul": h["tytul"], "park": h["park"], "powazna": h["powazna"], "scena": oh.scena,
+                "wypadek": oh.zrodlo == "wypadek",
                 "tekst": _tekst(dane, f, runda, h, sc["tekst"]), "opcja": None, "domyslna": False, "wynik": None,
                 "koszt": None, "skutki": [],
                 "ciag_dalszy": None}
@@ -118,7 +127,12 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
             skutki, nastepne = o["skutki"], o["nastepna"]
         wpis["skutki"] = [{k: v for k, v in s.items() if v is not None} for s in skutki]
         if not podglad:
-            for s in skutki:
+            for i, s in enumerate(skutki):
+                if s["typ"] == "szkoda":
+                    sz = aw.szkoda(dane, f, s, h, runda, ks, rach)
+                    wpis["skutki"][i].update(sz)
+                    wynik["szkody"].append(sz)
+                    continue
                 oddane = _skutek(f, s, h["id"], runda, ks, rach, wynik["kandydaci"], dane)
                 if oddane:
                     wynik["oddane"].extend(oddane)
@@ -189,7 +203,7 @@ def widok(dane: Dane, fp: Firma, runda: int, ziarno, wyniki: dict, firma: str) -
         if sc is None:
             continue
         akt.append({"historia": h["id"], "tytul": h["tytul"], "park": h["park"], "powazna": h["powazna"],
-                    "scena": oh.scena, "tekst": _tekst(dane, fp, runda, h, sc["tekst"]), "domyslna": sc["domyslna"],
+                    "scena": oh.scena, "wypadek": oh.zrodlo == "wypadek", "tekst": _tekst(dane, fp, runda, h, sc["tekst"]), "domyslna": sc["domyslna"],
                     "nowa": oh.scena == h["start"],
                     "opcje": [{"id": o["id"], "tekst": o["tekst"], "koszt": _koszt(o, kp)} for o in sc["opcje"]],
                     "skutki": [{k: v for k, v in s.items() if v is not None} for s in sc["skutki"]]})

@@ -45,6 +45,7 @@ strategie:
     - papier_przyjmie/ulotki
     promocje:
     - {typ: zestaw, nazwa: Zestaw Złotego Środka}
+    polisy: [lokal, oc]          # gra z lokalami: polisy ubezpieczyciela (dane/zdarzenia/losowe.yaml)
   tani:
     nazwa: Tani Kebab Nocny
     cena: 0.78
@@ -64,6 +65,7 @@ strategie:
     promocje:
     - {typ: happy_hours, nazwa: Tanie Godziny Nocnego}
     - {typ: studencka, nazwa: Indeks Głodomora}
+    polisy: []                   # oszczędza na wszystkim, także na ubezpieczeniu
   premium:
     nazwa: Kebab Premium
     cena: 1.08
@@ -82,6 +84,7 @@ strategie:
     - fala_koziolka/billboard
     promocje:
     - {typ: karta, nazwa: Złota Karta Sułtana}
+    polisy: [lokal, sprzet, oc]
   agresywny:
     nazwa: Kebab Głośny Marketing
     cena: 0.8
@@ -109,6 +112,7 @@ strategie:
     promocje:
     - {typ: dwa_za_jeden, nazwa: Podwójny Cios}
     - {typ: happy_hours, nazwa: Godzina Szału}
+    polisy: [oc]
   nasladowca:
     nazwa: Kebab Naśladowca
     cena: null

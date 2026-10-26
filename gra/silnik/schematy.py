@@ -396,6 +396,7 @@ class Strategia(Schemat):
     szkolenia: int = Field(ge=0)
     kampanie: list[str] = Field(default_factory=list)   # gra z lokalami: "agencja/kanał" z mapa/reklama.yaml
     promocje: list[PromocjaBota] = Field(default_factory=list)   # gra z lokalami: typy z mapa/promocje.yaml
+    polisy: list[str] = Field(default_factory=list)   # gra z lokalami: rodzaje polis z zdarzenia/losowe.yaml
 
 
 class UstawieniaBotow(Schemat):
@@ -896,13 +897,15 @@ class KosztOpcji(Schemat):
     porcje: int = Field(default=0, ge=0)       # porcje jedzenia (zasady.koszt_porcji zł)
 
 
-SKUTKI_POLA = {"gotowka": "kwota", "popyt": "mnoznik", "czas": "godziny", "kandydat": "kandydat"}
+SKUTKI_POLA = {"kwota": ("gotowka", "szkoda"), "mnoznik": ("popyt",), "godziny": ("czas",), "kandydat": ("kandydat",)}
 
 
 class Skutek(Schemat):
-    typ: Literal["gotowka", "popyt", "czas", "kandydat", "oddaj_zapas"]   # oddaj_zapas – tylko bank żywności
+    # oddaj_zapas – tylko bank żywności; szkoda – tylko wypadki w lokalu (losowe.yaml, silnik/awarie.py)
+    typ: Literal["gotowka", "popyt", "czas", "kandydat", "oddaj_zapas", "szkoda"]
     opis: str = Field(min_length=3)
-    kwota: float | None = None                          # gotowka: + przychód, − koszt
+    kwota: float | None = None                          # gotowka: + przychód, − koszt; szkoda: koszt (> 0)
+    polisa: str | None = None                           # szkoda: rodzaj polisy, która ją pokrywa (None – żadna)
     mnoznik: float | None = Field(default=None, gt=0)    # popyt: mnożnik atrakcyjności lokali
     godziny: float | None = Field(default=None, gt=0)    # czas: o tyle mniej godzin właściciela
     rund: int = Field(default=1, ge=1)
@@ -910,9 +913,13 @@ class Skutek(Schemat):
 
     @model_validator(mode="after")
     def _pola(self):
-        for typ, pole in SKUTKI_POLA.items():
-            if (getattr(self, pole) is not None) != (self.typ == typ):
-                raise ValueError(f"skutek typu {self.typ}: pole {pole} " + ("wymagane" if self.typ == typ else "zbędne"))
+        for pole, typy in SKUTKI_POLA.items():
+            if (getattr(self, pole) is not None) != (self.typ in typy):
+                raise ValueError(f"skutek typu {self.typ}: pole {pole} " + ("wymagane" if self.typ in typy else "zbędne"))
+        if self.typ == "szkoda" and self.kwota <= 0:
+            raise ValueError("szkoda: kwota musi być dodatnia")
+        if self.polisa is not None and self.typ != "szkoda":
+            raise ValueError(f"skutek typu {self.typ}: pole polisa zbędne")
         return self
 
 
@@ -1011,20 +1018,80 @@ class ZasadyZdarzen(Schemat):
     koszt_porcji: float = Field(gt=0)
 
 
+def skutki_historii(h: Historia) -> list[Skutek]:
+    return [sk for s in h.sceny.values() for sk in [*s.skutki, *(x for o in s.opcje for x in o.skutki)]]
+
+
+def _bez_skutku(historie: list[Historia], typ: str, gdzie: str):
+    if inne := sorted({h.id for h in historie for sk in skutki_historii(h) if sk.typ == typ}):
+        raise ValueError(f"skutek {typ} jest tylko w {gdzie}: {', '.join(inne)}")
+
+
+def _unikalne_id(historie: list[Historia]):
+    ids = [h.id for h in historie]
+    if len(ids) != len(set(ids)):
+        raise ValueError("id historii muszą być unikalne")
+
+
 class PlikParkow(Plik):
     zasady: ZasadyZdarzen
     historie: list[Historia] = Field(min_length=1)
 
     @model_validator(mode="after")
     def _unikalne(self):
-        ids = [h.id for h in self.historie]
-        if len(ids) != len(set(ids)):
-            raise ValueError("id historii muszą być unikalne")
+        _unikalne_id(self.historie)
         if bez := [h.id for h in self.historie if not h.park]:
             raise ValueError(f"historie w parkach muszą mieć park: {', '.join(bez)}")
-        if inne := [h.id for h in self.historie for s in h.sceny.values()
-                    for sk in [*s.skutki, *(x for o in s.opcje for x in o.skutki)] if sk.typ == "oddaj_zapas"]:
-            raise ValueError(f"skutek oddaj_zapas jest tylko w historii banku żywności: {', '.join(sorted(set(inne)))}")
+        _bez_skutku(self.historie, "oddaj_zapas", "historii banku żywności")
+        _bez_skutku(self.historie, "szkoda", "wypadkach w lokalu (losowe.yaml)")
+        return self
+
+
+class ZasadyWypadkow(Schemat):
+    od_rundy: int = Field(ge=1)
+    szansa: float = Field(gt=0, le=1)      # na rundę i drużynę z działającym lokalem
+    max_strata: float = Field(gt=0)        # zł – górna granica jednej szkody
+
+
+class Polisa(Schemat):
+    nazwa: str
+    opis: str
+    stala: float = Field(ge=0)             # zł miesięcznie
+    za_lokal: float = Field(ge=0)          # zł miesięcznie za każdy lokal
+    od_majatku: float = Field(ge=0, lt=1)  # miesięcznie, ułamek majątku (ceny zakupu inwestycji)
+    pokrycie: float = Field(gt=0, le=1)    # część szkody ponad franszyzę, którą zwraca ubezpieczyciel
+    franszyza: float = Field(ge=0)         # zł – tę część szkody firma zawsze pokrywa sama
+
+
+class Ubezpieczyciel(Schemat):
+    nazwa: str
+    budynek: str | None                    # id z mapa/budynki.yaml
+    karencja_rund: int = Field(ge=0)
+    polisy: dict[str, Polisa] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _skladki(self):
+        if bez := [k for k, p in self.polisy.items() if not (p.stala or p.za_lokal or p.od_majatku)]:
+            raise ValueError(f"polisy bez składki: {', '.join(bez)}")
+        return self
+
+
+class PlikWypadkow(Plik):
+    """dane/zdarzenia/losowe.yaml: wypadki w lokalu jednej drużyny i polisy ubezpieczyciela (silnik/awarie.py)."""
+    zasady: ZasadyWypadkow
+    ubezpieczyciel: Ubezpieczyciel
+    historie: list[Historia] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _sprawdz(self):
+        _unikalne_id(self.historie)
+        if w_parku := [h.id for h in self.historie if h.park]:
+            raise ValueError(f"wypadki dzieją się w lokalu (bez pola park): {', '.join(w_parku)}")
+        _bez_skutku(self.historie, "oddaj_zapas", "historii banku żywności")
+        for h in self.historie:
+            for sk in skutki_historii(h):
+                if sk.polisa is not None and sk.polisa not in self.ubezpieczyciel.polisy:
+                    raise ValueError(f"{h.id}: nieznana polisa {sk.polisa!r} (ubezpieczyciel.polisy)")
         return self
 
 
@@ -1047,6 +1114,7 @@ class BankZywnosci(Schemat):
     def _bez_parku(self):
         if self.historia.park:
             raise ValueError("historia banku żywności nie dzieje się w parku (bez pola park)")
+        _bez_skutku([self.historia], "szkoda", "wypadkach w lokalu (losowe.yaml)")
         return self
 
 
@@ -1059,6 +1127,7 @@ class PlikMagazynu(Plik):
 SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "parki.yaml": PlikParkow,
     "magazyn.yaml": PlikMagazynu,
+    "losowe.yaml": PlikWypadkow,
 }
 
 

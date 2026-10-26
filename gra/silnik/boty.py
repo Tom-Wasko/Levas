@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from . import awarie as aw
 from . import banki as bk
 from . import biuro as bo
 from . import lokale as lk
@@ -267,4 +268,6 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         d["szkolenia"] = [{"firma": szk["firmy"][1]["nazwa"], "szkolenie": p["nazwa"]} for p in najlepsze]
     if lokale and dane.zdarzenia:   # eventy w parkach: losowa opcja (najwyżej 3 h właściciela)
         d["zdarzenia"] = zd.wybor_bota(dane, f, runda, konf["ziarno"])
+    if lokale and aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
+        d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
     return d

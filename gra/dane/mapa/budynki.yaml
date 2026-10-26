@@ -425,3 +425,14 @@ budynki:
     y: 6
     szer: 1
     gl: 1
+- id: ubezpieczyciel
+  nazwa: TUW „Pod Koziołkiem”
+  rodzaj: ubezpieczenia
+  strefa: centrum
+  opis: Polisy na lokal, sprzęt i OC – odszkodowania po wypadkach w lokalu (dane/zdarzenia/losowe.yaml).
+  zakladka: ubezpieczenia
+  mapa:
+    x: 7
+    y: 8
+    szer: 1
+    gl: 1

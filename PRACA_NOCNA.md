@@ -137,6 +137,14 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    najemcy zostają w jego ewidencji środków trwałych (amortyzacja) także po wyprowadzce; brak podatku od
    nieruchomości; boty nie licytują i nie kupują budynków. Czy tak? (zapisane 27.10)
 
+17. **Wypadki i ubezpieczyciel (F3b.5).** Liczby do sprawdzenia (`dane/zdarzenia/losowe.yaml`): wypadki od rundy 4,
+   szansa 8% na rundę (średnio niecałe 2 wypadki na grę), szkody 500–4200 zł w scenie, limit 8000 zł za jedną szkodę
+   (nie za całą historię); polisy (kwoty miesięczne): lokal 140 zł za lokal, pokrycie 90%, franszyza 300 zł; sprzęt
+   0,2% majątku, 85%, 200 zł; OC 80 zł, 100%, 100 zł; karencja 1 runda. Uproszczenia: szkody i odszkodowania bez VAT
+   (zw), składka zwolniona z VAT; polisa chroni przed wypadkiem tylko, gdy chroniła w rundzie jego początku (ciąg
+   dalszy też); wypowiedzenie – od razu, bez zwrotu składki. Nazwa ubezpieczyciela: TUW „Pod Koziołkiem”. Czy tak?
+   (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -356,3 +364,5 @@ _brak_
   Start F3b.4 (licytacje i przejęcia).
 - 27.10 – F3b.4 gotowe: licytacje lokali (najwyższa oferta, remis – losowanie), kupno budynków z najemcą, wykup,
   wypowiedzenia z rozliczeniem nakładów, wyprowadzki, zakładka Licytacje i przejęcia; pytanie 16. Start F3b.5.
+- 27.10 – F3b.5 gotowe: wypadki w lokalu (10 historii, 8 komicznych), ubezpieczyciel z polisami na lokal, sprzęt i OC,
+  zakładka Ubezpieczenia, boty z polisami; pytanie 17. Start F3b.6 (urząd/sanepid).

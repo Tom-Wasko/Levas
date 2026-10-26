@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from silnik import awarie as aw
 from silnik import banki as bk
 from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
@@ -203,6 +204,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                                   (v.get("wyniki") or {}).get("przejecia"))
         if dane.zdarzenia:
             v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
+        if aw.dane_wypadkow(dane):
+            v["ubezpieczenia"] = aw.widok(dane, f, runda, info.get("ubezpieczenia") if edycja
+                                          else stan.wyniki[runda][firma].get("ubezpieczenia"), poprzedni.wyniki, firma)
         fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)
         v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
                       "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}

@@ -100,4 +100,17 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   z ofertą, własne budynki z wypowiedzeniem, najmy u innych; Wyniki: przejęcie, wyprowadzki, licytacje w mieście);
   test `test_licytacje.py`
 
-Zadania F3b.5–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3b.5 Wypadki w lokalu i ubezpieczyciel (gra z lokalami) – `silnik/awarie.py`, dane `dane/zdarzenia/losowe.yaml`
+  (schemat `PlikWypadkow`): 10 historii w 2–3 scenach (8 komicznych – Gołąb Zenon, Pani Halina z drugiego piętra,
+  Najazd koziołków, Zalanie z góry, Śpiewająca frytkownica, hulajnoga, kot kierownik, ząb pana Ryszarda; 2 poważne
+  bez żartów – pożar kuchni, włamanie), rozgrywane jak eventy w parkach, ale tylko w jednej drużynie: od rundy 4
+  szansa 8% na rundę (strumień `wypadki`), naraz jeden otwarty, bez powtórek (`Firma.wypadki`); nowy skutek
+  `szkoda` (koszt w KPiR bez VAT, najwyżej 8000 zł, pole `polisa`). Ubezpieczyciel TUW „Pod Koziołkiem” (budynek
+  na mapie): polisy na lokal, sprzęt i OC (pokrycie, franszyza, składka miesięczna stała + za lokal + od majątku,
+  zwolniona z VAT), decyzja `polisy: [rodzaj]` (pełna lista, `Firma.polisy`: rodzaj → runda początku ochrony,
+  karencja 1 runda); odszkodowanie (szkoda − franszyza) × pokrycie jako przychód pozostały, gdy polisa chroniła
+  w rundzie początku wypadku; boty z polisami wg strategii (`boty.yaml` → `polisy`); wyniki rundy `ubezpieczenia`;
+  zakładka **Finanse → Ubezpieczenia** (Decyzje: kup/wypowiedz, składki; Wyniki: składki, szkody, odszkodowania,
+  historia szkód), zakładka Zdarzenia pokazuje wypadki i szkody; test `test_awarie.py`
+
+Zadania F3b.6–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

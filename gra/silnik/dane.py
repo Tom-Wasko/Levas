@@ -82,7 +82,8 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
 
 
 def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
-    """Eventy (`dane/zdarzenia/`): parki (F3b.1), sanepid i bank żywności (magazyn). Brak katalogu = gra bez eventów."""
+    """Eventy (`dane/zdarzenia/`): parki (F3b.1), sanepid i bank żywności (magazyn), wypadki i ubezpieczyciel (losowe,
+    F3b.5). Brak katalogu = gra bez eventów."""
     if not (katalog / "parki.yaml").exists():
         return None
     return {n.removesuffix(".yaml"): s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"})
@@ -433,7 +434,8 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
 
 
 def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
-    """Odwołania eventów: park z mapy (park albo woda), zawód kandydata, id banku żywności inne niż w parkach."""
+    """Odwołania eventów: park z mapy (park albo woda), budynek ubezpieczyciela, zawód kandydata, id historii
+    unikalne we wszystkich plikach."""
     if not d.zdarzenia:
         return
     if not d.mapa:
@@ -441,10 +443,22 @@ def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
         return
     parki = {b["id"] for b in d.mapa["budynki"] if b["rodzaj"] in ("park", "woda")}
     bank = d.zdarzenia["magazyn"]["bank_zywnosci"]["historia"]
-    if any(h["id"] == bank["id"] for h in d.zdarzenia["parki"]["historie"]):
-        bledy.append(f"zdarzenia/magazyn.yaml: id historii {bank['id']!r} jest już w parki.yaml")
-    for h in [*d.zdarzenia["parki"]["historie"], bank]:
-        co = f"zdarzenia/{'parki' if h['park'] else 'magazyn'}.yaml: {h['id']}"
+    pliki = [("parki", h) for h in d.zdarzenia["parki"]["historie"]] + [("magazyn", bank)]         + [("losowe", h) for h in d.zdarzenia["losowe"]["historie"]]
+    gdzie: dict[str, str] = {}
+    for plik, h in pliki:
+        if h["id"] in gdzie:
+            bledy.append(f"zdarzenia/{plik}.yaml: id historii {h['id']!r} jest już w {gdzie[h['id']]}.yaml")
+        gdzie.setdefault(h["id"], plik)
+    ub = d.zdarzenia["losowe"]["ubezpieczyciel"]["budynek"]
+    if ub and ub not in {b["id"] for b in d.mapa["budynki"]}:
+        brak(ub, "zdarzenia/losowe.yaml: ubezpieczyciel", "budynek", "mapa/budynki.yaml")
+    polisy = d.zdarzenia["losowe"]["ubezpieczyciel"]["polisy"]
+    for s, st in d.boty["strategie"].items():
+        for x in st.get("polisy", []):
+            if x not in polisy:
+                brak(x, f"boty.yaml: {s}.polisy", "rodzaj polisy", "zdarzenia/losowe.yaml: ubezpieczyciel.polisy")
+    for plik, h in pliki:
+        co = f"zdarzenia/{plik}.yaml: {h['id']}"
         if h["park"] and h["park"] not in parki:
             brak(h["park"], co, "park albo woda", "mapa/budynki.yaml")
         for nazwa, s in h["sceny"].items():

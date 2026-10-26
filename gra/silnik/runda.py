@@ -18,6 +18,7 @@ from copy import deepcopy
 
 import numpy as np
 
+from . import awarie as aw
 from . import banki as bk
 from . import biuro as bo
 from . import czas_wlasciciela as cw
@@ -323,6 +324,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
             wyniki[nazwa]["zdarzenia"] = info[nazwa].get("zdarzenia")
+            if aw.dane_wypadkow(dane):
+                wyniki[nazwa]["ubezpieczenia"] = aw.raport(info[nazwa].get("ubezpieczenia"), info[nazwa].get("zdarzenia"))
             wyniki[nazwa]["magazyn"] = info[nazwa].get("magazyn")
             wyniki[nazwa]["biuro"] = info[nazwa].get("biuro")
             wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")

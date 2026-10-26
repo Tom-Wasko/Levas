@@ -310,6 +310,8 @@ class Firma(Model):
     harpagon: PozyczkaHarpagona | None = None
     historie: list[OtwartaHistoria] = Field(default_factory=list)   # eventy w parkach: ciągi dalsze
     efekty: list[Efekt] = Field(default_factory=list)
+    wypadki: dict[str, int] = Field(default_factory=dict)   # wypadki w lokalu (silnik/awarie.py): id → runda początku
+    polisy: dict[str, int] = Field(default_factory=dict)    # polisy ubezpieczyciela: rodzaj → runda początku ochrony
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
     promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
