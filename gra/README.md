@@ -26,7 +26,9 @@ Ręcznie (z folderu `gra`):
 Strona startowa → „Nowa gra”: firmy graczy (na tym komputerze) i boty (zrównoważony, tani, premium,
 agresywny marketing, naśladowca). Zakładki są jak w Revasie: Oferta (menu) → Inwestycje → HR → Dostawcy → Marketing →
 Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik **Decyzje / Wyniki** pokazuje wyniki
-poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. **Analiza** liczy przewidywany wynik rundy
+poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. Limity (`silnik/limity.py`): najwyżej
+3 nowych pracowników na rundę (zatrudnienia i oferty podkupienia razem) i kolejny lokal co 3 rundy – zapis
+decyzji z przekroczeniem jest odrzucony. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
 **Panel mistrza gry** – http://127.0.0.1:8765/mg/ (tylko rola mistrza gry): nowa gra

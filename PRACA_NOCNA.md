@@ -85,6 +85,10 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
      pracownicy) i wyniki firm w każdej rundzie (przychody, koszty, dochód netto, gotówka, zadłużenie, wynik
      działalności); średnik i przecinek dziesiętny pod polskiego Excela.
    Czy tak może zostać? (zapisane 26.10)
+11. **Limity (F3a.15).** Do limitu 3 nowych pracowników liczę zatrudnienia z puli **i** oferty podkupienia
+   (także te, które pracownik odrzuci – oferta jest złożona w tej rundzie); zastąpienie kandydata na tym samym
+   stanowisku się nie liczy. Lokal „co 3 rundy” liczę od rundy wzięcia poprzedniego lokalu (lokal z rundy 1 →
+   kolejny od rundy 4), nie od chwili, gdy zacznie działać. Czy tak? (zapisane 26.10)
 
 ## Odłożone zadania
 
@@ -295,3 +299,4 @@ _brak_
   deklaracji zgodne z silnikiem (42/42 przypadki); 154 testy. Rozszerzony test uzgodnienia złapał błąd: kredyt
   odnawialny z końca rundy nie trafiał do dokumentów – naprawione.
 - 26.10 – F3a.14 gotowe: panel mistrza gry (pauza, harmonogram zamykania rund z komendą `zamykaj_rundy`, podgląd drużyn tylko do odczytu, poziomy botów bez efektu do F4.4, eksport CSV); pytanie 10. Start F3a.15.
+- 26.10 – F3a.15 gotowe: limity odrzucane przy zapisie decyzji (`silnik/limity.py`); pytanie 11. Krok 3a zakończony, start F3b.1 Parki.

@@ -1,5 +1,6 @@
 // HR: zatrudnienie, udogodnienia, szkolenia.
-import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast,
+  wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
@@ -50,7 +51,12 @@ export const zatrudnienie = {
   },
   akcje: {
     kandydaci: (el, c) => oknoKandydatow(c, el.dataset.t, +el.dataset.n),
-    zatrudnij: (el, c) => oknoZatrudnienia(c, el.dataset.k, el.dataset.t, +el.dataset.n),
+    zatrudnij: (el, c) => {
+      const { t, n } = el.dataset;
+      const inne = (c.d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n));   // zastąpienie kandydata się nie liczy
+      if (ponadLimitPracownikow(c.v, inne, c.d.podkup || [])) return toast(tekstLimituPracownikow(c.v));
+      return oknoZatrudnienia(c, el.dataset.k, t, +n);
+    },
     "potwierdz-zatrudnienie": async (el, c) => {
       const pensja = +document.getElementById("z-pensja").value, umowa = document.getElementById("z-umowa").value;
       if (pensja < c.kat.placa_minimalna) return toast(`Pensja nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);

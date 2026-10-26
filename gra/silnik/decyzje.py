@@ -37,6 +37,7 @@ from datetime import timedelta
 
 from . import biuro as bo
 from . import czas_wlasciciela as cw
+from . import limity as lm
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import srodki_trwale as st_trwale
@@ -371,6 +372,13 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("czerwony", "zatrudnienie", tekst)
         for b in bo.bledy(dane, firma, d):
             dodaj(b["poziom"], b["zakladka"], b["tekst"])
+        # przekroczenia odrzuca zapis decyzji (API), a przeliczenie przycina – tu czerwone są w uwagach rynku pracy i lokali
+        lim = lm.stan_limitow(dane, firma, d, runda)
+        if lim["pracownicy"]["nowi"] == lim["pracownicy"]["limit"]:
+            dodaj("niebieski", "zatrudnienie", f"Wykorzystany limit nowych pracowników w tej rundzie "
+                  f"({lim['pracownicy']['limit']}) – kolejnych przyjmiesz w następnej rundzie.")
+        if firma.lokale and runda < lim["lokal"]["od_rundy"]:
+            dodaj("niebieski", "lokale", f"Kolejny lokal możesz wziąć od rundy {lim['lokal']['od_rundy']}.")
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

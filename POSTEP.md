@@ -38,4 +38,8 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 
 - [x] F3a.14 Panel mistrza gry – **pauza** gry (drużyny nie zmieniają ani nie wysyłają decyzji, runda się nie zamyka – także z harmonogramu; cofnięcie działa); **zamykanie rund o stałej porze**: tygodniowe terminy (`Gra.harmonogram`, `gry/harmonogram.py`), runda zamyka się w pierwszym terminie po zamknięciu poprzedniej, komenda `manage.py zamykaj_rundy` (raz albo `--petla 60`; Harmonogram zadań Windows / cron w README), termin widoczny dla drużyn na pasku i w *Wyślij decyzje*, strona drużyny odświeża się po pauzie i zmianie terminu; **wgląd mistrza gry w drużyny uczniów tylko do odczytu** (API: 403, strona: komunikat; drużynę bez uczniów i grę lokalną prowadzi nadal mistrz gry); **poziom botów** (łatwy / średni / trudny, `dane/boty.yaml: poziomy`) przy zakładaniu gry i w trakcie (od następnej rundy) – na razie zapisany bez wpływu na decyzje (zachowanie poziomów w F4.4); **eksport do arkusza**: ranking i wyniki firm w rundach (CSV, średnik, przecinek dziesiętny, BOM – Excel); migracja `0004_prowadzenie_gry`; test `test_prowadzenie.py`. Odblokowywanie zakładek – w F4.3 (jak w planie)
 
-Zadania F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3a.15 Limity – `silnik/limity.py`: najwyżej 3 nowych pracowników na rundę (zatrudnienia + oferty podkupienia pracowników innych drużyn) i kolejny lokal co 3 rundy; **zapis decyzji z przekroczeniem jest odrzucony** (API 400 z opisem, strona pokazuje komunikat i wczytuje poprzednie decyzje), przyciski *Zatrudnij +* i *Złóż ofertę* sprawdzają limit od razu; lista błędów: niebieskie „wykorzystany limit nowych pracowników” i „kolejny lokal od rundy N” (czerwone – jak dotąd z przeliczenia, które nadal przycina nadmiar u botów i w starych zapisach); test `test_limity.py`. Pełna lista błędów dla nowych decyzji – w F4.2 (jak w planie)
+
+**Krok 3a zakończony.**
+
+Zadania F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

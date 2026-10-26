@@ -24,6 +24,8 @@ from silnik.biuro import ukryj
 from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
+from silnik.limity import naruszenia
+from silnik.lokale import tryb_lokali
 from silnik.runda import przelicz_runde
 
 from .prezentacja import katalogi, przeglad_mg, tabela_wynikow, widok
@@ -373,6 +375,11 @@ def api_decyzje(request, id_, firma):
             raise BladZapytania("Decyzje są wysłane – najpierw wróć do podejmowania decyzji.")
         _moze_zmieniac(request, id_, firma)
         _sprawdz_wersje(request, g, firma)
+        # limity (silnik/limity.py): zapis z przekroczeniem jest odrzucony
+        if tryb_lokali(g.dane, g.konfiguracja):
+            bledy = naruszenia(g.dane, g.stan().firmy[firma], d, g.runda)
+            if bledy:
+                raise BladZapytania(" ".join(bledy))
         g.ustaw_decyzje(firma, d)
         druzyny.autor(g, firma, request.user)
     return odpowiedz(_z_druzyna(request, widok(g, firma), id_, g, firma))

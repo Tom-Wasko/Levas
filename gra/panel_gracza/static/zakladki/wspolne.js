@@ -32,6 +32,10 @@ export const gw = (n) => {
 };
 // godzina z czasu ISO (zapis decyzji przez kogoś z drużyny)
 export const godzina = (iso) => iso ? new Date(iso).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "";
+// limit nowych pracowników na rundę (silnik/limity.py): czy po dodaniu jeszcze jednego będzie przekroczony
+export const ponadLimitPracownikow = (v, zatrudnij, podkup) => !!v.agencja && zatrudnij.length + podkup.length >= v.agencja.limit;
+export const tekstLimituPracownikow = (v) => `W jednej rundzie możesz przyjąć najwyżej ${v.agencja.limit} nowych pracowników
+  (zatrudnienia i oferty podkupienia razem). Zrezygnuj z któregoś albo poczekaj do następnej rundy.`;
 // termin zamknięcia rundy z harmonogramu mistrza gry, np. „środa, 28 października, 08:00”
 export const termin = (iso) => iso ? new Date(iso).toLocaleString("pl-PL",
   { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";

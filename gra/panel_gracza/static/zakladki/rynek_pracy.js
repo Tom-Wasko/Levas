@@ -1,6 +1,6 @@
 // Rynek pracy (gra z lokalami, silnik/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
 // i okresy wypowiedzenia. Kandydatów z puli zatrudnia się w zakładce HR → Zatrudnienie.
-import { esc, gw, licz, nazwaFirmy, okno, tabela, toast, zamknijOkno, zl } from "./wspolne.js";
+import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
 
 const UMOWY = { prace: "umowa o pracę", zlecenie: "umowa zlecenie" };
 const WYNIK_ZLOZONEJ = { przyjeta: "przyjęta", odrzucona: "odrzucona – pensja nie wyższa od obecnej", kontroferta: "przebita kontrofertą",
@@ -103,7 +103,11 @@ export const rynek_pracy = {
         d.kontroferty = kf;
       });
     },
-    "oferta-podkupienia": (el, c) => oknoOferty(c, el.dataset.id),
+    "oferta-podkupienia": (el, c) => {
+      const inne = (c.d.podkup || []).filter((o) => o.pracownik !== el.dataset.id);
+      if (ponadLimitPracownikow(c.v, c.d.zatrudnij || [], inne)) return toast(tekstLimituPracownikow(c.v));
+      return oknoOferty(c, el.dataset.id);
+    },
     "potwierdz-oferte": async (el, c) => {
       const p = c.v.agencja.cudzy.find((x) => x.id === el.dataset.id);
       const pensja = +document.getElementById("o-pensja").value, umowa = document.getElementById("o-umowa").value;
