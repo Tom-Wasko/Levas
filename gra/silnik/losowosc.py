@@ -27,6 +27,7 @@ CELE = frozenset({
     "kolejnosc",   # kolejność firm w rundzie
     "parki",       # kolejność historii w parkach: runda = numer cyklu wszystkich historii
     "lokal",       # wybór lokalu przez bota: runda, nazwa firmy
+    "licytacje",   # remis w licytacji lokalu: runda, id lokalu
     "popyt",       # szum popytu: runda, firma, usługa
     "reklamacje",  # reklamacje: runda, firma, usługa
     "rynek_pracy", # remisy w licytacjach i ofertach podkupienia: runda, rodzaj, id osoby

@@ -28,6 +28,7 @@ from . import magazyn as mag
 from . import menu
 from . import popyt as pp
 from . import promocje as pm
+from . import przejecia as pr
 from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
@@ -78,11 +79,20 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     nazwy = sorted(s.firmy)
     kolejnosc = list(strumien(ziarno, r, "kolejnosc").permutation(nazwy))
 
-    ksiegi, rachunki, info, bledy, start, odnawialny = {}, {}, {}, {}, {}, {}
+    ksiegi, rachunki, info, bledy, odnawialny = {}, {}, {}, {}, {}
     # "jednoczesnie" (jak w oficjalnej grze): przychody i wydatki miesiąca rozliczane razem – kredyt odnawialny tylko
     # na niedobór na koniec miesiąca; "na_biezaco": wydatki z decyzji opłacane przed wpływem przychodów
     tryb_kredytu = konfiguracja.get("kredyt_odnawialny", "jednoczesnie")
     tryb_lokali = lk.tryb_lokali(dane, konfiguracja)
+    start = {n: {"magazyn": dict(f.magazyn), "gotowka": f.gotowka, "pracownicy": len(f.pracownicy), "uslugi": len(f.oferta)}
+             for n, f in s.firmy.items()}
+    for nazwa in nazwy:
+        ksiegi[nazwa], rachunki[nazwa] = Ksiega(vat=rz.reguly_vat(dane) if tryb_lokali else None), Rachunek()
+    przetargi, przegrane, wyprowadzki = [], {}, {}
+    if tryb_lokali:  # wyprowadzki po wypowiedzeniu najmu, potem licytacje lokali i budynków (silnik/przejecia.py)
+        wyprowadzki = pr.koniec_najmu(dane, s, r, ksiegi, rachunki)
+        lic = pr.licytacje(dane, s.firmy, decyzje, r, ziarno, lk.zajete(s.firmy))
+        przetargi, przegrane = lic["przetargi"], lic["przegrane"]
     zajete = lk.zajete(s.firmy)
     rezerwacje, rynek_pracy = {}, {}
     if tryb_lokali:  # agencja pracy: limit nowych, licytacje kandydatów, podkupienia i kontroferty (silnik/rynek_pracy.py)
@@ -91,11 +101,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         f = s.firmy[nazwa]
         d = decyzje.get(nazwa, {})
         poprzednia_oferta = list(f.oferta)
-        start[nazwa] = {"magazyn": dict(f.magazyn), "gotowka": f.gotowka,
-                        "pracownicy": len(f.pracownicy), "uslugi": len(f.oferta)}
         for p in f.pracownicy.values():
             p.premia = 0.0
-        ksiegi[nazwa], rachunki[nazwa] = Ksiega(vat=rz.reguly_vat(dane) if tryb_lokali else None), Rachunek()
         # lokaty i kredyty na początku miesiąca, przed zakupami (historia rachunku ATH, luty: opłata za konto → lokata
         # 30 000 z salda 33 564 → stanowisko, sprzęt, … – saldo w trakcie miesiąca może być ujemne); bank wybrany
         # w tej rundzie działa od razu (ATH maj: zmiana na Gaz Bank i lokata 7%)
@@ -109,7 +116,12 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 f.bank = d["bank"]
             bank_info = bank_poczatek_miesiaca(f, dane.pozycje("banki")[f.bank], d, r, ksiegi[nazwa], rachunki[nazwa]) \
                 if f.bank else None
-        lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa]) if tryb_lokali else None
+        lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa],
+                           przegrane.get((nazwa, "lokal"))) if tryb_lokali else None
+        if tryb_lokali:   # kupno budynku z najemcą, wypowiedzenia najmu (silnik/przejecia.py)
+            info_przejecia = {"przejecie": pr.przejmij(dane, s.firmy, nazwa, d.get("przejecie"), r,
+                                                       przegrane.get((nazwa, "przejecie")), ksiegi[nazwa], rachunki[nazwa]),
+                              "wypowiedzenia": pr.wypowiedz(dane, s.firmy, nazwa, d.get("wypowiedz"), r)}
         przed = dict(f.pracownicy)
         pula = rp.pula_dla(s.kandydaci, rezerwacje, nazwa) if tryb_lokali else s.kandydaci
         info[nazwa] = zastosuj(dane, f, d, r, pula, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
@@ -117,6 +129,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["ksiegowosc"] = ksiegowosc
             info[nazwa]["leasing"] = bk.leasing_wez(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
             info[nazwa]["harpagon"] = harpagon_info
+            info[nazwa]["przejecia"] = info_przejecia
         if tryb_lokali:  # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
             zatrudnieni = set(info[nazwa]["zatrudnieni"])
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
@@ -144,6 +157,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             rynek_pracy[nazwa]["zatrudnieni"] = info[nazwa].get("kanaly_zatrudnienia", [])
             info[nazwa]["rynek_pracy"] = rynek_pracy[nazwa]
             bledy[nazwa] += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in rynek_pracy[nazwa]["uwagi"]]
+            bledy[nazwa] += pr.bledy(dane, s.firmy, nazwa, r, info[nazwa]["przejecia"])
             # presja Harpagona na dłużnika: przypomnienia, odsetki karne, wizyty (pracownik, który odszedł – do puli)
             info[nazwa]["harpagon_presja"], odszedl = lw.presja(dane, s.firmy[nazwa], nazwa, r, ziarno, ksiegi[nazwa],
                                                                 rachunki[nazwa])
@@ -253,7 +267,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         for n in f.internet:
             ksieguj(f, ks, rach, f"Utrzymanie reklamy internetowej: {n}", dane.na_runde(narz[n]["utrzymanie"]))
         if tryb_lokali:
-            lk.koszty_rundy(dane, f, r, ks, rach)
+            lk.koszty_rundy(dane, f, r, ks, rach, s.firmy)
             amortyzuj(dane, f, r, ks)
         else:
             ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
@@ -304,6 +318,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:
             wyniki[nazwa]["lokale"] = lk.stan_lokali(dane, f, r)
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
+            wyniki[nazwa]["przejecia"] = pr.raport(dane, s.firmy, nazwa, r, info[nazwa]["przejecia"], przetargi,
+                                                   wyprowadzki.get(nazwa, []))
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
             wyniki[nazwa]["zdarzenia"] = info[nazwa].get("zdarzenia")
@@ -340,6 +356,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                                   {"_konkurenci_stali": konfiguracja.get("konkurenci_stali"), "_rynek": rynek})
     if tryb_lokali:  # kto zajmuje który lokal (mapa miasta, zakładka Lokale – wyniki)
         s.rynek[r]["lokale"] = lk.zajete(s.firmy)
+        s.rynek[r]["przejecia"] = pr.publiczne(dane, s.firmy, przetargi)
         if strefowy:
             s.rynek[r]["strefy"] = strefowy["strefy"]
         if kampanie:   # reklamy widać na mieście: kto, gdzie i za ile

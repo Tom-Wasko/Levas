@@ -69,7 +69,7 @@ def test_ten_sam_lokal_w_jednej_rundzie_dostaje_jedna_firma():
     decyzje = {n: s.wyniki[1][n]["lokal_decyzja"] for n in ("A", "B")}
     assert sorted(d["przyjety"] for d in decyzje.values()) == [False, True]
     przegrany = next(n for n, d in decyzje.items() if not d["przyjety"])
-    assert "zajęła już firma" in decyzje[przegrany]["powod"]
+    assert "licytację wygrała firma" in decyzje[przegrany]["powod"] and "losowanie" in decyzje[przegrany]["powod"]
     assert s.firmy[przegrany].lokale == [] and s.firmy[przegrany].gotowka == pytest.approx(s.wyniki[1][przegrany]["gotowka"])
     assert any(b["zakladka"] == "lokale" and b["poziom"] == "czerwony" for b in s.wyniki[1][przegrany]["lista_bledow"])
 

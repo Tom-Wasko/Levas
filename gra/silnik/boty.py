@@ -119,14 +119,17 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     odbl = dane.odblokowane(runda)
     d: dict = {"zatrudnij": [], "sprzet_kup": [], "zamowienia": []}
     lokale = lk.tryb_lokali(dane, konf)
-    if lokale and not f.lokale:
+    # wszystkie lokale z wypowiedzianym najmem (nowy właściciel budynku, silnik/przejecia.py) – szuka nowego
+    wyprowadzka = lokale and f.lokale and all(x.najem_do is not None for x in f.lokale)         and runda >= lk.runda_nowego_lokalu(dane, f)
+    if lokale and (not f.lokale or wyprowadzka):
         # bez lokalu: najem gotowego lokalu; dalsze decyzje liczone tak, jakby lokal już był (przegrany spór o lokal
         # – stanowiska odrzucone, ponowna próba w następnej rundzie)
         d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf)
-        if d["lokal"] is None:
+        if d["lokal"] is None and not f.lokale:
             return d
-        f = deepcopy(f)
-        lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
+        if d["lokal"] is not None:
+            f = deepcopy(f)
+            lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
     miejsca = lk.wolne_miejsca(dane, f, runda) if lokale else None
     if not f.bank:
         d["bank"] = bk.najlepsze(dane)["konto"] if lokale else \
@@ -174,7 +177,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     nowe_inst, nowe_rec = [], 0
     istniejace = f.stanowiska_typu(KUCHNIA)
     wolne = [s for s in istniejace if not s.sprzet]
-    nastepny = len(istniejace) + 1
+    nastepny = f.nowy_nr(KUCHNIA)
     for u in oferta:
         potrzeba = stanowiska_potrzebne(dane, u, klienci[u] * szczyt)  # obsługa dzień po dniu: obsada na szczyt
         maja = [s for s in istniejace if all(n in s.sprzet for n in dane.uslugi[u]["sprzet"])]
@@ -201,7 +204,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             if n not in s.sprzet:
                 d["sprzet_kup"].append({"typ": KASA, "nr": s.nr, "nazwa": n, "jakosc": q})
     for i in range(nowe_rec):
-        nr = len(rec) + i + 1
+        nr = f.nowy_nr(KASA) + i
         for n in dane.sprzet_kasy:
             d["sprzet_kup"].append({"typ": KASA, "nr": nr, "nazwa": n, "jakosc": q})
     d["stanowiska"] = {KUCHNIA: len(nowe_inst), KASA: nowe_rec}
@@ -219,7 +222,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         kasjer = dane.zawody_typu(KASA)[0]
         cele = [(KUCHNIA, nr, zawod) for nr, zawod in sorted(obsada.items())]
         cele += [(KASA, s.nr, kasjer) for s in rec if not s.pracownik]
-        cele += [(KASA, len(rec) + i + 1, kasjer) for i in range(nowe_rec)]
+        cele += [(KASA, f.nowy_nr(KASA) + i, kasjer) for i in range(nowe_rec)]
         if lokale:  # agencja pracy: najwyżej limit nowych na rundę, resztę bot zatrudni w kolejnych
             cele = cele[: rp.ustawienia(dane)["limit_nowych"]]
         for typ, nr, zawod in cele:

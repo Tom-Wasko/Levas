@@ -493,6 +493,13 @@ class ZasadyLokali(Schemat):
     nowy_lokal_co_rund: int = Field(ge=1)
     kaucja_miesiecy: float = Field(ge=0)
     urzadzanie_rund: int = Field(ge=0)
+    # licytacje i przejęcia (silnik/przejecia.py)
+    licytacje_od_rundy: int = Field(ge=1)      # od tej rundy można przebić cenę wywoławczą (wcześniej remis)
+    oferta_max: float = Field(ge=1)            # najwyżej tyle × cena wywoławcza (chroni przed literówką)
+    przejecia_od_rundy: int = Field(ge=1)
+    wypowiedzenie_rund: int = Field(ge=1)      # KC art. 673, 678
+    ulepszenia_zwrot: float = Field(ge=0, le=1)     # część nakładów najemcy, którą płaci zatrzymujący je właściciel
+    przywrocenie_koszt: float = Field(ge=0, le=1)   # część nakładów, którą płaci najemca za przywrócenie stanu
 
 
 class Miejsca(Schemat):

@@ -4,7 +4,7 @@ opis: 'Lokale do najmu lub kupna. Kwoty w złotych, czynsz i utrzymanie (media) 
   na rundę. gotowy: działa od razu, sprzęt wynajmującego (przy najmie nie można go sprzedać); niewyposazony: 1 runda
   urządzania, jednorazowa adaptacja, cały sprzęt trzeba kupić; dzialka: tylko kupno, budowa budowa_rund rund, koszt_budowy
   płatny w równych ratach co rundę budowy. miejsca: ile stanowisk każdego typu zmieści lokal. Kaucja przy najmie:
-  kaucja_miesiecy × czynsz (zwrotna przy wyprowadzce – później).'
+  kaucja_miesiecy × czynsz (zwrotna po końcu najmu).'
 zrodlo: 'założenie F3a.3: czynsz = metraż × stawka strefy (strefy.yaml: czynsz_m2; gotowy +25%), cena kupna ≈ 40
   miesięcznych czynszów (gotowy +10%; ceny rynkowe przeskalowane do kapitału gry), działka = m² gruntu × 3 × czynsz_m2,
   budowa 900 zł/m², adaptacja 250 zł/m², media 300 zł + 25 zł/m²; rząd wielkości (oferty najmu w Lublinie 2025:
@@ -13,6 +13,16 @@ zasady:
   nowy_lokal_co_rund: 3
   kaucja_miesiecy: 2
   urzadzanie_rund: 1
+  # licytacje i przejęcia (od rundy 4): kilka drużyn o ten sam lokal – wygrywa najwyższa oferta względem ceny
+  # wywoławczej (czynszu albo ceny), remis – losowanie; kupno budynku z najemcą, wypowiedzenie 4 rundy (KC art. 673,
+  # 678), rozliczenie nakładów najemcy (KC art. 676): zatrzymanie – właściciel płaci ulepszenia_zwrot × nakłady,
+  # przywrócenie stanu – najemca płaci przywrocenie_koszt × nakłady
+  licytacje_od_rundy: 4
+  oferta_max: 3
+  przejecia_od_rundy: 4
+  wypowiedzenie_rund: 4
+  ulepszenia_zwrot: 0.5
+  przywrocenie_koszt: 0.3
 zestawy:
   podstawowy:
     nazwa: Zestaw podstawowy (★)

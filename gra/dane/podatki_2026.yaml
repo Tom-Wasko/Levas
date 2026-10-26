@@ -80,5 +80,9 @@ vat:
     stawka: 0.23
   - zawiera: Sprzedaż wyposażenia
     stawka: 0.23
+  - zawiera: Rozliczenie ulepszeń lokalu       # nakłady najemcy odkupione przez właściciela (KC art. 676)
+    stawka: 0.23
+  - zawiera: Przywrócenie lokalu
+    stawka: 0.23
   srodki_trwale: 0.23          # sprzęt, wyposażenie, stanowiska od progu amortyzacji (lokal i działka – bez VAT)
 zus_pracodawcy: 0.2048         # od pensji na umowie o pracę: emerytalna 9,76%, rentowa 6,5%, wypadkowa 1,67%, FP 2,45%, FGŚP 0,1%

@@ -83,4 +83,21 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   w Marketingu (Decyzje: rodzaje z liczbami, włącz/wyłącz, nazwa, danie, konkurencja; Wyniki: komiczne teksty,
   liczby promocji, promocje na mieście); test `test_promocje.py`
 
-Zadania F3b.4–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3b.4 Licytacje i przejęcia lokali (gra z lokalami) – zamiast planowanych `oferty.py` i `koniec_najmu.py` jeden
+  moduł `silnik/przejecia.py`; zasady w `dane/mapa/lokale.yaml` (`licytacje_od_rundy` 4, `oferta_max` 3,
+  `przejecia_od_rundy` 4, `wypowiedzenie_rund` 4, `ulepszenia_zwrot` 0,5, `przywrocenie_koszt` 0,3). Licytacja:
+  ten sam lokal / budynek chce kilka drużyn → wygrywa najwyższa oferta względem ceny wywoławczej (pole oferty
+  w decyzji `lokal`), remis – losowanie (strumień `licytacje`), wcześniej zawsze losowanie (zamiast kolejności rundy);
+  decyzja `przejecie: {id, oferta}` – kupno budynku z ceną, który wynajmuje drużyna (KC art. 678: najemca płaci
+  czynsz nowemu właścicielowi – jego przychód z VAT), najemca kupujący swój lokal – wykup (własność, zwrot kaucji,
+  sprzęt wynajmującego jego); decyzja `wypowiedz: [{id, ulepszenia}]` – najem trwa jeszcze 4 rundy, potem
+  wyprowadzka: sprzedaż sprzętu najemcy, zwrot kaucji, pracownicy na wolne stanowiska w innych lokalach albo
+  zwolnienie z odprawą (do puli), nakłady najemcy (adaptacja, stanowiska – nowe pole `Lokal.naklady`) rozliczone
+  wg KC art. 676 (właściciel zatrzymuje i płaci 50% albo najemca płaci 30% za przywrócenie stanu), budynek staje się
+  lokalem właściciela; numery nowych stanowisk `Firma.nowy_nr` (bez kolizji po wyprowadzce); boty nie licytują,
+  po wypowiedzeniu szukają nowego lokalu; lista błędów (odrzucone decyzje, wypowiedzenie, nowy właściciel); dane
+  rynku: przetargi i właściciele; zakładka **Licytacje i przejęcia** w grupie Lokale (Decyzje: budynki na sprzedaż
+  z ofertą, własne budynki z wypowiedzeniem, najmy u innych; Wyniki: przejęcie, wyprowadzki, licytacje w mieście);
+  test `test_licytacje.py`
+
+Zadania F3b.5–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

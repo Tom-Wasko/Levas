@@ -164,15 +164,19 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             n = len(miejsca[typ])
             if n == 0:
                 continue
-        start = len(firma.stanowiska_typu(typ))
+        start = firma.nowy_nr(typ)
         for i in range(n):
-            firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda,
+            firma.stanowiska.append(Stanowisko(nr=start + i, typ=typ, od_rundy=runda,
                                                lokal=miejsca[typ][i] if miejsca is not None else None))
         st_trwale.zakup(dane, firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}",
                         f"Stanowiska: {dane.typy_stanowisk[typ]['kto']} (runda {runda})", "sprzet", pakiety[str(n)],
                         runda, lokale)
         firma.majatek += pakiety[str(n)]
         info["inwestycje"] += pakiety[str(n)]
+        for lok_id in miejsca[typ][:n] if miejsca is not None else []:   # nakłady najemcy – rozliczenie ulepszeń
+            lok = next(x for x in firma.lokale if x.id == lok_id)
+            if lok.forma == "najem":
+                lok.naklady += pakiety[str(n)] / n
 
     # sprzedaż i zakup sprzętu
     sprzet_ok, kadry_ok = "inwestycje_sprzet" in odbl, "hr_zatrudnienie" in odbl

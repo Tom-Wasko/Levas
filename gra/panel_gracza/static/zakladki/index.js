@@ -8,6 +8,7 @@ import { agencje, internetowy, promocje, tradycyjny } from "./marketing.js";
 import { sprzedaz } from "./sprzedaz.js";
 import { bank, biuro, kpir, raport } from "./finanse.js";
 import { lokale } from "./lokale.js";
+import { przejecia } from "./przejecia.js";
 import { mapa } from "./mapa.js";
 import { klienci } from "./klienci.js";
 import { swiezosc } from "./swiezosc.js";
@@ -17,23 +18,23 @@ import { harpagon } from "./harpagon.js";
 import { podatki } from "./podatki.js";
 import { zdarzenia } from "./zdarzenia.js";
 
-const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
+const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, przejecia, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
   dostawcy, swiezosc, czas_wlasciciela, zdarzenia, agencje, promocje, tradycyjny, internetowy, sprzedaz, raport, kpir, podatki, bank, harpagon, biuro, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
-export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
+export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", przejecia: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", rynek_pracy: "rynek_pracy", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar", zdarzenia: "zdarzenia",
   agencje: "tradycyjny", promocje: "procent", tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", podatki: "podatki", bank: "bank", harpagon: "harpagon",
   biuro: "biuro", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
 
 // od której rundy zakładka jest dostępna (podpowiedź w menu)
 export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, tradycyjny: 5, internetowy: 6, szkolenia: 7,
-  sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2, zdarzenia: 2 };
+  przejecia: 4, sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2, zdarzenia: 2 };
 
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { klucz: "karta_wynikow", tytul: "Karta wyników", ikona: "karta" },
-  { klucz: "lokale", tytul: "Lokale", ikona: "lokale" },
+  { klucz: "lokale", tytul: "Lokale", ikona: "lokale", pod: ["lokale", "przejecia"] },
   { klucz: "klienci", tytul: "Klienci i strefy", ikona: "klienci" },
   { klucz: "oferta", tytul: "Oferta", ikona: "oferta" },
   { klucz: "inwestycje", tytul: "Inwestycje", ikona: "inwestycje", pod: ["stanowiska", "sprzet", "wyposazenie", "srodki_trwale"] },

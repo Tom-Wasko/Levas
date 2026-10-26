@@ -92,8 +92,14 @@ export const lokale = {
     if (L.decyzja && L.decyzja.przyjety === false) html += `<div class="komunikat">${esc(L.decyzja.powod)}</div>`;
     if (wyb) {
       const lok = lokalMapy(kat, wyb.id);
+      const P = v.przejecia, wyw = wyb.forma === "najem" ? lok?.czynsz : lok?.cena;
+      const licytuj = P && v.runda >= P.licytacje_od_rundy && wyw != null;
       html += `<div class="komunikat ok">Wybrany lokal: <b>${esc(lok?.nazwa ?? wyb.id)}</b> (${FORMY[wyb.forma] ?? wyb.forma}).
-        Jeśli w tej rundzie wybierze go też inna drużyna, dostanie go firma wcześniejsza w kolejności rundy (losowej).</div>`;
+        Jeśli w tej rundzie wybierze go też inna drużyna, wygrywa wyższa oferta względem ceny wywoławczej, a przy remisie – losowanie.
+        ${licytuj ? `<div style="margin-top:8px"><label>Twoja oferta (${wyb.forma === "najem" ? "czynsz za miesiąc" : "cena"}, wywoławcza ${zl(wyw)}, najwyżej ${P.oferta_max} ×):
+          <input type="number" min="${wyw}" max="${wyw * P.oferta_max}" step="100" value="${wyb.oferta ?? wyw}" data-zmiana="lokal-oferta"
+            style="width:110px" ${edycja ? "" : "disabled"}></label></div>`
+          : P ? `<div class="podpowiedz">Przebijać cenę wywoławczą można od rundy ${P.licytacje_od_rundy}.</div>` : ""}</div>`;
     }
     html += mojeLokale(kat, L.moje);
     const sortuj = SORT_OFERTY[lokale.sort] ? lokale.sort : "";
@@ -136,5 +142,6 @@ export const lokale = {
   zmiany: {
     "lokal-strefa": (el, c) => { lokale.filtr = el.value; c.rysuj(); },
     "lokal-sort": (el, c) => { lokale.sort = el.value; c.rysuj(); },
+    "lokal-oferta": (el, c) => c.zmien((d) => { d.lokal = { ...d.lokal, oferta: Number(el.value) }; }),
   },
 };

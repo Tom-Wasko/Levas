@@ -125,6 +125,18 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    włączają promocje dopiero, gdy w poprzedniej rundzie obsłużyły ≥ 90% popytu (w praktyce rzadko). To lekcja dla
    graczy („promocja, gdy masz wolne moce”), ale może warto osłabić rabaty? Czy tak? (zapisane 27.10)
 
+16. **Licytacje i przejęcia (F3b.4).** Zamiast `oferty.py` i `koniec_najmu.py` z planu – jeden moduł
+   `silnik/przejecia.py`. Spór o lokal rozstrzyga teraz najwyższa oferta względem ceny wywoławczej (czynszu albo
+   ceny; najwyżej 3 ×), od rundy 4; wcześniej i przy remisie – losowanie (dotąd: kolejność rundy). Kupić można tylko
+   budynek, który ma cenę w danych (lokale tylko do najmu – nie) i który wynajmuje drużyna; najemca płaci ten sam
+   czynsz nowemu właścicielowi (przychód z VAT 23%). Wypowiedzenie: 4 rundy łącznie z rundą wypowiedzenia, potem
+   wyprowadzka na początku rundy: sprzęt najemcy sprzedany (jak w zakładce Sprzęt), pracownicy przeniesieni na wolne
+   stanowiska w innych lokalach, reszta zwolniona z odprawą; nakłady najemcy (adaptacja + zakup stanowisk) rozliczone
+   wg wyboru właściciela: zatrzymanie – płaci 50% nakładów i zostają mu stanowiska, przywrócenie – najemca płaci 30%.
+   Uproszczenia: kaucja wraca do najemcy „z zewnątrz” (nie z kasy właściciela, który jej nie dostał); stanowiska
+   najemcy zostają w jego ewidencji środków trwałych (amortyzacja) także po wyprowadzce; brak podatku od
+   nieruchomości; boty nie licytują i nie kupują budynków. Czy tak? (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -342,3 +354,5 @@ _brak_
 - 27.10 – F3b.3 gotowe: promocje (5 rodzajów z ozdobną nazwą, znużenie i przywiązanie, 2 za 1 z podwójnymi porcjami,
   zestaw z dopłatą i VAT napoju), zakładka Promocje, boty z promocjami tylko przy wolnych mocach; pytanie 15.
   Start F3b.4 (licytacje i przejęcia).
+- 27.10 – F3b.4 gotowe: licytacje lokali (najwyższa oferta, remis – losowanie), kupno budynków z najemcą, wykup,
+  wypowiedzenia z rozliczeniem nakładów, wyprowadzki, zakładka Licytacje i przejęcia; pytanie 16. Start F3b.5.

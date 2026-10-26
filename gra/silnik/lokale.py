@@ -2,7 +2,10 @@
 
 Pula lokali jest wspólna: lokal zajęty przez drużynę znika z oferty innych. Decyzja rundy:
 
-    "lokal": {"id": "centrum_3", "forma": "najem" | "kupno"}
+    "lokal": {"id": "centrum_3", "forma": "najem" | "kupno", "oferta": kwota}
+
+`oferta` (od rundy `licytacje_od_rundy`) – proponowany czynsz miesięczny albo cena, nie niższa od wywoławczej;
+bez niej – cena wywoławcza.
 
 - gotowy – działa od razu, ze sprzętem z zestawu (przy najmie sprzęt wynajmującego – nie do sprzedania);
 - niewyposazony – jednorazowa adaptacja (koszt KPiR), działa od następnej rundy, sprzęt trzeba kupić;
@@ -11,8 +14,8 @@ Pula lokali jest wspólna: lokal zajęty przez drużynę znika z oferty innych. 
 Najem: kaucja (`kaucja_miesiecy` × czynsz) i co rundę czynsz (KPiR). Każdy działający lokal: co rundę media
 (utrzymanie, KPiR). Kupno, kaucja i budowa to ruchy na rachunku (bez KPiR). Nowy lokal można wziąć, gdy
 od wzięcia każdego poprzedniego minęło `nowy_lokal_co_rund` rund. Stanowiska stoją w działających lokalach
-i jest ich najwyżej tyle, ile lokal ma miejsc (`miejsca`). Dwie drużyny chcące ten sam lokal w jednej
-rundzie: dostaje go ta, która jest wcześniej w kolejności rundy (losowej, jak przy zatrudnianiu).
+i jest ich najwyżej tyle, ile lokal ma miejsc (`miejsca`). Kilka drużyn chcących ten sam lokal w jednej
+rundzie: licytacja – wygrywa najwyższa oferta, remis rozstrzyga losowanie (silnik/przejecia.py).
 """
 from __future__ import annotations
 
@@ -53,11 +56,31 @@ def dziala_od(dane: Dane, lok: dict, runda: int) -> int:
     return runda
 
 
-def koszt_wejscia(dane: Dane, lok: dict, forma: str) -> float:
-    """Jednorazowy koszt wzięcia lokalu w rundzie decyzji: kaucja albo cena, plus adaptacja."""
+def koszt_wejscia(dane: Dane, lok: dict, forma: str, kwota: float | None = None) -> float:
+    """Jednorazowy koszt wzięcia lokalu w rundzie decyzji: kaucja albo cena, plus adaptacja. `kwota` – oferta
+    (czynsz albo cena) zamiast wywoławczej."""
     if forma == "kupno":
-        return lok["cena"] + lok.get("adaptacja", 0)
-    return dane.mapa["zasady"]["kaucja_miesiecy"] * lok["czynsz"] + lok.get("adaptacja", 0)
+        return (kwota or lok["cena"]) + lok.get("adaptacja", 0)
+    return dane.mapa["zasady"]["kaucja_miesiecy"] * (kwota or lok["czynsz"]) + lok.get("adaptacja", 0)
+
+
+def oferta(dane: Dane, decyzja: dict, lok: dict, forma: str, runda: int) -> tuple[float | None, str | None]:
+    """Kwota oferty (czynsz miesięczny przy najmie, cena przy kupnie) i powód odrzucenia. Bez oferty i przed
+    rundą licytacji – cena wywoławcza."""
+    z = dane.mapa["zasady"]
+    wywolawcza = lok.get("czynsz") if forma == "najem" else lok.get("cena")
+    if decyzja.get("oferta") in (None, "") or runda < z["licytacje_od_rundy"]:
+        return wywolawcza, None
+    try:
+        kwota = round(float(decyzja["oferta"]), 2)
+    except (TypeError, ValueError):
+        return None, "Oferta w licytacji musi być kwotą."
+    if kwota < wywolawcza:
+        return None, f"Oferta {kwota:,.0f} zł jest niższa od ceny wywoławczej {wywolawcza:,.0f} zł.".replace(",", " ")
+    if kwota > z["oferta_max"] * wywolawcza:
+        return None, (f"Oferta ponad {z['oferta_max']:g} × cena wywoławcza – sprzedawca podejrzewa literówkę "
+                      "i dzwoni na policję.")
+    return kwota, None
 
 
 def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete_lokale: dict[str, str]) -> str | None:
@@ -79,33 +102,41 @@ def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete
         return f"{lok['nazwa']} jest tylko na sprzedaż."
     if forma == "kupno" and lok.get("cena") is None:
         return f"{lok['nazwa']} jest tylko do wynajęcia."
-    if forma == "kupno" and firma.gotowka < koszt_wejscia(dane, lok, forma):
-        return f"Za mało gotówki na zakup: potrzeba {koszt_wejscia(dane, lok, forma):,.0f} zł.".replace(",", " ")
+    kwota, blad = oferta(dane, decyzja, lok, forma, runda)
+    if blad:
+        return blad
+    if forma == "kupno" and firma.gotowka < koszt_wejscia(dane, lok, forma, kwota):
+        return f"Za mało gotówki na zakup: potrzeba {koszt_wejscia(dane, lok, forma, kwota):,.0f} zł.".replace(",", " ")
     return None
 
 
 def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_lokale: dict[str, str],
-            ksiega: Ksiega, rachunek: Rachunek) -> dict:
-    """Decyzja o nowym lokalu. Zwraca {"id", "forma", "przyjety", "powod", "dziala_od"} (pusty – brak decyzji)."""
+            ksiega: Ksiega, rachunek: Rachunek, przegrana: str | None = None) -> dict:
+    """Decyzja o nowym lokalu. Zwraca {"id", "forma", "oferta", "przyjety", "powod", "dziala_od"} (pusty – brak
+    decyzji). `przegrana` – powód przegranej licytacji (silnik/przejecia.py)."""
     if not decyzja or not decyzja.get("id"):
         return {}
     info = {"id": decyzja["id"], "forma": decyzja.get("forma")}
-    powod = powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale)
+    powod = powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale) or przegrana
     if powod:
         return {**info, "przyjety": False, "powod": powod}
     lok, forma = dane.lokale[decyzja["id"]], decyzja["forma"]
+    kwota = oferta(dane, decyzja, lok, forma, runda)[0]
+    info["oferta"] = kwota
     nowy = Lokal(id=lok["id"], forma=forma, od_rundy=runda, dziala_od=dziala_od(dane, lok, runda))
     if forma == "najem":
-        nowy.czynsz = lok["czynsz"]
-        nowy.kaucja = dane.mapa["zasady"]["kaucja_miesiecy"] * lok["czynsz"]
+        nowy.czynsz = kwota
+        nowy.kaucja = dane.mapa["zasady"]["kaucja_miesiecy"] * kwota
         rachunek.zapisz(firma, f"Kaucja za lokal: {lok['adres']}", -nowy.kaucja, "kaucje")
     else:
-        nowy.cena = lok["cena"]
+        nowy.cena = kwota
         rachunek.zapisz(firma, f"Zakup {'działki' if lok['typ'] == 'dzialka' else 'lokalu'}: {lok['adres']}", -nowy.cena, "inwestycje")
         przyjmij(dane, firma, f"{'Działka' if lok['typ'] == 'dzialka' else 'Lokal'}: {lok['adres']}",
                  "grunt" if lok["typ"] == "dzialka" else "lokal", nowy.cena, runda)
     if lok.get("adaptacja"):
         ksieguj(firma, ksiega, rachunek, f"Adaptacja lokalu: {lok['adres']}", lok["adaptacja"])
+        if forma == "najem":   # nakład najemcy – rozliczenie ulepszeń po wypowiedzeniu (silnik/przejecia.py)
+            nowy.naklady = lok["adaptacja"]
     firma.lokale.append(nowy)
     zajete_lokale[lok["id"]] = firma.nazwa
     if lok["typ"] == "gotowy":
@@ -113,7 +144,7 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
             if forma == "kupno":  # kupiony sprzęt jest firmy – liczy się do majątku (rozwój firmy), jak kupiony osobno
                 firma.majatek += sum(dane.sprzet[n]["ceny"][str(q)] for n, q in st["sprzet"].items())
             firma.stanowiska.append(Stanowisko(
-                nr=len(firma.stanowiska_typu(st["typ"])) + 1, typ=st["typ"], od_rundy=runda, lokal=lok["id"],
+                nr=firma.nowy_nr(st["typ"]), typ=st["typ"], od_rundy=runda, lokal=lok["id"],
                 sprzet=dict(st["sprzet"]), sprzet_wynajmujacego=list(st["sprzet"]) if forma == "najem" else []))
     return {**info, "przyjety": True, "powod": None, "dziala_od": nowy.dziala_od}
 
@@ -131,8 +162,14 @@ def wolne_miejsca(dane: Dane, firma: Firma, runda: int) -> dict[str, list[str]]:
     return wynik
 
 
-def koszty_rundy(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> None:
-    """Czynsz najmu, media działających lokali i raty budowy (w miejsce stałego kosztu utrzymania lokalu)."""
+def koszty_rundy(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek: Rachunek,
+                 firmy: dict[str, Firma] | None = None) -> None:
+    """Czynsz najmu, media działających lokali i raty budowy (w miejsce stałego kosztu utrzymania lokalu);
+    właściciel budynku z najemcą (silnik/przejecia.py) dostaje czynsz najemcy."""
+    for b in firma.budynki:
+        najem = next(x for x in firmy[b.najemca].lokale if x.id == b.id)
+        ksieguj(firma, ksiega, rachunek, f"Czynsz najmu od najemcy: {dane.lokale[b.id]['adres']}",
+                dane.na_runde(najem.czynsz), "przychod_pozostaly")
     for lok in firma.lokale:
         d = dane.lokale[lok.id]
         if lok.forma == "najem":
@@ -170,6 +207,7 @@ def stan_lokali(dane: Dane, firma: Firma, runda: int) -> list[dict]:
         wynik.append({"id": lok.id, "nazwa": d["nazwa"], "adres": d["adres"], "strefa": d["strefa"], "typ": d["typ"],
                       "forma": lok.forma, "od_rundy": lok.od_rundy, "dziala_od": lok.dziala_od,
                       "dziala": lok.dziala_od <= runda, "czynsz": lok.czynsz, "utrzymanie": d["utrzymanie"],
+                      "wlasciciel": lok.wlasciciel, "najem_do": lok.najem_do,
                       "miejsca": d["miejsca"],
                       "zajete": {t: sum(1 for s in firma.stanowiska_typu(t) if s.lokal == lok.id)
                                  for t in TYPY_STANOWISK}})

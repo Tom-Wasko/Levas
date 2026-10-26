@@ -107,9 +107,25 @@ class Lokal(Model):
     czynsz_gr: int = 0            # miesięczny (najem)
     kaucja_gr: int = 0
     cena_gr: int = 0              # cena zakupu (kupno)
+    # przejęcie budynku przez inną drużynę (silnik/przejecia.py): najem trwa dalej, czynsz idzie do właściciela
+    wlasciciel: str | None = None
+    najem_do: int | None = None   # po wypowiedzeniu: ostatnia runda najmu
+    ulepszenia: str | None = None # rozliczenie nakładów po wypowiedzeniu: "zatrzymaj" | "przywroc" (KC art. 676)
+    naklady_gr: int = 0           # nakłady najemcy na lokal (adaptacja, stanowiska) – do rozliczenia ulepszeń
 
     czynsz = _kwota("czynsz")
     kaucja = _kwota("kaucja")
+    cena = _kwota("cena")
+    naklady = _kwota("naklady")
+
+
+class KupionyBudynek(Model):
+    """Budynek kupiony razem z najemcą – inną drużyną (silnik/przejecia.py); po końcu najmu – lokal właściciela."""
+    id: str                       # id lokalu z mapy
+    od_rundy: int
+    cena_gr: int
+    najemca: str
+
     cena = _kwota("cena")
 
 
@@ -274,6 +290,7 @@ class Firma(Model):
     gotowka_gr: int = 0
     stanowiska: list[Stanowisko] = Field(default_factory=list)
     lokale: list[Lokal] = Field(default_factory=list)
+    budynki: list[KupionyBudynek] = Field(default_factory=list)   # budynki z najemcą (gra z lokalami)
     srodki_trwale: list[SrodekTrwaly] = Field(default_factory=list)
     pracownicy: dict[str, Pracownik] = Field(default_factory=dict)
     magazyn: dict[str, float] = Field(default_factory=dict)           # "zasób|jakość" → opakowania
@@ -318,6 +335,10 @@ class Firma(Model):
 
     def stanowiska_typu(self, typ: str) -> list[Stanowisko]:
         return [s for s in self.stanowiska if s.typ == typ]
+
+    def nowy_nr(self, typ: str) -> int:
+        """Numer następnego stanowiska typu (po wyprowadzce z lokalu w numeracji mogą być luki)."""
+        return max((s.nr for s in self.stanowiska_typu(typ)), default=0) + 1
 
     def stanowisko(self, typ: str, nr: int) -> Stanowisko | None:
         return next((s for s in self.stanowiska if s.typ == typ and s.nr == nr), None)
