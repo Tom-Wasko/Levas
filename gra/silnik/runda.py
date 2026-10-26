@@ -47,6 +47,7 @@ from .rynek import (
     wzrost_reklamy_internetowej,
     wzrost_reklamy_tradycyjnej,
 )
+from .srodki_trwale import amortyzuj, ewidencja
 
 EPS = 1e-9
 
@@ -185,6 +186,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             ksieguj(f, ks, rach, f"Utrzymanie reklamy internetowej: {n}", dane.na_runde(narz[n]["utrzymanie"]))
         if tryb_lokali:
             lk.koszty_rundy(dane, f, r, ks, rach)
+            amortyzuj(dane, f, r, ks)
         else:
             ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
                     dane.na_runde(z["finanse"]["utrzymanie_klubu"]))
@@ -209,6 +211,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:
             wyniki[nazwa]["lokale"] = lk.stan_lokali(dane, f, r)
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
+            wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
+            wyniki[nazwa]["srodki_trwale"] = ewidencja(f)
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
                 wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]

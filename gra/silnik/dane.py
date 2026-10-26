@@ -77,6 +77,7 @@ class Dane:
         self.dostawcy: dict = p["dostawcy.yaml"]["ceny"]
         self.dostawcy_pierwsi: list[str] = p["dostawcy.yaml"]["pierwsi"]
         self.dostawcy_wszyscy_od: int = MIESIACE.index(p["dostawcy.yaml"]["wszyscy_od_miesiaca"])
+        self.dostawcy_info: dict = p["dostawcy.yaml"].get("dostawcy", {})   # dni dostaw, koszty, gazetki (F3a.6)
         self.kandydaci: list = p["kandydaci.yaml"]["znani"]
         self.rynek_pracy: dict = p["kandydaci.yaml"]
         self.katalog_ofert: dict = p["katalog.yaml"]
@@ -252,6 +253,16 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
     for dost in d.dostawcy_pierwsi:
         if dost not in wszyscy:
             brak(dost, "dostawcy.yaml: pierwsi", "dostawca", "dostawcy.yaml: ceny")
+    if d.dostawcy_info:
+        for dost in sorted(wszyscy - set(d.dostawcy_info)):
+            brak(dost, "dostawcy.yaml: ceny", "dostawca", "dostawcy.yaml: dostawcy")
+        for dost, x in d.dostawcy_info.items():
+            g = x.get("gazetka")
+            if g and g["rabat_min"] > g["rabat_max"]:
+                bledy.append(f"dostawcy.yaml: {dost}.gazetka: rabat_min > rabat_max")
+    for b in (d.mapa or {}).get("budynki", []):
+        if b["rodzaj"] == "dostawca" and d.dostawcy_info and b["nazwa"] not in d.dostawcy_info:
+            brak(b["nazwa"], f"mapa/budynki.yaml: {b['id']}", "dostawca", "dostawcy.yaml: dostawcy")
     for k in d.kandydaci:
         if k["zawod"] not in d.zawody:
             brak(k["zawod"], f"kandydaci.yaml: {k['imie_nazwisko']}", "zawód", "katalog.yaml: stanowiska.typy")

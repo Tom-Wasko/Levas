@@ -1,28 +1,97 @@
 // Dostawcy: zakup składników, magazyn, zwroty. W grze z lokalami zamówienie ma dzień dostawy (świeżość – zakładka
-// „Magazyn i świeżość”, silnik/swiezosc.py).
+// „Magazyn i świeżość”, silnik/swiezosc.py), a dostawcy mają swoje zasady (silnik/dostawcy.py: zasady_dostaw):
+// dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
 import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
 
 const stan = (v, z, q) => v.stan_przed.magazyn[`${z}|${q}`] || 0;
 const zamowienia = (v, d, z, q) => (v.decyzje.zamowienia || []).filter((x) => x.dostawca === d && x.zasob === z && +x.jakosc === q);
 const zamowione = (v, d, z, q, dz) => zamowienia(v, d, z, q).filter((x) => dz === undefined || (+x.dzien || 0) === dz).reduce((s, x) => s + x.ilosc, 0);
 const dniDostaw = (v) => (v.lokale && v.swiezosc?.dni) || null;
+const DNI = ["pn", "wt", "śr", "czw", "pt", "sob", "nd"];
+const RODZAJ = { dyskont: "Dyskont", hurtownia: "Hurtownia", producent: "Producent", piekarnia: "Piekarnia" };
+const info = (v, d) => (v.dostawcy_info || {})[d] || { dni_dostaw: [0, 1, 2, 3, 4, 5, 6], koszt_dostawy: 0, minimalne_zamowienie: 0 };
+const dzienTyg = (iso) => (new Date(iso).getUTCDay() + 6) % 7;
+// indeksy dni rundy, w które dostawca dowozi (null – gra bez lokali)
+const dniDostawcy = (v, d) => { const dni = dniDostaw(v); return dni && dni.map((x, i) => i).filter((i) => info(v, d).dni_dostaw.includes(dzienTyg(dni[i].data))); };
+const rabat = (v, d, z) => (v.gazetki || {})[d]?.[z];
 
 // Podział zamówienia na dostawy (jak planowanie._dostawy w silniku): co `krok` dni – krótki termin albo chłodnia /
-// zamrażarka; każda dostawa na dni do następnej, zapas z magazynu zmniejsza pierwszą.
-function dostawy(kat, z, potrzeba, stan, udzialy) {
+// zamrażarka; każda dostawa na dni do następnej, zapas z magazynu zmniejsza pierwszą. dozwolone – dni dostaw
+// dostawcy: dostawa przesuwa się na ostatni dzień dostaw przed planowanym (albo pierwszy).
+function dostawy(kat, z, potrzeba, stan, udzialy, dozwolone) {
   const zas = kat.zasoby[z], n = udzialy.length;
   const termin = zas.termin_dni || n;
   let krok = Math.min(termin, n);
   if ((zas.przechowywanie || "suche") !== "suche") krok = Math.min(krok, 3);
   const suma = udzialy.reduce((s, x) => s + x, 0) || 1, wynik = [];
+  let punkty = [];
+  for (let j = 0; j < n; j += krok) punkty.push(j);
+  if (dozwolone && dozwolone.length) {
+    punkty = [...new Set(punkty.map((j) => { const p = dozwolone.filter((d) => d <= j); return p.length ? p[p.length - 1] : dozwolone[0]; }))].sort((a, b) => a - b);
+  }
+  const granice = [0, ...punkty.slice(1), n];
   let zapas = stan;
-  for (let j = 0; j < n; j += krok) {
-    const ile = potrzeba * udzialy.slice(j, j + krok).reduce((s, x) => s + x, 0) / suma - zapas;
+  punkty.forEach((j, i) => {
+    const ile = potrzeba * udzialy.slice(granice[i], granice[i + 1]).reduce((s, x) => s + x, 0) / suma - zapas;
     const k = Math.ceil(Math.max(0, ile) - 1e-9);
     zapas = krok < termin ? Math.max(0, k - ile) : 0;
     if (k > 0) wynik.push([j, k]);
-  }
+  });
   return wynik;
+}
+
+// Zamówienia na prognozę u najtańszych (jak planowanie.zamowienie_zasobow): z podziałem na dni bez dyskontów
+// i bez dostawców, u których któraś dostawa nie osiąga minimalnego zamówienia.
+function planZamowien(c, q, zapas) {
+  const pot = zapotrzebowanie(c.v, c.kat), ceny = c.v.ceny_dostawcow;
+  const udzialy = dniDostaw(c.v) && c.v.popyt?.prognoza?.dni?.length ? c.v.popyt.prognoza.dni : null;
+  const pomin = new Set(udzialy ? Object.keys(ceny).filter((d) => info(c.v, d).odbior_osobisty) : []);
+  for (;;) {
+    const tanie = najtansze(ceny, pomin), nowe = [];
+    for (const [z, p] of Object.entries(pot)) {
+      const mag = [1, 2, 3].reduce((s, j) => s + stan(c.v, z, j), 0);
+      let jq = q;
+      while (!tanie[`${z}|${jq}`] && jq > 1) jq--;
+      if (!tanie[`${z}|${jq}`]) continue;
+      const d = tanie[`${z}|${jq}`].d;
+      if (udzialy) {
+        for (const [dzien, ilosc] of dostawy(c.kat, z, p * zapas, mag, udzialy, dniDostawcy(c.v, d))) nowe.push({ dostawca: d, zasob: z, jakosc: jq, ilosc, dzien });
+        continue;
+      }
+      const brak = Math.ceil(Math.max(0, p * zapas - mag) - 1e-9);
+      if (brak > 0) nowe.push({ dostawca: d, zasob: z, jakosc: jq, ilosc: brak });
+    }
+    if (!udzialy) return nowe;
+    const wartosc = {};
+    for (const x of nowe) { const k = `${x.dostawca}|${x.dzien}`; wartosc[k] = (wartosc[k] || 0) + x.ilosc * ceny[x.dostawca][x.zasob][x.jakosc]; }
+    const zaMale = Object.entries(wartosc).filter(([k, w]) => w < (info(c.v, k.split("|")[0]).minimalne_zamowienie || 0) - 1e-9).map(([k]) => k.split("|")[0]);
+    if (!zaMale.length) return nowe;
+    for (const d of zaMale) pomin.add(d);
+  }
+}
+
+function kafelInfo(v, d) {
+  const x = info(v, d);
+  if (!v.dostawcy_info) return "";
+  const w = (a, b) => `<div class="wiersz"><span>${a}</span><span>${b}</span></div>`;
+  const g = Object.entries((v.gazetki || {})[d] || {});
+  return `<div class="podpowiedz" style="margin-bottom:6px">${RODZAJ[x.rodzaj] || ""}${x.opis ? ` – ${esc(x.opis)}` : ""}</div>`
+    + w("Dni dostaw", x.dni_dostaw.length === 7 ? "codziennie" : x.dni_dostaw.map((i) => DNI[i]).join(", "))
+    + (x.odbior_osobisty ? w("Odbiór osobisty", `${licz(x.godziny_odbioru)} h właściciela / dzień zakupów`) : "")
+    + (x.limit_opakowan ? w("Limit na klienta", `${licz(x.limit_opakowan)} opak. składnika dziennie`) : "")
+    + (x.koszt_dostawy ? w("Dowóz", `${zl2(x.koszt_dostawy)}${x.darmowa_od ? ` (darmowy od ${zl(x.darmowa_od)})` : ""}`) : "")
+    + (x.minimalne_zamowienie ? w("Minimalne zamówienie", `${zl(x.minimalne_zamowienie)} / dostawa`) : "")
+    + (g.length ? `<div class="komunikat ok" style="margin:6px 0">Gazetka: ${g.map(([z, r]) => `${esc(z)} −${Math.round(r * 100)}%`).join(", ")}</div>` : "");
+}
+
+function planDostaw(P, tytul) {
+  if (!P || (!P.dostawy.length && !P.uwagi.length)) return "";
+  const godziny = Object.values(P.czas_wlasciciela).reduce((s, x) => s + x, 0);
+  return tabela(tytul, ["Dzień", "Dostawca", "Wartość", "Opłata za dowóz", "Czas właściciela"],
+    P.dostawy.map((x) => [`${DNI[dzienTyg(x.data)]} <span class="podpowiedz">${+x.data.slice(8)}.${x.data.slice(5, 7)}</span>`, esc(x.dostawca), zl2(x.wartosc),
+      x.oplata ? `<span class="minus">${zl2(x.oplata)}</span>` : "0", x.godziny ? `${licz(x.godziny)} h` : "–"]),
+    { klasy: ["l", "l"], stopka: ["Razem", "", zl2(P.dostawy.reduce((s, x) => s + x.wartosc, 0)), zl2(P.dostawy.reduce((s, x) => s + x.oplata, 0)), godziny ? `${licz(godziny)} h` : "–"] })
+    + P.uwagi.map((u) => `<div class="komunikat">${esc(u)}</div>`).join("");
 }
 
 function zapotrzebowanie(v, kat) {
@@ -33,9 +102,10 @@ function zapotrzebowanie(v, kat) {
   return wynik;
 }
 
-function najtansze(ceny) {
+function najtansze(ceny, pomin = new Set()) {
   const w = {};
   for (const [d, zas] of Object.entries(ceny)) for (const [z, jak] of Object.entries(zas)) for (const [q, c] of Object.entries(jak)) {
+    if (pomin.has(d)) continue;
     if (!w[`${z}|${q}`] || c < w[`${z}|${q}`].c) w[`${z}|${q}`] = { c, d };
   }
   return w;
@@ -43,11 +113,14 @@ function najtansze(ceny) {
 
 export const dostawcy = {
   tytul: "Dostawcy", ikona: "⛟", odblokowanie: "dostawcy",
-  info: "Kup składniki potrzebne do wybranych dań. Składniki możesz kupować u jednego lub kilku dostawców. Niezużyte zostają w magazynie.",
+  info: `Kup składniki potrzebne do wybranych dań. Składniki możesz kupować u jednego lub kilku dostawców. Niezużyte zostają w magazynie.
+    Hurtownie dowożą w swoje dni (za darmo od progu), piekarnia codziennie, producent mięsa ma minimalne zamówienie,
+    a w dyskoncie kupujesz sam – taniej przy małych ilościach i z gazetką, ale tracisz czas i nie wyniesiesz więcej niż limit.`,
   decyzje({ v, kat, edycja }) {
     const ceny = v.ceny_dostawcow;
     const koszt = (v.decyzje.zamowienia || []).reduce((s, z) => s + (ceny[z.dostawca]?.[z.zasob]?.[z.jakosc] || 0) * z.ilosc, 0);
     const pot = zapotrzebowanie(v, kat), tanie = najtansze(ceny);
+    const plan = planDostaw(v.dostawy_plan, "Dostawy w tej rundzie");
     const wiersze = Object.keys(kat.zasoby).filter((z) => pot[z] || [1, 2, 3].some((q) => stan(v, z, q))).map((z) => {
       const magazyn = [1, 2, 3].reduce((s, q) => s + stan(v, z, q), 0);
       const zam = (v.decyzje.zamowienia || []).filter((x) => x.zasob === z).reduce((s, x) => s + x.ilosc, 0);
@@ -63,11 +136,13 @@ export const dostawcy = {
       <button class="btn pom maly" data-akcja="auto-zamow" ${edycja ? "" : "disabled"}>Zamów</button></span></div>`;
     html += tabela("Zapotrzebowanie na prognozowanych klientów (opakowania)", ["Zasób", "Opakowanie", "Potrzeba wg prognoz", "W magazynie",
       "Zamówione teraz", "Brakuje", "Najtańsze oferty"], wiersze, { klasy: ["l", "l"] });
+    if (dniDostaw(v)) html += `<p class="podpowiedz">„Zamów” w grze z lokalami pomija dyskonty (odbiór osobisty, limity) – w nich kupujesz ręcznie w bazie składników.</p>`;
+    html += plan;
     html += `<div class="pasek">Dostawcy</div><div class="siatka trojka">`;
     for (const d of Object.keys(ceny)) {
       const wartosc = (v.decyzje.zamowienia || []).filter((x) => x.dostawca === d).reduce((s, x) => s + (ceny[d]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc, 0);
       const zwrot = !!(v.decyzje.zwrot_nadmiaru || {})[d];
-      html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">
+      html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}
         <div class="wiersz"><span>Koszt zwrotu</span><span>${Math.round(kat.parametry.koszt_zwrotu * 100)}%</span></div>
         <div class="wiersz"><span>Koszt magazynowania</span><span>${zl2(kat.parametry.koszt_magazynowania)}</span></div>
         <label class="pole" style="margin-top:8px">Zwrot składników nadmiarowych
@@ -85,7 +160,7 @@ export const dostawcy = {
     const suma = (v.wyniki?.zasoby || []).reduce((s, x) => s + x.wartosc, 0);
     const firmy = Object.keys(v.rynek?.jakosc_zasobow || {});
     const jak = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => ulamek(v.rynek.jakosc_zasobow[f][q]))]);
-    return tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []), "Zwroty",
+    return planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []), "Zwroty",
       `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", ...(straty ? [""] : []), "", "", zl2(suma)] })
       + tabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`;
@@ -99,21 +174,7 @@ export const dostawcy = {
     baza: (el, c) => oknoBazy(c, el.dataset.d),
     "auto-zamow": async (el, c) => {
       const q = +document.getElementById("auto-jakosc").value, zapas = +document.getElementById("auto-zapas").value;
-      const pot = zapotrzebowanie(c.v, c.kat), tanie = najtansze(c.v.ceny_dostawcow);
-      const nowe = [];
-      for (const [z, p] of Object.entries(pot)) {
-        const mag = [1, 2, 3].reduce((s, j) => s + stan(c.v, z, j), 0);
-        let jq = q;
-        while (!tanie[`${z}|${jq}`] && jq > 1) jq--;
-        if (!tanie[`${z}|${jq}`]) continue;
-        const udzialy = dniDostaw(c.v) && c.v.popyt?.prognoza?.dni?.length ? c.v.popyt.prognoza.dni : null;
-        if (udzialy) {
-          for (const [dzien, ilosc] of dostawy(c.kat, z, p * zapas, mag, udzialy)) nowe.push({ dostawca: tanie[`${z}|${jq}`].d, zasob: z, jakosc: jq, ilosc, dzien });
-          continue;
-        }
-        const brak = Math.ceil(Math.max(0, p * zapas - mag) - 1e-9);
-        if (brak > 0) nowe.push({ dostawca: tanie[`${z}|${jq}`].d, zasob: z, jakosc: jq, ilosc: brak });
-      }
+      const nowe = planZamowien(c, q, zapas);
       if (!nowe.length) return toast("Zapas w magazynie wystarcza na prognozowanych klientów.");
       await c.zmien((d) => { d.zamowienia = nowe; });
       toast(dniDostaw(c.v) ? "Zamówienia ustawione – dostawy rozłożone na dni wg terminów przydatności (poprzednie zastąpione)."
@@ -135,7 +196,7 @@ export const dostawcy = {
 };
 
 function oknoBazy({ v, kat, edycja }, dost) {
-  const ceny = v.ceny_dostawcow[dost] || {}, dni = dniDostaw(v);
+  const ceny = v.ceny_dostawcow[dost] || {}, dni = dniDostaw(v), moje = dniDostawcy(v, dost) || [];
   const pole = (z, q, ile, dz) => `<input type="number" class="krotkie" min="0" step="1" value="${ile}" data-zmiana="ilosc" data-d="${esc(dost)}" data-z="${esc(z)}" data-q="${q}"
     ${dz === undefined ? "" : `data-dz="${dz}"`} ${edycja ? "" : "disabled"}>`;
   const w = [];
@@ -143,14 +204,19 @@ function oknoBazy({ v, kat, edycja }, dost) {
     const zas = kat.zasoby[z];
     const miejsce = zas.przechowywanie && zas.przechowywanie !== "suche" ? ` · ${zas.przechowywanie === "chlodnia" ? "chłodnia" : "zamrażarka"} ${licz(zas.miejsce_l)} l` : "";
     const termin = zas.termin_dni ? `<br><span class="podpowiedz">termin ${zas.termin_dni} dni${miejsce}</span>` : "";
+    const r = rabat(v, dost, z);
     w.push([`${esc(z)}<br><span class="podpowiedz">${zas.typ_opakowania} (${licz(zas.opakowanie)} ${zas.jednostka})</span>${dni ? termin : ""}`,
-      gw(+q), ulamek(stan(v, z, +q)), zl2(c),
-      ...(dni ? dni.map((_, i) => pole(z, q, zamowione(v, dost, z, +q, i), i)) : [pole(z, q, zamowione(v, dost, z, +q))]),
+      gw(+q), ulamek(stan(v, z, +q)), zl2(c) + (r ? `<br><span class="plus">gazetka −${Math.round(r * 100)}%</span>` : ""),
+      ...(dni ? moje.map((i) => pole(z, q, zamowione(v, dost, z, +q, i), i)) : [pole(z, q, zamowione(v, dost, z, +q))]),
       zl2(zamowione(v, dost, z, +q) * c)]);
   }
-  const kolumny = dni ? dni.map((d) => `${d.dzien}<div class="podpowiedz">${+d.data.slice(8)}.${d.data.slice(5, 7)}</div>`) : ["Zamówienie (opakowania)"];
+  const kolumny = dni ? moje.map((i) => `${dni[i].dzien}<div class="podpowiedz">${+dni[i].data.slice(8)}.${dni[i].data.slice(5, 7)}</div>`) : ["Zamówienie (opakowania)"];
+  const x = info(v, dost);
   okno(`Dostawca „${esc(dost)}”`, tabela(null, ["Składnik", "Jakość", "Na magazynie", "Cena", ...kolumny, "Wartość"], w, { klasy: ["l"] })
     + `<p class="podpowiedz">Ceny w tym ${OKRES.miejscownik}. Ilości wpisujesz w opakowaniach (np. napój: opakowanie 24 szt.).
-      ${dni ? "Kolumny dni – dostawa rano tego dnia; termin przydatności liczy się od dnia dostawy (zakładka Magazyn i świeżość)." : ""}</p>`,
+      ${dni ? "Kolumny dni – dostawa rano tego dnia (tylko dni dostaw tego dostawcy); termin przydatności liczy się od dnia dostawy (zakładka Magazyn i świeżość)." : ""}
+      ${dni && x.limit_opakowan ? ` Najwyżej ${licz(x.limit_opakowan)} opakowań składnika dziennie, każdy dzień zakupów to ${licz(x.godziny_odbioru)} h właściciela.` : ""}
+      ${dni && x.minimalne_zamowienie ? ` Dostawa poniżej ${zl(x.minimalne_zamowienie)} nie zostanie zrealizowana.` : ""}
+      ${dni && x.koszt_dostawy ? ` Dowóz ${zl2(x.koszt_dostawy)} za dostawę${x.darmowa_od ? `, darmowy od ${zl(x.darmowa_od)}` : ""}.` : ""}</p>`,
     { przyciski: `<button class="btn pom" data-akcja="zamknij-okno">Zapisz</button>` });
 }

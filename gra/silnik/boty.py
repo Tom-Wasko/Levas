@@ -183,7 +183,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:
         ceny_d = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
-        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni)
+        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni,
+                                             dane.data_rundy(runda))
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka)
     bufor = f.gotowka > ust["bufor_gotowki"]

@@ -30,8 +30,10 @@ from __future__ import annotations
 import math
 from datetime import timedelta
 
+from . import srodki_trwale as st_trwale
 from . import swiezosc as sw
 from .dane import KASA, KUCHNIA, Dane
+from .dostawcy import zasady_dostaw
 from .finanse import Ksiega, Rachunek, ksieguj
 from .lokale import bledy as bledy_lokali
 from .lokale import wolne_miejsca
@@ -123,7 +125,9 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         for i in range(n):
             firma.stanowiska.append(Stanowisko(nr=start + i + 1, typ=typ, od_rundy=runda,
                                                lokal=miejsca[typ][i] if miejsca is not None else None))
-        ksieguj(firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}", pakiety[str(n)])
+        st_trwale.zakup(dane, firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}",
+                        f"Stanowiska: {dane.typy_stanowisk[typ]['kto']} (runda {runda})", "sprzet", pakiety[str(n)],
+                        runda, lokale)
         firma.majatek += pakiety[str(n)]
         info["inwestycje"] += pakiety[str(n)]
 
@@ -133,6 +137,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         st = firma.stanowisko(s["typ"], int(s["nr"]))
         if st and s["nazwa"] in st.sprzet and s["nazwa"] not in st.sprzet_wynajmujacego:
             q = st.sprzet.pop(s["nazwa"])
+            st_trwale.sprzedaj(firma, f"{s['nazwa']} ({s['typ']} {s['nr']})", ksiega)
             ksieguj(firma, ksiega, rachunek, f"Sprzedaż sprzętu: {s['nazwa']}",
                     cena_sprzedazy_sprzetu(dane, dane.sprzet[s["nazwa"]]["ceny"][str(q)]), "przychod_pozostaly")
             wartosc = dane.sprzet[s["nazwa"]]["ceny"][str(q)]      # majątek po cenie zakupu (rozwój firmy)
@@ -148,7 +153,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         q = int(s.get("jakosc", 3))
         cena = info_s["ceny"][str(q)]
         st.sprzet[s["nazwa"]] = q
-        ksieguj(firma, ksiega, rachunek, f"Koszt zakupu: {s['nazwa']}", cena)
+        st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {s['nazwa']}", f"{s['nazwa']} ({s['typ']} {s['nr']})",
+                        "sprzet", cena, runda, lokale)
         firma.majatek += cena
         info["inwestycje"] += cena
 
@@ -197,12 +203,17 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         info["zatrudnieni"].append(p.id)
 
     # zasoby od dostawców
-    zakupy = {}
+    zakupy, zamowienia = {}, []
     for z in d.get("zamowienia", []) if "dostawcy" in odbl else []:
         ilosc = float(z.get("ilosc") or 0)
         cena = cena_dostawcy(dane, ceny_dostawcow, z["dostawca"], z["zasob"], int(z["jakosc"]))
-        if ilosc <= 0 or cena is None:
-            continue
+        if ilosc > 0 and cena is not None:
+            zamowienia.append({**z, "ilosc": ilosc, "cena": cena})
+    if lokale:  # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz (silnik/dostawcy.py)
+        zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
+                                                    (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days)
+    for z in zamowienia:
+        ilosc, cena = z["ilosc"], z.pop("cena")
         k = f"{z['zasob']}|{int(z['jakosc'])}"
         firma.magazyn[k] = firma.magazyn.get(k, 0.0) + ilosc
         firma.wartosc_magazynu_gr[k] = firma.wartosc_magazynu_gr.get(k, 0) + grosze(ilosc * cena)
@@ -215,6 +226,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         info["zakupy_zasobow"].setdefault(z["dostawca"], []).append({**z, "cena": cena, "wartosc": round(ilosc * cena, 2)})
     for dostawca, kwota in zakupy.items():
         ksieguj(firma, ksiega, rachunek, f"Zakup zasobu od dostawcy: {dostawca}", kwota, "towary")
+    for dostawca, kwota in info.get("dostawy", {}).get("oplaty", {}).items():
+        ksieguj(firma, ksiega, rachunek, f"Koszt dostawy: {dostawca}", kwota)
 
     # udogodnienia i wyposażenie
     for rodzaj, nazwa_pozycji in (("udogodnienia", "udogodnień"), ("wyposazenie", "wyposażenia")):
@@ -225,6 +238,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         for n in d.get(f"{rodzaj}_sprzedaj", []):
             if n in posiadane:
                 posiadane.remove(n)
+                st_trwale.sprzedaj(firma, n, ksiega)
                 ksieguj(firma, ksiega, rachunek, f"Sprzedaż {nazwa_pozycji}: {n}",
                         pozycje[n]["cena"] * dane.z["finanse"]["sprzedaz_udogodnien"], "przychod_pozostaly")
                 firma.majatek -= pozycje[n]["cena"]
@@ -232,7 +246,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         for n in d.get(f"{rodzaj}_kup", []):
             if n in pozycje and n not in posiadane and pozycje[n]["od_rundy"] <= runda:
                 posiadane.append(n)
-                ksieguj(firma, ksiega, rachunek, f"Koszt zakupu: {n}", pozycje[n]["cena"])   # opis jak w KPiR gry
+                st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {n}", n,   # opis jak w KPiR gry
+                                "sprzet" if rodzaj == "udogodnienia" else "wyposazenie", pozycje[n]["cena"], runda, lokale)
                 firma.majatek += pozycje[n]["cena"]
                 info["inwestycje"] += pozycje[n]["cena"]
 
@@ -303,6 +318,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         bledy_lokali(dane, firma, runda, lokal, dodaj)
         for poziom, tekst in sw.ostrzezenia(dane, firma, runda):
             dodaj(poziom, "swiezosc", tekst)
+        for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
+            dodaj("czerwony", "dostawcy", tekst)
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

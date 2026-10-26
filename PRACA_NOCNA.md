@@ -146,3 +146,30 @@ _brak_
     (do ok. 9 tys. zł strat tygodniowo); poprawię w kalibracji (krok 5) albo przy F3a.7 (grafiki),
   - sprawdzone: pytest (102) i ruff na zielono, `sprawdz` danych, zakładki Magazyn i świeżość oraz Dostawcy
     wyrenderowane na widoku prawdziwej gry (bez `undefined`/`NaN`).
+- 26.10 5:45 – F3a.6 gotowe: dostawcy i sprzęt. Decyzje **do potwierdzenia**:
+  - lista dostawców z notatki „Elementy mapy” (prawdziwe marki: Biedronka, Lidl, Stokrotka, Makro, Selgros,
+    Eurocash) + fikcyjny producent mięsa „Rożen” z Łęcznej i Piekarnia Koziołek; dawni Mięsny Bazar Zamojski
+    i Hurtownia Lubelska Spiżarnia usunięte (ich ceny są bazą nowych),
+  - ceny względem dawnej hurtowni: dyskonty 0,88–0,97 (tylko ★ i ★★), Makro 1,0, Selgros ok. 1,02 (taniej mięso),
+    Eurocash ok. 0,99 (bez hummusu i falafla), producent 0,97 dawnego mięsnego (★★ i ★★★) – kalibracja w kroku 5,
+  - dni dostaw: Makro pn/czw, Selgros wt/pt, Eurocash pn/śr/pt, producent wt/pt, piekarnia i dyskonty codziennie;
+    dowóz: Makro 79 zł (gratis od 1000 zł), Selgros 69 zł (od 900), Eurocash 89 zł (od 1200), piekarnia 15 zł
+    (od 150); producent – minimum 800 zł za dostawę, od rundy 3,
+  - dyskonty: odbiór osobisty (1–1,5 h czasu właściciela za dzień zakupów – na razie tylko liczone i pokazane,
+    ograniczenie czasu właściciela w F3a.7), limit 4 opakowania składnika dziennie, gazetka: 2–3 składniki
+    taniej o 10–35%, losowane co tydzień,
+  - zamówienie na dzień bez dostaw – odrzucone (czerwony błąd), ponad limit dyskontu – obcięte, poniżej minimum –
+    cała dostawa odrzucona; opłata za dowóz to koszt w KPiR („Koszt dostawy: …”),
+  - planowanie (boty i „Zamów brakujące”) pomija dyskonty i dostawców, u których dostawa nie osiąga minimum –
+    w dyskontach drużyna kupuje ręcznie,
+  - środki trwałe (tylko gra z lokalami): próg 10 000 zł netto, amortyzacja liniowa od rundy po zakupie
+    (stawka roczna / 52): lokal i budynek 2,5%, grunt 0%, sprzęt i wyposażenie 20%; zakup to ruch na rachunku,
+    odpis to koszt w KPiR bez ruchu gotówki; obecnie środkami trwałymi są w praktyce tylko kupione lokale, działki
+    i budynki (sprzęt i wyposażenie kosztują mniej niż 10 000 zł); majątek do rozwoju firmy – bez zmian
+    (lokal się do niego nie wlicza), sprzedaż lokalu – później,
+  - sklepy przy wyposażeniu (WiFi – OBI, dystrybutor wody – Castorama, stoliki – IKEA, telewizor – Jula);
+    na mapie jeden budynek „Park handlowy” zamiast osobnych sklepów; okna w barwach marek – krok z grafiką,
+  - nowa zakładka **Inwestycje → Środki trwałe** (Decyzje + Wyniki), plan dostaw i opłaty w zakładce Dostawcy,
+  - sprawdzone: pytest (111) i ruff na zielono, `sprawdz` danych, zakładki Dostawcy, Środki trwałe, Wyposażenie
+    i Dashboard wyrenderowane na widoku prawdziwej gry (bez `undefined`/`NaN`); straty botów po zmianie dostawców:
+    agresywny ok. 7,6 tys. zł tygodniowo (było ok. 9 tys.).

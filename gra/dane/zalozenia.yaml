@@ -196,6 +196,16 @@ finanse:
     wartosc: 0.1
     pewnosc: zalozenie
     zrodlo: 'dashboard: 10%; nie wiadomo, czy miesięcznie – w fitness brak sprzętu > 10 000 PLN'
+  amortyzacja_roczna:
+    wartosc:
+      lokal: 0.025
+      budynek: 0.025
+      grunt: 0
+      sprzet: 0.2
+      wyposazenie: 0.2
+    pewnosc: zalozenie
+    zrodlo: 'gra z lokalami (F3a.6): stawki roczne jak w wykazie stawek amortyzacyjnych – budynki i lokale niemieszkalne
+      2,5%, grunt bez amortyzacji, sprzęt i wyposażenie 20%; amortyzacja liniowa co rundę'
   koszt_magazynowania:
     wartosc: 50
     pewnosc: potwierdzone

@@ -137,28 +137,83 @@ budynki:
     y: 5
     szer: 1
     gl: 1
-- id: bazar
-  nazwa: Mięsny Bazar Zamojski
-  rodzaj: dostawca
-  strefa: dworzec
-  opis: Mięso na kebab i drób.
-  zakladka: dostawcy
-  mapa:
-    x: 7
-    y: 10
-    szer: 2
-    gl: 1
-- id: hurtownia
-  nazwa: Hurtownia Lubelska Spiżarnia
+- id: makro
+  nazwa: Makro
   rodzaj: dostawca
   strefa: felin
-  opis: 'Wszystko w dużych opakowaniach: warzywa, sosy, frytki, napoje.'
+  opis: 'Hurtownia: pełny asortyment, dowóz w poniedziałki i czwartki.'
   zakladka: dostawcy
   mapa:
     x: 17
     y: 2
     szer: 2
     gl: 2
+- id: selgros
+  nazwa: Selgros
+  rodzaj: dostawca
+  strefa: felin
+  opis: 'Hurtownia: mięso i napoje, dowóz we wtorki i piątki.'
+  zakladka: dostawcy
+  mapa:
+    x: 16
+    y: 7
+    szer: 2
+    gl: 2
+- id: eurocash
+  nazwa: Eurocash
+  rodzaj: dostawca
+  strefa: felin
+  opis: 'Hurtownia: tanie warzywa i sosy, dowóz w pn, śr i pt.'
+  zakladka: dostawcy
+  mapa:
+    x: 19
+    y: 7
+    szer: 2
+    gl: 2
+- id: biedronka
+  nazwa: Biedronka
+  rodzaj: dostawca
+  strefa: akademickie
+  opis: 'Dyskont – gazetka, odbiór osobisty.'
+  zakladka: dostawcy
+  mapa:
+    x: 4
+    y: 8
+    szer: 2
+    gl: 1
+- id: lidl
+  nazwa: Lidl
+  rodzaj: dostawca
+  strefa: lsm_czuby
+  opis: 'Dyskont – gazetka, odbiór osobisty.'
+  zakladka: dostawcy
+  mapa:
+    x: 2
+    y: 16
+    szer: 2
+    gl: 1
+- id: stokrotka
+  nazwa: Stokrotka
+  rodzaj: dostawca
+  strefa: czechow
+  opis: 'Dyskont – blisko osiedla, odbiór osobisty.'
+  zakladka: dostawcy
+  mapa:
+    x: 5
+    y: 2
+    szer: 2
+    gl: 1
+- id: rozen
+  nazwa: Zakłady Mięsne „Rożen” z Łęcznej
+  rodzaj: dostawca
+  strefa: zemborzyce
+  opis: 'Producent stożków kebab – punkt odbioru zamówień (od rundy 3).'
+  zakladka: dostawcy
+  mapa:
+    x: 9
+    y: 16
+    szer: 2
+    gl: 1
 - id: sprzet_gastro
   nazwa: Hurtownia sprzętu gastronomicznego
   rodzaj: sklep
@@ -171,10 +226,10 @@ budynki:
     szer: 2
     gl: 1
 - id: market_budowlany
-  nazwa: Market budowlany
+  nazwa: Park handlowy (Leroy Merlin, IKEA, OBI, Jula, Castorama)
   rodzaj: sklep
   strefa: lsm_czuby
-  opis: Stoliki, krzesła, telewizor z meczami – wyposażenie sali dla klientów.
+  opis: Meble, stoliki, telewizor z meczami i materiały do urządzenia sali – kupione wyposażenie jest od razu w lokalu.
   zakladka: wyposazenie
   mapa:
     x: 0

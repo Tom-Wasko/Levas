@@ -4,6 +4,7 @@ const P = {
   karta: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01" stroke-width="3"/>',
   oferta: '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
   inwestycje: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  srodki_trwale: '<path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/><path d="M9 11h6"/>',
   hr: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14.5c2.3.2 4 1.7 4.5 4"/>',
   dostawcy: '<path d="M2 6h11v10H2zM13 10h4l4 3.5V16h-8"/><circle cx="6" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/>',
   marketing: '<path d="M3 10v4l11 4V6L3 10z"/><path d="M14 9a4 4 0 0 1 0 6"/><path d="M6 14.5 7.5 20h2.5"/><path d="M18 7l2-2M18 17l2 2M19 12h3"/>',

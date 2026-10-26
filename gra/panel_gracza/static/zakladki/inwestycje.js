@@ -151,6 +151,36 @@ export const wyposazenie = {
   akcje: { "kup-udog": (el, c) => przelaczUdog(el, c), "sprzedaj-udog": (el, c) => przelaczUdog(el, c) },
 };
 
+const RODZAJ_ST = { lokal: "lokal", budynek: "budynek", grunt: "grunt (bez amortyzacji)", sprzet: "sprzęt", wyposazenie: "wyposażenie" };
+
+function ewidencja(lista, tytul) {
+  const w = (lista || []).map((s) => [esc(s.nazwa), esc(RODZAJ_ST[s.rodzaj] || s.rodzaj), licz(s.od_rundy), proc(s.stawka),
+    zl(s.wartosc), zl(s.umorzenie), zl(s.netto)]);
+  const suma = (k) => (lista || []).reduce((a, s) => a + s[k], 0);
+  if (w.length) w.push(["<b>Razem</b>", "", "", "", `<b>${zl(suma("wartosc"))}</b>`, `<b>${zl(suma("umorzenie"))}</b>`, `<b>${zl(suma("netto"))}</b>`]);
+  return tabela(tytul, ["Środek trwały", "Rodzaj", "Od rundy", "Stawka roczna", "Wartość początkowa", "Umorzenie", "Wartość netto"],
+    w.length ? w : [["Brak środków trwałych – wynajęty lokal i tańsze zakupy idą od razu w koszty.", "", "", "", "", "", ""]], { klasy: ["l", "l"] });
+}
+
+export const srodki_trwale = {
+  tytul: "Środki trwałe", tytulPelny: "Inwestycje - środki trwałe i amortyzacja", ikona: "srodki_trwale",
+  odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
+  info: "Kupiony lokal, wybudowany budynek i zakupy od progu amortyzacji to środki trwałe: płacisz od razu, ale w KPiR koszt rozkłada się na lata (odpis co rundę).",
+  decyzje({ v }) {
+    const a = v.amortyzacja || { prog: 0, stawki: {} };
+    const stawki = Object.entries(a.stawki).filter(([, s]) => s > 0).map(([r, s]) => `${esc(RODZAJ_ST[r] || r)}: ${proc(s)} rocznie`).join(" · ");
+    return ewidencja(v.srodki_trwale, "Ewidencja środków trwałych (po decyzjach tej rundy)")
+      + `<p class="podpowiedz">Zakupy od ${zl(a.prog)} netto są środkami trwałymi i amortyzują się liniowo od rundy po zakupie (${stawki}; grunt się nie amortyzuje).
+         Tańsze zakupy od razu w koszty. Przy sprzedaży niezamortyzowana wartość idzie w koszty. Amortyzacja zmniejsza dochód i podatek, ale nie gotówkę.</p>`;
+  },
+  wyniki({ v }) {
+    const odpisy = (v.wyniki?.kpir?.pozycje || []).filter((p) => p.opis.startsWith("Amortyzacja") || p.opis.startsWith("Niezamortyzowana"))
+      .map((p) => [esc(p.opis), zl(p.pozostale)]);
+    return ewidencja(v.wyniki?.srodki_trwale, "Ewidencja środków trwałych na koniec rundy")
+      + tabela("Odpisy w KPiR", ["Pozycja", "Kwota"], odpisy.length ? odpisy : [["W tej rundzie bez odpisów.", ""]], { klasy: ["l"] });
+  },
+};
+
 export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
   const pozycje = kat.oferty[rodzaj].pozycje.filter((p) => p.od_rundy <= v.runda);
   const przed = v.stan_przed[rodzaj], teraz = v.stan[rodzaj];
@@ -165,7 +195,7 @@ export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
         ? `<button class="btn ${ma ? "pom" : "zielony"}" data-akcja="sprzedaj-udog" data-r="${rodzaj}" data-nazwa="${esc(p.nazwa)}" ${edycja ? "" : "disabled"}>${ma ? "Sprzedaj" : "✓ Sprzedane"}</button>`
         : `<button class="btn ${ma ? "zielony" : "czarny"}" data-akcja="kup-udog" data-r="${rodzaj}" data-nazwa="${esc(p.nazwa)}" ${edycja ? "" : "disabled"}>${ma ? "✓ Wybrano" : "Wybierz"}</button>`;
       return `<div class="kafel ${ma ? "wybrany" : ""}"><div class="kg">${esc(p.nazwa)}<span class="pigulka inf" title="% ${kogo} oczekujących">${p.procent}%</span></div>
-        <div class="kt"><div class="wiersz"><span>${mial ? "Cena sprzedaży" : "Cena zakupu"}</span><span>${zl(mial ? p.cena / 2 : p.cena)}</span></div>
+        <div class="kt">${p.sklep ? `<div class="wiersz"><span>Sklep</span><span>${esc(p.sklep)}</span></div>` : ""}<div class="wiersz"><span>${mial ? "Cena sprzedaży" : "Cena zakupu"}</span><span>${zl(mial ? p.cena / 2 : p.cena)}</span></div>
         <div class="wiersz"><span>Koszt utrzymania</span><span>${zl(naRunde(p.utrzymanie))}${naOkres()}</span></div>
         <div class="wiersz"><span>% ${kogo} oczekujących</span><span>${p.procent}%</span></div></div><div class="kd">${przycisk}</div></div>`;
     }).join("")}</div>`;

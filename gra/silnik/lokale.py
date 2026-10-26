@@ -19,6 +19,7 @@ from __future__ import annotations
 from .dane import TYPY_STANOWISK, Dane
 from .finanse import Ksiega, Rachunek, ksieguj
 from .model import Firma, Lokal, Stanowisko
+from .srodki_trwale import przyjmij
 
 FORMY = ("najem", "kupno")
 
@@ -101,6 +102,8 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
     else:
         nowy.cena = lok["cena"]
         rachunek.zapisz(firma, f"Zakup {'działki' if lok['typ'] == 'dzialka' else 'lokalu'}: {lok['adres']}", -nowy.cena)
+        przyjmij(dane, firma, f"{'Działka' if lok['typ'] == 'dzialka' else 'Lokal'}: {lok['adres']}",
+                 "grunt" if lok["typ"] == "dzialka" else "lokal", nowy.cena, runda)
     if lok.get("adaptacja"):
         ksieguj(firma, ksiega, rachunek, f"Adaptacja lokalu: {lok['adres']}", lok["adaptacja"])
     firma.lokale.append(nowy)
@@ -141,6 +144,8 @@ def koszty_rundy(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega, rachunek:
             etap = runda - lok.od_rundy + 1
             rachunek.zapisz(firma, f"Budowa lokalu: {d['adres']} (etap {etap} z {d['budowa_rund']})",
                             -d["koszt_budowy"] / d["budowa_rund"])
+            if etap == d["budowa_rund"]:   # budynek gotowy – środek trwały (koszt budowy)
+                przyjmij(dane, firma, f"Budynek: {d['adres']}", "budynek", d["koszt_budowy"], runda)
 
 
 def bledy(dane: Dane, firma: Firma, runda: int, info: dict, dodaj) -> None:

@@ -12,7 +12,8 @@ from silnik.decyzje import (
     lista_bledow,
     zastosuj,
 )
-from silnik.dostawcy import ceny_rundy
+from silnik.dostawcy import ceny_rundy, oferta_rundy
+from silnik.dostawcy import info as info_dostawcy
 from silnik.finanse import Ksiega, Rachunek
 from silnik.gra import Gra
 from silnik.lokale import (
@@ -26,6 +27,7 @@ from silnik.lokale import (
 )
 from silnik.model import Firma, do_slownika
 from silnik.popyt import widok_popytu
+from silnik.srodki_trwale import ewidencja
 
 
 def _firma_slownik(f: Firma) -> dict:
@@ -127,7 +129,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     v["lista_bledow"] = bledy
     v["kandydaci"] = (kandydaci_firmy(stan.kandydaci, f) if edycja
                       else kandydaci_firmy(poprzedni.kandydaci, poprzedni.firmy[firma]))
-    v["ceny_dostawcow"] = ceny_rundy(dane, gra.konfiguracja["ziarno"], runda, gra.konfiguracja.get("ceny_dostawcow", "dane"))
+    v["ceny_dostawcow"], v["gazetki"] = oferta_rundy(dane, gra.konfiguracja["ziarno"], runda,
+                                                     gra.konfiguracja.get("ceny_dostawcow", "dane"))
+    v["dostawcy_info"] = {d: info_dostawcy(dane, d) for d in v["ceny_dostawcow"]}
     v["ceny_sprzedazy_sprzetu"] = {n: {q: cena_sprzedazy_sprzetu(dane, c) for q, c in s["ceny"].items()}
                                    for n, s in dane.sprzet.items()}
 
@@ -147,6 +151,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
         v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
         v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
+        v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
+        v["srodki_trwale"] = ewidencja(f)
+        v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
     return v
 
 

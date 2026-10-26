@@ -126,13 +126,14 @@ udogodnienia:
     od_rundy: 8
 wyposazenie:
   zrodlo: Inwestycje – wyposażenie r9 (gra ATH); cena = 2 × cena sprzedaży; parking i terminal – cena zakupu nieznana (sprzedaż
-    0)
+    0); sklep – notatka „Elementy mapy” (Leroy Merlin, IKEA, OBI, Jula, Castorama), przypisanie – założenie F3a.6
   pozycje:
   - nazwa: Darmowe WiFi
     procent: 95
     cena: 200
     utrzymanie: 20
     od_rundy: 4
+    sklep: OBI
   - nazwa: Miejsca parkingowe dla klientów
     procent: 90
     cena: 0
@@ -148,16 +149,19 @@ wyposazenie:
     cena: 2000
     utrzymanie: 200
     od_rundy: 5
+    sklep: Castorama
   - nazwa: Stoliki i krzesła dla klientów
     procent: 60
     cena: 2500
     utrzymanie: 0
     od_rundy: 5
+    sklep: IKEA
   - nazwa: Telewizor z meczami
     procent: 30
     cena: 2300
     utrzymanie: 10
     od_rundy: 5
+    sklep: Jula
 media_tradycyjne:
   zrodlo: 'Marketing – tradycyjny r6–r8 (gra ATH); zniżka: [od emisji, %]; od rundy 5: billboard/ulotki i prasa, od 6: radio,
     od 7: telewizja (od użytkownika)'

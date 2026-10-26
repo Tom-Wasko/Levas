@@ -14,7 +14,7 @@ from silnik.model import Firma, Stanowisko
 from silnik.operacje import _zuzyj
 
 PN, WT, SR = date(2026, 10, 12), date(2026, 10, 13), date(2026, 10, 14)
-DOSTAWCA = "Hurtownia Lubelska Spiżarnia"
+DOSTAWCA = "Makro"
 
 
 def _partia(dane, zasob, ilosc, dostawa, jakosc=2, cena=10.0, runda=2):
@@ -89,17 +89,17 @@ def test_gra_dostawy_na_dni_kosz_i_zwrot():
     dni = pp.dni_rundy(g.dane, 2)
     s = _runda(g, A={"zamowienia": [{"dostawca": DOSTAWCA, "zasob": "Bułka", "jakosc": 2, "ilosc": 2, "dzien": 0},
                                     {"dostawca": DOSTAWCA, "zasob": "Tortilla", "jakosc": 2, "ilosc": 3, "dzien": 3},
-                                    {"dostawca": DOSTAWCA, "zasob": "Sos", "jakosc": 2, "ilosc": 1, "dzien": 5}]})
+                                    {"dostawca": DOSTAWCA, "zasob": "Sos", "jakosc": 2, "ilosc": 1, "dzien": 3}]})
     w = s.wyniki[2]["A"]
     straty = [(x["zasob"], x["data"], x["powod"]) for x in w["swiezosc"]["straty"]]
     assert straty == [("Bułka", dni[1].isoformat(), "termin")]           # bułka z poniedziałku – kosz we wtorek
     bulka = next(x for x in w["zasoby"] if x["zasob"] == "Bułka")
     assert bulka["straty"] == pytest.approx(2) and bulka["wykorzystane"] == pytest.approx(0) and bulka["koniec"] == 0
     f = s.firmy["A"]
-    assert {p.zasob: p.dostawa for p in f.partie} == {"Tortilla": dni[3].isoformat(), "Sos": dni[5].isoformat()}
+    assert {p.zasob: p.dostawa for p in f.partie} == {"Tortilla": dni[3].isoformat(), "Sos": dni[3].isoformat()}
     assert w["swiezosc"]["zasoby"]["Tortilla"]["dostawy"][3] == pytest.approx(3)
     # zwrot nadmiaru: całe opakowania z partii tej rundy
-    s = _runda(g, A={"zamowienia": [{"dostawca": DOSTAWCA, "zasob": "Napój", "jakosc": 2, "ilosc": 2, "dzien": 1}],
+    s = _runda(g, A={"zamowienia": [{"dostawca": DOSTAWCA, "zasob": "Napój", "jakosc": 2, "ilosc": 2, "dzien": 0}],
                      "zwrot_nadmiaru": {DOSTAWCA: True}})
     assert not [p for p in s.firmy["A"].partie if p.zasob == "Napój"]
     assert next(x for x in s.wyniki[3]["A"]["zasoby"] if x["zasob"] == "Napój")["zwroty"] == pytest.approx(2)

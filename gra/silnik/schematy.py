@@ -94,9 +94,37 @@ class PlikZasobow(Plik):
 # --- dostawcy.yaml ---
 
 
+class Gazetka(Schemat):
+    pozycji: int = Field(ge=1)                 # ile składników co tydzień w promocji
+    rabat_min: float = Field(gt=0, lt=1)
+    rabat_max: float = Field(gt=0, lt=1)
+
+
+class Dostawca(Schemat):
+    rodzaj: Literal["dyskont", "hurtownia", "producent", "piekarnia"]
+    opis: str
+    dni_dostaw: list[int] = Field(min_length=1)   # 0 = poniedziałek … 6 = niedziela
+    koszt_dostawy: float = Field(default=0, ge=0)  # za każdą dostawę (dzień) poniżej progu
+    darmowa_od: float | None = Field(default=None, gt=0)
+    minimalne_zamowienie: float = Field(default=0, ge=0)   # wartość jednej dostawy
+    odbior_osobisty: bool = False                 # dyskont: właściciel jedzie sam (czas właściciela, F3a.7)
+    godziny_odbioru: float = Field(default=0, ge=0)
+    limit_opakowan: int | None = Field(default=None, ge=1)  # na składnik na dzień
+    od_rundy: int = Field(default=0, ge=0)
+    gazetka: Gazetka | None = None
+
+    @field_validator("dni_dostaw")
+    @classmethod
+    def _dni(cls, v):
+        if sorted(set(v)) != v or v[0] < 0 or v[-1] > 6:
+            raise ValueError("dni dostaw: rosnące, bez powtórzeń, 0–6")
+        return v
+
+
 class PlikDostawcow(Plik):
     pierwsi: list[str]
     wszyscy_od_miesiaca: str
+    dostawcy: dict[str, Dostawca] = Field(default_factory=dict)   # bez sekcji (dane Revasa): dostawa każdego dnia, bez opłat
     ceny: dict[
         str, dict[str, dict[str, dict[Jakosc, float]]]
     ]  # miesiąc → dostawca → zasób → jakość → cena
@@ -220,6 +248,7 @@ class Udogodnienie(Schemat):
     cena: float
     utrzymanie: float
     od_rundy: int = 1
+    sklep: str | None = None      # gra z lokalami: sklep budowlany / meblowy na mapie (F3a.6)
 
 
 class Medium(Schemat):

@@ -52,7 +52,9 @@ export const dashboard = {
       ${kafel("Minimalne wynagrodzenie brutto", "zatrudnienie", `${licz(kat.placa_minimalna)} PLN / miesiąc`
         + (OKRES.rund_w_roku === 12 ? "" : `<div class="maly-tekst">≈ ${licz(naRunde(kat.placa_minimalna))} PLN${naOkres()}</div>`))}
       ${kafel("Czas pracy pracownika i sprzętów", "zegar", `<div>${p.godziny}H / ${OKRES.mianownik.toUpperCase()}<div class="maly-tekst">Otwarte: 9:00–17:00</div></div>`)}
-      ${kafel("Stawki amortyzacji", "procent", `<div class="maly-tekst">Sprzęt powyżej ${licz(p.amortyzacja_prog)} PLN: 10%<br>Sprzęt do ${licz(p.amortyzacja_prog)} PLN: 100%</div>`)}
+      ${kafel("Stawki amortyzacji", "procent", v.amortyzacja
+        ? `<div class="maly-tekst">Lokal i budynek: ${proc(v.amortyzacja.stawki.budynek)} rocznie<br>Od ${licz(p.amortyzacja_prog)} PLN: ${proc(v.amortyzacja.stawki.sprzet)} rocznie<br>Do ${licz(p.amortyzacja_prog)} PLN: 100%</div>`
+        : `<div class="maly-tekst">Sprzęt powyżej ${licz(p.amortyzacja_prog)} PLN: 10%<br>Sprzęt do ${licz(p.amortyzacja_prog)} PLN: 100%</div>`)}
       ${kafel("Pozostałe informacje", "finanse", `<div class="maly-tekst">Podatek dochodowy ${proc(p.cit, 0)}<br>Składki ZUS pracodawcy ${proc(p.zus, 0)}
         <br>Kredyt odnawialny: ${v.gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "jak w grze (jednocześnie)"}
         ${d.lokaty ? `<br>Lokaty: ${zl(d.lokaty)}` : ""}${d.zadluzenie ? `<br>Zadłużenie: ${zl(d.zadluzenie)}` : ""}</div>`)}

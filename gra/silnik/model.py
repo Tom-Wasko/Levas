@@ -146,6 +146,19 @@ class Cena(Model):
     rabat = _kwota("rabat")
 
 
+class SrodekTrwaly(Model):
+    """Pozycja ewidencji środków trwałych (gra z lokalami): amortyzacja liniowa od rundy po zakupie."""
+    nazwa: str
+    rodzaj: str                   # klucz stawki w zalozenia.yaml: finanse.amortyzacja_roczna
+    od_rundy: int
+    stawka: float                 # roczna
+    wartosc_gr: int = 0           # wartość początkowa
+    umorzenie_gr: int = 0         # suma odpisów
+
+    wartosc = _kwota("wartosc")
+    umorzenie = _kwota("umorzenie")
+
+
 class Firma(Model):
     nazwa: str
     bot: str | None = None
@@ -154,6 +167,7 @@ class Firma(Model):
     gotowka_gr: int = 0
     stanowiska: list[Stanowisko] = Field(default_factory=list)
     lokale: list[Lokal] = Field(default_factory=list)
+    srodki_trwale: list[SrodekTrwaly] = Field(default_factory=list)
     pracownicy: dict[str, Pracownik] = Field(default_factory=dict)
     magazyn: dict[str, float] = Field(default_factory=dict)           # "zasób|jakość" → opakowania
     wartosc_magazynu_gr: dict[str, int] = Field(default_factory=dict) # "zasób|jakość" → grosze (średni koszt)
