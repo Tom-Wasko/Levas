@@ -17,6 +17,7 @@ from functools import lru_cache
 
 import numpy as np
 
+from . import czas_wlasciciela as cw
 from .dane import MIESIACE, Dane
 from .losowosc import strumien
 
@@ -77,11 +78,12 @@ def gazetki(dane: Dane, ziarno, runda: int, ceny: dict) -> dict[str, dict[str, f
     return wynik
 
 
-def zasady_dostaw(dane: Dane, zamowienia: list[dict], start: date, dni: int) -> tuple[list[dict], dict]:
+def zasady_dostaw(dane: Dane, zamowienia: list[dict], start: date, dni: int, czas=None) -> tuple[list[dict], dict]:
     """Zamówienia (z polem "cena") po zasadach dostaw gry z lokalami → (przyjęte, podsumowanie).
 
     Kolejno: dzień poza dniami dostaw dostawcy – zamówienie odrzucone; ponad limit opakowań dyskontu (na składnik
-    na dzień) – ilość obcięta; dostawa (dostawca, dzień) poniżej minimalnego zamówienia – odrzucona w całości.
+    na dzień) – ilość obcięta; dostawa (dostawca, dzień) poniżej minimalnego zamówienia – odrzucona w całości;
+    dzień zakupów w dyskoncie, na który nie starcza czasu właściciela (`czas` – silnik/czas_wlasciciela.py) – odrzucony.
     Podsumowanie: {"uwagi": [tekst], "oplaty": {dostawca: zł}, "czas_wlasciciela": {dostawca: godziny},
     "dostawy": [{dostawca, dzien, data, wartosc, oplata, godziny}]}."""
     uwagi, przyjete, uzyte = [], [], {}
@@ -120,19 +122,27 @@ def zasady_dostaw(dane: Dane, zamowienia: list[dict], start: date, dni: int) -> 
                          f" {minimum:g} zł, odrzucona.")
     przyjete = [z for z in przyjete if (z["dostawca"], z["dzien"]) not in za_male]
     wynik = {"uwagi": uwagi, "oplaty": {}, "czas_wlasciciela": {}, "dostawy": []}
+    bez_czasu = set()
     for (d, dz), w in sorted(wartosc.items(), key=lambda x: (x[0][1], x[0][0])):
         if (d, dz) in za_male:
             continue
         inf = info(dane, d)
         oplata = inf["koszt_dostawy"] if inf["darmowa_od"] is None or w < inf["darmowa_od"] - 1e-9 else 0
         godziny = inf["godziny_odbioru"] if inf["odbior_osobisty"] else 0
+        data = start + timedelta(days=dz)
+        if godziny and czas is not None and not czas.wez(godziny, f"Odbiór osobisty: {d} ({DNI[data.weekday()]} {data:%d.%m})",
+                                                         "dostawcy"):
+            bez_czasu.add((d, dz))
+            uwagi.append(f"{d}: brak czasu właściciela na zakupy {W_DZIEN[data.weekday()]} ({cw.godziny(godziny)} h,"
+                         f" wolne {cw.godziny(czas.wolne)} h z {cw.godziny(czas.pula)} h) – zakupy odrzucone.")
+            continue
         if oplata:
             wynik["oplaty"][d] = wynik["oplaty"].get(d, 0) + oplata
         if godziny:
             wynik["czas_wlasciciela"][d] = wynik["czas_wlasciciela"].get(d, 0) + godziny
         wynik["dostawy"].append({"dostawca": d, "dzien": dz, "data": (start + timedelta(days=dz)).isoformat(),
                                  "wartosc": round(w, 2), "oplata": oplata, "godziny": godziny})
-    return przyjete, wynik
+    return [z for z in przyjete if (z["dostawca"], z["dzien"]) not in bez_czasu], wynik
 
 
 def ceny_miesiaca(dane: Dane, ziarno, miesiac: int, tryb: str = "dane", klucz: int | None = None) -> dict:

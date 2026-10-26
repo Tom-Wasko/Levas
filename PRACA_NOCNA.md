@@ -29,6 +29,10 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    w Microsoft Entra ID szkoły (identyfikator klienta, sekret, identyfikator dzierżawy) – to zrobi administrator
    szkolnego Microsoft 365 albo Ty, jeśli masz dostęp. Czy mam przygotować krótką instrukcję krok po kroku?
    Do tego czasu działa własny login i hasło. (zadane: 26.10 0:40, do wysłania w poniedziałek o 6:00)
+4. **Czas właściciela (F3a.7).** Przyjąłem 20 h na rundę (tydzień), tyle samo dla każdej drużyny – firma ma jednego
+   właściciela, więc liczba osób w drużynie nie zmienia puli. Na razie zużywa ją tylko odbiór osobisty w dyskontach
+   (1–1,5 h za dzień zakupów), później pracuj.pl i parki. Czy 20 h jest dobre i czy pula ma rosnąć z liczbą osób
+   w drużynie? (zadane: 26.10 5:30, do wysłania w poniedziałek o 6:00)
 
 ## Odłożone zadania
 
@@ -146,7 +150,7 @@ _brak_
     (do ok. 9 tys. zł strat tygodniowo); poprawię w kalibracji (krok 5) albo przy F3a.7 (grafiki),
   - sprawdzone: pytest (102) i ruff na zielono, `sprawdz` danych, zakładki Magazyn i świeżość oraz Dostawcy
     wyrenderowane na widoku prawdziwej gry (bez `undefined`/`NaN`).
-- 26.10 5:45 – F3a.6 gotowe: dostawcy i sprzęt. Decyzje **do potwierdzenia**:
+- 26.10 5:20 – F3a.6 gotowe: dostawcy i sprzęt. Decyzje **do potwierdzenia**:
   - lista dostawców z notatki „Elementy mapy” (prawdziwe marki: Biedronka, Lidl, Stokrotka, Makro, Selgros,
     Eurocash) + fikcyjny producent mięsa „Rożen” z Łęcznej i Piekarnia Koziołek; dawni Mięsny Bazar Zamojski
     i Hurtownia Lubelska Spiżarnia usunięte (ich ceny są bazą nowych),
@@ -173,3 +177,9 @@ _brak_
   - sprawdzone: pytest (111) i ruff na zielono, `sprawdz` danych, zakładki Dostawcy, Środki trwałe, Wyposażenie
     i Dashboard wyrenderowane na widoku prawdziwej gry (bez `undefined`/`NaN`); straty botów po zmianie dostawców:
     agresywny ok. 7,6 tys. zł tygodniowo (było ok. 9 tys.).
+- 26.10 5:30 – F3a.7 gotowe: czas właściciela. Decyzje **do potwierdzenia** (pytanie 4):
+  - pula 20 h na rundę, niezależna od liczby osób w drużynie, nie przechodzi na następną rundę,
+  - godziny zużywane po kolei (dzień, dostawca); dzień zakupów w dyskoncie, na który nie starcza godzin –
+    odrzucony w całości, czerwony błąd w zakładce Dostawcy,
+  - nowa zakładka **Czas właściciela** (Decyzje + Wyniki) w menu pod „Magazyn i świeżość”; pracuj.pl (F3a.8)
+    i parki (F3b.1) dopiszą się do tej samej puli.

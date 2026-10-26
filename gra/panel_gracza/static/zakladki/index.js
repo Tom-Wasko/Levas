@@ -11,13 +11,14 @@ import { lokale } from "./lokale.js";
 import { mapa } from "./mapa.js";
 import { klienci } from "./klienci.js";
 import { swiezosc } from "./swiezosc.js";
+import { czas_wlasciciela } from "./czas.js";
 
 const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, udogodnienia, szkolenia,
-  dostawcy, swiezosc, tradycyjny, internetowy, sprzedaz, raport, kpir, bank, biuro, lista_bledow, wyslij, analiza };
+  dostawcy, swiezosc, czas_wlasciciela, tradycyjny, internetowy, sprzedaz, raport, kpir, bank, biuro, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
 export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
-  wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc",
+  wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar",
   tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", bank: "bank",
   biuro: "biuro", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
 
@@ -35,6 +36,7 @@ export const MENU = [
   { klucz: "hr", tytul: "HR", ikona: "hr", pod: ["zatrudnienie", "udogodnienia", "szkolenia"] },
   { klucz: "dostawcy", tytul: "Dostawcy", ikona: "dostawcy" },
   { klucz: "swiezosc", tytul: "Magazyn i świeżość", ikona: "swiezosc" },
+  { klucz: "czas_wlasciciela", tytul: "Czas właściciela", ikona: "zegar" },
   { klucz: "marketing", tytul: "Marketing", ikona: "marketing", pod: ["tradycyjny", "internetowy"] },
   { klucz: "sprzedaz", tytul: "Sprzedaż", ikona: "sprzedaz" },
   { klucz: "finanse", tytul: "Finanse", ikona: "finanse", pod: ["raport", "kpir", "bank", "biuro"] },

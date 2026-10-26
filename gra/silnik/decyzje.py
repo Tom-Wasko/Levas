@@ -30,6 +30,7 @@ from __future__ import annotations
 import math
 from datetime import timedelta
 
+from . import czas_wlasciciela as cw
 from . import srodki_trwale as st_trwale
 from . import swiezosc as sw
 from .dane import KASA, KUCHNIA, Dane
@@ -209,9 +210,11 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         cena = cena_dostawcy(dane, ceny_dostawcow, z["dostawca"], z["zasob"], int(z["jakosc"]))
         if ilosc > 0 and cena is not None:
             zamowienia.append({**z, "ilosc": ilosc, "cena": cena})
-    if lokale:  # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz (silnik/dostawcy.py)
+    if lokale:  # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/dostawcy.py)
+        czas = cw.nowy(dane)
         zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
-                                                    (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days)
+                                                    (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
+        info["czas_wlasciciela"] = czas.podsumowanie()
     for z in zamowienia:
         ilosc, cena = z["ilosc"], z.pop("cena")
         k = f"{z['zasob']}|{int(z['jakosc'])}"

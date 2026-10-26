@@ -212,6 +212,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["lokale"] = lk.stan_lokali(dane, f, r)
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
+            wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
             wyniki[nazwa]["srodki_trwale"] = ewidencja(f)
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]

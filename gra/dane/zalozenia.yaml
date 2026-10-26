@@ -146,6 +146,11 @@ operacje:
     wartosc: 40
     pewnosc: zalozenie
     zrodlo: 'F2.7: jak etat – 40 h sprzętu w tygodniu; Revas: 160 h w miesiącu'
+  czas_wlasciciela:
+    wartosc: 20
+    pewnosc: zalozenie
+    zrodlo: 'F3a.7: godziny właściciela na rundę (tydzień) na sprawy poza lokalem – odbiór osobisty w dyskontach,
+      później pracuj.pl i parki; nie zależy od liczby osób w drużynie (firma ma jednego właściciela)'
   zajecia_zaokraglane_w_gore:
     wartosc: true
     pewnosc: potwierdzone

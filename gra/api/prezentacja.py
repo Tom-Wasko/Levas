@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from silnik import czas_wlasciciela as cw
 from silnik import swiezosc
 from silnik.dane import Dane
 from silnik.decyzje import (
@@ -153,6 +154,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
         v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
         v["srodki_trwale"] = ewidencja(f)
+        v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
+                                 else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
         v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
     return v
 

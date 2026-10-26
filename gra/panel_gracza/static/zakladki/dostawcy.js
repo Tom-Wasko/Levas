@@ -120,7 +120,9 @@ export const dostawcy = {
     const ceny = v.ceny_dostawcow;
     const koszt = (v.decyzje.zamowienia || []).reduce((s, z) => s + (ceny[z.dostawca]?.[z.zasob]?.[z.jakosc] || 0) * z.ilosc, 0);
     const pot = zapotrzebowanie(v, kat), tanie = najtansze(ceny);
-    const plan = planDostaw(v.dostawy_plan, "Dostawy w tej rundzie");
+    const C = v.czas_wlasciciela;
+    const plan = planDostaw(v.dostawy_plan, "Dostawy w tej rundzie") + (C && C.wykorzystane
+      ? `<p class="podpowiedz">Czas właściciela: wolne ${licz(C.wolne, 1)} h z ${licz(C.pula, 1)} h w tej rundzie (<a data-zakladka-k="czas_wlasciciela">szczegóły</a>).</p>` : "");
     const wiersze = Object.keys(kat.zasoby).filter((z) => pot[z] || [1, 2, 3].some((q) => stan(v, z, q))).map((z) => {
       const magazyn = [1, 2, 3].reduce((s, q) => s + stan(v, z, q), 0);
       const zam = (v.decyzje.zamowienia || []).filter((x) => x.zasob === z).reduce((s, x) => s + x.ilosc, 0);
