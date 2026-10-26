@@ -1,5 +1,5 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
-import { esc, godzina, info, nazwaRundy, OKRES, okno, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
+import { esc, godzina, info, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
   from "./zakladki/wspolne.js";
 import ZAKLADKI, { IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
@@ -245,6 +245,8 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (e.target.closest(".logo")) { S.zakladka = "dashboard"; rysuj(); return; }
+  const th = e.target.closest("th[data-sort]");
+  if (th && !e.target.closest("input, select, button, a")) return przelaczSortowanie(th);
   const el = e.target.closest("[data-akcja]");
   if (!el) return;
   const a = el.dataset.akcja;

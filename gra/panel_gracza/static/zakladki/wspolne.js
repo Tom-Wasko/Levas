@@ -45,9 +45,52 @@ export function info(tekst) {
   return `<div class="info"><span class="i">i</span><span>${tekst}</span></div>`;
 }
 
-export function tabela(tytul, naglowki, wiersze, { stopka = null, klasy = [] } = {}) {
-  const th = naglowki.map((h, i) => `<th class="${klasy[i] || ""}">${h}</th>`).join("");
-  const tr = wiersze.map((w) => `<tr>${w.map((c, i) => `<td class="${klasy[i] || ""}">${c ?? ""}</td>`).join("")}</tr>`).join("");
+// --- sortowanie tabel: klik w nagłówek – rosnąco, malejąco, kolejność pierwotna. Stan per tabela (tytuł + nagłówki)
+// zostaje po przerysowaniu widoku; w oknach (np. baza składników) wiersze układa się od razu w DOM.
+const _sort = {};
+const _tekst = (h) => String(h ?? "").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").trim();
+
+// wartość komórki do porównania: liczba („1 234,56 PLN”, „−3%”, „≈ 120”, „★★”), tekst albo null (pusta, „–”)
+export function kluczSortu(html) {
+  const t = _tekst(html);
+  if (!t || t === "–" || t === "-") return null;
+  if (/^★+$/.test(t)) return t.length;
+  const m = t.replace(/[\s\u00a0\u202f≈~]/g, "").replace(/^−/, "-").match(/^[-+]?\d+(?:,\d+)?/);
+  return m ? parseFloat(m[0].replace(",", ".")) : t.toLowerCase();
+}
+
+function porownaj(a, b, kier) {
+  if (a === null || b === null) return a === b ? 0 : a === null ? 1 : -1;   // puste zawsze na końcu
+  if (typeof a !== typeof b) return typeof a === "number" ? -kier : kier;
+  return (typeof a === "number" ? a - b : a.localeCompare(b, "pl", { numeric: true })) * kier;
+}
+
+function ulozone(lista, komorka, s) {
+  if (!s) return lista;
+  return lista.map((x, i) => [x, kluczSortu(komorka(x)), i])
+    .sort(([, ka, ia], [, kb, ib]) => porownaj(ka, kb, s.kier) || ia - ib).map(([x]) => x);
+}
+
+export function przelaczSortowanie(th) {
+  const klucz = th.dataset.sort, k = +th.dataset.k, s = _sort[klucz];
+  const nowy = _sort[klucz] = !s || s.k !== k ? { k, kier: 1 } : s.kier === 1 ? { k, kier: -1 } : null;
+  const tab = th.closest("table"), tb = tab.tBodies[0];
+  tab.querySelectorAll("th[data-sort]").forEach((h) => h.classList.remove("rosnaco", "malejaco"));
+  if (nowy) th.classList.add(nowy.kier === 1 ? "rosnaco" : "malejaco");
+  const rzedy = [...tb.rows].sort((a, b) => a.dataset.i - b.dataset.i);
+  ulozone(rzedy, (r) => r.cells[k]?.innerHTML, nowy).forEach((r) => tb.appendChild(r));
+}
+
+export function tabela(tytul, naglowki, wiersze, { stopka = null, klasy = [], sortuj = true } = {}) {
+  const klucz = sortuj && wiersze.length > 1 ? _tekst(`${tytul || ""}|${naglowki.join("|")}`) : null;
+  const s = klucz ? _sort[klucz] : null;
+  const th = naglowki.map((h, i) => {
+    const kier = s && s.k === i ? (s.kier === 1 ? " rosnaco" : " malejaco") : "";
+    return klucz ? `<th class="${klasy[i] || ""}${kier}" data-sort="${esc(klucz)}" data-k="${i}" title="Kliknij, aby posortować">${h}</th>`
+      : `<th class="${klasy[i] || ""}">${h}</th>`;
+  }).join("");
+  const wi = ulozone(wiersze.map((w, i) => [w, i]), ([w]) => s && w[s.k], s);
+  const tr = wi.map(([w, n]) => `<tr data-i="${n}">${w.map((c, i) => `<td class="${klasy[i] || ""}">${c ?? ""}</td>`).join("")}</tr>`).join("");
   const tf = stopka ? `<tfoot><tr>${stopka.map((c, i) => `<td class="${klasy[i] || ""}">${c ?? ""}</td>`).join("")}</tr></tfoot>` : "";
   const brak = wiersze.length ? "" : `<tr><td colspan="${naglowki.length}">Brak danych</td></tr>`;
   return `${tytul ? `<div class="tabela-tytul">${tytul}</div>` : ""}<div class="tab-wrap"><table class="t"><thead><tr>${th}</tr></thead><tbody>${tr}${brak}</tbody>${tf}</table></div>`;

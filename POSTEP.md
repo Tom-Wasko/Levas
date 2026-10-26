@@ -43,5 +43,11 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 **Krok 3a zakończony.**
 
 - [x] F3b.1 Parki – `dane/zdarzenia/parki.yaml`: 14 historii w 7 parkach (12 komicznych, 2 poważne; 4 nowe parki na mapie), sceny z opcjami (koszt: godziny właściciela, gotówka, porcje jedzenia), opcja domyślna, ciąg dalszy za N rund z szansą; schematy z kontrolą grafu (każda ścieżka się kończy, brak scen nieosiągalnych); `silnik/zdarzenia.py`: od rundy 2 co rundę jedna historia dla wszystkich drużyn (kolejność losowana bez powtórzeń w cyklu), skutki – gotówka (bez VAT), mnożnik popytu, mniej godzin właściciela w kolejnych rundach, kandydat na rynku pracy tylko dla tej drużyny; boty wybierają losowo spośród opcji do 3 h; zakładka **Zdarzenia** (Decyzje: sceny i wybór reakcji, Wyniki: reakcje, skutki, „ciąg dalszy nastąpi”, trwające efekty, dziennik); lista błędów: niebieski brak wyboru, czerwony brak czasu właściciela (gra bierze opcję domyślną); test `test_zdarzenia.py`
+- [x] Zmiany 26.10 (polecenia użytkownika): kapitał startowy 40 000 zł (dane, README, notatki); sortowanie tabel
+  kliknięciem w nagłówek (rosnąco, malejąco, kolejność pierwotna; liczby w polskim zapisie, gwiazdki, puste na końcu;
+  działa też w oknach, np. baza składników) i lista „Sortuj” w ofercie lokali; testy kupna lokali dostają jawnie
+  kapitał 100 000 zł
+- [ ] Magazyn bez kosztu magazynowania i zwrotów: wynajem chłodni (1 zł/l, termin −2 dni), kontrole sanepidu,
+  zdarzenie „bank żywności”
 
 Zadania F3b.2–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

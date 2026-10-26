@@ -41,7 +41,7 @@ def test_kapital_startowy(client):
     assert {f["nazwa"]: f["gotowka"] for f in p["firmy"]} == {"Drużyna 1": 50000, "Drużyna 2": 50000, "Bot": 50000}
     # bez kapitału – z danych gry
     id2 = _nowa(client, kapital_startowy="").json()["id"]
-    assert _przeglad(client, id2)["gra"]["kapital"] == 100000
+    assert _przeglad(client, id2)["gra"]["kapital"] == 40000
 
 
 def test_prowadzenie_rundy(client):

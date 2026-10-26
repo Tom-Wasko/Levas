@@ -3,7 +3,7 @@
 # Zarys aplikacji
 
 ## 1. Panel mistrza gry
-- Tworzenie nowych gier: liczba rund (domyślnie 26) i kapitał startowy (domyślnie 100 000 zł).
+- Tworzenie nowych gier: liczba rund (domyślnie 26) i kapitał startowy (domyślnie 40 000 zł).
 - Drużyny: zakładanie drużyn 1–4 osób i przypisywanie do nich uczniów.
 - Boty: włączenie lub wyłączenie botów, ich liczba i poziom trudności (łatwy / średni / trudny).
 - Zamykanie rundy: ręcznie albo automatycznie o ustalonej godzinie; widać, które drużyny wysłały już decyzje.

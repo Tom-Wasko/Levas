@@ -14,6 +14,7 @@ INDEX_JS = Path(__file__).parents[1] / "panel_gracza" / "static" / "zakladki" / 
 
 
 def _gra(*firmy, rund=8, **opcje):
+    opcje.setdefault("kapital_startowy", 100000)   # testy kupna lokali i działek – kapitał większy niż domyślny
     return Gra.nowa("lokale", [(n, b) for n, b in firmy] or [("A", None), ("B", None)], rund, 1, **opcje)
 
 

@@ -308,3 +308,4 @@ _brak_
 - 26.10 – F3a.14 gotowe: panel mistrza gry (pauza, harmonogram zamykania rund z komendą `zamykaj_rundy`, podgląd drużyn tylko do odczytu, poziomy botów bez efektu do F4.4, eksport CSV); pytanie 10. Start F3a.15.
 - 26.10 – F3a.15 gotowe: limity odrzucane przy zapisie decyzji (`silnik/limity.py`); pytanie 11. Krok 3a zakończony, start F3b.1 Parki.
 - 26.10 – F3b.1 gotowe: eventy w parkach (14 historii, zakładka Zdarzenia); pytanie 12. Nowe polecenia użytkownika: kapitał 40 000 zł, sortowanie list, lodówki + sanepid zamiast kosztu magazynowania, bez zwrotów + event z bankiem żywności.
+- 26.10 – kapitał 40 000 zł, poprawione 4 notatki (zgoda użytkownika), sortowanie tabel i oferty lokali. Boty przy 40 000 zł nie schodzą poniżej ok. 18 000 zł gotówki (2 ziarna × 26 rund). Dalej: magazyn (wynajem chłodni, sanepid, bank żywności).

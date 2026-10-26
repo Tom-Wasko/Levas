@@ -187,6 +187,10 @@ table.t th { text-transform: uppercase; font-size: 10px; font-weight: 700; paddi
   background: #faf8f6; text-align: center; color: var(--szary); letter-spacing: .02em; }
 table.t td { padding: 10px; border-top: 1px solid #f2efec; text-align: center; font-variant-numeric: tabular-nums; }
 table.t tbody tr:hover td { background: var(--pom-jasny); }
+table.t th[data-sort] { cursor: pointer; user-select: none; }
+table.t th[data-sort]:hover { color: var(--pom); }
+table.t th.rosnaco::after { content: " ▲"; color: var(--pom); }
+table.t th.malejaco::after { content: " ▼"; color: var(--pom); }
 table.t td.l, table.t th.l { text-align: left; }
 table.t td.r, table.t th.r { text-align: right; }
 table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2px solid var(--pom-mgla); }

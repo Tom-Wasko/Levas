@@ -54,6 +54,15 @@ export function przyciskiLokalu(v, d, lok, edycja) {
 const potencjal = (v, lok) => v.popyt?.strefy[lok.strefa]
   ? `<div class="wiersz"><span>Klienci – szacunek${naOkres()}</span><span>≈ ${licz(v.popyt.strefy[lok.strefa].potencjal)}</span></div>` : "";
 
+// sortowanie oferty lokali; brak wartości (np. czynsz lokalu na sprzedaż) – na koniec
+const _albo = (x) => x ?? Infinity;
+const SORT_OFERTY = {
+  wejscie: { nazwa: "najtańsze wejście", klucz: (v, l) => _albo(Math.min(...Object.values(l.wejscie || {}))) },
+  czynsz: { nazwa: "najniższy czynsz", klucz: (v, l) => _albo(l.czynsz) },
+  metraz: { nazwa: "największy metraż", klucz: (v, l) => -l.metraz },
+  klienci: { nazwa: "najwięcej klientów", klucz: (v, l) => -(v.popyt?.strefy[l.strefa]?.potencjal ?? 0) },
+};
+
 function kafelOferty(v, kat, d, lok, edycja) {
   const wyb = wybranyLokal(d)?.id === lok.id;
   return `<div class="kafel ${wyb ? "wybrany" : ""}"><div class="kg">${esc(lok.nazwa)}<span class="pigulka">${TYPY[lok.typ]}</span></div>
@@ -87,12 +96,17 @@ export const lokale = {
         Jeśli w tej rundzie wybierze go też inna drużyna, dostanie go firma wcześniejsza w kolejności rundy (losowej).</div>`;
     }
     html += mojeLokale(kat, L.moje);
+    const sortuj = SORT_OFERTY[lokale.sort] ? lokale.sort : "";
     const oferta = L.oferta.filter((l) => !strefa || l.strefa === strefa);
+    if (sortuj) oferta.sort((a, b) => SORT_OFERTY[sortuj].klucz(v, a) - SORT_OFERTY[sortuj].klucz(v, b));
     const opcje = Object.entries(kat.mapa.strefy).map(([k, s]) =>
       `<option value="${k}" ${k === strefa ? "selected" : ""}>${esc(s.nazwa)} (${L.oferta.filter((l) => l.strefa === k).length})</option>`).join("");
     html += `<div class="pasek">Wolne lokale w mieście</div>
       <div class="wiersz" style="gap:12px;align-items:center;margin-bottom:14px"><label>Strefa:
         <select data-zmiana="lokal-strefa"><option value="">wszystkie (${L.oferta.length})</option>${opcje}</select></label>
+        <label>Sortuj:
+        <select data-zmiana="lokal-sort"><option value="">domyślnie</option>${Object.entries(SORT_OFERTY).map(([k, o]) =>
+          `<option value="${k}" ${k === sortuj ? "selected" : ""}>${o.nazwa}</option>`).join("")}</select></label>
         <a class="btn jasny maly" data-zakladka-k="mapa">Pokaż na mapie</a></div>`;
     if (!oferta.length) return html + `<p class="podpowiedz">Brak wolnych lokali${strefa ? " w tej strefie" : ""}.</p>`;
     for (const [k, s] of Object.entries(kat.mapa.strefy)) {
@@ -119,5 +133,8 @@ export const lokale = {
   akcje: {
     "lokal-wybierz": (el, c) => { zamknijOkno(); return c.zmien((d) => { d.lokal = el.dataset.id ? { id: el.dataset.id, forma: el.dataset.forma } : null; }); },
   },
-  zmiany: { "lokal-strefa": (el, c) => { lokale.filtr = el.value; c.rysuj(); } },
+  zmiany: {
+    "lokal-strefa": (el, c) => { lokale.filtr = el.value; c.rysuj(); },
+    "lokal-sort": (el, c) => { lokale.sort = el.value; c.rysuj(); },
+  },
 };

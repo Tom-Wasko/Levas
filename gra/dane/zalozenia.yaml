@@ -174,9 +174,9 @@ operacje:
       dopasowania'
 finanse:
   kapital_startowy:
-    wartosc: 100000
+    wartosc: 40000
     pewnosc: zalozenie
-    zrodlo: 'notatka „Ustalenia gry”: kapitał startowy 100 000 zł'
+    zrodlo: 'notatka „Ustalenia gry”: kapitał startowy 40 000 zł (zmiana 26.10)'
   placa_minimalna:
     wartosc: 4806
     pewnosc: potwierdzone

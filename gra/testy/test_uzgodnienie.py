@@ -46,7 +46,7 @@ def _dodatki(draw, lokale: bool) -> dict:
 def _graj(lokale: bool, ziarno: int, strategie: list[str], dodatki: list[dict]):
     rund = len(dodatki)
     g = Gra.nowa("lokale", [("H", strategie[0]), ("B1", strategie[1]), ("B2", strategie[2])], rund, ziarno,
-                 lokale=lokale)
+                 lokale=lokale, kapital_startowy=100000)
     for r, extra in enumerate(dodatki, start=1):
         d = decyzje_bota(g.dane, g.stan(), "H", strategie[0], r, g.konfiguracja)
         if extra.pop("zwrot_nadmiaru", False):

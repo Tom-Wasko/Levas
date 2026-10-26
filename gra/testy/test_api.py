@@ -45,7 +45,7 @@ def test_strony_i_statyki(client):
 
 def test_domyslna_gra_tygodniowa(client):
     strona = client.get("/").content.decode()
-    assert 'value="26"' in strona and "100 000 PLN" in strona
+    assert 'value="26"' in strona and "40 000 PLN" in strona
     id_ = _nowa(client, liczba_rund="")
     v = client.get(_url(id_, "widok")).json()
     kal = v["gra"]["kalendarz"]

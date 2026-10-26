@@ -12,7 +12,7 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 | Długość gry | ustala mistrz gry, domyślnie 26 rund (pół roku) |
 | Drużyny | 1–4 osób, wszystkie na jednej wspólnej mapie Lublina |
 | Boty | mistrz gry włącza je albo nie i wybiera poziom trudności |
-| Kapitał startowy | 100 000 zł |
+| Kapitał startowy | 40 000 zł |
 | Miasto | Lublin, 10 stref (Stare Miasto, Centrum, Miasteczko Akademickie, Politechnika, Dworzec, Zygmuntowskie, LSM i Czuby, Czechów i Kalinowszczyzna, Felin, Zemborzyce) |
 | Marki | prawdziwe nazwy (banki, sklepy, hurtownie) |
 | Postacie | biuro rachunkowe Jakuba Klimka-Ślęzaka (J.K.Ś.), lokal Tymka na sprzedaż, lichwiarz Harpagon |
@@ -36,6 +36,12 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 | Lokal niewyposażony → gotowy | 1 runda |
 | Pojedynczy sprzęt, mebel | od razu |
 | Kasyno | otwarte tylko na 1 rundę po zaproszeniu |
+
+## Magazyn
+- Nie ma stałego kosztu magazynowania ani zwrotów towaru do dostawcy – kupiony towar zostaje w lokalu.
+- Pojemność chłodni i zamrażarki zależy od sprzętu w lokalu. Towar, który się nie mieści, trafia do wynajętej chłodni: 1 zł za litr nadmiaru przy dostawie, termin przydatności krótszy o 2 dni *(roboczo)*.
+- Sanepid: duży nadmiar w wynajętej chłodni i przeterminowany towar zwiększają szansę kontroli; kontrola z zastrzeżeniami to mandat i mniej klientów przez kilka rund.
+- Bank żywności: gdy w lokalu jest dużo jedzenia blisko końca terminu, może pojawić się zdarzenie z propozycją oddania go do banku żywności.
 
 ## Przejęcia
 - Okres wypowiedzenia pracownika na umowie o pracę (KP art. 36) w rundach: 2 rundy (staż < 6 mies.), 4 rundy (6 mies. – 3 lata), 13 rund (≥ 3 lata). Pracownicy w puli mają losowy staż u obecnego pracodawcy.
