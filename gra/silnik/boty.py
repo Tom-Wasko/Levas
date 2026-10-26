@@ -105,13 +105,14 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         r_inni = [c / dane.uslugi[u]["cena_preferowana"] for x, c in inni.items() if x != nazwa]
         r_sr = (sum(r_inni) + ceny[u] / dane.uslugi[u]["cena_preferowana"]) / (len(r_inni) + 1)
         klienci[u] = oczekiwany_popyt(dane, u, m_sprz, ceny[u], (q, q, q), n, r_sr, wyp) * st["pokrycie"]
-    szczyt = 1.0
+    szczyt, udzialy_dni = 1.0, None
     if lokale:  # popyt strefowy: prognoza dla własnych lokali przy cenach konkurencji z poprzedniej rundy
         r_sprz = max(runda, 2)
         moje = {lok.id: {u: {"strefa": dane.lokale[lok.id]["strefa"], "cena": ceny[u], "jakosc": (q, q, q),
                              "wyposazenie": wyp} for u in oferta} for lok in f.lokale if lok.dziala_od <= r_sprz}
         prog = pp.prognoza(dane, r_sprz, {**pp.oferty_konkurencji(dane, stan, r_sprz, nazwa), nazwa: moje}, nazwa)
         klienci = {u: prog["dania"].get(u, 0.0) * st["pokrycie"] for u in oferta}
+        udzialy_dni = prog["dni"] or None
         szczyt = max([pp.szczyt(dane, dane.lokale[x]["strefa"], r_sprz) for x in moje] or [1.0])
     d["oferta"] = {u: int(round(klienci[u] / st["pokrycie"])) for u in oferta}
     if "sprzedaz" in odbl:
@@ -182,7 +183,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:
         ceny_d = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
-        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"])
+        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni)
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka)
     bufor = f.gotowka > ust["bufor_gotowki"]

@@ -14,7 +14,8 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
                        wcześniej inna firma, zatrudniany jest najbardziej podobny
     zmiany:            {id pracownika: {"pensja", "umowa", "premia"}}
     zwolnij:           [id pracownika]
-    zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc"}]      ilość w opakowaniach
+    zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc", "dzien"}]   ilość w opakowaniach; dzien – dzień
+                                                              dostawy w rundzie (0 = poniedziałek; gra z lokalami)
     zwrot_nadmiaru:    {dostawca: true/false}               – zwrot niezużytych zasobów z tej rundy (koszt 10%)
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
     reklama_tradycyjna:{medium: liczba emisji}
@@ -27,7 +28,9 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
 from __future__ import annotations
 
 import math
+from datetime import timedelta
 
+from . import swiezosc as sw
 from .dane import KASA, KUCHNIA, Dane
 from .finanse import Ksiega, Rachunek, ksieguj
 from .lokale import bledy as bledy_lokali
@@ -203,6 +206,11 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         k = f"{z['zasob']}|{int(z['jakosc'])}"
         firma.magazyn[k] = firma.magazyn.get(k, 0.0) + ilosc
         firma.wartosc_magazynu_gr[k] = firma.wartosc_magazynu_gr.get(k, 0) + grosze(ilosc * cena)
+        if lokale:  # partia z dniem dostawy (świeżość); magazyn do końca decyzji = stan + zamówione
+            dni = (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days
+            dzien = min(max(0, int(z.get("dzien") or 0)), dni - 1)
+            firma.partie.append(sw.nowa_partia(dane, z["zasob"], int(z["jakosc"]), ilosc, cena,
+                                               dane.data_rundy(runda) + timedelta(days=dzien), z["dostawca"], runda))
         zakupy[z["dostawca"]] = zakupy.get(z["dostawca"], 0.0) + ilosc * cena
         info["zakupy_zasobow"].setdefault(z["dostawca"], []).append({**z, "cena": cena, "wartosc": round(ilosc * cena, 2)})
     for dostawca, kwota in zakupy.items():
@@ -275,7 +283,7 @@ def gotowe_uslugi(dane: Dane, firma: Firma) -> dict[str, list[str]]:
         if u not in firma.ceny:
             b.append("nie jest włączone do sprzedaży (brak ceny)")
         for z in dane.uslugi[u]["zasoby"]:
-            if sum(firma.magazyn.get(f"{z}|{q}", 0) for q in (1, 2, 3)) <= 1e-9:
+            if sw.dostepne(dane, firma.magazyn, z) <= 1e-9:
                 b.append(f"brak składnika: {z}")
         braki[u] = b
     return braki
@@ -293,6 +301,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
 
     if lokal is not None:
         bledy_lokali(dane, firma, runda, lokal, dodaj)
+        for poziom, tekst in sw.ostrzezenia(dane, firma, runda):
+            dodaj(poziom, "swiezosc", tekst)
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

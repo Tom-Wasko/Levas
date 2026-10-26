@@ -39,8 +39,9 @@ def kasjerzy_potrzebni(dane: Dane, klienci: dict[str, float]) -> int:
 
 
 def zamowienie_zasobow(dane: Dane, firma: Firma, klienci: dict[str, float], ceny_dostawcow: dict, jakosc: int,
-                       zapas: float) -> list[dict]:
-    """Zamówienia (u najtańszych dostawców w danej jakości), żeby starczyło na `klienci` × zapas."""
+                       zapas: float, dni: list[float] | None = None) -> list[dict]:
+    """Zamówienia (u najtańszych dostawców w danej jakości), żeby starczyło na `klienci` × zapas.
+    dni – udziały dni rundy w popycie (gra z lokalami): dostawy rozbite na dni wg terminu przydatności."""
     potrzeba = {}
     for u, k in klienci.items():
         for z, ile in dane.uslugi[u]["zasoby"].items():
@@ -49,12 +50,36 @@ def zamowienie_zasobow(dane: Dane, firma: Firma, klienci: dict[str, float], ceny
     wynik = []
     for z, p in potrzeba.items():
         stan = sum(firma.magazyn.get(f"{z}|{q}", 0.0) for q in (1, 2, 3))
-        brak = math.ceil(max(0.0, p - stan) - 1e-9)
-        if brak <= 0:
-            continue
         q = jakosc
         while (z, str(q)) not in oferty and q > 1:
             q -= 1
-        if (z, str(q)) in oferty:
-            wynik.append({"dostawca": oferty[(z, str(q))][1], "zasob": z, "jakosc": q, "ilosc": brak})
+        if (z, str(q)) not in oferty:
+            continue
+        for dzien, brak in _dostawy(dane, z, p, stan, dni):
+            wynik.append({"dostawca": oferty[(z, str(q))][1], "zasob": z, "jakosc": q, "ilosc": brak,
+                          **({"dzien": dzien} if dni else {})})
+    return wynik
+
+
+def _dostawy(dane: Dane, zasob: str, potrzeba: float, stan: float, dni: list[float] | None) -> list[tuple[int, int]]:
+    """[(dzień, opakowania)]: bez podziału – jedna dostawa w poniedziałek; z podziałem – co `krok` dni (krótki termin
+    albo chłodnia / zamrażarka o ograniczonej pojemności), każda na dni do następnej dostawy. Zapas z magazynu
+    zmniejsza pierwszą dostawę; przy krótkim terminie resztka z dostawy nie przechodzi na następną (idzie do kosza)."""
+    if not dni:
+        brak = math.ceil(max(0.0, potrzeba - stan) - 1e-9)
+        return [(0, brak)] if brak > 0 else []
+    z = dane.zasoby[zasob]
+    termin = z.get("termin_dni") or len(dni)
+    krok = min(termin, len(dni))
+    if z.get("przechowywanie", "suche") != "suche":
+        krok = min(krok, 3)
+    przechodzi = krok < termin
+    suma = sum(dni) or 1.0
+    wynik, zapas = [], stan
+    for j in range(0, len(dni), krok):
+        ile = potrzeba * sum(dni[j:j + krok]) / suma - zapas
+        n = math.ceil(max(0.0, ile) - 1e-9)
+        zapas = max(0.0, n - ile) if przechodzi else 0.0
+        if n > 0:
+            wynik.append((j, n))
     return wynik

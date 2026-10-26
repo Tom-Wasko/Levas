@@ -23,9 +23,9 @@ def wspolczynnik_gwiazdek(gwiazdki: float, wsp: dict) -> float:
     return float(np.interp(g, [1, 2, 3], [wsp["1"], wsp["2"], wsp["3"]]))
 
 
-def mnoznik_jakosci(dane: Dane, pracownicy: float, sprzet: float, zasoby: float) -> float:
+def mnoznik_jakosci(dane: Dane, pracownicy: float, sprzet: float, zasoby: float, wagi: dict | None = None) -> float:
     p = dane.z["popyt"]
-    w, wsp = p["wagi_jakosci"], p["wspolczynniki_jakosci"]
+    w, wsp = wagi or p["wagi_jakosci"], p["wspolczynniki_jakosci"]
     return (w["pracownicy"] * wspolczynnik_gwiazdek(pracownicy, wsp) + w["sprzet"] * wspolczynnik_gwiazdek(sprzet, wsp)
             + w["zasoby"] * wspolczynnik_gwiazdek(zasoby, wsp)) / sum(w.values())
 

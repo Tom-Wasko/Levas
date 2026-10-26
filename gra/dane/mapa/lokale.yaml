@@ -23,6 +23,8 @@ zestawy:
         Rożen: 1
         Frytownica: 1
         Lodówka na napoje: 1
+        Szafa chłodnicza: 1
+        Zamrażarka: 1
     - typ: kasa
       sprzet:
         Kasa fiskalna: 1
@@ -37,6 +39,8 @@ zestawy:
         Rożen: 2
         Frytownica: 2
         Lodówka na napoje: 2
+        Szafa chłodnicza: 2
+        Zamrażarka: 2
     - typ: kasa
       sprzet:
         Kasa fiskalna: 2
@@ -51,6 +55,8 @@ zestawy:
         Rożen: 2
         Frytownica: 2
         Lodówka na napoje: 2
+        Szafa chłodnicza: 2
+        Zamrażarka: 2
     - typ: kuchnia
       sprzet:
         Rożen: 2

@@ -128,3 +128,21 @@ _brak_
   - nowa zakładka **Klienci i strefy** w menu pod Lokalami (Decyzje + Wyniki), szacunek klientów na kafelkach lokali,
   - sprawdzone: pytest (96) i ruff na zielono, `sprawdz` danych, zakładka wyrenderowana na prawdziwym widoku gry
     botów (bez błędów, bez `undefined`/`NaN`); gra 4 botów 26 tyg. – ok. 6 s.
+- 26.10 5:00 – F3a.5 gotowe: menu i świeżość. Decyzje **do potwierdzenia**:
+  - świeżość (partie, terminy, chłodnia) działa tylko w grze z lokalami; gra bez lokali i dane Revasa – jak dotąd,
+  - magazyn i pojemność chłodni/zamrażarki są wspólne dla całej firmy (suma sprzętu ze wszystkich lokali), nie
+    osobno dla lokalu; suchy magazyn bez limitu,
+  - terminy i litry składników (bułka 2 dni, warzywa 3, mięso 4, surówki 3, sosy 3 tyg., mrożonki miesiące) oraz
+    pojemności: szafa chłodnicza 600/800/1000 l, zamrażarka 250/300/400 l (wg jakości) – moje założenia, `zrodlo` w danych,
+  - nowe składniki: Pita mrożona i Mięso kebab mrożone – zamienniki używane dopiero po świeżych, kara −1★ jakości
+    składnika (poniżej 1★ nie schodzi); ceny i opakowania mrożonek – moje założenia,
+  - jakość dania = 0,5 składniki + 0,3 kucharze + 0,2 sprzęt (`dane/mapa/menu.yaml`), liczona raz na rundę,
+  - danie, któremu rano brakuje składnika, wypada z menu na ten dzień; połowa jego klientów (`zmiana_dania: 0.5`)
+    zamawia inne danie (proporcjonalnie do popytu), reszta odchodzi,
+  - nadmiar dostawy ponad pojemność chłodni – przepada od razu (powód „nie zmieściło się”),
+  - zamówienia w zakładce Dostawcy mają kolumny dni (Pn…Nd); „Zamów automatycznie” rozkłada dostawy jak boty:
+    chłodzone i mrożone co 3 dni, krótkoterminowe co termin,
+  - boty zamawiają według prognozy popytu, nie mocy obsługi – przy dużym popycie (bot agresywny) mięso się psuje
+    (do ok. 9 tys. zł strat tygodniowo); poprawię w kalibracji (krok 5) albo przy F3a.7 (grafiki),
+  - sprawdzone: pytest (102) i ruff na zielono, `sprawdz` danych, zakładki Magazyn i świeżość oraz Dostawcy
+    wyrenderowane na widoku prawdziwej gry (bez `undefined`/`NaN`).

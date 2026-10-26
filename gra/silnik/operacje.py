@@ -22,6 +22,7 @@ import math
 import numpy as np
 from scipy.optimize import linprog
 
+from . import swiezosc as sw
 from .dane import KASA, KUCHNIA, Dane
 from .losowosc import strumien
 from .model import Firma, Stanowisko
@@ -77,10 +78,9 @@ def jakosc_uslugi(dane: Dane, firma: Firma, usluga: str) -> tuple[float, float, 
         jak = [s.sprzet[n] for s in st for n in u["sprzet"]]
     sprz = float(np.mean(jak)) if jak else 3.0       # danie bez sprzętu (np. dodatek)
     zas = []
-    for nazwa in u["zasoby"]:
-        ilosci = {q: firma.magazyn.get(f"{nazwa}|{q}", 0.0) for q in (1, 2, 3)}
-        suma = sum(ilosci.values())
-        zas.append(sum(q * v for q, v in ilosci.items()) / suma if suma > EPS else 1.0)
+    for nazwa in u["zasoby"]:   # średnia gwiazdek zapasu; zamiennik (mrożonka) – z karą jakości
+        q = sw.jakosc_skladnika(dane, firma.magazyn, nazwa)
+        zas.append(1.0 if q is None else q)
     return prac, sprz, float(np.mean(zas)) if zas else 3.0
 
 
@@ -120,9 +120,10 @@ def _przydziel_godziny(potrzeby: dict[str, float], mozliwe: dict[str, list[int]]
 
 
 def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
-           skala_godzin: float = 1.0, klucze: tuple = ()) -> dict:
+           skala_godzin: float = 1.0, klucze: tuple = (), dzien: str | None = None) -> dict:
     """Ilu klientów firma obsłuży. Zmienia magazyn (zużycie). Zwraca szczegóły do wyników.
-    skala_godzin – część godzin rundy (obsługa dzień po dniu w popyt.py), klucze – do strumienia reklamacji."""
+    skala_godzin – część godzin rundy (obsługa dzień po dniu w popyt.py), klucze – do strumienia reklamacji,
+    dzien – data (ISO) w grze z lokalami: zużycie z partii dostarczonych do tego dnia (swiezosc.py)."""
     godz_prac = dane.z["operacje"]["godziny_pracownika"] * skala_godzin
     stanowiska = firma.stanowiska_typu(KUCHNIA)
     indeks = {s.nr: i for i, s in enumerate(stanowiska)}
@@ -156,7 +157,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
     # obsłużeni ∝ popyt · godziny^α, α ≈ −1,55, błąd 19% wobec 32% przy podziale proporcjonalnym; α = 0 – proporcjonalnie)
     alfa = dane.z["operacje"].get("braki_wykladnik_godzin", 0.0)
     for nazwa in sorted(potrzeba, key=lambda n: -potrzeba[n]):
-        dostepne = sum(firma.magazyn.get(f"{nazwa}|{q}", 0.0) for q in (1, 2, 3))
+        dostepne = sw.dostepne(dane, firma.magazyn, nazwa)
         na_kl = {u: dane.uslugi[u]["zasoby"][nazwa] / dane.zasoby[nazwa]["opakowanie"] for u in obsluzeni
                  if nazwa in dane.uslugi[u]["zasoby"] and obsluzeni[u] > 0}
         if sum(obsluzeni[u] * x for u, x in na_kl.items()) <= dostepne + EPS:
@@ -189,7 +190,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
     for u in obsluzeni:
         for nazwa, ile in dane.uslugi[u]["zasoby"].items():
             zuzycie[nazwa] = zuzycie.get(nazwa, 0.0) + (obsluzeni[u] + reklamacje[u]) * ile / dane.zasoby[nazwa]["opakowanie"]
-    zuzyte = _zuzyj(firma, zuzycie)
+    zuzyte = _zuzyj(dane, firma, zuzycie, dzien)
 
     # recepcja – po zużyciu zasobów: klienci utraceni przez brak recepcji zużyli już zasoby
     # (gra ATH: luty i maj – zużycie napoju = popyt + ok. 0,5%, a nie sprzedaż)
@@ -240,24 +241,34 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
     }
 
 
-def _zuzyj(firma: Firma, zuzycie: dict[str, float]) -> dict[str, dict]:
-    """Zdejmuje zużycie z magazynu (najpierw najwyższa jakość) i zwraca {zasób: {"ilosc", "wartosc"}}."""
+def _zuzyj(dane: Dane, firma: Firma, zuzycie: dict[str, float], dzien: str | None = None) -> dict[str, dict]:
+    """Zdejmuje zużycie z magazynu i zwraca {zasób: {"ilosc", "wartosc"}}: gra z lokalami – partie od najkrótszego
+    terminu (swiezosc.py), bez lokali – najpierw najwyższa jakość; po składniku podstawowym jego zamienniki."""
+    if firma.partie:
+        return sw.zuzyj(dane, firma, zuzycie, dzien)
     wynik = {}
     for nazwa, ile in zuzycie.items():
-        pozostalo, wartosc = ile, 0.0
-        for q in (3, 2, 1):
-            k = f"{nazwa}|{q}"
-            stan = firma.magazyn.get(k, 0.0)
-            if stan <= EPS or pozostalo <= EPS:
-                continue
-            bierz = min(stan, pozostalo)
-            wart = firma.wartosc_magazynu_gr.get(k, 0)
-            zdejmij = wart if stan - bierz <= EPS else round(wart * bierz / stan)
-            firma.magazyn[k] = stan - bierz
-            firma.wartosc_magazynu_gr[k] = wart - zdejmij
-            wartosc += zdejmij / 100
-            pozostalo -= bierz
-        wynik[nazwa] = {"ilosc": ile - max(pozostalo, 0.0), "wartosc": wartosc}
+        pozostalo = ile
+        for z in [nazwa] + sw.zamienniki(dane, nazwa):
+            mn = 1.0 if z == nazwa else sw.przelicznik(dane, z)
+            wartosc, wziete = 0.0, 0.0
+            for q in (3, 2, 1):
+                k = f"{z}|{q}"
+                stan = firma.magazyn.get(k, 0.0)
+                if stan <= EPS or pozostalo <= EPS:
+                    continue
+                bierz = min(stan, pozostalo / mn)
+                wart = firma.wartosc_magazynu_gr.get(k, 0)
+                zdejmij = wart if stan - bierz <= EPS else round(wart * bierz / stan)
+                firma.magazyn[k] = stan - bierz
+                firma.wartosc_magazynu_gr[k] = wart - zdejmij
+                wartosc += zdejmij / 100
+                wziete += bierz
+                pozostalo -= bierz * mn
+            if z == nazwa:
+                wynik[nazwa] = {"ilosc": ile - max(pozostalo, 0.0), "wartosc": wartosc}
+            elif wziete > EPS:
+                wynik[z] = {"ilosc": wziete, "wartosc": wartosc}
     return wynik
 
 

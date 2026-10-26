@@ -19,7 +19,9 @@ import numpy as np
 
 from . import karta as kw
 from . import lokale as lk
+from . import menu
 from . import popyt as pp
+from . import swiezosc as sw
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
 from .dostawcy import ceny_rundy
@@ -187,7 +189,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
                     dane.na_runde(z["finanse"]["utrzymanie_klubu"]))
 
-        zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach)
+        zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach, r)
         if sum(f.magazyn.values()) > 1e-6:
             ksieguj(f, ks, rach, "Koszt magazynowania", dane.na_runde(z["finanse"]["koszt_magazynowania"]))
         if f.bank:
@@ -209,6 +211,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
+                wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]
+                _straty_w_zasobach(wyniki[nazwa]["zasoby"], strefowy["swiezosc"][nazwa]["straty"])
 
     s.runda = r
     s.wyniki[r] = wyniki
@@ -221,7 +225,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     return s
 
 
-def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachunek) -> dict:
+def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachunek, runda: int = 0) -> dict:
     """Zwrot niezużytych zasobów kupionych w tej rundzie u dostawców z włączonym zwrotem.
 
     Jak w oficjalnej grze (gra A/B/C online, Vela – luty): wracają tylko całe nienaruszone opakowania z zakupu tej
@@ -236,10 +240,13 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
         for zk in zakupy:
             k = f"{zk['zasob']}|{int(zk['jakosc'])}"
             ile = math.floor(min(float(zk["ilosc"]), f.magazyn.get(k, 0.0)) + 1e-9)
+            if f.partie:  # gra z lokalami: całe opakowania z partii tej rundy od tego dostawcy
+                ile, _ = sw.zwroc(f, dostawca, zk["zasob"], int(zk["jakosc"]), runda, ile)
             if ile <= 0:
                 continue
-            f.magazyn[k] -= ile
-            f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
+            if not f.partie:
+                f.magazyn[k] -= ile
+                f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
             wartosc += ile * zk["cena"]
             wynik[zk["zasob"]] = wynik.get(zk["zasob"], 0.0) + ile
         if wartosc <= 0:
@@ -252,6 +259,18 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
         rach.zapisz(f, f"Zwrot zasobów do dostawcy: {dostawca}", round(wartosc, 2))
         ksieguj(f, ks, rach, f"Koszt zwrotu zasobów do dostawcy:  {dostawca}", wartosc * koszt)
     return wynik
+
+
+def _straty_w_zasobach(zasoby: list[dict], straty: list[dict]) -> None:
+    """Kolumna „straty” (przeterminowane i bez miejsca w chłodni) – przeniesiona z „wykorzystane”."""
+    for row in zasoby:
+        row["straty"] = 0.0
+    for s in straty:
+        row = next((x for x in zasoby if x["zasob"] == s["zasob"] and x["jakosc"] == s["jakosc"]), None)
+        if row:
+            przenies = min(s["ilosc"], row["wykorzystane"])
+            row["straty"] = round(row["straty"] + przenies, 3)
+            row["wykorzystane"] = round(row["wykorzystane"] - przenies, 3)
 
 
 def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, obsluga, oferty, rynek, start, zwroty,
@@ -352,7 +371,8 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
             ceny = [o["cena"] for o in (oferty or {}).get(u, {}).values()]
             return float(np.mean(ceny)) if ceny else v["cena_po_rabacie"]
         r_rynek = sum(v["sprzedaz"] * v["cena_po_rabacie"] / srednia_rynku(u, v) for u, v in sprzedane.items()) / klienci
-        q_sr = sum(v["sprzedaz"] * mnoznik_jakosci(dane, *v["jakosc"]) for v in sprzedane.values()) / klienci
+        jakosc = menu.jakosc_dania if f.lokale else (lambda dane, q: mnoznik_jakosci(dane, *q))
+        q_sr = sum(v["sprzedaz"] * jakosc(dane, v["jakosc"]) for v in sprzedane.values()) / klienci
         reklamacje = sum(v["reklamacje"] for v in sprzedane.values()) / klienci
     else:
         r_rynek, q_sr, reklamacje = 1.0, 0.0, 0.0

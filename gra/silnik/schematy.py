@@ -61,6 +61,14 @@ class Sprzet(Schemat):
     dla: Literal["kuchnia", "kasa"]
     ceny: dict[Jakosc, float]
     utrzymanie: dict[Jakosc, float]
+    przechowywanie: Literal["chlodnia", "zamrazarka"] | None = None   # miejsce na składniki (gra z lokalami)
+    pojemnosc_l: dict[Jakosc, float] | None = None
+
+    @model_validator(mode="after")
+    def _pojemnosc(self):
+        if (self.przechowywanie is None) != (self.pojemnosc_l is None):
+            raise ValueError("przechowywanie i pojemnosc_l podaje się razem")
+        return self
 
 
 class PlikSprzetu(Plik):
@@ -68,6 +76,11 @@ class PlikSprzetu(Plik):
 
 
 class Zasob(Schemat):
+    przechowywanie: Literal["chlodnia", "zamrazarka", "suche"] = "suche"
+    termin_dni: int | None = Field(default=None, ge=1)   # razem z dniem dostawy; brak = bez terminu
+    miejsce_l: float = Field(default=0, ge=0)              # litry opakowania w chłodni / zamrażarce
+    zamiennik_dla: str | None = None
+    kara_jakosci: float = Field(default=0, ge=0, le=2)    # gwiazdki mniej, gdy zastępuje składnik podstawowy
     opakowanie: float = Field(gt=0)
     jednostka: str
     typ_opakowania: str
@@ -505,6 +518,17 @@ class WydarzenieKalendarza(Schemat):
     strefy: dict[str, float] = Field(min_length=1)
 
 
+class WagiJakosciDania(Schemat):
+    skladniki: float = Field(ge=0)
+    kucharze: float = Field(ge=0)
+    sprzet: float = Field(ge=0)
+
+
+class PlikMenu(Plik):
+    jakosc: WagiJakosciDania
+    zmiana_dania: float = Field(ge=0, le=1)
+
+
 class PlikPopytu(Plik):
     model: ModelPopytu
     dni_tygodnia: DniTygodnia
@@ -517,6 +541,7 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "lokale.yaml": PlikLokali,
     "budynki.yaml": PlikBudynkow,
     "popyt.yaml": PlikPopytu,
+    "menu.yaml": PlikMenu,
 }
 
 SCHEMATY: dict[str, type[BaseModel]] = {

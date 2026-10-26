@@ -101,6 +101,20 @@ class Lokal(Model):
     cena = _kwota("cena")
 
 
+class Partia(Model):
+    """Dostawa składnika w grze z lokalami (silnik/swiezosc.py): zużywana od najkrótszego terminu (FIFO)."""
+    zasob: str
+    jakosc: int
+    ilosc: float                  # opakowania (pozostało)
+    wartosc_gr: int               # wartość pozostałej ilości
+    dostawa: str                  # data dostawy (ISO) – od rana tego dnia partia jest w lokalu
+    termin: str | None = None     # ostatni dzień użycia (ISO); wieczorem tego dnia partia idzie do kosza
+    dostawca: str = ""
+    runda: int = 0                # runda zakupu (zwrot nadmiaru)
+
+    wartosc = _kwota("wartosc")
+
+
 class Lokata(Model):
     id: int
     kwota_gr: int
@@ -143,6 +157,7 @@ class Firma(Model):
     pracownicy: dict[str, Pracownik] = Field(default_factory=dict)
     magazyn: dict[str, float] = Field(default_factory=dict)           # "zasób|jakość" → opakowania
     wartosc_magazynu_gr: dict[str, int] = Field(default_factory=dict) # "zasób|jakość" → grosze (średni koszt)
+    partie: list[Partia] = Field(default_factory=list)                # gra z lokalami: dostawy z terminami
     oferta: dict[str, int] = Field(default_factory=dict)              # usługa → prognoza popytu na miesiąc
     uslugi_kiedykolwiek: list[str] = Field(default_factory=list)
     ceny: dict[str, Cena] = Field(default_factory=dict)               # usługa → cena i rabat

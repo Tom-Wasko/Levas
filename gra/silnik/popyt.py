@@ -13,6 +13,8 @@ Klienci strefy wybierają lokal (model logitowy z opcją zewnętrzną A_0 – ba
 Dwa lokale w jednej strefie dzielą tę samą pulę; lokal łapie też klientów sąsiednich stref, słabiej z odległością
 (środki stref na siatce mapy). Obsługa – dzień po dniu w każdym lokalu (operacje.obsluz: godziny pracowników
 i sprzętu rundy rozłożone równo na dni), więc szczyt w piątek przy zbyt małej obsadzie to utracona sprzedaż.
+Dzień firmy (F3a.5): rano dostawy (swiezosc.przyjmij), dania bez składnika wyłączone – część klientów bierze inne
+danie (menu.przenies), obsługa w lokalach, wieczorem przeterminowane partie do kosza (swiezosc.wyrzuc).
 Reklama: na razie mnożniki Revasa (rynek.py), własny model reklamy – krok F3b.
 """
 from __future__ import annotations
@@ -22,11 +24,12 @@ from datetime import date, timedelta
 
 import numpy as np
 
+from . import menu
+from . import swiezosc as sw
 from .dane import Dane
 from .losowosc import strumien
 from .model import Firma
 from .operacje import jakosc_uslugi, kasjerzy, obsluz
-from .rynek import mnoznik_jakosci
 
 WSZYSTKIE = "wszystkie"   # klucz kalendarza: każda strefa
 
@@ -117,7 +120,7 @@ def atrakcyjnosc(dane: Dane, strefa_klienta: str, usluga: str, o: dict) -> float
     p = dane.mapa["popyt"]
     ps = p["strefy"][strefa_klienta]
     r = o["cena"] / (dane.uslugi[usluga]["cena_preferowana"] * ps["cena"])
-    return (mnoznik_jakosci(dane, *o["jakosc"]) * math.exp(-p["model"]["elastycznosc_ceny"] * ps["wrazliwosc_ceny"] * (r - 1))
+    return (menu.jakosc_dania(dane, o["jakosc"]) * math.exp(-p["model"]["elastycznosc_ceny"] * ps["wrazliwosc_ceny"] * (r - 1))
             * math.exp(-odleglosc(dane, strefa_klienta, o["strefa"]) / p["model"]["zasieg"])
             * o.get("zadowolenie", 1.0) * o.get("wyposazenie", 1.0) * (1 + o.get("reklama", 0.0)) * o.get("mnoznik_firmy", 1.0))
 
@@ -165,7 +168,8 @@ def oferty_lokali(dane: Dane, firma: Firma, runda: int, ceny: dict[str, float], 
 def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str, dict]], runda: int, ziarno) -> dict:
     """Popyt i obsługa w grze z lokalami. oferty: {firma: {lokal: {danie: oferta}}} (z `oferty_lokali`).
     Zwraca {"popyt": {firma: {danie: n}}, "obsluga": {firma: wynik jak operacje.obsluz}, "klienci": {firma: …},
-    "rynek": {danie: {firma: {"popyt", "skladniki"}}}, "strefy": {…}} – dane do wyników i zakładki „Klienci”."""
+    "rynek": {danie: {firma: {"popyt", "skladniki"}}}, "strefy": {…}, "swiezosc": {firma: …}} – dane do wyników
+    i zakładek „Klienci” oraz „Magazyn i świeżość”."""
     dni = dni_rundy(dane, runda)
     pr = pule(dane, runda, ziarno)
     po_daniach: dict = {}
@@ -175,7 +179,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                 po_daniach.setdefault(u, {})[(f, lok)] = o
     pod = podzial(dane, pr, po_daniach)
 
-    popyt, obsluga, klienci, rynek = {}, {}, {}, {}
+    popyt, obsluga, klienci, rynek, swiezosc = {}, {}, {}, {}, {}
     zrodla: dict[str, dict[str, float]] = {}
     for f, lokale in oferty.items():
         firma = firmy[f]
@@ -188,12 +192,31 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                        for lok, dania in lokale.items()}
         widoki = {lok: widok_lokalu(firma, lok) for lok in lokale}
         sprzedaz_lokalu = {lok: 0 for lok in lokale}
+        raport = _raport_swiezosci(dane, firma, dni)
         for i in range(len(dni)):
+            dzien = dni[i].isoformat()
+            if firma.partie:
+                przyjete, straty = sw.przyjmij(dane, firma, dzien)
+                for z, ile in przyjete.items():
+                    raport["zasoby"].setdefault(z, _wiersz(len(dni)))["dostawy"][i] += ile
+                _dodaj_straty(raport, straty, i, len(dni))
             for lok in lokale:
                 d = dzien_popyt[lok][i]
                 if not any(d.values()):
                     continue
-                o = obsluz(dane, widoki[lok], d, ziarno, runda, skala_godzin=1 / len(dni), klucze=(lok, i))
+                wyl = menu.wylaczone(dane, firma.magazyn, [u for u in d if d[u]])
+                if wyl:
+                    d, przeszli = menu.przenies(dane, d, wyl)
+                    dzien_popyt[lok][i] = d
+                    for u, n in przeszli.items():
+                        z = raport["zamiany"].setdefault(u, {"przeszli": 0, "odeszli": 0})
+                        z["przeszli"] += n
+                        z["odeszli"] += d[u]
+                        raport["wylaczone"].append({"data": dzien, "lokal": lok, "danie": u, "skladnik": wyl[u]})
+                o = obsluz(dane, widoki[lok], d, ziarno, runda, skala_godzin=1 / len(dni), klucze=(lok, i),
+                           dzien=dzien if firma.partie else None)
+                for n, z in o["zuzyte_zasoby"].items():
+                    raport["zasoby"].setdefault(n, _wiersz(len(dni)))["zuzycie"][i] += z["ilosc"]
                 for u, k in o["obsluzeni"].items():
                     laczna["obsluzeni"][u] = laczna["obsluzeni"].get(u, 0) + k
                     laczna["utracona"][u] = laczna["utracona"].get(u, 0) + o["utracona"][u]
@@ -212,6 +235,11 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     for k, h in o[klucz].items():
                         laczna[klucz][k] = laczna[klucz].get(k, 0.0) + h
                 laczna["godziny_recepcji"] += o["godziny_recepcji"]
+            if firma.partie:
+                _dodaj_straty(raport, sw.wyrzuc(firma, dzien), i, len(dni))
+                raport["zajetosc"].append(sw.zajete(dane, firma, dzien))
+        sw.uzgodnij(firma)
+        swiezosc[f] = _zakoncz_raport(raport)
         laczna["liczba_recepcjonistow"] = sum(len(kasjerzy(dane, v)) for v in widoki.values())
         laczna["przyczyna"] = {u: max(p, key=p.get) for u, p in przyczyny.items()}
         for u in dzienne:
@@ -245,8 +273,32 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         dzien = [int(round(sum(pz[u][i] for u in pz))) for i in range(len(dni))]
         strefy[z] = {"pula": sum(dzien), "dni": dzien,
                      "klienci": {f: int(round(x)) for f, x in sorted(zrodla.get(z, {}).items())}}
-    return {"popyt": popyt, "obsluga": obsluga, "klienci": klienci, "rynek": rynek,
+    return {"popyt": popyt, "obsluga": obsluga, "klienci": klienci, "rynek": rynek, "swiezosc": swiezosc,
             "strefy": {"strefy": strefy, "dni": [d.isoformat() for d in dni], "wydarzenia": wydarzenia(dane, dni)}}
+
+
+def _wiersz(n: int) -> dict:
+    return {"dostawy": [0.0] * n, "zuzycie": [0.0] * n, "straty": [0.0] * n}
+
+
+def _raport_swiezosci(dane: Dane, firma: Firma, dni: list[date]) -> dict:
+    return {"dni": [d.isoformat() for d in dni], "zasoby": {}, "straty": [], "zamiany": {}, "wylaczone": [],
+            "pojemnosc": sw.pojemnosc(dane, firma), "zajetosc": []}
+
+
+def _dodaj_straty(raport: dict, straty: list[dict], i: int, n: int) -> None:
+    raport["straty"].extend(straty)
+    for s in straty:
+        raport["zasoby"].setdefault(s["zasob"], _wiersz(n))["straty"][i] += s["ilosc"]
+
+
+def _zakoncz_raport(raport: dict) -> dict:
+    for w in raport["zasoby"].values():
+        for k in w:
+            w[k] = [round(x, 3) for x in w[k]]
+    raport["wartosc_strat"] = round(sum(s["wartosc"] for s in raport["straty"]), 2)
+    raport["zajetosc"] = [{k: round(v, 1) for k, v in z.items()} for z in raport["zajetosc"]]
+    return raport
 
 
 def prognoza(dane: Dane, runda: int, oferty: dict[str, dict[str, dict]], firma: str) -> dict:

@@ -1,11 +1,17 @@
 # Składniki (w kodzie: zasoby)
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Składniki dań (w kodzie silnika: zasoby): opakowanie, jednostka, typ opakowania, średnie ceny. Kolejność = kolejność
-  w raportach.'
-zrodlo: notatki/Menu i składniki.md (receptury i ceny rynkowe brutto ze starego Levasa); ceny hurtowe – założenie F2.6 (rząd
-  wielkości cen hurtowni gastronomicznych)
+  w raportach. Świeżość (gra z lokalami, F3a.5): przechowywanie (chlodnia, zamrazarka, suche), termin_dni – ile dni
+  partia nadaje się do użycia razem z dniem dostawy (brak = bez terminu), miejsce_l – litry jednego opakowania w chłodni
+  lub zamrażarce; zamiennik_dla – składnik używany, gdy zabraknie podstawowego (jakość niższa o kara_jakosci gwiazdek).'
+zrodlo: notatki/Menu i składniki.md (receptury i ceny rynkowe brutto ze starego Levasa, terminy ważności); ceny hurtowe –
+  założenie F2.6 (rząd wielkości cen hurtowni gastronomicznych); objętości opakowań i ceny mrożonek (ok. 80% świeżych) –
+  założenie F3a.5
 zasoby:
   Bułka:
+    przechowywanie: suche
+    termin_dni: 2
+    miejsce_l: 25
     opakowanie: 50
     jednostka: szt.
     typ_opakowania: worek
@@ -14,6 +20,9 @@ zasoby:
       '2': 45
       '3': 52
   Tortilla:
+    przechowywanie: suche
+    termin_dni: 30
+    miejsce_l: 3
     opakowanie: 18
     jednostka: szt.
     typ_opakowania: opakowanie
@@ -22,6 +31,9 @@ zasoby:
       '2': 24
       '3': 28
   Pita:
+    przechowywanie: suche
+    termin_dni: 2
+    miejsce_l: 20
     opakowanie: 50
     jednostka: szt.
     typ_opakowania: worek
@@ -29,7 +41,23 @@ zasoby:
       '1': 45
       '2': 50
       '3': 58
+  Pita mrożona:
+    przechowywanie: zamrazarka
+    termin_dni: 60
+    miejsce_l: 20
+    zamiennik_dla: Pita
+    kara_jakosci: 1
+    opakowanie: 50
+    jednostka: szt.
+    typ_opakowania: worek
+    srednie_ceny:
+      '1': 36
+      '2': 40
+      '3': 46
   Mięso kebab:
+    przechowywanie: chlodnia
+    termin_dni: 4
+    miejsce_l: 15
     opakowanie: 10000
     jednostka: g
     typ_opakowania: stożek
@@ -37,7 +65,23 @@ zasoby:
       '1': 290
       '2': 330
       '3': 390
+  Mięso kebab mrożone:
+    przechowywanie: zamrazarka
+    termin_dni: 90
+    miejsce_l: 15
+    zamiennik_dla: Mięso kebab
+    kara_jakosci: 1
+    opakowanie: 10000
+    jednostka: g
+    typ_opakowania: stożek
+    srednie_ceny:
+      '1': 250
+      '2': 285
+      '3': 335
   Warzywa:
+    przechowywanie: chlodnia
+    termin_dni: 5
+    miejsce_l: 20
     opakowanie: 5000
     jednostka: g
     typ_opakowania: skrzynka
@@ -46,6 +90,9 @@ zasoby:
       '2': 36
       '3': 44
   Surówki:
+    przechowywanie: chlodnia
+    termin_dni: 4
+    miejsce_l: 6
     opakowanie: 5000
     jednostka: g
     typ_opakowania: wiadro
@@ -54,6 +101,9 @@ zasoby:
       '2': 48
       '3': 58
   Sos:
+    przechowywanie: chlodnia
+    termin_dni: 21
+    miejsce_l: 6
     opakowanie: 5000
     jednostka: g
     typ_opakowania: wiadro
@@ -62,6 +112,9 @@ zasoby:
       '2': 72
       '3': 88
   Frytki mrożone:
+    przechowywanie: zamrazarka
+    termin_dni: 180
+    miejsce_l: 20
     opakowanie: 10000
     jednostka: g
     typ_opakowania: karton
@@ -70,6 +123,9 @@ zasoby:
       '2': 72
       '3': 85
   Falafel mrożony:
+    przechowywanie: zamrazarka
+    termin_dni: 120
+    miejsce_l: 4
     opakowanie: 100
     jednostka: szt.
     typ_opakowania: karton
@@ -78,6 +134,9 @@ zasoby:
       '2': 82
       '3': 98
   Hummus:
+    przechowywanie: chlodnia
+    termin_dni: 7
+    miejsce_l: 2.5
     opakowanie: 2000
     jednostka: g
     typ_opakowania: pojemnik
@@ -86,6 +145,9 @@ zasoby:
       '2': 44
       '3': 54
   Ser i dodatki:
+    przechowywanie: chlodnia
+    termin_dni: 14
+    miejsce_l: 2.5
     opakowanie: 2000
     jednostka: g
     typ_opakowania: pojemnik
@@ -94,6 +156,9 @@ zasoby:
       '2': 60
       '3': 72
   Napój:
+    przechowywanie: suche
+    termin_dni: 180
+    miejsce_l: 10
     opakowanie: 24
     jednostka: szt.
     typ_opakowania: zgrzewka
@@ -102,6 +167,8 @@ zasoby:
       '2': 60
       '3': 70
   Opakowanie:
+    przechowywanie: suche
+    miejsce_l: 30
     opakowanie: 500
     jednostka: szt.
     typ_opakowania: karton
@@ -110,6 +177,8 @@ zasoby:
       '2': 80
       '3': 95
   Box:
+    przechowywanie: suche
+    miejsce_l: 40
     opakowanie: 300
     jednostka: szt.
     typ_opakowania: karton

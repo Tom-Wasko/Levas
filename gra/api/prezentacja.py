@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from silnik import swiezosc
 from silnik.dane import Dane
 from silnik.decyzje import (
     cena_sprzedazy_sprzetu,
@@ -145,6 +146,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
         zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
         v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
+        v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
     return v
 
 

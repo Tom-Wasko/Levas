@@ -58,10 +58,11 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
     if not (katalog / "strefy.yaml").exists():
         return None
-    st, lo, bu, po = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    st, lo, bu, po, me = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
-            "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po}}
+            "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po},
+            "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")}}
 
 
 class Dane:
@@ -232,6 +233,14 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
                 brak(z, f"uslugi.yaml: {u}", "zasób", "zasoby.yaml")
         if x["prowadzacy"] not in d.zawody_typu(KUCHNIA):
             brak(x["prowadzacy"], f"uslugi.yaml: {u}", "zawód kuchni", "katalog.yaml: stanowiska.typy")
+    for z, x in d.zasoby.items():
+        g = x.get("zamiennik_dla")
+        if g is None:
+            continue
+        if g not in d.zasoby or d.zasoby[g].get("zamiennik_dla"):
+            brak(g, f"zasoby.yaml: {z}.zamiennik_dla", "zasób podstawowy", "zasoby.yaml")
+        elif d.zasoby[g]["jednostka"] != x["jednostka"]:
+            bledy.append(f"zasoby.yaml: {z}: zamiennik musi mieć tę samą jednostkę co {g}")
     for m, ceny in d.dostawcy.items():
         if m not in MIESIACE:
             brak(m, "dostawcy.yaml: ceny", "miesiąc", "MIESIACE")
