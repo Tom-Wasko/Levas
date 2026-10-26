@@ -122,7 +122,8 @@ class Partia(Model):
     dostawa: str                  # data dostawy (ISO) – od rana tego dnia partia jest w lokalu
     termin: str | None = None     # ostatni dzień użycia (ISO); wieczorem tego dnia partia idzie do kosza
     dostawca: str = ""
-    runda: int = 0                # runda zakupu (zwrot nadmiaru)
+    runda: int = 0                # runda zakupu
+    wynajem: bool = False         # w wynajętej chłodni (nie zmieściło się we własnej) – nie zajmuje własnego miejsca
 
     wartosc = _kwota("wartosc")
 

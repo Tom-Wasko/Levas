@@ -48,6 +48,8 @@ vat:
     stawka: 0.23
   - zawiera: Koszt magazynowania
     stawka: 0.23
+  - zawiera: Wynajem chłodni
+    stawka: 0.23
   - zawiera: biura rachunkowego
     stawka: 0.23
   - zawiera: Obsługa kadrowo-płacowa

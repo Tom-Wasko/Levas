@@ -5,7 +5,8 @@ Runda r = miesiąc r (1 = styczeń). Kolejność jak w KPiR i banku gry:
     widzi pełną listę kandydatów – ta sama osoba może pracować w kilku firmach, jak w grze A/B/C),
  2. bank: nowe lokaty i kredyty, zerwania, spłaty,
  3. od rundy 2: popyt rynku → obsługa klientów → przychody,
- 4. koszty miesiąca: pensje + ZUS, utrzymanie (klub, sprzęt, udogodnienia, wyposażenie, internet), zwroty,
+ 4. koszty miesiąca: pensje + ZUS, utrzymanie (klub, sprzęt, udogodnienia, wyposażenie, internet), zwroty (w grze
+    z lokalami zamiast zwrotów i kosztu magazynowania – wynajęta chłodnia i sanepid, silnik/magazyn.py),
     magazynowanie, bank (opłaty, odsetki, lokaty), biuro rachunkowe,
  5. podatek, kredyt odnawialny przy braku gotówki,
  6. karta wyników (od rundy 2; w grze widoczna od rundy 3).
@@ -23,11 +24,11 @@ from . import czas_wlasciciela as cw
 from . import karta as kw
 from . import lichwiarz as lw
 from . import lokale as lk
+from . import magazyn as mag
 from . import menu
 from . import popyt as pp
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
-from . import swiezosc as sw
 from . import zdarzenia as zd
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
@@ -245,9 +246,14 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             ksieguj(f, ks, rach, f"{dane.okres['przymiotnik']} koszt utrzymania lokalu",
                     dane.na_runde(z["finanse"]["utrzymanie_klubu"]))
 
-        zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach, r)
-        if sum(f.magazyn.values()) > 1e-6:
-            ksieguj(f, ks, rach, "Koszt magazynowania", dane.na_runde(z["finanse"]["koszt_magazynowania"]))
+        if tryb_lokali:   # bez zwrotów i kosztu magazynowania: wynajęta chłodnia i kontrola sanepidu
+            zwroty = {}
+            info[nazwa]["magazyn"] = mag.koniec_rundy(dane, f, r, ziarno, (strefowy or {}).get("swiezosc", {}).get(nazwa) or {},
+                                                      ks, rach)
+        else:
+            zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach, r)
+            if sum(f.magazyn.values()) > 1e-6:
+                ksieguj(f, ks, rach, "Koszt magazynowania", dane.na_runde(z["finanse"]["koszt_magazynowania"]))
         bank_koniec = None
         if tryb_lokali:
             bank_koniec = bk.koniec_rundy(dane, f, r, ks, rach)
@@ -288,6 +294,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
             wyniki[nazwa]["zdarzenia"] = info[nazwa].get("zdarzenia")
+            wyniki[nazwa]["magazyn"] = info[nazwa].get("magazyn")
             wyniki[nazwa]["biuro"] = info[nazwa].get("biuro")
             wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")
             wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej
@@ -301,6 +308,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
                 wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]
+                mag.dolicz_oddane(strefowy["swiezosc"][nazwa], (info[nazwa].get("zdarzenia") or {}).get("oddane"))
                 _straty_w_zasobach(wyniki[nazwa]["zasoby"], strefowy["swiezosc"][nazwa]["straty"])
 
     s.runda = r
@@ -315,7 +323,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
 
 
 def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachunek, runda: int = 0) -> dict:
-    """Zwrot niezużytych zasobów kupionych w tej rundzie u dostawców z włączonym zwrotem.
+    """Zwrot niezużytych zasobów kupionych w tej rundzie u dostawców z włączonym zwrotem (gra bez lokali).
 
     Jak w oficjalnej grze (gra A/B/C online, Vela – luty): wracają tylko całe nienaruszone opakowania z zakupu tej
     rundy (3 kupione, zużyte 0,1 → zwrot 2), pozycja zakupu w KPiR maleje o ich wartość, osobna pozycja „Koszt zwrotu
@@ -329,14 +337,10 @@ def _zwroty(dane: Dane, f: Firma, d: dict, info: dict, ks: Ksiega, rach: Rachune
         for zk in zakupy:
             k = f"{zk['zasob']}|{int(zk['jakosc'])}"
             ile = math.floor(min(float(zk["ilosc"]), f.magazyn.get(k, 0.0)) + 1e-9)
-            z_partii = bool(f.partie)   # przed zwrotem – zwrot może zabrać ostatnią partię
-            if z_partii:  # gra z lokalami: całe opakowania z partii tej rundy od tego dostawcy
-                ile, _ = sw.zwroc(f, dostawca, zk["zasob"], int(zk["jakosc"]), runda, ile)
             if ile <= 0:
                 continue
-            if not z_partii:
-                f.magazyn[k] -= ile
-                f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
+            f.magazyn[k] -= ile
+            f.wartosc_magazynu_gr[k] = max(0, f.wartosc_magazynu_gr.get(k, 0) - grosze(ile * zk["cena"]))
             wartosc += ile * zk["cena"]
             sv = rz.stawka_zasobu(dane, zk["zasob"]) or 0.0
             stawki[sv] = stawki.get(sv, 0.0) - ile * zk["cena"]

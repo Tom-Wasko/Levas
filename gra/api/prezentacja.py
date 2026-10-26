@@ -7,6 +7,7 @@ from silnik import banki as bk
 from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
 from silnik import lichwiarz as lw
+from silnik import magazyn as mag
 from silnik import rozliczenie as rz
 from silnik import rynek_pracy as rp
 from silnik import swiezosc
@@ -177,6 +178,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
         v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
         v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
+        przet = sum(x["wartosc"] for x in ((v.get("wyniki") or {}).get("swiezosc") or {}).get("straty", []) if x["powod"] == "termin")
+        v["magazyn"] = mag.ryzyko(dane, f, runda, przet)
         v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
         v["srodki_trwale"] = ewidencja(f)
         v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja

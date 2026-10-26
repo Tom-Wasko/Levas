@@ -15,6 +15,7 @@ function skutekTekst(s) {
   if (s.typ === "gotowka") return `${esc(s.opis)}: <span class="${s.kwota >= 0 ? "plus" : "minus"}">${zl2(s.kwota)}</span>`;
   if (s.typ === "popyt") return `${esc(s.opis)}: popyt ${s.mnoznik >= 1 ? "+" : ""}${proc(s.mnoznik - 1, 0)} przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
   if (s.typ === "czas") return `${esc(s.opis)}: ${licz(s.godziny, 1)} h właściciela mniej przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
+  if (s.typ === "oddaj_zapas") return `${esc(s.opis)}${s.oddane ? `: ${zl2(s.oddane)}` : ""} – znika z zaplecza (bez kosztu w KPiR, był kosztem przy zakupie)`;
   if (s.typ === "kandydat") return `${esc(s.opis)}: ${esc(s.kandydat.imie_nazwisko)} czeka na <a data-zakladka-k="rynek_pracy">rynku pracy</a>`;
   return esc(s.opis);
 }
@@ -30,7 +31,7 @@ function scenaHtml(s, wybor, edycja) {
         style="text-align:left;margin:4px 0;width:100%">${etykieta}</button>`
       : `<div class="wiersz"><span>${wybrana ? "▶ " : ""}${etykieta}</span></div>`;
   }).join("");
-  return `<div class="karta">${naglowek(s)}<p class="podpowiedz">${s.nowa ? "Nowe wydarzenie w parku" : "Ciąg dalszy"}</p>
+  return `<div class="karta">${naglowek(s)}<p class="podpowiedz">${s.nowa ? (s.park ? "Nowe wydarzenie w parku" : "Nowe wydarzenie w lokalu") : "Ciąg dalszy"}</p>
     <p>${esc(s.tekst)}</p>${opcje}${skutkiHtml(s.skutki)}</div>`;
 }
 
@@ -43,7 +44,7 @@ function efektyHtml(E) {
 function rozegranaHtml(w) {
   return `<div class="karta">${naglowek(w)}<p>${esc(w.tekst)}</p>
     ${w.opcja ? `<p><b>${w.domyslna ? "Reakcja (domyślna)" : "Twoja reakcja"}:</b> ${esc(w.opcja_tekst)} <small>– ${kosztTekst(w.koszt)}</small></p>
-      <p>${esc(w.wynik)}</p>` : ""}${skutkiHtml(w.skutki)}
+      <p>${esc(w.wynik)}</p>` : ""}${skutkiHtml(w.skutki?.map((s) => s.typ === "oddaj_zapas" ? { ...s, oddane: w.oddane } : s))}
     ${w.ciag_dalszy ? `<p class="podpowiedz">Ciąg dalszy nastąpi (runda ${w.ciag_dalszy}).</p>` : ""}</div>`;
 }
 

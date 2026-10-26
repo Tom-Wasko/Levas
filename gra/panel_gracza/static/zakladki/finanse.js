@@ -13,7 +13,7 @@ const GRUPY = [
   ["Utrzymanie sprzętu, udogodnień i wyposażenia", (p) => /^Koszty utrzymania/.test(p.opis) ? p.pozostale : 0],
   ["Marketing", (p) => /reklam/i.test(p.opis) ? p.pozostale : 0],
   ["Szkolenia", (p) => p.opis.startsWith("Szkolenie") ? p.pozostale : 0],
-  ["Utrzymanie lokalu i magazynu", (p) => /utrzymania lokalu|magazynowania/.test(p.opis) ? p.pozostale : 0],
+  ["Utrzymanie lokalu i magazynu", (p) => /utrzymania lokalu|magazynowania|^Wynajem chłodni/.test(p.opis) ? p.pozostale : 0],
   ["Bank (opłaty, odsetki)", (p) => /^(Opłata za konto|Odsetki)/.test(p.opis) ? p.pozostale : 0],
   ["Biuro rachunkowe", (p) => /biura rachunkowego|kadrowo/.test(p.opis) ? p.pozostale : 0],
 ];

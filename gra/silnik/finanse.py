@@ -103,7 +103,8 @@ class Ksiega:
 RODZAJE_OPERACJI = {"kpir": "Zapisy w KPiR", "korekta": "Korekty zapisów w KPiR (zwroty zasobów)",
                     "podatki": "Podatki i składki", "inwestycje": "Inwestycje (lokale, budowa, środki trwałe)",
                     "kredyty": "Kredyty", "lokaty": "Lokaty", "kaucje": "Kaucje za lokale",
-                    "harpagon": "Harpagon (poza księgami)"}
+                    "harpagon": "Harpagon (poza księgami)",
+                    "kary": "Mandaty i kary (poza KPiR – nie są kosztem podatkowym)"}
 
 
 @dataclass

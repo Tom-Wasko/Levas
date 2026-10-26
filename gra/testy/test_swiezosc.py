@@ -38,12 +38,39 @@ def test_termin_fifo_i_kosz():
     assert sw.ilosc(f.magazyn, "Bułka") == pytest.approx(1) and f.partie == [nowa]
 
 
-def test_pojemnosc_chlodni():
+def test_wynajem_chlodni():
+    """Nadmiar ponad chłodnię lokalu jedzie do wynajętej chłodni: 1 zł/l, termin krótszy o 2 dni, bez straty."""
+    dane = dane_domyslne()
+    f = Firma(nazwa="A", stanowiska=[Stanowisko(nr=1, typ=KUCHNIA, sprzet={"Szafa chłodnicza": 1})])
+    f.partie = [_partia(dane, "Mięso kebab", 50, PN), _partia(dane, "Frytki mrożone", 1, PN), _partia(dane, "Tortilla", 100, PN)]
+    przyjete, straty, wynajete = sw.przyjmij(dane, f, PN.isoformat())
+    assert straty == [] and przyjete["Mięso kebab"] == pytest.approx(50)
+    po = {w["zasob"]: w for w in wynajete}
+    assert po["Mięso kebab"]["ilosc"] == pytest.approx(10) and po["Mięso kebab"]["litry"] == pytest.approx(150)   # 750 l do 600 l
+    assert po["Mięso kebab"]["koszt"] == pytest.approx(150) and po["Mięso kebab"]["termin"] == "2026-10-13"        # 15.10 − 2 dni
+    assert po["Frytki mrożone"]["litry"] == pytest.approx(20) and "Tortilla" not in po   # bez zamrażarki; suche – bez limitu
+    assert sw.zajete(dane, f, PN.isoformat())["chlodnia"] == pytest.approx(600)          # wynajęta – poza własną chłodnią
+    assert sw.ilosc(f.magazyn, "Mięso kebab") == pytest.approx(50)
+    assert sorted(p.wynajem for p in f.partie if p.zasob == "Mięso kebab") == [False, True]
+    # w kolejnej dostawie wynajęta partia nie zabiera miejsca, a zużywa się pierwsza (krótszy termin)
+    zuzyte = sw.zuzyj(dane, f, {"Mięso kebab": 10}, PN.isoformat())
+    assert zuzyte["Mięso kebab"]["ilosc"] == pytest.approx(10) and not [p for p in f.partie if p.wynajem and p.zasob == "Mięso kebab"]
+    f2 = Firma(nazwa="B", stanowiska=f.stanowiska, partie=[_partia(dane, "Mięso kebab", 50, PN, runda=2)])
+    assert [p for p, _ in sw.ostrzezenia(dane, f2, 2)] == ["pomaranczowy"]
+    assert sw.plan_wynajmu(dane, f2, 2)[0]["litry"] == pytest.approx(150)
+    f3 = Firma(nazwa="C", partie=[_partia(dane, "Mięso kebab", 1, PN, runda=2)])
+    assert [p for p, t in sw.ostrzezenia(dane, f3, 2)] == ["pomaranczowy"] and "wynajętej" in sw.ostrzezenia(dane, f3, 2)[0][1]
+
+
+def test_pojemnosc_chlodni_bez_wynajmu(monkeypatch):
+    """Dane bez wynajętej chłodni (F3a.5): nadmiar to strata."""
+    monkeypatch.setattr(sw, "wynajem", lambda dane: None)
     dane = dane_domyslne()
     f = Firma(nazwa="A", stanowiska=[Stanowisko(nr=1, typ=KUCHNIA, sprzet={"Szafa chłodnicza": 1})])
     assert sw.pojemnosc(dane, f) == {"chlodnia": 600.0, "zamrazarka": 0.0}
     f.partie = [_partia(dane, "Mięso kebab", 50, PN), _partia(dane, "Frytki mrożone", 1, PN), _partia(dane, "Tortilla", 100, PN)]
-    _, straty = sw.przyjmij(dane, f, PN.isoformat())
+    _, straty, wynajete = sw.przyjmij(dane, f, PN.isoformat())
+    assert wynajete == []
     po = {s["zasob"]: s for s in straty}
     assert po["Mięso kebab"]["ilosc"] == pytest.approx(10) and po["Mięso kebab"]["powod"] == "miejsce"   # 750 l do 600 l
     assert po["Frytki mrożone"]["ilosc"] == pytest.approx(1)              # bez zamrażarki
@@ -98,11 +125,13 @@ def test_gra_dostawy_na_dni_kosz_i_zwrot():
     f = s.firmy["A"]
     assert {p.zasob: p.dostawa for p in f.partie} == {"Tortilla": dni[3].isoformat(), "Sos": dni[3].isoformat()}
     assert w["swiezosc"]["zasoby"]["Tortilla"]["dostawy"][3] == pytest.approx(3)
-    # zwrot nadmiaru: całe opakowania z partii tej rundy
+    # w grze z lokalami nie ma zwrotów do dostawcy ani kosztu magazynowania – towar zostaje w lokalu
     s = _runda(g, A={"zamowienia": [{"dostawca": DOSTAWCA, "zasob": "Napój", "jakosc": 2, "ilosc": 2, "dzien": 0}],
                      "zwrot_nadmiaru": {DOSTAWCA: True}})
-    assert not [p for p in s.firmy["A"].partie if p.zasob == "Napój"]
-    assert next(x for x in s.wyniki[3]["A"]["zasoby"] if x["zasob"] == "Napój")["zwroty"] == pytest.approx(2)
+    assert [p.ilosc for p in s.firmy["A"].partie if p.zasob == "Napój"] == [pytest.approx(2)]
+    assert next(x for x in s.wyniki[3]["A"]["zasoby"] if x["zasob"] == "Napój")["zwroty"] == 0
+    opisy = [p["opis"] for p in s.wyniki[3]["A"]["kpir"]["pozycje"]]
+    assert not [o for o in opisy if "zwrotu" in o or "magazynowania" in o]
 
 
 def test_sprawdz_wykrywa_zly_zamiennik(tmp_path):

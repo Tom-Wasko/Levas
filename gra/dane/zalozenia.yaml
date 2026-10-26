@@ -318,3 +318,32 @@ losowosc:
       rozrzut_pensji: 0.03
     pewnosc: zalozenie
     zrodlo: te same osoby w różnych grach mają pensje różniące się o 2–4%
+magazyn:   # gra z lokalami (zmiana 26.10): bez kosztu magazynowania i zwrotów – wynajem chłodni i kontrole sanepidu
+  wynajem_zl_za_litr:
+    wartosc: 1
+    pewnosc: zalozenie
+    zrodlo: 'odpowiedź użytkownika 26.10: towar, który nie mieści się w chłodni lub zamrażarce lokalu, jedzie do
+      wynajętej chłodni – 1 zł brutto (VAT 23%) za litr nadmiaru przy dostawie'
+  wynajem_skrocenie_terminu_dni:
+    wartosc: 2
+    pewnosc: zalozenie
+    zrodlo: 'odpowiedź użytkownika 26.10: towar w wynajętej chłodni ma termin krótszy o 2 dni (nie krótszy niż do
+      dnia dostawy)'
+  sanepid:
+    wartosc:
+      szansa_bazowa: 0.03
+      szansa_za_litr_wynajmu: 0.0005
+      szansa_za_zl_przeterminowanych: 0.0004
+      szansa_max: 0.6
+      mandat_min: 300
+      mandat_za_litr_wynajmu: 1
+      mandat_za_zl_przeterminowanych: 0.5
+      mandat_max: 3000
+      popyt_po_mandacie: 0.93
+      rund_spadku: 2
+    pewnosc: zalozenie
+    zrodlo: 'odpowiedź użytkownika 26.10 (kontrole sanepidu zamiast kosztu magazynowania): co rundę szansa kontroli =
+      bazowa + za litr w wynajętej chłodni + za zł przeterminowanego towaru (najwyżej szansa_max); kontrola kończy
+      się mandatem z szansą (szansa − bazowa) / szansa; mandat = min + za litr + za zł strat (od min do max, co 50
+      zł), poza KPiR; po mandacie popyt × popyt_po_mandacie przez rund_spadku rund. Liczby – założenie do kalibracji
+      w kroku 5 (100 l w wynajmie i 300 zł przeterminowanych → ok. 20% na kontrolę)'

@@ -33,11 +33,11 @@ def test_dane_historii():
 
 def test_kolejnosc_bez_powtorzen():
     g = _gra()
-    z, n = zd.zasady(g.dane), len(zd.historie(g.dane))
+    z, n = zd.zasady(g.dane), len(zd.historie_parkow(g.dane))
     ziarno = g.konfiguracja["ziarno"]
     assert zd.event_parku(g.dane, ziarno, z["od_rundy"] - 1) is None
     cykl = [zd.event_parku(g.dane, ziarno, r) for r in range(z["od_rundy"], z["od_rundy"] + n)]
-    assert sorted(cykl) == sorted(zd.historie(g.dane))
+    assert sorted(cykl) == sorted(zd.historie_parkow(g.dane))
 
 
 def test_ta_sama_historia_dla_wszystkich_i_ciag_dalszy(zbyszek):

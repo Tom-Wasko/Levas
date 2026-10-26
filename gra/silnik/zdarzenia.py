@@ -6,10 +6,14 @@ drużyna przeżywa ją osobno: w scenie wybiera opcję (decyzja `zdarzenia: {his
 domyślna), opcje kosztują czas właściciela, gotówkę i porcje jedzenia. Ciąg dalszy czeka w `Firma.historie` na swoją
 rundę (z szansą, strumień „zdarzenia”). Skutki: gotówka (bez VAT), mnożnik popytu i mniej godzin właściciela
 (`Firma.efekty`), kandydat na rynku pracy widoczny tylko dla tej drużyny (`tylko_dla`).
+
+Poza parkami: historia „bank żywności” (`dane/zdarzenia/magazyn.yaml`, silnik/magazyn.py) – zaczyna się tylko w tej
+drużynie, która ma w lokalu dużo jedzenia z krótkim terminem; skutek oddaj_zapas zabiera te partie z magazynu.
 """
 from __future__ import annotations
 
 from . import czas_wlasciciela as cw
+from . import magazyn as mag
 from .dane import Dane
 from .finanse import Ksiega, Rachunek, ksieguj
 from .losowosc import strumien
@@ -22,25 +26,41 @@ def zasady(dane: Dane) -> dict:
     return dane.zdarzenia["parki"]["zasady"]
 
 
-def historie(dane: Dane) -> dict[str, dict]:
+def historie_parkow(dane: Dane) -> dict[str, dict]:
     return {h["id"]: h for h in dane.zdarzenia["parki"]["historie"]}
+
+
+def historie(dane: Dane) -> dict[str, dict]:
+    """Wszystkie historie: w parkach i bank żywności."""
+    b = mag.bank(dane)
+    return {**historie_parkow(dane), **({b["historia"]["id"]: b["historia"]} if b else {})}
+
+
+def _tekst(dane: Dane, f: Firma, runda: int, h: dict, tekst: str) -> str:
+    """{wartosc} w historii banku żywności – wartość jedzenia z krótkim terminem."""
+    if "{wartosc}" not in tekst:
+        return tekst
+    return tekst.replace("{wartosc}", f"za ok. {mag.wartosc_zapasu(dane, f, runda):,.0f} zł".replace(",", "\u00a0"))
 
 
 def event_parku(dane: Dane, ziarno, runda: int) -> str | None:
     """Historia, która zaczyna się w parku w tej rundzie (ta sama dla wszystkich drużyn); None – jeszcze nie ma."""
     if not dane.zdarzenia or runda < zasady(dane)["od_rundy"]:
         return None
-    ids = list(historie(dane))
+    ids = list(historie_parkow(dane))
     cykl, i = divmod(runda - zasady(dane)["od_rundy"], len(ids))
     return ids[int(strumien(ziarno, cykl, "parki").permutation(len(ids))[i])]
 
 
 def aktywne(dane: Dane, f: Firma, runda: int, ziarno) -> list[OtwartaHistoria]:
-    """Sceny firmy w tej rundzie: event parku (gdy firma nie jest już w tej historii) i ciągi dalsze."""
+    """Sceny firmy w tej rundzie: event parku (gdy firma nie jest już w tej historii), bank żywności i ciągi dalsze."""
     wynik = [h for h in f.historie if h.runda <= runda]
     hid = event_parku(dane, ziarno, runda)
     if hid and all(h.historia != hid for h in f.historie):
         wynik.insert(0, OtwartaHistoria(historia=hid, scena=historie(dane)[hid]["start"], runda=runda))
+    if mag.startuje(dane, f, runda, ziarno):
+        b = mag.bank(dane)["historia"]
+        wynik.append(OtwartaHistoria(historia=b["id"], scena=b["start"], runda=runda))
     return wynik
 
 
@@ -65,7 +85,7 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
     Zwraca {"sceny": [...], "bledy": [...], "kandydaci": [...]} – kandydaci do puli rynku pracy."""
     wybory = d.get("zdarzenia") or {}
     hs, kp = historie(dane), zasady(dane)["koszt_porcji"]
-    wynik = {"sceny": [], "bledy": [], "kandydaci": []}
+    wynik = {"sceny": [], "bledy": [], "kandydaci": [], "oddane": []}
     zostaja = [h for h in f.historie if h.runda > runda]
     for oh in aktywne(dane, f, runda, ziarno):
         h = hs.get(oh.historia)
@@ -73,7 +93,8 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
         if sc is None:   # historia zniknęła z danych
             continue
         wpis = {"historia": h["id"], "tytul": h["tytul"], "park": h["park"], "powazna": h["powazna"], "scena": oh.scena,
-                "tekst": sc["tekst"], "opcja": None, "domyslna": False, "wynik": None, "koszt": None, "skutki": [],
+                "tekst": _tekst(dane, f, runda, h, sc["tekst"]), "opcja": None, "domyslna": False, "wynik": None,
+                "koszt": None, "skutki": [],
                 "ciag_dalszy": None}
         skutki, nastepne = sc["skutki"], sc["nastepna"]
         if sc["opcje"]:
@@ -98,7 +119,10 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
         wpis["skutki"] = [{k: v for k, v in s.items() if v is not None} for s in skutki]
         if not podglad:
             for s in skutki:
-                _skutek(f, s, h["id"], runda, ks, rach, wynik["kandydaci"])
+                oddane = _skutek(f, s, h["id"], runda, ks, rach, wynik["kandydaci"], dane)
+                if oddane:
+                    wynik["oddane"].extend(oddane)
+                    wpis["oddane"] = round(sum(x["wartosc"] for x in oddane), 2)
             n = _ciag_dalszy(nastepne, strumien(ziarno, runda, "zdarzenia", f.nazwa, h["id"]).random())
             if n:
                 wpis["ciag_dalszy"] = runda + n["za_ile_rund"]
@@ -111,7 +135,11 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
     return wynik
 
 
-def _skutek(f: Firma, s: dict, hid: str, runda: int, ks: Ksiega, rach: Rachunek, kandydaci: list[dict]):
+def _skutek(f: Firma, s: dict, hid: str, runda: int, ks: Ksiega, rach: Rachunek, kandydaci: list[dict],
+            dane: Dane | None = None) -> list[dict] | None:
+    """Skutek opcji albo sceny; oddaj_zapas zwraca oddane partie (straty z powodem „bank”)."""
+    if s["typ"] == "oddaj_zapas":
+        return mag.oddaj(dane, f, runda)
     if s["typ"] == "gotowka":
         if s["kwota"] > 0:
             ksieguj(f, ks, rach, s["opis"], s["kwota"], "przychod_pozostaly", stawka=0)
@@ -125,6 +153,7 @@ def _skutek(f: Firma, s: dict, hid: str, runda: int, ks: Ksiega, rach: Rachunek,
                               opis=s["opis"]))
     elif s["typ"] == "kandydat":
         kandydaci.append({**s["kandydat"], "id": f"zd_{hid}_{f.nazwa}_{runda}", "tylko_dla": f.nazwa})
+    return None
 
 
 def mnoznik_popytu(f: Firma, runda: int) -> float:
@@ -160,7 +189,8 @@ def widok(dane: Dane, fp: Firma, runda: int, ziarno, wyniki: dict, firma: str) -
         if sc is None:
             continue
         akt.append({"historia": h["id"], "tytul": h["tytul"], "park": h["park"], "powazna": h["powazna"],
-                    "scena": oh.scena, "tekst": sc["tekst"], "domyslna": sc["domyslna"], "nowa": oh.scena == h["start"],
+                    "scena": oh.scena, "tekst": _tekst(dane, fp, runda, h, sc["tekst"]), "domyslna": sc["domyslna"],
+                    "nowa": oh.scena == h["start"],
                     "opcje": [{"id": o["id"], "tekst": o["tekst"], "koszt": _koszt(o, kp)} for o in sc["opcje"]],
                     "skutki": [{k: v for k, v in s.items() if v is not None} for s in sc["skutki"]]})
     dziennik = [{**w, "runda": r} for r in sorted(wyniki) if r < runda

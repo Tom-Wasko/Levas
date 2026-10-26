@@ -19,7 +19,8 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     zwolnij:           [id pracownika]
     zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc", "dzien"}]   ilość w opakowaniach; dzien – dzień
                                                               dostawy w rundzie (0 = poniedziałek; gra z lokalami)
-    zwrot_nadmiaru:    {dostawca: true/false}               – zwrot niezużytych zasobów z tej rundy (koszt 10%)
+    zwrot_nadmiaru:    {dostawca: true/false}               – zwrot niezużytych zasobów z tej rundy (koszt 10%;
+                                                              gra bez lokali – w grze z lokalami zwrotów nie ma)
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
     reklama_tradycyjna:{medium: liczba emisji}
     internet_uruchom / internet_wylacz: [narzędzie]

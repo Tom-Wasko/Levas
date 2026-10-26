@@ -140,16 +140,21 @@ export const dostawcy = {
       "Zamówione teraz", "Brakuje", "Najtańsze oferty"], wiersze, { klasy: ["l", "l"] });
     if (dniDostaw(v)) html += `<p class="podpowiedz">„Zamów” w grze z lokalami pomija dyskonty (odbiór osobisty, limity) – w nich kupujesz ręcznie w bazie składników.</p>`;
     html += plan;
+    const wyn = v.swiezosc?.wynajem;
+    if (v.lokale && wyn) html += `<p class="podpowiedz">Dostawcy nie przyjmują zwrotów. Co nie zmieści się w chłodni lub zamrażarce lokalu,
+      jedzie do wynajętej chłodni (${zl2(wyn.zl_za_litr)} za litr, termin krótszy o ${wyn.skrocenie_dni} dni) – szczegóły w zakładce
+      <a data-zakladka-k="swiezosc">Świeżość</a>.</p>`;
     html += `<div class="pasek">Dostawcy</div><div class="siatka trojka">`;
     for (const d of Object.keys(ceny)) {
       const wartosc = (v.decyzje.zamowienia || []).filter((x) => x.dostawca === d).reduce((s, x) => s + (ceny[d]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc, 0);
       const zwrot = !!(v.decyzje.zwrot_nadmiaru || {})[d];
-      html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}
+      const zwroty = v.lokale ? "" : `
         <div class="wiersz"><span>Koszt zwrotu</span><span>${Math.round(kat.parametry.koszt_zwrotu * 100)}%</span></div>
         <div class="wiersz"><span>Koszt magazynowania</span><span>${zl2(kat.parametry.koszt_magazynowania)}</span></div>
         <label class="pole" style="margin-top:8px">Zwrot składników nadmiarowych
           <select data-zmiana="zwrot" data-d="${esc(d)}" ${edycja ? "" : "disabled"}><option value="0" ${zwrot ? "" : "selected"}>Nie – zostają w magazynie</option>
-          <option value="1" ${zwrot ? "selected" : ""}>Tak – zwrot niezużytych (koszt 10%)</option></select></label></div>
+          <option value="1" ${zwrot ? "selected" : ""}>Tak – zwrot niezużytych (koszt 10%)</option></select></label>`;
+      html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}${zwroty}</div>
         <div class="kd"><button class="btn czarny" data-akcja="baza" data-d="${esc(d)}">Baza składników</button>
         <div class="wiersz"><span>Zamówienie</span><span>${zl2(wartosc)}</span></div></div></div>`;
     }

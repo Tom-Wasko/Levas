@@ -806,7 +806,7 @@ SKUTKI_POLA = {"gotowka": "kwota", "popyt": "mnoznik", "czas": "godziny", "kandy
 
 
 class Skutek(Schemat):
-    typ: Literal["gotowka", "popyt", "czas", "kandydat"]
+    typ: Literal["gotowka", "popyt", "czas", "kandydat", "oddaj_zapas"]   # oddaj_zapas – tylko bank żywności
     opis: str = Field(min_length=3)
     kwota: float | None = None                          # gotowka: + przychód, − koszt
     mnoznik: float | None = Field(default=None, gt=0)    # popyt: mnożnik atrakcyjności lokali
@@ -877,7 +877,7 @@ class Scena(Schemat):
 
 class Historia(Schemat):
     id: str = Field(pattern=r"^[a-z0-9_]+$")
-    park: str                # id budynku z mapa/budynki.yaml (park albo woda)
+    park: str | None = None  # id budynku z mapa/budynki.yaml (park albo woda); w parkach wymagany
     tytul: str = Field(min_length=3)
     powazna: bool = False    # ok. 80% historii ma być komicznych (notatka „Zdarzenia i historie”)
     start: str
@@ -926,11 +926,45 @@ class PlikParkow(Plik):
         ids = [h.id for h in self.historie]
         if len(ids) != len(set(ids)):
             raise ValueError("id historii muszą być unikalne")
+        if bez := [h.id for h in self.historie if not h.park]:
+            raise ValueError(f"historie w parkach muszą mieć park: {', '.join(bez)}")
+        if inne := [h.id for h in self.historie for s in h.sceny.values()
+                    for sk in [*s.skutki, *(x for o in s.opcje for x in o.skutki)] if sk.typ == "oddaj_zapas"]:
+            raise ValueError(f"skutek oddaj_zapas jest tylko w historii banku żywności: {', '.join(sorted(set(inne)))}")
         return self
+
+
+class TekstySanepidu(Schemat):
+    kontrole_ok: list[str] = Field(min_length=1)
+    kontrole_mandat: list[str] = Field(min_length=1)
+
+
+class ZasadyBanku(Schemat):
+    prog_zl: float = Field(gt=0)
+    dni_do_terminu: int = Field(ge=0)
+    szansa: float = Field(gt=0, le=1)
+
+
+class BankZywnosci(Schemat):
+    zasady: ZasadyBanku
+    historia: Historia
+
+    @model_validator(mode="after")
+    def _bez_parku(self):
+        if self.historia.park:
+            raise ValueError("historia banku żywności nie dzieje się w parku (bez pola park)")
+        return self
+
+
+class PlikMagazynu(Plik):
+    """dane/zdarzenia/magazyn.yaml: teksty kontroli sanepidu i historia „bank żywności” (silnik/magazyn.py)."""
+    sanepid: TekstySanepidu
+    bank_zywnosci: BankZywnosci
 
 
 SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "parki.yaml": PlikParkow,
+    "magazyn.yaml": PlikMagazynu,
 }
 
 

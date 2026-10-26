@@ -1,0 +1,114 @@
+# Magazyn w grze z lokalami (zmiana 26.10, silnik/magazyn.py): teksty kontroli sanepidu i historia „bank żywności”
+# Liczby kontroli (szansa, mandat, spadek popytu) i wynajmu chłodni – zalozenia.yaml, sekcja magazyn
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Kontrola sanepidu: tekst losowany z listy (kontrola bez zastrzeżeń albo z mandatem – {kwota} to kwota mandatu,
+  {rund} – liczba rund mniejszego popytu). Bank żywności: historia jak w parkach (sceny, opcje, skutki), zaczyna
+  się, gdy w lokalu zostało z poprzednich rund jedzenie za co najmniej zasady.prog_zl zł z terminem do
+  zasady.dni_do_terminu dni (z szansą zasady.szansa na rundę). Skutek oddaj_zapas zabiera te partie z magazynu (bez
+  zapisu w KPiR – towar był już kosztem przy zakupie).'
+zrodlo: 'Odpowiedzi użytkownika 26.10: zamiast kosztu magazynowania wynajem chłodni i kontrole sanepidu, zamiast
+  zwrotów – brak zwrotów i zdarzenie z oddaniem jedzenia do banku żywności; teksty i progi – założenie, do
+  kalibracji w kroku 5'
+sanepid:
+  kontrole_ok:
+  - >-
+    O 11:40 w drzwiach staje pani inspektor z Państwowej Inspekcji Sanitarnej, w kitlu tak białym, że kucharz odruchowo
+    chowa ścierkę za plecy. Zagląda do lodówek, mierzy temperaturę termometrem wyglądającym jak różdżka i sprawdza
+    daty na każdym pudełku, łącznie z pudełkiem po butach, w którym ktoś trzyma śrubki. Na koniec wpisuje do protokołu
+    „bez zastrzeżeń” i prosi o falafel na wynos. Płaci. Zespół przez resztę dnia chodzi dumny jak po maturze.
+  - >-
+    Kontrola sanepidu trafia na dzień, w którym pomocnik akurat z nudów umył okap. Inspektor przeciąga palcem po
+    półce, ogląda palec pod światło i z widocznym rozczarowaniem nie znajduje niczego. „Pierwszy raz od tygodnia” –
+    mruczy, wpisując „bez uwag”. Podobno w lokalu obok znalazł kota, który twierdził, że jest zastępcą kierownika.
+  - >-
+    Inspektor sanepidu zjawia się incognito, zamawia kebab i dopiero po pierwszym kęsie wyciąga legitymację. Kucharz
+    blednie, ale kontrola idzie gładko: chłodnia trzyma temperaturę, daty się zgadzają, a mięso pachnie tak, jak
+    powinno pachnieć mięso. W protokole – „bez zastrzeżeń”, w opinii na mapach – pięć gwiazdek od „Pana Z.”.
+  kontrole_mandat:
+  - >-
+    Sanepid przychodzi w czwartek, akurat gdy przed lokalem stoi furgonetka wynajętej chłodni z napisem „Mroźnia
+    u Mietka – mrozimy wszystko oprócz uczuć”. Inspektor otwiera drzwi furgonetki, potem drugie, potem pudełko
+    z sosem czosnkowym, który ma datę z poprzedniej epoki. Pan Mietek tłumaczy, że „to sos z charakterem”. Inspektor
+    tłumaczy, że charakter kosztuje {kwota}. Lokalny portal publikuje zdjęcie protokołu i przez {rund} rundy część
+    klientów omija lokal szerokim łukiem.
+  - >-
+    Kontrolerka sanepidu znajduje w koszu stertę przeterminowanych bułek ułożonych w piramidę, którą pomocnik
+    nazywa „instalacją artystyczną o przemijaniu”. Sztuka współczesna nie robi na niej wrażenia: mandat {kwota},
+    zalecenie „mniej zamawiać, więcej myśleć” i wpis do protokołu, który ktoś usłużnie wrzuca na grupę „Lublin –
+    gdzie zjeść”. Przez {rund} rundy klientów jest mniej.
+  - >-
+    Przy kontroli wychodzi, że w chłodni u Mietka obok waszego mięsa leży jego prywatny karp na Wigilię, „żeby nie
+    stał w wannie”. Inspektor uznaje, że karp w październiku to dowód na zbyt długie przechowywanie, a wasze pudła
+    z przeterminowanym towarem – dowód rzeczowy numer dwa. Mandat {kwota}. Karp dostaje pouczenie. Przez {rund}
+    rundy lokal ma gorszą prasę.
+  - >-
+    Inspektor sanepidu prosi o pokazanie zapasów. Ktoś otwiera zaplecze i ze środka wysypuje się lawina pudełek –
+    część z datą sprzed tygodnia, część bez daty, jedno podpisane „NIE OTWIERAĆ (Krzysiek)”. Protokół ma cztery
+    strony, mandat – {kwota}. Krzysiek do dziś nie powiedział, co było w pudełku. Przez {rund} rundy klienci pytają,
+    czy „to ten lokal z lawiną”.
+bank_zywnosci:
+  zasady:
+    prog_zl: 200          # wartość jedzenia z poprzednich rund z krótkim terminem
+    dni_do_terminu: 3     # termin najpóźniej tyle dni od początku rundy
+    szansa: 0.4           # szansa na rundę, gdy warunek jest spełniony
+  historia:
+    id: bank_zywnosci
+    tytul: Pani Halina z banku żywności
+    start: telefon
+    sceny:
+      telefon:
+        tekst: >-
+          W poniedziałek rano dzwoni pani Halina z Lubelskiego Banku Żywności. Mówi szybko, jakby ktoś ją gonił, i
+          chyba ktoś ją goni, bo w tle słychać klakson i krzyk „pani Halino, ziemniaki!”. Słyszała od znajomej
+          znajomej, że macie na zapleczu sporo jedzenia z krótkim terminem ({wartosc}), i pyta, czy zamiast do
+          kosza nie wolelibyście oddać go ludziom, którzy go potrzebują. Furgonetkę ma, kierowcę ma, „nawet pasy
+          w furgonetce działają, prawie wszystkie”.
+        domyslna: zostaw
+        opcje:
+        - id: oddaj
+          tekst: Oddajcie jedzenie, pomożemy załadować (1 h)
+          koszt:
+            czas: 1
+          wynik: >-
+            Pan Rysiek, kierowca pani Haliny, ładuje skrzynki z precyzją tetrisowego mistrza i opowiada, że kiedyś
+            woził cyrk, „więc jedzenie, które nie ucieka, to dla mnie wakacje”. Zapas znika z zaplecza, chłodnia
+            oddycha z ulgą, a pani Halina obiecuje wrzucić podziękowanie na profil banku.
+          skutki:
+          - typ: oddaj_zapas
+            opis: Jedzenie z krótkim terminem oddane do banku żywności
+          - typ: popyt
+            opis: Podziękowanie banku żywności w internecie
+            mnoznik: 1.03
+            rund: 2
+          nastepna:
+          - scena: podziekowanie
+            za_ile_rund: 1
+        - id: oddaj_z_kamera
+          tekst: Oddajcie jedzenie i nagrajcie z tego film do sieci (2 h)
+          koszt:
+            czas: 2
+          wynik: >-
+            Nagranie idzie świetnie do momentu, w którym pan Rysiek postanawia pokazać, jak ładowało się słonia.
+            Na szczęście słonia nie ma, jest tylko skrzynia pomidorów, która ląduje na operatorze. Film z
+            pomidorowym finałem robi furorę – dwadzieścia tysięcy wyświetleń i komentarz „najlepsza reklama
+            jedzenia, jaką widziałem”.
+          skutki:
+          - typ: oddaj_zapas
+            opis: Jedzenie z krótkim terminem oddane do banku żywności
+          - typ: popyt
+            opis: Film z pomidorami i panem Ryśkiem krąży po sieci
+            mnoznik: 1.05
+            rund: 2
+          nastepna:
+          - scena: podziekowanie
+            za_ile_rund: 1
+        - id: zostaw
+          tekst: Dziękujecie, ale zapas zostaje – może się jeszcze sprzeda
+          wynik: >-
+            Pani Halina mówi „rozumiem” takim tonem, jakim mama mówi „rób, jak uważasz”. Zapas zostaje na zapleczu.
+            Jeśli się nie sprzeda, wieczorem pójdzie do kosza – a kosz, jak wiadomo, w banku żywności nie pracuje.
+      podziekowanie:
+        tekst: >-
+          Przychodzi list od banku żywności, pisany ręcznie, z rysunkiem od dzieci ze świetlicy: wasz lokal jako
+          zamek, kucharz jako rycerz, a zamiast miecza – łopatka do kebaba. Ktoś przypina go nad kasą. Klienci
+          pytają, kto rysował, i zostawiają większe napiwki.

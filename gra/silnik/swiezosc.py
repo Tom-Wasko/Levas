@@ -6,8 +6,10 @@ sprzet.yaml – przechowywanie i pojemnosc_l sprzętu (szafa chłodnicza, zamra�
 Zasady:
 - każde zamówienie to partia z dniem dostawy (zamowienia[].dzien, 0 = poniedziałek rundy); termin = dzień dostawy
   + termin_dni − 1 (bułka z poniedziałku – 2 dni – ląduje w koszu we wtorek wieczorem),
-- dzień w lokalu: rano dostawy (do chłodni i zamrażarki wchodzi tyle, ile się zmieści – reszta to strata), w ciągu
-  dnia klienci zużywają najpierw partie z najkrótszym terminem (FIFO), wieczorem przeterminowane partie idą do kosza,
+- dzień w lokalu: rano dostawy (do chłodni i zamrażarki wchodzi tyle, ile się zmieści – reszta jedzie do wynajętej
+  chłodni: zalozenia.yaml magazyn.wynajem_zl_za_litr za litr nadmiaru, termin krótszy o wynajem_skrocenie_terminu_dni;
+  bez tych założeń – jak w F3a.5 – reszta to strata), w ciągu dnia klienci zużywają najpierw partie z najkrótszym
+  terminem (FIFO), wieczorem przeterminowane partie idą do kosza,
 - magazyn jest wspólny dla lokali firmy, pojemność = suma pojemności sprzętu ze wszystkich stanowisk; suche – bez limitu,
 - zamiennik (np. mrożona pita) jest używany, gdy zabraknie składnika podstawowego; danie z zamiennikiem ma jakość
   składnika niższą o kara_jakosci gwiazdek.
@@ -88,9 +90,20 @@ def na_stanie(firma: Firma, dzien: str | None = None) -> list[Partia]:
     return [p for p in firma.partie if dzien is None or p.dostawa <= dzien]
 
 
+def wynajem(dane: Dane) -> dict | None:
+    """Wynajęta chłodnia (założenia magazyn.*): {"zl_za_litr", "skrocenie_dni"}; None – dane bez niej."""
+    m = dane.z.get("magazyn") or {}
+    if "wynajem_zl_za_litr" not in m:
+        return None
+    return {"zl_za_litr": m["wynajem_zl_za_litr"], "skrocenie_dni": m["wynajem_skrocenie_terminu_dni"]}
+
+
 def zajete(dane: Dane, firma: Firma, dzien: str | None = None) -> dict[str, float]:
+    """Litry zajęte we własnej chłodni i zamrażarce (bez partii w wynajętej chłodni)."""
     wynik = {t: 0.0 for t in CHLODZONE}
     for p in na_stanie(firma, dzien):
+        if p.wynajem:
+            continue
         t = dane.zasoby[p.zasob].get("przechowywanie", "suche")
         if t in wynik:
             wynik[t] += miejsce(dane, p)
@@ -121,23 +134,44 @@ def _uszczknij(p: Partia, ile: float) -> int:
     return wart
 
 
-def przyjmij(dane: Dane, firma: Firma, dzien: str) -> tuple[dict[str, float], list[dict]]:
-    """Ranne dostawy dnia: do chłodni i zamrażarki tyle, ile się zmieści. Zwraca ({zasób: przyjęte}, straty)."""
+def _do_wynajmu(dane: Dane, p: Partia, ile: float, dzien: str, wyn: dict) -> tuple[Partia, dict]:
+    """Część partii do wynajętej chłodni: nowa partia z terminem krótszym o skrocenie_dni (nie wcześniej niż dziś)."""
+    termin_ = p.termin
+    if termin_:
+        termin_ = max(dzien, (date.fromisoformat(termin_) - timedelta(days=wyn["skrocenie_dni"])).isoformat())
+    nowa = Partia(zasob=p.zasob, jakosc=p.jakosc, ilosc=ile, wartosc_gr=_uszczknij(p, ile), dostawa=p.dostawa,
+                  termin=termin_, dostawca=p.dostawca, runda=p.runda, wynajem=True)
+    litry = miejsce(dane, nowa)
+    return nowa, {"data": dzien, "zasob": p.zasob, "jakosc": p.jakosc, "ilosc": round(ile, 3), "litry": round(litry, 1),
+                  "koszt": round(litry * wyn["zl_za_litr"], 2), "termin": termin_,
+                  "przechowywanie": dane.zasoby[p.zasob]["przechowywanie"]}
+
+
+def przyjmij(dane: Dane, firma: Firma, dzien: str) -> tuple[dict[str, float], list[dict], list[dict]]:
+    """Ranne dostawy dnia: do chłodni i zamrażarki tyle, ile się zmieści, reszta – do wynajętej chłodni (bez niej
+    w danych – strata). Zwraca ({zasób: przyjęte}, straty, wynajem)."""
     poj = pojemnosc(dane, firma)
     zaj = zajete(dane, firma, (date.fromisoformat(dzien) - timedelta(days=1)).isoformat())
-    przyjete, straty = {}, []
-    for p in [p for p in firma.partie if p.dostawa == dzien]:
+    wyn = wynajem(dane)
+    przyjete, straty, wynajete = {}, [], []
+    for p in [p for p in firma.partie if p.dostawa == dzien and not p.wynajem]:
         t = dane.zasoby[p.zasob].get("przechowywanie", "suche")
+        dostarczone = p.ilosc
         if t in poj:
             l_opak = dane.zasoby[p.zasob].get("miejsce_l", 0.0)
             wolne = max(0.0, poj[t] - zaj[t])
             nadmiar = p.ilosc - (wolne / l_opak if l_opak > EPS else p.ilosc)
-            if nadmiar > EPS:
+            if nadmiar > EPS and wyn:
+                nowa, w = _do_wynajmu(dane, p, nadmiar, dzien, wyn)
+                firma.partie.append(nowa)
+                wynajete.append(w)
+            elif nadmiar > EPS:
                 straty.append(_strata(p, nadmiar, _uszczknij(p, nadmiar), "miejsce", dzien))
+                dostarczone = p.ilosc
             zaj[t] += miejsce(dane, p)
-        przyjete[p.zasob] = przyjete.get(p.zasob, 0.0) + p.ilosc
+        przyjete[p.zasob] = przyjete.get(p.zasob, 0.0) + dostarczone
     uzgodnij(firma, dzien)
-    return przyjete, straty
+    return przyjete, straty, wynajete
 
 
 def wyrzuc(firma: Firma, dzien: str) -> list[dict]:
@@ -174,47 +208,52 @@ def zuzyj(dane: Dane, firma: Firma, zuzycie: dict[str, float], dzien: str | None
     return wynik
 
 
-def zwroc(firma: Firma, dostawca: str, zasob: str, jakosc: int, runda: int, ile: float) -> tuple[float, int]:
-    """Zwrot nadmiaru: całe opakowania z partii tej rundy od dostawcy (najpierw najnowsze). Zwraca (ilość, grosze)."""
-    zwrot, wartosc = 0.0, 0
-    for p in sorted((p for p in firma.partie if p.runda == runda and p.dostawca == dostawca and p.zasob == zasob
-                     and p.jakosc == jakosc), key=lambda p: p.dostawa, reverse=True):
-        n = min(int(p.ilosc + EPS), int(ile - zwrot + EPS))
-        if n > 0:
-            wartosc += _uszczknij(p, n)
-            zwrot += n
-    uzgodnij(firma)
-    return zwrot, wartosc
-
-
 NAZWY = {"chlodnia": "chłodni", "zamrazarka": "zamrażarki"}
 
 
-def ostrzezenia(dane: Dane, firma: Firma, runda: int) -> list[tuple[str, str]]:
-    """Lista błędów (po decyzjach): dostawy do chłodni / zamrażarki, które się nie zmieszczą."""
+def plan_wynajmu(dane: Dane, firma: Firma, runda: int) -> list[dict]:
+    """Szacunek nadmiaru przy dostawach rundy (dostawa dnia + zapas z poprzednich rund w pierwszym dniu, bez
+    sprzedaży między dostawami): [{"data", "przechowywanie", "litry", "pojemnosc", "koszt"}]."""
     wynik = []
     poj = pojemnosc(dane, firma)
+    wyn = wynajem(dane)
     start = dane.data_rundy(runda).isoformat()
-    nowe = [p for p in firma.partie if p.runda == runda]
+    nowe = [p for p in firma.partie if p.runda == runda and not p.wynajem]
     for t in CHLODZONE:
         dzienne: dict[str, float] = {}
         for p in nowe:
             if dane.zasoby[p.zasob].get("przechowywanie") == t:
                 dzienne[p.dostawa] = dzienne.get(p.dostawa, 0.0) + miejsce(dane, p)
-        if not dzienne:
-            continue
-        if poj[t] <= EPS:
-            wynik.append(("czerwony", f"Zamawiasz składniki do {NAZWY[t]}, a nie masz takiego sprzętu – dostawca "
-                                      "zostawi je na chodniku i trafią do kosza."))
-            continue
-        stare = sum(miejsce(dane, p) for p in firma.partie if p.dostawa < start
+        stare = sum(miejsce(dane, p) for p in firma.partie if p.dostawa < start and not p.wynajem
                     and dane.zasoby[p.zasob].get("przechowywanie") == t)
         for dzien, litry in sorted(dzienne.items()):
-            razem = litry + (stare if dzien == start else 0.0)
-            if razem > poj[t] + EPS:
-                wynik.append(("pomaranczowy", f"Dostawa {date.fromisoformat(dzien).strftime('%d.%m')}: "
-                              f"{razem:.0f} l do {NAZWY[t]} o pojemności {poj[t]:.0f} l – nadmiar się zepsuje."))
+            nadmiar = litry + (stare if dzien == start else 0.0) - poj[t]
+            if nadmiar > EPS:
+                wynik.append({"data": dzien, "przechowywanie": t, "litry": round(nadmiar, 1), "pojemnosc": poj[t],
+                              "koszt": round(nadmiar * wyn["zl_za_litr"], 2) if wyn else None})
     return wynik
+
+
+def ostrzezenia(dane: Dane, firma: Firma, runda: int) -> list[tuple[str, str]]:
+    """Lista błędów (po decyzjach): dostawy do chłodni / zamrażarki, które się nie zmieszczą."""
+    wyn = wynajem(dane)
+    wynik = []
+    for x in plan_wynajmu(dane, firma, runda):
+        t, dzien = x["przechowywanie"], date.fromisoformat(x["data"]).strftime("%d.%m")
+        if wyn and x["pojemnosc"] <= EPS:
+            wynik.append(("pomaranczowy", f"Dostawa {dzien}: nie masz {NAZWY[t]} – {x['litry']:.0f} l pojedzie do "
+                                          f"wynajętej chłodni (ok. {x['koszt']:.0f} zł, termin krótszy o {wyn['skrocenie_dni']} dni)."))
+        elif wyn:
+            wynik.append(("pomaranczowy", f"Dostawa {dzien}: ok. {x['litry']:.0f} l nie zmieści się w {NAZWY[t].removesuffix('i') + 'i'} "
+                                          f"({x['pojemnosc']:.0f} l) – pojedzie do wynajętej chłodni (ok. {x['koszt']:.0f} zł, "
+                                          f"termin krótszy o {wyn['skrocenie_dni']} dni)."))
+        elif x["pojemnosc"] <= EPS:
+            wynik.append(("czerwony", f"Zamawiasz składniki do {NAZWY[t]}, a nie masz takiego sprzętu – dostawca "
+                                      "zostawi je na chodniku i trafią do kosza."))
+        else:
+            wynik.append(("pomaranczowy", f"Dostawa {dzien}: {x['litry'] + x['pojemnosc']:.0f} l do {NAZWY[t]} o pojemności "
+                                          f"{x['pojemnosc']:.0f} l – nadmiar się zepsuje."))
+    return list(dict.fromkeys(wynik))
 
 
 def podsumowanie(dane: Dane, firma: Firma, runda: int) -> dict:
@@ -230,17 +269,17 @@ def podsumowanie(dane: Dane, firma: Firma, runda: int) -> dict:
         z = {t: 0.0 for t in CHLODZONE}
         for p in firma.partie:
             t = dane.zasoby[p.zasob].get("przechowywanie", "suche")
-            if t in z and p.dostawa <= iso and not (p.termin and p.termin < iso):
+            if t in z and not p.wynajem and p.dostawa <= iso and not (p.termin and p.termin < iso):
                 z[t] += miejsce(dane, p)
         zajetosc.append({k: round(v, 1) for k, v in z.items()})
     return {"dni": [{"data": d.isoformat(), "dzien": nazwy[d.weekday()]} for d in dni], "pojemnosc": pojemnosc(dane, firma),
-            "zajetosc": zajetosc,
+            "zajetosc": zajetosc, "wynajem": wynajem(dane), "plan_wynajmu": plan_wynajmu(dane, firma, runda),
             "partie": [{"zasob": p.zasob, "jakosc": p.jakosc, "ilosc": round(p.ilosc, 3), "wartosc": p.wartosc,
                         "dostawa": p.dostawa, "termin": p.termin, "dostawca": p.dostawca, "nowa": p.runda == runda,
-                        "przechowywanie": dane.zasoby[p.zasob].get("przechowywanie", "suche"),
+                        "przechowywanie": dane.zasoby[p.zasob].get("przechowywanie", "suche"), "wynajem": p.wynajem,
                         "miejsce_l": round(miejsce(dane, p), 1)}
                        for p in sorted(firma.partie, key=lambda p: (p.termin or "9999", p.dostawa, p.zasob))]}
 
 
-__all__ = ["dostepne", "jakosc_skladnika", "nowa_partia", "ostrzezenia", "podsumowanie", "pojemnosc", "przyjmij", "uzgodnij", "wyrzuc", "zajete",
-           "zamienniki", "zuzyj", "zwroc"]
+__all__ = ["dostepne", "jakosc_skladnika", "nowa_partia", "ostrzezenia", "plan_wynajmu", "podsumowanie", "pojemnosc", "przyjmij",
+           "uzgodnij", "wynajem", "wyrzuc", "zajete", "zamienniki", "zuzyj"]

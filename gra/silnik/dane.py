@@ -78,7 +78,7 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
 
 
 def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
-    """Eventy (`dane/zdarzenia/`, F3b.1): parki. Brak katalogu = gra bez eventów."""
+    """Eventy (`dane/zdarzenia/`): parki (F3b.1), sanepid i bank żywności (magazyn). Brak katalogu = gra bez eventów."""
     if not (katalog / "parki.yaml").exists():
         return None
     return {n.removesuffix(".yaml"): s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"})
@@ -397,16 +397,19 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
 
 
 def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
-    """Odwołania eventów: park z mapy (park albo woda), zawód kandydata."""
+    """Odwołania eventów: park z mapy (park albo woda), zawód kandydata, id banku żywności inne niż w parkach."""
     if not d.zdarzenia:
         return
     if not d.mapa:
         bledy.append("zdarzenia/: eventy w parkach wymagają mapy (dane/mapa/)")
         return
     parki = {b["id"] for b in d.mapa["budynki"] if b["rodzaj"] in ("park", "woda")}
-    for h in d.zdarzenia["parki"]["historie"]:
-        co = f"zdarzenia/parki.yaml: {h['id']}"
-        if h["park"] not in parki:
+    bank = d.zdarzenia["magazyn"]["bank_zywnosci"]["historia"]
+    if any(h["id"] == bank["id"] for h in d.zdarzenia["parki"]["historie"]):
+        bledy.append(f"zdarzenia/magazyn.yaml: id historii {bank['id']!r} jest już w parki.yaml")
+    for h in [*d.zdarzenia["parki"]["historie"], bank]:
+        co = f"zdarzenia/{'parki' if h['park'] else 'magazyn'}.yaml: {h['id']}"
+        if h["park"] and h["park"] not in parki:
             brak(h["park"], co, "park albo woda", "mapa/budynki.yaml")
         for nazwa, s in h["sceny"].items():
             for sk in [*s["skutki"], *(x for o in s["opcje"] for x in o["skutki"])]:

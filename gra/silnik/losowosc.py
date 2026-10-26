@@ -30,6 +30,7 @@ CELE = frozenset({
     "popyt",       # szum popytu: runda, firma, usługa
     "reklamacje",  # reklamacje: runda, firma, usługa
     "rynek_pracy", # remisy w licytacjach i ofertach podkupienia: runda, rodzaj, id osoby
+    "sanepid",     # kontrola sanepidu w lokalu (silnik/magazyn.py): runda, firma
     "zdarzenia",   # ciąg dalszy historii z parku: runda, firma, historia
 })
 

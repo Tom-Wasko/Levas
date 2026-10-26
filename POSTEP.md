@@ -47,7 +47,15 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   kliknięciem w nagłówek (rosnąco, malejąco, kolejność pierwotna; liczby w polskim zapisie, gwiazdki, puste na końcu;
   działa też w oknach, np. baza składników) i lista „Sortuj” w ofercie lokali; testy kupna lokali dostają jawnie
   kapitał 100 000 zł
-- [ ] Magazyn bez kosztu magazynowania i zwrotów: wynajem chłodni (1 zł/l, termin −2 dni), kontrole sanepidu,
-  zdarzenie „bank żywności”
+- [x] Magazyn bez kosztu magazynowania i zwrotów (gra z lokalami; gra bez lokali i `dane_revas/` bez zmian):
+  wynajęta chłodnia „Mroźnia u Mietka” – nadmiar ponad chłodnię/zamrażarkę lokalu przy dostawie (`swiezosc.przyjmij`,
+  `Partia.wynajem`) za 1 zł/l z VAT 23%, termin krótszy o 2 dni, nie zajmuje miejsca w lokalu; kontrola sanepidu co
+  rundę (`silnik/magazyn.py`, strumień „sanepid”): szansa 3% + za litry w wynajmie i złotówki przeterminowanego
+  towaru, mandat 300–3000 zł poza KPiR (nowy rodzaj operacji „kary”, w uzgodnieniu kasy i biurze rachunkowym) i −7%
+  popytu na 2 rundy, komiczne teksty kontroli w `dane/zdarzenia/magazyn.yaml`; historia „Pani Halina z banku
+  żywności” (zapas z krótkim terminem ≥ 200 zł, szansa 40%; oddanie zabiera partie – strata z powodem „bank”, +3% lub
+  +5% popytu, podziękowanie w następnej rundzie); zwroty i koszt magazynowania ukryte w zakładce Dostawcy;
+  zakładka **Świeżość**: Decyzje – nadmiar do wynajmu dzień po dniu i ryzyko kontroli, Wyniki – wynajęte partie i
+  karta kontroli; testy `test_magazyn.py`, `test_swiezosc.py`
 
 Zadania F3b.2–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

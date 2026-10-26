@@ -34,12 +34,14 @@ WYJASNIENIA = {
     "wynagrodzenia": "pensje i premie pracowników to wynagrodzenia (kolumna 12); ZUS pracodawcy idzie do pozostałych",
     "pozostale": "czynsz, utrzymanie, reklama, opłaty bankowe, ZUS, dostawa i amortyzacja to pozostałe wydatki "
                  "(kolumna 13)",
-    POZA: "kredyt, lokata, kaucja, zakup środka trwałego, podatki i Harpagon nie są ani przychodem, ani kosztem – "
+    POZA: "kredyt, lokata, kaucja, zakup środka trwałego, podatki, Harpagon i mandaty nie są ani przychodem, ani "
+          "kosztem podatkowym – "
           "poza KPiR (środek trwały trafia do ewidencji i kosztuje przez amortyzację)",
 }
 TYPY_POZA = {"podatki": "Potwierdzenie przelewu do urzędu / ZUS", "kredyty": "Umowa kredytu i wyciąg bankowy",
              "lokaty": "Wyciąg bankowy – lokata", "kaucje": "Umowa najmu – kaucja",
-             "harpagon": "Kwit Harpagona (na serwetce)", "inwestycje": "Umowa kupna / akt notarialny"}
+             "harpagon": "Kwit Harpagona (na serwetce)", "inwestycje": "Umowa kupna / akt notarialny",
+             "kary": "Mandat karny (sanepid)"}
 POLA = {"vat": "VAT", "pit": "zaliczka na PIT", "zdrowotna": "składka zdrowotna"}
 
 

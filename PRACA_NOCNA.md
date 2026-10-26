@@ -97,6 +97,15 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    mapie (Ogród Botaniczny, Park Bronowicki, Park Rury, Błonia); boty wybierają losowo spośród opcji do 3 h;
    pan Zbyszek (kucharz 2★) trafia na rynek pracy tylko dla drużyny, która go zaprosiła. Czy tak? (zapisane 26.10)
 
+13. **Magazyn (zmiana 26.10).** Liczby do sprawdzenia (`zalozenia.yaml` → `magazyn`): wynajem 1 zł za litr nadmiaru
+   (jednorazowo za dostawę, nie za dzień), termin −2 dni, VAT 23%; sanepid: szansa 3% co rundę + 0,05 pp. za litr
+   w wynajmie + 0,04 pp. za złotówkę przeterminowanego towaru (max 60%) – kontrola „z problemem” kończy się
+   mandatem 300 zł + 1 zł/l + 0,5 zł za złotówkę przeterminowaną (max 3000 zł, zaokr. do 50 zł) i −7% popytu przez
+   2 rundy; mandat nie jest kosztem podatkowym; bank żywności: zapas, któremu do końca terminu zostało ≤ 3 dni, wart
+   ≥ 200 zł, szansa 40% na rundę, raz na grę; oddanie bez kosztu w KPiR (był kosztem przy zakupie). Uwaga: jedno
+   wyrzucone opakowanie mięsa to już ok. +14 pp. szansy kontroli – może za ostro? Gra bez lokali (`dane_revas/`)
+   zostaje ze zwrotami i kosztem magazynowania. Czy tak? (zapisane 26.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -309,3 +318,4 @@ _brak_
 - 26.10 – F3a.15 gotowe: limity odrzucane przy zapisie decyzji (`silnik/limity.py`); pytanie 11. Krok 3a zakończony, start F3b.1 Parki.
 - 26.10 – F3b.1 gotowe: eventy w parkach (14 historii, zakładka Zdarzenia); pytanie 12. Nowe polecenia użytkownika: kapitał 40 000 zł, sortowanie list, lodówki + sanepid zamiast kosztu magazynowania, bez zwrotów + event z bankiem żywności.
 - 26.10 – kapitał 40 000 zł, poprawione 4 notatki (zgoda użytkownika), sortowanie tabel i oferty lokali. Boty przy 40 000 zł nie schodzą poniżej ok. 18 000 zł gotówki (2 ziarna × 26 rund). Dalej: magazyn (wynajem chłodni, sanepid, bank żywności).
+- 26.10 – magazyn gotowy: wynajęta chłodnia, sanepid z mandatami poza KPiR, bank żywności, bez zwrotów i kosztu magazynowania w grze z lokalami; pytanie 13. Start F3b.2.

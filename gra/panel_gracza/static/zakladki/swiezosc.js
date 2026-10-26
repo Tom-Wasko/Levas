@@ -4,7 +4,46 @@ import { esc, gw, licz, nazwaUslugi, tabela, ulamek, wykres, zl2 } from "./wspol
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
 const MIEJSCE = { chlodnia: "Chłodnia", zamrazarka: "Zamrażarka", suche: "Suchy magazyn" };
-const POWOD = { termin: "minął termin przydatności", miejsce: "nie zmieściło się – dostawca zostawił pod drzwiami" };
+const POWOD = { termin: "minął termin przydatności", miejsce: "nie zmieściło się – dostawca zostawił pod drzwiami",
+  bank: "oddane do banku żywności" };
+const procent = (x) => `${Math.round(x * 1000) / 10}%`;
+
+function planWynajmuHtml(S) {
+  if (!S.wynajem) return "";
+  if (!S.plan_wynajmu.length) return `<p class="podpowiedz">Wszystko mieści się w lokalu – wynajęta chłodnia (${zl2(S.wynajem.zl_za_litr)} za litr) nie będzie potrzebna.</p>`;
+  return tabela(`Nadmiar do wynajętej chłodni (${zl2(S.wynajem.zl_za_litr)} za litr, termin krótszy o ${S.wynajem.skrocenie_dni} dni)`,
+    ["Dzień dostawy", "Miejsce", "Pojemność lokalu (l)", "Nadmiar (l)", "Koszt"],
+    S.plan_wynajmu.map((x) => [dataKrotka(x.data), MIEJSCE[x.przechowywanie], licz(x.pojemnosc), licz(x.litry), zl2(x.koszt)]),
+    { klasy: ["l", "l"], stopka: ["Razem", "", "", licz(S.plan_wynajmu.reduce((s, x) => s + x.litry, 0)), zl2(S.plan_wynajmu.reduce((s, x) => s + x.koszt, 0))] });
+}
+
+function ryzykoHtml(M) {
+  if (!M) return "";
+  return `<div class="kafel"><div class="kg">Sanepid – ryzyko kontroli w tej rundzie</div><div class="kt">
+    <div class="wiersz"><span>Szansa kontroli</span><span>${procent(M.szansa)}</span></div>
+    <div class="wiersz"><span>Litry w wynajętej chłodni (wg planu)</span><span>${licz(M.litry)}</span></div>
+    <div class="wiersz"><span>Przeterminowane w poprzedniej rundzie</span><span>${zl2(M.przeterminowane)}</span></div>
+    <div class="wiersz"><span>Możliwy mandat</span><span>${M.problem > 0 ? zl2(M.mandat) : "–"}</span></div></div>
+    <div class="kd"><span class="podpowiedz">Kontrola bez zastrzeżeń nic nie kosztuje. Mandat grozi, gdy towar stoi w wynajętej chłodni albo
+    w koszu ląduje przeterminowane jedzenie – i przez kilka rund mniej klientów.</span></div></div>`;
+}
+
+function wynikiMagazynu(W, M) {
+  let html = "";
+  if (W.wynajem?.length) html += tabela("Wynajęta chłodnia – Mroźnia u Mietka", ["Dzień", "Składnik", "Jakość", "Opakowania", "Litry", "Ostatni dzień", "Koszt"],
+    W.wynajem.map((x) => [dataKrotka(x.data), esc(x.zasob), gw(x.jakosc), ulamek(x.ilosc), licz(x.litry), dataKrotka(x.termin), zl2(x.koszt)]),
+    { klasy: ["l", "l"], stopka: ["Razem", "", "", "", licz(M?.wynajem?.litry || 0), "", zl2(M?.wynajem?.koszt || 0)] });
+  const sp = M?.sanepid;
+  if (sp) {
+    const naglowek = !sp.kontrola ? "Sanepid nie przyszedł" : sp.mandat ? `Kontrola sanepidu – mandat ${zl2(sp.mandat)}` : "Kontrola sanepidu – bez zastrzeżeń";
+    html += `<div class="kafel"><div class="kg">${naglowek}</div><div class="kt">
+      ${sp.tekst ? `<p>${esc(sp.tekst)}</p>` : ""}
+      <div class="wiersz"><span>Szansa kontroli</span><span>${procent(sp.szansa)}</span></div>
+      ${sp.mandat ? `<div class="wiersz"><span>Popyt</span><span class="minus">${procent(sp.popyt - 1)} przez ${sp.rund} rundy</span></div>` : ""}</div>
+      ${sp.mandat ? `<div class="kd"><span class="podpowiedz">Mandat płacisz z konta – nie jest kosztem podatkowym (poza KPiR).</span></div>` : ""}</div>`;
+  }
+  return html;
+}
 
 function zajetoscHtml(S) {
   const typy = Object.keys(S.pojemnosc);
@@ -54,7 +93,8 @@ export const swiezosc = {
   tytul: "Świeżość", tytulPelny: "Magazyn i świeżość", ikona: "swiezosc", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
   info: `Składniki mają termin przydatności: bułka z poniedziałku ląduje w koszu we wtorek wieczorem, mięso wytrzyma cztery dni, mrożonki – miesiące.
     Dzień dostawy wybierasz w zakładce <a data-zakladka-k="dostawcy">Dostawcy</a> (baza składników dostawcy). Chłodzone i mrożone składniki muszą się zmieścić
-    w szafie chłodniczej i zamrażarce – czego nie zmieścisz, to się zepsuje. Mrożona pita i mrożone mięso zastępują świeże, gdy tych zabraknie,
+    w szafie chłodniczej i zamrażarce – nadmiar jedzie do wynajętej chłodni (płacisz za litr, a termin się skraca).
+    Dużo towaru w wynajmie i przeterminowane jedzenie w koszu przyciągają sanepid. Mrożona pita i mrożone mięso zastępują świeże, gdy tych zabraknie,
     ale klienci to czują (−1★ jakości składnika).`,
   decyzje({ v }) {
     const S = v.swiezosc;
@@ -65,14 +105,16 @@ export const swiezosc = {
       <span>Zamrażarka: <span class="kwota">${licz(S.pojemnosc.zamrazarka)} l</span></span>
       <span>Partie kończące termin w tej rundzie: <span class="kwota">${wygasa.length}</span></span></div>`
       + (S.pojemnosc.chlodnia || S.pojemnosc.zamrazarka ? "" : `<div class="komunikat">Nie masz szafy chłodniczej ani zamrażarki – kup je w zakładce Sprzęt, inaczej mięso będzie trzymane na parapecie.</div>`)
-      + zajetoscHtml(S) + (S.partie.length ? partieHtml(S, S.dni) : `<p class="podpowiedz">Magazyn jest pusty.</p>`);
+      + zajetoscHtml(S) + planWynajmuHtml(S) + ryzykoHtml(v.magazyn)
+      + (S.partie.length ? partieHtml(S, S.dni) : `<p class="podpowiedz">Magazyn jest pusty.</p>`);
   },
   wyniki({ v, kat }) {
     const W = v.wyniki?.swiezosc;
     if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie sprzedaży.</p>`;
     return `<div class="pasek ciemny"><span>Wartość strat: <span class="kwota">${zl2(W.wartosc_strat)}</span></span>
       <span>Wyrzucone partie: <span class="kwota">${W.straty.length}</span></span></div>`
-      + wynikiZasoby(W) + `<div class="wykres"><canvas id="w-swiezosc"></canvas></div>` + wynikiStraty(W) + wynikiMenu(W, kat);
+      + wynikiZasoby(W) + `<div class="wykres"><canvas id="w-swiezosc"></canvas></div>` + wynikiStraty(W)
+      + wynikiMagazynu(W, v.wyniki?.magazyn) + wynikiMenu(W, kat);
   },
   po({ v }, tryb) {
     const W = v.wyniki?.swiezosc;

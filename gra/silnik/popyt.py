@@ -196,7 +196,8 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         for i in range(len(dni)):
             dzien = dni[i].isoformat()
             if firma.partie:
-                przyjete, straty = sw.przyjmij(dane, firma, dzien)
+                przyjete, straty, wynajete = sw.przyjmij(dane, firma, dzien)
+                raport["wynajem"].extend(wynajete)
                 for z, ile in przyjete.items():
                     raport["zasoby"].setdefault(z, _wiersz(len(dni)))["dostawy"][i] += ile
                 _dodaj_straty(raport, straty, i, len(dni))
@@ -283,7 +284,7 @@ def _wiersz(n: int) -> dict:
 
 def _raport_swiezosci(dane: Dane, firma: Firma, dni: list[date]) -> dict:
     return {"dni": [d.isoformat() for d in dni], "zasoby": {}, "straty": [], "zamiany": {}, "wylaczone": [],
-            "pojemnosc": sw.pojemnosc(dane, firma), "zajetosc": []}
+            "pojemnosc": sw.pojemnosc(dane, firma), "zajetosc": [], "wynajem": []}
 
 
 def _dodaj_straty(raport: dict, straty: list[dict], i: int, n: int) -> None:
