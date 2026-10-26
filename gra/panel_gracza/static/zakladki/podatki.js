@@ -1,6 +1,6 @@
 // Podatki i ZUS jednoosobowej działalności (gra z lokalami, silnik/rozliczenie.py): rejestr VAT, składki
 // właściciela, zaliczka PIT liniowego – rozliczenie co rundę zamiast CIT Revasa. Ceny w grze są brutto.
-import { esc, proc, tabela, zl2 } from "./wspolne.js";
+import { esc, nazwaUslugi, proc, tabela, zl2 } from "./wspolne.js";
 
 const RODZAJ = { nalezny: "należny (sprzedaż)", naliczony: "naliczony (zakupy)" };
 
@@ -13,7 +13,9 @@ function stawkiHtml(R, tytul) {
 
 function rejestrHtml(R) {
   if (!R?.pozycje?.length) return "";
-  return `<details><summary>Rejestr VAT – ${R.pozycje.length} pozycji</summary>`
+  const n = R.pozycje.length, j = n % 10, d = n % 100;
+  const slowo = n === 1 ? "pozycja" : j >= 2 && j <= 4 && (d < 12 || d > 14) ? "pozycje" : "pozycji";
+  return `<details><summary>Rejestr VAT – ${n} ${slowo}</summary>`
     + tabela(null, ["Opis", "Rodzaj", "Stawka", "Netto", "VAT", "Brutto"],
       R.pozycje.map((p) => [esc(p.opis), RODZAJ[p.rodzaj], proc(p.stawka, 0), zl2(p.netto), zl2(p.vat), zl2(p.brutto)]),
       { klasy: ["l", "l", "r", "r", "r", "r"] }) + `</details>`;
@@ -32,11 +34,11 @@ export const podatki = {
     sprzedaży i z większości zakupów wydzielany jest VAT (do KPiR trafia netto). Na koniec każdej rundy biuro rachunkowe
     rozlicza: VAT (należny − naliczony; nadwyżka przechodzi na następną rundę), składkę zdrowotną, zaliczkę na PIT
     (narastająco od początku gry) i – po uldze na start – preferencyjny ZUS. Wszystko płaci się z konta, automatycznie.`,
-  decyzje({ v }) {
+  decyzje({ v, kat }) {
     const T = v.podatki;
     if (!T) return `<p class="podpowiedz">Brak danych.</p>`;
     const P = T.parametry, S = T.stan;
-    const uslugi = Object.entries(P.vat_uslug).map(([u, s]) => [esc(v.kat?.uslugi?.[u]?.nazwa || u), proc(s, 0)]);
+    const uslugi = Object.entries(P.vat_uslug).map(([u, s]) => [esc(kat.uslugi[u] ? nazwaUslugi(kat, u) : u), proc(s, 0)]);
     return `<div class="karta"><p>Urząd skarbowy w Levasie mieści się w budynku, który – jak głosi legenda – sam siebie
         rozliczył z podatku od nieruchomości. Pani naczelnik nie ma nic przeciwko Tobie. Ma tylko kalkulator.</p></div>`
       + parametryHtml(P, T.ulga_na_start)

@@ -14,14 +14,15 @@ import { swiezosc } from "./swiezosc.js";
 import { czas_wlasciciela } from "./czas.js";
 import { rynek_pracy } from "./rynek_pracy.js";
 import { harpagon } from "./harpagon.js";
+import { podatki } from "./podatki.js";
 
 const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
-  dostawcy, swiezosc, czas_wlasciciela, tradycyjny, internetowy, sprzedaz, raport, kpir, bank, harpagon, biuro, lista_bledow, wyslij, analiza };
+  dostawcy, swiezosc, czas_wlasciciela, tradycyjny, internetowy, sprzedaz, raport, kpir, podatki, bank, harpagon, biuro, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
 export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", rynek_pracy: "rynek_pracy", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar",
-  tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", bank: "bank", harpagon: "harpagon",
+  tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", podatki: "podatki", bank: "bank", harpagon: "harpagon",
   biuro: "biuro", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
 
 // od której rundy zakładka jest dostępna (podpowiedź w menu)
@@ -41,7 +42,7 @@ export const MENU = [
   { klucz: "czas_wlasciciela", tytul: "Czas właściciela", ikona: "zegar" },
   { klucz: "marketing", tytul: "Marketing", ikona: "marketing", pod: ["tradycyjny", "internetowy"] },
   { klucz: "sprzedaz", tytul: "Sprzedaż", ikona: "sprzedaz" },
-  { klucz: "finanse", tytul: "Finanse", ikona: "finanse", pod: ["raport", "kpir", "bank", "harpagon", "biuro"] },
+  { klucz: "finanse", tytul: "Finanse", ikona: "finanse", pod: ["raport", "kpir", "podatki", "bank", "harpagon", "biuro"] },
   { klucz: "lista_bledow", tytul: "Lista błędów", ikona: "bledy" },
   { klucz: "wyslij", tytul: "Wyślij decyzje", ikona: "wyslij", klasa: "wyslij" },
   { klucz: "analiza", tytul: "Analiza", ikona: "analiza" },

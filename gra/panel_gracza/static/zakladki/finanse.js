@@ -55,7 +55,7 @@ export const kpir = {
   tytul: "KPiR", tytulPelny: "KPiR – księga przychodów i rozchodów", ikona: "📒", odblokowanie: (v) => v.runda >= 2,
   info: ({ v }) => `Księga przychodów i rozchodów za ${v.runda >= 2 ? (v.historia?.[v.runda - 2]?.miesiac || "") : ""}.`,
   wyniki({ v }) {
-    const k = v.wyniki.kpir;
+    const k = v.wyniki.kpir, R = v.wyniki.rozliczenie;
     const w = k.pozycje.map((p, i) => [i + 1, esc(p.opis), zl2(p.przychod), zl2(p.przychod_pozostaly), zl2(p.przychod + p.przychod_pozostaly),
       zl2(p.towary), zl2(p.wynagrodzenia), zl2(p.pozostale), zl2(p.wynagrodzenia + p.pozostale)]);
     const s = (f) => k.pozycje.reduce((a, p) => a + f(p), 0);
@@ -63,7 +63,10 @@ export const kpir = {
       "Zakup towarów i materiałów", "Wynagrodzenia", "Pozostałe wydatki", "Razem wydatki"], w,
       { klasy: ["", "l", "r", "r", "r", "r", "r", "r", "r"], stopka: ["", "Suma", zl2(s((p) => p.przychod)), zl2(s((p) => p.przychod_pozostaly)),
         zl2(k.przychody), zl2(k.towary), zl2(k.wynagrodzenia), zl2(k.pozostale), zl2(k.wynagrodzenia + k.pozostale)] })
-      + tabela(null, ["", "Kwota"], [["Dochód do opodatkowania", zl2(k.dochod)], ["Podatek", zl2(k.podatek)], ["Dochód netto", zl2(k.dochod_netto)]], { klasy: ["l", "r"] });
+      + tabela(null, ["", "Kwota"], [["Dochód do opodatkowania", zl2(k.dochod)], ...(R
+        ? [["Zaliczka na PIT", zl2(R.zaliczka)], ["Składka zdrowotna", zl2(R.zdrowotna)]]   // JDG – zakładka Podatki
+        : [["Podatek", zl2(k.podatek)]]), ["Dochód netto", zl2(k.dochod_netto)]], { klasy: ["l", "r"] })
+      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Finanse → Podatki.</p>` : "");
   },
 };
 

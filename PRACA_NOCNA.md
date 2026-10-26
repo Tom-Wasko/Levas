@@ -252,3 +252,6 @@ _brak_
   przechodzą), zakładka `podatki.js` napisana, ale nie zarejestrowana; pytanie 8 zapisane, nie wysłane.
   Zadania cron usunięte. Notatki bez zmian (w `notatki/Plan implementacji.md` git widzi tylko zmianę końców linii
   – nie commituję jej).
+
+26.10 – F3a.11 dokończone na prośbę („start working until i say to stop”): zakładka **Finanse → Podatki**
+  (Decyzje + Wyniki) zarejestrowana, KPiR pokazuje zaliczkę PIT i zdrowotną; render sprawdzony w node (rundy 1 i 4).
