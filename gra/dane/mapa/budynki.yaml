@@ -3,13 +3,13 @@
 opis: 'Budynki na mapie: każdy prowadzi do zakładki gry (zakladka – klucz z panel_gracza/static/zakladki/index.js;
   null = jeszcze bez zakładki). Własny lokal drużyny otwiera okno z zakładkami firmy. mapa: pola siatki.'
 zrodlo: notatka „Elementy mapy” (banki w dwóch rzędach po trzy, dostawcy, sklepy, parki, agencje, urząd); nazwy
-  banków, biur, dostawców i firm szkoleniowych z katalog.yaml i dostawcy.yaml
+  banków z mapa/banki.yaml (F3a.9), biur, dostawców i firm szkoleniowych z katalog.yaml i dostawcy.yaml
 budynki:
 - id: bank_1
-  nazwa: MBP Bank
+  nazwa: Crédit Agricole
   rodzaj: bank
   strefa: centrum
-  opis: Bank – konto, lokaty i kredyty.
+  opis: Bank – kredyt na start dla firmy bez historii (dane/mapa/banki.yaml).
   zakladka: bank
   mapa:
     x: 8
@@ -17,10 +17,10 @@ budynki:
     szer: 1
     gl: 1
 - id: bank_2
-  nazwa: Beauty Bank
+  nazwa: PKO BP
   rodzaj: bank
   strefa: centrum
-  opis: Bank – konto, lokaty i kredyty.
+  opis: Bank – kredyt inwestycyjny pod zastaw (dane/mapa/banki.yaml).
   zakladka: bank
   mapa:
     x: 9
@@ -28,10 +28,10 @@ budynki:
     szer: 1
     gl: 1
 - id: bank_3
-  nazwa: Euro Biznes Bank
+  nazwa: Pekao
   rodzaj: bank
   strefa: centrum
-  opis: Bank – konto, lokaty i kredyty.
+  opis: Bank – leasing sprzętu (dane/mapa/banki.yaml).
   zakladka: bank
   mapa:
     x: 10
@@ -39,10 +39,10 @@ budynki:
     szer: 1
     gl: 1
 - id: bank_4
-  nazwa: Gaz Bank
+  nazwa: ING
   rodzaj: bank
   strefa: centrum
-  opis: Bank – konto, lokaty i kredyty.
+  opis: Bank – najlepsze lokaty (dane/mapa/banki.yaml).
   zakladka: bank
   mapa:
     x: 8
@@ -50,10 +50,10 @@ budynki:
     szer: 1
     gl: 1
 - id: bank_5
-  nazwa: IT Bank
+  nazwa: mBank
   rodzaj: bank
   strefa: centrum
-  opis: Bank – konto, lokaty i kredyty.
+  opis: Bank – najtańsze konto firmowe i terminal (dane/mapa/banki.yaml).
   zakladka: bank
   mapa:
     x: 9
@@ -61,10 +61,10 @@ budynki:
     szer: 1
     gl: 1
 - id: bank_6
-  nazwa: Brand Bank
+  nazwa: Santander
   rodzaj: bank
   strefa: centrum
-  opis: Bank – konto, lokaty i kredyty.
+  opis: Bank – największy limit w koncie (dane/mapa/banki.yaml).
   zakladka: bank
   mapa:
     x: 10

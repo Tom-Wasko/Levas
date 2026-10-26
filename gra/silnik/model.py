@@ -133,6 +133,7 @@ class Lokata(Model):
     oprocentowanie: float
     od_rundy: int
     miesiecy: int
+    bank: str = ""                # gra z lokalami: bank lokaty (silnik/banki.py)
 
     kwota = _kwota("kwota")
 
@@ -143,10 +144,37 @@ class Kredyt(Model):
     oprocentowanie: float
     od_rundy: int
     miesiecy: int
-    pozostalo_gr: int
+    pozostalo_gr: int             # dług do spłaty (z zaległymi ratami kapitałowymi i doliczonymi odsetkami)
+    bank: str = ""                # gra z lokalami (silnik/banki.py): bank, produkt i zastaw
+    produkt: str = ""             # "start" | "inwestycyjny" | "obrotowy"
+    zastaw: str = ""              # "lokal:<id>" | "sprzet:<typ>:<nr>:<nazwa>"
+    zalegle: int = 0              # rund z rzędu bez zapłaconej raty
+    zaleglosc_gr: int = 0         # zaległe raty kapitałowe
 
     kwota = _kwota("kwota")
     pozostalo = _kwota("pozostalo")
+    zaleglosc = _kwota("zaleglosc")
+
+
+class Leasing(Model):
+    """Sprzęt w leasingu (gra z lokalami, silnik/banki.py): na stanowisku, ale własność banku do wykupu."""
+    id: int
+    bank: str
+    typ: str
+    nr: int
+    nazwa: str
+    jakosc: int
+    cena_gr: int
+    od_rundy: int
+    rund: int
+    pozostalo_rat: int
+    rata_gr: int
+    wykup_gr: int
+    zalegle: int = 0
+
+    cena = _kwota("cena")
+    rata = _kwota("rata")
+    wykup = _kwota("wykup")
 
 
 class Cena(Model):
@@ -194,6 +222,7 @@ class Firma(Model):
     biuro: str | None = None
     lokaty: list[Lokata] = Field(default_factory=list)
     kredyty: list[Kredyt] = Field(default_factory=list)
+    leasingi: list[Leasing] = Field(default_factory=list)
     kredyt_odnawialny_gr: int = 0
     majatek_gr: int = 0               # suma inwestycji (sprzęt, stanowiska, udogodnienia, wyposażenie) – rozwój firmy
     rozwoj_poprzedni: float | None = None

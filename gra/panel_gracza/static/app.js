@@ -68,7 +68,7 @@ async function zmien(fn) {
 
 const odbl = (k) => S.v.odblokowane.includes(k);
 function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "function" ? z.odblokowanie(S.v) : odbl(z.odblokowanie)); }
-const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd));
+const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd) && (!z.wynikiGdy || z.wynikiGdy(S.v)));
 const kluczZakladki = (z) => Object.keys(ZAKLADKI).find((k) => ZAKLADKI[k] === z);
 
 const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wyslane, zmien, api, wczytaj, ustaw, rysuj,
@@ -155,7 +155,7 @@ function glowa(v, z, tryb, decyzje, wyniki, runda) {
       </div>
       <div class="przelacznik">
         ${decyzje ? `<a class="${tryb === "decyzje" ? "aktywny" : ""}" data-akcja="tryb" data-t="decyzje">Decyzje</a>` : ""}
-        ${z.wyniki ? `<a class="${tryb === "wyniki" ? "aktywny" : ""} ${wyniki ? "" : "wylaczony"}" data-akcja="tryb" data-t="wyniki">Wyniki</a>` : ""}
+        ${z.wyniki && (!z.wynikiGdy || z.wynikiGdy(v)) ? `<a class="${tryb === "wyniki" ? "aktywny" : ""} ${wyniki ? "" : "wylaczony"}" data-akcja="tryb" data-t="wyniki">Wyniki</a>` : ""}
       </div>
     </div>`;
 }

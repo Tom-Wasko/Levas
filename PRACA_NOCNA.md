@@ -39,6 +39,12 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    rund). Staż liczę od zatrudnienia w grze – notatki mówią o „losowym stażu” kandydatów w puli; czy kandydaci
    mają przychodzić z losowym stażem (wtedy ten staż liczy się do okresu wypowiedzenia)? Czy kwoty i gwiazdki pasują?
    (zadane: 26.10 5:45, do wysłania w poniedziałek o 6:00)
+6. **Banki (F3a.9).** Przyjąłem 6 banków z mapy: Crédit Agricole (kredyt na start bez historii, 11,9%),
+   PKO BP (inwestycyjny pod zastaw 7,9%, do 70% wartości), Pekao (leasing 7,5%, wpłata 10%), ING (lokaty do 4%),
+   mBank (konto i terminal 0 zł, prowizja 0,79%), Santander (limit 40 000 zł, 16,9%). Kwoty to mój szacunek na 10.2026.
+   „Historia firmy” = 4 rundy od otwarcia pierwszego lokalu; 70% sprzedaży płacone kartą; 3 rundy bez raty → bank
+   przejmuje zastaw (kupiony lokal staje się wynajmowany). Czy banki, oprocentowanie i te zasady pasują?
+   (zadane: 26.10 6:05)
 
 ## Odłożone zadania
 
@@ -204,3 +210,19 @@ _brak_
   - nowa zakładka **Rynek pracy** (Decyzje: kanały, oferty dla moich pracowników + kontroferta, staż i okres
     wypowiedzenia, headhunter; Wyniki: zatrudnieni z kanałem i kosztem, licytacje, oferty, odejścia i przyjścia)
     w menu HR; w oknie zatrudnienia wybór kanału rekrutacji.
+- 26.10 6:05 – F3a.9 gotowe: banki. Decyzje **do potwierdzenia** (pytanie 6):
+  - 6 banków (`dane/mapa/banki.yaml`), każdy z inną najlepszą ofertą; konto firmowe w jednym banku, lokaty, kredyty
+    i leasing w dowolnych; opłaty i oprocentowanie – szacunek na 10.2026, do kalibracji w kroku 5,
+  - terminal: abonament + prowizja od 70% sprzedaży (część płacona kartą),
+  - kredyt na start bez historii; obrotowy i inwestycyjny dopiero po 4 rundach od otwarcia pierwszego lokalu;
+    jeden aktywny kredyt danego rodzaju w jednym banku; inwestycyjny wymaga zastawu (kupiony lokal albo kupiony sprzęt,
+    do 70% wartości netto),
+  - brak środków na ratę (gotówka + wolny limit): odsetki doliczone do długu, stopa karna 19%, rata do zaległości,
+    spłacana razem z następną; po 3 rundach bank przejmuje zastaw po 80% wartości netto, nadwyżka wraca na konto,
+    przejęty lokal firma dalej wynajmuje (czynsz z danych lokalu albo 0,6% ceny miesięcznie),
+  - leasing: sprzęt od razu na stanowisku, do wykupu własność banku (nie do sprzedania, bez amortyzacji), wpłata
+    i raty annuitetowe w koszty, wykup 1% ceny; 3 zaległe raty → bank zabiera sprzęt,
+  - limit w koncie z wybranego banku, debet ponad limit – odsetki karne; tryb Revasa bez zmian,
+  - zakładka **Finanse → Bank** w grze z lokalami: Decyzje (kafelki banków z najlepszą ofertą, porównanie, lokaty,
+    kredyty z zastawem, leasing, limit) + nowe Wyniki (opłaty, raty, leasing, przejęcia, odrzucone decyzje);
+    test `test_banki.py`.

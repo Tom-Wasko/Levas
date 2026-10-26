@@ -17,6 +17,7 @@ from copy import deepcopy
 
 import numpy as np
 
+from . import banki as bk
 from . import karta as kw
 from . import lokale as lk
 from . import menu
@@ -87,14 +88,19 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         # lokaty i kredyty na początku miesiąca, przed zakupami (historia rachunku ATH, luty: opłata za konto → lokata
         # 30 000 z salda 33 564 → stanowisko, sprzęt, … – saldo w trakcie miesiąca może być ujemne); bank wybrany
         # w tej rundzie działa od razu (ATH maj: zmiana na Gaz Bank i lokata 7%)
-        if d.get("bank") and d["bank"] in dane.dostepne("banki", r):
-            f.bank = d["bank"]
-        bank_info = bank_poczatek_miesiaca(f, dane.pozycje("banki")[f.bank], d, r, ksiegi[nazwa], rachunki[nazwa]) \
-            if f.bank else None
+        if tryb_lokali:   # sześć banków z mapy, produkty w dowolnym banku (silnik/banki.py)
+            bank_info = bk.poczatek_rundy(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
+        else:
+            if d.get("bank") and d["bank"] in dane.dostepne("banki", r):
+                f.bank = d["bank"]
+            bank_info = bank_poczatek_miesiaca(f, dane.pozycje("banki")[f.bank], d, r, ksiegi[nazwa], rachunki[nazwa]) \
+                if f.bank else None
         lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa]) if tryb_lokali else None
         przed = dict(f.pracownicy)
         pula = rp.pula_dla(s.kandydaci, rezerwacje, nazwa) if tryb_lokali else s.kandydaci
         info[nazwa] = zastosuj(dane, f, d, r, pula, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
+        if tryb_lokali:   # sprzęt w leasingu – na stanowiskach już z tej rundy
+            info[nazwa]["leasing"] = bk.leasing_wez(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
         if tryb_lokali:  # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
             zatrudnieni = set(info[nazwa]["zatrudnieni"])
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
@@ -211,7 +217,10 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach, r)
         if sum(f.magazyn.values()) > 1e-6:
             ksieguj(f, ks, rach, "Koszt magazynowania", dane.na_runde(z["finanse"]["koszt_magazynowania"]))
-        if f.bank:
+        bank_koniec = None
+        if tryb_lokali:
+            bank_koniec = bk.koniec_rundy(dane, f, r, ks, rach)
+        elif f.bank:
             bank_koniec_miesiaca(f, dane.pozycje("banki")[f.bank], r, ks, rach, dane.rund_w_roku)
         if f.biuro:
             b = dane.pozycje("biura_rachunkowe")[f.biuro]
@@ -221,6 +230,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         podatek = ks.podatek(z["finanse"]["podatek_cit"])
         rach.zapisz(f, "Podatek dochodowy", -podatek)
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
+        if tryb_lokali:
+            bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
         netto = round(ks.dochod - podatek, 2)
         f.skumulowany_dochod_netto = round(f.skumulowany_dochod_netto + netto, 2)
         wyniki[nazwa] = _wyniki_firmy(dane, f, r, ks, rach, info[nazwa], popyt.get(nazwa, {}),
@@ -232,6 +243,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
             wyniki[nazwa]["rynek_pracy"] = info[nazwa].get("rynek_pracy")
             wyniki[nazwa]["srodki_trwale"] = ewidencja(f)
+            wyniki[nazwa]["bank"] = {"poczatek": info[nazwa].get("bank"), "koniec": bank_koniec,
+                                     "leasing": info[nazwa].get("leasing"), "historia": bk.historia(f, r),
+                                     "debet_ponad_limit": bk.debet_ponad_limit(dane, f)}
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
                 wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]

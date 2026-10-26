@@ -29,4 +29,6 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 
 - [x] F3a.8 Agencja pracy – `silnik/rynek_pracy.py`, `dane/kandydaci.yaml` (`agencja`): kanały rekrutacji pracuj.pl / agencja / headhunter (gwiazdki, opłata, mnożnik kosztu rekrutacji, czas właściciela, od rundy), wspólna pula kandydatów z licytacją (wyższa pensja, remis – losowanie), limit 3 nowych na rundę, podkupienie przez headhuntera z kontrofertą, okres wypowiedzenia wg stażu (`Pracownik.odchodzi`), zwolnieni wracają do puli; nowa zakładka **Rynek pracy** (Decyzje + Wyniki) w HR, wybór kanału w oknie zatrudnienia; test `test_rynek_pracy.py`
 
-Zadania F3a.9–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3a.9 Banki – sześć banków z mapy (`dane/mapa/banki.yaml`, `silnik/banki.py`), każdy z inną najlepszą ofertą: Crédit Agricole (kredyt na start bez historii), PKO BP (kredyt inwestycyjny pod zastaw), Pekao (leasing sprzętu), ING (lokaty), mBank (tanie konto i terminal), Santander (limit w koncie); konto firmowe z terminalem (abonament + prowizja od płatności kartą), lokaty i kredyty w dowolnym banku, historia firmy, zastaw lokalu lub sprzętu i przejęcie po zaległościach, odsetki karne, leasing (sprzęt bez prawa sprzedaży do wykupu), debet ponad limit; zakładka **Finanse → Bank** w grze z lokalami (Decyzje + nowe Wyniki); boty wybierają najtańsze konto; test `test_banki.py`
+
+Zadania F3a.10–F3a.15, F3b.1–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

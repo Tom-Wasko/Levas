@@ -595,12 +595,73 @@ class PlikPopytu(Plik):
     kalendarz: list[WydarzenieKalendarza] = []
 
 
+# --- mapa/banki.yaml (F3a.9) ---
+
+
+class Terminal(Schemat):
+    abonament: float = Field(ge=0)       # miesięczny
+    prowizja: float = Field(ge=0, lt=1)  # od płatności kartą
+
+
+class Limit(Schemat):
+    kwota: float = Field(ge=0)
+    oprocentowanie: float = Field(ge=0, lt=1)
+
+
+class ProduktKredytowy(Schemat):
+    produkt: Literal["start", "inwestycyjny", "obrotowy"]
+    nazwa: str
+    oprocentowanie: float = Field(gt=0, lt=1)
+    prowizja: float = Field(ge=0, lt=1)
+    maks_kwota: float = Field(gt=0)
+    maks_rund: int = Field(gt=0)
+    historia: bool = False               # wymaga historii firmy (banki.yaml: historia_rund)
+    zastaw: float | None = Field(default=None, gt=0, le=1)  # część wartości zastawu, którą bank pożycza
+
+
+class OfertaLeasingu(Schemat):
+    wplata: float = Field(ge=0, lt=1)    # wpłata własna – część ceny sprzętu
+    oprocentowanie: float = Field(gt=0, lt=1)
+    rund: list[int] = Field(min_length=1)
+    wykup: float = Field(ge=0, lt=1)
+
+
+class BankMapy(Schemat):
+    nazwa: str
+    specjalizacja: str
+    opis: str
+    konto: float = Field(ge=0)           # miesięczna opłata
+    terminal: Terminal
+    lokaty: dict[int, float] = Field(min_length=1)   # okres w rundach → oprocentowanie roczne
+    limit: Limit
+    kredyty: list[ProduktKredytowy] = Field(default_factory=list)
+    leasing: OfertaLeasingu | None = None
+
+
+class PlikBankow(Plik):
+    udzial_kart: float = Field(ge=0, le=1)
+    historia_rund: int = Field(ge=0)
+    stopa_karna: float = Field(gt=0, lt=1)
+    przejecie_po: int = Field(gt=0)
+    wycena_zastawu: float = Field(gt=0, le=1)
+    czynsz_po_przejeciu: float = Field(gt=0, lt=1)
+    banki: list[BankMapy] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _nazwy(self):
+        nazwy = [b.nazwa for b in self.banki]
+        if len(set(nazwy)) != len(nazwy):
+            raise ValueError("nazwy banków muszą być różne")
+        return self
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
     "budynki.yaml": PlikBudynkow,
     "popyt.yaml": PlikPopytu,
     "menu.yaml": PlikMenu,
+    "banki.yaml": PlikBankow,
 }
 
 SCHEMATY: dict[str, type[BaseModel]] = {

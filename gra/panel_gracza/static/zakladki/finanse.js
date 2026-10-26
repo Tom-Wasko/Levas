@@ -1,4 +1,5 @@
 // Finanse: raport finansowy, KPiR, bank, biuro rachunkowe.
+import { akcjeBanku, decyzjeBanku, wynikiBanku } from "./banki.js";
 import { esc, OKRES, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
 
 const GRUPY = [
@@ -70,7 +71,10 @@ let zakladkaBanku = "historia", wyborBanku = false;
 export const bank = {
   tytul: "Bank", tytulPelny: "Finanse - bank", ikona: "🏦", odblokowanie: "finanse_bank",
   info: "Wybierz bank, w którym Twoja firma będzie prowadzić konto firmowe. Zarządzaj lokatami i kredytami.",
+  wynikiGdy: (v) => !!v.gra.lokale,   // w grze z lokalami: opłaty, raty, przejęcia (silnik/banki.py)
+  wyniki: (c) => wynikiBanku(c),
   decyzje({ v, kat, edycja }) {
+    if (v.gra.lokale) return decyzjeBanku({ v, kat, edycja });
     const banki = kat.oferty.banki.pozycje;
     const wybrany = v.stan.bank;
     const dostepny = (b) => (b.od_rundy || 1) <= v.runda;
@@ -116,6 +120,7 @@ export const bank = {
     return html;
   },
   akcje: {
+    ...akcjeBanku,
     bank: (el, c) => { wyborBanku = false; return c.zmien((d) => { d.bank = el.dataset.b; }); },
     "zmien-bank": (el, c) => { wyborBanku = true; c.idz("bank", "decyzje"); },
     "bank-powrot": (el, c) => { wyborBanku = false; c.idz("bank", "decyzje"); },

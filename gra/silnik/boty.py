@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from . import banki as bk
 from . import lokale as lk
 from . import popyt as pp
 from . import rynek_pracy as rp
@@ -81,7 +82,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
     miejsca = lk.wolne_miejsca(dane, f, runda) if lokale else None
     if not f.bank:
-        d["bank"] = min(dane.dostepne("banki", runda).values(), key=lambda b: b["konto"] + b["karta"])["nazwa"]
+        d["bank"] = bk.najlepsze(dane)["konto"] if lokale else \
+            min(dane.dostepne("banki", runda).values(), key=lambda b: b["konto"] + b["karta"])["nazwa"]
     if not f.biuro:
         d["biuro"] = min(dane.pozycje("biura_rachunkowe").values(), key=lambda b: b["etat"])["nazwa"]
 

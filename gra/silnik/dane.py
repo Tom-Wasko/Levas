@@ -16,7 +16,7 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from .schematy import SCHEMATY, SCHEMATY_MAPY, sprawdz_zalozenia
+from .schematy import SCHEMATY, SCHEMATY_MAPY, PlikBankow, sprawdz_zalozenia
 
 KATALOG_GRY = Path(__file__).resolve().parents[1]
 KATALOG_DANYCH = KATALOG_GRY / "dane"
@@ -58,11 +58,12 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
     if not (katalog / "strefy.yaml").exists():
         return None
-    st, lo, bu, po, me = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    st, lo, bu, po, me, ba = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
             "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po},
-            "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")}}
+            "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")},
+            "banki": PlikBankow.model_validate(ba).model_dump(exclude={"opis", "zrodlo"})}  # z domyślnymi polami
 
 
 class Dane:
