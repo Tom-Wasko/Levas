@@ -1,0 +1,647 @@
+# Eventy w parkach (F3b.1, silnik/zdarzenia.py) – co rundę jedna historia, ta sama dla wszystkich drużyn
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Co rundę w jednym z parków Lublina dzieje się coś, w czym każda drużyna może wziąć udział (niezależnie od
+  innych). Historia ma kilka scen w kolejnych rundach; wybór w scenie zmienia dalszy ciąg. Opcje kosztują czas
+  właściciela, gotówkę albo porcje jedzenia (porcja = koszt_porcji zł). Bez wyboru gra bierze opcję domyślną
+  (zawsze bez czasu właściciela). Skutki: gotowka (+ przychód, − koszt; bez VAT), popyt (mnożnik atrakcyjności
+  lokali przez `rund` rund od tej rundy), czas (mniej godzin właściciela w następnych `rund` rundach), kandydat
+  (osoba na rynku pracy widoczna tylko dla tej drużyny). nastepna: kolejne sceny z szansą – reszta do 1 = koniec.'
+zrodlo: 'Notatka „Elementy mapy” (Parki: prawdziwe parki Lublina, jeden event na rundę dla wszystkich, czas
+  właściciela, gotówka, porcje, opóźnione skutki jak w „60 Seconds!” – bezdomny, który przychodzi do pracy) i
+  „Zdarzenia i historie” (2–4 sceny, ok. 80% komicznych, lubelskie smaczki, postacie fikcyjne); koszt porcji,
+  kwoty i siła skutków – założenie F3b.1, do kalibracji w kroku 5'
+zasady:
+  od_rundy: 2          # w rundzie 1 drużyny dopiero otwierają lokale
+  koszt_porcji: 9      # zł za porcję rozdaną w parku (składniki i opakowanie)
+historie:
+
+- id: pan_zbyszek
+  park: ogrod_saski
+  tytul: Pan Zbyszek z ławki
+  start: lawka
+  sceny:
+    lawka:
+      tekst: >-
+        Na ławce przy fontannie w Ogrodzie Saskim siedzi starszy pan w marynarce pamiętającej lata osiemdziesiąte
+        i karmi wiewiórki okruszkami z pustej torby. Opowiada, że kiedyś gotował w hotelowej kuchni na Krakowskim
+        Przedmieściu, „ale wiewiórki nie płacą, a hotel zamknęli”.
+      domyslna: idz_dalej
+      opcje:
+      - id: kebab
+        tekst: Dajesz mu kebaba i siadasz na chwilę
+        koszt: {czas: 1, porcje: 1}
+        wynik: >-
+          Pan Zbyszek je powoli, z namaszczeniem, i ocenia sos: „Za dużo czosnku, za mało odwagi”. Coś zapisuje na
+          serwetce i chowa ją do kieszeni marynarki.
+        nastepna:
+        - {scena: wizyta, za_ile_rund: 2}
+      - id: pieniadze
+        tekst: Dajesz mu 50 zł
+        koszt: {gotowka: 50}
+        wynik: >-
+          Pan Zbyszek dziękuje, kłania się i kupuje wiewiórkom orzechy laskowe. Wiewiórki są zachwycone. Ty – trochę
+          mniej, bo orzechy były droższe niż kebab.
+      - id: idz_dalej
+        tekst: Idziesz dalej
+        wynik: Mijasz ławkę. Wiewiórka patrzy na Ciebie z wyrzutem, który zostanie z Tobą do wieczora.
+    wizyta:
+      tekst: >-
+        Do lokalu wchodzi pan Zbyszek – ogolony, w wyprasowanej marynarce, z serwetką z parku. Na serwetce: Twój sos
+        z poprawkami naniesionymi drobnym pismem. „Przyszedłem oddać kebaba. W naturze. Zatrudni mnie Pan?”
+      domyslna: przepis
+      opcje:
+      - id: zatrudnij
+        tekst: Zapraszasz go na rozmowę o pracę
+        wynik: >-
+          Pan Zbyszek zjawia się na rozmowie pół godziny przed czasem i od progu poprawia ustawienie przypraw.
+          Czeka na Twoją decyzję w zakładce Zatrudnienie – tylko u Ciebie.
+        skutki:
+        - typ: kandydat
+          opis: Zbigniew Ławecki (kucharz) na rynku pracy – tylko dla Twojej firmy
+          kandydat:
+            imie_nazwisko: Zbigniew Ławecki
+            gwiazdki: 2
+            zawod: Kucharz
+            pensja_preferowana: 4950
+            koszt_rekrutacji: 0
+            koszt_odprawy: 2000
+            zadowolenie_klientow: 0.95
+            ryzyko_reklamacji: 0.03
+      - id: przepis
+        tekst: Bierzesz tylko przepis na sos
+        wynik: >-
+          Pan Zbyszek kiwa głową ze zrozumieniem, zostawia serwetkę i wychodzi. Sos według jego poprawek okazuje się
+          lepszy. Trochę Ci głupio, ale klientom smakuje.
+        skutki:
+        - {typ: popyt, mnoznik: 1.03, rund: 3, opis: Sos pana Zbyszka}
+
+- id: szachista
+  park: ogrod_saski
+  tytul: Profesor przy szachownicy
+  start: wyzwanie
+  sceny:
+    wyzwanie:
+      tekst: >-
+        Przy kamiennym stoliku szachowym w Ogrodzie Saskim emerytowany profesor matematyki ogłasza: „Kto mnie
+        pokona, o tego kebabie opowiem na wykładzie. Kto przegra – stawia obiad”. Na stoliku leży już siedem
+        paragonów od pokonanych.
+      domyslna: pomin
+      opcje:
+      - id: zagraj
+        tekst: Siadasz do partii
+        koszt: {czas: 2}
+        wynik: >-
+          Partia trwa dwie godziny. Profesor gra czarnymi, mruczy coś o ciągu Fibonacciego i w końcówce… robi się
+          ciemno. Partię odłożono do przyszłego tygodnia.
+        nastepna:
+        - {scena: wygrana, za_ile_rund: 1, szansa: 0.4}
+        - {scena: przegrana, za_ile_rund: 1, szansa: 0.6}
+      - id: ulotki
+        tekst: Rozdajesz ulotki kibicom
+        koszt: {gotowka: 40}
+        wynik: >-
+          Kibice biorą ulotki i używają ich do zapisywania ruchów. Jedna ulotka trafia do protokołu partii, więc
+          Twój lokal jest teraz częścią historii szachów w Lublinie.
+        skutki:
+        - {typ: popyt, mnoznik: 1.01, rund: 1, opis: Ulotki w Ogrodzie Saskim}
+      - id: pomin
+        tekst: Nie grasz – szkoda czasu
+        wynik: Profesor odprowadza Cię wzrokiem i mówi do wiewiórki „Ten się bał”. Wiewiórka przytakuje.
+    wygrana:
+      tekst: >-
+        Dogrywka: wygrywasz! Profesor dotrzymuje słowa – na wykładzie z analizy rysuje Twój kebab jako bryłę
+        obrotową i każe studentom policzyć jego objętość. Studenci przychodzą sprawdzić wynik doświadczalnie.
+      skutki:
+      - {typ: popyt, mnoznik: 1.06, rund: 2, opis: Kebab na wykładzie z analizy}
+    przegrana:
+      tekst: >-
+        Dogrywka: przegrywasz w czterdziestu ruchach. Profesor zamawia obiad z trzech dań, deser i herbatę
+        „z cytryną, ale bez cytryny”. Na odchodne daje radę: „Skoczek na f3, kebab na stół”.
+      skutki:
+      - {typ: gotowka, kwota: -120, opis: Obiad dla profesora}
+
+- id: wiewiorka_gienia
+  park: park_ludowy
+  tytul: Wiewiórka Gienia
+  start: kradziez
+  sceny:
+    kradziez:
+      tekst: >-
+        Na pikniku w Parku Ludowym wiewiórka ukradła Twojemu klientowi frytkę i zjadła ją na oczach wycieczki
+        szkolnej. Pani nauczycielka pyta, czy to element programu edukacyjnego, bo dzieci chcą jeszcze raz.
+      domyslna: zaprzecz
+      opcje:
+      - id: maskotka
+        tekst: Mówisz, że tak – to Gienia, maskotka lokalu, i częstujesz klasę
+        koszt: {czas: 2, porcje: 15}
+        wynik: >-
+          Dzieci karmią Gienię frytkami pod nadzorem, a Gienia pozuje do zdjęć jak zawodowa modelka. Nauczycielka
+          wpisuje do dziennika: „Zajęcia terenowe – przyroda i gastronomia”.
+        nastepna:
+        - {scena: slawa, za_ile_rund: 1}
+      - id: zaprzecz
+        tekst: Mówisz, że wiewiórka nie ma z Wami nic wspólnego
+        wynik: >-
+          Wiewiórka odwraca się do Ciebie plecami i odchodzi z godnością. Dzieci uznają, że skłóciłeś się z
+          wiewiórką. To nie jest dobra reklama, ale też nie najgorsza.
+    slawa:
+      tekst: >-
+        Wycieczka opowiedziała o Gieni w domu. Rodzice dzwonią z pytaniem, kiedy można ją zobaczyć. Kłopot w tym,
+        że Gienia nie jest Twoja, nie ma grafiku i nie odbiera telefonu.
+      domyslna: natura
+      opcje:
+      - id: budka
+        tekst: Stawiasz w parku budkę „Gienia – stołuje się u nas”
+        koszt: {gotowka: 250}
+        wynik: Gienia wprowadza się do budki pierwszego dnia i od razu przegania z niej sikorkę. Charakter ma.
+        skutki:
+        - {typ: popyt, mnoznik: 1.05, rund: 3, opis: Budka Gieni w Parku Ludowym}
+      - id: przebranie
+        tekst: Kupujesz strój wiewiórki i sam tańczysz przy wejściu
+        koszt: {czas: 1, gotowka: 90}
+        wynik: Strój jest za duży, ogon się ciągnie, ale entuzjazm masz ogromny. Ciąg dalszy za tydzień.
+        nastepna:
+        - {scena: upal, za_ile_rund: 1}
+      - id: natura
+        tekst: Zostawiasz sprawy naturze
+        wynik: >-
+          Gienia przychodzi pod lokal, kiedy chce – czyli wtedy, gdy ktoś je frytki. Popularność bez kosztów,
+          ale i bez kontroli.
+        skutki:
+        - {typ: popyt, mnoznik: 1.01, rund: 1, opis: Gienia pod lokalem}
+    upal:
+      tekst: >-
+        Przez tydzień tańczysz w stroju wiewiórki przy wejściu. Dzieci są zachwycone, Ty – mniej: w środku stroju
+        jest 38 stopni. Prawdziwa Gienia siada na latarni naprzeciwko i wyraźnie się z Ciebie nabija.
+      skutki:
+      - {typ: popyt, mnoznik: 1.07, rund: 2, opis: Taniec wiewiórki przy wejściu}
+      - {typ: czas, godziny: 2, rund: 1, opis: Odpoczynek po tygodniu w stroju wiewiórki}
+
+- id: cebularze
+  park: park_ludowy
+  tytul: Wielki Konkurs Jedzenia Cebularzy
+  start: zapisy
+  sceny:
+    zapisy:
+      tekst: >-
+        Na festynie w Parku Ludowym startuje Wielki Konkurs Jedzenia Cebularzy. Organizator szuka sponsora nagrody
+        i zawodnika na wolne miejsce – poprzedni się wycofał, bo „w życiu miał już dość cebuli”.
+      domyslna: pomin
+      opcje:
+      - id: sponsor
+        tekst: Sponsorujesz nagrodę (logo na banerze)
+        koszt: {gotowka: 400}
+        wynik: Twoje logo wisi na banerze obok logo piekarni i rysunku uśmiechniętej cebuli. Dobre towarzystwo.
+        skutki:
+        - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Logo na banerze konkursu}
+      - id: zawodnik
+        tekst: Startujesz w konkursie
+        koszt: {czas: 3}
+        wynik: >-
+          Po siódmym cebularzu przestajesz czuć dłonie, po dziewiątym – sens życia. Sędziowie liczą okruszki.
+          Wyniki ogłoszą w przyszłym tygodniu.
+        nastepna:
+        - {scena: wygrana, za_ile_rund: 1, szansa: 0.3}
+        - {scena: drugie, za_ile_rund: 1, szansa: 0.7}
+      - id: pomin
+        tekst: Kibicujesz z daleka
+        wynik: Kibicujesz z bezpiecznej odległości. Zapach cebuli i tak Cię dogania.
+    wygrana:
+      tekst: >-
+        Wygrywasz! Lokalna telewizja nagrywa z Tobą wywiad, w którym mówisz tylko „cebula”, bo nic więcej nie
+        przechodzi przez gardło. Materiał leci w wieczornych wiadomościach. Nagroda – 500 zł.
+      skutki:
+      - {typ: gotowka, kwota: 500, opis: Nagroda w konkursie cebularzy}
+      - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Mistrz cebularzy w telewizji}
+    drugie:
+      tekst: >-
+        Drugie miejsce. Zwycięzca – emerytowany kierowca autobusu linii 13 – zjadł o pół cebularza więcej.
+        Dostajesz dyplom i tydzień czkawki, przez którą nie da się prowadzić rozmów z dostawcami.
+      skutki:
+      - {typ: czas, godziny: 3, rund: 1, opis: Czkawka po konkursie cebularzy}
+
+- id: jamnik_kebab
+  park: park_bronowicki
+  tytul: Zaginął Kebab
+  start: ogloszenia
+  sceny:
+    ogloszenia:
+      tekst: >-
+        Na drzewach w Parku Bronowickim wiszą ogłoszenia: „ZAGINĄŁ KEBAB. Mały, brązowy, reaguje na sos
+        czosnkowy. Nagroda!”. Chodzi o jamnika. Ludzie i tak dzwonią do Twojego lokalu, żeby zapytać o nagrodę.
+      domyslna: pomin
+      opcje:
+      - id: szukaj
+        tekst: Idziesz szukać jamnika
+        koszt: {czas: 3}
+        wynik: Przeczesujesz park z kawałkiem mięsa w dłoni, wołając „Kebab! Kebab!”. Przechodnie się oglądają.
+        nastepna:
+        - {scena: znaleziony, za_ile_rund: 1, szansa: 0.6}
+        - {scena: nieznaleziony, za_ile_rund: 1, szansa: 0.4}
+      - id: doklejka
+        tekst: Doklejasz pod ogłoszeniami „Kebab znaleziony – codziennie u nas”
+        koszt: {gotowka: 60}
+        wynik: Kartki trzymają się dobrze. Lepiej niż Twoje relacje z właścicielką jamnika – o czym się wkrótce przekonasz.
+        nastepna:
+        - {scena: oburzenie, za_ile_rund: 1}
+      - id: pomin
+        tekst: Nie Twój jamnik, nie Twój kebab
+        wynik: Nie mieszasz się. Telefon i tak dzwoni co godzinę.
+    znaleziony:
+      tekst: >-
+        Kebab (jamnik) siedział pod ławką przy stawie i patrzył na kaczki z wyższością. Właścicielka, pani Teresa –
+        przewodnicząca koła gospodyń – płacze ze szczęścia, wręcza nagrodę i zamawia catering na najbliższe zebranie.
+      skutki:
+      - {typ: gotowka, kwota: 300, opis: Nagroda za znalezienie jamnika}
+      - {typ: popyt, mnoznik: 1.03, rund: 3, opis: Koło gospodyń poleca}
+    nieznaleziony:
+      tekst: >-
+        Trzy godziny szukania. Znajdujesz dwie piłki tenisowe, czapkę Motoru Lublin i ogromny szacunek dla
+        jamników. Kebab wraca sam następnego dnia – prosto do Twojego lokalu. Pani Teresa i tak dziękuje.
+      skutki:
+      - {typ: popyt, mnoznik: 1.02, rund: 1, opis: Wdzięczność pani Teresy}
+    oburzenie:
+      tekst: >-
+        Pani Teresa przychodzi z wydrukiem Twojej kartki. Jest oburzona: „Mój Kebab to członek rodziny, nie
+        promocja!”. Jamnik oburzony nie jest – u Ciebie pachnie mięsem, więc merda ogonem.
+      domyslna: nic
+      opcje:
+      - id: przepros
+        tekst: Przepraszasz i częstujesz oboje
+        koszt: {czas: 1, porcje: 2}
+        wynik: Przeprosiny przyjęte. Jamnik dostaje plasterek mięsa bez przypraw, pani Teresa – kebab z podwójnym sosem.
+        skutki:
+        - {typ: popyt, mnoznik: 1.02, rund: 2, opis: Pani Teresa udobruchana}
+      - id: nic
+        tekst: Wzruszasz ramionami
+        wynik: >-
+          Pani Teresa pisze na osiedlowej grupie, że „u nich to i jamnika by przyprawili”. Kilka osób na wszelki
+          wypadek omija Twój lokal.
+        skutki:
+        - {typ: popyt, mnoznik: 0.97, rund: 2, opis: Wpis pani Teresy na grupie osiedla}
+
+- id: biegacz
+  park: park_bronowicki
+  tytul: Zasłabnięcie na biegu
+  powazna: true
+  start: bieg
+  sceny:
+    bieg:
+      tekst: >-
+        Podczas niedzielnego biegu charytatywnego w Parku Bronowickim jeden z biegaczy zasłabł tuż przy stoisku
+        z wodą. Ktoś wezwał karetkę, która jest w drodze.
+      domyslna: ratownicy
+      opcje:
+      - id: pomoc
+        tekst: Udzielasz pierwszej pomocy i zostajesz do przyjazdu karetki
+        koszt: {czas: 2}
+        wynik: >-
+          Układasz poszkodowanego w pozycji bezpiecznej i kontrolujesz oddech do przyjazdu ratowników. Biegacz
+          trafia do szpitala, jego stan jest stabilny.
+        nastepna:
+        - {scena: podziekowanie, za_ile_rund: 2}
+      - id: ratownicy
+        tekst: Zostawiasz to ratownikom medycznym biegu
+        wynik: Ratownicy biegu przejmują poszkodowanego. Biegacz trafia do szpitala, jego stan jest stabilny.
+    podziekowanie:
+      tekst: >-
+        Biegacz – nauczyciel wychowania fizycznego z pobliskiej szkoły – wrócił do zdrowia i przyszedł podziękować.
+        Rada rodziców zamówiła u Ciebie poczęstunek na zakończenie zawodów szkolnych.
+      skutki:
+      - {typ: gotowka, kwota: 400, opis: Poczęstunek dla szkoły}
+      - {typ: popyt, mnoznik: 1.02, rund: 2, opis: Polecenie od szkoły}
+
+- id: influencerka
+  park: park_rury
+  tytul: Najgorszy kebab w Lublinie
+  start: nagranie
+  sceny:
+    nagranie:
+      tekst: >-
+        W Parku Rury influencerka @lublin_na_talerzu (48 tys. obserwujących) nagrywa odcinek „Szukam najgorszego
+        kebaba w Lublinie”. Podchodzi do Ciebie z telefonem na kijku: „Możemy zacząć od Pana?”
+      domyslna: odmowa
+      opcje:
+      - id: zgoda
+        tekst: Zgadzasz się i podajesz najlepszy kebab
+        koszt: {czas: 1, porcje: 3}
+        wynik: Influencerka próbuje, kamera się kręci, a Ty pocisz się bardziej niż rożen. Odcinek wyjdzie w przyszłym tygodniu.
+        nastepna:
+        - {scena: zachwyt, za_ile_rund: 1, szansa: 0.5}
+        - {scena: wpadka, za_ile_rund: 1, szansa: 0.5}
+      - id: wspolpraca
+        tekst: Proponujesz „współpracę reklamową”
+        koszt: {gotowka: 500}
+        wynik: Influencerka przelicza coś w pamięci i zmienia tytuł odcinka na „Szukam NAJLEPSZEGO kebaba”. Szybko poszło.
+        nastepna:
+        - {scena: sponsorowany, za_ile_rund: 1}
+      - id: odmowa
+        tekst: Odmawiasz
+        wynik: Odcinek „Kebab, który się bał” ma 20 tys. wyświetleń. Komentujący zgadują, który to lokal. Część zgaduje dobrze.
+        skutki:
+        - {typ: popyt, mnoznik: 0.98, rund: 1, opis: "Odcinek „Kebab, który się bał”"}
+    zachwyt:
+      tekst: >-
+        Odcinek wyszedł. Influencerka próbuje, milknie, próbuje jeszcze raz i przez 40 sekund nagrywa ciszę z
+        zamkniętymi oczami. Tytuł zmieniła na „Szukałam najgorszego, znalazłam najlepszego”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.08, rund: 2, opis: Zachwyt influencerki}
+    wpadka:
+      tekst: >-
+        Odcinek wyszedł. W połowie nagrania sos czosnkowy wystrzelił z tortilli prosto w obiektyw. Film „Kebab mnie
+        zaatakował” ma 200 tys. wyświetleń, a ludzie przychodzą zobaczyć „ten agresywny kebab”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Viral „Kebab mnie zaatakował”}
+    sponsorowany:
+      tekst: >-
+        Materiał sponsorowany wyszedł poprawny, tylko w komentarzach ktoś pyta: „Czemu na końcu mruga dwa razy,
+        jakby ją zmuszono?”. Efekt – umiarkowany, jak to z reklamą.
+      skutki:
+      - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Materiał sponsorowany}
+
+- id: grill_sasiedzki
+  park: park_rury
+  tytul: Grill sąsiedzki na LSM-ie
+  start: zaproszenie
+  sceny:
+    zaproszenie:
+      tekst: >-
+        Rada osiedla organizuje w Parku Rury grill sąsiedzki i pyta, czy zrobisz catering na sześćdziesiąt osób.
+        Zapłata „ze zbiórki” – skarbnik, pan Wiesław, zapewnia, że sąsiedzi są hojni.
+      domyslna: pomin
+      opcje:
+      - id: catering
+        tekst: Robisz catering (płatny ze zbiórki)
+        koszt: {czas: 3, porcje: 40}
+        wynik: Sąsiedzi jedzą, chwalą i robią sobie zdjęcia z Twoimi kebabami. Pan Wiesław chodzi z puszką. Liczenie – w przyszłym tygodniu.
+        nastepna:
+        - {scena: zbiorka, za_ile_rund: 1, szansa: 0.7}
+        - {scena: guzik, za_ile_rund: 1, szansa: 0.3}
+      - id: ulotki
+        tekst: Wysyłasz pracownika z ulotkami
+        koszt: {gotowka: 80}
+        wynik: Ulotki rozeszły się szybko – część jako podkładki pod kiełbaski, część jako wachlarze. Kilka trafiło do kieszeni.
+        skutki:
+        - {typ: popyt, mnoznik: 1.02, rund: 1, opis: Ulotki na grillu sąsiedzkim}
+      - id: pomin
+        tekst: Odmawiasz – za dużo roboty
+        wynik: Rada osiedla zamawia kiełbaski w markecie. Sąsiedzi przez cały wieczór mówią, że „kebab byłby lepszy”.
+    zbiorka:
+      tekst: >-
+        Zbiórka się udała. Pan Wiesław przynosi kopertę i półgodzinne przemówienie o sile wspólnoty osiedlowej.
+        Koperta jest grubsza niż przemówienie – a to coś znaczy.
+      skutki:
+      - {typ: gotowka, kwota: 650, opis: Zapłata za catering z grilla}
+      - {typ: popyt, mnoznik: 1.02, rund: 2, opis: Sąsiedzi z LSM-u polecają}
+    guzik:
+      tekst: >-
+        Zbiórka zebrała 210 zł, guzik i zdjęcie kota skarbnika. Pan Wiesław obiecuje dopłacić resztę „w przyszłym
+        kwartale, jak kot pozwoli”.
+      skutki:
+      - {typ: gotowka, kwota: 210, opis: Zbiórka z grilla (część)}
+      nastepna:
+      - {scena: doplata, za_ile_rund: 3, szansa: 0.5}
+    doplata:
+      tekst: >-
+        Pan Wiesław dotrzymuje słowa: przynosi 300 zł w bilonie i nowe zdjęcie kota – tym razem z dedykacją.
+      skutki:
+      - {typ: gotowka, kwota: 300, opis: Dopłata za catering z grilla}
+
+- id: trupi_kwiat
+  park: ogrod_botaniczny
+  tytul: Trupi kwiat zakwitł
+  start: kolejka
+  sceny:
+    kolejka:
+      tekst: >-
+        W Ogrodzie Botanicznym UMCS zakwitło dziwidło olbrzymie – kwiat, który kwitnie raz na kilka lat i pachnie
+        jak zepsute mięso. Kolejka zwiedzających sięga bramy. Ktoś mówi głośno: „To chyba od tego kebaba na rogu”.
+      domyslna: pomin
+      opcje:
+      - id: stoisko
+        tekst: Stawiasz przy kolejce stoisko „Tu pachnie lepiej”
+        koszt: {czas: 3, gotowka: 100, porcje: 20}
+        wynik: >-
+          Kontrast działa: po trzech minutach przy kwiecie ludzie ustawiają się do Ciebie jak do apteki. Ogrodnik
+          prosi, żebyś przesunął stoisko, bo „kwiat ma kompleksy”.
+        skutki:
+        - {typ: popyt, mnoznik: 1.06, rund: 2, opis: Stoisko przy trupim kwiecie}
+      - id: mietowki
+        tekst: Rozdajesz w kolejce miętówki z logo
+        koszt: {gotowka: 150}
+        wynik: Miętówki znikają w kwadrans. Ludzie biorą po trzy – jedną dla siebie, dwie dla nosa.
+        skutki:
+        - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Miętówki z logo}
+      - id: pomin
+        tekst: Nic nie robisz – kwiat to kwiat
+        wynik: Nic nie robisz. Plotka o „kebabie na rogu” zaczyna żyć własnym życiem.
+        nastepna:
+        - {scena: plotka, za_ile_rund: 1, szansa: 0.5}
+    plotka:
+      tekst: >-
+        Lokalny portal pisze: „Czy trupi kwiat ma związek z gastronomią w okolicy? Sprawdziliśmy – nie ma. Ale
+        pytanie pozostaje”. Kilku klientów pyta, czy mięso jest na pewno świeże.
+      skutki:
+      - {typ: popyt, mnoznik: 0.97, rund: 1, opis: Artykuł o trupim kwiecie}
+
+- id: doktorantka
+  park: ogrod_botaniczny
+  tytul: Badania nad tymiankiem
+  start: propozycja
+  sceny:
+    propozycja:
+      tekst: >-
+        Doktorantka z UMCS, pani Marta, szuka lokalu do badań „Wpływ ziół z ogrodu botanicznego na zadowolenie
+        klientów gastronomii”. Ma ankiety, zioła w doniczkach i grant na 0 zł.
+      domyslna: odmowa
+      opcje:
+      - id: zgoda
+        tekst: Zgadzasz się na badania w Twoim lokalu
+        koszt: {czas: 2}
+        wynik: >-
+          Przez tydzień pani Marta dosypuje do sosów ziół i ankietuje klientów. Jeden klient pyta, czy to legalne.
+          Jest – to tymianek.
+        nastepna:
+        - {scena: wyniki_badan, za_ile_rund: 2}
+      - id: odmowa
+        tekst: Odmawiasz – lokal to nie laboratorium
+        wynik: Pani Marta idzie do konkurencji. Tymianek idzie z nią.
+    wyniki_badan:
+      tekst: >-
+        Pani Marta przynosi wyniki: klienci jedzący sos tymiankowy są o 12% bardziej zadowoleni (p < 0,05, cokolwiek
+        to znaczy). Proponuje, żebyś został współautorem artykułu naukowego.
+      domyslna: przepis
+      opcje:
+      - id: wspolautor
+        tekst: Zostajesz współautorem (trzeba przeczytać i poprawić tekst)
+        koszt: {czas: 2}
+        wynik: >-
+          Artykuł „Thymus vulgaris a satysfakcja konsumenta lokalu gastronomicznego w Lublinie” trafia do
+          czasopisma. Twój kebab ma teraz numer DOI.
+        skutki:
+        - {typ: popyt, mnoznik: 1.04, rund: 3, opis: Kebab z numerem DOI}
+      - id: przepis
+        tekst: Bierzesz przepis, sławę zostawiasz nauce
+        wynik: Sos tymiankowy wchodzi do menu. Pani Marta dziękuje w przypisie numer 14.
+        skutki:
+        - {typ: popyt, mnoznik: 1.02, rund: 2, opis: Sos tymiankowy}
+
+- id: dukaty
+  park: blonia
+  tytul: Szlachta płaci dukatami
+  start: rekonstrukcja
+  sceny:
+    rekonstrukcja:
+      tekst: >-
+        Na Błoniach pod Zamkiem trwa rekonstrukcja zawarcia Unii Lubelskiej. Trzydziestu szlachciców w kontuszach
+        zamawia kebaby i chce płacić „dukatami z mennicy koronnej”. Dukaty są plastikowe, ale szlachta – bardzo
+        przekonująca.
+      domyslna: pomin
+      opcje:
+      - id: dukaty
+        tekst: Przyjmujesz dukaty
+        koszt: {porcje: 30}
+        wynik: Szlachta wiwatuje i wznosi toast ayranem. Masz pełną szufladę plastikowych dukatów i poczucie, że coś się wydarzyło.
+        nastepna:
+        - {scena: kolekcjoner, za_ile_rund: 2, szansa: 0.5}
+      - id: karta
+        tekst: Wyjaśniasz, że od 1569 roku sporo się zmieniło, i przyjmujesz kartę
+        koszt: {czas: 1, porcje: 30}
+        wynik: Hetman płaci zbliżeniowo, z kamienną twarzą. Chorąży prosi o fakturę na „Rzeczpospolitą Obojga Narodów”.
+        skutki:
+        - {typ: gotowka, kwota: 750, opis: Kebaby dla szlachty (płatność kartą)}
+      - id: pomin
+        tekst: Odsyłasz szlachtę do innego lokalu
+        wynik: Szlachta odchodzi z godnością, ale ktoś mamrocze „liberum veto”. Nie wiesz, czy to obelga.
+    kolekcjoner:
+      tekst: >-
+        Do lokalu wchodzi kolekcjoner rekwizytów historycznych. Chce kupić cały komplet „dukatów z rekonstrukcji
+        2026 z autentycznym zapachem czosnku”. Płaci prawdziwymi złotówkami.
+      skutki:
+      - {typ: gotowka, kwota: 1200, opis: Kolekcjoner kupuje dukaty}
+
+- id: instalacja
+  park: blonia
+  tytul: Sztuka z kebaba
+  start: noc_kultury
+  sceny:
+    noc_kultury:
+      tekst: >-
+        Podczas Nocy Kultury na Błoniach artysta prosi o pięćdziesiąt kebabów do instalacji „Konsumpcja (nie
+        dotykać)”. Obiecuje, że Twoje logo trafi do katalogu wystawy.
+      domyslna: pomin
+      opcje:
+      - id: piecdziesiat
+        tekst: Dajesz pięćdziesiąt kebabów
+        koszt: {porcje: 50}
+        wynik: 'Instalacja wygląda imponująco: kebaby ułożone w spiralę wokół lustra. Tłum robi zdjęcia. Mewy też się interesują.'
+        nastepna:
+        - {scena: krytycy, za_ile_rund: 1}
+      - id: dziesiec
+        tekst: Dajesz dziesięć – na wersję kameralną
+        koszt: {czas: 1, porcje: 10}
+        wynik: 'Artysta wybiera minimalizm: „Konsumpcja (wersja kameralna)”. Krytycy chwalą odwagę ograniczenia.'
+        skutki:
+        - {typ: popyt, mnoznik: 1.02, rund: 1, opis: Logo w katalogu Nocy Kultury}
+      - id: pomin
+        tekst: Odmawiasz – kebaby są do jedzenia
+        wynik: Artysta używa w końcu pierogów. Instalacja nazywa się „Konsumpcja (wersja ruska)”.
+    krytycy:
+      tekst: >-
+        Instalacja stoi od trzech dni. Krytyk z Warszawy pisze, że to „najważniejszy głos o gastronomii w tym
+        dziesięcioleciu”. Sanepid pisze, że chce porozmawiać.
+      domyslna: nic
+      opcje:
+      - id: sprzatnij
+        tekst: Pomagasz rozebrać instalację przed wizytą sanepidu
+        koszt: {czas: 2}
+        wynik: Rozbieracie instalację o świcie. Sława zostaje, zapach też – ale krócej.
+        skutki:
+        - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Sława po Nocy Kultury}
+      - id: nic
+        tekst: Sztuka obroni się sama
+        wynik: >-
+          Sanepid uznaje sztukę za odpady i wystawia mandat. Artysta jest zachwycony – mandat w ramce dołącza
+          do instalacji jako jej część.
+        skutki:
+        - {typ: gotowka, kwota: -400, opis: Mandat za instalację z kebabów}
+        - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Sława po Nocy Kultury}
+
+- id: morsy
+  park: zalew
+  tytul: Morsowanie nad Zalewem
+  start: zaproszenie
+  sceny:
+    zaproszenie:
+      tekst: >-
+        Klub morsów znad Zalewu Zemborzyckiego zaprasza na niedzielne morsowanie. Kto wytrzyma w wodzie pięć minut,
+        trafia na listę sponsorów w klubowej gablocie. Woda ma 2 stopnie, prezes klubu – 74 lata i krótkie spodenki.
+      domyslna: pomin
+      opcje:
+      - id: morsuj
+        tekst: Wchodzisz do wody
+        koszt: {czas: 2}
+        wynik: Wchodzisz do wody z okrzykiem, którego nie powtórzysz przy dzieciach. Prezes mierzy czas zegarkiem z 1985 roku.
+        nastepna:
+        - {scena: gablota, za_ile_rund: 1, szansa: 0.6}
+        - {scena: katar, za_ile_rund: 1, szansa: 0.4}
+      - id: herbata
+        tekst: Przywozisz morsom herbatę w termosach i kebaby
+        koszt: {czas: 2, porcje: 25}
+        wynik: >-
+          Morsy jedzą kebaby w kąpielówkach przy zerze stopni. Ktoś robi zdjęcie, które obiega lubelski internet
+          z podpisem „Hartujemy się od środka”.
+        skutki:
+        - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Kebaby dla morsów}
+      - id: pomin
+        tekst: Zostajesz w ciepłym lokalu
+        wynik: Zostajesz w lokalu. Morsy przechodzą obok witryny w ręcznikach i patrzą z politowaniem.
+    gablota:
+      tekst: >-
+        Wytrzymujesz pięć minut i czternaście sekund. Prezes wiesza Twoje zdjęcie w gablocie, między zdjęciem
+        prezesa z 1998 roku a zdjęciem foki, która podobno kiedyś tu przypłynęła.
+      skutki:
+      - {typ: popyt, mnoznik: 1.03, rund: 3, opis: Zdjęcie w gablocie morsów}
+    katar:
+      tekst: >-
+        Wytrzymujesz pięć minut, ale następne pięć dni spędzasz pod kocem z herbatą z miodem i lipą. Lokal działa,
+        Ty – mniej. Morsy przysyłają kartkę „Pierwszy raz zawsze boli”.
+      skutki:
+      - {typ: czas, godziny: 6, rund: 1, opis: Przeziębienie po morsowaniu}
+      - {typ: popyt, mnoznik: 1.02, rund: 2, opis: Morsy kibicują}
+
+- id: zaginione_dziecko
+  park: zalew
+  tytul: Zaginione dziecko nad Zalewem
+  powazna: true
+  start: poszukiwania
+  sceny:
+    poszukiwania:
+      tekst: >-
+        Nad Zalewem Zemborzyckim zgubił się sześcioletni chłopiec. Rodzice i ratownicy proszą okolicznych o pomoc
+        w poszukiwaniach.
+      domyslna: sluzby
+      opcje:
+      - id: szukaj
+        tekst: Dołączasz do poszukiwań
+        koszt: {czas: 3}
+        wynik: >-
+          Razem z ratownikami przeszukujecie brzeg. Po godzinie chłopiec odnajduje się przy wypożyczalni rowerów
+          wodnych – przestraszony, ale cały.
+        nastepna:
+        - {scena: rodzice, za_ile_rund: 1}
+      - id: kartka
+        tekst: Wywieszasz w lokalu kartkę z rysopisem
+        koszt: {czas: 1}
+        wynik: Pracownik rozpoznaje chłopca na przystanku przy lokalu i dzwoni na policję. Wszystko kończy się dobrze.
+        skutki:
+        - {typ: popyt, mnoznik: 1.01, rund: 1, opis: Pomoc w poszukiwaniach}
+      - id: sluzby
+        tekst: Zostawiasz poszukiwania służbom
+        wynik: Ratownicy i policja odnajdują chłopca po godzinie. Wszystko kończy się dobrze.
+    rodzice:
+      tekst: >-
+        Rodzice chłopca przychodzą z podziękowaniem. Lokalna gazeta opisuje poszukiwania i wymienia ludzi, którzy
+        pomogli – także Ciebie.
+      skutki:
+      - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Artykuł o poszukiwaniach}

@@ -10,6 +10,7 @@ from silnik import lichwiarz as lw
 from silnik import rozliczenie as rz
 from silnik import rynek_pracy as rp
 from silnik import swiezosc
+from silnik import zdarzenia as zd
 from silnik.dane import Dane
 from silnik.decyzje import (
     cena_sprzedazy_sprzetu,
@@ -66,6 +67,10 @@ def stan_po_szkicu(gra: Gra, firma: str):
     if lokale:
         info["bank"], info["leasing"] = bank_info, bk.leasing_wez(gra.dane, f, d, r, ks, rach)
         info["harpagon"] = harpagon_info
+    if lokale and gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
+        czas = cw.z_podsumowania(info["czas_wlasciciela"])
+        info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
+        info["czas_wlasciciela"] = czas.podsumowanie()
     bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
                          lokal, info)
     bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
@@ -73,6 +78,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
         odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]
         bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
         bledy += lw.bledy(gra.dane, f, harpagon_info, r)
+        bledy += (info.get("zdarzenia") or {}).get("bledy", [])
     return stan, f, ks, info, bledy
 
 
@@ -176,6 +182,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
                                  else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
         v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
+        if dane.zdarzenia:
+            v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
         fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)
         v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
                       "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}

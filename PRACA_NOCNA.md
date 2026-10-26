@@ -90,6 +90,13 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    stanowisku się nie liczy. Lokal „co 3 rundy” liczę od rundy wzięcia poprzedniego lokalu (lokal z rundy 1 →
    kolejny od rundy 4), nie od chwili, gdy zacznie działać. Czy tak? (zapisane 26.10)
 
+12. **Parki (F3b.1).** Założenia do sprawdzenia: porcja jedzenia w evencie kosztuje 9 zł (koszt towaru, bez VAT);
+   gotówka z eventów (nagrody, opłaty) bez VAT; od rundy 2 **co rundę** jedna historia, ta sama dla wszystkich
+   drużyn, bez powtórzeń w cyklu 14 historii; skutki: popyt od −3% do +8% na 1–3 rundy, 2–6 h właściciela mniej na 1
+   rundę, nagrody 210–1200 zł, straty 120–400 zł; 12 historii komicznych i 2 poważne (biegacz, zaginione dziecko); 4 nowe parki na
+   mapie (Ogród Botaniczny, Park Bronowicki, Park Rury, Błonia); boty wybierają losowo spośród opcji do 3 h;
+   pan Zbyszek (kucharz 2★) trafia na rynek pracy tylko dla drużyny, która go zaprosiła. Czy tak? (zapisane 26.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -300,3 +307,4 @@ _brak_
   odnawialny z końca rundy nie trafiał do dokumentów – naprawione.
 - 26.10 – F3a.14 gotowe: panel mistrza gry (pauza, harmonogram zamykania rund z komendą `zamykaj_rundy`, podgląd drużyn tylko do odczytu, poziomy botów bez efektu do F4.4, eksport CSV); pytanie 10. Start F3a.15.
 - 26.10 – F3a.15 gotowe: limity odrzucane przy zapisie decyzji (`silnik/limity.py`); pytanie 11. Krok 3a zakończony, start F3b.1 Parki.
+- 26.10 – F3b.1 gotowe: eventy w parkach (14 historii, zakładka Zdarzenia); pytanie 12. Nowe polecenia użytkownika: kapitał 40 000 zł, sortowanie list, lodówki + sanepid zamiast kosztu magazynowania, bez zwrotów + event z bankiem żywności.

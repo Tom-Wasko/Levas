@@ -20,6 +20,7 @@ from .schematy import (
     OPCJONALNE,
     SCHEMATY,
     SCHEMATY_MAPY,
+    SCHEMATY_ZDARZEN,
     PlikBankow,
     PlikBiur,
     PlikHarpagona,
@@ -76,6 +77,14 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
             "biura": PlikBiur.model_validate(bi).model_dump(exclude={"opis", "zrodlo"})}
 
 
+def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
+    """Eventy (`dane/zdarzenia/`, F3b.1): parki. Brak katalogu = gra bez eventów."""
+    if not (katalog / "parki.yaml").exists():
+        return None
+    return {n.removesuffix(".yaml"): s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"})
+            for n, s in SCHEMATY_ZDARZEN.items()}   # z domyślnymi polami
+
+
 class Dane:
     def __init__(self, katalog: Path = KATALOG_DANYCH):
         self.katalog = katalog
@@ -99,6 +108,7 @@ class Dane:
         self.zalozenia_pelne: dict = p["zalozenia.yaml"]
         self.z: dict = _wartosci(self.zalozenia_pelne)
         self.mapa: dict | None = _wczytaj_mape(katalog / "mapa")
+        self.zdarzenia: dict | None = _wczytaj_zdarzenia(katalog / "zdarzenia")
         self.podatki: dict | None = _wartosci(p["podatki_2026.yaml"]) if "podatki_2026.yaml" in p else None   # JDG (F3a.11)
 
     @cached_property
@@ -126,7 +136,8 @@ class Dane:
     def wersja(self) -> str:
         """Skrót danych i założeń – w grze wieloosobowej wszyscy muszą mieć ten sam."""
         h = hashlib.sha256()
-        for plik in sorted([*self.katalog.glob("*.yaml"), *self.katalog.glob("mapa/*.yaml")]):
+        for plik in sorted([*self.katalog.glob("*.yaml"), *self.katalog.glob("mapa/*.yaml"),
+                              *self.katalog.glob("zdarzenia/*.yaml")]):
             h.update(plik.read_bytes())
         return h.hexdigest()[:12]
 
@@ -231,6 +242,17 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
             except ValidationError as e:
                 for b in e.errors():
                     bledy.append(f"mapa/{nazwa}: {'.'.join(map(str, b['loc']))}: {b['msg']}")
+    zd = katalog / "zdarzenia"
+    if zd.exists():
+        for nazwa, schemat in SCHEMATY_ZDARZEN.items():
+            if not (zd / nazwa).exists():
+                bledy.append(f"brak pliku dane/zdarzenia/{nazwa}")
+                continue
+            try:
+                schemat.model_validate(_wczytaj(zd / nazwa))
+            except ValidationError as e:
+                for b in e.errors():
+                    bledy.append(f"zdarzenia/{nazwa}: {'.'.join(map(str, b['loc']))}: {b['msg']}")
     if bledy:
         return bledy
 
@@ -370,7 +392,26 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
         for s in w["strefy"]:
             if s != "wszystkie" and s not in m["strefy"]:
                 brak(s, f"mapa/popyt.yaml: kalendarz: {w['nazwa']}", "strefa", "mapa/strefy.yaml")
+    _sprawdz_zdarzenia(d, bledy, brak)
     return bledy
+
+
+def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
+    """Odwołania eventów: park z mapy (park albo woda), zawód kandydata."""
+    if not d.zdarzenia:
+        return
+    if not d.mapa:
+        bledy.append("zdarzenia/: eventy w parkach wymagają mapy (dane/mapa/)")
+        return
+    parki = {b["id"] for b in d.mapa["budynki"] if b["rodzaj"] in ("park", "woda")}
+    for h in d.zdarzenia["parki"]["historie"]:
+        co = f"zdarzenia/parki.yaml: {h['id']}"
+        if h["park"] not in parki:
+            brak(h["park"], co, "park albo woda", "mapa/budynki.yaml")
+        for nazwa, s in h["sceny"].items():
+            for sk in [*s["skutki"], *(x for o in s["opcje"] for x in o["skutki"])]:
+                if sk["kandydat"] and sk["kandydat"]["zawod"] not in d.zawody:
+                    brak(sk["kandydat"]["zawod"], f"{co}.{nazwa}", "zawód", "katalog.yaml: stanowiska.typy")
 
 
 @lru_cache(maxsize=1)

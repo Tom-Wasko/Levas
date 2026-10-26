@@ -42,6 +42,7 @@ from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import srodki_trwale as st_trwale
 from . import swiezosc as sw
+from . import zdarzenia as zd
 from .dane import KASA, KUCHNIA, Dane
 from .dostawcy import zasady_dostaw
 from .finanse import Ksiega, Rachunek, ksieguj
@@ -81,7 +82,8 @@ def kandydaci_firmy(pula: list[dict], firma: Firma) -> list[dict]:
     """Kandydaci widoczni dla firmy: cała pula bez jej własnych pracowników. Każda firma ma pełną listę – w grze
     A/B/C drużyny A i C zatrudniły w lutym te same osoby (Miś, Tarnowska), a Mroczkowskiego A w lutym, C w marcu."""
     zajeci = {p.imie_nazwisko for p in firma.pracownicy.values()}
-    return [k for k in pula if k["id"] not in firma.pracownicy and k["imie_nazwisko"] not in zajeci]
+    return [k for k in pula if k["id"] not in firma.pracownicy and k["imie_nazwisko"] not in zajeci
+            and k.get("tylko_dla", firma.nazwa) == firma.nazwa]   # kandydat z eventu w parku – tylko dla jednej firmy
 
 
 def _kanal(dane: Dane, kandydat: dict, wybrany: str | None, runda: int, czas: cw.Czas, info: dict) -> str | None:
@@ -168,6 +170,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     # sprzedaż i zakup sprzętu
     sprzet_ok, kadry_ok = "inwestycje_sprzet" in odbl, "hr_zatrudnienie" in odbl
     czas = cw.nowy(dane) if lokale else None   # czas właściciela: pracuj.pl, potem odbiór osobisty w dyskontach
+    for e in zd.efekty_czasu(firma, runda) if lokale else []:   # skutki eventów w parkach (np. przeziębienie)
+        czas.wez(e.wartosc, e.opis, zd.ZAKLADKA)
     for s in d.get("sprzet_sprzedaj", []) if sprzet_ok else []:
         st = firma.stanowisko(s["typ"], int(s["nr"]))
         if st and s["nazwa"] in st.sprzet and s["nazwa"] not in st.sprzet_wynajmujacego:

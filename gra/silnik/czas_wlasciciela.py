@@ -37,5 +37,12 @@ class Czas:
         return {"pula": self.pula, "wykorzystane": self.wykorzystane, "wolne": self.wolne, "pozycje": list(self.pozycje)}
 
 
+def z_podsumowania(p: dict) -> Czas:
+    """Czas odtworzony z `podsumowanie()` – kolejne decyzje rundy zużywają resztę godzin."""
+    c = Czas(p["pula"])
+    c.pozycje = list(p["pozycje"])
+    return c
+
+
 def nowy(dane: Dane) -> Czas:
     return Czas(dane.z["operacje"]["czas_wlasciciela"])

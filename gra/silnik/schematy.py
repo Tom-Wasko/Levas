@@ -793,6 +793,147 @@ class PlikPodatkow(Plik):
     zus_pracodawcy: float = Stawka
 
 
+# --- zdarzenia/*.yaml (eventy w parkach F3b.1; katalog opcjonalny – bez niego gra bez eventów) ---
+
+
+class KosztOpcji(Schemat):
+    czas: float = Field(default=0, ge=0)       # godziny właściciela
+    gotowka: float = Field(default=0, ge=0)    # zł
+    porcje: int = Field(default=0, ge=0)       # porcje jedzenia (zasady.koszt_porcji zł)
+
+
+SKUTKI_POLA = {"gotowka": "kwota", "popyt": "mnoznik", "czas": "godziny", "kandydat": "kandydat"}
+
+
+class Skutek(Schemat):
+    typ: Literal["gotowka", "popyt", "czas", "kandydat"]
+    opis: str = Field(min_length=3)
+    kwota: float | None = None                          # gotowka: + przychód, − koszt
+    mnoznik: float | None = Field(default=None, gt=0)    # popyt: mnożnik atrakcyjności lokali
+    godziny: float | None = Field(default=None, gt=0)    # czas: o tyle mniej godzin właściciela
+    rund: int = Field(default=1, ge=1)
+    kandydat: ZnanyKandydat | None = None               # kandydat: osoba tylko dla tej drużyny
+
+    @model_validator(mode="after")
+    def _pola(self):
+        for typ, pole in SKUTKI_POLA.items():
+            if (getattr(self, pole) is not None) != (self.typ == typ):
+                raise ValueError(f"skutek typu {self.typ}: pole {pole} " + ("wymagane" if self.typ == typ else "zbędne"))
+        return self
+
+
+class Nastepna(Schemat):
+    scena: str
+    za_ile_rund: int = Field(default=1, ge=1)
+    szansa: float = Field(default=1, gt=0, le=1)
+
+
+def _szanse(nastepne: list[Nastepna]):
+    if sum(n.szansa for n in nastepne) > 1 + 1e-9:
+        raise ValueError("szanse kolejnych scen sumują się do więcej niż 1")
+
+
+class Opcja(Schemat):
+    id: str = Field(pattern=r"^[a-z0-9_]+$")
+    tekst: str = Field(min_length=3)
+    koszt: KosztOpcji = Field(default_factory=KosztOpcji)
+    wynik: str = Field(min_length=3)
+    skutki: list[Skutek] = []
+    nastepna: list[Nastepna] = []
+
+    @model_validator(mode="after")
+    def _sprawdz(self):
+        _szanse(self.nastepna)
+        return self
+
+
+class Scena(Schemat):
+    """Scena z opcjami (skutki i ciąg dalszy przy opcjach) albo scena końcowa / przejściowa bez wyboru."""
+    tekst: str = Field(min_length=3)
+    opcje: list[Opcja] = []
+    domyslna: str | None = None
+    skutki: list[Skutek] = []
+    nastepna: list[Nastepna] = []
+
+    @model_validator(mode="after")
+    def _sprawdz(self):
+        _szanse(self.nastepna)
+        if not self.opcje:
+            if self.domyslna is not None:
+                raise ValueError("scena bez opcji nie ma opcji domyślnej")
+            return self
+        ids = [o.id for o in self.opcje]
+        if len(ids) != len(set(ids)):
+            raise ValueError("id opcji muszą być unikalne")
+        if self.skutki or self.nastepna:
+            raise ValueError("w scenie z opcjami skutki i ciąg dalszy są przy opcjach")
+        dom = next((o for o in self.opcje if o.id == self.domyslna), None)
+        if dom is None:
+            raise ValueError(f"opcja domyślna {self.domyslna!r} nie jest jedną z opcji")
+        if dom.koszt.czas:
+            raise ValueError("opcja domyślna nie może wymagać czasu właściciela")
+        return self
+
+
+class Historia(Schemat):
+    id: str = Field(pattern=r"^[a-z0-9_]+$")
+    park: str                # id budynku z mapa/budynki.yaml (park albo woda)
+    tytul: str = Field(min_length=3)
+    powazna: bool = False    # ok. 80% historii ma być komicznych (notatka „Zdarzenia i historie”)
+    start: str
+    sceny: dict[str, Scena]
+
+    @model_validator(mode="after")
+    def _graf(self):
+        def dalej(s: Scena) -> list[str]:
+            return [n.scena for n in [*s.nastepna, *(x for o in s.opcje for x in o.nastepna)]]
+
+        for nazwa, s in self.sceny.items():
+            for n in dalej(s):
+                if n not in self.sceny:
+                    raise ValueError(f"scena {nazwa}: nie ma sceny {n!r}")
+        if self.start not in self.sceny:
+            raise ValueError(f"nie ma sceny startowej {self.start!r}")
+        stan: dict[str, int] = {}   # 1 – w trakcie, 2 – sprawdzona
+
+        def odwiedz(n: str):
+            if stan.get(n) == 1:
+                raise ValueError(f"historia zapętla się na scenie {n!r} – każda ścieżka musi się kończyć")
+            if stan.get(n) == 2:
+                return
+            stan[n] = 1
+            for m in dalej(self.sceny[n]):
+                odwiedz(m)
+            stan[n] = 2
+
+        odwiedz(self.start)
+        if nieosiagalne := sorted(set(self.sceny) - set(stan)):
+            raise ValueError(f"sceny nieosiągalne ze startu: {', '.join(nieosiagalne)}")
+        return self
+
+
+class ZasadyZdarzen(Schemat):
+    od_rundy: int = Field(ge=1)
+    koszt_porcji: float = Field(gt=0)
+
+
+class PlikParkow(Plik):
+    zasady: ZasadyZdarzen
+    historie: list[Historia] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unikalne(self):
+        ids = [h.id for h in self.historie]
+        if len(ids) != len(set(ids)):
+            raise ValueError("id historii muszą być unikalne")
+        return self
+
+
+SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
+    "parki.yaml": PlikParkow,
+}
+
+
 SCHEMATY: dict[str, type[BaseModel]] = {
     "uslugi.yaml": PlikUslug,
     "sprzet.yaml": PlikSprzetu,

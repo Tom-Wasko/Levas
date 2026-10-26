@@ -14,6 +14,7 @@ from . import biuro as bo
 from . import lokale as lk
 from . import popyt as pp
 from . import rynek_pracy as rp
+from . import zdarzenia as zd
 from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_rundy
@@ -210,4 +211,6 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         szk = dane.katalog_ofert["szkolenia"]
         najlepsze = sorted(szk["pozycje"], key=lambda p: -p["procent"])[:st["szkolenia"]]
         d["szkolenia"] = [{"firma": szk["firmy"][1]["nazwa"], "szkolenie": p["nazwa"]} for p in najlepsze]
+    if lokale and dane.zdarzenia:   # eventy w parkach: losowa opcja (najwyżej 3 h właściciela)
+        d["zdarzenia"] = zd.wybor_bota(dane, f, runda, konf["ziarno"])
     return d

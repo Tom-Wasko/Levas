@@ -319,8 +319,8 @@ budynki:
   nazwa: Ogród Saski
   rodzaj: park
   strefa: akademickie
-  opis: Park – wkrótce cotygodniowe wydarzenia dla wszystkich drużyn.
-  zakladka: null
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
   mapa:
     x: 2
     y: 8
@@ -330,19 +330,63 @@ budynki:
   nazwa: Park Ludowy
   rodzaj: park
   strefa: zygmuntowskie
-  opis: Park – wkrótce cotygodniowe wydarzenia dla wszystkich drużyn.
-  zakladka: null
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
   mapa:
     x: 12
     y: 13
     szer: 2
     gl: 2
+- id: ogrod_botaniczny
+  nazwa: Ogród Botaniczny UMCS
+  rodzaj: park
+  strefa: akademickie
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 0
+    y: 8
+    szer: 2
+    gl: 2
+- id: park_bronowicki
+  nazwa: Park Bronowicki
+  rodzaj: park
+  strefa: felin
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 18
+    y: 4
+    szer: 2
+    gl: 2
+- id: park_rury
+  nazwa: Park Rury
+  rodzaj: park
+  strefa: lsm_czuby
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 2
+    y: 17
+    szer: 2
+    gl: 2
+- id: blonia
+  nazwa: Błonia pod Zamkiem
+  rodzaj: park
+  strefa: stare_miasto
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 12
+    y: 9
+    szer: 2
+    gl: 1
 - id: zalew
   nazwa: Zalew Zemborzycki
   rodzaj: woda
   strefa: zemborzyce
-  opis: Plaża, żaglówki i wędkarze. Wydarzenia nad wodą – wkrótce.
-  zakladka: null
+  opis: Plaża, żaglówki, wędkarze i morsy – co jakiś czas wydarzenia nad wodą (zakładka Zdarzenia).
+  zakladka: zdarzenia
   mapa:
     x: 11
     y: 17

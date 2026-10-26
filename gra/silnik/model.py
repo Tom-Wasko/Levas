@@ -228,6 +228,24 @@ class SrodekTrwaly(Model):
     umorzenie = _kwota("umorzenie")
 
 
+class OtwartaHistoria(Model):
+    """Ciąg dalszy historii z eventu w parku (silnik/zdarzenia.py) – scena czeka na swoją rundę."""
+    historia: str
+    scena: str
+    runda: int
+    zrodlo: str = "park"
+    sciezka: list[str] = Field(default_factory=list)   # sceny rozegrane wcześniej
+
+
+class Efekt(Model):
+    """Skutek eventu trwający kilka rund: mnożnik popytu albo godziny właściciela mniej (silnik/zdarzenia.py)."""
+    typ: str                      # "popyt" | "czas"
+    wartosc: float                # mnożnik albo godziny
+    od_rundy: int
+    do_rundy: int
+    opis: str = ""
+
+
 class Firma(Model):
     nazwa: str
     bot: str | None = None
@@ -253,6 +271,8 @@ class Firma(Model):
     kredyty: list[Kredyt] = Field(default_factory=list)
     leasingi: list[Leasing] = Field(default_factory=list)
     harpagon: PozyczkaHarpagona | None = None
+    historie: list[OtwartaHistoria] = Field(default_factory=list)   # eventy w parkach: ciągi dalsze
+    efekty: list[Efekt] = Field(default_factory=list)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
     deklaracja: dict | None = None    # samodzielna księgowość: dokumenty i poprawne kwoty rundy (silnik/biuro.py)
     kredyt_odnawialny_gr: int = 0

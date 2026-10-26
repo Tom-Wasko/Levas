@@ -28,7 +28,9 @@ agresywny marketing, naśladowca). Zakładki są jak w Revasie: Oferta (menu) �
 Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik **Decyzje / Wyniki** pokazuje wyniki
 poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. Limity (`silnik/limity.py`): najwyżej
 3 nowych pracowników na rundę (zatrudnienia i oferty podkupienia razem) i kolejny lokal co 3 rundy – zapis
-decyzji z przekroczeniem jest odrzucony. **Analiza** liczy przewidywany wynik rundy
+decyzji z przekroczeniem jest odrzucony. **Zdarzenia** (`silnik/zdarzenia.py`, `dane/zdarzenia/parki.yaml`):
+od rundy 2 co tydzień w jednym z parków zaczyna się historia, ta sama dla wszystkich drużyn; reakcja kosztuje czas
+właściciela, gotówkę albo porcje, ciąg dalszy przychodzi w kolejnych rundach. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 
 **Panel mistrza gry** – http://127.0.0.1:8765/mg/ (tylko rola mistrza gry): nowa gra

@@ -25,10 +25,12 @@ CELE = frozenset({
     "harpagon",    # wizyty Harpagona u dłużnika: runda, firma
     "kandydaci",   # rynek pracy: runda 0 = pula startowa
     "kolejnosc",   # kolejność firm w rundzie
+    "parki",       # kolejność historii w parkach: runda = numer cyklu wszystkich historii
     "lokal",       # wybór lokalu przez bota: runda, nazwa firmy
     "popyt",       # szum popytu: runda, firma, usługa
     "reklamacje",  # reklamacje: runda, firma, usługa
     "rynek_pracy", # remisy w licytacjach i ofertach podkupienia: runda, rodzaj, id osoby
+    "zdarzenia",   # ciąg dalszy historii z parku: runda, firma, historia
 })
 
 

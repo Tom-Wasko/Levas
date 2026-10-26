@@ -19,6 +19,7 @@ import numpy as np
 
 from . import banki as bk
 from . import biuro as bo
+from . import czas_wlasciciela as cw
 from . import karta as kw
 from . import lichwiarz as lw
 from . import lokale as lk
@@ -27,6 +28,7 @@ from . import popyt as pp
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import swiezosc as sw
+from . import zdarzenia as zd
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
 from .dostawcy import ceny_rundy
@@ -117,6 +119,12 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
                 + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
         bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
+        if tryb_lokali and dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/zdarzenia.py)
+            czas = cw.z_podsumowania(info[nazwa]["czas_wlasciciela"])
+            info[nazwa]["zdarzenia"] = zd.rozegraj(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa], czas)
+            info[nazwa]["czas_wlasciciela"] = czas.podsumowanie()
+            s.kandydaci += info[nazwa]["zdarzenia"].pop("kandydaci")
+            bledy[nazwa] += info[nazwa]["zdarzenia"]["bledy"]
         if tryb_lokali and (info[nazwa]["ksiegowosc"] or {}).get("kara"):
             ksg = info[nazwa]["ksiegowosc"]
             bledy[nazwa].append({"poziom": "czerwony", "zakladka": "finanse_biuro",
@@ -160,6 +168,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             if tryb_lokali:  # popyt strefowy: oferty lokali (zadowolenie klientów z karty poprzedniej rundy)
                 zk = ((s.wyniki.get(r - 1) or {}).get(nazwa, {}).get("karta") or {}).get("zadowolenie_klientow")
                 mn_firmy *= 1 - info[nazwa]["harpagon_presja"]["odplyw"]   # Harpagon odstrasza gości
+                mn_firmy *= zd.mnoznik_popytu(f, r)   # skutki eventów w parkach
                 ceny = {u: max(0.01, f.ceny[u].cena - f.ceny[u].rabat) for u in f.oferta if u in f.ceny}
                 oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, ceny, {
                     "wyposazenie": wyp, "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy,
@@ -278,6 +287,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["lokal_decyzja"] = info[nazwa]["lokal"]
             wyniki[nazwa]["dostawy"] = info[nazwa].get("dostawy")
             wyniki[nazwa]["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
+            wyniki[nazwa]["zdarzenia"] = info[nazwa].get("zdarzenia")
             wyniki[nazwa]["biuro"] = info[nazwa].get("biuro")
             wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")
             wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej
