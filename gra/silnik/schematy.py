@@ -655,6 +655,39 @@ class PlikBankow(Plik):
         return self
 
 
+# --- mapa/harpagon.yaml ---
+
+
+class Wizyta(Schemat):
+    rodzaj: Literal["szkody", "klienci", "pracownik"]
+    waga: float = Field(gt=0)
+    koszt: tuple[float, float] | None = None      # szkody: naprawa od–do
+    odplyw: float | None = Field(default=None, gt=0, lt=1)   # klienci: tyle mniej gości w tej rundzie
+    historie: list[str] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _parametry(self):
+        if self.rodzaj == "szkody" and not (self.koszt and 0 < self.koszt[0] <= self.koszt[1]):
+            raise ValueError("wizyta „szkody” wymaga kosztu [od, do]")
+        if self.rodzaj == "klienci" and self.odplyw is None:
+            raise ValueError("wizyta „klienci” wymaga odpływu")
+        return self
+
+
+class PlikHarpagona(Plik):
+    maks_kwota: float = Field(gt=0)
+    min_kwota: float = Field(gt=0)
+    oprocentowanie_rundy: float = Field(gt=0, lt=1)
+    termin_rund: int = Field(gt=0)
+    odsetki_karne_rundy: float = Field(gt=0, lt=1)
+    karne_od: int = Field(gt=0)
+    wizyty_od: int = Field(gt=0)
+    przed_terminem: str
+    karne: str
+    przypomnienia: list[str] = Field(min_length=1)
+    wizyty: list[Wizyta] = Field(min_length=1)
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
@@ -662,6 +695,7 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "popyt.yaml": PlikPopytu,
     "menu.yaml": PlikMenu,
     "banki.yaml": PlikBankow,
+    "harpagon.yaml": PlikHarpagona,
 }
 
 SCHEMATY: dict[str, type[BaseModel]] = {

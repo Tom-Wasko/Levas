@@ -19,6 +19,7 @@ import numpy as np
 
 from . import banki as bk
 from . import karta as kw
+from . import lichwiarz as lw
 from . import lokale as lk
 from . import menu
 from . import popyt as pp
@@ -90,6 +91,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         # w tej rundzie działa od razu (ATH maj: zmiana na Gaz Bank i lokata 7%)
         if tryb_lokali:   # sześć banków z mapy, produkty w dowolnym banku (silnik/banki.py)
             bank_info = bk.poczatek_rundy(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
+            harpagon_info = lw.poczatek_rundy(dane, f, d, r, rachunki[nazwa])   # gotówka poza KPiR
         else:
             if d.get("bank") and d["bank"] in dane.dostepne("banki", r):
                 f.bank = d["bank"]
@@ -101,6 +103,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         info[nazwa] = zastosuj(dane, f, d, r, pula, ceny_dost, ksiegi[nazwa], rachunki[nazwa], tryb_lokali)
         if tryb_lokali:   # sprzęt w leasingu – na stanowiskach już z tej rundy
             info[nazwa]["leasing"] = bk.leasing_wez(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
+            info[nazwa]["harpagon"] = harpagon_info
         if tryb_lokali:  # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
             zatrudnieni = set(info[nazwa]["zatrudnieni"])
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
@@ -117,6 +120,11 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             rynek_pracy[nazwa]["zatrudnieni"] = info[nazwa].get("kanaly_zatrudnienia", [])
             info[nazwa]["rynek_pracy"] = rynek_pracy[nazwa]
             bledy[nazwa] += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in rynek_pracy[nazwa]["uwagi"]]
+            # presja Harpagona na dłużnika: przypomnienia, odsetki karne, wizyty (pracownik, który odszedł – do puli)
+            info[nazwa]["harpagon_presja"], odszedl = lw.presja(dane, s.firmy[nazwa], nazwa, r, ziarno, ksiegi[nazwa],
+                                                                rachunki[nazwa])
+            if odszedl:
+                s.kandydaci.append(rp.jako_kandydat(odszedl))
 
     # --- rynek i sprzedaż ----------------------------------------------------------------------
     popyt, obsluga, oferty = {}, {}, {}
@@ -138,6 +146,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             mn_firmy = mnoznik_firmy(dane, f)
             if tryb_lokali:  # popyt strefowy: oferty lokali (zadowolenie klientów z karty poprzedniej rundy)
                 zk = ((s.wyniki.get(r - 1) or {}).get(nazwa, {}).get("karta") or {}).get("zadowolenie_klientow")
+                mn_firmy *= 1 - info[nazwa]["harpagon_presja"]["odplyw"]   # Harpagon odstrasza gości
                 ceny = {u: max(0.01, f.ceny[u].cena - f.ceny[u].rabat) for u in f.oferta if u in f.ceny}
                 oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, ceny, {
                     "wyposazenie": wyp, "reklama": reklama + reklama_int, "mnoznik_firmy": mn_firmy,
@@ -220,6 +229,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         bank_koniec = None
         if tryb_lokali:
             bank_koniec = bk.koniec_rundy(dane, f, r, ks, rach)
+            info[nazwa]["harpagon_odsetki"] = lw.koniec_rundy(dane, f, r)   # doliczone do długu, poza KPiR
         elif f.bank:
             bank_koniec_miesiaca(f, dane.pozycje("banki")[f.bank], r, ks, rach, dane.rund_w_roku)
         if f.biuro:
@@ -232,6 +242,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
         if tryb_lokali:
             bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
+            bledy[nazwa] += lw.bledy(dane, f, info[nazwa].get("harpagon"), r + 1)
         netto = round(ks.dochod - podatek, 2)
         f.skumulowany_dochod_netto = round(f.skumulowany_dochod_netto + netto, 2)
         wyniki[nazwa] = _wyniki_firmy(dane, f, r, ks, rach, info[nazwa], popyt.get(nazwa, {}),
@@ -246,6 +257,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             wyniki[nazwa]["bank"] = {"poczatek": info[nazwa].get("bank"), "koniec": bank_koniec,
                                      "leasing": info[nazwa].get("leasing"), "historia": bk.historia(f, r),
                                      "debet_ponad_limit": bk.debet_ponad_limit(dane, f)}
+            wyniki[nazwa]["harpagon"] = {"poczatek": info[nazwa].get("harpagon"), "presja": info[nazwa].get("harpagon_presja"),
+                                         "odsetki": info[nazwa].get("harpagon_odsetki"), "stan": lw.stan(dane, f, r + 1)}
             if strefowy:
                 wyniki[nazwa]["klienci"] = strefowy["klienci"][nazwa]
                 wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]

@@ -1,0 +1,71 @@
+# Lichwiarz Harpagon (F3a.10, silnik/lichwiarz.py i silnik/zaleglosci.py) – pożyczka „na czarno” poza KPiR
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Pożyczka od ręki, bez sprawdzania zdolności kredytowej i poza księgami: gotówka nie jest przychodem, spłata
+  i odsetki nie są kosztem. Jedna pożyczka naraz. Odsetki co rundę od całego długu (kapitał + naliczone odsetki).
+  Po terminie rośnie presja: przypomnienia, odsetki karne, a potem wizyty (szkody w lokalu, odpływ klientów,
+  odejście pracownika). Teksty: {dlug}, {kwota}, {koszt}, {procent}, {pracownik}, {termin}.'
+zrodlo: 'Notatka „Elementy mapy” (Lichwiarz Harpagon: pożyczka poza KPiR, rosnąca presja) i „Zdarzenia i historie”
+  (rozbudowane, komiczne historie); postacie ze „Skąpca” Moliera (Harpagon, Mistrz Jakub – kucharz i stangret
+  w jednej osobie); kwoty i oprocentowanie – założenie F3a.10, do kalibracji w kroku 5'
+maks_kwota: 20000           # bez sprawdzania zdolności – ale więcej Harpagon nie ma w szkatułce
+min_kwota: 500
+oprocentowanie_rundy: 0.05  # 5% tygodniowo od całego długu
+termin_rund: 4              # tyle rund po wzięciu pożyczki na spłatę
+odsetki_karne_rundy: 0.1    # po terminie (od rundy `karne_od` po terminie)
+karne_od: 2                 # która runda po terminie – odsetki karne
+wizyty_od: 3                # która runda po terminie – wizyty co rundę
+przed_terminem: 'Na ladzie leży kartka z życzeniami: „Z okazji Pańskiego terminu spłaty, który przypada już w tym
+  tygodniu, życzę zdrowia, pomyślności i {dlug}. Proszę nie dziękować – dziękować będę ja. H.” Kartka jest
+  używana – ktoś starannie wymazał z niej „Wesołych Świąt 1668”.'
+karne: 'Harpagon wyjmuje liczydło, które pamięta czasy Ludwika XIV, i przelicza dług jeszcze raz – wolniej i z
+  większą przyjemnością. Od tej rundy odsetki karne: {procent} tygodniowo.'
+przypomnienia:              # kolejne rundy po terminie (ostatnie powtarza się aż do wizyt)
+- 'Pod drzwiami lokalu ktoś wsunął liścik pisany gęsim piórem: „Szanowny Dłużniku! Termin minął wczoraj o 23:59.
+  Ja nie śpię. Ja liczę. Do zapłaty: {dlug}. Z wyrazami szacunku i odsetkami – Harpagon.” Na odwrocie dopisek
+  drobnym pismem: „Papier i atrament – 12 groszy, doliczone do długu”.'
+- 'Harpagon przychodzi osobiście. Zamawia najmniejszy kebab, prosi o rabat „dla stałego wierzyciela”, płaci
+  wyliczonymi groszami, a resztę – dwa grosze – każe sobie wydać. Na odchodne zostawia napiwek: radę. „Gdyby Pan
+  mniej jadł, więcej by Pan oddał.” Dług wynosi {dlug}.'
+- 'Mistrz Jakub, kucharz i stangret Harpagona w jednej osobie, przysyła pocztówkę z rysunkiem kebaba i podpisem:
+  „Mój pan ma do Pana sprawę. Ja mam do Pana przepis na sos. Jedno z nas przyjdzie w przyszłym tygodniu.” Dług:
+  {dlug}.'
+wizyty:
+- rodzaj: szkody
+  waga: 1
+  koszt: [800, 3000]        # naprawa – zwykły koszt w KPiR (naprawa jest prawdziwa, tylko jej powód nie)
+  historie:
+  - 'Mistrz Jakub przychodzi „zmierzyć lokal na wypadek zajęcia komorniczego”. Mierzy krawiecką miarką, po czym
+    stwierdza, że lada jest o dwa centymetry za długa, i skraca ją piłą. Potem witrynę – młotkiem, „bo krzywo wisiała”.
+    Naprawa kosztuje {koszt}. Dług nadal wynosi {dlug}.'
+  - 'Harpagon wpada „tylko na chwilę, przypomnieć o drobiazgu” i odkrywa, że w lokalu pali się światło, choć jest
+    jasno. Wykręca wszystkie żarówki, żeby „nie marnować cudzych pieniędzy, które są właściwie moje”. Przy ostatniej
+    spada z drabiny na szafkę z sosami. Sprzątanie, nowe żarówki i szafka: {koszt}. Dług: {dlug}.'
+  - 'Mistrz Jakub postanawia odzyskać część długu „w naturze” i próbuje wynieść rożen. Rożen jest przykręcony do
+    podłogi. Mistrz Jakub jest wytrwały. Podłoga mniej. Fachowiec od posadzek bierze {koszt}, a Harpagon przysyła
+    rachunek za „nadgodziny” swojego stangreta. Dług: {dlug}.'
+- rodzaj: klienci
+  waga: 1
+  odplyw: 0.3               # tyle klientów mniej we wszystkich lokalach firmy w tej rundzie
+  historie:
+  - 'Harpagon zajmuje stolik przy oknie na cały tydzień. Zamawia szklankę wody z kranu (gratis) i głośno komentuje
+    każdy rachunek: „Dwadzieścia osiem złotych?! Za tyle w moich czasach kupowało się konia! Z wozem!”. Klienci
+    wychodzą, zanim zamówią. W tej rundzie przychodzi o {procent} mniej gości. Dług: {dlug}.'
+  - 'Przed wejściem staje Mistrz Jakub z tablicą „TU JADA DŁUŻNIK – LICZCIE RESZTĘ DWA RAZY”. Do każdego, kto
+    się zatrzyma, podchodzi z propozycją pożyczki „na korzystnych warunkach”. Przechodnie omijają lokal szerokim
+    łukiem: o {procent} mniej klientów w tej rundzie. Dług: {dlug}.'
+  - 'Harpagon rozkłada przed lokalem stolik i sprzedaje „kebaby z odzysku” po złotówce – to resztki, które
+    wyłowił z Twojego kosza. Studenci są zachwyceni ceną i przez chwilę nikt nie wchodzi do środka. W tej rundzie
+    o {procent} mniej klientów. Sanepid już notuje adres. Dług: {dlug}.'
+- rodzaj: pracownik
+  waga: 1
+  historie:
+  - 'Harpagon wygłasza do {pracownik} półgodzinny wykład o tym, że świeczka przy pracy to rozrzutność, a obiad –
+    przesąd. Na koniec proponuje posadę „liczącego monety w piwnicy” za złotówkę na godzinę plus prestiż.
+    {pracownik} odmawia, ale wraca do domu tak przestraszony, że następnego dnia składa wypowiedzenie i znika
+    bez okresu wypowiedzenia. Dług: {dlug}.'
+  - 'Mistrz Jakub przychodzi na zaplecze „podszkolić personel”. Uczy {pracownik}, jak z jednej cebuli zrobić
+    sałatkę dla czterdziestu osób, i pyta, czy da się sprzedać klientom zapach kebaba bez kebaba. {pracownik}
+    stwierdza, że nie po to kończył kurs, i odchodzi jeszcze tego samego dnia. Dług: {dlug}.'
+  - '{pracownik} dostaje od Harpagona list: „Pański pracodawca jest mi winien {dlug}. Proponuję, by od dziś
+    wypłatę odbierał Pan bezpośrednio u mnie – po potrąceniu odsetek wyjdzie około zera, ale za to regularnie.”
+    {pracownik} nie czyta dalej, pakuje fartuch i odchodzi do pracy, w której nikt nie pisze gęsim piórem.'

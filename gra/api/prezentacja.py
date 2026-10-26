@@ -5,6 +5,7 @@ from copy import deepcopy
 
 from silnik import banki as bk
 from silnik import czas_wlasciciela as cw
+from silnik import lichwiarz as lw
 from silnik import rynek_pracy as rp
 from silnik import swiezosc
 from silnik.dane import Dane
@@ -55,18 +56,21 @@ def stan_po_szkicu(gra: Gra, firma: str):
         dd, _, raport = rp.przed_decyzjami(gra.dane, deepcopy(stan), {firma: d}, r, gra.konfiguracja["ziarno"])
         d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
     bank_info = bk.poczatek_rundy(gra.dane, f, d, r, ks, rach) if lokale else None
+    harpagon_info = lw.poczatek_rundy(gra.dane, f, d, r, rach) if lokale else None   # wizyty – dopiero w przeliczeniu
     info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_rundy(gra.dane, gra.konfiguracja["ziarno"], r,
                                                                   gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach,
                     lokale)
     info["lokal"] = lokal
     if lokale:
         info["bank"], info["leasing"] = bank_info, bk.leasing_wez(gra.dane, f, d, r, ks, rach)
+        info["harpagon"] = harpagon_info
     bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
                          lokal, info)
     bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
     if lokale:   # odrzucone kredyty, lokaty i leasing (zaległości i debet – dopiero w przeliczeniu)
         odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]
         bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
+        bledy += lw.bledy(gra.dane, f, harpagon_info, r)
     return stan, f, ks, info, bledy
 
 
@@ -174,6 +178,11 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
                       "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}
         v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)
+        u = lw.ustawienia(dane)
+        v["harpagon"] = {"przed": lw.stan(dane, fp, runda), "po": lw.stan(dane, f, runda),
+                         "decyzja": info.get("harpagon"),
+                         "warunki": {k: u[k] for k in ("maks_kwota", "min_kwota", "oprocentowanie_rundy", "termin_rund",
+                                                       "odsetki_karne_rundy", "karne_od", "wizyty_od")}}
         v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
     return v
 

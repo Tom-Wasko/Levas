@@ -9,7 +9,7 @@ const MARGINES = 16, NAD = 70;  // miejsce nad mapą na wysokie budynki
 const BUDYNKI = {  // rodzaj → kolor dachu i wysokość
   bank: ["#2d73d6", 30], urzad: ["#9b51e0", 40], poczta: ["#f2b705", 22], biuro: ["#17a2b8", 26], nieruchomosci: ["#e5333f", 24],
   praca: ["#795548", 24], dostawca: ["#a0522d", 18], sklep: ["#5c6bc0", 20], szkola: ["#26a69a", 26], reklama: ["#ec407a", 22],
-  uczelnia: ["#3f51b5", 34], media: ["#455a64", 28],
+  uczelnia: ["#3f51b5", 34], media: ["#455a64", 28], lichwiarz: ["#3b2f2f", 16],
 };
 const LOKAL = { moj: "#e45f26", wybrany: "#00c06a", wolny: "#ffffff", zajety: "#9aa0a8" };
 const FIRMA = ["oferta", "stanowiska", "sprzet", "zatrudnienie", "sprzedaz", "kpir"];

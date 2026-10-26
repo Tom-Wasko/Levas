@@ -177,6 +177,20 @@ class Leasing(Model):
     wykup = _kwota("wykup")
 
 
+class PozyczkaHarpagona(Model):
+    """Pożyczka od lichwiarza Harpagona (gra z lokalami, silnik/lichwiarz.py) – poza KPiR."""
+    kwota_gr: int
+    dlug_gr: int                      # kapitał + naliczone odsetki
+    od_rundy: int
+    termin: int                       # ostatnia runda spłaty bez presji
+    odsetki_gr: int = 0               # suma naliczonych odsetek
+    wizyty: int = 0
+
+    kwota = _kwota("kwota")
+    dlug = _kwota("dlug")
+    odsetki = _kwota("odsetki")
+
+
 class Cena(Model):
     """Cena usługi i rabat (włączona sprzedaż)."""
     cena_gr: int
@@ -223,6 +237,7 @@ class Firma(Model):
     lokaty: list[Lokata] = Field(default_factory=list)
     kredyty: list[Kredyt] = Field(default_factory=list)
     leasingi: list[Leasing] = Field(default_factory=list)
+    harpagon: PozyczkaHarpagona | None = None
     kredyt_odnawialny_gr: int = 0
     majatek_gr: int = 0               # suma inwestycji (sprzęt, stanowiska, udogodnienia, wyposażenie) – rozwój firmy
     rozwoj_poprzedni: float | None = None

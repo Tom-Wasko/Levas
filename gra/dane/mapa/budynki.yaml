@@ -346,3 +346,14 @@ budynki:
     y: 17
     szer: 4
     gl: 3
+- id: harpagon
+  nazwa: Kantor „U Harpagona”
+  rodzaj: lichwiarz
+  strefa: dworzec
+  opis: Pożyczki od ręki, bez pytań i bez ksiąg. Pytania zadaje się później – i zadaje je Mistrz Jakub.
+  zakladka: harpagon
+  mapa:
+    x: 8
+    y: 12
+    szer: 1
+    gl: 1

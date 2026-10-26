@@ -46,6 +46,12 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    przejmuje zastaw (kupiony lokal staje się wynajmowany). Czy banki, oprocentowanie i te zasady pasują?
    (zadane: 26.10 6:05)
 
+7. **Harpagon (F3a.10).** Przyjąłem: pożyczka 500–20 000 zł, 5% na rundę (tydzień) od całego długu, termin 4 rundy;
+   po terminie: 1. runda – przypomnienie, od 2. – odsetki karne 10%, od 3. – co rundę jedna losowa wizyta (szkody
+   800–3000 zł w KPiR jako „Naprawa szkód w lokalu”, albo atrakcyjność lokali −30% w tej rundzie, albo odejście
+   losowego pracownika bez wypowiedzenia). Dług u Harpagona nie wchodzi do wskaźnika zadłużenia w karcie wyników
+   i boty z niego nie korzystają. Czy te wartości i zasady pasują? (zadane: 26.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -226,3 +232,13 @@ _brak_
   - zakładka **Finanse → Bank** w grze z lokalami: Decyzje (kafelki banków z najlepszą ofertą, porównanie, lokaty,
     kredyty z zastawem, leasing, limit) + nowe Wyniki (opłaty, raty, leasing, przejęcia, odrzucone decyzje);
     test `test_banki.py`.
+
+26.10 – F3a.10 gotowe: Harpagon (do potwierdzenia – pytanie 7):
+  - pożyczka poza KPiR: gotówka i spłata tylko na rachunku (operacje `poza_ksiegami`), odsetki doliczane do długu
+    bez ruchu gotówki; jedna pożyczka naraz; spłata przed nową pożyczką w tej samej rundzie,
+  - presja: runda terminu – „życzenia”, potem przypomnienia (3 teksty), odsetki karne od 2. rundy po terminie,
+    wizyty od 3. (losowane z wag, strumień `harpagon`), komiczne historie z Harpagonem i Mistrzem Jakubem,
+  - odpływ klientów zrobiony jako mnożnik atrakcyjności lokali ×0,7 (nie dokładnie −30% gości przy konkurencji),
+  - pracownik odchodzi od razu, bez odprawy, wraca do puli kandydatów; wizyta „pracownik” tylko gdy jest kto odejść,
+  - dług nie wlicza się do zadłużenia w karcie, boty nie pożyczają; kantor „U Harpagona” na mapie przy dworcu (8,12),
+  - zakładka **Finanse → Harpagon** (Decyzje + Wyniki), test `test_harpagon.py`.
