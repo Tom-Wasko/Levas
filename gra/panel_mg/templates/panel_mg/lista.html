@@ -39,10 +39,12 @@
         <details class="wiecej"><summary>Więcej ustawień</summary>
           <div class="dwie">
             <label class="pole">Kredyt odnawialny<select id="kredyt">
-              <option value="jednoczesnie">jak w oficjalnej grze – kredyt tylko na niedobór na koniec rundy</option>
-              <option value="na_biezaco">na bieżąco – zakupy opłacane przed wpływem przychodów</option></select></label>
+              <option value="na_biezaco">na bieżąco – jak w banku: zakupy opłacane przed wpływem przychodów</option>
+              <option value="jednoczesnie">jak w oficjalnej grze – kredyt tylko na niedobór na koniec rundy</option></select></label>
             <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">z danych gry (pierwsze rundy), dalej generowane</option>
               <option value="losowe">wszystkie generowane</option></select></label>
+            <label class="pole"><span><input type="checkbox" id="auto-zamowienia"> Przycisk „Zamów brakujące u najtańszych” w Dostawcach
+              (domyślnie wyłączony – drużyny liczą zamówienia same)</span></label>
           </div>
         </details>
         <p style="display:flex"><button class="btn pom" id="utworz" style="margin-left:auto">Utwórz grę</button></p>
@@ -83,6 +85,7 @@
         nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
         kapital_startowy: document.getElementById("kapital").value, ziarno: document.getElementById("ziarno").value,
         ceny_dostawcow: document.getElementById("ceny").value, kredyt_odnawialny: document.getElementById("kredyt").value,
+        auto_zamowienia: document.getElementById("auto-zamowienia").checked,
         firmy }) });
       const j = await r.json();
       if (!r.ok) return pokazBlad(j.blad);

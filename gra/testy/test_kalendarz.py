@@ -29,37 +29,37 @@ def test_daty_stale_i_ruchome():
     assert _dni_wydarzenia(d, "Tłusty czwartek", date(2027, 1, 1), date(2027, 3, 31)) == [date(2027, 2, 4)]
     assert _dni_wydarzenia(d, "Wielkanoc", date(2027, 3, 1), date(2027, 4, 30)) == [date(2027, 3, 27), date(2027, 3, 28),
                                                                                    date(2027, 3, 29)]
-    assert _dni_wydarzenia(d, "Black Friday", date(2026, 11, 1), date(2026, 11, 30)) == [date(2026, 11, 27)]
+    assert _dni_wydarzenia(d, "Black Friday", date(2025, 11, 1), date(2025, 11, 30)) == [date(2025, 11, 28)]
     ferie = _dni_wydarzenia(d, "Ferie zimowe", date(2027, 1, 1), date(2027, 2, 28))
     assert len(ferie) == 14 and ferie[0].weekday() == 0
     # zakres przez Nowy Rok
-    przerwa = _dni_wydarzenia(d, "Przerwa świąteczna na uczelniach", date(2026, 12, 1), date(2027, 1, 31))
-    assert przerwa[0] == date(2026, 12, 21) and przerwa[-1] == date(2027, 1, 6)
+    przerwa = _dni_wydarzenia(d, "Przerwa świąteczna na uczelniach", date(2025, 12, 1), date(2026, 1, 31))
+    assert przerwa[0] == date(2025, 12, 21) and przerwa[-1] == date(2026, 1, 6)
     # rok bez daty ruchomej – wydarzenia nie ma
     assert not _dni_wydarzenia(d, "Tłusty czwartek", date(2030, 1, 1), date(2030, 12, 31))
 
 
 def test_mnozniki_i_zmiana_puli(monkeypatch):
     d = dane_domyslne()
-    swieta = kl.tydzien(d, _runda_z(d, date(2026, 12, 24)))
+    swieta = kl.tydzien(d, _runda_z(d, date(2025, 12, 24)))
     assert {"Wigilia i Boże Narodzenie", "Przerwa świąteczna na uczelniach"} <= {w["nazwa"] for w in swieta["wydarzenia"]}
     assert swieta["strefy"]["akademickie"] < -0.5 < swieta["strefy"]["centrum"] < 0
-    assert kl.mnoznik(d, "akademickie", date(2026, 12, 24)) == pytest.approx(0.35 * 0.35)   # dwa wydarzenia się mnożą
-    assert kl.mnoznik(d, "stare_miasto", date(2026, 12, 31)) == 2.0   # strefa wygrywa z „wszystkie”
-    jarmark = kl.tydzien(d, _runda_z(d, date(2026, 12, 9)))
+    assert kl.mnoznik(d, "akademickie", date(2025, 12, 24)) == pytest.approx(0.35 * 0.35)   # dwa wydarzenia się mnożą
+    assert kl.mnoznik(d, "stare_miasto", date(2025, 12, 31)) == 2.0   # strefa wygrywa z „wszystkie”
+    jarmark = kl.tydzien(d, _runda_z(d, date(2025, 12, 9)))
     assert jarmark["strefy"]["stare_miasto"] == pytest.approx(0.25) and "felin" not in jarmark["strefy"]
     # zmiana tygodnia = stosunek wag dni z kalendarzem i bez
-    r = _runda_z(d, date(2026, 11, 11))
+    r = _runda_z(d, date(2025, 11, 11))
     dni = pp.dni_rundy(d, r)
     z = pp.wagi_dni(d, "centrum", dni).sum() / pp.wagi_dni(d, "centrum", dni, kalendarz=False).sum() - 1
     assert kl.tydzien(d, r)["strefy"]["centrum"] == pytest.approx(z, abs=1e-4) and z > 0
     # pula strefy w rundzie świątecznej jest mniejsza niż bez kalendarza
-    pr = pp.pule(d, _runda_z(d, date(2026, 12, 24)))
+    pr = pp.pule(d, _runda_z(d, date(2025, 12, 24)))
     monkeypatch.setattr(d, "kalendarz_miasta", None)   # dane_domyslne() są wspólne – przywracane po teście
-    bez = pp.pule(d, _runda_z(d, date(2026, 12, 24)))
+    bez = pp.pule(d, _runda_z(d, date(2025, 12, 24)))
     u = next(iter(pr["akademickie"]))
     assert pr["akademickie"][u].sum() < 0.5 * bez["akademickie"][u].sum()
-    assert kl.tydzien(d, 1)["strefy"] == {} and kl.widok(d, 1, 26) is None
+    assert kl.tydzien(d, _runda_z(d, date(2025, 10, 20)))["strefy"] == {}
 
 
 def test_schemat_kalendarza():
@@ -77,12 +77,12 @@ def test_sprawdz_wykrywa_bledy_kalendarza(tmp_path):
 
     def zmien(d):
         d["wydarzenia"][0]["strefy"] = {"atlantyda": 2.0}
-        d["ruchome"]["wielkanoc"].pop(2027)
+        d["ruchome"]["wielkanoc"].pop(2026)
 
     _zmien(kat, "kalendarz/kalendarz.yaml", zmien)
     bledy = sprawdz(kat)
     assert any("atlantyda" in b for b in bledy), bledy
-    assert any("wielkanoc" in b and "2027" in b for b in bledy), bledy
+    assert any("wielkanoc" in b and "2026" in b for b in bledy), bledy
 
 
 def test_widok_kalendarza():

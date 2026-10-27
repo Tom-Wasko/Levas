@@ -73,7 +73,9 @@ function decyzje() {
     `<a class="btn jasny maly" href="${strona(f)}" target="_blank" rel="noopener">Strona firmy</a>`]);
   const ustawienia = [["Kapitał startowy", zl(gra.kapital)], ["Ziarno losowości", esc(gra.ziarno)],
     ["Kredyt odnawialny", gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "na niedobór na koniec rundy"],
-    ["Ceny dostawców", gra.ceny_dostawcow === "losowe" ? "wszystkie generowane" : "z danych, dalej generowane"]];
+    ["Ceny dostawców", gra.ceny_dostawcow === "losowe" ? "wszystkie generowane" : "z danych, dalej generowane"],
+    ["Przycisk „Zamów brakujące” w Dostawcach", `${gra.auto_zamowienia ? "włączony" : "wyłączony"}${gra.zakonczona ? ""
+      : ` <a data-akcja="auto-zamowienia">${gra.auto_zamowienia ? "wyłącz" : "włącz"}</a>`}`]];
   return `${info(opis)}
     ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", ""], wiersze, { klasy: ["l", "l"] })}
     <div class="przyciski-mg">
@@ -253,6 +255,12 @@ async function wykonaj(akcja, el) {
     await api(`${URL_GRY}/prowadzenie`, "POST", { odblokowanie });
     zamknijOkno();
     toast("Harmonogram odblokowań zapisany.");
+    return wczytaj();
+  }
+  if (akcja === "auto-zamowienia") {
+    const auto = !S.p.gra.auto_zamowienia;
+    await api(`${URL_GRY}/prowadzenie`, "POST", { auto_zamowienia: auto });
+    toast(auto ? "Drużyny mogą zamawiać brakujące składniki jednym przyciskiem." : "Przycisk „Zamów brakujące” wyłączony.");
     return wczytaj();
   }
   if (akcja === "odswiez") return wczytaj();

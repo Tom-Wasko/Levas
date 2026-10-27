@@ -366,7 +366,7 @@ def gotowe_uslugi(dane: Dane, firma: Firma) -> dict[str, list[str]]:
 
 
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
-                 tryb_kredytu: str = "jednoczesnie", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
+                 tryb_kredytu: str = "na_biezaco", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
     `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/lokale.py: wybierz; None – bez sprawdzania lokali),
     `info` – wynik `zastosuj` (odrzucone stanowiska)."""

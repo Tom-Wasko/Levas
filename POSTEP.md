@@ -221,9 +221,9 @@ Plan kroków 1–4 (bez giełdy) zrealizowany.
 
 Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POSTEP + PRACA_NOCNA, commit i push.
 
-- [ ] P1 Tworzenie gier – `graj` nie startuje drugiego serwera na zajętym porcie (dwa serwery na 8765, stary
+- [x] P1 Tworzenie gier – `graj` nie startuje drugiego serwera na zajętym porcie (dwa serwery na 8765, stary
   z nieaktualnym kodem)
-- [ ] P2 Domyślne ustawienia: start pon. 1.09.2025, 18 pełnych rund (do 4.01.2026), kapitał 40 000 zł, kredyt
+- [x] P2 Domyślne ustawienia: start pon. 1.09.2025, 18 pełnych rund (do 4.01.2026), kapitał 40 000 zł, kredyt
   „na bieżąco”, przycisk „Zamów brakujące” w Dostawcach domyślnie wyłączony – opcja MG (nowa gra i trwająca gra);
   wrzesień – wprowadzenie (studenci wracają w październiku)
 - [ ] P3 Tutorial dla graczy: strona „Jak grać” w panelu + `INSTRUKCJA.md` + PDF

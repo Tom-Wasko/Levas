@@ -89,7 +89,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
         info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
         info["czas_wlasciciela"] = czas.podsumowanie()
-    bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
+    bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
                          lokal, info)
     bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
     # odrzucone kredyty, lokaty i leasing (zaległości i debet – dopiero w przeliczeniu)
@@ -146,7 +146,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "zakonczona": gra.zakonczona, "firmy": gra.konfiguracja["firmy"], "wyslane": gra.wyslane(),
                  "brakujace": gra.brakujace(), "ziarno": gra.konfiguracja["ziarno"], "runda_startowa": gra.runda_startowa,
                  "konkurenci_stali": gra.konfiguracja.get("konkurenci_stali", []),
-                 "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
+                 "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
+                 "auto_zamowienia": bool(gra.konfiguracja.get("auto_zamowienia")),
                  "lokale": True,
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja,
@@ -373,7 +374,8 @@ def przeglad_mg(gra: Gra) -> dict:
     return {
         "gra": {"nazwa": konf["nazwa"], "runda": r, "liczba_rund": konf["liczba_rund"], "zakonczona": gra.zakonczona,
                 "ziarno": konf["ziarno"], "kapital": gra.kapital_startowy,
-                "kredyt_odnawialny": konf.get("kredyt_odnawialny", "jednoczesnie"),
+                "kredyt_odnawialny": konf.get("kredyt_odnawialny", "na_biezaco"),
+                "auto_zamowienia": bool(konf.get("auto_zamowienia")),
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
                 "lokale": True,
                 "brakujace": [] if gra.zakonczona else gra.brakujace(),

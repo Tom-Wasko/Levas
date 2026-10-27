@@ -25,7 +25,7 @@ def _przeglad(client, id_):
 
 
 def test_strony_panelu(client):
-    assert 'value="26"' in client.get("/mg/").content.decode()
+    assert 'value="18"' in client.get("/mg/").content.decode()
     id_ = _nowa(client).json()["id"]
     assert client.get(f"/mg/gra/{id_}").status_code == 200
     assert client.get("/mg/gra/nie-ma-takiej").status_code == 404
@@ -67,13 +67,25 @@ def test_prowadzenie_rundy(client):
 
 
 def test_koniec_kroku_2_cala_gra(client):
-    """Jedna drużyna i wszystkie boty grają 26 tygodni; mistrz gry zamyka każdą rundę z przeglądarki."""
+    """Jedna drużyna i wszystkie boty grają 18 tygodni; mistrz gry zamyka każdą rundę z przeglądarki."""
     from silnik.dane import dane_domyslne
 
     boty = [{"nazwa": f"Bot {k}", "bot": k} for k in dane_domyslne().boty["strategie"]]
     id_ = _nowa(client, kapital_startowy="", firmy=[{"nazwa": "Drużyna 1", "bot": None}] + boty).json()["id"]
-    for r in range(1, 27):
+    for r in range(1, 19):
         assert client.post(f"/api/gry/{id_}/przelicz").json()["runda"] == r + 1
     p = _przeglad(client, id_)
-    assert p["gra"]["zakonczona"] and len(p["historia"]) == 26 and p["historia"][-1]["skrot"] == "T26"
+    assert p["gra"]["zakonczona"] and len(p["historia"]) == 18 and p["historia"][-1]["skrot"] == "T18"
     assert client.post(f"/api/gry/{id_}/przelicz").status_code == 400  # gra zakończona
+
+
+def test_domyslny_kredyt_i_przycisk_zamow_brakujace(client):
+    """Domyślnie kredyt „na bieżąco” i bez przycisku „Zamów brakujące”; mistrz gry włącza go w trakcie gry."""
+    id_ = _nowa(client).json()["id"]
+    p = _przeglad(client, id_)
+    assert p["gra"]["kredyt_odnawialny"] == "na_biezaco" and p["gra"]["auto_zamowienia"] is False
+    gracz = lambda: client.get(f"/api/gry/{id_}/widok/Drużyna 1").json()["gra"]["auto_zamowienia"]  # noqa: E731
+    assert gracz() is False
+    r = client.post(f"/api/gry/{id_}/prowadzenie", {"auto_zamowienia": True}, content_type="application/json")
+    assert r.json()["gra"]["auto_zamowienia"] is True and gracz() is True
+    assert _przeglad(client, _nowa(client, auto_zamowienia=True).json()["id"])["gra"]["auto_zamowienia"] is True

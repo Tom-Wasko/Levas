@@ -68,9 +68,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     kolejnosc = list(strumien(ziarno, r, "kolejnosc").permutation(nazwy))
 
     ksiegi, rachunki, info, bledy, odnawialny = {}, {}, {}, {}, {}
-    # "jednoczesnie" (jak w oficjalnej grze): przychody i wydatki miesiąca rozliczane razem – kredyt odnawialny tylko
+    # domyślnie "na_biezaco" (jak w banku); "jednoczesnie" (jak w oficjalnej grze): przychody i wydatki miesiąca rozliczane razem – kredyt odnawialny tylko
     # na niedobór na koniec miesiąca; "na_biezaco": wydatki z decyzji opłacane przed wpływem przychodów
-    tryb_kredytu = konfiguracja.get("kredyt_odnawialny", "jednoczesnie")
+    tryb_kredytu = konfiguracja.get("kredyt_odnawialny", "na_biezaco")
     start = {n: {"magazyn": dict(f.magazyn), "gotowka": f.gotowka, "pracownicy": len(f.pracownicy), "uslugi": len(f.oferta)}
              for n, f in s.firmy.items()}
     for nazwa in nazwy:

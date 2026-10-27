@@ -175,7 +175,8 @@ def api_gry(request):
             int(d["liczba_rund"]) if d.get("liczba_rund") else None,  # brak – domyślna z danych
             int(ziarno) if str(ziarno or "").strip().isdigit() else None,
             ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
-            kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),
+            kredyt_odnawialny=d.get("kredyt_odnawialny", "na_biezaco"),
+            auto_zamowienia=bool(d.get("auto_zamowienia")),
             kapital_startowy=kapital,
             poziomy=poziomy,
             odblokowanie=d.get("odblokowanie") or None,   # {element: tydzień} – zmiany harmonogramu
@@ -214,9 +215,13 @@ def _przeglad(id_: str) -> dict:
 @tylko_mg
 def api_prowadzenie(request, id_):
     """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]},
-    {"poziom": {"firma", "poziom"}} (poziom bota) albo {"odblokowanie": {element: tydzień}}
-    (harmonogram odblokowań gry z lokalami)."""
+    {"poziom": {"firma", "poziom"}} (poziom bota), {"odblokowanie": {element: tydzień}}
+    (harmonogram odblokowań gry z lokalami) albo {"auto_zamowienia": bool}
+    (przycisk „Zamów brakujące” w Dostawcach)."""
     d = cialo(request)
+    if "auto_zamowienia" in d:
+        with serwisy.zmiana(id_) as g:
+            g.konfiguracja["auto_zamowienia"] = bool(d["auto_zamowienia"])
     if "odblokowanie" in d:
         if not isinstance(d["odblokowanie"], dict):
             raise BladZapytania("Harmonogram odblokowań: {element: tydzień}.")

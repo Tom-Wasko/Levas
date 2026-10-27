@@ -15,18 +15,64 @@ rodzaje:
   miasto: Wydarzenie w mieście
 ruchome:
   wielkanoc:
+    2025: '04-20'
     2026: '04-05'
     2027: '03-28'
     2028: '04-16'
   black_friday:            # piątek po czwartym czwartku listopada
+    2025: '11-28'
     2026: '11-27'
     2027: '11-26'
     2028: '11-24'
   ferie_zimowe:            # poniedziałek pierwszego tygodnia ferii w województwie lubelskim (założenie)
+    2025: '01-27'
     2026: '02-02'
     2027: '01-18'
     2028: '02-14'
 wydarzenia:
+- nazwa: Wakacje studenckie
+  rodzaj: uczelnie
+  opis: >-
+    Wrzesień: studenci jeszcze odsypiają lato u rodziców, a Miasteczko Akademickie należy do gołębi i ekip
+    remontowych malujących akademiki na ten sam beżowy kolor co rok temu. Dobry czas, żeby spokojnie przygotować
+    lokal, zanim w październiku wróci głodna fala.
+  od: '09-01'
+  do: '09-30'
+  strefy:
+    akademickie: 0.35
+    politechnika: 0.4
+    centrum: 0.9
+- nazwa: Początek roku szkolnego
+  rodzaj: szkoly
+  opis: >-
+    Uczniowie wracają do szkół, rodzice odprowadzają pierwszaków i szukają czegoś, co da się zjeść jedną ręką,
+    drugą trzymając tornister w kształcie dinozaura.
+  od: '09-01'
+  do: '09-01'
+  strefy:
+    wszystkie: 1.05
+- nazwa: Powrót studentów
+  rodzaj: uczelnie
+  opis: >-
+    Ostatni weekend września: pociągi z Rzeszowa, Zamościa i Białej Podlaskiej przywożą studentów ze słoikami od
+    mamy. Słoiki starczają do wtorku – od środy zaczyna się sezon na kebab.
+  od: '09-26'
+  do: '09-30'
+  strefy:
+    akademickie: 1.6
+    politechnika: 1.5
+    dworzec: 1.3
+- nazwa: Inauguracja roku akademickiego
+  rodzaj: uczelnie
+  opis: >-
+    Rektorzy w togach, gaudeamus i przemówienia o „nowym rozdziale”. Po uroczystości cały rozdział – w liczbie
+    kilku tysięcy osób – szuka obiadu w promieniu pięciuset metrów od auli.
+  od: '10-01'
+  do: '10-03'
+  strefy:
+    akademickie: 1.35
+    politechnika: 1.3
+    centrum: 1.1
 - nazwa: Konfrontacje Teatralne
   rodzaj: miasto
   opis: >-

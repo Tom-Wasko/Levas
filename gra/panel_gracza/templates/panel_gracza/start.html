@@ -29,10 +29,11 @@
           <label class="pole">Liczba rund ({{ kalendarz.mnoga }})<input type="number" id="rundy" min="2" max="{{ kalendarz.maks }}" value="{{ kalendarz.domyslna }}"></label>
           <label class="pole">Ziarno losowości (puste = losowe)<input type="text" id="ziarno" placeholder="np. 2026"></label>
           <label class="pole">Kredyt odnawialny<select id="kredyt">
-            <option value="jednoczesnie">jak w oficjalnej grze – przychody i wydatki jednocześnie (kredyt tylko na niedobór na koniec rundy)</option>
-            <option value="na_biezaco">na bieżąco – zakupy opłacane przed wpływem przychodów</option></select></label>
+            <option value="na_biezaco">na bieżąco – jak w banku: zakupy opłacane przed wpływem przychodów</option>
+            <option value="jednoczesnie">jak w oficjalnej grze – przychody i wydatki jednocześnie (kredyt tylko na niedobór na koniec rundy)</option></select></label>
           <label class="pole">Ceny dostawców<select id="ceny"><option value="dane">z danych gry (pierwsze rundy), dalej generowane</option>
             <option value="losowe">wszystkie generowane</option></select></label>
+          <label class="pole"><span><input type="checkbox" id="auto-zamowienia"> Przycisk „Zamów brakujące u najtańszych” w Dostawcach</span></label>
         </div>
         <div class="tabela-tytul">Firmy na rynku</div>
         <div class="tab-wrap"><table class="t" id="firmy"><thead><tr><th class="l">Nazwa firmy</th><th>Prowadzi</th><th></th></tr></thead><tbody></tbody></table></div>
@@ -68,7 +69,8 @@
       const r = await fetch("/api/gry", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() }, body: JSON.stringify({
         nazwa: document.getElementById("nazwa").value, liczba_rund: +document.getElementById("rundy").value,
         ziarno: document.getElementById("ziarno").value, ceny_dostawcow: document.getElementById("ceny").value, firmy,
-        kredyt_odnawialny: document.getElementById("kredyt").value }) });
+        kredyt_odnawialny: document.getElementById("kredyt").value,
+        auto_zamowienia: document.getElementById("auto-zamowienia").checked }) });
       const j = await r.json();
       if (!r.ok) return alert(j.blad);
       location.href = `/gra/${j.id}`;

@@ -7,10 +7,10 @@ rundy:
   kalendarz:
     okres: tydzien
     rund_w_roku: 52
-    start: 2026-10-05
-    zrodlo: 'notatka „Ustalenia gry”: runda = 1 tydzień; start – założenie F2.7: poniedziałek na początku roku
-      akademickiego (studenci w Lublinie)'
-  domyslna_liczba: 26
+    start: 2025-09-01
+    zrodlo: 'notatka „Ustalenia gry”: runda = 1 tydzień; start – użytkownik 27.10 (PRACA_NOCNA pyt. 2): pierwszy
+      tydzień września (poniedziałek 1.09.2025), wrzesień to wprowadzenie, zabawa zaczyna się, gdy wracają studenci'
+  domyslna_liczba: 18   # 18 pełnych tygodni: 1.09.2025 – 4.01.2026 (użytkownik 27.10)
   odblokowanie:
     '1':
     - nazwa_firmy

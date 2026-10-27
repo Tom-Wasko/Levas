@@ -41,7 +41,8 @@ class Gra:
                 "firmy": [{"nazwa": n, "bot": b, **({"poziom": opcje["poziomy"][n]} if b and n in opcje.get("poziomy", {})
                                                     else {})} for n, b in firmy],
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
-                "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "jednoczesnie"),
+                "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "na_biezaco"),
+                "auto_zamowienia": bool(opcje.get("auto_zamowienia", False)),   # przycisk „Zamów brakujące” (MG)
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,
                 "lokale": True}   # lokale z mapy miasta (dane/mapa); zapisy bez tego klucza – stary tryb REVAS
         if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych

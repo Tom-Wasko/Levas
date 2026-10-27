@@ -45,11 +45,11 @@ def test_strony_i_statyki(client):
 
 def test_domyslna_gra_tygodniowa(client):
     strona = client.get("/").content.decode()
-    assert 'value="26"' in strona and "40 000 PLN" in strona
+    assert 'value="18"' in strona and "40 000 PLN" in strona
     id_ = _nowa(client, liczba_rund="")
     v = client.get(_url(id_, "widok")).json()
     kal = v["gra"]["kalendarz"]
-    assert v["gra"]["liczba_rund"] == 26 and kal["rund_w_roku"] == 52 and len(kal["nazwy"]) == 26
+    assert v["gra"]["liczba_rund"] == 18 and kal["rund_w_roku"] == 52 and len(kal["nazwy"]) == 18
     assert v["miesiac"] == kal["nazwy"][0] and kal["nazwy"][0].startswith("Tydzień 1")
     # Levas: drużyna zaczyna bez lokalu i wybiera go na mapie
     assert v["gra"]["lokale"] and v["stan"]["stanowiska"] == [] and v["lokale"]["oferta"]

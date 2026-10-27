@@ -52,18 +52,18 @@ def test_pula_strefy_i_odleglosc():
 
 def test_dni_tygodnia_i_kalendarz():
     dane = dane_domyslne()
-    r = next(r for r in range(1, 30) if dane.data_rundy(r) == date(2026, 11, 9))   # tydzień z 11 listopada
+    r = next(r for r in range(1, 30) if dane.data_rundy(r) == date(2025, 11, 10))   # tydzień z 11 listopada (wtorek)
     dni = pp.dni_rundy(dane, r)
     assert len(dni) == 7 and dni[0].weekday() == 0
     w = pp.wagi_dni(dane, "dworzec", dni)
     assert w[4] > w[0]                                      # piątek > poniedziałek
-    assert dni[2] == date(2026, 11, 11)
+    assert dni[1] == date(2025, 11, 11)
     assert [x["nazwa"] for x in pp.wydarzenia(dane, dni)] == ["Święto Niepodległości"]
     c = pp.wagi_dni(dane, "centrum", dni)
-    assert c[2] / c[1] == pytest.approx(1.5 * 1.1 / 1.1)    # święto: Centrum ×1,5 (klucz strefy wygrywa z „wszystkie”)
-    assert w[2] / w[1] == pytest.approx(0.8 * 0.95 / 0.9)    # reszta miasta ×0,8
+    assert c[1] / c[2] == pytest.approx(1.5 * 1.1 / 1.1)    # święto: Centrum ×1,5 (klucz strefy wygrywa z „wszystkie”)
+    assert w[1] / w[2] == pytest.approx(0.8 * 0.9 / 0.95)    # reszta miasta ×0,8
     # wydarzenie przez Nowy Rok
-    swieta = pp.dni_rundy(dane, next(r for r in range(1, 30) if dane.data_rundy(r) == date(2026, 12, 28)))
+    swieta = pp.dni_rundy(dane, next(r for r in range(1, 30) if dane.data_rundy(r) == date(2025, 12, 29)))
     assert any(x["nazwa"] == "Przerwa świąteczna na uczelniach" for x in pp.wydarzenia(dane, swieta))
     assert pp.szczyt(dane, "stare_miasto", r) > 1.2
 

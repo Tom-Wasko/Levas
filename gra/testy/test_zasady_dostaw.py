@@ -46,7 +46,7 @@ def test_gazetki_i_producent_od_rundy_3():
     ceny2, gaz2 = dst.oferta_rundy(dane, 1, 2)
     assert ROZEN not in ceny2 and ROZEN in dst.ceny_rundy(dane, 1, 3)
     assert set(gaz2) == {"Biedronka", "Lidl", "Stokrotka"} and len(gaz2["Biedronka"]) == 3
-    baza = dane.dostawcy["pazdziernik"]
+    baza = dst.ceny_miesiaca(dane, 1, dane.miesiac_rundy(2), "dane", 2)   # wrzesień – ceny losowane
     for d, rabaty in gaz2.items():
         for z, r in rabaty.items():
             assert 0.1 <= r <= 0.35

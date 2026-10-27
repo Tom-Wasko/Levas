@@ -533,3 +533,11 @@ _brak_
   kampanii +10…30%; wypowiedzenie – jedno, 2 rundy; wypadki +4 pp. za rundę bez wypadku; tutorial – strona
   w grze + md + PDF; stary Levas – tylko lista różnic, jeśli starczy czasu; serwerów na 8765 nie ruszać.
   Lista zadań: `POSTEP.md` → „Poprawki 27.10” (P1–P20).
+- 27.10 09:50 – P1 gotowe: `graj` nie uruchamia drugiego serwera, gdy port 8765 jest zajęty (komunikat: zamknij
+  okna serwera i uruchom start.bat ponownie). **Po powrocie: zamknij oba okna serwera i uruchom start.bat raz** –
+  tworzenie gier wtedy działa (dziś rano odpowiadał stary serwer z 26.10).
+- 27.10 09:50 – P2 gotowe: start pon. 1.09.2025, 18 rund (do 4.01.2026), kredyt domyślnie „na bieżąco”, przycisk
+  „Zamów brakujące u najtańszych” domyślnie wyłączony – pole w „Więcej ustawień” przy tworzeniu gry i
+  „włącz/wyłącz” w tabeli „Ustawienia gry” panelu MG. Wrzesień w kalendarzu: wakacje studenckie (mało studentów),
+  początek roku szkolnego, powrót studentów (ostatni weekend), inauguracja roku akademickiego (1–3.10).
+  Daty ruchome 2025 (Black Friday 28.11, ferie – założenie 27.01). Start P3 (tutorial).
