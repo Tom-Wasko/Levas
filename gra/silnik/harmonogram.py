@@ -4,7 +4,8 @@ Element harmonogramu to zakładka (katalog.yaml: rundy.harmonogram_lokali.zaklad
 terminem w danych: kanały rekrutacji, późniejsi dostawcy, licytacje i przejęcia lokali, promocje, kanały agencji
 reklamowych, eventy w parkach, wypadki, handel między drużynami (bez klubu z kasynem – mistrz gry o nim nie wie,
 silnik/kasyno.py). Mistrz gry może zmienić
-tydzień każdego elementu (konfiguracja gry: `odblokowanie` – {element: tydzień}, tylko zmiany względem danych).
+tydzień każdego elementu (konfiguracja gry: `odblokowanie` – {element: tydzień}, tylko zmiany względem danych) – poza
+tygodniem 1 (P15): to tydzień przygotowawczy, jego zakładek nie da się przesunąć ani przenieść niczego do niego.
 
 Gra liczy się na widoku danych (`dla_gry`): płytkiej kopii wspólnych danych z harmonogramem zakładek i z tygodniami
 mistrza gry wpisanymi tam, skąd czytają je moduły (kopiowane są tylko słowniki na drodze do zmienionego pola) –
@@ -19,6 +20,7 @@ from .dane import Dane
 from .lokale import tryb_lokali
 
 Sciezka = tuple[str, ...]   # (atrybut danych, klucze…) do pola z numerem pierwszej rundy
+PRZYGOTOWAWCZY = 1          # tydzień przygotowań – poza władzą mistrza gry
 
 
 def baza(dane: Dane) -> Dane:
@@ -120,10 +122,14 @@ def sprawdz_zmiany(dane: Dane, zmiany: dict, obecne: dict, runda: int, liczba_ru
         teraz = nowe.get(k, el[k]["tydzien"])
         if t == teraz:
             continue
+        if el[k]["tydzien"] <= PRZYGOTOWAWCZY:
+            raise ValueError(f"{el[k]['nazwa']}: tydzień {PRZYGOTOWAWCZY} jest przygotowawczy – tego nie zmienisz.")
         if teraz < runda:
             raise ValueError(f"{el[k]['nazwa']}: już odblokowane (tydzień {teraz}) – przeliczonych tygodni nie zmieniam.")
-        if not runda <= t <= liczba_rund + 1:
-            raise ValueError(f"{el[k]['nazwa']}: tydzień od {runda} do {liczba_rund} ({liczba_rund + 1} – wyłączone).")
+        od = max(runda, PRZYGOTOWAWCZY + 1)
+        if not od <= t <= liczba_rund + 1:
+            raise ValueError(f"{el[k]['nazwa']}: tydzień od {od} do {liczba_rund} ({liczba_rund + 1} – wyłączone; "
+                             f"tydzień {PRZYGOTOWAWCZY} jest przygotowawczy).")
         if t == el[k]["tydzien"]:
             nowe.pop(k, None)
         else:
@@ -132,9 +138,11 @@ def sprawdz_zmiany(dane: Dane, zmiany: dict, obecne: dict, runda: int, liczba_ru
 
 
 def widok(dane: Dane, runda: int) -> list[dict]:
-    """Harmonogram gry: [{"klucz", "nazwa", "grupa", "tydzien", "domyslny", "odblokowany"}] (pusty – gra bez lokali)."""
+    """Harmonogram gry: [{"klucz", "nazwa", "grupa", "tydzien", "domyslny", "odblokowany", "staly"}] (pusty – gra bez
+    lokali; staly – zakładka tygodnia przygotowawczego, mistrz gry jej nie przesuwa)."""
     if baza(dane) is dane:
         return []
     z = dane.nadpisane_rundy
     return [{"klucz": k, "nazwa": e["nazwa"], "grupa": e["grupa"], "tydzien": z.get(k, e["tydzien"]),
-             "domyslny": e["tydzien"], "odblokowany": z.get(k, e["tydzien"]) <= runda} for k, e in elementy(dane).items()]
+             "domyslny": e["tydzien"], "odblokowany": z.get(k, e["tydzien"]) <= runda,
+             "staly": e["tydzien"] <= PRZYGOTOWAWCZY} for k, e in elementy(dane).items()]

@@ -199,7 +199,7 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 | 5 | Handel z drużynami, kolejne kampanie reklamowe |
 | 7 | Szkolenia |
 
-Mistrz gry może przesunąć te terminy – aktualny tydzień zawsze widać w menu przy wyszarzonej zakładce.
+Mistrz gry może przesunąć te terminy (poza tygodniem 1 – tydzień przygotowawczy jest zawsze taki sam) – aktualny tydzień zawsze widać w menu przy wyszarzonej zakładce.
 
 ## 15. Dziesięć rad na dobry start
 

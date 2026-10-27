@@ -135,11 +135,14 @@ function opisOdblokowan(el) {
 function edytujOdblokowanie() {
   const el = S.p.prowadzenie.odblokowanie;
   const grupy = [...new Set(el.map((e) => e.grupa))];
+  const od = Math.max(S.p.gra.runda, 2);   // tydzień 1 – przygotowawczy (silnik/harmonogram.py)
+  const blokada = (e) => e.staly ? "disabled title=\"Tydzień przygotowawczy – nie do zmiany\"" : e.odblokowany ? "disabled title=\"Już odblokowane\"" : "";
   const wiersz = (e) => `<tr><td class="l">${esc(e.nazwa)}</td><td><input type="number" class="tydz-mg" data-k="${esc(e.klucz)}"
-      min="${S.p.gra.runda}" max="${WYLACZONE()}" value="${e.tydzien}" ${e.odblokowany ? "disabled title=\"Już odblokowane\"" : ""}></td>
-      <td class="podpowiedz">${e.tydzien === e.domyslny ? "" : `dane: ${e.domyslny}`}</td></tr>`;
-  okno("Harmonogram odblokowań", `<p>Tydzień, od którego drużyny mogą korzystać z elementu. Zmienić można tylko to, co jeszcze się
-      nie odblokowało, i najwcześniej na bieżący tydzień (${S.p.gra.runda}). Tydzień ${WYLACZONE()} – element wyłączony w tej grze.</p>
+      min="${od}" max="${WYLACZONE()}" value="${e.tydzien}" ${blokada(e)}></td>
+      <td class="podpowiedz">${e.staly ? "tydzień przygotowawczy" : e.tydzien === e.domyslny ? "" : `dane: ${e.domyslny}`}</td></tr>`;
+  okno("Harmonogram odblokowań", `<p>Tydzień, od którego drużyny mogą korzystać z elementu. Tydzień 1 jest przygotowawczy –
+      jego zakładek nie przesuniesz ani nie przeniesiesz nic do niego. Zmienić można tylko to, co jeszcze się nie odblokowało,
+      i najwcześniej na tydzień ${od}. Tydzień ${WYLACZONE()} – element wyłączony w tej grze.</p>
     ${grupy.map((g) => `<div class="tabela-tytul">${esc(g)}</div><div class="tab-wrap"><table class="t"><tbody>${el.filter((e) => e.grupa === g).map(wiersz).join("")}</tbody></table></div>`).join("")}`,
   { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button><button class="btn pom" data-akcja="zapisz-odblokowanie">Zapisz</button>` });
 }

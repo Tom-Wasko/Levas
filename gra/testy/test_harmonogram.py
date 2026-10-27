@@ -69,3 +69,18 @@ def test_api_prowadzenie(client):
     assert {e["klucz"]: e["tydzien"] for e in p}["promocje"] == 4
     v = client.get(f"/api/gry/{gra}/widok/A").json()
     assert v["harmonogram"]["promocje"] == 4 and v["harmonogram"]["handel"] == 3
+
+
+def test_tydzien_przygotowawczy():
+    """P15: zakładek tygodnia 1 mistrz gry nie przesuwa i nie przenosi niczego do tygodnia 1."""
+    dane = dane_domyslne()
+    el = hm.elementy(dane)
+    pierwsze = [k for k, e in el.items() if e["tydzien"] == 1]
+    assert "finanse_bank" in pierwsze
+    for zle in ({"finanse_bank": 3}, {"finanse_bank": 9}, {"handel": 1}):
+        with pytest.raises(ValueError, match="przygotowawczy"):
+            _gra(odblokowanie=zle)
+    g = _gra(odblokowanie={"finanse_bank": 1, "handel": 2})   # bez zmiany – w porządku
+    assert g.konfiguracja["odblokowanie"] == {"handel": 2}
+    w = {e["klucz"]: e for e in hm.widok(g.dane, 1)}
+    assert all(w[k]["staly"] for k in pierwsze) and not w["handel"]["staly"]

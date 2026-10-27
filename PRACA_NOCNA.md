@@ -609,3 +609,7 @@ _brak_
 - Nowe pole `dania` – wydarzenie zmienia popyt na konkretne dania w swoich strefach: mecz (kebab w bułce, frytki, napój ↑, talerz ↓), Wigilia (falafel ×1,6), Konfrontacje Teatralne (falafel), Halloween (mniej sosu czosnkowego), Andrzejki, Black Friday, Sylwester itd. Widoczne w zakładce Kalendarz miejski.
 - Sezonowość dań płynna z dnia na dzień (interpolacja między środkami miesięcy) zamiast skoku 1. dnia miesiąca. Wrzesień w strefach uczelni nie jest już liczony podwójnie (miesiąc + „Wakacje studenckie”).
 - Wydarzenia styczeń–kwiecień zostawiłem (przydają się przy dłuższych grach ustawionych przez MG).
+
+### P15 – tydzień 1 przygotowawczy, MG go nie zmienia (27.10)
+- Harmonogram odblokowań: zakładek tygodnia 1 (nazwa firmy, misja, oferta, stanowiska, bank, biuro rachunkowe…) mistrz gry nie przesuwa – ani przy zakładaniu gry (API), ani w trakcie (panel MG). Nie da się też przenieść żadnego elementu do tygodnia 1 (najwcześniej tydzień 2).
+- Panel MG: te pola są wyszarzone z dopiskiem „tydzień przygotowawczy”; instrukcja i PDF – jedno zdanie.
