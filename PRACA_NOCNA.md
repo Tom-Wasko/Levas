@@ -649,3 +649,6 @@ _brak_
   (12 mechanik ze starej wersji, których nie ma obecnie, nowości obecnej wersji i tabela rzeczy rozwiązanych inaczej).
 - **Pytanie:** czy przenieść coś ze starego? Moja propozycja na później: okrojona dynamika pracowników (cechy
   i zadowolenie osoby), opinie klientów na mapie i kilka grup klientów w strefach. Bez Twojej zgody nic nie przenoszę.
+
+### Drobiazg – kolor detektywa na mapie (27.10)
+- Budynek „Sokole Oko” miał na mapie szary dach (brak rodzaju `detektyw` w `BUDYNKI` w `mapa.js`) – teraz ciemnobrązowy, niski.
