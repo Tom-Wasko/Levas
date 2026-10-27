@@ -1,5 +1,6 @@
 """Handel między drużynami (F3b.8): oferty towaru i sprzętu, przyjęcie w następnej rundzie, faktury w KPiR obu
-stron, partie z terminem u kupującego, odrzucenia (widełki, limit, brak towaru, boty, przed rundą odblokowania)."""
+stron, partie z terminem u kupującego, odrzucenia (widełki, limit, brak towaru, boty, przed rundą odblokowania),
+negocjacje na żywo w rundzie wystawienia (P13)."""
 
 import copy
 
@@ -139,6 +140,63 @@ def test_przed_odblokowaniem():
     s = _przygotuj(g, [_towar(900)])
     h = s.wyniki[2]["A"]["handel"]
     assert not h["wystawione"] and "od rundy 5" in h["odrzucone"][0]["powod"]
+
+
+def test_negocjacja_ruchy_i_stany():
+    dane = dane_domyslne()
+    o = {"cena": 900, "klucz": "k"}
+    n = hd.negocjacja(dane, o, None)
+    assert n["stan"] == "ruch_kupujacego" and n["kontr"] == 0 and n["kontr_zostalo"] == 3 and n["cena"] == 900
+    assert hd.negocjacja(dane, o, {"przyjmij": 900})["stan"] == "umowa"
+    assert hd.negocjacja(dane, o, {"przyjmij": 850})["stan"] == "ruch_kupujacego"   # przyjęcie starej ceny
+    assert hd.negocjacja(dane, o, {"odrzuc": True})["stan"] == "odrzucona"
+    n = hd.negocjacja(dane, o, {"kontry": [700]})
+    assert n["stan"] == "ruch_sprzedawcy" and n["cena"] == 700 and n["kontr_zostalo"] == 2
+    assert hd.negocjacja(dane, {**o, "przyjmij_kontre": 700}, {"kontry": [700]})["stan"] == "umowa"
+    o2 = {"cena": 800, "ceny": [900, 800]}
+    n = hd.negocjacja(dane, o2, {"kontry": [700, 750, 760]})   # kontra kupującego ponad kolejność – ucięta
+    assert [r["cena"] for r in n["ruchy"]] == [900, 700, 800, 750] and n["kontr_zostalo"] == 0
+    assert hd.negocjacja(dane, {**o2, "przyjmij_kontre": 750}, {"kontry": [700, 750]})["stan"] == "umowa"
+    n = hd.negocjacja(dane, {"ceny": [900, 800, 790]}, {"kontry": [700, 750]})   # czwarta kontra – ponad limit
+    assert n["kontr"] == 3 and n["cena"] == 750 and n["stan"] == "ruch_sprzedawcy"
+
+
+def test_negocjacje_na_zywo_i_umowa(od_drugiej):
+    """Szkic oferty A widzi B jeszcze w tej rundzie; kontra, kontra, przyjęcie – transakcja w następnej rundzie
+    po uzgodnionej cenie, bez handel_przyjmij."""
+    from api.prezentacja import widok
+    g = _gra()
+    _runda(g, A={**_lokal("centrum_3"), "stanowiska": {"kuchnia": 1}}, B=_lokal("centrum_2"))
+    a = {"stanowiska": {}, "zamowienia": [HUMMUS], "handel_oferty": [{**_towar(900), "klucz": "k1"}]}
+    g.ustaw_decyzje("A", a)
+    na = widok(g, "B")["handel"]["na_zywo"]
+    (o,) = na["przychodzace"]
+    assert o["klucz"] == "A/k1" and o["negocjacja"]["stan"] == "ruch_kupujacego" and o["od_nazwa"] == "A"
+    z1 = na["znacznik"]
+    g.ustaw_decyzje("B", {"handel_odpowiedzi": {"A/k1": {"kontry": [700]}}})
+    assert widok(g, "A")["handel"]["na_zywo"]["moje"]["k1"]["stan"] == "ruch_sprzedawcy"
+    a["handel_oferty"][0].update(ceny=[900, 800], cena=800)
+    g.ustaw_decyzje("A", a)
+    na = widok(g, "B")["handel"]["na_zywo"]
+    assert na["znacznik"] != z1 and na["przychodzace"][0]["negocjacja"]["cena"] == 800
+    s = _runda(g, B={"handel_odpowiedzi": {"A/k1": {"kontry": [700], "przyjmij": 800}}})
+    (w,) = s.wyniki[2]["A"]["handel"]["wystawione"]
+    assert w["uzgodniona"] and w["cena"] == 800 and w["negocjacja"]["stan"] == "umowa"
+    s = _runda(g, A={"handel_oferty": []}, B={})
+    (t,) = s.wyniki[3]["B"]["handel"]["transakcje"]
+    assert t["strona"] == "zakup" and t["cena"] == 800 and t["uzgodniona"]
+    assert any(p["opis"] == "Zakup towarów od drużyny A: Hummus" for p in s.wyniki[3]["B"]["kpir"]["pozycje"])
+    assert all(s.wyniki[3][n]["uzgodnienie"]["roznica"] == 0 for n in "AB")
+
+
+def test_odrzucona_oferta_przepada(od_drugiej):
+    g = _gra()
+    _runda(g, A={**_lokal("centrum_3"), "stanowiska": {"kuchnia": 1}}, B=_lokal("centrum_2"))
+    s = _runda(g, A={"stanowiska": {}, "zamowienia": [HUMMUS], "handel_oferty": [_towar(900)]},
+               B={"handel_odpowiedzi": {"A/i1": {"odrzuc": True}}})
+    h = s.wyniki[2]["A"]["handel"]
+    assert not h["wystawione"] and h["odrzucone_przez_adresata"] and not s.firmy["A"].oferty_handlu
+    assert not any(b["zakladka"] == hd.ZAKLADKA for b in s.wyniki[2]["A"]["lista_bledow"])
 
 
 def test_widok_i_podglad(od_drugiej):

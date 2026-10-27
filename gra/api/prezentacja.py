@@ -64,7 +64,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     poprzednia_oferta = list(f.oferta)
     # handel: przyjęte oferty od razu na kopii stanu (druga strona – w pustej księdze; jej decyzje – w przeliczeniu)
     handel = hd.przyjmij(gra.dane, stan.firmy, {firma: d}, r, {firma: ks}, {firma: rach},
-                         gra.konfiguracja["ziarno"])[firma]
+                         gra.konfiguracja["ziarno"], tylko=firma)[firma]
     # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
     lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach)
     # kupno budynku i wypowiedzenia na kopii stanu (licytacja z innymi drużynami – dopiero w przeliczeniu)
@@ -85,7 +85,8 @@ def stan_po_szkicu(gra: Gra, firma: str):
     info["wlasciciel"], info["kasyno"] = portfel_info
     info["urzad"] = urz.ustaw(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach)
     # nowe oferty – sprawdzone na stanie po zakupach (w przeliczeniu: po tygodniu sprzedaży)
-    info["handel"] = hd.raport(handel, hd.wystaw(gra.dane, stan.firmy, firma, d, r))
+    info["handel"] = hd.raport(handel, hd.wystaw(gra.dane, stan.firmy, firma, d, r,
+                                                 hd.odpowiedzi(gra.decyzje.get(r, {}))))
     if gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
         info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
@@ -232,7 +233,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["wlasciciel"] = wl.widok(dane, fp, f, info.get("wlasciciel") if edycja
                                    else stan.wyniki[runda][firma].get("wlasciciel"))
     v["handel"] = hd.widok(dane, poprzedni.firmy, firma, runda, info.get("handel") if edycja
-                           else stan.wyniki[runda][firma].get("handel"))
+                           else stan.wyniki[runda][firma].get("handel"),
+                           gra.decyzje.get(runda, {}) if edycja else None)
     klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
                      else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
     if klub:

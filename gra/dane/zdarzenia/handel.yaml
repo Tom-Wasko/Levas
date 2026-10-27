@@ -11,6 +11,7 @@ handel:
   maks_ofert: 5          # ofert wystawionych przez drużynę w jednej rundzie
   cena_min: 0.5          # cena brutto od 50% wartości (towar – koszt zakupu, sprzęt – cena katalogowa nowego)
   cena_maks: 2.0         # do 200% wartości
+  maks_kontr: 3          # P13 (odpowiedź 20): negocjacje na żywo – najwyżej 3 kontroferty (obie strony razem)
 teksty:
 - >-
   Przekazanie odbyło się na parkingu pod galerią, z bagażnika do bagażnika. Przechodzień zapytał, czy to legalne.

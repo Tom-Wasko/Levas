@@ -182,7 +182,8 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 - **Kolejny lokal** można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
   bez litości). Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
 - **Handel z drużynami** (od tygodnia 5) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
-  i z fakturą.
+  i z fakturą. Druga drużyna widzi Twoją ofertę od razu i może się targować: przyjąć, odrzucić albo dać kontrofertę –
+  i tak na przemian, najwyżej 3 kontroferty. Przyjęta cena to umowa, towar przychodzi na początku następnego tygodnia.
 - **Analiza „co jeśli”** (od tygodnia 2) – przewidywany wynik tygodnia dla Twoich decyzji, zanim je wyślesz.
 
 ## 14. Kiedy co się odblokowuje

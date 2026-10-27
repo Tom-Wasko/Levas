@@ -229,7 +229,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
         bledy[nazwa] += lw.bledy(dane, f, info[nazwa].get("harpagon"), r + 1)
         # nowe oferty handlowe – po tygodniu sprzedaży, do przyjęcia w następnej rundzie
-        info[nazwa]["handel"] = hd.raport(handel.get(nazwa), hd.wystaw(dane, s.firmy, nazwa, d, r))
+        info[nazwa]["handel"] = hd.raport(handel.get(nazwa), hd.wystaw(dane, s.firmy, nazwa, d, r,
+                                                                       hd.odpowiedzi(decyzje)))
         bledy[nazwa] += hd.bledy(info[nazwa]["handel"])
         netto = round(ks.dochod - podatek, 2)
         f.skumulowany_dochod_netto = round(f.skumulowany_dochod_netto + netto, 2)

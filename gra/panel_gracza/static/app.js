@@ -303,7 +303,7 @@ window.addEventListener("hashchange", () => {
 export { S, okno, kluczZakladki };
 
 // --- drużyna: zmiany innych osób i przeliczenie rundy pojawiają się same -------------------------
-const ODSWIEZANIE_MS = 20000;
+const ODSWIEZANIE_MS = 20000, ODSWIEZANIE_HANDLU_MS = 5000;   // w zakładce Handel – negocjacje na żywo (P13)
 async function sprawdzZmiany() {
   const v = S.v;
   if (!v || document.hidden || document.querySelector(".zaslona") || v.gra.zakonczona) return;
@@ -319,6 +319,11 @@ async function sprawdzZmiany() {
     await S.zapis;
     return wczytaj();
   }
+  if (st.handel && v.handel?.na_zywo && st.handel !== v.handel.na_zywo.znacznik && !pisze) {
+    toast("Nowy ruch w negocjacjach handlowych.");
+    await S.zapis;
+    return wczytaj();
+  }
   const wersja = v.druzyna?.autorzy?.wersja ?? 0;
   const wyslaneTeraz = st.wyslane.join("|"), wyslanePrzed = v.gra.wyslane.join("|");
   if ((st.wersja !== wersja || wyslaneTeraz !== wyslanePrzed) && !pisze) {
@@ -327,5 +332,9 @@ async function sprawdzZmiany() {
     return wczytaj();
   }
 }
-setInterval(() => sprawdzZmiany().catch(() => {}), ODSWIEZANIE_MS);
+let tik = 0;
+setInterval(() => {
+  tik += ODSWIEZANIE_HANDLU_MS;
+  if (S.zakladka === "handel" || tik >= ODSWIEZANIE_MS) { tik = 0; sprawdzZmiany().catch(() => {}); }
+}, ODSWIEZANIE_HANDLU_MS);
 

@@ -22,6 +22,7 @@ from gry.models import Gra
 from konta import druzyny
 from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
 from silnik import co_jesli
+from silnik import handel as hd
 from silnik import harmonogram as hm
 from silnik import kasyno as kas
 from silnik.biuro import ukryj
@@ -386,6 +387,7 @@ def api_stan(request, id_, firma):
             "wyslane": [] if g.zakonczona else g.wyslane(),
             "pauza": p["pauza"],
             "termin": p["termin"],
+            "handel": None if g.zakonczona else hd.znacznik(g.decyzje.get(g.runda, {}), firma),
         }
     )
 

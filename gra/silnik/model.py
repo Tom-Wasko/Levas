@@ -126,6 +126,8 @@ class OfertaHandlu(Model):
     nazwa: str | None = None      # sprzęt `nazwa` ze stanowiska `stanowisko` nr `nr`
     stanowisko: str | None = None
     nr: int | None = None
+    uzgodniona: bool = False      # P13: umowa z negocjacji w rundzie wystawienia – transakcja bez przyjęcia
+    nr_kupujacego: int | None = None   # stanowisko kupującego na sprzęt (z negocjacji)
 
     cena = _kwota("cena")
 

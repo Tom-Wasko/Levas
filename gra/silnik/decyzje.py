@@ -37,6 +37,9 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
                                                               za całość; silnik/handel.py)
     handel_przyjmij:   [{"id", "nr"}]                       – przyjęcie ofert z poprzedniej rundy (nr – stanowisko
                                                               na kupiony sprzęt)
+                       negocjacje na żywo (P13): oferta ma też "klucz", "ceny" (kolejne ceny sprzedawcy)
+                       i "przyjmij_kontre"; handel_odpowiedzi: {"<sprzedawca>/<klucz>": {"kontry", "przyjmij", "nr",
+                       "odrzuc"}} – odpowiedź adresata w tej samej rundzie (umowa – transakcja w następnej)
 """
 from __future__ import annotations
 

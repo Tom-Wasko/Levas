@@ -589,3 +589,16 @@ _brak_
   to ta sama decyzja `wyplata_wlasna` co w Portfelu właściciela, więc na koncie firmy widać tylko zwykłą „Wypłatę własną
   właściciela (poza KPiR)”; wypłata idzie przed zakładami, można ją postawić w tej samej rundzie. Do tego karta
   „Zasada milczenia” (ironiczna tabliczka nad barem + historia o stoisku z watą cukrową). Instrukcja celowo milczy o klubie.
+
+### P13 – negocjacje na żywo w handlu (27.10)
+- Adresat widzi szkic oferty od razu (jeszcze w tej samej rundzie): może ją przyjąć, odrzucić albo dać kontrofertę;
+  sprzedawca odpowiada przyjęciem kontroferty albo własną kontrą – na przemian, razem najwyżej 3 kontroferty
+  (`maks_kontr` w dane/zdarzenia/handel.yaml).
+- Przyjęta cena = umowa: transakcja wykonuje się sama na początku następnej rundy (bez klikania „Przyjmij”).
+  Oferta bez umowy działa jak dotąd – adresat może ją przyjąć w następnej rundzie po ostatniej cenie sprzedawcy.
+  Odrzucona oferta przepada (bez czerwonego błędu u sprzedawcy).
+- Wszystko trzymane w szkicach decyzji obu drużyn (`handel_oferty[].ceny/przyjmij_kontre`, `handel_odpowiedzi`),
+  więc event sourcing bez zmian. Panel w zakładce Handel odpytuje serwer co 5 s (gdzie indziej co 20 s) i odświeża
+  widok po ruchu drugiej drużyny (znacznik w /api/gry/<id>/stan/<firma>).
+- Testy: stany negocjacji i limit kontr, pełna negocjacja → umowa → transakcja po uzgodnionej cenie, odrzucenie.
+  INSTRUKCJA (md + pdf) – zdanie o targowaniu się.

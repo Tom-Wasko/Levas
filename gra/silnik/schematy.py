@@ -1293,6 +1293,7 @@ class ZasadyHandlu(Schemat):
     maks_ofert: int = Field(ge=1)          # ofert wystawionych przez drużynę w jednej rundzie
     cena_min: float = Field(gt=0)          # widełki ceny jako część wartości (towar – koszt zakupu, sprzęt – katalog)
     cena_maks: float = Field(gt=0)
+    maks_kontr: int = Field(default=3, ge=0)   # P13: kontrofert w jednej negocjacji (obie strony razem)
 
 
 class PlikHandlu(Plik):
