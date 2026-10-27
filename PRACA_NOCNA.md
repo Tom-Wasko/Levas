@@ -643,3 +643,9 @@ _brak_
   niewidoczna kampania). Dotyczy tylko botów, nigdy drużyn graczy.
 - Mistrz gry wybiera go tak jak inne poziomy (lista poziomów bierze się z danych) – przy zakładaniu gry i w trakcie.
 - Test: przy tej samej strategii niemożliwy sprzedaje więcej niż trudny. Testy 267 OK.
+
+### P20 – Przegląd starego Levasa (27.10)
+- Przeczytałem gałąź `kod` z `Tom-Wasko/Levas-stary` (tylko odczyt). Lista różnic: `ROZNICE_LEVAS_STARY.md`
+  (12 mechanik ze starej wersji, których nie ma obecnie, nowości obecnej wersji i tabela rzeczy rozwiązanych inaczej).
+- **Pytanie:** czy przenieść coś ze starego? Moja propozycja na później: okrojona dynamika pracowników (cechy
+  i zadowolenie osoby), opinie klientów na mapie i kilka grup klientów w strefach. Bez Twojej zgody nic nie przenoszę.

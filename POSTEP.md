@@ -246,4 +246,4 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 - [x] P17 Sprzątanie: usunąć zbędne pozostałości Revasa (`dane_revas/`, martwy kod) – pytanie 27
 - [x] P18 Nowe historyjki (parki, zdarzenia) – do 15:00, po wszystkim innym – pytanie 12
 - [x] P19 (jeśli czas) bot „niemożliwy”; inaczej wpis w rzeczach na przyszłość – pytanie 25
-- [ ] P20 (jeśli czas) przegląd starego Levasa (`Tom-Wasko/Levas-stary`, branch `kod`) – lista różnic – pytanie 1
+- [x] P20 (jeśli czas) przegląd starego Levasa (`Tom-Wasko/Levas-stary`, branch `kod`) – lista różnic – pytanie 1
