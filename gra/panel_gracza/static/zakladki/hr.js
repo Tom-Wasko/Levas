@@ -28,7 +28,8 @@ export const zatrudnienie = {
           <button class="btn jasny" data-akcja="kandydaci" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Zatrudnij pracownika →</button>
           ${v.lokale ? `<button class="btn jasny maly" style="margin-top:6px" data-akcja="wlasciciel" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Stań sam (właściciel)</button>` : ""}</div></div>`;
         const nowy = p.od_rundy === v.runda;
-        return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}</div>
+        const wyp = p.odchodzi ? `<span class="pigulka">wypowiedzenie do r. ${p.odchodzi.runda}</span>` : "";
+        return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}${wyp}</div>
           <div class="kt srodek" data-akcja="profil" data-id="${esc(p.id)}" style="cursor:pointer"><div class="awatar">${inicjaly(p.imie_nazwisko)}</div>
           <b>${esc(p.imie_nazwisko)}</b><br><span class="podpowiedz">${esc(p.zawod)} · ${UMOWY[p.umowa]}</span><br>${gw(p.gwiazdki)}<br>
           <b class="akcent">${zl(p.pensja)}</b>${p.premia ? `<br><span class="podpowiedz">premia ${zl(p.premia)}</span>` : ""}</div></div>`;
@@ -96,12 +97,16 @@ export const zatrudnienie = {
     },
     zwolnij: async (el, c) => {
       const id = el.dataset.id, nowy = el.dataset.nowy === "1";
-      if (!nowy && !confirm("Zwolnić pracownika? Trzeba zapłacić odprawę.")) return;
+      if (!nowy && !confirm("Zwolnić pracownika? Trzeba zapłacić odprawę, a na umowie o pracę przez 2 rundy wypowiedzenia nadal pracuje i dostaje pensję.")) return;
       zamknijOkno();
       await c.zmien((d) => {
         if (nowy) d.zatrudnij = (d.zatrudnij || []).filter((z) => z.kandydat !== id);
         else d.zwolnij = [...new Set([...(d.zwolnij || []), id])];
       });
+    },
+    "cofnij-zwolnienie": async (el, c) => {
+      zamknijOkno();
+      await c.zmien((d) => { d.zwolnij = (d.zwolnij || []).filter((x) => x !== el.dataset.id); });
     },
   },
 };
@@ -188,7 +193,11 @@ function oknoProfilu({ v, kat, edycja }, id) {
       ${pole("Aktualne wynagrodzenie brutto", `<input type="number" id="p-pensja" step="10" value="${p.pensja}" ${edycja ? "" : "disabled"}>`)}
       ${nowy ? "" : pole("Premia (jednorazowo w tej rundzie)", `<input type="number" id="p-premia" step="50" value="${p.premia || 0}" ${edycja ? "" : "disabled"}>`)}
       ${pole("Forma zatrudnienia", `<select id="p-umowa" ${edycja ? "" : "disabled"}>${Object.entries(UMOWY).map(([k, n]) => `<option value="${k}" ${p.umowa === k ? "selected" : ""}>${n}</option>`).join("")}</select>`)}
-      <button class="btn czarny" data-akcja="zwolnij" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>${nowy ? "Anuluj zatrudnienie" : "Zwolnij"}</button>
+      ${(v.decyzje.zwolnij || []).includes(id)
+    ? `<button class="btn jasny" data-akcja="cofnij-zwolnienie" data-id="${esc(id)}" ${edycja ? "" : "disabled"}>Cofnij zwolnienie</button>
+       <span class="podpowiedz">${p.umowa === "prace" ? "Umowa o pracę: przez 2 rundy wypowiedzenia jeszcze pracuje i dostaje pensję." : "Umowa zlecenie: odchodzi od razu."}</span>`
+    : p.odchodzi ? `<span class="minus">W okresie wypowiedzenia – odchodzi w rundzie ${p.odchodzi.runda}.</span>`
+      : `<button class="btn czarny" data-akcja="zwolnij" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>${nowy ? "Anuluj zatrudnienie" : "Zwolnij"}</button>`}
     </div></div>`, { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="zapisz-profil" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>Zapisz</button>` });
 }

@@ -196,12 +196,8 @@ agencja:
       czas_wlasciciela: 0
       podkupienie_czesc_pensji: 0.5
   wypowiedzenie:
-  - staz_od: 0
+  - staz_od: 0       # jedna długość dla wszystkich (P6): 2 rundy, w obie strony (zwolnienie i odejście)
     rund: 2
-  - staz_od: 26
-    rund: 4
-  - staz_od: 156
-    rund: 13
 imiona_kobiet:
 - Anna
 - Katarzyna

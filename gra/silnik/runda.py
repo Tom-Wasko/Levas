@@ -428,7 +428,7 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
     jakosci = [q for st in f.stanowiska for q in st.sprzet.values()]
     sprzet_gw = float(np.mean(jakosci)) if jakosci else 2.0
     udog = sum(dane.pozycje("udogodnienia")[n]["procent"] / 100 for n in f.udogodnienia)
-    zmiany = (len(info["zatrudnieni"]) + len(info["zwolnieni"])) / max(1, len(prac))
+    zmiany = (len(info["zatrudnieni"]) + len(info["zwolnieni"]) + len(info.get("wypowiedzenia", []))) / max(1, len(prac))
     zp = kw.zadowolenie_pracownikow(dane, placa, sprzet_gw, udog, info["szkolenia_procent"], zlecenia,
                                     zmiany if r > 2 else 0.0) if prac else 0.0
 

@@ -125,7 +125,8 @@ widoczna w wynikach Sprzedaży i bolesna dla zadowolenia klientów.
 - Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy.
 - **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3)
   i szkoleniami (od tygodnia 7). Niezadowoleni pracują gorzej i odchodzą.
-- Zwolnienie i odejście mają okres wypowiedzenia – pracownik przez ten czas jeszcze pracuje (i kosztuje).
+- Zwolnienie i odejście do konkurencji mają **2 rundy wypowiedzenia** (umowa o pracę) – pracownik przez ten czas
+  jeszcze pracuje i dostaje pensję; odprawę płacisz od razu. Zleceniobiorca odchodzi bez wypowiedzenia.
 - **Brakuje rąk?** Właściciel może sam stanąć na jednym wolnym stanowisku (przycisk *Stań sam* w zakładce
   Zatrudnienie). Pracuje jak pracownik 1★ i nie bierze pensji, ale każda godzina za ladą schodzi z jego 20 godzin.
 

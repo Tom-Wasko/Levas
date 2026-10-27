@@ -61,7 +61,7 @@ from .dostawcy import zasady_dostaw
 from .finanse import Ksiega, Rachunek, ksieguj
 from .lokale import bledy as bledy_lokali
 from .lokale import wolne_miejsca
-from .model import Cena, Firma, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
+from .model import Cena, Firma, Odejscie, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
 from .operacje import kasjerzy, stanowiska_uslugi
 
 
@@ -127,7 +127,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
              ksiega: Ksiega, rachunek: Rachunek) -> dict:
     """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów).
     Nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany wcześniej, silnik/lokale.py)."""
-    info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
+    info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "wypowiedzenia": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
     if d.get("nazwa"):
@@ -215,13 +215,20 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
 
     # kadry
     for pid in d.get("zwolnij", []) if kadry_ok else []:
-        p = firma.pracownicy.pop(pid, None)
-        if p:
-            st = firma.stanowisko(dane.typ_zawodu(p.zawod), p.stanowisko)
-            if st:
-                st.pracownik = None
-            ksieguj(firma, ksiega, rachunek, f"Koszt zwolnienia {p.imie_nazwisko}", p.koszt_odprawy)   # opis jak w KPiR gry
-            info["zwolnieni"].append(pid)
+        p = firma.pracownicy.get(pid)
+        if not p or p.odchodzi:
+            continue
+        ksieguj(firma, ksiega, rachunek, f"Koszt zwolnienia {p.imie_nazwisko}", p.koszt_odprawy)   # opis jak w KPiR gry
+        okres = rp.okres_wypowiedzenia(dane, p, runda)
+        if okres:   # umowa o pracę: pracuje (i kosztuje) do końca wypowiedzenia, potem wraca do puli (P6)
+            p.odchodzi = Odejscie(do="", runda=runda + okres, pensja=p.pensja, umowa=p.umowa, od_rundy=runda)
+            info["wypowiedzenia"].append({"pracownik": pid, "imie_nazwisko": p.imie_nazwisko, "runda_odejscia": runda + okres})
+            continue
+        del firma.pracownicy[pid]
+        st = firma.stanowisko(dane.typ_zawodu(p.zawod), p.stanowisko)
+        if st:
+            st.pracownik = None
+        info["zwolnieni"].append(pid)
     for pid, zm in (d.get("zmiany") or {}).items():
         p = firma.pracownicy.get(pid)
         if not p:
@@ -415,6 +422,9 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
                       f"{date.fromisoformat(s['termin']):%d.%m}) – zamów mniej albo bliżej dnia sprzedaży.")
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
+        for w in (info or {}).get("wypowiedzenia", []):
+            dodaj("niebieski", "zatrudnienie", f"{w['imie_nazwisko']} dostaje wypowiedzenie – pracuje i dostaje pensję "
+                  f"do rundy {w['runda_odejscia'] - 1}, potem wraca na rynek pracy.")
         wl = (info or {}).get("wlasciciel_stanowisko")
         if wl and not wl["przyjete"]:
             dodaj("czerwony", "zatrudnienie", f"Właściciel nie stanie na stanowisku nr {wl['nr']}: {wl['powod']}.")

@@ -229,7 +229,7 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 - [x] P3 Tutorial dla graczy: strona „Jak grać” w panelu + `INSTRUKCJA.md` + PDF
 - [x] P4 Instrukcja logowania kontem Microsoft (`gra/LOGOWANIE_MICROSOFT.md`) – pytanie 3
 - [x] P5 Właściciel jako pracownik 1★ (ręcznie, godziny z puli 20 h, bez pensji) – pytanie 4
-- [ ] P6 Jedno wypowiedzenie: 2 rundy dla wszystkich – pytanie 5
+- [x] P6 Jedno wypowiedzenie: 2 rundy dla wszystkich – pytanie 5
 - [ ] P7 Krótkie opisy dydaktyczne w zakładkach finansów (VAT, KPiR, PIT, ZUS, bank…) – pytanie 8
 - [ ] P8 Lokal „co 3 rundy”: komunikat, że właściciel musi odpocząć – pytanie 11
 - [ ] P9 Parki: co rundę kilka eventów (te same dla wszystkich, każdy może wziąć każdy, ta sama nagroda), każdy

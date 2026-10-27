@@ -9,8 +9,9 @@ Dane: dane/kandydaci.yaml – agencja (kanały pracuj.pl / agencja pracy / headh
 - Podkupienie (tylko przez headhuntera): oferta dla pracownika innej firmy; obecny pracodawca może złożyć kontrofertę
   w tej samej rundzie. Pracownik przyjmuje najlepszą ofertę, jeśli jest wyższa od jego pensji i od kontroferty;
   wygrana kontroferta podnosi mu pensję. Umowa zlecenie – przejście od razu, umowa o pracę – po okresie
-  wypowiedzenia (KP art. 36, staż u obecnego pracodawcy w rundach). Pracownika w okresie wypowiedzenia nie można
-  zwolnić ani podkupić.
+  wypowiedzenia. Pracownika w okresie wypowiedzenia nie można zwolnić ani podkupić.
+- Okres wypowiedzenia (P6): jedna długość z danych (2 rundy) w obie strony – zwolniony pracownik na umowie o pracę
+  pracuje i dostaje pensję jeszcze przez okres wypowiedzenia, potem wraca do puli (`Odejscie` z pustym `do`).
 
 Kolejność w rundzie (silnik/runda.py): `przed_decyzjami` (limit, licytacje, podkupienia) → decyzje firm
 (`zastosuj`: kanał, koszt, czas właściciela) → `po_decyzjach` (przejścia pracowników, opłaty headhuntera).
@@ -54,7 +55,7 @@ def staz(p: Pracownik, runda: int) -> int:
 
 
 def okres_wypowiedzenia(dane: Dane, p: Pracownik, runda: int) -> int:
-    """Rundy do odejścia: umowa zlecenie 0, umowa o pracę wg stażu (KP art. 36)."""
+    """Rundy do odejścia: umowa zlecenie 0, umowa o pracę wg danych (jedna długość, wpisy wg stażu – na przyszłość)."""
     if p.umowa != "prace":
         return 0
     s = staz(p, runda)

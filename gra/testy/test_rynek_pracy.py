@@ -123,9 +123,26 @@ def test_zleceniobiorca_przechodzi_od_razu():
 def test_zwolniony_wraca_do_puli():
     g, s = _start()
     k = _kandydat(s, 1)
-    _runda(g, A={"zatrudnij": [_z(k, 1)]})
+    s = _runda(g, A={"zatrudnij": [_z(k, 1)]})
+    r = s.runda + 1
     s = _runda(g, A={"zwolnij": [k["id"]]})
-    assert k["id"] in {x["id"] for x in s.kandydaci}
+    p = s.firmy["A"].pracownicy[k["id"]]   # umowa o pracę: 2 rundy wypowiedzenia (P6), odprawa od razu
+    assert p.odchodzi and p.odchodzi.do == "" and p.odchodzi.runda == r + 2
+    assert k["id"] not in {x["id"] for x in s.kandydaci}
+    assert any("dostaje wypowiedzenie" in t for t in _bledy(s, r, "A", "zatrudnienie"))
+    s = _runda(g)
+    assert k["id"] in s.firmy["A"].pracownicy and s.wyniki[r + 1]["A"]["pracownicy"]   # nadal pracuje i kosztuje
+    s = _runda(g)
+    assert k["id"] not in s.firmy["A"].pracownicy and k["id"] in {x["id"] for x in s.kandydaci}
+    assert s.wyniki[r + 2]["A"]["rynek_pracy"]["odejscia"][0]["do"] == ""
+
+
+def test_zwolniony_zleceniobiorca_odchodzi_od_razu():
+    g, s = _start()
+    k = _kandydat(s, 1)
+    _runda(g, A={"zatrudnij": [{**_z(k, 1), "umowa": "zlecenie"}]})
+    s = _runda(g, A={"zwolnij": [k["id"]]})
+    assert k["id"] not in s.firmy["A"].pracownicy and k["id"] in {x["id"] for x in s.kandydaci}
 
 
 def test_wlasciciel_na_stanowisku_jako_pracownik_1_gwiazdka():

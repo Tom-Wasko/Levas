@@ -563,3 +563,7 @@ _brak_
   (właściciel)” w HR → Zatrudnienie; pracuje jak 1★ (zadowolenie i ryzyko reklamacji jak przeciętny kandydat 1★),
   bez pensji, godziny (do 40) z puli czasu właściciela; za mało czasu – odrzucone (lista błędów). Tylko w tej
   rundzie (decyzja na każdą rundę). W wynikach – wiersz „Właściciel” w „Twoi pracownicy”. Instrukcja i PDF uzupełnione.
+- **P6 (27.10):** jedno wypowiedzenie – 2 rundy (dane/kandydaci.yaml), w obie strony. Zwolniony na umowie o pracę
+  pracuje i dostaje pensję jeszcze 2 rundy (odprawa od razu), potem wraca do puli; w HR plakietka „wypowiedzenie
+  do r. N” i przycisk „Cofnij zwolnienie” w tej samej rundzie. **Decyzja do potwierdzenia:** zleceniobiorca nadal
+  odchodzi od razu (umowa zlecenie nie ma wypowiedzenia z KP) – jeśli wolisz 2 rundy także dla zlecenia, to jedna linijka.

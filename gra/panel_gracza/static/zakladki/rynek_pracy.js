@@ -16,13 +16,14 @@ function kosztKanalu(k) {
 function kanalyHtml(A) {
   const w = Object.values(A.kanaly).map((k) => [esc(k.nazwa), k.gwiazdki.map((g) => "★".repeat(g)).join(", "), kosztKanalu(k),
     k.czas_wlasciciela ? `${licz(k.czas_wlasciciela, 1)} h` : "–", k.dostepny ? "dostępny" : `<span class="podpowiedz">od rundy ${k.od_rundy}</span>`]);
-  const wyp = A.wypowiedzenie.map((x, i) => {
+  const wyp = A.wypowiedzenie.length === 1 ? rundy(A.wypowiedzenie[0].rund) : A.wypowiedzenie.map((x, i) => {
     const nast = A.wypowiedzenie[i + 1];
     return `staż ${nast ? `${x.staz_od}–${nast.staz_od - 1}` : `od ${x.staz_od}`} rund: ${rundy(x.rund)}`;
   }).join(" · ");
   return tabela("Kanały rekrutacji", ["Kanał", "Kandydaci", "Koszt zatrudnienia", "Czas właściciela", "Dostępność"], w, { klasy: ["l", "l", "l"] })
     + `<p class="podpowiedz">Bez wskazania kanału zatrudnienie idzie najtańszym dostępnym. Okres wypowiedzenia (umowa o pracę): ${wyp};
-       zleceniobiorca odchodzi od razu.</p>`;
+       zleceniobiorca odchodzi od razu.
+       Wypowiedzenie działa w obie strony: zwolniony pracownik też pracuje (i dostaje pensję) do końca okresu.</p>`;
 }
 
 export const rynek_pracy = {
@@ -50,7 +51,7 @@ export const rynek_pracy = {
     html += tabela("Twoi pracownicy – staż i okres wypowiedzenia", ["Pracownik", "Zawód", "Umowa", "Staż", "Okres wypowiedzenia", "Status"],
       A.moi.length ? A.moi.map((p) => [esc(p.imie_nazwisko), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, UMOWY[p.umowa], rundy(p.staz),
         p.okres ? rundy(p.okres) : "od razu",
-        p.odchodzi ? `<span class="minus">odchodzi do ${esc(nazwaFirmy(v, p.odchodzi.do))} w rundzie ${p.odchodzi.runda}</span>` : "pracuje"])
+        p.odchodzi ? `<span class="minus">${p.odchodzi.do ? `odchodzi do ${esc(nazwaFirmy(v, p.odchodzi.do))}` : "zwolniony – odchodzi"} w rundzie ${p.odchodzi.runda}</span>` : "pracuje"])
         : [["Nie masz jeszcze pracowników.", "", "", "", "", ""]], { klasy: ["l", "l", "l"] });
 
     if (!A.headhunter) {
@@ -71,7 +72,7 @@ export const rynek_pracy = {
     if (!R) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
     const pusto = (n, t) => [[t, ...Array(n - 1).fill("")]];
     const kanaly = v.agencja?.kanaly || {};
-    const ruchy = [...R.odejscia.map((o) => [esc(o.imie_nazwisko), `<span class="minus">odejście</span>`, esc(nazwaFirmy(v, o.do))]),
+    const ruchy = [...R.odejscia.map((o) => [esc(o.imie_nazwisko), `<span class="minus">odejście</span>`, o.do ? esc(nazwaFirmy(v, o.do)) : "koniec wypowiedzenia – pula kandydatów"]),
       ...R.przyjscia.map((o) => [esc(o.imie_nazwisko), `przyjście (stanowisko nr ${o.stanowisko})`, esc(nazwaFirmy(v, o.od))])];
     return tabela("Zatrudnieni w rundzie", ["Pracownik", "Kanał", "Koszt zatrudnienia", "Pensja"],
       R.zatrudnieni.length ? R.zatrudnieni.map((z) => [esc(z.imie_nazwisko), esc(kanaly[z.kanal]?.nazwa || z.kanal), zl(z.koszt), zl(z.pensja)])

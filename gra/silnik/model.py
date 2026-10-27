@@ -54,7 +54,8 @@ class Model(BaseModel):
 
 
 class Odejscie(Model):
-    """Pracownik przyjął ofertę innej firmy (F3a.8): przechodzi do niej w rundzie `runda` (po okresie wypowiedzenia)."""
+    """Pracownik przyjął ofertę innej firmy (F3a.8) albo został zwolniony (P6, `do` puste): odchodzi w rundzie `runda`
+    (po okresie wypowiedzenia) – do nowej firmy albo z powrotem do puli kandydatów."""
     do: str
     runda: int
     pensja_gr: int
