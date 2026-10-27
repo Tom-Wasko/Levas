@@ -12,7 +12,6 @@ kopiowano. To lista do decyzji: co warto przenieść później, a co zostało ś
 | Runda | tydzień, kalendarz 2027–2028 | tydzień, 18 rund od pon. 1.09.2025 do 4.01.2026, wrzesień – wprowadzenie |
 | Decyzje | pojedyncze akcje (`wykonaj_akcje`), każda sprawdzana od razu | jeden plik decyzji na rundę (format Revasa), błędy na liście z zakładkami |
 | Interfejs | strony Django z formularzami | panel w JS: zakładki Decyzje / Wyniki dla każdego elementu i mapa miasta |
-| Pieniądze | int w groszach | float zaokrąglany do grosza |
 | Logowanie | brak (tryb deweloperski) | konta, role (uczeń, mistrz gry), logowanie Microsoft |
 | Czas właściciela | 60 h na tydzień | 20 h na rundę, zakładka Czas właściciela |
 
@@ -70,6 +69,7 @@ kopiowano. To lista do decyzji: co warto przenieść później, a co zostało ś
 
 | Element | Stary | Obecny |
 |---|---|---|
+| Pieniądze | kwoty w groszach (int) | kwoty w modelu w groszach (int, pola `_gr`) |
 | Podatki | VAT, PIT liniowy, składka zdrowotna, ZUS z ulgą na start | to samo: rejestr VAT, PIT liniowy, zdrowotna, ZUS (kwoty 2026) |
 | Księgowość | biuro albo samodzielna mini-gra z celowymi błędami i kontrolą | biuro albo samodzielnie (ryzyko błędu, kara) |
 | Bank | konto w jednym banku, kredyt na start, inwestycyjny z zastawem | kilka banków, lokaty i kredyty, kredyt odnawialny „na bieżąco” |
@@ -77,7 +77,7 @@ kopiowano. To lista do decyzji: co warto przenieść później, a co zostało ś
 | Higiena / sanepid | wzór higieny (sprzątanie, sprzęt, kuchnia), kontrole | poziomy higieny, kontrole i mandaty, skargi z historyjek |
 | Agencja pracy | 3 poziomy wyszukiwania, podkupienie z kontrofertą | kanały (pracuj.pl, agencja, headhunter), licytacje, podkupienie z kontrofertą |
 | Handel | sprzęt, towar, lokal, cofnięcie przez MG | sprzęt, towar, lokal, negocjacje na żywo |
-| Termin rundy | termin i automatyczne zamykanie | termin rundy i zamknięcie przez mistrza gry albo po decyzjach wszystkich |
+| Termin rundy | termin i automatyczne zamykanie (`zamykaj_rundy`) | harmonogram terminów tygodniowych, pauza gry, `zamykaj_rundy`; mistrz gry może też zamknąć rundę ręcznie |
 
 ## Propozycja (do decyzji)
 
