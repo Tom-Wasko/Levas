@@ -111,10 +111,12 @@ włącza):
 .venv\Scripts\python manage.py konto ala --imie "Ala Nowak"                  # uczeń
 ```
 
-**Konto Microsoft (szkolne):** zarejestruj aplikację w Microsoft Entra ID (adres przekierowania
-`http(s)://<serwer>/konta/microsoft/login/callback/`) i ustaw zmienne `LEVAS_MS_CLIENT_ID`,
-`LEVAS_MS_SECRET` i `LEVAS_MS_TENANT` (identyfikator dzierżawy szkoły – logują się tylko jej konta). Bez nich
-przycisk Microsoft się nie pokazuje. Pierwsze logowanie zakłada konto ucznia.
+**Konto Microsoft (szkolne)** – krok po kroku w [`LOGOWANIE_MICROSOFT.md`](LOGOWANIE_MICROSOFT.md):
+aplikacja w Microsoft Entra ID (adres przekierowania `http(s)://<serwer>/konta/microsoft/login/callback/`),
+dane w `lokalne.json` (`"microsoft": {"client_id", "tenant", "secret"}`) albo w zmiennych `LEVAS_MS_CLIENT_ID`,
+`LEVAS_MS_TENANT`, `LEVAS_MS_SECRET`. Bez nich przycisk Microsoft się nie pokazuje. Pierwsze logowanie zakłada
+konto ucznia; rola mistrza gry: `manage.py konto <e-mail> --mg`. Serwer pod innym adresem: `LEVAS_HOSTY`
+(albo `"hosty"`), za https: `LEVAS_HTTPS=1` (albo `"https": true`).
 
 **Gra na własnym komputerze** (`start.bat`, `manage.py graj`) loguje się sama na lokalne konto mistrza gry
 `lokalny` – tylko z tego komputera. Sam `runserver` wymaga logowania.

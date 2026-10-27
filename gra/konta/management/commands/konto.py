@@ -1,6 +1,7 @@
 """`python manage.py konto <login> [--mg] [--imie ...]` – zakłada albo zmienia konto.
 
-Hasło: opcja --haslo albo pytanie w konsoli."""
+Hasło: opcja --haslo albo pytanie w konsoli. Adres e-mail zamiast loginu wskazuje istniejące konto
+(np. założone pierwszym logowaniem kontem Microsoft) – tak nadaje się mu rolę mistrza gry."""
 
 from getpass import getpass
 
@@ -21,7 +22,9 @@ class Command(BaseCommand):
         parser.add_argument("--haslo", help="hasło (bez tej opcji – pytanie w konsoli)")
 
     def handle(self, *args, login, mg, uczen, imie, haslo, **opcje):
-        user, nowe = get_user_model().objects.get_or_create(username=login)
+        uzytkownicy = get_user_model().objects
+        po_mailu = uzytkownicy.filter(email__iexact=login).first() if "@" in login else None
+        user, nowe = (po_mailu, False) if po_mailu else uzytkownicy.get_or_create(username=login)
         if imie:
             user.first_name, _, user.last_name = imie.partition(" ")
         if nowe or haslo is not None:
@@ -32,4 +35,4 @@ class Command(BaseCommand):
         user.save()
         if mg or uczen:
             nadaj_mg(user, mg)
-        self.stdout.write(f"{'Założono' if nowe else 'Zmieniono'} konto {login}.")
+        self.stdout.write(f"{'Założono' if nowe else 'Zmieniono'} konto {user.username}.")

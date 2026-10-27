@@ -76,6 +76,14 @@ def test_komenda_konto_mistrz_gry():
     assert not jest_mg(get_user_model().objects.get(username="pani-ania"))
 
 
+def test_komenda_konto_po_mailu_konta_microsoft():
+    """Konto z pierwszego logowania Microsoft (login nadany automatycznie) – rola MG po adresie e-mail."""
+    get_user_model().objects.create(username="anna7", email="Anna.Kowalska@szkola.edu.pl")
+    call_command("konto", "anna.kowalska@szkola.edu.pl", "--mg")
+    assert jest_mg(get_user_model().objects.get(username="anna7"))
+    assert get_user_model().objects.count() == 1
+
+
 def test_uczen_nie_odczyta_cudzej_druzyny(gra, uczen):
     ala, bartek, obcy = uczen("ala"), uczen("bartek"), uczen("obcy")
     _dopisz(gra, A, "ala")

@@ -547,3 +547,11 @@ _brak_
   wersja na telefon i do druku), link „Jak grać” w nagłówkach panelu gracza i MG. PDF: `gra/INSTRUKCJA.pdf`,
   odświeżanie: `python manage.py instrukcja_pdf` (drukuje Edge). Na stronie startowej poprawiony tekst
   „gotowym lokalem” → lokal wybiera się na mapie w 1. tygodniu.
+- **P4 gotowe:** `gra/LOGOWANIE_MICROSOFT.md` – rejestracja aplikacji w Microsoft Entra krok po kroku (adres
+  zwrotny, identyfikatory, klucz tajny, zgoda administratora), wpisanie danych, próba na własnym komputerze
+  (`runserver 8766` + http://localhost:8766), serwer z https, role i drużyny, tabela typowych błędów AADSTS.
+  Ułatwienia w kodzie: dane Microsoft można wpisać do `gra/lokalne.json` (zamiast zmiennych środowiskowych),
+  `LEVAS_HOSTY`/`"hosty"` (adres serwera), `LEVAS_HTTPS`/`"https"` (serwer za https), `manage.py konto
+  <e-mail> --mg` nadaje rolę MG kontu założonemu przez Microsoft. Ważne: klasa w sieci szkoły po
+  `http://192.168…` nie zaloguje się kontem Microsoft (Microsoft wymaga https poza localhost) – do tego
+  potrzebny serwer z certyfikatem; do tego czasu loginy i hasła.

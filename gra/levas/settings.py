@@ -8,29 +8,44 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+PLIK_LOKALNY = BASE_DIR / "lokalne.json"  # ustawienia tego komputera (poza gitem)
+LOKALNE = json.loads(PLIK_LOKALNY.read_text(encoding="utf-8")) if PLIK_LOKALNY.exists() else {}
+
+
 def _klucz() -> str:
-    """Klucz z LEVAS_SECRET_KEY albo wygenerowany raz i trzymany w `lokalne.json` (poza gitem)."""
+    """Klucz z LEVAS_SECRET_KEY albo wygenerowany raz i trzymany w `lokalne.json`."""
     if os.environ.get("LEVAS_SECRET_KEY"):
         return os.environ["LEVAS_SECRET_KEY"]
-    plik = BASE_DIR / "lokalne.json"
-    dane = json.loads(plik.read_text(encoding="utf-8")) if plik.exists() else {}
-    if not dane.get("secret_key"):
-        dane["secret_key"] = secrets.token_urlsafe(50)
-        plik.write_text(json.dumps(dane, indent=1), encoding="utf-8")
-    return dane["secret_key"]
+    if not LOKALNE.get("secret_key"):
+        LOKALNE["secret_key"] = secrets.token_urlsafe(50)
+        PLIK_LOKALNY.write_text(json.dumps(LOKALNE, indent=1), encoding="utf-8")
+    return LOKALNE["secret_key"]
 
 
 SECRET_KEY = _klucz()
 DEBUG = os.environ.get("LEVAS_DEBUG", "1") == "1"
+# Inne adresy serwera (np. gra w sieci szkoły): LEVAS_HOSTY="levas.szkola.pl,192.168.1.20"
+# albo "hosty" w lokalne.json.
+_HOSTY = os.environ.get("LEVAS_HOSTY", "").split(",") + LOKALNE.get("hosty", [])
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+ALLOWED_HOSTS += [h.strip() for h in _HOSTY if h.strip()]
+# Za serwerem WWW z https (LEVAS_HTTPS=1 albo "https": true): adresy zwrotne logowania z https.
+if os.environ.get("LEVAS_HTTPS") == "1" or LOKALNE.get("https"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+    CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS[3:]]
+    SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
 
-# Logowanie kontem Microsoft (szkolnym): aplikacja zarejestrowana w Microsoft Entra ID, adres
-# przekierowania http(s)://<serwer>/konta/microsoft/login/callback/. Bez LEVAS_MS_CLIENT_ID – tylko
-# własny login i hasło. LEVAS_MS_TENANT: identyfikator dzierżawy szkoły (tylko jej konta).
+# Logowanie kontem Microsoft (szkolnym), krok po kroku: LOGOWANIE_MICROSOFT.md. Aplikacja
+# zarejestrowana w Microsoft Entra ID, adres przekierowania
+# http(s)://<serwer>/konta/microsoft/login/callback/. Dane z LEVAS_MS_CLIENT_ID / LEVAS_MS_SECRET /
+# LEVAS_MS_TENANT albo z "microsoft" w lokalne.json. Bez identyfikatora klienta – tylko własny login
+# i hasło. Dzierżawa (tenant) szkoły: logują się tylko jej konta.
+_MS = LOKALNE.get("microsoft", {})
 MICROSOFT = {
-    "client_id": os.environ.get("LEVAS_MS_CLIENT_ID", ""),
-    "secret": os.environ.get("LEVAS_MS_SECRET", ""),
-    "tenant": os.environ.get("LEVAS_MS_TENANT", "organizations"),
+    "client_id": os.environ.get("LEVAS_MS_CLIENT_ID", _MS.get("client_id", "")),
+    "secret": os.environ.get("LEVAS_MS_SECRET", _MS.get("secret", "")),
+    "tenant": os.environ.get("LEVAS_MS_TENANT", _MS.get("tenant", "organizations")),
 }
 
 INSTALLED_APPS = [
