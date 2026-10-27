@@ -1,5 +1,6 @@
 // Finanse: raport finansowy, KPiR, bank, biuro rachunkowe.
 import { akcjeBanku, decyzjeBanku, wynikiBanku } from "./banki.js";
+import { LEKCJA_BANK, LEKCJA_KPIR, LEKCJA_RAPORT } from "./lekcje.js";
 import { esc, OKRES, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
 
 const GRUPY = [
@@ -66,7 +67,7 @@ export const raport = {
         [`Saldo konta na koniec ${OKRES.dopelniacz}`, zl2(v.wyniki.gotowka), ""], ["Lokaty", zl2(v.wyniki.lokaty), ""],
         ["Zadłużenie (kredyty)", zl2(v.wyniki.zadluzenie), ""]], { klasy: ["l", "r", "r"] })}
       ${uzgodnienieHtml(v.wyniki.uzgodnienie)}
-      <div class="wykres"><canvas id="w-wynik"></canvas></div>`;
+      <div class="wykres"><canvas id="w-wynik"></canvas></div>${LEKCJA_RAPORT}`;
   },
   po({ v }) {
     const h = v.historia || [];
@@ -91,7 +92,7 @@ export const kpir = {
       + tabela(null, ["", "Kwota"], [["Dochód do opodatkowania", zl2(k.dochod)], ...(R
         ? [["Zaliczka na PIT", zl2(R.zaliczka)], ["Składka zdrowotna", zl2(R.zdrowotna)]]   // JDG – zakładka Podatki
         : [["Podatek", zl2(k.podatek)]]), ["Dochód netto", zl2(k.dochod_netto)]], { klasy: ["l", "r"] })
-      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Finanse → Podatki.</p>` : "");
+      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Finanse → VAT.</p>` : "") + LEKCJA_KPIR;
   },
 };
 
@@ -102,7 +103,7 @@ export const bank = {
   wynikiGdy: (v) => !!v.gra.lokale,   // w grze z lokalami: opłaty, raty, przejęcia (silnik/banki.py)
   wyniki: (c) => wynikiBanku(c),
   decyzje({ v, kat, edycja }) {
-    if (v.gra.lokale) return decyzjeBanku({ v, kat, edycja });
+    if (v.gra.lokale) return decyzjeBanku({ v, kat, edycja }) + LEKCJA_BANK;
     const banki = kat.oferty.banki.pozycje;
     const wybrany = v.stan.bank;
     const dostepny = (b) => (b.od_rundy || 1) <= v.runda;

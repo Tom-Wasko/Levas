@@ -158,6 +158,8 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   oszczędności. To nie jest koszt ani przychód firmy.
 - **Harpagon** spod dworca pożycza od ręki i bez pytań. Spłata po terminie to przypomnienia, odsetki karne, a potem
   wizyty, po których w lokalu brakuje krzeseł. Ostatnia deska ratunku – naprawdę ostatnia.
+- **Jak to działa naprawdę?** W zakładkach VAT, KPiR, Podatki, Bank i Raport finansowy jest zwinięta niebieska
+  ramka 📘 – krótko i na przykładach wyjaśnia, jak te sprawy wyglądają w prawdziwej firmie.
 
 ## 12. Parki, zdarzenia i wypadki
 

@@ -145,3 +145,8 @@ export function wykres(id, typ, etykiety, serie, opcje = {}) {
 
 export const nazwaUslugi = (kat, u) => kat.uslugi[u]?.nazwa ?? u;
 export const nazwaFirmy = (v, f) => v.rynek?.firmy?.[f] ?? f;
+
+// Opis dydaktyczny (P7): zwijana ramka „jak to działa naprawdę”; punkty to gotowy HTML (bez danych gracza).
+export function lekcja(tytul, punkty) {
+  return `<details class="lekcja"><summary>${esc(tytul)}</summary><ul>${punkty.map((p) => `<li>${p}</li>`).join("")}</ul></details>`;
+}

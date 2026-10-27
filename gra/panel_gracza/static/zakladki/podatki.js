@@ -1,6 +1,7 @@
 // Podatki jednoosobowej działalności (silnik/rozliczenie.py) – dwie zakładki Finansów: VAT (rejestr, stawki,
 // deklaracja) oraz Podatki (składki właściciela, zaliczka PIT liniowego). Rozliczenie co rundę, ceny w grze są brutto.
 import { UKRYTE } from "./finanse.js";
+import { LEKCJA_PIT_ZUS, LEKCJA_VAT } from "./lekcje.js";
 import { esc, nazwaUslugi, proc, tabela, zl2 } from "./wspolne.js";
 
 const RODZAJ = { nalezny: "należny (sprzedaż)", naliczony: "naliczony (zakupy)" };
@@ -50,7 +51,7 @@ export const vat = {
         stawka robi się niejasna”. Twoje paragony przegląda jednak z wyraźnym apetytem.</p></div>`
       + tabela("Nadwyżka VAT z poprzednich rund", ["Do odliczenia w tej rundzie"], [[zl2(T.stan.vat_nadwyzka)]])
       + stawkiHtml(T.rejestr, "VAT z decyzji tej rundy (przed sprzedażą)") + rejestrHtml(T.rejestr)
-      + `<details open><summary>Stawki VAT</summary>${stawkiVatHtml(T.parametry, kat)}</details>`;
+      + `<details open><summary>Stawki VAT</summary>${stawkiVatHtml(T.parametry, kat)}</details>` + LEKCJA_VAT;
   },
   wyniki({ v }) {
     const W = v.wyniki?.rozliczenie;
@@ -76,7 +77,7 @@ export const podatki = {
       + parametryHtml(P, T.ulga_na_start)
       + tabela("Stan rozliczeń na początku rundy", ["Dochód narastająco", "Zdrowotna odliczona", "Zaliczki PIT wpłacone", "Nadwyżka VAT do przeniesienia", "Razem zapłacone"],
         [[zl2(S.dochod), zl2(S.zdrowotna_odliczona), zl2(S.zaliczki), zl2(S.vat_nadwyzka), zl2(S.zaplacone)]])
-      + `<p class="podpowiedz">Odliczenie zdrowotnej do ${zl2(P.limit_odliczenia)} rocznie.</p>`;
+      + `<p class="podpowiedz">Odliczenie zdrowotnej do ${zl2(P.limit_odliczenia)} rocznie.</p>` + LEKCJA_PIT_ZUS;
   },
   wyniki({ v }) {
     const W = v.wyniki?.rozliczenie;

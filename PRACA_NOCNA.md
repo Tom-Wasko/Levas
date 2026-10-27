@@ -567,3 +567,6 @@ _brak_
   pracuje i dostaje pensję jeszcze 2 rundy (odprawa od razu), potem wraca do puli; w HR plakietka „wypowiedzenie
   do r. N” i przycisk „Cofnij zwolnienie” w tej samej rundzie. **Decyzja do potwierdzenia:** zleceniobiorca nadal
   odchodzi od razu (umowa zlecenie nie ma wypowiedzenia z KP) – jeśli wolisz 2 rundy także dla zlecenia, to jedna linijka.
+- **P7 (27.10):** opisy dydaktyczne – zwijana ramka 📘 „jak to działa naprawdę” (zakladki/lekcje.js) w zakładkach
+  VAT, KPiR, Podatki (PIT i ZUS), Bank i Raport finansowy: przykłady liczbowe, różnica zysk/gotówka, RRSO, ulga na start,
+  terminy JPK/ZUS/PIT. Stawki i progi podane ogólnie (bez konkretnych kwot, które co roku się zmieniają).
