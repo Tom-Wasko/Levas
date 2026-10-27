@@ -20,7 +20,6 @@ const P = {
   udogodnienia: '<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9zM16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3v3M12 3v3"/>',
   szkolenia: '<path d="M2 9l10-5 10 5-10 5L2 9z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5M22 9v6"/>',
   tradycyjny: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/>',
-  internetowy: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
   raport: '<path d="M21 12A9 9 0 1 1 12 3v9h9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15V3.5z"/>',
   kpir: '<path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5v-17z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M8 7h8M8 11h6"/>',
   harpagon: '<path d="M6 9h12l-1.5 11h-9L6 9z"/><path d="M9 9V7a3 3 0 0 1 6 0v2M12 13v4M10.5 14.5h3"/>',

@@ -229,6 +229,12 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    testów mechaniki obsługi. Pytania: czy usunąć tryb Revasa na stałe (w tym `dane_revas/` i zakładkę Marketing
    z reklamą Revasa w panelu)? czy sezonowość ma być tygodniowa (np. wakacje, sesja, święta – część jest już
    w kalendarzu miasta)? (zapisane 27.10)
+28. **Zakładki (F4.7).** Menu: „Oferta” → „Menu”, „Zdarzenia” → „Parki” (pełny tytuł: Parki – eventy, zdarzenia
+   i wypadki), „Magazyn i świeżość” jako podzakładka Dostawców, nowa zakładka Finanse ▸ VAT (wydzielona
+   z Podatków, z krótkim komicznym wstępem o panu Zenonie z urzędu skarbowego), wyniki dla Stanowisk i Szkoleń.
+   Pytania: czy nazwy i grupowanie pasują (np. Parki jako osobna pozycja menu czy pod Klientami)? czy zostawić
+   pana Zenona? Zakładki bez trybu wyników (Pulpit, Mapa, Lista błędów, Wyślij, Analiza) i bez decyzji (Karta,
+   Raport, KPiR) zostały celowo – to podglądy/raporty. (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -473,3 +479,5 @@ _brak_
   pytanie 26. Start F4.6 (sprzątanie).
 - 27.10 06:24 – F4.6 gotowe: jeden tryb gry (z mapą miasta), usunięty kod Revasa (popyt, reklama, zwroty, startowy
   lokal), nazwy kasy zamiast recepcji, `gra/balans/symuluj.py`; 245 testów; pytanie 27. Start F4.7 (zakładki).
+- 27.10 06:35 – F4.7 gotowe: menu i zakładki (Menu, VAT, Parki, Dostawcy ▸ świeżość), wyniki Stanowisk i Szkoleń;
+  245 testów; pytanie 28. Plan kroków 1–4 (bez giełdy) zrealizowany.

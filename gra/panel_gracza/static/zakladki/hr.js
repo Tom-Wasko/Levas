@@ -172,6 +172,15 @@ export const szkolenia = {
     return `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl(koszt)}</span></span></div>`
       + tabela(null, ["Szkolenie", "% pracowników oczekujących", ...s.firmy.map((f) => `${esc(f.nazwa)}<br><span class="podpowiedz">${f.zadowoleni_klienci}% zadowolonych klientów</span>`)], w, { klasy: ["l"] });
   },
+  wyniki({ v }) {
+    const l = v.wyniki?.szkolenia || [], k = v.wyniki?.karta;
+    const w = l.map((x) => [esc(x.szkolenie), esc(x.firma), `${x.procent}%`, zl(x.koszt)]);
+    const razem = l.reduce((a, x) => a + x.koszt, 0), pr = l.reduce((a, x) => a + x.procent, 0);
+    return (w.length ? tabela("Szkolenia w tej rundzie", ["Szkolenie", "Firma szkoleniowa", "% pracowników oczekujących", "Koszt"],
+      [...w, ["<b>Razem</b>", "", `<b>${pr}%</b>`, `<b>${zl(razem)}</b>`]], { klasy: ["l", "l"] })
+      : `<p class="podpowiedz">W tej rundzie nie było szkoleń.</p>`)
+      + (k ? tabela("Efekt", ["Zadowolenie pracowników (karta wyników)"], [[licz(k.zadowolenie_pracownikow, 3)]]) : "");
+  },
   akcje: {
     szkolenie: (el, c) => c.zmien((d) => {
       const l = d.szkolenia || [], s = el.dataset.s, f = el.dataset.f;

@@ -29,6 +29,20 @@ export const stanowiska = {
     }
     return html + `</div><p class="podpowiedz">W jednej rundzie można uruchomić jeden pakiet każdego rodzaju (do 5 stanowisk). Puste stanowiska nie generują kosztów.</p>`;
   },
+  wyniki({ v, kat }) {
+    const typy = kat.oferty.stanowiska.typy, sprzet = v.wyniki?.sprzet || [];
+    const own = TYPY.map((typ) => {
+      const st = v.stan.stanowiska.filter((s) => s.typ === typ), m = miejscaLokali(v, typ);
+      const ob = sprzet.filter((s) => s.typ === typ).map((s) => s.oblozenie);
+      return [esc(typy[typ].nazwa), licz(st.length), m ? `${licz(m.zajete)} z ${licz(m.wszystkie)}` : "–",
+        ob.length ? proc(ob.reduce((a, x) => a + x, 0) / ob.length) : "–", ob.length ? proc(Math.max(...ob)) : "–"];
+    });
+    const rs = v.rynek?.stanowiska || {};
+    const firmy = Object.keys(rs).map((f) => [esc(nazwaFirmy(v, f)), ...TYPY.map((t) => licz(rs[f][t] || 0))]);
+    return tabela("Twoje stanowiska", ["Rodzaj", "Liczba", "Miejsca w lokalach (zajęte)", "Średnie obłożenie sprzętu", "Najwyższe obłożenie"], own, { klasy: ["l"] })
+      + (firmy.length ? tabela("Stanowiska konkurencji", ["Firma", ...TYPY.map((t) => esc(typy[t].nazwa))], firmy, { klasy: ["l"] }) : "")
+      + `<p class="podpowiedz">Obłożenie blisko 100% oznacza, że sprzęt był wąskim gardłem – kolejne stanowisko (i pracownik) przyjmie więcej klientów.</p>`;
+  },
   akcje: { pakiet: (el, c) => c.zmien((d) => { d.stanowiska = { ...(d.stanowiska || {}), [el.dataset.t]: +el.dataset.n }; }) },
 };
 

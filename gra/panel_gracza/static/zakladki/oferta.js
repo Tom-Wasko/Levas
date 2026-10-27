@@ -21,7 +21,7 @@ const limitNowych = (kat, r) => r === 1 ? kat.oferty.rundy.uslugi_w_rundzie_1
   : r >= kat.oferty.rundy.nowe_uslugi_od_rundy ? kat.oferty.rundy.nowe_uslugi_na_runde : 0;
 
 export const oferta = {
-  tytul: "Oferta", ikona: "⚑", odblokowanie: "oferta",
+  tytul: "Menu", tytulPelny: "Menu – dania, ceny i prognoza", ikona: "⚑", odblokowanie: "oferta",
   info: ({ v, kat }) => v.runda === 1
     ? `Wybierz dania do menu i określ ich ${popytOkresu()}. W pierwszej rundzie można wybrać tylko ${kat.oferty.rundy.uslugi_startowe.map((u) => nazwaUslugi(kat, u)).join(", ")}.`
     : v.runda < kat.oferty.rundy.nowe_uslugi_od_rundy ? "W rundzie 2 sprzedajesz dania wybrane w rundzie 1. Nowe dania można dodawać od rundy 3."

@@ -332,8 +332,11 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         for s in d.get("szkolenia", []):
             if s.get("szkolenie") in pozycje and s.get("firma") in firmy:
                 p = pozycje[s["szkolenie"]]
-                koszty[s["firma"]] = koszty.get(s["firma"], 0) + p["ceny"][firmy.index(s["firma"])]
+                cena = p["ceny"][firmy.index(s["firma"])]
+                koszty[s["firma"]] = koszty.get(s["firma"], 0) + cena
                 info["szkolenia_procent"] += p["procent"] / 100
+                info.setdefault("szkolenia", []).append({"szkolenie": p["nazwa"], "firma": s["firma"],
+                                                         "procent": p["procent"], "koszt": cena})
         for f, kwota in koszty.items():
             ksieguj(firma, ksiega, rachunek, f"Szkolenie w firmie: {f}", kwota)
     if aw.dane_wypadkow(dane):   # polisy i składki – po inwestycjach (składka od majątku)

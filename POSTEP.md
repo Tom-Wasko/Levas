@@ -205,5 +205,13 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   `silnik/jakosc.py`; nazwy po fitnessie: `godziny_kasy`, `pensje_rynkowe_kasy`, `liczba_kasjerow`;
   `gra/balans_botow.py` → `gra/balans/symuluj.py` (`python -X utf8 -m balans.symuluj`); testy Revasa
   przeniesione na dane Levasa albo usunięte (pytanie 27)
+- [x] F4.7 Zakładki – menu jak w Revasie dla nowych funkcji: Lokale (lokale, przejęcia, urząd), Menu (dawna
+  Oferta), Dostawcy ▸ Dostawcy / Magazyn i świeżość, HR, Marketing ▸ Agencje / Promocje (usunięte martwe zakładki
+  reklamy tradycyjnej i internetowej Revasa), Finanse ▸ Raport / KPiR / **VAT** (nowa: rejestr, stawki,
+  deklaracja) / Podatki (PIT i ZUS) / Bank / Harpagon / Biuro / Ubezpieczenia / Właściciel, Parki (eventy,
+  zdarzenia, wypadki), Handel; nowe wyniki w Inwestycje ▸ Stanowiska (liczba, miejsca w lokalach, obłożenie,
+  stanowiska konkurencji – `rynek.stanowiska`) i HR ▸ Szkolenia (`wyniki.szkolenia`, efekt w karcie);
+  z panelu MG usunięty wybór „bez lokali”; wszystkie zakładki sprawdzone w node na widoku prawdziwej gry
+  (pytanie 28)
 
-Zadanie F4.7 – jeszcze nie zaczęte.
+Plan kroków 1–4 (bez giełdy) zrealizowany.

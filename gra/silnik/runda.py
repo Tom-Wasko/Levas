@@ -379,6 +379,7 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
                        "wartosc": f.wartosc_magazynu(k)})
     w["zasoby"] = zasoby
     w["zuzyte_zasoby"] = zuzyte
+    w["szkolenia"] = info.get("szkolenia", [])   # zakładka HR ▸ Szkolenia (wyniki)
 
     # karta wyników
     if r >= 2:
@@ -431,7 +432,7 @@ def _rynek_publiczny(dane: Dane, s: StanGry, r: int, oferty, wyniki, rynek) -> d
     pub = {"firmy": {n: s.firmy[n].nazwa_wyswietlana or n for n in firmy},
            "popyt": {u: {n: v["popyt"] for n, v in rynek_u.items()} for u, rynek_u in rynek.items()},
            "ceny": {u: {n: round(o["cena"], 2) for n, o in v.items()} for u, v in oferty.items()},
-           "pracownicy": {}, "wynagrodzenia": {}, "wykorzystanie": {}, "sprzet": {}, "jakosc_zasobow": {},
+           "pracownicy": {}, "wynagrodzenia": {}, "wykorzystanie": {}, "sprzet": {}, "stanowiska": {}, "jakosc_zasobow": {},
            "udogodnienia": {}, "wyposazenie": {}, "karta": {}}
     for n in firmy:
         f, w = s.firmy[n], wyniki[n]
@@ -441,6 +442,7 @@ def _rynek_publiczny(dane: Dane, s: StanGry, r: int, oferty, wyniki, rynek) -> d
             pub["wynagrodzenia"].setdefault(n, {})[zawod] = round(float(np.mean([p["pensja"] for p in ps])), 0) if ps else None
             pub["wykorzystanie"].setdefault(n, {})[zawod] = round(float(np.mean([p["wykorzystanie"] for p in ps])), 4) if ps else None
         pub["sprzet"][n] = {g: sum(x["jakosc"] == g for x in w["sprzet"]) for g in (1, 2, 3)}
+        pub["stanowiska"][n] = {t: len(f.stanowiska_typu(t)) for t in sorted({st.typ for st in f.stanowiska})}
         pub["jakosc_zasobow"][n] = {g: round(sum(x["zamowione"] for x in w["zasoby"] if x["jakosc"] == g), 3) for g in (1, 2, 3)}
         pub["udogodnienia"][n] = len(f.udogodnienia)
         pub["wyposazenie"][n] = len(f.wyposazenie)

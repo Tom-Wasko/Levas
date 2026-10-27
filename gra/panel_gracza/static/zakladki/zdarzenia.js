@@ -53,7 +53,7 @@ function rozegranaHtml(w) {
 }
 
 export const zdarzenia = {
-  tytul: "Zdarzenia", tytulPelny: "Zdarzenia i wypadki", ikona: "zdarzenia", odblokowanie: (v) => !!v.zdarzenia, ukryta: (v) => !v.zdarzenia,
+  tytul: "Parki i zdarzenia", tytulPelny: "Parki – eventy, zdarzenia i wypadki", ikona: "zdarzenia", odblokowanie: (v) => !!v.zdarzenia, ukryta: (v) => !v.zdarzenia,
   info: `Co tydzień w jednym z parków na <a data-zakladka-k="mapa">mapie miasta</a> dzieje się coś, co widzą wszystkie drużyny.
     Jak zareagujesz, zależy od Ciebie: reakcja może kosztować czas właściciela, gotówkę albo porcje jedzenia, a jej skutki
     – pieniądze, klienci, nowy pracownik – bywają odłożone w czasie. Bez wyboru gra wybiera reakcję domyślną.
