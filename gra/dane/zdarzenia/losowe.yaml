@@ -527,3 +527,84 @@ historie:
         na policję. Po kilku dniach dzwoni dzielnicowy: część rzeczy z pierwszego włamania odnalazła się w lombardzie.
       skutki:
       - {typ: gotowka, kwota: 800, opis: Odzyskana część sprzętu (wartość)}
+
+- id: biedronki
+  tytul: Inwazja biedronek
+  start: okno
+  sceny:
+    okno:
+      tekst: >-
+        Październikowe słońce przygrzało i na szybę lokalu przyleciały biedronki azjatyckie – nie dziesięć, nie sto,
+        tylko „cała rodzina z kuzynami”, jak mówi pracownik. Siedzą na witrynie, na menu i na plakacie z promocją.
+        Jedna usiadła klientowi na kebabie i patrzy mu w oczy.
+      domyslna: zostaw
+      opcje:
+      - id: odkurzacz
+        tekst: Wynosisz je odkurzaczem do parku
+        koszt: {czas: 2}
+        wynik: >-
+          Przez dwie godziny chodzisz z odkurzaczem po lokalu jak pogromca duchów, a potem uroczyście wysypujesz
+          biedronki pod lipą na skwerze. Przechodzień pyta, czy to „jakiś happening ekologiczny”. Mówisz, że tak.
+      - id: dezynsekcja
+        tekst: Wzywasz firmę od dezynsekcji
+        koszt: {gotowka: 250}
+        wynik: >-
+          Pan z firmy ogląda szybę, mówi „o, harmonie, typowy październik” i uszczelnia ramy okien. Biedronki
+          przenoszą się do lokalu obok. Sąsiad z lokalu obok patrzy na Ciebie przez szybę z wyrzutem.
+      - id: zostaw
+        tekst: Zostawiasz – w listopadzie same znikną
+        wynik: >-
+          Biedronki nie czekają do listopada. Chowają się w każdej szczelinie lokalu, a klientka robi zdjęcie
+          „biedronka na sałatce” i pyta sanepid w komentarzu, czy to w cenie.
+        skutki:
+        - {typ: kontrola, szansa: 0.08, rund: 2, opis: Zdjęcie biedronki na sałatce}
+        nastepna:
+        - {scena: kasa, za_ile_rund: 1}
+    kasa:
+      tekst: >-
+        Kasa fiskalna zaczęła drukować paragony z kropkami i w końcu zamilkła. Serwisant otwiera obudowę i znajduje
+        w środku kolonię biedronek, które urządziły sobie zimowisko na ciepłej płytce drukarki. „Pierwszy raz widzę
+        kasę na diecie owadziej” – mówi i wystawia fakturę.
+      skutki:
+      - {typ: szkoda, kwota: 900, polisa: sprzet, opis: Kasa fiskalna jako zimowisko biedronek}
+
+- id: szkielet_bogdan
+  tytul: Szkielet Bogdan
+  start: dekoracja
+  sceny:
+    dekoracja:
+      tekst: >-
+        Przed Halloween pracownik kupił plastikowy szkielet naturalnej wielkości, nazwał go Bogdanem i posadził przy
+        oknie z kebabem w dłoni. Wieczorem pod lokal podjeżdża radiowóz: starsza pani z naprzeciwka zgłosiła, że
+        „w barze siedzi nieboszczyk i nikt nic nie robi”.
+      domyslna: przeprosiny
+      opcje:
+      - id: wyjasnij
+        tekst: Wychodzisz do policjantów i przedstawiasz Bogdana
+        koszt: {czas: 1}
+        wynik: >-
+          Policjanci oglądają Bogdana, jeden mówi „dobrze wygląda jak na swój wiek”, drugi robi mu zdjęcie do
+          grupy na komendzie. Zostają na kebabie i płacą, chociaż proponujesz „na koszt Bogdana”.
+        skutki:
+        - {typ: gotowka, kwota: 60, opis: Kolacja patrolu po spotkaniu z Bogdanem}
+        nastepna:
+        - {scena: komenda, za_ile_rund: 1}
+      - id: przeprosiny
+        tekst: Przepraszasz przez okno i zostawiasz Bogdana na miejscu
+        wynik: >-
+          Policjanci machają ręką i odjeżdżają. Bogdan siedzi dalej przy oknie, tuż obok promiennika ciepła, który
+          pracownik włączył, „żeby Bogdanowi nie było zimno”.
+        nastepna:
+        - {scena: topnienie, za_ile_rund: 1}
+    komenda:
+      tekst: >-
+        Zdjęcie Bogdana z komendy trafiło do internetu z podpisem „Najspokojniejszy klient w Lublinie”. Ludzie
+        przychodzą zrobić sobie z nim selfie i przy okazji coś zjeść.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Selfie z Bogdanem}
+    topnienie:
+      tekst: >-
+        Bogdan stopił się od promiennika i spłynął na parapet, a razem z nim stopiła się obudowa promiennika
+        i kawałek blatu. W lokalu pachnie plastikiem i trochę horrorem. Pracownik ogłasza żałobę.
+      skutki:
+      - {typ: szkoda, kwota: 650, polisa: lokal, opis: "Stopiony Bogdan, promiennik i blat"}

@@ -627,3 +627,12 @@ _brak_
 - Martwy kod usunięty: miesięczny bank Revasa (`bank_poczatek_miesiaca`, `bank_koniec_miesiaca`, `odsetki_naliczone_lokat` – gra używa `silnik/banki.py`), `NAZWY_WSKAZNIKOW`, `moze_gre`; stary plik `gra/__pycache__/balans_botow…pyc`.
 - README: bez `dane_revas/`, kalendarz rund poprawiony (18 tygodni od 1.09.2025, 40 000 zł). Opisy w `katalog.yaml` i `kandydaci.yaml` bez ścieżki do usuniętych danych.
 - Zostawione celowo: `WIEDZA_O_GRZE.md` (źródło mechanik), nazwy z Revasa w kodzie (usługa = danie itd. – słownik w README), zabezpieczenia `if dane.mapa` (dane bez mapy dalej da się sprawdzić `sprawdz`).
+
+### P18 – Nowe historyjki (27.10)
+- `parki.yaml`: 7 nowych eventów w parkach (21 w sumie), jesienne motywy wrzesień–grudzień: Kasztanowa giełda (Park Ludowy),
+  Dynia-rekordzistka (Ogród Botaniczny), Latawiec nad Zamkiem (Błonia, z kandydatem na kasjera), Chrzest jachtu kapitana
+  Henryka (Zalew), Oda do kebaba (Park Rury, losowe zakończenie), Wycieczka z Biłgoraja (Ogród Saski) oraz poważny
+  Mobilny punkt krwiodawstwa (Błonia). Proporcja komicznych nadal ok. 80%.
+- `losowe.yaml`: 2 nowe wypadki w lokalu – Inwazja biedronek (październik, szkoda na sprzęcie) i Szkielet Bogdan
+  (Halloween, szkoda w lokalu albo sława w internecie).
+- Testy 266 OK, dane sprawdzone.

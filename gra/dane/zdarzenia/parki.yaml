@@ -646,3 +646,343 @@ historie:
         pomogli – także Ciebie.
       skutki:
       - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Artykuł o poszukiwaniach}
+
+- id: kasztanowa_gielda
+  park: park_ludowy
+  tytul: Kasztanowa giełda
+  start: prezes
+  sceny:
+    prezes:
+      tekst: >-
+        Pod kasztanowcami w Parku Ludowym dzieci prowadzą giełdę: kasztan zwykły – jeden żelek, kasztan
+        „błyszczący jak nowy” – trzy. Przewodniczący giełdy, dziewięcioletni Kacper w kamizelce taty, podchodzi
+        do Ciebie z teczką na suwak: „Mam propozycję inwestycyjną. Ludziki z kasztanów jako karty stałego klienta”.
+      domyslna: odmowa
+      opcje:
+      - id: inwestuj
+        tekst: Wchodzisz w spółkę – frytki dla zarządu i dwie godziny klejenia ludzików
+        koszt: {czas: 2, porcje: 4}
+        wynik: >-
+          Zarząd spółki (Kacper, jego siostra i kolega Bartek) zjada frytki w trakcie posiedzenia i uchwala
+          jednogłośnie, że każdy, kto przyniesie do lokalu kasztanowego ludzika, dostaje uśmiech i serwetkę. Kacper
+          zapowiada walne zgromadzenie „za dwa tygodnie, po matematyce”.
+        nastepna:
+        - {scena: walne, za_ile_rund: 2}
+      - id: kupno
+        tekst: Kupujesz od giełdy worek kasztanów do dekoracji lokalu
+        koszt: {gotowka: 60}
+        wynik: >-
+          Dostajesz trzy kilo kasztanów, paragon na kartce z zeszytu w kratkę i radę: „Nie trzymać przy kaloryferze,
+          bo strzelają”. Lokal wygląda jesiennie. Kaloryfer stoi w kącie i myśli swoje.
+        skutki:
+        - {typ: popyt, mnoznik: 1.01, rund: 2, opis: Jesienna dekoracja z kasztanów}
+      - id: odmowa
+        tekst: Mówisz, że nie inwestujesz w kasztany
+        wynik: >-
+          Kacper zapisuje coś w teczce i mówi do Bartka „rynek nie jest gotowy”. Bartek kiwa głową z powagą
+          analityka giełdowego, który ma dziewięć lat i lizaka.
+    walne:
+      tekst: >-
+        Do lokalu wchodzi czternaścioro dzieci z kasztanowymi ludzikami i jeden zmęczony tata. Kacper ogłasza
+        walne zgromadzenie akcjonariuszy i odczytuje porządek obrad: punkt pierwszy – dywidenda, punkt drugi –
+        dywidenda, punkt trzeci – „sprawy różne, czyli dywidenda”.
+      domyslna: przemowa
+      opcje:
+      - id: dywidenda
+        tekst: Wypłacasz dywidendę w frytkach
+        koszt: {porcje: 6}
+        wynik: >-
+          Walne kończy się owacją. Tata płaci za swój kebab i dwa dodatkowe na wynos „dla żony, która nie wierzyła”.
+          W szkole rozchodzi się, że Twój lokal „szanuje akcjonariuszy”.
+        skutki:
+        - {typ: gotowka, kwota: 70, opis: Zamówienie taty z walnego zgromadzenia}
+        - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Lokal szanujący akcjonariuszy}
+      - id: przemowa
+        tekst: Wygłaszasz przemowę o reinwestowaniu zysków
+        wynik: >-
+          Przemowa trwa cztery minuty. Po minucie drugiej połowa akcjonariuszy bawi się w berka między stolikami.
+          Kacper notuje: „zarząd nie wypłacił dywidendy, rozważyć wrogie przejęcie”. Na płocie szkoły pojawia się
+          rysunek kebaba ze smutną minką.
+        skutki:
+        - {typ: popyt, mnoznik: 0.99, rund: 1, opis: Rysunek na płocie szkoły}
+
+- id: dynia_rekordzistka
+  park: ogrod_botaniczny
+  tytul: Dynia-rekordzistka
+  start: transport
+  sceny:
+    transport:
+      tekst: >-
+        W Ogrodzie Botanicznym pani Krystyna, ogrodniczka od czterdziestu lat, przygotowuje dynię na konkurs
+        „Lubelski Olbrzym”. Dynia waży 312 kilogramów i ma imię – Bożenka. Problem: Bożenkę trzeba przenieść
+        na wózek, a wózek stoi na górce. „Potrzebuję silnych rąk i spokojnej głowy” – mówi pani Krystyna.
+      domyslna: kibicuj
+      opcje:
+      - id: pomoz
+        tekst: Pomagasz przy transporcie Bożenki
+        koszt: {czas: 4}
+        wynik: >-
+          Pięć osób, dwie deski, jeden koc i dużo krzyku „na trzy!”. Bożenka trafia na wózek. Wózek jest na górce.
+          Ktoś zapomniał zaciągnąć hamulec. Pani Krystyna mówi „o Jezusie” bardzo spokojnym głosem.
+        nastepna:
+        - {scena: konkurs, za_ile_rund: 1, szansa: 0.5}
+        - {scena: bozenka_ucieka, za_ile_rund: 1, szansa: 0.5}
+      - id: sponsor
+        tekst: Sponsorujesz Bożence wstęgę z nazwą lokalu
+        koszt: {gotowka: 200}
+        wynik: >-
+          Bożenka dostaje wstęgę jak miss. Na wstędze: nazwa Twojego lokalu i napis „Dynia sponsorowana przez
+          kebab”. Pani Krystyna uważa, że to „trochę nowoczesne”, ale fotografowie z gazety są zachwyceni.
+        skutki:
+        - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Wstęga na dyni-rekordzistce}
+      - id: kibicuj
+        tekst: Kibicujesz z daleka
+        wynik: >-
+          Kibicujesz z bezpiecznej odległości. Z tej odległości widać, że ludzie z deskami nie mają planu, ale mają
+          dużo entuzjazmu. Odchodzisz, zanim cokolwiek się wydarzy.
+    konkurs:
+      tekst: >-
+        Hamulec okazał się niepotrzebny – wózek zatrzymał się na krawężniku, a Bożenka wygrała „Lubelskiego
+        Olbrzyma”. Pani Krystyna w wywiadzie dla radia dziękuje „temu panu od kebaba, który trzymał deskę”.
+        Zamawia u Ciebie poczęstunek na jutrzejszy festyn dyniowy.
+      skutki:
+      - {typ: gotowka, kwota: 300, opis: Poczęstunek na festyn dyniowy}
+      - {typ: popyt, mnoznik: 1.03, rund: 1, opis: Podziękowanie w radiu}
+    bozenka_ucieka:
+      tekst: >-
+        Bożenka zjechała z górki z wózkiem, minęła dwie ławki, kaczkę i stoisko z miodem, po czym zatrzymała
+        się w żywopłocie. Jest cała. Żywopłot – nie. Ogród Botaniczny prosi o pokrycie kosztów nowych krzewów
+        „od każdego, kto trzymał deskę”. Nagranie „Dynia na wolności” robi furorę w lokalnym internecie.
+      skutki:
+      - {typ: gotowka, kwota: -90, opis: Udział w nowym żywopłocie}
+      - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Viral „Dynia na wolności”}
+
+- id: latawiec
+  park: blonia
+  tytul: Latawiec nad Zamkiem
+  start: wiatr
+  sceny:
+    wiatr:
+      tekst: >-
+        Na Błoniach pod Zamkiem wieje tak, że parasole zmieniają właścicieli. Student budownictwa Mateusz
+        rozkłada latawiec o rozpiętości sześciu metrów – projekt zaliczeniowy z aerodynamiki. „Brakuje mi tylko
+        sponsora na sznurek i czegoś na płachtę. Może Pana logo?”
+      domyslna: patrz
+      opcje:
+      - id: logo
+        tekst: Płacisz za sznurek i nadruk logo
+        koszt: {gotowka: 120}
+        wynik: >-
+          Latawiec z Twoim logo wzbija się nad Błonia. Wygląda dumnie. Wiatr wzmaga się. Mateusz mówi „spokojnie,
+          wszystko policzone”, a potem: „no, prawie wszystko”.
+        nastepna:
+        - {scena: wieza, za_ile_rund: 1}
+      - id: pomoc
+        tekst: Pomagasz trzymać linkę
+        koszt: {czas: 2}
+        wynik: >-
+          Przez dwie godziny trzymasz linkę razem z Mateuszem i rozmawiacie o wszystkim: o aerodynamice, o
+          kebabach i o tym, że Mateusz szuka pracy na wieczory, bo stypendium starcza do dziesiątego.
+        nastepna:
+        - {scena: mateusz, za_ile_rund: 1}
+      - id: patrz
+        tekst: Patrzysz z daleka i trzymasz czapkę
+        wynik: >-
+          Latawiec startuje, robi pętlę i ląduje na kocu pary, która właśnie się oświadczała. Ona powiedziała
+          „tak”. On mówi, że to był znak.
+    wieza:
+      tekst: >-
+        Latawiec zaplątał się o wieżę Zamku Lubelskiego i wisi tam od tygodnia z Twoim logo na wysokości
+        kaplicy. Straż pożarna zdjęła go w transmisji na żywo, a przewodnicy oprowadzają wycieczki pod hasłem
+        „tu wisiał kebab”. Mateusz dostał piątkę – „za udowodnienie siły wiatru w praktyce”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Logo na wieży Zamku}
+    mateusz:
+      tekst: >-
+        Mateusz przychodzi do lokalu z CV wydrukowanym na papierze milimetrowym. „Umiem liczyć, szybko się uczę
+        i nie boję się wiatru”. Czeka na Twoją decyzję w zakładce Zatrudnienie – tylko u Ciebie.
+      skutki:
+      - typ: kandydat
+        opis: Mateusz Wiatrowski (kasjer) na rynku pracy – tylko dla Twojej firmy
+        kandydat:
+          imie_nazwisko: Mateusz Wiatrowski
+          gwiazdki: 2
+          zawod: Kasjer
+          pensja_preferowana: 4900
+          koszt_rekrutacji: 0
+          koszt_odprawy: 1800
+          zadowolenie_klientow: 0.96
+          ryzyko_reklamacji: 0.02
+
+- id: kapitan_henryk
+  park: zalew
+  tytul: Chrzest jachtu kapitana Henryka
+  start: przystan
+  sceny:
+    przystan:
+      tekst: >-
+        Na przystani nad Zalewem Zemborzyckim kapitan Henryk – emerytowany kierowca autobusu linii 18 i żeglarz
+        z wyboru – kończy remont łódki. Brakuje mu tylko nazwy i butelki do chrztu. „Kto da nazwę, ten ma
+        dożywotni rejs. Albo przynajmniej do listopada, potem zamarza”.
+      domyslna: brzeg
+      opcje:
+      - id: nazwa
+        tekst: Proponujesz nazwę „Kebab I” i fundujesz szampana
+        koszt: {gotowka: 150}
+        wynik: >-
+          Kapitan Henryk rozbija butelkę o burtę za trzecim razem (za pierwszym chybił, za drugim się zawahał).
+          „Kebab I” zwodowany. Dziób łódki jest już trochę słodki od szampana.
+        nastepna:
+        - {scena: regaty, za_ile_rund: 2}
+      - id: zaloga
+        tekst: Przynosisz jedzenie dla załogi i pomagasz przy linach
+        koszt: {czas: 3, porcje: 6}
+        wynik: >-
+          Załoga – kapitan Henryk i trzech kolegów z zajezdni – je kebaby na pomoście i opowiada, jak w 1987
+          przejechali osiemnastką cały Lublin bez jednego spóźnienia. Klub żeglarski pyta o catering na zakończenie
+          sezonu.
+        nastepna:
+        - {scena: zakonczenie_sezonu, za_ile_rund: 1}
+      - id: brzeg
+        tekst: Zostajesz na brzegu
+        wynik: >-
+          Łódka dostaje nazwę „Halinka” po żonie kapitana. Żona kapitana macha z brzegu i mówi, że wolałaby
+          wycieczkę do Kazimierza.
+    regaty:
+      tekst: >-
+        „Kebab I” startuje w jesiennych regatach na Zalewie. Kapitan Henryk płynie spokojnie, jak autobusem
+        – zatrzymuje się przy każdej bojce. Zajmuje ostatnie miejsce, ale dostaje nagrodę publiczności, a lokalna
+        telewizja pokazuje łódkę z nazwą Twojego dania w wieczornych wiadomościach.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 2, opis: „Kebab I” w wieczornych wiadomościach}
+    zakonczenie_sezonu:
+      tekst: >-
+        Klub żeglarski zamawia catering na zakończenie sezonu – kapitan Henryk osobiście odbiera zamówienie,
+        w czapce kapitańskiej, i płaci gotówką wyliczoną co do grosza „jak za bilety”.
+      skutki:
+      - {typ: gotowka, kwota: 380, opis: Catering na zakończenie sezonu żeglarskiego}
+
+- id: oda_do_kebaba
+  park: park_rury
+  tytul: Oda do kebaba
+  start: slam
+  sceny:
+    slam:
+      tekst: >-
+        W Parku Rury trwa jesienny slam poetycki. Poeta w szaliku długim na dwa metry ogłasza, że kolejny utwór
+        napisze „o czymś prawdziwym” – i patrzy na Twój kebab. „Pozwoli Pan, że go opiszę? Potrzebuję
+        tylko natchnienia. I może trochę sosu”.
+      domyslna: idz
+      opcje:
+      - id: natchnienie
+        tekst: Dajesz natchnienie z sosem i słuchasz całego wieczoru
+        koszt: {czas: 2, porcje: 1}
+        wynik: >-
+          Poeta je w skupieniu, a potem pisze przez godzinę, mrucząc pod nosem rymy do „czosnek”. Zapowiada,
+          że oda ukaże się w studenckim zinie w przyszłym tygodniu.
+        nastepna:
+        - {scena: oda_piekna, za_ile_rund: 1, szansa: 0.4}
+        - {scena: oda_okropna, za_ile_rund: 1, szansa: 0.6}
+      - id: rym
+        tekst: Płacisz za „rymowaną reklamę”
+        koszt: {gotowka: 80}
+        wynik: >-
+          Poeta recytuje na scenie dwuwiersz: „Gdy w brzuchu pusto, a w sercu mrok – do kebaba zrób jeden krok”.
+          Publiczność klaszcze z grzeczności. Ktoś to jednak zapamiętał.
+        skutki:
+        - {typ: popyt, mnoznik: 1.01, rund: 2, opis: Rymowana reklama na slamie}
+      - id: idz
+        tekst: Uciekasz, zanim zacznie
+        wynik: >-
+          Utwór o Twoim kebabie i tak powstaje – w wersji „o tym, który uciekł”. Ma jedenaście strof i jest
+          bardzo smutny. Nikt poza poetą go nie zrozumiał.
+    oda_piekna:
+      tekst: >-
+        Oda „Rożen o zmierzchu” wyszła w zinie i okazała się naprawdę piękna. Polonistka z liceum czyta ją
+        uczniom na lekcji o metaforze. Uczniowie przychodzą sprawdzić, czy kebab „pachnie jak listopad”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Oda „Rożen o zmierzchu”}
+    oda_okropna:
+      tekst: >-
+        Oda wyszła. Ma czterdzieści siedem strof, w tym dwanaście o kapuście. Jest tak zła, że studenci
+        recytują ją na imprezach z ręką na sercu, a potem idą na kebaba, „żeby uczcić poezję”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Najgorsza oda w historii Lublina}
+
+- id: wycieczka_z_bilgoraja
+  park: ogrod_saski
+  tytul: Wycieczka z Biłgoraja
+  start: autokar
+  sceny:
+    autokar:
+      tekst: >-
+        Przy bramie Ogrodu Saskiego zatrzymuje się autokar z dwudziestką seniorów z Biłgoraja. Przewodniczka,
+        pani Teresa, ma problem: restauracja odwołała obiad, a grupa „jest głodna i ma zdanie”. Pyta, czy dasz
+        radę nakarmić wszystkich w godzinę – „ale bez ostrego, bo pan Kazimierz ma serce”.
+      domyslna: odmow
+      opcje:
+      - id: obiad
+        tekst: Przygotowujesz obiad dla całej grupy
+        koszt: {czas: 3, porcje: 8}
+        wynik: >-
+          Seniorzy jedzą przy złączonych stolikach i oceniają wszystko po kolei. Pan Kazimierz dokłada sobie
+          sos czosnkowy „bo serce to serce, a czosnek to zdrowie”. Pani Teresa płaci z kasy wycieczki i robi
+          zdjęcie „do kroniki”.
+        skutki:
+        - {typ: gotowka, kwota: 260, opis: Obiad dla wycieczki z Biłgoraja}
+        nastepna:
+        - {scena: kronika, za_ile_rund: 2}
+      - id: kanapki
+        tekst: Pakujesz frytki na drogę za pół ceny
+        koszt: {porcje: 3}
+        wynik: >-
+          Grupa je frytki w autokarze. Kierowca prosi, żeby następnym razem pakować bez keczupu, bo „tapicerka
+          pamięta wszystko”.
+        skutki:
+        - {typ: gotowka, kwota: 60, opis: Frytki dla wycieczki}
+      - id: odmow
+        tekst: Odmawiasz – nie dasz rady w godzinę
+        wynik: >-
+          Pani Teresa dziękuje i prowadzi grupę do baru mlecznego. Pan Kazimierz odwraca się w drzwiach
+          i mówi „a szkoda”, tonem, który zostaje z człowiekiem na długo.
+    kronika:
+      tekst: >-
+        W biuletynie parafialnym z Biłgoraja ukazała się kronika wycieczki – z Twoim lokalem na zdjęciu
+        i podpisem „Najlepszy obiad wyjazdu, chociaż z daleka”. Kto z Biłgoraja jedzie do Lublina, ten wie,
+        gdzie zjeść. A z Biłgoraja do Lublina jeździ się często – do lekarza, na zakupy i do wnuków.
+      skutki:
+      - {typ: popyt, mnoznik: 1.03, rund: 3, opis: Kronika wycieczki z Biłgoraja}
+
+- id: krwiodawstwo
+  park: blonia
+  tytul: Mobilny punkt krwiodawstwa
+  powazna: true
+  start: autobus
+  sceny:
+    autobus:
+      tekst: >-
+        Na Błoniach stanął autobus Regionalnego Centrum Krwiodawstwa. Zapasy krwi w szpitalach są w tym tygodniu
+        niskie, a lekarka zachęca przechodniów do oddania krwi. Organizatorzy szukają też kogoś, kto przygotuje
+        posiłek regeneracyjny dla dawców.
+      domyslna: dalej
+      opcje:
+      - id: oddaj
+        tekst: Oddajesz krew
+        koszt: {czas: 2}
+        wynik: >-
+          Badanie, krótka ankieta i dziesięć minut na fotelu. Dostajesz legitymację dawcy i zalecenie, żeby
+          w najbliższych dniach odpocząć i nie przemęczać się w pracy.
+        skutki:
+        - {typ: czas, godziny: 2, rund: 1, opis: Odpoczynek po oddaniu krwi}
+        - {typ: popyt, mnoznik: 1.01, rund: 2, opis: Plakat dawców z Twoim lokalem}
+      - id: posilek
+        tekst: Przygotowujesz posiłki dla dawców
+        koszt: {czas: 2, porcje: 10}
+        wynik: >-
+          Dawcy dostają ciepły posiłek po oddaniu krwi. Centrum dziękuje w mediach społecznościowych i zaprasza
+          na kolejną akcję.
+        skutki:
+        - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Podziękowanie Centrum Krwiodawstwa}
+      - id: dalej
+        tekst: Mijasz autobus
+        wynik: Autobus stoi na Błoniach do wieczora. Akcja zebrała kilkadziesiąt donacji.
