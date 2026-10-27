@@ -58,6 +58,3 @@ def gry_ucznia(user) -> set[str]:
 def moze_firme(user, id_gry: str, firma: str) -> bool:
     return jest_mg(user) or firma in firmy_ucznia(user, id_gry)
 
-
-def moze_gre(user, id_gry: str) -> bool:
-    return jest_mg(user) or bool(firmy_ucznia(user, id_gry))

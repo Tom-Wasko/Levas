@@ -2,7 +2,7 @@
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Rynek pracy: znane osoby (kucharze i kasjerzy) i parametry losowania nowych kandydatów (wg gwiazdek).'
 zrodlo: znani – założenie F2.6 (osoby fikcyjne, pensje 1★ 4810–4950, 2★ 5000–5300, 3★ 5400–5800); losowanie – listy kandydatów
-  gier REVAS (dane_revas/kandydaci.yaml)
+  gier REVAS
 znani:
 - imie_nazwisko: Mehmet Yılmaz
   gwiazdki: 3

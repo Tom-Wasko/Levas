@@ -130,22 +130,21 @@ przełącznik `panel_gracza/static/motyw.js`.
 |---|---|
 | `silnik/` | silnik gry (czysty Python, bez Django): rynek, operacje, finanse, karta wyników, boty |
 | `dane/*.yaml` | dane gry (kebab) i założenia (niepewne parametry), każdy z `zrodlo`; sprawdzenie: `python -m silnik.dane sprawdz` |
-| `dane_revas/` | dane oryginalnego Revasa (fitness) – wzorzec, na którym testy sprawdzają mechanikę: `python -m silnik.dane sprawdz dane_revas` |
 | `levas/` | projekt Django (ustawienia, adresy) |
 | `gry/` | modele `Gra`, `Runda`, `Decyzja` (event sourcing: konfiguracja + decyzje, stan liczy silnik) i `serwisy.py` |
 | `api/` | widoki JSON dla zakładek (`widoki.py`) i budowa widoku rundy (`prezentacja.py`) |
 | `panel_gracza/` | strony gracza, zakładki w czystym JS (`static/zakladki/`), Chart.js, komenda `graj` |
 | `konta/` | logowanie (django-allauth: własny login, konto Microsoft), role uczeń / mistrz gry (`role.py`), komenda `konto` |
 | `panel_mg/` | panel mistrza gry (`/mg/`): nowa gra, prowadzenie rund, wyniki drużyn; dane z `GET /api/gry/<id>/mg` |
-| `testy/` | pytest (mechaniki Revasa, zasady rund, API) |
+| `testy/` | pytest (mechaniki silnika, zasady rund, API) |
 
-`WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (liczby z gier – w `dane_revas/`).
+`WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (dane oryginalnego Revasa usunięte 27.10 –
+są w historii repozytorium i w `revas_26/`).
 
 ### Kalendarz rund
 
 `katalog.yaml` → `rundy.kalendarz`: okres (`tydzien` / `miesiac`), rund w roku, data startu. Kebab: runda = tydzień,
-26 rund od 5.10.2026, 40 000 zł i gotowy lokal (`stanowiska.startowe`: kuchnia z rożnem, frytownicą i lodówką,
-kasa). Revas (`dane_revas/`): runda = miesiąc od stycznia. Kwoty w danych są **miesięczne** (pensje, czynsz,
+18 rund od poniedziałku 1.09.2025 (do 4.01.2026), 40 000 zł. Kwoty w danych są **miesięczne** (pensje, czynsz,
 utrzymanie) – silnik księguje je na rundę przez `Dane.na_runde` (× 12 / rund w roku); oprocentowanie roczne dzieli
 się przez rundy w roku, okresy lokat i kredytów liczą się w rundach, sezonowość – według miesiąca rundy
 (`Dane.miesiac_rundy`, tydzień należy do miesiąca swojego czwartku). Koszty jednorazowe (zakupy, rekrutacja,

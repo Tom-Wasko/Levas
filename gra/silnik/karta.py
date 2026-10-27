@@ -139,8 +139,3 @@ def kebab(dane: Dane, f, w: dict, netto: float, zadluzenie_bankowe: float) -> di
     w["karta"] = karta(dane, netto, round(zk, 3), round(zp, 3), round(roz, 3), zad)
     return {"miary": m, "skladniki": {s: {x: round(y, 4) for x, y in d.items() if abs(y) > EPS}
                                       for s, d in skladniki.items()}}
-
-
-NAZWY_WSKAZNIKOW = {"wynik_dzialalnosci": "Wynik działalności", "wynik_ekonomiczny": "Wynik ekonomiczny",
-                    "zadowolenie_pracownikow": "Zadowolenie pracowników", "zadowolenie_klientow": "Zadowolenie klientów",
-                    "rozwoj_firmy": "Rozwój firmy", "wskaznik_zadluzenia": "Wskaźnik zadłużenia"}

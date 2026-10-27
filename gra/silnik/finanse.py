@@ -4,7 +4,7 @@
 - biuro rachunkowe: opłata za księgowanie × liczba pozycji KPiR (bez „Obsługi kadrowo-płacowej”, z samą sobą)
   + opłata kadrowa za każdego pracownika (etat / umowa cywilnoprawna),
 - CIT 19% od dodatniego dochodu miesiąca, bez rozliczania strat z poprzednich miesięcy,
-- lokaty i kredyty: odsetki proste (roczne / 12 za miesiąc); kredyt spłacany równymi ratami kapitałowymi,
+- lokaty i kredyty banków – silnik/banki.py,
 - kredyt odnawialny uruchamia się sam przy braku gotówki i jest spłacany, gdy gotówka wróci.
 
 Gra z lokalami (F3a.11, dane/podatki_2026.yaml): księga ma reguły VAT (`vat`). Kwoty w grze są brutto – `ksieguj`
@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal
 
-from .model import Firma, Kredyt, Lokata
+from .model import Firma
 
 KOLUMNY = ("przychod", "przychod_pozostaly", "towary", "wynagrodzenia", "pozostale")
 KOLUMNY_KOSZTOW = ("towary", "wynagrodzenia", "pozostale")
@@ -139,70 +139,6 @@ def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: 
     rachunek.zapisz(firma, opis, znak * kwota, "kpir")
 
 
-def bank_poczatek_miesiaca(firma: Firma, bank: dict, decyzje: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> dict:
-    """Nowe lokaty i kredyty, zerwane lokaty, wcześniejsze spłaty. Zwraca informacje do wyników."""
-    info = {"nowe_lokaty": [], "nowe_kredyty": [], "zerwane_lokaty": [], "splacone_kredyty": []}
-    for l in decyzje.get("lokaty_zerwij", []):
-        lokata = next((x for x in firma.lokaty if x.id == l), None)
-        if lokata:
-            firma.lokaty.remove(lokata)
-            rachunek.zapisz(firma, f"Zerwanie lokaty nr {lokata.id} (bez odsetek)", lokata.kwota, "lokaty")
-            info["zerwane_lokaty"].append(lokata.id)
-    for k in decyzje.get("kredyty_splac", []):
-        kredyt = next((x for x in firma.kredyty if x.id == k), None)
-        if kredyt and firma.gotowka >= kredyt.pozostalo:
-            firma.kredyty.remove(kredyt)
-            rachunek.zapisz(firma, f"Spłata kredytu nr {kredyt.id}", -kredyt.pozostalo, "kredyty")
-            info["splacone_kredyty"].append(kredyt.id)
-    for d in decyzje.get("kredyty_wez", []):
-        firma.licznik += 1
-        kredyt = Kredyt(id=firma.licznik, kwota=float(d["kwota"]), oprocentowanie=bank["kredyt"], od_rundy=runda,
-                        miesiecy=int(d["miesiecy"]), pozostalo=float(d["kwota"]))
-        firma.kredyty.append(kredyt)
-        rachunek.zapisz(firma, f"Kredyt nr {kredyt.id}", kredyt.kwota, "kredyty")
-        info["nowe_kredyty"].append(kredyt.id)
-    for d in decyzje.get("lokaty_zaloz", []):
-        kwota = min(float(d["kwota"]), max(0.0, firma.gotowka))
-        if kwota <= 0:
-            continue
-        firma.licznik += 1
-        lokata = Lokata(id=firma.licznik, kwota=kwota, oprocentowanie=bank["lokata"], od_rundy=runda,
-                        miesiecy=int(d["miesiecy"]))
-        firma.lokaty.append(lokata)
-        rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id}", -kwota, "lokaty")
-        info["nowe_lokaty"].append(lokata.id)
-    return info
-
-
-def bank_koniec_miesiaca(firma: Firma, bank: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek,
-                         rund_w_roku: int = 12) -> None:
-    """Raty i odsetki kredytów, odsetki kredytu odnawialnego, zakończone lokaty, opłata za konto (koniec rundy).
-    Oprocentowanie roczne dzielone na rundy; okresy kredytów i lokat (pole `miesiecy`) liczone w rundach."""
-    oplata = bank["konto"] + bank["karta"]  # miesięczna
-    ksieguj(firma, ksiega, rachunek, "Opłata za konto", oplata if rund_w_roku == 12 else round(oplata * 12 / rund_w_roku, 2))
-    for k in list(firma.kredyty):
-        if k.od_rundy == runda:
-            continue
-        odsetki = round(k.pozostalo * k.oprocentowanie / rund_w_roku, 2)
-        rata = round(min(k.pozostalo, k.kwota / k.miesiecy), 2)
-        ksieguj(firma, ksiega, rachunek, f"Odsetki od kredytu nr {k.id}", odsetki)
-        rachunek.zapisz(firma, f"Rata kapitałowa kredytu nr {k.id}", -rata, "kredyty")
-        k.pozostalo = round(k.pozostalo - rata, 2)
-        if k.pozostalo <= 0.005:
-            firma.kredyty.remove(k)
-    if firma.kredyt_odnawialny > 0:
-        ksieguj(firma, ksiega, rachunek, "Odsetki od kredytu odnawialnego",
-                round(firma.kredyt_odnawialny * bank["kredyt_odnawialny"] / rund_w_roku, 2))
-    for l in list(firma.lokaty):
-        # lokata na n miesięcy założona w miesiącu m kończy się z końcem miesiąca m + n − 1 (KPiR ATH, listopad:
-        # „Lokata (Luty − Grudzień)” na 10 mies. i „Lokata (Listopad)” na 1 mies. – odsetki obu w listopadzie)
-        if runda >= l.od_rundy + l.miesiecy - 1:
-            odsetki = round(l.kwota * l.oprocentowanie * l.miesiecy / rund_w_roku, 2)
-            firma.lokaty.remove(l)
-            rachunek.zapisz(firma, f"Zakończenie lokaty nr {l.id}", l.kwota, "lokaty")
-            ksieguj(firma, ksiega, rachunek, f"Odsetki od lokaty nr {l.id}", odsetki, "przychod_pozostaly")
-
-
 def uruchom_odnawialny(firma: Firma, rachunek: Rachunek) -> float:
     """Gdy saldo jest ujemne – kredyt odnawialny na brakującą kwotę. Zwraca pobraną kwotę."""
     if firma.gotowka >= 0:
@@ -228,7 +164,3 @@ def wyrownaj_gotowke(firma: Firma, rachunek: Rachunek, pobrany_w_miesiacu: float
 
 def zadluzenie(firma: Firma) -> float:
     return round(sum(k.pozostalo for k in firma.kredyty) + firma.kredyt_odnawialny, 2)
-
-
-def odsetki_naliczone_lokat(firma: Firma, runda: int, rund_w_roku: int = 12) -> float:
-    return round(sum(l.kwota * l.oprocentowanie * max(0, runda - l.od_rundy) / rund_w_roku for l in firma.lokaty), 2)

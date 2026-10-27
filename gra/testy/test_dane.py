@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from silnik import dane as modul_danych
-from silnik.dane import KATALOG_DANYCH, KATALOG_REVAS, Dane, sprawdz
+from silnik.dane import KATALOG_DANYCH, Dane, sprawdz
 
 SILNIK = Path(modul_danych.__file__).parent
 
@@ -34,7 +34,6 @@ def _zmien(kat: Path, plik: str, zmiana) -> None:
 
 def test_dane_gry_sa_poprawne():
     assert sprawdz() == []
-    assert sprawdz(KATALOG_REVAS) == []   # wzorzec REVAS (fitness) do testów mechaniki
 
 
 def test_kazdy_plik_ma_opis_i_zrodlo():

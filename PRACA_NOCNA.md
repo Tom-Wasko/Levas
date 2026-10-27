@@ -620,3 +620,10 @@ _brak_
 - Raport w wynikach: gotówka, przychody/koszty/dochód netto, zadłużenie, zadowolenie klientów, menu (ceny, popyt, sprzedaż, przychód, reklamacje), lokale, załoga (zawód × gwiazdki, średnia pensja), kampanie i promocje.
 - 15% wpadki: raport i tak przychodzi, ale śledzony dostaje w wynikach komiczną historię z nazwą zleceniodawcy. Boty nie zatrudniają detektywa. Teksty komiczne (powitania, raporty, wpadki, ofiary).
 - Testy: `testy/test_konkurencja.py` (6). INSTRUKCJA (rozdz. 13 i tabela odblokowań) + PDF.
+
+### P17 – Sprzątanie pozostałości Revasa (27.10)
+- Usunięty katalog `gra/dane_revas/` (dane klubu fitness z Revasa) i stała `KATALOG_REVAS` – zostają w historii gita i w `revas_26/`.
+- `testy/test_mechaniki.py` przepisane na dane Levasa (kebab): obłożenie kucharza i kasy, zużycie składników na porcję, limit godzin, brak składnika (krótsze dania obsłużone w większym odsetku), KPiR z ZUS i podatkiem, wynik ekonomiczny, powtarzalność gry. Oczekiwane wartości liczone z danych, nie z liczb gier Revasa (8 testów zamiast 10 – testy banku Revasa usunięte, banki Levasa testuje `test_banki.py`).
+- Martwy kod usunięty: miesięczny bank Revasa (`bank_poczatek_miesiaca`, `bank_koniec_miesiaca`, `odsetki_naliczone_lokat` – gra używa `silnik/banki.py`), `NAZWY_WSKAZNIKOW`, `moze_gre`; stary plik `gra/__pycache__/balans_botow…pyc`.
+- README: bez `dane_revas/`, kalendarz rund poprawiony (18 tygodni od 1.09.2025, 40 000 zł). Opisy w `katalog.yaml` i `kandydaci.yaml` bez ścieżki do usuniętych danych.
+- Zostawione celowo: `WIEDZA_O_GRZE.md` (źródło mechanik), nazwy z Revasa w kodzie (usługa = danie itd. – słownik w README), zabezpieczenia `if dane.mapa` (dane bez mapy dalej da się sprawdzić `sprawdz`).

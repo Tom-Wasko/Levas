@@ -1,6 +1,6 @@
 # Katalog ofert stałych
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: Stałe oferty gry (ceny, koszty utrzymania, zasięgi). Liczby z gier REVAS (dane_revas/katalog.yaml), nazwy przerobione
+opis: Stałe oferty gry (ceny, koszty utrzymania, zasięgi). Liczby z gier REVAS, nazwy przerobione
   na kebab (F2.6).
 rundy:
   zrodlo: instrukcja gry REVAS (zakładki odblokowywane w kolejnych rundach) i ustalenia z użytkownikiem

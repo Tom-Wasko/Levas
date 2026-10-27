@@ -32,7 +32,6 @@ from .schematy import (
 
 KATALOG_GRY = Path(__file__).resolve().parents[1]
 KATALOG_DANYCH = KATALOG_GRY / "dane"
-KATALOG_REVAS = KATALOG_GRY / "dane_revas"   # dane oryginalnej gry REVAS (fitness) – wzorzec do testów mechaniki
 
 MIESIACE = ["styczen", "luty", "marzec", "kwiecien", "maj", "czerwiec", "lipiec", "sierpien", "wrzesien",
             "pazdziernik", "listopad", "grudzien"]
