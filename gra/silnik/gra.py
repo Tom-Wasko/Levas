@@ -14,6 +14,7 @@ import secrets
 from copy import deepcopy
 from pathlib import Path
 
+from . import harmonogram as hm
 from .dane import Dane, dane_domyslne
 from .kandydaci import pula_startowa
 from .lokale import tryb_lokali
@@ -26,7 +27,7 @@ class Gra:
     def __init__(self, konfiguracja: dict, decyzje: dict | None = None, dane: Dane | None = None):
         self.konfiguracja = konfiguracja
         self.decyzje: dict[int, dict[str, dict]] = {int(k): v for k, v in (decyzje or {}).items()}
-        self.dane = dane or dane_domyslne()
+        self.dane = hm.dla_gry(dane or dane_domyslne(), konfiguracja)   # z lokalami – z harmonogramem gry
         self._stany: dict[int, StanGry] = {}
 
     # --- tworzenie i zapis -----------------------------------------------------------------------
@@ -45,6 +46,8 @@ class Gra:
                 "lokale": bool(opcje.get("lokale", dane.mapa is not None)) and dane.mapa is not None}
         if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych
             konf["kapital_startowy"] = float(opcje["kapital_startowy"])
+        if opcje.get("odblokowanie") and konf["lokale"]:   # mistrz gry może zmienić tygodnie odblokowań
+            konf["odblokowanie"] = hm.sprawdz_zmiany(dane, opcje["odblokowanie"], {}, 1, konf["liczba_rund"])
         return cls(konf, {}, dane)
 
     def do_slownika(self) -> dict:
@@ -177,6 +180,18 @@ class Gra:
             if f["bot"]:
                 d.pop(f["nazwa"], None)
         self._stany = {k: v for k, v in self._stany.items() if k < r}
+
+    def ustaw_odblokowanie(self, zmiany: dict) -> None:
+        """Mistrz gry zmienia tygodnie odblokowań ({element: tydzień}) – tylko elementy jeszcze zablokowane."""
+        if not tryb_lokali(self.dane, self.konfiguracja):
+            raise ValueError("Harmonogram odblokowań jest tylko w grze z lokalami.")
+        nowe = hm.sprawdz_zmiany(self.dane, zmiany, self.konfiguracja.get("odblokowanie") or {}, self.runda,
+                                 self.konfiguracja["liczba_rund"])
+        self.konfiguracja.pop("odblokowanie", None)
+        if nowe:
+            self.konfiguracja["odblokowanie"] = nowe
+        self.dane = hm.dla_gry(self.dane, self.konfiguracja)
+        self._stany = {k: v for k, v in self._stany.items() if k < self.runda}   # przeliczone rundy bez zmian
 
     def kopia(self) -> Gra:
         return Gra(deepcopy(self.konfiguracja), deepcopy(self.decyzje), self.dane)

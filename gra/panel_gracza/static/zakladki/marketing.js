@@ -131,7 +131,7 @@ function trwajaceHtml(v, lista, tytul) {
 
 export const agencje = {
   tytul: "Agencje reklamowe", tytulPelny: "Marketing - agencje reklamowe", ikona: "tradycyjny",
-  odblokowanie: (v) => !!v.reklama && v.runda >= 3, ukryta: (v) => !v.reklama,
+  odblokowanie: (v) => !!v.reklama && v.runda >= (v.harmonogram?.reklama ?? 1), ukryta: (v) => !v.reklama,
   info: () => `Zamów kampanię w jednej z agencji na mieście. Kampania w strefie przyciąga do miasta więcej głodnych (korzystają też sąsiedzi)
     i podbiera klientów konkurencji. Kilka firm reklamujących się tak samo w tej samej strefie zagłusza się nawzajem, a ta sama kampania powtórzona
     zaraz po poprzedniej działa słabiej. Po końcu kampania jeszcze przez chwilę wygasa.`,

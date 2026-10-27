@@ -1,7 +1,7 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
 import { esc, godzina, info, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
   from "./zakladki/wspolne.js";
-import ZAKLADKI, { IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
+import ZAKLADKI, { ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
 
 const S = { v: null, kat: null, zakladka: "dashboard", tryb: "decyzje", runda: null, d: {}, zapis: Promise.resolve(),
@@ -74,6 +74,7 @@ async function zmien(fn) {
 }
 
 const odbl = (k) => S.v.odblokowane.includes(k);
+const odRundy = (k) => S.v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];   // gra z lokalami: harmonogram gry (MG)
 function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "function" ? z.odblokowanie(S.v) : odbl(z.odblokowanie)); }
 const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd) && (!z.wynikiGdy || z.wynikiGdy(S.v)));
 const kluczZakladki = (z) => Object.keys(ZAKLADKI).find((k) => ZAKLADKI[k] === z);
@@ -91,12 +92,12 @@ function rysujMenu() {
     .map((poz) => poz.pod ? { ...poz, pod: widocznePod(poz.pod) } : poz).map((poz) => {
     const z = ZAKLADKI[poz.klucz] || {};
     const pod = poz.pod ? `<div class="pod">${poz.pod.map((k) => `<a data-zakladka="${k}" class="${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"} ${k === S.zakladka ? "aktywna" : ""}">
-      ${ikona(IKONY[k], 18)}${ZAKLADKI[k].tytul}${!dostepna(ZAKLADKI[k]) && OD_RUNDY[k] ? `<span class="od">od rundy ${OD_RUNDY[k]}</span>` : ""}</a>`).join("")}</div>` : "";
+      ${ikona(IKONY[k], 18)}${ZAKLADKI[k].tytul}${!dostepna(ZAKLADKI[k]) && odRundy(k) ? `<span class="od">od rundy ${odRundy(k)}</span>` : ""}</a>`).join("")}</div>` : "";
     const aktywna = poz.klucz === S.zakladka || (poz.pod || []).includes(S.zakladka);
     const zablokowana = poz.pod ? !poz.pod.some((k) => dostepna(ZAKLADKI[k])) : !dostepna(z);
     const cel = poz.pod ? poz.pod.find((k) => dostepna(ZAKLADKI[k])) || poz.pod[0] : poz.klucz;
     const znaczek = poz.klucz === "lista_bledow" && czerwone && S.v.edycja ? `<span class="znaczek">${czerwone}</span>` : "";
-    const tytulOd = zablokowana && OD_RUNDY[cel] ? ` title="Dostępne od rundy ${OD_RUNDY[cel]}"` : "";
+    const tytulOd = zablokowana && odRundy(cel) ? ` title="Dostępne od rundy ${odRundy(cel)}"` : "";
     return `<div class="poz ${poz.klasa || ""}" data-dzial="${poz.klucz}"><a data-zakladka="${cel}" class="${aktywna ? "aktywna" : ""} ${zablokowana ? "zablokowana" : ""}"${tytulOd}>
       ${ikona(poz.ikona)}${poz.tytul}${znaczek}</a>${pod}</div>`;
   }).join("");

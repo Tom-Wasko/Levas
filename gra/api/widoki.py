@@ -21,6 +21,7 @@ from gry import serwisy
 from gry.models import Gra
 from konta import druzyny
 from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
+from silnik import harmonogram as hm
 from silnik import kasyno as kas
 from silnik.biuro import ukryj
 from silnik.boty import decyzje_bota
@@ -169,17 +170,21 @@ def api_gry(request):
     poziomy = {f["nazwa"].strip(): f["poziom"] for f in wiersze if f.get("bot") and f.get("poziom")}
     if any(p not in znane for p in poziomy.values()):
         return blad("Nie ma takiego poziomu botów.")
-    g = GraSilnika.nowa(
-        d.get("nazwa") or "Gra",
-        firmy,
-        int(d["liczba_rund"]) if d.get("liczba_rund") else None,  # brak – domyślna z danych
-        int(ziarno) if str(ziarno or "").strip().isdigit() else None,
-        ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
-        kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),
-        kapital_startowy=kapital,
-        lokale=d.get("lokale", True) not in (False, "nie", "0", 0),
-        poziomy=poziomy,
-    )
+    try:
+        g = GraSilnika.nowa(
+            d.get("nazwa") or "Gra",
+            firmy,
+            int(d["liczba_rund"]) if d.get("liczba_rund") else None,  # brak – domyślna z danych
+            int(ziarno) if str(ziarno or "").strip().isdigit() else None,
+            ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
+            kredyt_odnawialny=d.get("kredyt_odnawialny", "jednoczesnie"),
+            kapital_startowy=kapital,
+            lokale=d.get("lokale", True) not in (False, "nie", "0", 0),
+            poziomy=poziomy,
+            odblokowanie=d.get("odblokowanie") or None,   # {element: tydzień} – zmiany harmonogramu
+        )
+    except ValueError as e:
+        return blad(str(e))
     return odpowiedz({"id": serwisy.utworz(g)})
 
 
@@ -203,6 +208,7 @@ def _przeglad(id_: str) -> dict:
     p["prowadzenie"]["dni"] = hg.DNI
     poziomy = g.dane.boty.get("poziomy") or {}
     p["prowadzenie"]["poziomy"] = {k: v["nazwa"] for k, v in poziomy.items()}
+    p["prowadzenie"]["odblokowanie"] = hm.widok(g.dane, g.runda)
     return p
 
 
@@ -210,9 +216,18 @@ def _przeglad(id_: str) -> dict:
 @api
 @tylko_mg
 def api_prowadzenie(request, id_):
-    """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]}
-    albo {"poziom": {"firma", "poziom"}} (poziom bota)."""
+    """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]},
+    {"poziom": {"firma", "poziom"}} (poziom bota) albo {"odblokowanie": {element: tydzień}}
+    (harmonogram odblokowań gry z lokalami)."""
     d = cialo(request)
+    if "odblokowanie" in d:
+        if not isinstance(d["odblokowanie"], dict):
+            raise BladZapytania("Harmonogram odblokowań: {element: tydzień}.")
+        try:
+            with serwisy.zmiana(id_) as g:
+                g.ustaw_odblokowanie(d["odblokowanie"])
+        except ValueError as e:
+            raise BladZapytania(str(e)) from e
     if "poziom" in d:
         firma, poziom = (d["poziom"] or {}).get("firma"), (d["poziom"] or {}).get("poziom")
         with serwisy.zmiana(id_) as g:

@@ -125,6 +125,9 @@ class Dane:
         self.zdarzenia: dict | None = _wczytaj_zdarzenia(katalog / "zdarzenia")
         self.kalendarz_miasta: dict | None = _wczytaj_kalendarz(katalog / "kalendarz")
         self.podatki: dict | None = _wartosci(p["podatki_2026.yaml"]) if "podatki_2026.yaml" in p else None   # JDG (F3a.11)
+        # widok danych gry z lokalami (silnik/harmonogram.py: dla_gry) – harmonogram zakładek i tygodnie mistrza gry
+        self.odblokowanie_rund: dict[str, list[str]] | None = None
+        self.nadpisane_rundy: dict[str, int] = {}
 
     @cached_property
     def lokale(self) -> dict[str, dict]:
@@ -214,7 +217,7 @@ class Dane:
 
     def odblokowane(self, runda: int) -> set[str]:
         wynik = set()
-        for r, zakladki in self.katalog_ofert["rundy"]["odblokowanie"].items():
+        for r, zakladki in (self.odblokowanie_rund or self.katalog_ofert["rundy"]["odblokowanie"]).items():
             if int(r) <= runda:
                 wynik |= set(zakladki)
         return wynik

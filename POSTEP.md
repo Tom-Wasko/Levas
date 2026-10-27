@@ -178,4 +178,12 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   Przycisk „Popraw” prowadzi też do nowych zakładek (Magazyn i świeżość, Zatrudnienie, Zdarzenia…); test
   `test_lista_bledow.py`
 
-Zadania F4.3–F4.7 – jeszcze nie zaczęte.
+- [x] F4.3 Odblokowywanie zakładek – `silnik/harmonogram.py`: elementy harmonogramu (zakładki z
+  `katalog.yaml → rundy.harmonogram_lokali` i elementy mapy z własnym `od_rundy`: kanały rekrutacji, późniejsi
+  dostawcy, licytacje, przejęcia, promocje, kanały agencji, eventy w parkach, wypadki, handel); gra z lokalami liczy
+  się na widoku danych z tygodniami mistrza gry (`konfiguracja.odblokowanie`, tylko zmiany), wspólne dane się nie
+  zmieniają; `Gra.ustaw_odblokowanie` (tylko przyszłe elementy, nie wcześniej niż bieżący tydzień, `liczba_rund + 1`
+  = wyłączone); API: opcja `odblokowanie` przy zakładaniu gry i `POST prowadzenie {"odblokowanie": …}`; panel MG:
+  okno „Harmonogram odblokowań”; strona drużyny: „od rundy N” z harmonogramu gry; test `test_harmonogram.py`
+
+Zadania F4.4–F4.7 – jeszcze nie zaczęte.

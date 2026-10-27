@@ -36,6 +36,27 @@ rundy:
     - marketing_internetowy
     '7':
     - hr_szkolenia
+  harmonogram_lokali:
+    zrodlo: 'gra z lokalami (F4.3): tydzień, od którego działa zakładka – mistrz gry może go zmienić dla gry; terminy
+      elementów mapy (kanały rekrutacji, agencje, promocje, parki, handel…) są w ich danych. Domyślnie jak w REVAS:
+      tydzień 1 to przygotowanie lokalu (bez ofert dostawców i sprzedaży), notatka „Ustalenia gry” – karta skumulowana
+      od 4 (dostawcy i pracuj.pl od 1 – PRACA_NOCNA pyt. 24)'
+    zakladki:
+      nazwa_firmy: {nazwa: Nazwa firmy, tydzien: 1}
+      misja: {nazwa: Misja, tydzien: 1}
+      oferta: {nazwa: Menu, tydzien: 1}
+      inwestycje_stanowiska: {nazwa: Stanowiska, tydzien: 1}
+      inwestycje_sprzet: {nazwa: Sprzęt i leasing, tydzien: 2}
+      sprzedaz: {nazwa: Ceny dań, tydzien: 2}
+      dostawcy: {nazwa: Dostawcy, tydzien: 2}
+      hr_zatrudnienie: {nazwa: Zatrudnienie, tydzien: 2}
+      finanse_bank: {nazwa: Bank, tydzien: 1}
+      finanse_biuro: {nazwa: Biuro rachunkowe, tydzien: 1}
+      karta_wynikow: {nazwa: Karta wyników, tydzien: 3}
+      hr_udogodnienia: {nazwa: Udogodnienia, tydzien: 3}
+      inwestycje_wyposazenie: {nazwa: Wyposażenie, tydzien: 4}
+      karta_skumulowana: {nazwa: Karta skumulowana, tydzien: 4}
+      hr_szkolenia: {nazwa: Szkolenia, tydzien: 7}
   uslugi_w_rundzie_1: 3
   uslugi_startowe:
   - kebab_w_bulce

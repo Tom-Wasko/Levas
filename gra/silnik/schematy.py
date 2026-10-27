@@ -236,10 +236,20 @@ class Kalendarz(Sekcja):
         return self
 
 
+class ZakladkaHarmonogramu(Schemat):
+    nazwa: str
+    tydzien: int = Field(ge=1)
+
+
+class HarmonogramLokali(Sekcja):
+    zakladki: dict[str, ZakladkaHarmonogramu]
+
+
 class Rundy(Sekcja):
     kalendarz: Kalendarz
     domyslna_liczba: int = Field(gt=0)
     odblokowanie: dict[str, list[str]]
+    harmonogram_lokali: HarmonogramLokali | None = None   # gra z lokalami (F4.3) – zamiast `odblokowanie`
     uslugi_w_rundzie_1: int = Field(ge=0)
     uslugi_startowe: list[str]
     uslugi_startowe_zrodlo: str

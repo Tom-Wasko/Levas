@@ -8,6 +8,7 @@ from silnik import banki as bk
 from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
 from silnik import handel as hd
+from silnik import harmonogram as hm
 from silnik import kalendarz as kl
 from silnik import kasyno as kas
 from silnik import lichwiarz as lw
@@ -158,7 +159,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "lokale": tryb_lokali(dane, gra.konfiguracja),
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja,
-         "odblokowane": sorted(dane.odblokowane(runda))}
+         "odblokowane": sorted(dane.odblokowane(runda)),
+         "harmonogram": {x["klucz"]: x["tydzien"] for x in hm.widok(dane, runda)}}   # z lokalami: tydzień elementu
 
     if edycja:
         stan, f, ks, info, bledy = stan_po_szkicu(gra, firma)

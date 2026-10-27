@@ -95,7 +95,7 @@ export const dashboard = {
 };
 
 export const karta_wynikow = {
-  tytul: "Karta wyników", ikona: "☷", wynikiOd: 3, odblokowanie: (v) => v.runda >= 3,
+  tytul: "Karta wyników", ikona: "☷", wynikiOd: 3, odblokowanie: "karta_wynikow",
   info: () => "Karta wyników pokazuje rezultaty decyzji podjętych w poprzedniej rundzie.",
   wyniki({ v }) {
     const karty = skumulowana ? v.karta_skumulowana : v.rynek.karta;
@@ -104,7 +104,7 @@ export const karta_wynikow = {
       ...WSKAZNIKI.map(([k]) => wsk(karty[f][k]))]);
     return `<div style="display:flex;gap:10px;justify-content:center">
         <button class="btn ${skumulowana ? "jasny" : "pom"}" data-akcja="karta-skum" data-s="0">Karta wyników</button>
-        <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.runda >= 4 ? "" : "disabled"}>Skumulowana karta wyników</button></div>
+        <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.odblokowane.includes("karta_skumulowana") ? "" : "disabled"}>Skumulowana karta wyników</button></div>
       ${tabela("Ranking zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n)], wiersze, { klasy: ["l"] })}
       ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>

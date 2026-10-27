@@ -194,6 +194,15 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    w Ofercie) i dopiero od 20 zł straty w tygodniu. Komunikaty z lekkim humorem („klienci sami sobie tego nie
    zrobią”). Pytania: czy progi takie? czy brak gotówki na zamówienie ma blokować zamówienie (teraz: ostrzeżenie,
    płaci kredyt odnawialny)? (zapisane 27.10)
+24. **Harmonogram odblokowań (F4.3).** Tygodnie domyślne jak w REVAS (`katalog.yaml → rundy.harmonogram_lokali`):
+   tydzień 1 to tydzień przygotowań (bez dostaw i sprzedaży), więc Sprzęt, Ceny dań, Dostawcy i Zatrudnienie
+   otwierają się w tygodniu 2 – notatka „Ustalenia gry” mówi o dostawcach i pracuj.pl od rundy 1. Mistrz gry może
+   zmienić tydzień każdego elementu (zakładki, kanały rekrutacji, późniejsi dostawcy, licytacje, przejęcia, promocje,
+   kanały agencji reklamowych, eventy w parkach, wypadki, handel) – przy zakładaniu gry (API) i w trakcie (panel MG,
+   tylko elementy jeszcze nieodblokowane, najwcześniej na bieżący tydzień, tydzień „liczba rund + 1” = wyłączone).
+   Klub z kasynem nie jest w harmonogramie (mistrz gry o nim nie wie). Pytania: czy tydzień 1 ma zostać
+   przygotowawczy? ubezpieczyciel „od rundy 3” z notatek – na razie bez blokady; czy MG ma móc przesuwać też zakładki
+   tygodnia 1 (teraz tak – można je opóźnić)? (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -428,3 +437,5 @@ _brak_
   przepracowanie, lokale, Harpagon), rozbicie w zakładce Karta wyników; pytanie 22. Start F4.2 (lista błędów).
 - 27.10 05:11 – F4.2 gotowe: lista błędów dla dań (sprzęt, kucharz, cena wobec kosztu składników), przeterminowanie
   przy prognozie, zamówienia ponad saldo; pytanie 23. Start F4.3 (odblokowywanie zakładek).
+- 27.10 05:28 – F4.3 gotowe: harmonogram odblokowań w tygodniach z danych, zmiany MG dla jednej gry (widok danych
+  gry, wspólne dane bez zmian), edytor w panelu MG, podpowiedzi „od rundy” z harmonogramu; pytanie 24. Start F4.4.

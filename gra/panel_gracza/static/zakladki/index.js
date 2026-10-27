@@ -37,6 +37,11 @@ export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", p
 export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, tradycyjny: 5, internetowy: 6, szkolenia: 7,
   przejecia: 4, sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2, zdarzenia: 2, ubezpieczenia: 2, handel: 5 };
 
+// zakładka → element harmonogramu gry z lokalami (silnik/harmonogram.py); tydzień z widoku zastępuje OD_RUNDY
+export const ELEMENT = { karta_wynikow: "karta_wynikow", agencje: "reklama", promocje: "promocje", udogodnienia: "hr_udogodnienia",
+  wyposazenie: "inwestycje_wyposazenie", szkolenia: "hr_szkolenia", przejecia: "przejecia", sprzet: "inwestycje_sprzet",
+  zatrudnienie: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", zdarzenia: "parki", handel: "handel" };
+
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { klucz: "karta_wynikow", tytul: "Karta wyników", ikona: "karta" },

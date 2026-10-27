@@ -1,5 +1,5 @@
 // Panel mistrza gry: zakładki Decyzje (kto wysłał, zamknięcie i cofnięcie rundy, pauza, harmonogram zamykania rund,
-// poziomy botów), Wyniki (ranking, wykresy, eksport CSV) i Drużyny (skład 1–4 uczniów, konta uczniów).
+// harmonogram odblokowań gry z lokalami, poziomy botów), Wyniki (ranking, wykresy, eksport CSV) i Drużyny (skład 1–4 uczniów, konta uczniów).
 // Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg), GET /api/gry/<id>/druzyny.
 import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, termin, toast, ustawKalendarz, wsk, wyczyscWykresy,
   wykres, zamknijOkno, zl }
@@ -83,7 +83,8 @@ function decyzje() {
       <a class="btn jasny" href="${URL_GRY}/eksport">Pobierz plik gry</a>
       <button class="btn jasny" data-akcja="odswiez">Odśwież</button></div>
     ${tabela("Prowadzenie gry", ["", ""], [["Zamykanie rund o stałej porze", `${harm}
-        ${gra.zakonczona ? "" : ` <a data-akcja="harmonogram">zmień</a>`}`], ["Najbliższy termin", P.pauza ? "– (gra wstrzymana)" : P.termin ? esc(termin(P.termin)) : "–"]],
+        ${gra.zakonczona ? "" : ` <a data-akcja="harmonogram">zmień</a>`}`], ["Najbliższy termin", P.pauza ? "– (gra wstrzymana)" : P.termin ? esc(termin(P.termin)) : "–"],
+      ...(P.odblokowanie.length ? [["Odblokowania (tygodnie)", `${opisOdblokowan(P.odblokowanie)}${gra.zakonczona ? "" : ` <a data-akcja="odblokowanie">zmień</a>`}`]] : [])],
     { klasy: ["l", "l"] })}
     ${tabela("Ustawienia gry", ["", ""], ustawienia, { klasy: ["l", "l"] })}`;
 }
@@ -119,6 +120,26 @@ function edytujHarmonogram() {
     <div id="terminy">${S.p.prowadzenie.harmonogram.map(wierszTerminu).join("")}</div>
     <p><a data-akcja="dodaj-termin">+ termin</a></p>`,
   { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button><button class="btn pom" data-akcja="zapisz-harmonogram">Zapisz</button>` });
+}
+
+// harmonogram odblokowań (gra z lokalami, silnik/harmonogram.py): tydzień każdego elementu, zmiany tylko przyszłych
+const WYLACZONE = () => S.p.gra.liczba_rund + 1;
+function opisOdblokowan(el) {
+  const zmienione = el.filter((e) => e.tydzien !== e.domyslny);
+  const nast = el.filter((e) => !e.odblokowany && e.tydzien < WYLACZONE()).sort((a, b) => a.tydzien - b.tydzien)[0];
+  return `${zmienione.length ? `zmienione: ${zmienione.length}` : "jak w danych"}${nast ? ` · następne: ${esc(nast.nazwa)} (tydz. ${nast.tydzien})` : ""}`;
+}
+
+function edytujOdblokowanie() {
+  const el = S.p.prowadzenie.odblokowanie;
+  const grupy = [...new Set(el.map((e) => e.grupa))];
+  const wiersz = (e) => `<tr><td class="l">${esc(e.nazwa)}</td><td><input type="number" class="tydz-mg" data-k="${esc(e.klucz)}"
+      min="${S.p.gra.runda}" max="${WYLACZONE()}" value="${e.tydzien}" ${e.odblokowany ? "disabled title=\"Już odblokowane\"" : ""}></td>
+      <td class="podpowiedz">${e.tydzien === e.domyslny ? "" : `dane: ${e.domyslny}`}</td></tr>`;
+  okno("Harmonogram odblokowań", `<p>Tydzień, od którego drużyny mogą korzystać z elementu. Zmienić można tylko to, co jeszcze się
+      nie odblokowało, i najwcześniej na bieżący tydzień (${S.p.gra.runda}). Tydzień ${WYLACZONE()} – element wyłączony w tej grze.</p>
+    ${grupy.map((g) => `<div class="tabela-tytul">${esc(g)}</div><div class="tab-wrap"><table class="t"><tbody>${el.filter((e) => e.grupa === g).map(wiersz).join("")}</tbody></table></div>`).join("")}`,
+  { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button><button class="btn pom" data-akcja="zapisz-odblokowanie">Zapisz</button>` });
 }
 
 // --- Drużyny: skład (1–4 uczniów), nowe konta i hasła ------------------------------------------------------------
@@ -221,6 +242,17 @@ async function wykonaj(akcja, el) {
     await api(`${URL_GRY}/prowadzenie`, "POST", { harmonogram });
     zamknijOkno();
     toast(harmonogram.length ? "Harmonogram zapisany." : "Harmonogram usunięty – rundy zamykasz sam(a).");
+    return wczytaj();
+  }
+  if (akcja === "odblokowanie") return edytujOdblokowanie();
+  if (akcja === "zapisz-odblokowanie") {
+    const stare = Object.fromEntries(S.p.prowadzenie.odblokowanie.map((e) => [e.klucz, e.tydzien]));
+    const odblokowanie = Object.fromEntries([...document.querySelectorAll(".tydz-mg:not([disabled])")]
+      .map((i) => [i.dataset.k, +i.value]).filter(([k, t]) => t !== stare[k]));
+    if (!Object.keys(odblokowanie).length) { zamknijOkno(); return toast("Bez zmian."); }
+    await api(`${URL_GRY}/prowadzenie`, "POST", { odblokowanie });
+    zamknijOkno();
+    toast("Harmonogram odblokowań zapisany.");
     return wczytaj();
   }
   if (akcja === "odswiez") return wczytaj();
