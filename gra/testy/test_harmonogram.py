@@ -22,11 +22,6 @@ def test_domyslny_harmonogram():
         assert g.dane.odblokowane(r) == stare, r
     assert hm.baza(g.dane) is dane and g.dane.nadpisane_rundy == {}
     assert all(e["tydzien"] == e["domyslny"] for e in hm.widok(g.dane, 1))
-    # gra bez lokali liczy się na wspólnych danych
-    g2 = _gra(lokale=False)
-    assert g2.dane is dane and hm.widok(g2.dane, 1) == []
-    with pytest.raises(ValueError):
-        g2.ustaw_odblokowanie({"handel": 2})
 
 
 def test_zmiany_mistrza_gry():

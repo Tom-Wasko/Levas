@@ -17,8 +17,7 @@ from pathlib import Path
 from . import harmonogram as hm
 from .dane import Dane, dane_domyslne
 from .kandydaci import pula_startowa
-from .lokale import tryb_lokali
-from .model import Firma, StanGry, Stanowisko, firma_z_slownika
+from .model import Firma, StanGry, firma_z_slownika
 
 WERSJA_SILNIKA = "1.2"  # 1.1: kwoty w groszach; 1.2: lokale na mapie miasta
 
@@ -35,6 +34,8 @@ class Gra:
     def nowa(cls, nazwa: str, firmy: list[tuple[str, str | None]], liczba_rund: int | None = None,
              ziarno: int | str | None = None, dane: Dane | None = None, **opcje) -> Gra:
         dane = dane or dane_domyslne()
+        if dane.mapa is None:
+            raise ValueError("Dane bez mapy miasta – gra bez lokali (tryb REVAS) nie jest już obsługiwana.")
         konf = {"nazwa": nazwa, "ziarno": ziarno if ziarno is not None else secrets.randbelow(10**9),
                 "liczba_rund": liczba_rund or dane.katalog_ofert["rundy"]["domyslna_liczba"],
                 "firmy": [{"nazwa": n, "bot": b, **({"poziom": opcje["poziomy"][n]} if b and n in opcje.get("poziomy", {})
@@ -42,11 +43,10 @@ class Gra:
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "jednoczesnie"),
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,
-                # lokale z mapy miasta (dane/mapa); bez nich – jeden gotowy lokal na start (jak w REVAS)
-                "lokale": bool(opcje.get("lokale", dane.mapa is not None)) and dane.mapa is not None}
+                "lokale": True}   # lokale z mapy miasta (dane/mapa); zapisy bez tego klucza – stary tryb REVAS
         if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych
             konf["kapital_startowy"] = float(opcje["kapital_startowy"])
-        if opcje.get("odblokowanie") and konf["lokale"]:   # mistrz gry może zmienić tygodnie odblokowań
+        if opcje.get("odblokowanie"):   # mistrz gry może zmienić tygodnie odblokowań
             konf["odblokowanie"] = hm.sprawdz_zmiany(dane, opcje["odblokowanie"], {}, 1, konf["liczba_rund"])
         return cls(konf, {}, dane)
 
@@ -75,12 +75,7 @@ class Gra:
         kapital = self.kapital_startowy
         firmy = {f["nazwa"]: Firma(nazwa=f["nazwa"], bot=f["bot"], nazwa_wyswietlana=f["nazwa"], gotowka=kapital)
                  for f in self.konfiguracja["firmy"]}
-        # gra bez lokali: gotowy lokal ze stanowiskami i sprzętem na start (katalog.yaml: stanowiska.startowe),
-        # bez kosztu; w grze z lokalami drużyna zaczyna bez lokalu
-        for f in ([] if tryb_lokali(self.dane, self.konfiguracja) else firmy.values()):
-            for st in self.dane.katalog_ofert["stanowiska"].get("startowe", []):
-                f.stanowiska.append(Stanowisko(nr=len(f.stanowiska_typu(st["typ"])) + 1, typ=st["typ"],
-                                               sprzet=dict(st["sprzet"])))
+        # drużyna zaczyna bez lokalu – wybiera go z mapy miasta w rundzie przygotowawczej
         imp = self.konfiguracja.get("import")
         if imp:
             for nazwa, d in imp.get("firmy", {}).items():
@@ -183,7 +178,7 @@ class Gra:
 
     def ustaw_odblokowanie(self, zmiany: dict) -> None:
         """Mistrz gry zmienia tygodnie odblokowań ({element: tydzień}) – tylko elementy jeszcze zablokowane."""
-        if not tryb_lokali(self.dane, self.konfiguracja):
+        if not self.konfiguracja.get("lokale"):
             raise ValueError("Harmonogram odblokowań jest tylko w grze z lokalami.")
         nowe = hm.sprawdz_zmiany(self.dane, zmiany, self.konfiguracja.get("odblokowanie") or {}, self.runda,
                                  self.konfiguracja["liczba_rund"])

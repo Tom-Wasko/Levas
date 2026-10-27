@@ -207,7 +207,7 @@ def _wyprowadzka(dane: Dane, s: StanGry, nazwa: str, umowa: Lokal, runda: int, z
     if umowa.naklady > 0 and umowa.ulepszenia == "zatrzymaj":
         kwota = round(umowa.naklady * z["ulepszenia_zwrot"], 2)
         st_trwale.zakup(dane, wlasciciel, ks_w, rach_w, f"Rozliczenie ulepszeń lokalu: {adres}", f"Ulepszenia: {adres}",
-                        "lokal", kwota, runda, True)
+                        "lokal", kwota, runda)
         ksieguj(najemca, ks_n, rach_n, f"Rozliczenie ulepszeń lokalu: {adres}", kwota, "przychod_pozostaly")
         info["rozliczenie"] = kwota
     elif umowa.naklady > 0:

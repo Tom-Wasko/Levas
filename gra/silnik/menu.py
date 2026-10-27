@@ -11,9 +11,9 @@ import math
 
 from . import swiezosc as sw
 from .dane import KUCHNIA, Dane
+from .jakosc import mnoznik_jakosci
 from .model import Firma
 from .operacje import sztuki_sprzetu
-from .rynek import mnoznik_jakosci
 
 EPS = 1e-9
 

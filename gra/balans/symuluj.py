@@ -2,8 +2,8 @@
 grają na jednym poziomie; wypisuje gotówkę, średni wynik działalności, lokale, pracowników,
 przeterminowany towar i sprzedaż/popyt ostatniej rundy.
 
-    python -X utf8 balans_botow.py [rundy] [poziomy po przecinku] [ziarna po przecinku]
-    python -X utf8 balans_botow.py 12 latwy,sredni,trudny 7,11,23
+    python -X utf8 -m balans.symuluj [rundy] [poziomy po przecinku] [ziarna po przecinku]
+    python -X utf8 -m balans.symuluj 12 latwy,sredni,trudny 7,11,23
 """
 import sys
 import time

@@ -191,7 +191,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         dzienne = {u: {"popyt": [0] * len(dni), "sprzedaz": [0] * len(dni)} for lok in lokale for u in lokale[lok]}
         lokale_wynik, przyczyny = [], {}
         laczna = {"obsluzeni": {}, "utracona": {}, "reklamacje": {}, "zuzyte_zasoby": {}, "godziny_stanowisk": {},
-                  "godziny_recepcji": 0.0, "liczba_recepcjonistow": 0, "godziny_sprzetu": {}}
+                  "godziny_kasy": 0.0, "liczba_kasjerow": 0, "godziny_sprzetu": {}}
         dzien_popyt = {lok: [{u: int(round(pod[(f, lok)][u]["porcje"][i])) for u in dania} for i in range(len(dni))]
                        for lok, dania in lokale.items()}
         promo = None
@@ -244,13 +244,13 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                 for klucz in ("godziny_stanowisk", "godziny_sprzetu"):
                     for k, h in o[klucz].items():
                         laczna[klucz][k] = laczna[klucz].get(k, 0.0) + h
-                laczna["godziny_recepcji"] += o["godziny_recepcji"]
+                laczna["godziny_kasy"] += o["godziny_kasy"]
             if firma.partie:
                 _dodaj_straty(raport, sw.wyrzuc(firma, dzien), i, len(dni))
                 raport["zajetosc"].append(sw.zajete(dane, firma, dzien))
         sw.uzgodnij(firma)
         swiezosc[f] = _zakoncz_raport(raport)
-        laczna["liczba_recepcjonistow"] = sum(len(kasjerzy(dane, v)) for v in widoki.values())
+        laczna["liczba_kasjerow"] = sum(len(kasjerzy(dane, v)) for v in widoki.values())
         laczna["przyczyna"] = {u: max(p, key=p.get) for u, p in przyczyny.items()}
         for u in dzienne:
             laczna["obsluzeni"].setdefault(u, 0)

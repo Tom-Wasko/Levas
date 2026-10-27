@@ -196,7 +196,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
     # (gra ATH: luty i maj – zużycie napoju = popyt + ok. 0,5%, a nie sprzedaż)
     rec = kasjerzy(dane, firma)
     godz_rec = len(rec) * godz_prac
-    potrzebne_rec = sum(obsluzeni[u] * dane.uslugi[u]["godziny_recepcji"] for u in popyt)
+    potrzebne_rec = sum(obsluzeni[u] * dane.uslugi[u]["godziny_kasy"] for u in popyt)
     if potrzebne_rec > godz_rec + EPS:
         skala = godz_rec / potrzebne_rec if potrzebne_rec else 0.0
         for u in popyt:
@@ -226,7 +226,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
                 for s in maja:
                     klucz = f"{s.nr}|{nazwa}"
                     sprzet_godz[klucz] = sprzet_godz.get(klucz, 0.0) + godz_u / len(maja)
-    zajete_rec = sum(obsluzeni[u] * dane.uslugi[u]["godziny_recepcji"] for u in obsluzeni)
+    zajete_rec = sum(obsluzeni[u] * dane.uslugi[u]["godziny_kasy"] for u in obsluzeni)
 
     return {
         "obsluzeni": obsluzeni,
@@ -235,8 +235,8 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
         "reklamacje": reklamacje,
         "zuzyte_zasoby": zuzyte,
         "godziny_stanowisk": {s.nr: godz_stanowisk[i] for i, s in enumerate(stanowiska)},
-        "godziny_recepcji": zajete_rec,
-        "liczba_recepcjonistow": len(rec),
+        "godziny_kasy": zajete_rec,
+        "liczba_kasjerow": len(rec),
         "godziny_sprzetu": sprzet_godz,
     }
 

@@ -41,13 +41,12 @@ def test_dzialka_grunt_bez_amortyzacji_budynek_po_budowie():
 def test_zakup_od_progu_i_sprzedaz():
     dane = dane_domyslne()
     f, ks, rach = Firma(nazwa="A", gotowka=50000), Ksiega(), Rachunek()
-    st.zakup(dane, f, ks, rach, "Koszt zakupu: Piec", "Piec", "sprzet", 12000, 3, lokale=True)
-    st.zakup(dane, f, ks, rach, "Koszt zakupu: Krzesło", "Krzesło", "wyposazenie", 300, 3, lokale=True)
-    st.zakup(dane, f, ks, rach, "Koszt zakupu: Piec 2", "Piec 2", "sprzet", 12000, 3, lokale=False)   # gra Revas
-    assert [p["opis"] for p in ks.pozycje] == ["Koszt zakupu: Krzesło", "Koszt zakupu: Piec 2"]
-    assert f.gotowka == pytest.approx(50000 - 24300) and [s.nazwa for s in f.srodki_trwale] == ["Piec"]
+    st.zakup(dane, f, ks, rach, "Koszt zakupu: Piec", "Piec", "sprzet", 12000, 3)
+    st.zakup(dane, f, ks, rach, "Koszt zakupu: Krzesło", "Krzesło", "wyposazenie", 300, 3)   # poniżej progu
+    assert [p["opis"] for p in ks.pozycje] == ["Koszt zakupu: Krzesło"]
+    assert f.gotowka == pytest.approx(50000 - 12300) and [s.nazwa for s in f.srodki_trwale] == ["Piec"]
     st.amortyzuj(dane, f, 3, ks)
-    assert len(ks.pozycje) == 2                                         # w rundzie zakupu bez odpisu
+    assert len(ks.pozycje) == 1                                         # w rundzie zakupu bez odpisu
     st.amortyzuj(dane, f, 4, ks)
     assert ks.pozycje[-1]["pozostale"] == pytest.approx(round(12000 * 0.2 / dane.rund_w_roku, 2))
     assert st.sprzedaj(f, "Piec", ks) and not st.sprzedaj(f, "Piec", ks)

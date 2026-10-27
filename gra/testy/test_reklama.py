@@ -146,7 +146,6 @@ def test_gra_kampania_popyt_wyniki_i_bledy(monkeypatch):
     assert [b["tekst"] for b in w["lista_bledow"] if b["zakladka"] == rk.ZAKLADKA] == [
         "Ulotki za wycieraczki (Drukarnia „Papier Przyjmie”): wybierz strefę."]
     assert not any(p["opis"].startswith("Reklama tradycyjna") for p in w["kpir"]["pozycje"])   # bez reklamy z Revasa
-    assert w["reklama"] == {"tradycyjna": 0.0, "internetowa": 0.0}
     assert s.rynek[3]["kampanie"]["A"]["wydatki"] == ra["zamowione"][0]["koszt"] and "B" not in s.rynek[3]["kampanie"]
     s = g.przelicz(wymus=True)
     assert s.wyniki[4]["A"]["reklama_agencje"]["kampanie"][0]["faza"] == "wygasa"
@@ -177,5 +176,3 @@ def test_widok_api_i_gra_bez_lokali():
     assert kanaly["ulotki"]["dostepny"] and not kanaly["influencer"]["dostepny"]
     assert kanaly["ulotki"]["trwa"] == [] and kanaly["radio"]["koszty"] == {"miasto": kanaly["radio"]["koszty"]["miasto"]}
     assert [x["faza"] for x in r["trwajace"]] == ["trwa"]
-    v = widok(_gra(lokale=False), "A")
-    assert "reklama" not in v

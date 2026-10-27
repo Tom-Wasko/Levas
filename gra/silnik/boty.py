@@ -34,16 +34,10 @@ from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .dostawcy import ceny_rundy
 from .finanse import Ksiega, Rachunek
+from .jakosc import mnoznik_wyposazenia
 from .losowosc import strumien
 from .model import Firma, StanGry
-from .planowanie import (
-    godziny_uslugi,
-    kasjerzy_potrzebni,
-    oczekiwany_popyt,
-    stanowiska_potrzebne,
-    zamowienie_zasobow,
-)
-from .rynek import mnoznik_wyposazenia
+from .planowanie import godziny_uslugi, kasjerzy_potrzebni, stanowiska_potrzebne, zamowienie_zasobow
 
 DOMYSLNY_POZIOM = "sredni"
 
@@ -193,7 +187,7 @@ def _plan_lokalu(dane: Dane, f: Firma, lok_id: str, klienci: dict[str, float], w
     obsada = float((dni * w).sum() / w.sum()) - 1e-6   # sprzęt ma nadążyć za kucharzami
     sztuki = {n: _ile(w, h, op["godziny_sprzetu"], obsada, miejsc_k) for n, h in sprzet.items()}
     stanowisk = min(miejsc_k, max([len(kuchnia), sum(kucharze.values()), *sztuki.values()]))
-    rec = sum(k * dane.uslugi[u]["godziny_recepcji"] for u, k in klienci.items())
+    rec = sum(k * dane.uslugi[u]["godziny_kasy"] for u, k in klienci.items())
     kasjer = (sum(k * marza.get(u, 0.0) for u, k in klienci.items()), osoby.get(dane.zawody_typu(KASA)[0], 0.0))
     kasjerzy = min(miejsc_r, max(1 if klienci else 0, _ile(w, rec, godz, cel, miejsc_r, kasjer)))
     dni = np.minimum(dni, _czesc_dni(w, rec, kasjerzy * godz))
@@ -311,13 +305,12 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     rundy = dane.katalog_ofert["rundy"]
     odbl = dane.odblokowane(runda)
     d: dict = {"zatrudnij": [], "sprzet_kup": [], "zamowienia": []}
-    lokale = lk.tryb_lokali(dane, konf)
-    pz = poziom(dane, konf, nazwa) if lokale else {}
-    planuje = pz.get("planowanie", "przepustowosc") == "przepustowosc" and lokale and dane.mapa.get("popyt")
+    pz = poziom(dane, konf, nazwa)
+    planuje = pz.get("planowanie", "przepustowosc") == "przepustowosc" and dane.mapa.get("popyt")
     # wszystkie lokale z wypowiedzianym najmem (nowy właściciel budynku, silnik/przejecia.py) – szuka nowego
-    wyprowadzka = lokale and f.lokale and all(x.najem_do is not None for x in f.lokale) \
+    wyprowadzka = f.lokale and all(x.najem_do is not None for x in f.lokale) \
         and runda >= lk.runda_nowego_lokalu(dane, f)
-    if lokale and (not f.lokale or wyprowadzka):
+    if not f.lokale or wyprowadzka:
         # bez lokalu: najem gotowego lokalu; dalsze decyzje liczone tak, jakby lokal już był (przegrany spór o lokal
         # – stanowiska odrzucone, ponowna próba w następnej rundzie)
         d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf,
@@ -327,14 +320,11 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         if d["lokal"] is not None:
             f = deepcopy(f)
             lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
-    miejsca = lk.wolne_miejsca(dane, f, runda) if lokale else None
+    miejsca = lk.wolne_miejsca(dane, f, runda)
     if not f.bank:
-        d["bank"] = bk.najlepsze(dane)["konto"] if lokale else \
-            min(dane.dostepne("banki", runda).values(), key=lambda b: b["konto"] + b["karta"])["nazwa"]
-    if lokale and not (f.biuro and bo.poprawny_wybor(dane, f.biuro)):   # biura z mapy – najtańsze dla typowej rundy
+        d["bank"] = bk.najlepsze(dane)["konto"]
+    if not (f.biuro and bo.poprawny_wybor(dane, f.biuro)):   # biura z mapy – najtańsze dla typowej rundy
         d["biuro"] = bo.najtansze(dane, bo.ustawienia(dane)["szacunek_dokumentow"], 4, 0)
-    elif not f.biuro:
-        d["biuro"] = min(dane.pozycje("biura_rachunkowe").values(), key=lambda b: b["etat"])["nazwa"]
 
     # usługi: start z usługami startowymi, potem po 3 nowe aż do celu
     oferta = list(f.oferta) or list(rundy["uslugi_startowe"])
@@ -345,76 +335,65 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             if u not in oferta:
                 oferta.append(u)
 
-    # oczekiwany popyt w rundzie, w której usługi będą sprzedawane (runda 1 planuje rundę 2)
-    m_sprz = dane.miesiac_rundy(max(runda, 2))
-    pub = stan.rynek.get(runda - 1, {})
+    # popyt strefowy w rundzie sprzedaży (runda 1 planuje rundę 2): prognoza dla własnych lokali przy cenach
+    # konkurencji z poprzedniej rundy
     wyp = mnoznik_wyposazenia(dane, f.wyposazenie)
-    ceny, klienci = {}, {}
-    for u in oferta:
-        ceny[u] = _cena(dane, st, stan, u, runda)
-        inni = pub.get("ceny", {}).get(u, {})
-        n = 1 + len([x for x in inni if x != nazwa])
-        r_inni = [c / dane.uslugi[u]["cena_preferowana"] for x, c in inni.items() if x != nazwa]
-        r_sr = (sum(r_inni) + ceny[u] / dane.uslugi[u]["cena_preferowana"]) / (len(r_inni) + 1)
-        klienci[u] = oczekiwany_popyt(dane, u, m_sprz, ceny[u], (q, q, q), n, r_sr, wyp) * st["pokrycie"]
+    ceny = {u: _cena(dane, st, stan, u, runda) for u in oferta}
     szczyt, udzialy_dni, plan = 1.0, None, None
-    if lokale:  # popyt strefowy: prognoza dla własnych lokali przy cenach konkurencji z poprzedniej rundy
-        r_sprz = max(runda, 2)
-        konkurencja = pp.oferty_konkurencji(dane, stan, r_sprz, nazwa)
-        korekta = _korekta_prognozy(stan, nazwa, runda, pz["korekta_prognozy"]) if pz.get("korekta_prognozy") else 1.0
-        blad = pz.get("blad_prognozy", 0)
-        if blad:   # łatwy: prognoza „na oko”
-            korekta *= 1 + float(strumien(konf["ziarno"], runda, "bot", nazwa, "prognoza").uniform(-blad, blad))
+    r_sprz = max(runda, 2)
+    konkurencja = pp.oferty_konkurencji(dane, stan, r_sprz, nazwa)
+    korekta = _korekta_prognozy(stan, nazwa, runda, pz["korekta_prognozy"]) if pz.get("korekta_prognozy") else 1.0
+    blad = pz.get("blad_prognozy", 0)
+    if blad:   # łatwy: prognoza „na oko”
+        korekta *= 1 + float(strumien(konf["ziarno"], runda, "bot", nazwa, "prognoza").uniform(-blad, blad))
 
-        def prognoza_cen(c: dict[str, float]) -> tuple[dict, dict]:
-            prog = _prognoza_lokali(dane, f, nazwa, oferta, c, q, wyp, konkurencja, r_sprz)
-            lok = {x: {u: n * korekta * st["pokrycie"] for u, n in dania.items()} for x, dania in prog["lokale"].items()}
-            return prog, lok
+    def prognoza_cen(c: dict[str, float]) -> tuple[dict, dict]:
+        prog = _prognoza_lokali(dane, f, nazwa, oferta, c, q, wyp, konkurencja, r_sprz)
+        lok = {x: {u: n * korekta * st["pokrycie"] for u, n in dania.items()} for x, dania in prog["lokale"].items()}
+        return prog, lok
 
-        prog, prog_lok = prognoza_cen(ceny)
-        if planuje:
-            osoby = {z: _koszt_pracy(dane, stan, z, pz.get("narzut_pracy", 1.0)) for z in dane.zawody}
+    prog, prog_lok = prognoza_cen(ceny)
+    if planuje:
+        osoby = {z: _koszt_pracy(dane, stan, z, pz.get("narzut_pracy", 1.0)) for z in dane.zawody}
 
-            def ekonomia(c: dict[str, float]) -> dict:
-                return {"cel": pz.get("cel_obslugi", 1.0), "osoby": osoby,
-                        "marza": {u: c[u] - mn.koszt_porcji(dane, f, u) for u in c}}
+        def ekonomia(c: dict[str, float]) -> dict:
+            return {"cel": pz.get("cel_obslugi", 1.0), "osoby": osoby,
+                    "marza": {u: c[u] - mn.koszt_porcji(dane, f, u) for u in c}}
 
-            plan = _plan_firmy(dane, f, prog_lok, r_sprz, runda, ekonomia(ceny))
-            if pz.get("mnozniki_ceny") and "sprzedaz" in odbl:   # trudny: cena o największej oczekiwanej marży
-                najlepsza = (_marza(dane, plan, ekonomia(ceny)), ceny, prog, prog_lok, plan)
-                for m in pz["mnozniki_ceny"]:
-                    c = {u: _cena(dane, st, stan, u, runda, m) for u in oferta}
-                    if c == ceny:
-                        continue
-                    pr, pl = prognoza_cen(c)
-                    pn = _plan_firmy(dane, f, pl, r_sprz, runda, ekonomia(c))
-                    if (mz := _marza(dane, pn, ekonomia(c))) > najlepsza[0]:
-                        najlepsza = (mz, c, pr, pl, pn)
-                _, ceny, prog, prog_lok, plan = najlepsza
-            drugi = pz.get("kolejny_lokal")
-            if drugi and "lokal" not in d and plan["lokale"] \
-                    and all(p["czesc"] < drugi["obsluga"] for p in plan["lokale"].values()) \
-                    and f.gotowka > drugi["gotowka"] and len(f.lokale) < drugi["maks_lokali"] \
-                    and runda >= lk.runda_nowego_lokalu(dane, f) and all(x.dziala_od <= runda for x in f.lokale):
-                d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0))
-                if d["lokal"] is None:
-                    d.pop("lokal")
-                else:
-                    f = deepcopy(f)
-                    lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
-                    prog, prog_lok = prognoza_cen(ceny)
-                    plan = _plan_firmy(dane, f, prog_lok, r_sprz, runda, ekonomia(ceny))
-            _zatrudnieni(f, plan)
-            klienci = {u: plan["sprzedaz"].get(u, 0.0) for u in oferta}   # zamówienia: tyle, ile kuchnia sprzeda
-            udzialy_dni = plan["dni"]
-        else:
-            klienci = {u: prog["dania"].get(u, 0.0) * korekta * st["pokrycie"] for u in oferta}
-            udzialy_dni = prog["dni"] or None
-            szczyt = max([pp.szczyt(dane, dane.lokale[x]["strefa"], r_sprz) for x in prog_lok] or [1.0])
-        prognoza_dan = {u: sum(x.get(u, 0.0) for x in prog_lok.values()) / st["pokrycie"] for u in oferta}
-        d["oferta"] = {u: int(round(prognoza_dan[u])) for u in oferta}
+        plan = _plan_firmy(dane, f, prog_lok, r_sprz, runda, ekonomia(ceny))
+        if pz.get("mnozniki_ceny") and "sprzedaz" in odbl:   # trudny: cena o największej oczekiwanej marży
+            najlepsza = (_marza(dane, plan, ekonomia(ceny)), ceny, prog, prog_lok, plan)
+            for m in pz["mnozniki_ceny"]:
+                c = {u: _cena(dane, st, stan, u, runda, m) for u in oferta}
+                if c == ceny:
+                    continue
+                pr, pl = prognoza_cen(c)
+                pn = _plan_firmy(dane, f, pl, r_sprz, runda, ekonomia(c))
+                if (mz := _marza(dane, pn, ekonomia(c))) > najlepsza[0]:
+                    najlepsza = (mz, c, pr, pl, pn)
+            _, ceny, prog, prog_lok, plan = najlepsza
+        drugi = pz.get("kolejny_lokal")
+        if drugi and "lokal" not in d and plan["lokale"] \
+                and all(p["czesc"] < drugi["obsluga"] for p in plan["lokale"].values()) \
+                and f.gotowka > drugi["gotowka"] and len(f.lokale) < drugi["maks_lokali"] \
+                and runda >= lk.runda_nowego_lokalu(dane, f) and all(x.dziala_od <= runda for x in f.lokale):
+            d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0))
+            if d["lokal"] is None:
+                d.pop("lokal")
+            else:
+                f = deepcopy(f)
+                lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
+                prog, prog_lok = prognoza_cen(ceny)
+                plan = _plan_firmy(dane, f, prog_lok, r_sprz, runda, ekonomia(ceny))
+        _zatrudnieni(f, plan)
+        klienci = {u: plan["sprzedaz"].get(u, 0.0) for u in oferta}   # zamówienia: tyle, ile kuchnia sprzeda
+        udzialy_dni = plan["dni"]
     else:
-        d["oferta"] = {u: int(round(klienci[u] / st["pokrycie"])) for u in oferta}
+        klienci = {u: prog["dania"].get(u, 0.0) * korekta * st["pokrycie"] for u in oferta}
+        udzialy_dni = prog["dni"] or None
+        szczyt = max([pp.szczyt(dane, dane.lokale[x]["strefa"], r_sprz) for x in prog_lok] or [1.0])
+    prognoza_dan = {u: sum(x.get(u, 0.0) for x in prog_lok.values()) / st["pokrycie"] for u in oferta}
+    d["oferta"] = {u: int(round(prognoza_dan[u])) for u in oferta}
     if "sprzedaz" in odbl:
         d["sprzedaz"] = {u: {"cena": ceny[u], "rabat": 0} for u in oferta}
 
@@ -427,7 +406,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
 
     # zatrudnienie (od rundy 2): stanowiska bez pracownika, które mają (albo dostają) sprzęt
     if "hr_zatrudnienie" in odbl:
-        pula = kandydaci_firmy(rp.widoczni(dane, stan.kandydaci, runda) if lokale else stan.kandydaci, stan.firmy[nazwa])
+        pula = kandydaci_firmy(rp.widoczni(dane, stan.kandydaci, runda), stan.firmy[nazwa])
         rng = strumien(konf["ziarno"], runda, "bot", nazwa)
         if plan is None:
             obsada = {o["nr"]: o["zawod"] for o in d.pop("_obsada", [])}
@@ -440,8 +419,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             cele = [(KUCHNIA, nr, zawod) for nr, zawod in sorted(obsada.items())]
             cele += [(KASA, s.nr, kasjer) for s in rec if not s.pracownik]
             cele += [(KASA, f.nowy_nr(KASA) + i, kasjer) for i in range(d["stanowiska"][KASA])]
-        if lokale:  # agencja pracy: najwyżej limit nowych na rundę, resztę bot zatrudni w kolejnych
-            cele = cele[: rp.ustawienia(dane)["limit_nowych"]]
+        cele = cele[: rp.ustawienia(dane)["limit_nowych"]]   # agencja pracy: limit nowych, reszta w kolejnych
         for typ, nr, zawod in cele:
             kandydaci = [k for k in pula if k["zawod"] == zawod]
             if not kandydaci:
@@ -471,28 +449,24 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if "hr_udogodnienia" in odbl and bufor:
         d["udogodnienia_kup"] = [p["nazwa"] for p in sorted(dane.pozycje("udogodnienia").values(), key=lambda p: p["cena"] / p["procent"])
                                  if p["od_rundy"] <= runda and p["nazwa"] not in f.udogodnienia][:max(0, st["udogodnienia"] - len(f.udogodnienia))]
-    agencje = lokale and rk.zasady(dane) is not None   # gra z lokalami: kampanie agencji zamiast reklamy z Revasa
+    agencje = rk.zasady(dane) is not None   # kampanie agencji reklamowych
     reklamuje = pz.get("kampanie", True)
     if plan is not None and pz.get("obsluga_kampanii") is not None:   # trudny: reklama tylko z wolną kuchnią
         reklamuje = reklamuje and all(p["czesc"] >= pz["obsluga_kampanii"] for p in plan["lokale"].values())
     if agencje:
         d["kampanie"] = _kampanie(dane, f, st, runda, ust) if reklamuje else []
     poprzednie = stan.wyniki.get(runda - 1, {}).get(nazwa)
-    if lokale and (promo := _promocje(dane, f, st, runda, d, bufor, poprzednie, ust)) is not None:
+    if (promo := _promocje(dane, f, st, runda, d, bufor, poprzednie, ust)) is not None:
         d["promocje"] = promo if pz.get("promocje", True) else []
-    if "marketing_tradycyjny" in odbl and bufor and not agencje:
-        d["reklama_tradycyjna"] = {n: e for n, e in st["reklama"].items() if n in dane.dostepne("media_tradycyjne", runda)}
-    if "marketing_internetowy" in odbl and bufor and not agencje:
-        d["internet_uruchom"] = [n for n in st["internet"] if n not in f.internet and n in dane.dostepne("narzedzia_internetowe", runda)]
     if "hr_szkolenia" in odbl and bufor and st["szkolenia"]:
         szk = dane.katalog_ofert["szkolenia"]
         najlepsze = sorted(szk["pozycje"], key=lambda p: -p["procent"])[:st["szkolenia"]]
         d["szkolenia"] = [{"firma": szk["firmy"][1]["nazwa"], "szkolenie": p["nazwa"]} for p in najlepsze]
-    if lokale and dane.zdarzenia:   # eventy w parkach: losowa opcja (najwyżej 3 h właściciela)
+    if dane.zdarzenia:   # eventy w parkach: losowa opcja (najwyżej 3 h właściciela)
         d["zdarzenia"] = zd.wybor_bota(dane, f, runda, konf["ziarno"])
-    if lokale and aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
+    if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
         d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
-    if lokale and st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
+    if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
         d["higiena"] = st["higiena"]
     return d
 

@@ -13,8 +13,6 @@ from silnik.finanse import Ksiega, Rachunek, bank_koniec_miesiaca, bank_poczatek
 from silnik.karta import karta, wskaznik_zadluzenia  # noqa: E402
 from silnik.model import Firma, Pracownik, Stanowisko  # noqa: E402
 from silnik.operacje import obsluz  # noqa: E402
-from silnik.planowanie import oczekiwany_popyt  # noqa: E402
-from silnik.rynek import koszt_emisji, wzrost_reklamy_internetowej, wzrost_reklamy_tradycyjnej  # noqa: E402
 
 D = Dane(KATALOG_REVAS)  # dane gry REVAS (fitness): testy liczą na liczbach z prawdziwych gier
 
@@ -43,7 +41,7 @@ def test_oblozenie_instruktora_i_recepcji_druzyna_c():
     w = obsluz(D, f, {"step": 392, "tbc": 340, "zumba": 212}, ziarno=1, runda=3)
     assert w["obsluzeni"] == {"step": 392, "tbc": 340, "zumba": 212}
     assert w["godziny_stanowisk"][1] / 160 == pytest.approx(0.803, abs=0.001)
-    assert w["godziny_recepcji"] / 160 == pytest.approx(0.472, abs=0.001)
+    assert w["godziny_kasy"] / 160 == pytest.approx(0.472, abs=0.001)
 
 
 def test_zuzycie_zasobow_na_klienta():
@@ -99,36 +97,9 @@ def test_lokata_i_kredyt():
     assert kredyt[0]["pozostale"] == pytest.approx(0.83, abs=0.01)   # kredyt 100 PLN / 1 mies. / 10%
 
 
-def test_koszt_emisji_i_reklama():
-    media = D.pozycje("media_tradycyjne")
-    assert koszt_emisji(media["Głos Miasta (dziennik)"], 8) == pytest.approx(4420)       # przykład z instrukcji
-    assert koszt_emisji(media["Fitness TV"], 3) == pytest.approx(72000)                  # KPiR ATH lipiec
-    czerwiec = {"Ulotki": 20, "Ekrany LED": 11, "Billboard (tradycyjny)": 11, "Super Fit (dziennik)": 14,
-                "Głos Miasta (dziennik)": 14, "Newsy Miasta (dziennik)": 14, "Radio Fakty": 21, "Fit FM": 21, "Radio City": 21}
-    assert wzrost_reklamy_tradycyjnej(D, czerwiec) == pytest.approx(0.4936, abs=0.03)    # ATH: +49,36%
-
-
-def test_popyt_ath_luty():
-    # ATH, luty: step po 35 PLN (pref. 40) przy 3 firmach (pozostałe 44 i 43 PLN) → popyt 740.
-    # Wspólna kalibracja z grą A/B/C online zawyża luty ATH o ok. 12% (różnica między grami – patrz
-    # POROWNANIE_ABC.md), stąd tolerancja 15%.
-    r_sr = (35 / 40 + 44 / 40 + 43 / 40) / 3
-    p = oczekiwany_popyt(D, "step", 1, 35, (3, 3, 3), 3, r_sr)
-    assert p == pytest.approx(740, rel=0.15)
-
-
-def test_popyt_abc_marzec():
-    # gra A/B/C online, marzec: bodybuilding drużyny A po 108,50 PLN (pref. 155), 5 firm (155; 108,5; 111,11; 150)
-    # → popyt 911; sprzęt i zasoby 3★
-    ceny = [108.5, 155, 108.5, 111.11, 150]
-    r_sr = sum(c / 155 for c in ceny) / 5
-    p = oczekiwany_popyt(D, "bodybuilding", 2, 108.5, (2.4, 3, 3), 5, r_sr)
-    assert p == pytest.approx(911, rel=0.10)
-
-
 def test_deterministycznosc_i_zapis(tmp_path):
     def gra():
-        g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "agresywny")], liczba_rund=4, ziarno=7, dane=D)
+        g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "agresywny")], liczba_rund=4, ziarno=7)
         for _ in range(4):
             g.przelicz()
         return g
@@ -136,26 +107,8 @@ def test_deterministycznosc_i_zapis(tmp_path):
     assert g1.stan(4).wyniki[4]["A"]["kpir"] == g2.stan(4).wyniki[4]["A"]["kpir"]
     plik = tmp_path / "gra.json"
     g1.zapisz(plik)
-    g3 = Gra.wczytaj(plik, D)
+    g3 = Gra.wczytaj(plik)
     assert g3.stan(4).firmy["B"].gotowka == g1.stan(4).firmy["B"].gotowka
-
-
-def test_reklama_tradycyjna_nasyca_sie_w_medium():
-    # ATH (eksperymenty rund 9–12): 60 ulotek +4,18%, 20 ulotek +3,48%, 2 × Fitness TV +6,8%, brak reklamy 0
-    assert wzrost_reklamy_tradycyjnej(D, {"Ulotki": 60}) == pytest.approx(0.0418, abs=0.01)
-    assert wzrost_reklamy_tradycyjnej(D, {"Ulotki": 20}) == pytest.approx(0.0348, abs=0.01)
-    assert wzrost_reklamy_tradycyjnej(D, {"Fitness TV": 2}) == pytest.approx(0.068, abs=0.015)
-    assert wzrost_reklamy_tradycyjnej(D, {}) == 0
-
-
-def test_reklama_internetowa_to_udzial_w_narzedziach():
-    # ATH: 5 z 7 narzędzi na rynku +12,7%, 6 z 12 +7,6%, 1 z 11 +0,14%; wyłączone narzędzia – 0
-    piec = {f"n{i}": 6 for i in range(5)}
-    assert wzrost_reklamy_internetowej(D, piec, 6, 7) == pytest.approx(0.127, abs=0.015)
-    assert wzrost_reklamy_internetowej(D, {f"n{i}": 6 for i in range(6)}, 8, 12) == pytest.approx(0.076, abs=0.012)
-    # przy bardzo małym udziale model zawyża o ok. 0,3 pkt proc. (0,49% zamiast 0,14%) – błąd dopasowania
-    assert wzrost_reklamy_internetowej(D, {"Instagram": 10}, 10, 11) == pytest.approx(0.0014, abs=0.004)
-    assert wzrost_reklamy_internetowej(D, {}, 9, 8) == 0
 
 
 def test_wskaznik_zadluzenia_ath_pazdziernik():
@@ -185,8 +138,3 @@ def test_brak_zasobu_najpierw_krotsze_zajecia():
     f.magazyn["Napój izotoniczny|3"] = 10          # 240 klientów
     w = obsluz(D, f, {"bodybuilding": 300, "joga": 300}, ziarno=1, runda=6)
     assert w["obsluzeni"]["bodybuilding"] / 300 > w["obsluzeni"]["joga"] / 300
-
-
-def test_wzrost_reklamy_tradycyjnej_maleje_z_kazda_emisja():
-    a, b, c = (wzrost_reklamy_tradycyjnej(D, {"Ulotki": n}) for n in (10, 20, 30))
-    assert 0 < a < b < c and (c - b) < (b - a)

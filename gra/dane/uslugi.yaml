@@ -24,7 +24,7 @@ uslugi:
     - 1.1
     - 1.05
     godziny_prowadzacego: 0.05
-    godziny_recepcji: 0.02
+    godziny_kasy: 0.02
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -46,7 +46,7 @@ uslugi:
     cena_preferowana: 27
     sezonowosc: *id001
     godziny_prowadzacego: 0.06
-    godziny_recepcji: 0.02
+    godziny_kasy: 0.02
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -68,7 +68,7 @@ uslugi:
     cena_preferowana: 23
     sezonowosc: *id001
     godziny_prowadzacego: 0.06
-    godziny_recepcji: 0.02
+    godziny_kasy: 0.02
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -90,7 +90,7 @@ uslugi:
     cena_preferowana: 35
     sezonowosc: *id001
     godziny_prowadzacego: 0.08
-    godziny_recepcji: 0.02
+    godziny_kasy: 0.02
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -125,7 +125,7 @@ uslugi:
     - 1.05
     - 1.0
     godziny_prowadzacego: 0.06
-    godziny_recepcji: 0.02
+    godziny_kasy: 0.02
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -147,7 +147,7 @@ uslugi:
     cena_preferowana: 11.5
     sezonowosc: *id001
     godziny_prowadzacego: 0.04
-    godziny_recepcji: 0.01
+    godziny_kasy: 0.01
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -178,7 +178,7 @@ uslugi:
     - 0.75
     - 0.75
     godziny_prowadzacego: 0.005
-    godziny_recepcji: 0.01
+    godziny_kasy: 0.01
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -196,7 +196,7 @@ uslugi:
     cena_preferowana: 3
     sezonowosc: *id001
     godziny_prowadzacego: 0.005
-    godziny_recepcji: 0.005
+    godziny_kasy: 0.005
     grupa: 1
     prowadzacy: Kucharz
     pensje_rynkowe:
@@ -206,7 +206,7 @@ uslugi:
     sprzet: []
     zasoby:
       Ser i dodatki: 40
-pensje_rynkowe_recepcji:
+pensje_rynkowe_kasy:
   niska: 4850
   srednia: 4950
   wysoka: 5100

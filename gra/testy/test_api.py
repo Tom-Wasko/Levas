@@ -51,11 +51,8 @@ def test_domyslna_gra_tygodniowa(client):
     kal = v["gra"]["kalendarz"]
     assert v["gra"]["liczba_rund"] == 26 and kal["rund_w_roku"] == 52 and len(kal["nazwy"]) == 26
     assert v["miesiac"] == kal["nazwy"][0] and kal["nazwy"][0].startswith("Tydzień 1")
-    # Levas: drużyna zaczyna bez lokalu i wybiera go na mapie; bez lokali – gotowy lokal na start (jak w REVAS)
+    # Levas: drużyna zaczyna bez lokalu i wybiera go na mapie
     assert v["gra"]["lokale"] and v["stan"]["stanowiska"] == [] and v["lokale"]["oferta"]
-    v = client.get(_url(_nowa(client, lokale="nie"), "widok")).json()
-    assert not v["gra"]["lokale"] and "lokale" not in v
-    assert {s["typ"] for s in v["stan"]["stanowiska"]} == {"kuchnia", "kasa"}
 
 
 def test_nowa_gra_walidacja(client):

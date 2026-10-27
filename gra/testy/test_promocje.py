@@ -202,4 +202,3 @@ def test_widok_api_i_gra_bez_lokali():
     assert [(x["typ"], x["nazwa"], x["nowa"]) for x in r["aktywne"]] == [("happy_hours", "Wtorek Cudów", True)]
     assert r["nowe"][0]["typ"] == "happy_hours"
     assert any(p["opis"].startswith(pm.OPIS_STARTU) for p in v["koszty_decyzji"])
-    assert "promocje" not in widok(_gra(lokale=False), "A")

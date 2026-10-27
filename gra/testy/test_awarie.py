@@ -132,4 +132,3 @@ def test_widok_api_i_gra_bez_lokali():
     assert U["decyzja"]["nowe"] == ["lokal"] and U["decyzja"]["skladki"] > 0
     assert any(p["opis"].startswith(aw.SKLADKA) for p in v["koszty_decyzji"])
     assert any(b["zakladka"] == aw.ZAKLADKA for b in v["lista_bledow"])
-    assert "ubezpieczenia" not in widok(_gra(lokale=False), "A")

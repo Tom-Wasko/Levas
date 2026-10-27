@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from .gra import Gra
 
 # decyzje, które drużyna ponawia co rundę (reszta zostaje w stanie firmy albo jest jednorazowa)
-POWTARZANE = ("sprzedaz", "oferta", "zamowienia", "kampanie", "reklama_tradycyjna", "promocje", "polisy",
+POWTARZANE = ("sprzedaz", "oferta", "zamowienia", "kampanie", "promocje", "polisy",
               "higiena")
 
 

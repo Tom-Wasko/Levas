@@ -198,5 +198,12 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   zamówienia, kampanie, reklama, promocje, polisy, higiena – bez jednorazowych), więc podgląd nie zdradza
   roboczych decyzji rywali; API `podglad` korzysta z modułu; zakładka Analiza: opis założenia i wiersz „Towar
   przeterminowany”; test `test_co_jesli.py` (m.in. podgląd = wynik, gdy rywal naprawdę powtarza decyzje)
+- [x] F4.6 Sprzątanie – usunięty tryb „gra bez lokali” (Revas): jedyny tryb to gra z mapą miasta (`Gra.nowa`
+  wymaga danych z mapą, stare zapisy bez lokali – czytelny błąd; tryb do odzyskania z commita `9930e14`);
+  usunięte `silnik/rynek.py` (popyt i reklama Revasa), `oczekiwany_popyt`, reklama tradycyjna/internetowa,
+  zwroty do dostawców (silnik i zakładka Dostawcy), startowe stanowiska; wspólne mnożniki jakości w
+  `silnik/jakosc.py`; nazwy po fitnessie: `godziny_kasy`, `pensje_rynkowe_kasy`, `liczba_kasjerow`;
+  `gra/balans_botow.py` → `gra/balans/symuluj.py` (`python -X utf8 -m balans.symuluj`); testy Revasa
+  przeniesione na dane Levasa albo usunięte (pytanie 27)
 
-Zadania F4.6–F4.7 – jeszcze nie zaczęte.
+Zadanie F4.7 – jeszcze nie zaczęte.

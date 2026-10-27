@@ -103,14 +103,14 @@ def test_skladki_spoleczne_po_uldze_i_limit_odliczenia_zdrowotnej():
 
 def test_srodek_trwaly_netto_w_ewidencji_i_vat_naliczony():
     f, ks, rach = Firma(nazwa="A", gotowka=20000), _ksiega(), Rachunek()
-    st_trwale.zakup(D, f, ks, rach, "Koszt zakupu: Rożen", "Rożen", "sprzet", 12300, 1, True)
+    st_trwale.zakup(D, f, ks, rach, "Koszt zakupu: Rożen", "Rożen", "sprzet", 12300, 1)
     assert f.gotowka == 7700 and f.srodki_trwale[0].wartosc == 10000
     assert ks.vat_suma("naliczony") == 2300 and not ks.pozycje
-    st_trwale.zakup(D, f, ks, rach, "Koszt zakupu: Lada", "Lada", "wyposazenie", 615, 1, True)   # poniżej progu – koszt
+    st_trwale.zakup(D, f, ks, rach, "Koszt zakupu: Lada", "Lada", "wyposazenie", 615, 1)   # poniżej progu – koszt
     assert _kpir(ks, "Koszt zakupu: Lada") == 500 and ks.vat_suma("naliczony") == 2415
 
 
-def test_gra_z_lokalami_rozlicza_jdg_a_revas_cit():
+def test_gra_rozlicza_jdg():
     g = _gra(("A", None), ("B", None))
     s = _runda(g, A=_lokal("centrum_3"), B=_lokal("dworzec_1"))
     w = s.wyniki[1]["A"]
@@ -125,6 +125,3 @@ def test_gra_z_lokalami_rozlicza_jdg_a_revas_cit():
     brutto = sum(r["brutto"] for r in vat["pozycje"] if r["opis"].startswith("Sprzedaż: "))
     assert round(sum(p["przychod"] for p in sprzedaz) + vat["nalezny"], 2) == round(brutto, 2)
     assert s.firmy["A"].rozliczenie.dochod == w["kpir"]["dochod"]
-    s = _runda(_gra(("A", None), ("B", None), lokale=False))
-    assert "rozliczenie" not in s.wyniki[1]["A"] and "vat" not in s.wyniki[1]["A"]
-    assert not any(p.get("vat") for p in s.wyniki[1]["A"]["kpir"]["pozycje"])

@@ -25,9 +25,9 @@ def przyjmij(dane: Dane, firma: Firma, nazwa: str, rodzaj: str, wartosc: float, 
 
 
 def zakup(dane: Dane, firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, nazwa: str, rodzaj: str,
-          cena: float, runda: int, lokale: bool) -> None:
-    """Zakup inwestycji: w grze z lokalami od progu – środek trwały, poniżej progu (i w grze Revas) – koszt od razu."""
-    if lokale and cena >= dane.z["finanse"]["amortyzacja_prog"]:
+          cena: float, runda: int) -> None:
+    """Zakup inwestycji: od progu – środek trwały (amortyzacja), poniżej progu – koszt od razu."""
+    if cena >= dane.z["finanse"]["amortyzacja_prog"]:
         rachunek.zapisz(firma, opis, -cena, "inwestycje")
         vat = ksiega.zarejestruj(opis, {dane.podatki["vat"]["srodki_trwale"]: cena}, False, inwestycja=True) if ksiega.vat is not None else 0.0
         przyjmij(dane, firma, nazwa, rodzaj, round(cena - vat, 2), runda)

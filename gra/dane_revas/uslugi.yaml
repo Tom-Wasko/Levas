@@ -24,7 +24,7 @@ uslugi:
     - 1.2
     - 1.2
     godziny_prowadzacego: 1
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 15
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -60,7 +60,7 @@ uslugi:
     - 1.2
     - 1.2
     godziny_prowadzacego: 1.5
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 15
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -96,7 +96,7 @@ uslugi:
     - 1.1
     - 1.1
     godziny_prowadzacego: 1.5
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 10
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -132,7 +132,7 @@ uslugi:
     - 1.2
     - 1.2
     godziny_prowadzacego: 1
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 15
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -165,7 +165,7 @@ uslugi:
     - 1.2
     - 1.2
     godziny_prowadzacego: 1.25
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 10
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -198,7 +198,7 @@ uslugi:
     - 1.1
     - 1.1
     godziny_prowadzacego: 1.25
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 10
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -232,7 +232,7 @@ uslugi:
     - 1.2
     - 1.2
     godziny_prowadzacego: 1.5
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 10
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -267,7 +267,7 @@ uslugi:
     - 1.1
     - 1.1
     godziny_prowadzacego: 1.25
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 1
     prowadzacy: Trener personalny
     pensje_rynkowe:
@@ -301,7 +301,7 @@ uslugi:
     - 1.1
     - 1
     godziny_prowadzacego: 1.5
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 1
     prowadzacy: Trener personalny
     pensje_rynkowe:
@@ -337,7 +337,7 @@ uslugi:
     - 1.1
     - 1.2
     godziny_prowadzacego: 1.25
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 1
     prowadzacy: Trener personalny
     pensje_rynkowe:
@@ -370,7 +370,7 @@ uslugi:
     - 1.1
     - 1.1
     godziny_prowadzacego: 1.25
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 10
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -403,7 +403,7 @@ uslugi:
     - 1.1
     - 1
     godziny_prowadzacego: 1.25
-    godziny_recepcji: 0.08
+    godziny_kasy: 0.08
     grupa: 10
     prowadzacy: Instruktor
     pensje_rynkowe:
@@ -416,7 +416,7 @@ uslugi:
       Napój izotoniczny: 1
       Płyn do dezynfekcji: 5
       Ręcznik papierowy: 5
-pensje_rynkowe_recepcji:
+pensje_rynkowe_kasy:
   niska: 4895
   srednia: 5005
   wysoka: 5445

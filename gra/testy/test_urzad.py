@@ -116,4 +116,3 @@ def test_widok_api_i_gra_bez_lokali():
     v = widok(g, "A")
     assert v["urzad"]["lokale"] == [{"id": "centrum_3", "nazwa": v["urzad"]["lokale"][0]["nazwa"], "dziala_od": 1, "odbior": 1}]
     assert v["wyniki"]["urzad"]["odbiory"][0]["przyjety"] and s.firmy["A"].odbiory == {"centrum_3": 1}
-    assert "urzad" not in widok(_gra(lokale=False), "A")

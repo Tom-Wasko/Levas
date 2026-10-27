@@ -37,14 +37,6 @@ def _rachunek(s, r, firma, poczatek):
     return [p["kwota"] for p in s.wyniki[r][firma]["rachunek"] if p["opis"].startswith(poczatek)]
 
 
-def test_gra_bez_lokali_jak_w_revas():
-    g = _gra(lokale=False)
-    assert not g.konfiguracja["lokale"]
-    assert {s.typ for s in g.stan_poczatkowy().firmy["A"].stanowiska} == {"kuchnia", "kasa"}
-    s = _runda(g, A=_lokal("centrum_3"))
-    assert s.firmy["A"].lokale == [] and "lokale" not in s.wyniki[1]["A"]
-
-
 def test_najem_gotowego_lokalu_kaucja_czynsz_i_sprzet_wynajmujacego():
     g = _gra()
     dane = g.dane

@@ -139,7 +139,6 @@ def test_podglad_bez_wynikow_i_ukrycie(zawsze_zaproszenie):
     assert not any(x in tekst for x in SLADY)
     tekst = json.dumps(kas.ukryj(v, portfel=False), ensure_ascii=False)
     assert '"kasyno"' not in tekst and '"wlasciciel"' in tekst
-    assert "kasyno" not in widok(_gra(lokale=False), "A") and "wlasciciel" not in widok(_gra(lokale=False), "A")
 
 
 @pytest.mark.django_db

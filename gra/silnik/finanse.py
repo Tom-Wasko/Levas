@@ -91,7 +91,7 @@ class Ksiega:
     def podatek(self, stawka: float) -> float:
         return round(max(0.0, self.dochod) * stawka, 2)
 
-    def do_slownika(self, stawka: float) -> dict:
+    def do_slownika(self, stawka: float = 0) -> dict:
         return {"pozycje": self.pozycje, "przychody": self.przychody, "koszty": self.koszty,
                 "towary": self.suma("towary"), "wynagrodzenia": self.suma("wynagrodzenia"),
                 "pozostale": self.suma("pozostale"), "dochod": self.dochod, "podatek": self.podatek(stawka),

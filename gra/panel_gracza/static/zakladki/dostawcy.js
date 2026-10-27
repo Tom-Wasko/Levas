@@ -1,4 +1,4 @@
-// Dostawcy: zakup składników, magazyn, zwroty. W grze z lokalami zamówienie ma dzień dostawy (świeżość – zakładka
+// Dostawcy: zakup składników i magazyn (bez zwrotów). Zamówienie ma dzień dostawy (świeżość – zakładka
 // „Magazyn i świeżość”, silnik/swiezosc.py), a dostawcy mają swoje zasady (silnik/dostawcy.py: zasady_dostaw):
 // dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
 import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
@@ -141,20 +141,13 @@ export const dostawcy = {
     if (dniDostaw(v)) html += `<p class="podpowiedz">„Zamów” w grze z lokalami pomija dyskonty (odbiór osobisty, limity) – w nich kupujesz ręcznie w bazie składników.</p>`;
     html += plan;
     const wyn = v.swiezosc?.wynajem;
-    if (v.lokale && wyn) html += `<p class="podpowiedz">Dostawcy nie przyjmują zwrotów. Co nie zmieści się w chłodni lub zamrażarce lokalu,
+    if (wyn) html += `<p class="podpowiedz">Dostawcy nie przyjmują zwrotów. Co nie zmieści się w chłodni lub zamrażarce lokalu,
       jedzie do wynajętej chłodni (${zl2(wyn.zl_za_litr)} za litr, termin krótszy o ${wyn.skrocenie_dni} dni) – szczegóły w zakładce
       <a data-zakladka-k="swiezosc">Świeżość</a>.</p>`;
     html += `<div class="pasek">Dostawcy</div><div class="siatka trojka">`;
     for (const d of Object.keys(ceny)) {
       const wartosc = (v.decyzje.zamowienia || []).filter((x) => x.dostawca === d).reduce((s, x) => s + (ceny[d]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc, 0);
-      const zwrot = !!(v.decyzje.zwrot_nadmiaru || {})[d];
-      const zwroty = v.lokale ? "" : `
-        <div class="wiersz"><span>Koszt zwrotu</span><span>${Math.round(kat.parametry.koszt_zwrotu * 100)}%</span></div>
-        <div class="wiersz"><span>Koszt magazynowania</span><span>${zl2(kat.parametry.koszt_magazynowania)}</span></div>
-        <label class="pole" style="margin-top:8px">Zwrot składników nadmiarowych
-          <select data-zmiana="zwrot" data-d="${esc(d)}" ${edycja ? "" : "disabled"}><option value="0" ${zwrot ? "" : "selected"}>Nie – zostają w magazynie</option>
-          <option value="1" ${zwrot ? "selected" : ""}>Tak – zwrot niezużytych (koszt 10%)</option></select></label>`;
-      html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}${zwroty}</div>
+      html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}</div>
         <div class="kd"><button class="btn czarny" data-akcja="baza" data-d="${esc(d)}">Baza składników</button>
         <div class="wiersz"><span>Zamówienie</span><span>${zl2(wartosc)}</span></div></div></div>`;
     }
@@ -163,12 +156,12 @@ export const dostawcy = {
   wyniki({ v }) {
     const straty = (v.wyniki?.zasoby || []).some((x) => "straty" in x);
     const z = (v.wyniki?.zasoby || []).map((x) => [esc(x.zasob), gw(x.jakosc), ulamek(x.poczatek), ulamek(x.zamowione), ulamek(x.wykorzystane),
-      ...(straty ? [x.straty ? `<span class="minus">${ulamek(x.straty)}</span>` : "0"] : []), ulamek(x.zwroty), ulamek(x.koniec), zl2(x.wartosc)]);
+      ...(straty ? [x.straty ? `<span class="minus">${ulamek(x.straty)}</span>` : "0"] : []), ulamek(x.koniec), zl2(x.wartosc)]);
     const suma = (v.wyniki?.zasoby || []).reduce((s, x) => s + x.wartosc, 0);
     const firmy = Object.keys(v.rynek?.jakosc_zasobow || {});
     const jak = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => ulamek(v.rynek.jakosc_zasobow[f][q]))]);
-    return planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []), "Zwroty",
-      `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", ...(straty ? [""] : []), "", "", zl2(suma)] })
+    return planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []),
+      `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", ...(straty ? [""] : []), "", zl2(suma)] })
       + tabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`;
   },
@@ -189,7 +182,6 @@ export const dostawcy = {
     },
   },
   zmiany: {
-    zwrot: (el, c) => c.zmien((d) => { d.zwrot_nadmiaru = { ...(d.zwrot_nadmiaru || {}), [el.dataset.d]: el.value === "1" }; }),
     ilosc: async (el, c) => {
       const { d: dost, z, q, dz } = el.dataset, ilosc = Math.max(0, +el.value || 0);
       const tenDzien = (x) => dz === undefined || (+x.dzien || 0) === +dz;

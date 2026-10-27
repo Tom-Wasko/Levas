@@ -233,7 +233,7 @@ def _wykonaj(dane: Dane, firmy: dict[str, Firma], sprzedawca: str, kupujacy: str
     s.majatek -= dane.sprzet[o.nazwa]["ceny"][str(q)]   # majątek po cenie zakupu (jak przy sprzedaży sprzętu)
     cel.sprzet[o.nazwa] = q
     st_trwale.zakup(dane, k, ks_k, rach_k, f"Koszt zakupu: {o.nazwa} od drużyny {nazwa(s)}",
-                    f"{o.nazwa} ({cel.typ} {cel.nr})", "sprzet", o.cena, runda, True)
+                    f"{o.nazwa} ({cel.typ} {cel.nr})", "sprzet", o.cena, runda)
     k.majatek += o.cena
     o.jakosc = q
     p["_nr"] = cel.nr

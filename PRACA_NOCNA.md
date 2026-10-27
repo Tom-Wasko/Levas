@@ -222,6 +222,13 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    handel – nie). Wcześniej (jak w Revasie) podgląd brał robocze decyzje rywali, czyli zdradzał np. ich nowe ceny.
    Pytania: czy lista powtarzanych decyzji jest dobra? czy podgląd ma też pokazywać ryzyko zdarzeń losowych
    (teraz wypadki i wynik kasyna są w podglądzie pomijane)? (zapisane 27.10)
+27. **Sprzątanie (F4.6).** Usunąłem tryb „gra bez lokali” (stary Revas: gotowy lokal na start, popyt i reklama
+   z Revasa, zwroty do dostawców) – Levas ma teraz jeden tryb: gra z mapą miasta. Da się go przywrócić z commita
+   `9930e14`. Zostało bez zmian: sezonowość popytu nadal miesięczna (`uslugi.yaml → sezonowosc`, 12 wartości –
+   tygodnie biorą wartość swojego miesiąca), dane Revasa (`gra/dane_revas/`) zostają jako wzorzec dla kilku
+   testów mechaniki obsługi. Pytania: czy usunąć tryb Revasa na stałe (w tym `dane_revas/` i zakładkę Marketing
+   z reklamą Revasa w panelu)? czy sezonowość ma być tygodniowa (np. wakacje, sesja, święta – część jest już
+   w kalendarzu miasta)? (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -464,3 +471,5 @@ _brak_
 - 27.10 06:10 – F4.5 gotowe: „co jeśli” w `silnik/co_jesli.py` – inne drużyny powtarzają decyzje z poprzedniej
   rundy (bez zdradzania roboczych decyzji rywali), opis i wiersz przeterminowanego towaru w zakładce Analiza;
   pytanie 26. Start F4.6 (sprzątanie).
+- 27.10 06:24 – F4.6 gotowe: jeden tryb gry (z mapą miasta), usunięty kod Revasa (popyt, reklama, zwroty, startowy
+  lokal), nazwy kasy zamiast recepcji, `gra/balans/symuluj.py`; 245 testów; pytanie 27. Start F4.7 (zakładki).

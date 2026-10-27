@@ -125,11 +125,11 @@ def test_gra_dostawy_na_dni_kosz_i_zwrot():
     f = s.firmy["A"]
     assert {p.zasob: p.dostawa for p in f.partie} == {"Tortilla": dni[3].isoformat(), "Sos": dni[3].isoformat()}
     assert w["swiezosc"]["zasoby"]["Tortilla"]["dostawy"][3] == pytest.approx(3)
-    # w grze z lokalami nie ma zwrotów do dostawcy ani kosztu magazynowania – towar zostaje w lokalu
+    # nie ma zwrotów do dostawcy ani kosztu magazynowania – towar zostaje w lokalu
     s = _runda(g, A={"zamowienia": [{"dostawca": DOSTAWCA, "zasob": "Napój", "jakosc": 2, "ilosc": 2, "dzien": 0}],
                      "zwrot_nadmiaru": {DOSTAWCA: True}})
     assert [p.ilosc for p in s.firmy["A"].partie if p.zasob == "Napój"] == [pytest.approx(2)]
-    assert next(x for x in s.wyniki[3]["A"]["zasoby"] if x["zasob"] == "Napój")["zwroty"] == 0
+    assert "zwroty" not in next(x for x in s.wyniki[3]["A"]["zasoby"] if x["zasob"] == "Napój")
     opisy = [p["opis"] for p in s.wyniki[3]["A"]["kpir"]["pozycje"]]
     assert not [o for o in opisy if "zwrotu" in o or "magazynowania" in o]
 

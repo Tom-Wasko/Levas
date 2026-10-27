@@ -39,7 +39,6 @@ from silnik.lokale import (
     koszt_wejscia,
     runda_nowego_lokalu,
     stan_lokali,
-    tryb_lokali,
     wybierz,
     zajete,
 )
@@ -60,52 +59,47 @@ def stan_po_szkicu(gra: Gra, firma: str):
     stan = deepcopy(gra.stan(r - 1))
     f = stan.firmy[firma]
     d = gra.szkic(firma)
-    lokale = tryb_lokali(gra.dane, gra.konfiguracja)
-    ks, rach = Ksiega(vat=rz.reguly_vat(gra.dane) if lokale else None), Rachunek()
+    ks, rach = Ksiega(vat=rz.reguly_vat(gra.dane)), Rachunek()
     poprzednia_oferta = list(f.oferta)
     # handel: przyjęte oferty od razu na kopii stanu (druga strona – w pustej księdze; jej decyzje – w przeliczeniu)
     handel = hd.przyjmij(gra.dane, stan.firmy, {firma: d}, r, {firma: ks}, {firma: rach},
-                         gra.konfiguracja["ziarno"])[firma] if lokale else None
+                         gra.konfiguracja["ziarno"])[firma]
     # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
-    lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach) if lokale else None
-    przejecia = None
-    if lokale:   # kupno budynku i wypowiedzenia na kopii stanu (licytacja z innymi drużynami – dopiero w przeliczeniu)
-        przejecia = {"przejecie": pr.przejmij(gra.dane, stan.firmy, firma, d.get("przejecie"), r, None, ks, rach),
-                     "wypowiedzenia": pr.wypowiedz(gra.dane, stan.firmy, firma, d.get("wypowiedz"), r)}
-    uwagi_rp = []
-    if lokale:  # limit nowych i ważność ofert podkupienia (licytacje i odpowiedzi pracowników – dopiero w przeliczeniu)
-        dd, _, raport = rp.przed_decyzjami(gra.dane, deepcopy(stan), {firma: d}, r, gra.konfiguracja["ziarno"])
-        d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
-    bank_info = bk.poczatek_rundy(gra.dane, f, d, r, ks, rach) if lokale else None
-    harpagon_info = lw.poczatek_rundy(gra.dane, f, d, r, rach) if lokale else None   # wizyty – dopiero w przeliczeniu
+    lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach)
+    # kupno budynku i wypowiedzenia na kopii stanu (licytacja z innymi drużynami – dopiero w przeliczeniu)
+    przejecia = {"przejecie": pr.przejmij(gra.dane, stan.firmy, firma, d.get("przejecie"), r, None, ks, rach),
+                 "wypowiedzenia": pr.wypowiedz(gra.dane, stan.firmy, firma, d.get("wypowiedz"), r)}
+    # limit nowych i ważność ofert podkupienia (licytacje i odpowiedzi pracowników – dopiero w przeliczeniu)
+    dd, _, raport = rp.przed_decyzjami(gra.dane, deepcopy(stan), {firma: d}, r, gra.konfiguracja["ziarno"])
+    d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
+    bank_info = bk.poczatek_rundy(gra.dane, f, d, r, ks, rach)
+    harpagon_info = lw.poczatek_rundy(gra.dane, f, d, r, rach)   # wizyty – dopiero w przeliczeniu
     # portfel właściciela i klub: stawki schodzą, wyniki gier – dopiero w przeliczeniu
-    portfel_info = wl.poczatek_rundy(gra.dane, f, d, r, rach, gra.konfiguracja["ziarno"], podglad=True) if lokale else (None, None)
+    portfel_info = wl.poczatek_rundy(gra.dane, f, d, r, rach, gra.konfiguracja["ziarno"], podglad=True)
     info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_rundy(gra.dane, gra.konfiguracja["ziarno"], r,
-                                                                  gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach,
-                    lokale)
+                                                                  gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach)
     info["lokal"] = lokal
-    if lokale:
-        info["bank"], info["leasing"] = bank_info, bk.leasing_wez(gra.dane, f, d, r, ks, rach)
-        info["harpagon"], info["przejecia"] = harpagon_info, przejecia
-        info["wlasciciel"], info["kasyno"] = portfel_info
-        info["urzad"] = urz.ustaw(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach)
-        # nowe oferty – sprawdzone na stanie po zakupach (w przeliczeniu: po tygodniu sprzedaży)
-        info["handel"] = hd.raport(handel, hd.wystaw(gra.dane, stan.firmy, firma, d, r))
-    if lokale and gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
+    info["bank"], info["leasing"] = bank_info, bk.leasing_wez(gra.dane, f, d, r, ks, rach)
+    info["harpagon"], info["przejecia"] = harpagon_info, przejecia
+    info["wlasciciel"], info["kasyno"] = portfel_info
+    info["urzad"] = urz.ustaw(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach)
+    # nowe oferty – sprawdzone na stanie po zakupach (w przeliczeniu: po tygodniu sprzedaży)
+    info["handel"] = hd.raport(handel, hd.wystaw(gra.dane, stan.firmy, firma, d, r))
+    if gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
         info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
         info["czas_wlasciciela"] = czas.podsumowanie()
     bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
                          lokal, info)
     bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
-    if lokale:   # odrzucone kredyty, lokaty i leasing (zaległości i debet – dopiero w przeliczeniu)
-        odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]
-        bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
-        bledy += lw.bledy(gra.dane, f, harpagon_info, r)
-        bledy += wl.bledy(*portfel_info)
-        bledy += hd.bledy(info["handel"])
-        bledy += pr.bledy(gra.dane, stan.firmy, firma, r, przejecia)
-        bledy += (info.get("zdarzenia") or {}).get("bledy", [])
+    # odrzucone kredyty, lokaty i leasing (zaległości i debet – dopiero w przeliczeniu)
+    odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]
+    bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
+    bledy += lw.bledy(gra.dane, f, harpagon_info, r)
+    bledy += wl.bledy(*portfel_info)
+    bledy += hd.bledy(info["handel"])
+    bledy += pr.bledy(gra.dane, stan.firmy, firma, r, przejecia)
+    bledy += (info.get("zdarzenia") or {}).get("bledy", [])
     return stan, f, ks, info, bledy
 
 
@@ -156,7 +150,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "brakujace": gra.brakujace(), "ziarno": gra.konfiguracja["ziarno"], "runda_startowa": gra.runda_startowa,
                  "konkurenci_stali": gra.konfiguracja.get("konkurenci_stali", []),
                  "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "jednoczesnie"),
-                 "lokale": tryb_lokali(dane, gra.konfiguracja),
+                 "lokale": True,
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja,
          "odblokowane": sorted(dane.odblokowane(runda)),
@@ -201,64 +195,63 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                           "gotowka": poprzedni.wyniki[r][firma]["gotowka"]}
                          for r in range(1, runda) if r in poprzedni.wyniki]
     v["dashboard"] = _dashboard(gra, firma, runda, poprzedni)
-    if tryb_lokali(dane, gra.konfiguracja):
-        v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
-        zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
-        v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
-        v["kalendarz_miasta"] = kl.widok(dane, runda, gra.konfiguracja["liczba_rund"])
-        v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
-        przet = sum(x["wartosc"] for x in ((v.get("wyniki") or {}).get("swiezosc") or {}).get("straty", []) if x["powod"] == "termin")
-        v["magazyn"] = mag.ryzyko(dane, f, runda, przet, urz.modyfikatory(dane, f, runda))
-        if urz.dane_urzedu(dane):
-            v["urzad"] = urz.widok(dane, f, runda, info.get("urzad") if edycja else stan.wyniki[runda][firma].get("urzad"),
-                                   poprzedni.wyniki, firma, przet)
-        v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
-        v["srodki_trwale"] = ewidencja(f)
-        v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
-                                 else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
-        v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
-        zam = ((info.get("kampanie") or {}) if edycja else (stan.wyniki[runda][firma].get("reklama_agencje") or {}))
-        v["reklama"] = rk.widok(dane, f, runda, poprzedni.rynek.get(runda - 1), zam.get("zamowione"))
-        if pm.zasady(dane):
-            v["promocje"] = pm.widok(dane, f, runda, poprzedni.rynek.get(runda - 1),
-                                     info.get("promocje") if edycja else stan.wyniki[runda][firma].get("promocje"))
-        v["przejecia"] = pr.widok(dane, stan.firmy, firma, runda,
-                                  info.get("przejecia") if edycja else stan.wyniki[runda][firma].get("przejecia"),
-                                  (v.get("wyniki") or {}).get("przejecia"))
-        if dane.zdarzenia:
-            v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
-        if aw.dane_wypadkow(dane):
-            v["ubezpieczenia"] = aw.widok(dane, f, runda, info.get("ubezpieczenia") if edycja
-                                          else stan.wyniki[runda][firma].get("ubezpieczenia"), poprzedni.wyniki, firma)
-        fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)
-        v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
-                      "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}
-        v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)
-        if wl.dane_portfela(dane):
-            v["wlasciciel"] = wl.widok(dane, fp, f, info.get("wlasciciel") if edycja
-                                       else stan.wyniki[runda][firma].get("wlasciciel"))
-        v["handel"] = hd.widok(dane, poprzedni.firmy, firma, runda, info.get("handel") if edycja
-                               else stan.wyniki[runda][firma].get("handel"))
-        klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
-                         else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
-        if klub:
-            v["kasyno"] = klub
-        u = lw.ustawienia(dane)
-        v["harpagon"] = {"przed": lw.stan(dane, fp, runda), "po": lw.stan(dane, f, runda),
-                         "decyzja": info.get("harpagon"),
-                         "warunki": {k: u[k] for k in ("maks_kwota", "min_kwota", "oprocentowanie_rundy", "termin_rund",
-                                                       "odsetki_karne_rundy", "karne_od", "wizyty_od")}}
-        v["podatki"] = _podatki(dane, fp, runda, rz.rejestr(ks) if edycja else stan.wyniki[runda][firma].get("vat"))
-        v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
-        v["ksiegowosc"] = bo.widok(dane, fp, f, v["decyzje"], v.get("wyniki"))
-        if edycja and fp.deklaracja:   # samodzielna księgowość: wynik podatkowy dopiero po deklaracji drużyny
-            v["wyniki"] = bo.ukryj(v.get("wyniki"))
-            v["ksiegowosc"]["ukryte"] = True
-            if v.get("historia"):
-                v["historia"][-1]["dochod_netto"] = None
-            v["dashboard"]["dochod_netto"] = None
-            v["podatki"]["stan"] = fp.deklaracja["stan_przed"]
-            v["podatki"]["stan_przed_deklaracja"] = True
+    v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
+    zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
+    v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
+    v["kalendarz_miasta"] = kl.widok(dane, runda, gra.konfiguracja["liczba_rund"])
+    v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
+    przet = sum(x["wartosc"] for x in ((v.get("wyniki") or {}).get("swiezosc") or {}).get("straty", []) if x["powod"] == "termin")
+    v["magazyn"] = mag.ryzyko(dane, f, runda, przet, urz.modyfikatory(dane, f, runda))
+    if urz.dane_urzedu(dane):
+        v["urzad"] = urz.widok(dane, f, runda, info.get("urzad") if edycja else stan.wyniki[runda][firma].get("urzad"),
+                               poprzedni.wyniki, firma, przet)
+    v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
+    v["srodki_trwale"] = ewidencja(f)
+    v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
+                             else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
+    v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
+    zam = ((info.get("kampanie") or {}) if edycja else (stan.wyniki[runda][firma].get("reklama_agencje") or {}))
+    v["reklama"] = rk.widok(dane, f, runda, poprzedni.rynek.get(runda - 1), zam.get("zamowione"))
+    if pm.zasady(dane):
+        v["promocje"] = pm.widok(dane, f, runda, poprzedni.rynek.get(runda - 1),
+                                 info.get("promocje") if edycja else stan.wyniki[runda][firma].get("promocje"))
+    v["przejecia"] = pr.widok(dane, stan.firmy, firma, runda,
+                              info.get("przejecia") if edycja else stan.wyniki[runda][firma].get("przejecia"),
+                              (v.get("wyniki") or {}).get("przejecia"))
+    if dane.zdarzenia:
+        v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
+    if aw.dane_wypadkow(dane):
+        v["ubezpieczenia"] = aw.widok(dane, f, runda, info.get("ubezpieczenia") if edycja
+                                      else stan.wyniki[runda][firma].get("ubezpieczenia"), poprzedni.wyniki, firma)
+    fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)
+    v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
+                  "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}
+    v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)
+    if wl.dane_portfela(dane):
+        v["wlasciciel"] = wl.widok(dane, fp, f, info.get("wlasciciel") if edycja
+                                   else stan.wyniki[runda][firma].get("wlasciciel"))
+    v["handel"] = hd.widok(dane, poprzedni.firmy, firma, runda, info.get("handel") if edycja
+                           else stan.wyniki[runda][firma].get("handel"))
+    klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
+                     else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
+    if klub:
+        v["kasyno"] = klub
+    u = lw.ustawienia(dane)
+    v["harpagon"] = {"przed": lw.stan(dane, fp, runda), "po": lw.stan(dane, f, runda),
+                     "decyzja": info.get("harpagon"),
+                     "warunki": {k: u[k] for k in ("maks_kwota", "min_kwota", "oprocentowanie_rundy", "termin_rund",
+                                                   "odsetki_karne_rundy", "karne_od", "wizyty_od")}}
+    v["podatki"] = _podatki(dane, fp, runda, rz.rejestr(ks) if edycja else stan.wyniki[runda][firma].get("vat"))
+    v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
+    v["ksiegowosc"] = bo.widok(dane, fp, f, v["decyzje"], v.get("wyniki"))
+    if edycja and fp.deklaracja:   # samodzielna księgowość: wynik podatkowy dopiero po deklaracji drużyny
+        v["wyniki"] = bo.ukryj(v.get("wyniki"))
+        v["ksiegowosc"]["ukryte"] = True
+        if v.get("historia"):
+            v["historia"][-1]["dochod_netto"] = None
+        v["dashboard"]["dochod_netto"] = None
+        v["podatki"]["stan"] = fp.deklaracja["stan_przed"]
+        v["podatki"]["stan_przed_deklaracja"] = True
     return v
 
 
@@ -385,7 +378,7 @@ def przeglad_mg(gra: Gra) -> dict:
                 "ziarno": konf["ziarno"], "kapital": gra.kapital_startowy,
                 "kredyt_odnawialny": konf.get("kredyt_odnawialny", "jednoczesnie"),
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
-                "lokale": tryb_lokali(dane, konf),
+                "lokale": True,
                 "brakujace": [] if gra.zakonczona else gra.brakujace(),
                 "kalendarz": kalendarz(dane, konf["liczba_rund"])},
         "firmy": firmy,

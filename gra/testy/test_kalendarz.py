@@ -95,4 +95,3 @@ def test_widok_kalendarza():
     _runda(g)
     v = widok(g, "A")["kalendarz_miasta"]
     assert v["biezacy"]["runda"] == 2 and v["poprzedni"]["runda"] == 1
-    assert "kalendarz_miasta" not in widok(_gra(lokale=False), "A")

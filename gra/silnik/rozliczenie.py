@@ -36,8 +36,8 @@ def stawka_zasobu(dane: Dane, zasob: str) -> float | None:
     return s["zasoby"].get(zasob, s["domyslna"])
 
 
-def zus_pracodawcy(dane: Dane, lokale: bool) -> float:
-    return dane.podatki["zus_pracodawcy"] if lokale and dane.podatki else dane.z["finanse"]["zus_pracodawcy"]
+def zus_pracodawcy(dane: Dane) -> float:
+    return dane.podatki["zus_pracodawcy"] if dane.podatki else dane.z["finanse"]["zus_pracodawcy"]
 
 
 def ulga_na_start(dane: Dane, runda: int) -> bool:

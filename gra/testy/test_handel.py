@@ -139,7 +139,6 @@ def test_przed_odblokowaniem():
     s = _przygotuj(g, [_towar(900)])
     h = s.wyniki[2]["A"]["handel"]
     assert not h["wystawione"] and "od rundy 5" in h["odrzucone"][0]["powod"]
-    assert "handel" not in _runda(_gra(lokale=False)).wyniki[1]["A"]
 
 
 def test_widok_i_podglad(od_drugiej):

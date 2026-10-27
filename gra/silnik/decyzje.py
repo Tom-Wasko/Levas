@@ -4,29 +4,25 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     nazwa, misja
     oferta:            {usługa: prognoza popytu}           – pełna lista usług w ofercie
     sprzedaz:          {usługa: {"cena", "rabat"}}          – usługi włączone do sprzedaży
-    lokal:             {"id", "forma": "najem" | "kupno"}   – nowy lokal z mapy (gra z lokalami; silnik/lokale.py)
-    stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet; w grze z lokalami najwyżej
-                                                              tyle, ile wolnych miejsc w działających lokalach)
+    lokal:             {"id", "forma": "najem" | "kupno"}   – nowy lokal z mapy (silnik/lokale.py)
+    stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet; najwyżej tyle, ile wolnych
+                                                              miejsc w działających lokalach)
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
     zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
-                       gra z lokalami: opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/rynek_pracy.py)
-    podkup:            [{"pracownik", "firma", "pensja", "umowa"}]   – gra z lokalami: oferta przez headhuntera
+                       opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/rynek_pracy.py)
+    podkup:            [{"pracownik", "firma", "pensja", "umowa"}]   – oferta przez headhuntera
     kontroferty:       {id pracownika: pensja}              – odpowiedź na oferty innych firm (ta sama runda)
                        opcjonalnie "zastepca": true + "wzor": {"zawod", "gwiazdki"} – gdy kandydata zatrudni
                        wcześniej inna firma, zatrudniany jest najbardziej podobny
     zmiany:            {id pracownika: {"pensja", "umowa", "premia"}}
     zwolnij:           [id pracownika]
     zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc", "dzien"}]   ilość w opakowaniach; dzien – dzień
-                                                              dostawy w rundzie (0 = poniedziałek; gra z lokalami)
-    zwrot_nadmiaru:    {dostawca: true/false}               – zwrot niezużytych zasobów z tej rundy (koszt 10%;
-                                                              gra bez lokali – w grze z lokalami zwrotów nie ma)
+                                                              dostawy w rundzie (0 = poniedziałek)
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
-    reklama_tradycyjna:{medium: liczba emisji}
-    internet_uruchom / internet_wylacz: [narzędzie]
-    kampanie:          [{"agencja", "kanal", "strefa"}]     – gra z lokalami: agencje reklamowe zamiast dwóch
-                                                              powyższych (silnik/reklama.py, dane/mapa/reklama.yaml)
-    promocje:          [{"typ", "nazwa", "danie"}]          – gra z lokalami: pełna lista włączonych promocji, nazwa
+    kampanie:          [{"agencja", "kanal", "strefa"}]     – agencje reklamowe (silnik/reklama.py,
+                                                              dane/mapa/reklama.yaml)
+    promocje:          [{"typ", "nazwa", "danie"}]          – pełna lista włączonych promocji, nazwa
                                                               ozdobna (silnik/promocje.py, dane/mapa/promocje.yaml)
     polisy:            [rodzaj]                             – gra z lokalami: pełna lista polis ubezpieczyciela
                                                               (silnik/awarie.py, dane/zdarzenia/losowe.yaml)
@@ -128,10 +124,9 @@ def _kanal(dane: Dane, kandydat: dict, wybrany: str | None, runda: int, czas: cw
 
 
 def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ceny_dostawcow: dict,
-             ksiega: Ksiega, rachunek: Rachunek, lokale: bool = False) -> dict:
+             ksiega: Ksiega, rachunek: Rachunek) -> dict:
     """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów).
-    `lokale` – gra z lokalami: nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany
-    wcześniej, w silnik/lokale.py: wybierz)."""
+    Nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany wcześniej, silnik/lokale.py)."""
     info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
@@ -158,18 +153,18 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                       for u, c in d["sprzedaz"].items() if c and c.get("cena")}
     if d.get("bank") and d["bank"] in dane.dostepne("banki", runda):
         firma.bank = d["bank"]
-    if d.get("biuro") and (not lokale or bo.poprawny_wybor(dane, d["biuro"])):   # z lokalami: biura z mapy
+    if d.get("biuro") and bo.poprawny_wybor(dane, d["biuro"]):   # biura z mapy albo samodzielna księgowość
         firma.biuro = d["biuro"]
 
     # stanowiska (działają od razu)
     pakiety = dane.katalog_ofert["stanowiska"]["pakiety"]
-    miejsca = wolne_miejsca(dane, firma, runda) if lokale else None
+    miejsca = wolne_miejsca(dane, firma, runda)
     for typ, n in (d.get("stanowiska") or {}).items():
         n = int(n or 0)
         if n <= 0 or typ not in dane.typy_stanowisk:
             continue
         n = min(n, dane.maks_nowych_stanowisk)
-        if miejsca is not None and n > len(miejsca[typ]):
+        if n > len(miejsca[typ]):
             info.setdefault("odrzucone_stanowiska", {})[typ] = n - len(miejsca[typ])
             n = len(miejsca[typ])
             if n == 0:
@@ -177,21 +172,21 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         start = firma.nowy_nr(typ)
         for i in range(n):
             firma.stanowiska.append(Stanowisko(nr=start + i, typ=typ, od_rundy=runda,
-                                               lokal=miejsca[typ][i] if miejsca is not None else None))
+                                               lokal=miejsca[typ][i]))
         st_trwale.zakup(dane, firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}",
                         f"Stanowiska: {dane.typy_stanowisk[typ]['kto']} (runda {runda})", "sprzet", pakiety[str(n)],
-                        runda, lokale)
+                        runda)
         firma.majatek += pakiety[str(n)]
         info["inwestycje"] += pakiety[str(n)]
-        for lok_id in miejsca[typ][:n] if miejsca is not None else []:   # nakłady najemcy – rozliczenie ulepszeń
+        for lok_id in miejsca[typ][:n]:   # nakłady najemcy – rozliczenie ulepszeń
             lok = next(x for x in firma.lokale if x.id == lok_id)
             if lok.forma == "najem":
                 lok.naklady += pakiety[str(n)] / n
 
     # sprzedaż i zakup sprzętu
     sprzet_ok, kadry_ok = "inwestycje_sprzet" in odbl, "hr_zatrudnienie" in odbl
-    czas = cw.nowy(dane) if lokale else None   # czas właściciela: pracuj.pl, potem odbiór osobisty w dyskontach
-    for e in zd.efekty_czasu(firma, runda) if lokale else []:   # skutki eventów w parkach (np. przeziębienie)
+    czas = cw.nowy(dane)   # czas właściciela: pracuj.pl, potem odbiór osobisty w dyskontach
+    for e in zd.efekty_czasu(firma, runda):   # skutki eventów w parkach (np. przeziębienie)
         czas.wez(e.wartosc, e.opis, zd.ZAKLADKA)
     for s in d.get("sprzet_sprzedaj", []) if sprzet_ok else []:
         st = firma.stanowisko(s["typ"], int(s["nr"]))
@@ -214,7 +209,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         cena = info_s["ceny"][str(q)]
         st.sprzet[s["nazwa"]] = q
         st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {s['nazwa']}", f"{s['nazwa']} ({s['typ']} {s['nr']})",
-                        "sprzet", cena, runda, lokale)
+                        "sprzet", cena, runda)
         firma.majatek += cena
         info["inwestycje"] += cena
 
@@ -237,7 +232,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             p.umowa = zm["umowa"]
         p.premia = float(zm.get("premia", 0) or 0)
     for z in d.get("zatrudnij", []) if kadry_ok else []:
-        dostepni = kandydaci_firmy(rp.widoczni(dane, pula, runda) if lokale else pula, firma)
+        dostepni = kandydaci_firmy(rp.widoczni(dane, pula, runda), firma)
         kandydat = next((k for k in dostepni if k["id"] == z["kandydat"]), None)
         if kandydat is None and z.get("zastepca"):
             # kandydata nie ma na liście: najbardziej podobny (gwiazdki, potem pensja)
@@ -251,13 +246,12 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             continue
         if dane.typ_zawodu(kandydat["zawod"]) != st.typ:
             continue
-        koszt = kandydat["koszt_rekrutacji"]
-        if lokale:  # kanał rekrutacji: wskazany albo najtańszy, na który starcza czasu właściciela
-            kanal = _kanal(dane, kandydat, z.get("kanal"), runda, czas, info)
-            if kanal is None:
-                info.setdefault("nieudane_zatrudnienia", []).append(z)
-                continue
-            koszt = rp.koszt(dane, kanal, kandydat)
+        # kanał rekrutacji: wskazany albo najtańszy, na który starcza czasu właściciela
+        kanal = _kanal(dane, kandydat, z.get("kanal"), runda, czas, info)
+        if kanal is None:
+            info.setdefault("nieudane_zatrudnienia", []).append(z)
+            continue
+        koszt = rp.koszt(dane, kanal, kandydat)
         p = Pracownik(id=kandydat["id"], imie_nazwisko=kandydat["imie_nazwisko"], zawod=kandydat["zawod"],
                       gwiazdki=kandydat["gwiazdki"], pensja_preferowana=kandydat["pensja_preferowana"],
                       koszt_rekrutacji=kandydat["koszt_rekrutacji"], koszt_odprawy=kandydat["koszt_odprawy"],
@@ -268,9 +262,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         st.pracownik = p.id
         ksieguj(firma, ksiega, rachunek, f"Koszt zatrudnienia: {p.imie_nazwisko}", koszt)
         info["zatrudnieni"].append(p.id)
-        if lokale:
-            info.setdefault("kanaly_zatrudnienia", []).append({"pracownik": p.id, "imie_nazwisko": p.imie_nazwisko,
-                                                               "kanal": kanal, "koszt": koszt, "pensja": p.pensja})
+        info.setdefault("kanaly_zatrudnienia", []).append({"pracownik": p.id, "imie_nazwisko": p.imie_nazwisko,
+                                                           "kanal": kanal, "koszt": koszt, "pensja": p.pensja})
 
     # zasoby od dostawców
     zakupy, zamowienia, stawki = {}, [], {}
@@ -279,20 +272,20 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         cena = cena_dostawcy(dane, ceny_dostawcow, z["dostawca"], z["zasob"], int(z["jakosc"]))
         if ilosc > 0 and cena is not None:
             zamowienia.append({**z, "ilosc": ilosc, "cena": cena})
-    if lokale:  # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/dostawcy.py)
-        zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
-                                                    (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
-        info["czas_wlasciciela"] = czas.podsumowanie()
+    # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/dostawcy.py)
+    zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
+                                                (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
+    info["czas_wlasciciela"] = czas.podsumowanie()
     for z in zamowienia:
         ilosc, cena = z["ilosc"], z.pop("cena")
         k = f"{z['zasob']}|{int(z['jakosc'])}"
         firma.magazyn[k] = firma.magazyn.get(k, 0.0) + ilosc
         firma.wartosc_magazynu_gr[k] = firma.wartosc_magazynu_gr.get(k, 0) + grosze(ilosc * cena)
-        if lokale:  # partia z dniem dostawy (świeżość); magazyn do końca decyzji = stan + zamówione
-            dni = (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days
-            dzien = min(max(0, int(z.get("dzien") or 0)), dni - 1)
-            firma.partie.append(sw.nowa_partia(dane, z["zasob"], int(z["jakosc"]), ilosc, cena,
-                                               dane.data_rundy(runda) + timedelta(days=dzien), z["dostawca"], runda))
+        # partia z dniem dostawy (świeżość); magazyn do końca decyzji = stan + zamówione
+        dni = (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days
+        dzien = min(max(0, int(z.get("dzien") or 0)), dni - 1)
+        firma.partie.append(sw.nowa_partia(dane, z["zasob"], int(z["jakosc"]), ilosc, cena,
+                                           dane.data_rundy(runda) + timedelta(days=dzien), z["dostawca"], runda))
         zakupy[z["dostawca"]] = zakupy.get(z["dostawca"], 0.0) + ilosc * cena
         s, sv = stawki.setdefault(z["dostawca"], {}), rz.stawka_zasobu(dane, z["zasob"]) or 0.0   # VAT wg składnika
         s[sv] = s.get(sv, 0.0) + ilosc * cena
@@ -320,30 +313,15 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             if n in pozycje and n not in posiadane and pozycje[n]["od_rundy"] <= runda:
                 posiadane.append(n)
                 st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {n}", n,   # opis jak w KPiR gry
-                                "sprzet" if rodzaj == "udogodnienia" else "wyposazenie", pozycje[n]["cena"], runda, lokale)
+                                "sprzet" if rodzaj == "udogodnienia" else "wyposazenie", pozycje[n]["cena"], runda)
                 firma.majatek += pozycje[n]["cena"]
                 info["inwestycje"] += pozycje[n]["cena"]
 
-    # marketing (gra z lokalami: kampanie agencji reklamowych zamiast reklamy z Revasa)
-    agencje = lokale and rk.zasady(dane) is not None
-    if agencje:
+    # marketing: kampanie agencji reklamowych i promocje
+    if rk.zasady(dane) is not None:
         info["kampanie"] = rk.zamow(dane, firma, d, runda, ksiega, rachunek)
-    if lokale and pm.zasady(dane):
+    if pm.zasady(dane):
         info["promocje"] = pm.ustaw(dane, firma, d, runda, ksiega, rachunek)
-    if "marketing_tradycyjny" in odbl and not agencje:
-        from .rynek import koszt_emisji
-        media = dane.dostepne("media_tradycyjne", runda)
-        for medium, emisje in (d.get("reklama_tradycyjna") or {}).items():
-            if medium in media and int(emisje or 0) > 0:
-                ksieguj(firma, ksiega, rachunek, f"Reklama tradycyjna: {medium}", koszt_emisji(media[medium], int(emisje)))
-    if "marketing_internetowy" in odbl and not agencje:
-        narzedzia = dane.dostepne("narzedzia_internetowe", runda)
-        for n in d.get("internet_wylacz", []):
-            firma.internet.pop(n, None)
-        for n in d.get("internet_uruchom", []):
-            if n in narzedzia and n not in firma.internet:
-                firma.internet[n] = runda
-                ksieguj(firma, ksiega, rachunek, f"Uruchomienie reklamy internetowej: {n}", narzedzia[n]["uruchomienie"])
 
     # szkolenia (koszt łączny w firmie szkoleniowej, efekt w tym miesiącu)
     if "hr_szkolenia" in odbl:
@@ -358,7 +336,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                 info["szkolenia_procent"] += p["procent"] / 100
         for f, kwota in koszty.items():
             ksieguj(firma, ksiega, rachunek, f"Szkolenie w firmie: {f}", kwota)
-    if lokale and aw.dane_wypadkow(dane):   # polisy i składki – po inwestycjach (składka od majątku)
+    if aw.dane_wypadkow(dane):   # polisy i składki – po inwestycjach (składka od majątku)
         info["ubezpieczenia"] = aw.ustaw(dane, firma, d, runda, ksiega, rachunek)
     return info
 
@@ -387,7 +365,7 @@ def gotowe_uslugi(dane: Dane, firma: Firma) -> dict[str, list[str]]:
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
                  tryb_kredytu: str = "jednoczesnie", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
-    `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/lokale.py: wybierz; None – gra bez lokali),
+    `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/lokale.py: wybierz; None – bez sprawdzania lokali),
     `info` – wynik `zastosuj` (odrzucone stanowiska)."""
     wynik, konkretne = [], set()   # konkretne – dania z błędem sprzętu lub kucharza (bez ogólnego „brak stanowiska”)
 

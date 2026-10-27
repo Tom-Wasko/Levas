@@ -1,7 +1,7 @@
 """Poziomy botów (F4.4): łatwy, średni i trudny różnią się sposobem planowania, a nie tylko mnożnikami."""
 import pytest
 
-from balans_botow import rozegraj
+from balans.symuluj import rozegraj
 from silnik import boty
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra

@@ -105,7 +105,7 @@ class Dane:
         self.pliki: dict[str, dict] = {p.name: _wczytaj(p) for p in sorted(katalog.glob("*.yaml"))}
         p = self.pliki
         self.uslugi: dict = p["uslugi.yaml"]["uslugi"]
-        self.pensje_recepcji: dict = p["uslugi.yaml"]["pensje_rynkowe_recepcji"]
+        self.pensje_kasy: dict = p["uslugi.yaml"]["pensje_rynkowe_kasy"]
         self.sprzet: dict = p["sprzet.yaml"]["sprzet"]
         self.zasoby: dict = p["zasoby.yaml"]["zasoby"]          # kolejność = kolejność w raportach
         self.dostawcy: dict = p["dostawcy.yaml"]["ceny"]

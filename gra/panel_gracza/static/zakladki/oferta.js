@@ -48,7 +48,7 @@ export const oferta = {
             <div class="wiersz"><span>Popyt roczny</span><span>${licz(u.popyt_roczny)}</span></div>
             <div class="wiersz"><span>Preferowana cena</span><span>${zl(u.cena_preferowana)}</span></div>
             <div class="wiersz"><span>Czas przygotowania</span><span>${Math.round(u.godziny_prowadzacego * 600) / 10} min</span></div>
-            <div class="wiersz"><span>Czas obsługi przy kasie</span><span>${Math.round(u.godziny_recepcji * 600) / 10} min</span></div>
+            <div class="wiersz"><span>Czas obsługi przy kasie</span><span>${Math.round(u.godziny_kasy * 600) / 10} min</span></div>
             ${u.grupa > 1 ? `<div class="wiersz"><span>Porcji naraz</span><span>${u.grupa}</span></div>` : ""}
             <div class="wiersz"><span>Przygotowuje</span><span>${esc(u.prowadzacy)}</span></div>
           </div>
@@ -94,7 +94,7 @@ export const oferta = {
         tabela("Sprzęt", ["Nazwa", "Dla", "Zapotrzebowanie", "★ Niska", "★★ Średnia", "★★★ Wysoka"], sprzet, { klasy: ["l"] })
         + tabela("Pracownicy", ["Typ", "Zaangażowanie", "Wynagrodzenie ★", "★★", "★★★"], pensje, { klasy: ["l"] })
         + tabela("Składniki na porcję", ["Nazwa", "Zużycie na porcję", "Opakowanie", "Średnia cena ★", "★★", "★★★"], zasoby, { klasy: ["l"] })
-        + `<p class="podpowiedz">${esc(kat.oferty.stanowiska.typy.kasa.kto)}: ${u.godziny_recepcji} h na klienta, pracownik z kompletem sprzętu
+        + `<p class="podpowiedz">${esc(kat.oferty.stanowiska.typy.kasa.kto)}: ${u.godziny_kasy} h na klienta, pracownik z kompletem sprzętu
            (${kat.sprzet_kasy.map(esc).join(", ")}). Dokładne ceny składników są w zakładce Dostawcy.</p>`);
     },
     usluga: async (el, c) => {

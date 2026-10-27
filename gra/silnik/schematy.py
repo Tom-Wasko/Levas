@@ -42,7 +42,7 @@ class Usluga(Schemat):
     cena_preferowana: float = Field(gt=0)
     sezonowosc: list[float] = Field(min_length=12, max_length=12)
     godziny_prowadzacego: float = Field(gt=0)
-    godziny_recepcji: float = Field(ge=0)
+    godziny_kasy: float = Field(ge=0)
     grupa: int = Field(gt=0)
     prowadzacy: str
     pensje_rynkowe: Pensje
@@ -52,7 +52,7 @@ class Usluga(Schemat):
 
 class PlikUslug(Plik):
     uslugi: dict[str, Usluga]
-    pensje_rynkowe_recepcji: Pensje
+    pensje_rynkowe_kasy: Pensje
 
 
 # --- sprzet.yaml, zasoby.yaml ---
