@@ -98,7 +98,7 @@ export const karta_wynikow = {
 };
 
 const DOKAD = { lokale: "lokale", stanowiska: "stanowiska", oferta: "oferta", finanse_bank: "bank", finanse_biuro: "biuro", hr_zatrudnienie: "zatrudnienie",
-  inwestycje_sprzet: "sprzet", dostawcy: "dostawcy", sprzedaz: "sprzedaz", wlasciciel: "wlasciciel", kasyno: "kasyno" };
+  inwestycje_sprzet: "sprzet", dostawcy: "dostawcy", sprzedaz: "sprzedaz", wlasciciel: "wlasciciel", kasyno: "kasyno", handel: "handel" };
 
 export const lista_bledow = {
   tytul: "Lista błędów", ikona: "☰",

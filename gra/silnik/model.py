@@ -98,6 +98,23 @@ class Stanowisko(Model):
     sprzet_wynajmujacego: list[str] = Field(default_factory=list)   # sprzęt z najmu lokalu – nie do sprzedania
 
 
+class OfertaHandlu(Model):
+    """Oferta sprzedaży innej drużynie (silnik/handel.py): wystawiona w rundzie `runda`, do przyjęcia w następnej."""
+    id: str
+    do: str                       # drużyna adresat
+    typ: str                      # "towar" albo "sprzet"
+    cena_gr: int                  # brutto za całość
+    runda: int
+    zasob: str | None = None      # towar: zasób, jakość, ilość opakowań
+    jakosc: int | None = None     # jakość towaru albo sprzętu (przy wystawieniu)
+    ilosc: float | None = None
+    nazwa: str | None = None      # sprzęt `nazwa` ze stanowiska `stanowisko` nr `nr`
+    stanowisko: str | None = None
+    nr: int | None = None
+
+    cena = _kwota("cena")
+
+
 class Lokal(Model):
     """Lokal drużyny (dane: dane/mapa/lokale.yaml)."""
     id: str
@@ -317,6 +334,7 @@ class Firma(Model):
     odbiory: dict[str, int] = Field(default_factory=dict)   # lokal → runda odbioru przez sanepid
     portfel_gr: int | None = None   # prywatny portfel właściciela (silnik/wlasciciel.py); None – oszczędności z danych
     zaproszenia: list[int] = Field(default_factory=list)    # rundy z otwartym klubem (silnik/kasyno.py)
+    oferty_handlu: list[OfertaHandlu] = Field(default_factory=list)   # wystawione innym drużynom (silnik/handel.py)
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
     promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami

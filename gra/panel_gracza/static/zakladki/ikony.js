@@ -39,6 +39,7 @@ const P = {
   rynek_pracy: '<circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M1.5 19c.5-3 2.6-4.6 5.5-4.6s5 1.6 5.5 4.6M11.5 19c.5-3 2.6-4.6 5.5-4.6s5 1.6 5.5 4.6M9.5 12.5l5-1"/>',
   zdarzenia: '<path d="M12 22v-6M8 22h8"/><path d="M12 16c-4 0-6-2.5-6-5.5C6 7.5 8.7 4 12 2c3.3 2 6 5.5 6 8.5S16 16 12 16z"/>',
   urzad: '<path d="M3 21h18M4 9h16M12 3l8 6H4l8-6z"/><path d="M6 9v9M10 9v9M14 9v9M18 9v9M4 18h16"/>',
+  handel: '<path d="M3 8h14l-3-3M21 16H7l3 3"/>',
   klucz: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3M14.5 8.5l2.5 2.5"/>',
   tarcza: '<path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/>',
   zegar: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',

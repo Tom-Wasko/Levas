@@ -7,6 +7,7 @@ from silnik import awarie as aw
 from silnik import banki as bk
 from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
+from silnik import handel as hd
 from silnik import kasyno as kas
 from silnik import lichwiarz as lw
 from silnik import magazyn as mag
@@ -60,6 +61,9 @@ def stan_po_szkicu(gra: Gra, firma: str):
     lokale = tryb_lokali(gra.dane, gra.konfiguracja)
     ks, rach = Ksiega(vat=rz.reguly_vat(gra.dane) if lokale else None), Rachunek()
     poprzednia_oferta = list(f.oferta)
+    # handel: przyjęte oferty od razu na kopii stanu (druga strona – w pustej księdze; jej decyzje – w przeliczeniu)
+    handel = hd.przyjmij(gra.dane, stan.firmy, {firma: d}, r, {firma: ks}, {firma: rach},
+                         gra.konfiguracja["ziarno"])[firma] if lokale else None
     # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
     lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach) if lokale else None
     przejecia = None
@@ -83,6 +87,8 @@ def stan_po_szkicu(gra: Gra, firma: str):
         info["harpagon"], info["przejecia"] = harpagon_info, przejecia
         info["wlasciciel"], info["kasyno"] = portfel_info
         info["urzad"] = urz.ustaw(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach)
+        # nowe oferty – sprawdzone na stanie po zakupach (w przeliczeniu: po tygodniu sprzedaży)
+        info["handel"] = hd.raport(handel, hd.wystaw(gra.dane, stan.firmy, firma, d, r))
     if lokale and gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
         info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
@@ -95,6 +101,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
         bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
         bledy += lw.bledy(gra.dane, f, harpagon_info, r)
         bledy += wl.bledy(*portfel_info)
+        bledy += hd.bledy(info["handel"])
         bledy += pr.bledy(gra.dane, stan.firmy, firma, r, przejecia)
         bledy += (info.get("zdarzenia") or {}).get("bledy", [])
     return stan, f, ks, info, bledy
@@ -225,6 +232,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         if wl.dane_portfela(dane):
             v["wlasciciel"] = wl.widok(dane, fp, f, info.get("wlasciciel") if edycja
                                        else stan.wyniki[runda][firma].get("wlasciciel"))
+        v["handel"] = hd.widok(dane, poprzedni.firmy, firma, runda, info.get("handel") if edycja
+                               else stan.wyniki[runda][firma].get("handel"))
         klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
                          else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
         if klub:

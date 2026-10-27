@@ -1256,6 +1256,25 @@ class PlikKasyna(Plik):
     gry: dict[str, GraKasyna] = Field(min_length=1)
 
 
+class ZasadyHandlu(Schemat):
+    od_rundy: int = Field(ge=1)
+    maks_ofert: int = Field(ge=1)          # ofert wystawionych przez drużynę w jednej rundzie
+    cena_min: float = Field(gt=0)          # widełki ceny jako część wartości (towar – koszt zakupu, sprzęt – katalog)
+    cena_maks: float = Field(gt=0)
+
+
+class PlikHandlu(Plik):
+    """dane/zdarzenia/handel.yaml: handel między drużynami – towar i sprzęt z fakturą (silnik/handel.py)."""
+    handel: ZasadyHandlu
+    teksty: list[str] = Field(min_length=1)   # przekazanie: {sprzedawca}, {kupujacy}, {co}
+
+    @model_validator(mode="after")
+    def _widelki(self):
+        if self.handel.cena_min > self.handel.cena_maks:
+            raise ValueError("handel: cena_min większa niż cena_maks")
+        return self
+
+
 SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "parki.yaml": PlikParkow,
     "magazyn.yaml": PlikMagazynu,
@@ -1263,6 +1282,7 @@ SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "urzad.yaml": PlikUrzedu,
     "wlasciciel.yaml": PlikWlasciciela,
     "kasyno.yaml": PlikKasyna,
+    "handel.yaml": PlikHandlu,
 }
 
 

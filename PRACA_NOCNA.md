@@ -163,6 +163,15 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    od dochodu JDG). Pytania: czy portfel też ukrywać przed MG? czy eksport ma zawierać zakłady (MG mógłby je
    wtedy zobaczyć w pliku)? czy liczby takie? (zapisane 27.10)
 
+20. **Handel między drużynami (F3b.8).** Założenia: od rundy 5 (notatka „Ustalenia gry”); towar i sprzęt – **bez
+   lokali** (notatka „Prawidła świata” wymienia też lokale: przekazanie najmu/własności z kaucją, nakładami
+   i wyposażeniem to osobna, większa zmiana – zrobić później?); cena brutto w widełkach 50–200% wartości (towar –
+   średni koszt zakupu z magazynu, sprzęt – cena katalogowa nowego), żeby nie dało się przelewać pieniędzy „za
+   grosz” albo „za milion”; najwyżej 5 ofert w rundzie; oferta ważna jedną rundę (adresat przyjmuje w następnej,
+   potem wygasa); towar sprawdzany na stan po tygodniu sprzedaży, a przy przyjęciu – czy nadal jest; boty nie
+   handlują. Pytania: czy widełki i limity takie? czy dodać negocjację (kontroferta adresata) albo handel w tej
+   samej rundzie? czy handel lokalami robić teraz? (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -388,3 +397,5 @@ _brak_
   w historiach, zakładka Urząd i sanepid; pytanie 18. Start F3b.7 (kasyno).
 - 27.10 01:25 – F3b.7 gotowe: portfel właściciela (wpłata/wypłata własna poza KPiR) i tajny klub przy ul. Nocnej
   (zaproszenia, ruletka i automat, ukryty przed MG); pytanie 19. Start F3b.8 (handel między drużynami).
+- 27.10 04:35 – F3b.8 gotowe: oferty towaru i sprzętu dla innych drużyn, przyjęcie w następnej rundzie, faktury
+  w KPiR obu stron, zakładka Handel z drużynami; pytanie 20. Start F3b.9 (kalendarz miejski).

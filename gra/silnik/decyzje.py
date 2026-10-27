@@ -36,6 +36,11 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
                                                               – samodzielna księgowość za poprzednią rundę (biuro.py)
     lokaty_zaloz:      [{"kwota", "miesiecy"}];  lokaty_zerwij: [id]
     kredyty_wez:       [{"kwota", "miesiecy"}];  kredyty_splac: [id]
+    handel_oferty:     [{"do", "typ": "towar", "zasob", "jakosc", "ilosc", "cena"} | {"do", "typ": "sprzet",
+                       "stanowisko", "nr", "nazwa", "cena"}]  – gra z lokalami: oferty dla innych drużyn (cena brutto
+                                                              za całość; silnik/handel.py)
+    handel_przyjmij:   [{"id", "nr"}]                       – przyjęcie ofert z poprzedniej rundy (nr – stanowisko
+                                                              na kupiony sprzęt)
 """
 from __future__ import annotations
 

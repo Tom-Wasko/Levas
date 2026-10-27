@@ -21,19 +21,20 @@ import { ubezpieczenia } from "./ubezpieczenia.js";
 import { urzad } from "./urzad.js";
 import { wlasciciel } from "./wlasciciel.js";
 import { kasyno } from "./kasyno.js";
+import { handel } from "./handel.js";
 
 const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, przejecia, urzad, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
-  dostawcy, swiezosc, czas_wlasciciela, zdarzenia, agencje, promocje, tradycyjny, internetowy, sprzedaz, raport, kpir, podatki, bank, harpagon, biuro, ubezpieczenia, wlasciciel, kasyno, lista_bledow, wyslij, analiza };
+  dostawcy, swiezosc, czas_wlasciciela, zdarzenia, agencje, promocje, tradycyjny, internetowy, sprzedaz, handel, raport, kpir, podatki, bank, harpagon, biuro, ubezpieczenia, wlasciciel, kasyno, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
 export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", przejecia: "lokale", urzad: "urzad", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", rynek_pracy: "rynek_pracy", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar", zdarzenia: "zdarzenia",
-  agencje: "tradycyjny", promocje: "procent", tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", podatki: "podatki", bank: "bank", harpagon: "harpagon",
+  agencje: "tradycyjny", promocje: "procent", tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir", podatki: "podatki", bank: "bank", harpagon: "harpagon",
   biuro: "biuro", ubezpieczenia: "tarcza", wlasciciel: "portfel", kasyno: "klucz", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
 
 // od której rundy zakładka jest dostępna (podpowiedź w menu)
 export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, tradycyjny: 5, internetowy: 6, szkolenia: 7,
-  przejecia: 4, sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2, zdarzenia: 2, ubezpieczenia: 2 };
+  przejecia: 4, sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, analiza: 2, zdarzenia: 2, ubezpieczenia: 2, handel: 5 };
 
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
@@ -49,6 +50,7 @@ export const MENU = [
   { klucz: "zdarzenia", tytul: "Zdarzenia", ikona: "zdarzenia" },
   { klucz: "marketing", tytul: "Marketing", ikona: "marketing", pod: ["agencje", "promocje", "tradycyjny", "internetowy"] },
   { klucz: "sprzedaz", tytul: "Sprzedaż", ikona: "sprzedaz" },
+  { klucz: "handel", tytul: "Handel z drużynami", ikona: "handel" },
   { klucz: "finanse", tytul: "Finanse", ikona: "finanse", pod: ["raport", "kpir", "podatki", "bank", "harpagon", "biuro", "ubezpieczenia", "wlasciciel"] },
   { klucz: "kasyno", tytul: "Nocna 13", ikona: "klucz" },   // widoczna tylko z zaproszeniem (ukryta)
   { klucz: "lista_bledow", tytul: "Lista błędów", ikona: "bledy" },

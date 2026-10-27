@@ -1,0 +1,34 @@
+opis: >-
+  Handel między drużynami (gra z lokalami, silnik/handel.py). Drużyna wystawia innej drużynie ofertę sprzedaży
+  towaru z magazynu albo sprzętu ze stanowiska; adresat przyjmuje ją w następnej rundzie. Obie strony dostają
+  fakturę w KPiR (VAT należny u sprzedawcy, naliczony u kupującego). Widełki ceny chronią przed przelewaniem
+  pieniędzy między drużynami „za grosz” albo „za milion”.
+zrodlo: >-
+  Notatki „Prawidła świata” (handel między drużynami: towar, sprzęt i lokale po uzgodnionej cenie, z fakturą, w KPiR)
+  i „Ustalenia gry” (odblokowanie w rundzie 5). Widełki, limit ofert i teksty – założenia gry (do potwierdzenia).
+handel:
+  od_rundy: 5
+  maks_ofert: 5          # ofert wystawionych przez drużynę w jednej rundzie
+  cena_min: 0.5          # cena brutto od 50% wartości (towar – koszt zakupu, sprzęt – cena katalogowa nowego)
+  cena_maks: 2.0         # do 200% wartości
+teksty:
+- >-
+  Przekazanie odbyło się na parkingu pod galerią, z bagażnika do bagażnika. Przechodzień zapytał, czy to legalne.
+  Było – {sprzedawca} wręczył(a) fakturę w dwóch egzemplarzach, a {kupujacy} podpisał(a) się na masce samochodu.
+  Towar: {co}.
+- >-
+  {kupujacy} przyjechał(a) po {co} wózkiem sklepowym „pożyczonym” spod dyskontu. Pół drogi powrotnej wózek skręcał
+  sam w lewo, jakby chciał wrócić do domu. Dojechali. Faktura przetrwała, choć ma odcisk koła.
+- >-
+  {sprzedawca} wystawił(a) fakturę ręcznie, bo drukarka akurat postanowiła mieć dzień refleksji. Pismo jest
+  czytelne w 80%, a pozostałe 20% {kupujacy} postanowił(a) traktować jako tajemnicę handlową. {co} – dostarczone.
+- >-
+  Negocjacje trwały dłużej niż sama transakcja: {kupujacy} chciał(a) rabat „za ładne oczy”, {sprzedawca}
+  odpowiedział(a), że oczy nie są środkiem płatniczym. Stanęło na cenie z oferty i wspólnym zdjęciu z {co}.
+- >-
+  Kurier miał przewieźć {co} „w godzinę”. Po trzech godzinach przysłał zdjęcie zachodu słońca nad Zalewem
+  Zemborzyckim z podpisem „prawie jestem”. Dojechał. {kupujacy} i {sprzedawca} wymienili się fakturą i spojrzeniem
+  pełnym zrozumienia.
+- >-
+  {sprzedawca} przyniósł(-osła) {co} osobiście, w koszulce z napisem „Nie jestem hurtownią”. {kupujacy} uznał(a)
+  to za element negocjacji. Faktura ma pieczątkę w kształcie kota – innej nie było pod ręką.

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from .dane import Dane
 from .finanse import KOLUMNY, Ksiega, Rachunek, do_grosza, ksieguj
+from .handel import SPRZEDAZ_TOWAROW
 from .losowosc import strumien
 from .model import Firma
 
@@ -28,7 +29,7 @@ NAZWY_KOLUMN = {"przychod": "7. Przychód ze sprzedaży", "przychod_pozostaly": 
                 "towary": "10. Zakup towarów i materiałów", "wynagrodzenia": "12. Wynagrodzenia",
                 "pozostale": "13. Pozostałe wydatki", POZA: "Poza KPiR"}
 WYJASNIENIA = {
-    "przychod": "sprzedaż dań to przychód ze sprzedaży (kolumna 7)",
+    "przychod": "sprzedaż dań (i towarów innej drużynie) to przychód ze sprzedaży (kolumna 7)",
     "przychod_pozostaly": "odsetki od lokat i sprzedaż sprzętu to pozostałe przychody (kolumna 8), nie sprzedaż dań",
     "towary": "składniki i opakowania do dań to zakup towarów i materiałów (kolumna 10) – także korekta po zwrocie",
     "wynagrodzenia": "pensje i premie pracowników to wynagrodzenia (kolumna 12); ZUS pracodawcy idzie do pozostałych",
@@ -166,7 +167,8 @@ def dokumenty(ksiega: Ksiega, rachunek: Rachunek) -> list[dict]:
             lista = pozycje.get(opis) or [None]
             p = lista.pop(0) if lista[0] is not None else None
             kol = _kolumna(p)
-            typ = ("Raport kasy fiskalnej" if kol == "przychod" else "Lista płac" if kol == "wynagrodzenia"
+            typ = ("Faktura sprzedaży" if opis.startswith(SPRZEDAZ_TOWAROW)
+                   else "Raport kasy fiskalnej" if kol == "przychod" else "Lista płac" if kol == "wynagrodzenia"
                    else "Deklaracja ZUS" if "ZUS" in opis
                    else "Wyciąg bankowy" if any(x in opis for x in ("Odsetki", "Prowizja", "Opłata za konto"))
                    else "Faktura sprzedaży" if kol == "przychod_pozostaly" else "Faktura zakupu")

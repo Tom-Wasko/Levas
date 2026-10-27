@@ -22,6 +22,7 @@ from . import awarie as aw
 from . import banki as bk
 from . import biuro as bo
 from . import czas_wlasciciela as cw
+from . import handel as hd
 from . import karta as kw
 from . import kasyno as kas
 from . import lichwiarz as lw
@@ -97,6 +98,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         wyprowadzki = pr.koniec_najmu(dane, s, r, ksiegi, rachunki)
         lic = pr.licytacje(dane, s.firmy, decyzje, r, ziarno, lk.zajete(s.firmy))
         przetargi, przegrane = lic["przetargi"], lic["przegrane"]
+    # handel między drużynami: oferty z poprzedniej rundy przyjęte teraz – przed zakupami (silnik/handel.py)
+    handel = hd.przyjmij(dane, s.firmy, decyzje, r, ksiegi, rachunki, ziarno) if tryb_lokali else {}
     zajete = lk.zajete(s.firmy)
     rezerwacje, rynek_pracy = {}, {}
     if tryb_lokali:  # agencja pracy: limit nowych, licytacje kandydatów, podkupienia i kontroferty (silnik/rynek_pracy.py)
@@ -324,6 +327,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:
             bledy[nazwa] += bk.bledy(dane, f, info[nazwa].get("bank"), bank_koniec)
             bledy[nazwa] += lw.bledy(dane, f, info[nazwa].get("harpagon"), r + 1)
+        if tryb_lokali:   # nowe oferty handlowe – po tygodniu sprzedaży, do przyjęcia w następnej rundzie
+            info[nazwa]["handel"] = hd.raport(handel.get(nazwa), hd.wystaw(dane, s.firmy, nazwa, d, r))
+            bledy[nazwa] += hd.bledy(info[nazwa]["handel"])
         netto = round(ks.dochod - podatek, 2)
         f.skumulowany_dochod_netto = round(f.skumulowany_dochod_netto + netto, 2)
         wyniki[nazwa] = _wyniki_firmy(dane, f, r, ks, rach, info[nazwa], popyt.get(nazwa, {}),
@@ -348,6 +354,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             if klub:
                 wyniki[nazwa]["kasyno"] = klub
             wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")
+            if info[nazwa].get("handel"):
+                wyniki[nazwa]["handel"] = info[nazwa]["handel"]
             wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej
             wyniki[nazwa]["rynek_pracy"] = info[nazwa].get("rynek_pracy")
             wyniki[nazwa]["srodki_trwale"] = ewidencja(f)

@@ -137,4 +137,15 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   Zakładki **Finanse → Portfel właściciela** i **Nocna 13** (ukryta poza rundą z zaproszeniem i rundą po niej;
   Decyzje/Wyniki), komunikat z zaproszeniem na Dashboardzie; test `test_kasyno.py`
 
-Zadania F3b.8–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3b.8 Handel między drużynami (gra z lokalami) – `silnik/handel.py` (`dane/zdarzenia/handel.yaml`, schemat
+  `PlikHandlu`): od rundy 5 decyzja `handel_oferty` – sprzedaż innej drużynie (nie botowi) towaru z magazynu albo
+  sprzętu ze stanowiska (nie z najmu lokalu, nie w leasingu), cena brutto za całość w widełkach 50–200% wartości
+  (koszt zakupu / cena katalogowa), najwyżej 5 ofert; oferta sprawdzana po tygodniu sprzedaży (`Firma.oferty_handlu`),
+  adresat przyjmuje ją w następnej rundzie (`handel_przyjmij`, nr stanowiska na sprzęt) – transakcja na początku
+  przeliczenia, przed zakupami, jeśli sprzedawca ma towar, a kupujący pieniądze. Faktury w KPiR obu stron (towar:
+  przychód kol. 7 z VAT należnym / zakup towarów kol. 10; sprzęt: jak sprzedaż i zakup sprzętu), partie przechodzą
+  z terminem przydatności; komiczny tekst przekazania (strumień `handel`); w biurze sprzedaż towaru to faktura
+  sprzedaży. Podgląd liczy przyjęcie na kopii stanu. Zakładka **Handel z drużynami** (Decyzje/Wyniki); test
+  `test_handel.py`
+
+Zadania F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
