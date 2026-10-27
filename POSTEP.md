@@ -226,7 +226,7 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 - [x] P2 Domyślne ustawienia: start pon. 1.09.2025, 18 pełnych rund (do 4.01.2026), kapitał 40 000 zł, kredyt
   „na bieżąco”, przycisk „Zamów brakujące” w Dostawcach domyślnie wyłączony – opcja MG (nowa gra i trwająca gra);
   wrzesień – wprowadzenie (studenci wracają w październiku)
-- [ ] P3 Tutorial dla graczy: strona „Jak grać” w panelu + `INSTRUKCJA.md` + PDF
+- [x] P3 Tutorial dla graczy: strona „Jak grać” w panelu + `INSTRUKCJA.md` + PDF
 - [ ] P4 Instrukcja logowania kontem Microsoft (`gra/LOGOWANIE_MICROSOFT.md`) – pytanie 3
 - [ ] P5 Właściciel jako pracownik 1★ (ręcznie, godziny z puli 20 h, bez pensji) – pytanie 4
 - [ ] P6 Jedno wypowiedzenie: 2 rundy dla wszystkich – pytanie 5

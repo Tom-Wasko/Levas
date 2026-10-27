@@ -13,7 +13,7 @@
 </head>
 <body>
   <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma">{% if mg %}Lista gier{% else %}Twoje gry{% endif %}</div></div>
-    <div class="konto">{% include "konta/_konto.html" %}</div></header>
+    <div class="konto"><a href="/jak-grac">Jak grać</a>{% include "konta/_konto.html" %}</div></header>
   <main class="scena">
     <div class="karta">
       <div class="karta-glowa"><div class="tytul">Lista gier</div><div></div><div></div></div>
@@ -22,7 +22,7 @@
     </div>
     {% if mg %}    <div class="karta" style="margin-top:24px">
       <div class="karta-glowa"><div class="tytul">Nowa gra</div><div></div><div></div></div>
-      <div class="info"><span class="i">i</span><span>Dodaj firmy graczy (na tym komputerze) i boty komputerowe. Runda to {{ kalendarz.okres }}. Gra zaczyna się w rundzie 1 – {{ kalendarz.pierwsza }} – z kapitałem {{ kapital }} PLN i gotowym lokalem.</span></div>
+      <div class="info"><span class="i">i</span><span>Dodaj firmy graczy (na tym komputerze) i boty komputerowe. Runda to {{ kalendarz.okres }}. Gra zaczyna się w rundzie 1 – {{ kalendarz.pierwsza }} – z kapitałem {{ kapital }} PLN – lokal drużyny wybierają na mapie w pierwszym tygodniu.</span></div>
       <div class="tresc">
         <div class="dwie">
           <label class="pole">Nazwa gry<input type="text" id="nazwa" value="Trening"></label>

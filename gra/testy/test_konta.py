@@ -176,3 +176,18 @@ def test_graj_nie_startuje_na_zajetym_porcie():
         s.listen()
         with pytest.raises(CommandError, match="zajęty"):
             call_command("graj", port=s.getsockname()[1], bez_przegladarki=True)
+
+
+def test_instrukcja_jak_grac_bez_logowania(client):
+    """Strona „Jak grać” z INSTRUKCJA.md – dostępna bez logowania, ze spisem treści, tabelami i ramkami."""
+    from panel_gracza.instrukcja import na_html
+
+    r = client.get("/jak-grac")
+    assert r.status_code == 200
+    strona = r.content.decode()
+    assert "Spis treści" in strona and "<table>" in strona and 'class="ramka' in strona
+    h = na_html("# Tytuł\n\n## Rozdział A\n\nTekst **gruby** i `kod`.\n\n- jeden\n  - pod\n- dwa\n\n"
+                "| a | b |\n|---|---|\n| 1 | <x> |\n\n> **Uwaga.** Ostrożnie.\n")
+    assert h["tytul"] == "Tytuł" and h["spis"] == [{"kotwica": "rozdział-a", "tytul": "Rozdział A"}]
+    assert "<b>gruby</b>" in h["tresc"] and "<code>kod</code>" in h["tresc"] and "&lt;x&gt;" in h["tresc"]
+    assert "<li>jeden<ul><li>pod</li></ul></li>" in h["tresc"] and 'class="ramka uwaga"' in h["tresc"]

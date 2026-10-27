@@ -15,7 +15,7 @@ from django.shortcuts import redirect
 
 from .role import nadaj_mg
 
-WOLNE = ("/konta/", "/static/", "/favicon.ico")
+WOLNE = ("/konta/", "/static/", "/favicon.ico", "/jak-grac")
 LOKALNE_ADRESY = {"127.0.0.1", "::1"}
 LOKALNY_LOGIN = "lokalny"
 

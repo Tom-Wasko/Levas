@@ -541,3 +541,9 @@ _brak_
   „włącz/wyłącz” w tabeli „Ustawienia gry” panelu MG. Wrzesień w kalendarzu: wakacje studenckie (mało studentów),
   początek roku szkolnego, powrót studentów (ostatni weekend), inauguracja roku akademickiego (1–3.10).
   Daty ruchome 2025 (Black Friday 28.11, ferie – założenie 27.01). Start P3 (tutorial).
+- **P3 gotowe:** instrukcja dla graczy `gra/INSTRUKCJA.md` (15 rozdziałów: runda, karta wyników, tydzień 1 i 2,
+  klienci, dostawcy, ludzie, czas właściciela, marketing, pieniądze, parki/zdarzenia, rozwój, odblokowania,
+  10 rad; bez kasyna – jest tajne). W grze strona **/jak-grac** (bez logowania, spis treści, ramki z radami,
+  wersja na telefon i do druku), link „Jak grać” w nagłówkach panelu gracza i MG. PDF: `gra/INSTRUKCJA.pdf`,
+  odświeżanie: `python manage.py instrukcja_pdf` (drukuje Edge). Na stronie startowej poprawiony tekst
+  „gotowym lokalem” → lokal wybiera się na mapie w 1. tygodniu.

@@ -23,6 +23,10 @@ Ręcznie (z folderu `gra`):
 
 ## Jak się gra
 
+Instrukcja dla graczy: [`INSTRUKCJA.md`](INSTRUKCJA.md), w grze strona **/jak-grac** (link „Jak grać”
+w nagłówku, dostępna bez logowania) i [`INSTRUKCJA.pdf`](INSTRUKCJA.pdf). Po zmianie instrukcji PDF
+odświeża `.venv\Scripts\python manage.py instrukcja_pdf` (drukuje Edge albo Chrome).
+
 Strona startowa → „Nowa gra”: firmy graczy (na tym komputerze) i boty (zrównoważony, tani, premium,
 agresywny marketing, naśladowca). Zakładki są jak w Revasie: Oferta (menu) → Inwestycje → HR → Dostawcy → Marketing →
 Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik **Decyzje / Wyniki** pokazuje wyniki

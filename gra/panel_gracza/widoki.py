@@ -12,6 +12,8 @@ from gry.models import Gra
 from konta.role import firmy_ucznia, jest_mg, moze_firme
 from silnik.dane import dane_domyslne
 
+from .instrukcja import instrukcja
+
 
 def _gra(id_: str):
     try:
@@ -35,6 +37,12 @@ def start(request):
     kontekst = {"strategie": strategie, "kalendarz": kalendarz, "kapital": kapital}
     kontekst["mg"] = jest_mg(request.user)  # uczeń widzi tylko gry swoich drużyn, bez zakładania
     return render(request, "panel_gracza/start.html", kontekst)
+
+
+def jak_grac(request):
+    """Instrukcja dla graczy (INSTRUKCJA.md) – bez logowania, do przeczytania przed grą."""
+    kontekst = instrukcja() | {"powrot": "/", "powrot_tekst": "Lista gier"}
+    return render(request, "panel_gracza/jak_grac.html", kontekst)
 
 
 @ensure_csrf_cookie
