@@ -396,6 +396,7 @@ class PromocjaBota(Schemat):
 
 class Strategia(Schemat):
     nazwa: str
+    min_kuchnia: int = Field(0, ge=0)   # gra z lokalami, bot planujący: najmniej miejsc w kuchni wybieranego lokalu
     cena: float | None  # ułamek ceny preferowanej; None = średnia rynku z poprzedniej rundy
     jakosc: int = Field(ge=1, le=3)
     uslugi: int = Field(gt=0)
@@ -423,9 +424,27 @@ class UstawieniaBotow(Schemat):
     zapas_zasobow: float = Field(ge=1)
 
 
+class KolejnyLokalBota(Schemat):
+    obsluga: float = Field(gt=0, le=1)
+    gotowka: float = Field(ge=0)
+    maks_lokali: int = Field(ge=1)
+
+
 class PoziomBota(Schemat):
+    """Zachowanie bota na poziomie (gra z lokalami) – opis pól w dane/boty.yaml."""
     nazwa: str
     opis: str
+    planowanie: Literal["proste", "przepustowosc"] = "przepustowosc"
+    cel_obslugi: float = Field(1.0, gt=0, le=1)
+    blad_prognozy: float = Field(0, ge=0, lt=1)
+    losowy_kandydat: bool = False
+    kampanie: bool = True
+    promocje: bool = True
+    korekta_prognozy: list[float] | None = Field(None, min_length=2, max_length=2)
+    mnozniki_ceny: list[float] = Field(default_factory=list)
+    narzut_pracy: float = Field(1.0, ge=1)
+    obsluga_kampanii: float | None = Field(None, ge=0, le=1)
+    kolejny_lokal: KolejnyLokalBota | None = None
 
 
 class PlikBotow(Plik):

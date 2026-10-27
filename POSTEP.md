@@ -185,5 +185,13 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   zmieniają; `Gra.ustaw_odblokowanie` (tylko przyszłe elementy, nie wcześniej niż bieżący tydzień, `liczba_rund + 1`
   = wyłączone); API: opcja `odblokowanie` przy zakładaniu gry i `POST prowadzenie {"odblokowanie": …}`; panel MG:
   okno „Harmonogram odblokowań”; strona drużyny: „od rundy N” z harmonogramu gry; test `test_harmonogram.py`
+- [x] F4.4 Boty – poziomy (`dane/boty.yaml → poziomy`, schemat `PoziomBota`, `boty.poziom`): łatwy – proste
+  reguły (kuchnia na danie, zamówienia na cały popyt, błąd prognozy, losowy kandydat, bez kampanii i promocji);
+  średni – planer przepustowości (`_plan_firmy`/`_plan_lokalu`: kucharze każdego zawodu, sztuki sprzętu i kasjerzy
+  na popyt dzień po dniu, kolejna osoba tylko, gdy dodatkowa sprzedaż × marża pokrywa jej koszt; zamówienia
+  i udziały dni z planu; lokal z co najmniej `min_kuchnia` miejscami); trudny – korekta prognozy o wynik
+  poprzedniej rundy, wybór ceny o największej oczekiwanej marży, kampanie tylko przy nadążającej obsłudze,
+  drugi lokal (`kolejny_lokal`); narzędzie `gra/balans_botow.py`; test `test_boty.py`. Bez przejęć i licytacji
+  przez boty (pytanie 25)
 
-Zadania F4.4–F4.7 – jeszcze nie zaczęte.
+Zadania F4.5–F4.7 – jeszcze nie zaczęte.

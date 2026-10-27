@@ -91,7 +91,7 @@ def test_kasa_zgadza_sie_z_kpir_w_losowych_grach(lokale, ziarno, strategie, data
 
 def test_uzgodnienie_obejmuje_wszystkie_rodzaje_operacji():
     """Scenariusz z każdym rodzajem: inwestycje (kupno działki), kaucja, kredyt, lokata, Harpagon, podatki."""
-    dodatki = [{"lokal": {"id": "centrum_3", "forma": "najem"}, "harpagon_wez": 3000,
+    dodatki = [{"lokal": {"id": "centrum_2", "forma": "najem"}, "harpagon_wez": 3000,
                 "kredyty_wez": [{"bank": "Crédit Agricole", "produkt": "start", "kwota": 20000, "rund": 26}],
                 "lokaty_zaloz": [{"bank": "ING", "kwota": 5000, "rund": 4}]},
                {"harpagon_splac": 5000}, {}, {"lokal": {"id": "czechow_3", "forma": "kupno"}}]   # lokal co 3 rundy

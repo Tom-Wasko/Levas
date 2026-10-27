@@ -203,6 +203,20 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    Klub z kasynem nie jest w harmonogramie (mistrz gry o nim nie wie). Pytania: czy tydzień 1 ma zostać
    przygotowawczy? ubezpieczyciel „od rundy 3” z notatek – na razie bez blokady; czy MG ma móc przesuwać też zakładki
    tygodnia 1 (teraz tak – można je opóźnić)? (zapisane 27.10)
+25. **Poziomy botów (F4.4).** Poziomy różnią się sposobem planowania (`dane/boty.yaml → poziomy`, `silnik/boty.py`):
+   **łatwy** – stare proste reguły (osobna kuchnia na danie, zamówienia na cały przewidywany popyt, błąd prognozy
+   ±25%, zatrudnia losowego kandydata z zawodu, bez kampanii i promocji); **średni** – planuje obsadę i sprzęt na
+   popyt dzień po dniu (kolejny kucharz/kasjer tylko, gdy dodatkowa sprzedaż × marża pokrywa jego koszt), zamawia
+   tylko to, co kuchnia sprzeda, reklamuje się wg strategii; **trudny** – dodatkowo poprawia prognozę o wynik
+   poprzedniej rundy, wybiera cenę o największej oczekiwanej marży (±10–15%), reklamuje się tylko, gdy nadąża
+   z obsługą, i bierze drugi lokal (gotówka > 60 000 zł, kuchnia nie nadąża). Planujące boty wybierają lokal
+   z co najmniej 2 miejscami w kuchni (tani – 1). Wyniki (`gra/balans_botow.py`, 12 tygodni, ziarna 7/11/23, średnia
+   gotówka 5 strategii): łatwy ≈ 46 tys., średni ≈ 69 tys., trudny ≈ 82 tys.; towar przeterminowany: łatwy 10–70
+   tys., średni/trudny ≈ 3–7 tys. Wyjątek: Premium na poziomie łatwym zarabia więcej niż na średnim (kampanie
+   influencer + billboard ≈ 14 tys. i karta stałego klienta, a dodatkowa obsada sprzedaje niewiele więcej). Nie
+   zrobione: przejęcia i licytacje lokali przez boty, zwalnianie pracowników. Pytania: czy takie różnice poziomów
+   wystarczą? czy trudny bot ma też przejmować i licytować lokale? czy Premium ma reklamować się taniej (np. bez
+   billboardu)? (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -439,3 +453,6 @@ _brak_
   przy prognozie, zamówienia ponad saldo; pytanie 23. Start F4.3 (odblokowywanie zakładek).
 - 27.10 05:28 – F4.3 gotowe: harmonogram odblokowań w tygodniach z danych, zmiany MG dla jednej gry (widok danych
   gry, wspólne dane bez zmian), edytor w panelu MG, podpowiedzi „od rundy” z harmonogramu; pytanie 24. Start F4.4.
+- 27.10 05:55 – F4.4 gotowe: poziomy botów łatwy/średni/trudny (planowanie obsady dzień po dniu z rachunkiem
+  opłacalności, zamówienia w granicach przepustowości, wybór ceny, reklama tylko przy nadążającej obsłudze, drugi
+  lokal), narzędzie `gra/balans_botow.py`, test `test_boty.py`; pytanie 25. Start F4.5 („co jeśli”).

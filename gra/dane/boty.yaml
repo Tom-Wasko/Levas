@@ -16,22 +16,51 @@ ustawienia:
   krok_ceny: 0.5
   losuj_z_najlepszych_kandydatow: 3
   zapas_zasobow: 1.05
-# Poziomy trudności: mistrz gry wybiera je dla każdego bota (konfiguracja gry: firmy[].poziom). Zachowanie botów
-# na poziomach – F4.4 (proste mnożniki pokrycia popytu, błędu ceny i reklamy dawały słabszemu botowi często WIĘKSZY
-# zysk, bo strategie z Revasa zamawiają za dużo i przepłacają reklamę – potrzebne prawdziwe planowanie).
+# Poziomy trudności (gra z lokalami): mistrz gry wybiera je dla każdego bota (konfiguracja gry: firmy[].poziom,
+# bez niego – sredni). Same mnożniki pokrycia popytu, błędu ceny i reklamy dawały słabszemu botowi często WIĘKSZY
+# zysk, więc poziomy różnią się sposobem planowania (silnik/boty.py):
+# - planowanie: proste – osobna kuchnia na każde danie i zamówienia na cały przewidywany popyt (towar się psuje,
+#   gdy kuchnia nie nadąża); przepustowosc – kucharze, sztuki sprzętu i kasjerzy na popyt dzień po dniu
+#   (najwyżej tyle, ile miejsc w lokalu), zamówienia tylko na to, co kuchnia sprzeda;
+# - cel_obslugi – najwyżej jaką część popytu (dzień po dniu) bot chce obsłużyć – kolejną osobę zatrudnia tylko,
+#   gdy dodatkowa sprzedaż × (cena − składniki) pokrywa jej koszt (pensja × narzut_pracy – składki);
+# - blad_prognozy – losowy błąd prognozy (± ułamek), losowy_kandydat – zatrudnia kogokolwiek z zawodu;
+# - kampanie / promocje – czy w ogóle reklamuje się w agencjach i daje promocje (dalej wg strategii);
+# - korekta_prognozy – granice poprawki prognozy o popyt / prognozę poprzedniej rundy;
+# - mnozniki_ceny – sprawdzane ceny (× cena strategii): wybiera tę o największej oczekiwanej marży (sprzedaż
+#   w granicach przepustowości × (cena − składniki) − praca obsady; narzut_pracy – pensja × narzut na składki);
+# - obsluga_kampanii – kampanie tylko, gdy plan obsługuje co najmniej tę część popytu każdego lokalu;
+# - kolejny_lokal – kolejny gotowy lokal, gdy żaden lokal nie obsługuje części popytu `obsluga`, gotówki jest
+#   ponad `gotowka`, a firma ma mniej niż `maks_lokali` (co mapa.zasady.nowy_lokal_co_rund rund).
 poziomy:
   latwy:
     nazwa: Łatwy
     opis: proste reguły, łatwo go przegonić
+    planowanie: proste
+    blad_prognozy: 0.25
+    losowy_kandydat: true
+    kampanie: false
+    promocje: false
   sredni:
     nazwa: Średni
     opis: trzyma się swojej strategii
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    narzut_pracy: 1.25
   trudny:
     nazwa: Trudny
-    opis: planuje zapasy, reklamę i lokale
+    opis: planuje zapasy, ceny, reklamę i lokale
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    korekta_prognozy: [0.8, 1.25]
+    mnozniki_ceny: [0.9, 0.95, 1.05, 1.1, 1.15]
+    narzut_pracy: 1.25
+    obsluga_kampanii: 0.9
+    kolejny_lokal: {obsluga: 0.85, gotowka: 60000, maks_lokali: 2}
 strategie:
   zrownowazony:
     nazwa: Kebab u Zrównoważonego
+    min_kuchnia: 2               # planujący bot (poziom średni i trudny): najmniej miejsc w kuchni lokalu
     cena: 0.92
     jakosc: 2
     uslugi: 6
@@ -49,6 +78,7 @@ strategie:
     higiena: podstawowa          # gra z lokalami: poziom higieny (dane/zdarzenia/urzad.yaml)
   tani:
     nazwa: Tani Kebab Nocny
+    min_kuchnia: 1
     cena: 0.78
     jakosc: 1
     uslugi: 8
@@ -70,6 +100,7 @@ strategie:
     higiena: podstawowa          # mop i grafik – bez tego sanepid nie odbierze lokalu
   premium:
     nazwa: Kebab Premium
+    min_kuchnia: 2
     cena: 1.08
     jakosc: 3
     uslugi: 5
@@ -90,6 +121,7 @@ strategie:
     higiena: haccp
   agresywny:
     nazwa: Kebab Głośny Marketing
+    min_kuchnia: 2
     cena: 0.8
     jakosc: 3
     uslugi: 8
@@ -119,6 +151,7 @@ strategie:
     higiena: firma
   nasladowca:
     nazwa: Kebab Naśladowca
+    min_kuchnia: 2
     cena: null
     jakosc: 2
     uslugi: 6
