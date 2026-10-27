@@ -82,7 +82,7 @@ export const dashboard = {
       ${kafel("Stawki amortyzacji", "procent", v.amortyzacja
         ? `<div class="maly-tekst">Lokal i budynek: ${proc(v.amortyzacja.stawki.budynek)} rocznie<br>Od ${licz(p.amortyzacja_prog)} PLN: ${proc(v.amortyzacja.stawki.sprzet)} rocznie<br>Do ${licz(p.amortyzacja_prog)} PLN: 100%</div>`
         : `<div class="maly-tekst">Sprzęt powyżej ${licz(p.amortyzacja_prog)} PLN: 10%<br>Sprzęt do ${licz(p.amortyzacja_prog)} PLN: 100%</div>`)}
-      ${kafel("Pozostałe informacje", "finanse", `<div class="maly-tekst">Podatek dochodowy ${proc(p.cit, 0)}<br>Składki ZUS pracodawcy ${proc(p.zus, 0)}
+      ${kafel("Pozostałe informacje", "finanse", `<div class="maly-tekst">PIT liniowy ${proc(v.podatki?.parametry?.pit ?? 0, 0)}<br>Składki ZUS pracodawcy ${proc(p.zus, 0)}
         <br>Kredyt odnawialny: ${v.gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "jak w grze (jednocześnie)"}
         ${d.lokaty ? `<br>Lokaty: ${zl(d.lokaty)}` : ""}${d.zadluzenie ? `<br>Zadłużenie: ${zl(d.zadluzenie)}` : ""}</div>`)}
     </div>${(v.historia || []).length > 1 ? `<div class="wykres"><canvas id="w-dash"></canvas></div>` : ""}`;

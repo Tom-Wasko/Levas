@@ -66,10 +66,10 @@ def test_kazdy_plik_ma_opis_i_zrodlo():
         ),
         (
             "zalozenia.yaml",
-            lambda d: d["finanse"]["podatek_cit"].update(pewnosc="chyba"),
-            "finanse.podatek_cit",
+            lambda d: d["finanse"]["zus_pracodawcy"].update(pewnosc="chyba"),
+            "finanse.zus_pracodawcy",
         ),
-        ("zalozenia.yaml", lambda d: d["finanse"]["podatek_cit"].pop("zrodlo"), "podatek_cit"),
+        ("zalozenia.yaml", lambda d: d["finanse"]["zus_pracodawcy"].pop("zrodlo"), "zus_pracodawcy"),
     ],
 )
 def test_sprawdz_wykrywa_bledy(tmp_path, plik, zmiana, oczekiwany):

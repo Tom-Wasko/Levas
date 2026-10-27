@@ -481,3 +481,5 @@ _brak_
   lokal), nazwy kasy zamiast recepcji, `gra/balans/symuluj.py`; 245 testów; pytanie 27. Start F4.7 (zakładki).
 - 27.10 06:35 – F4.7 gotowe: menu i zakładki (Menu, VAT, Parki, Dostawcy ▸ świeżość), wyniki Stanowisk i Szkoleń;
   245 testów; pytanie 28. Plan kroków 1–4 (bez giełdy) zrealizowany.
+- 27.10 06:45 – dosprzątanie: nieużywane parametry Revasa usunięte z `dane/zalozenia.yaml` (zostają w
+  `dane_revas/`), pulpit pokazuje stawkę PIT liniowego.

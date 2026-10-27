@@ -115,11 +115,8 @@ def katalogi(dane: Dane) -> dict:
     return {"mapa": dane.mapa, "uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_kasy": dane.sprzet_kasy, "zawody": dane.zawody, "zasoby": dane.zasoby,
             "oferty": dane.katalog_ofert, "placa_minimalna": dane.z["finanse"]["placa_minimalna"],
             "parametry": {"kapital": dane.z["finanse"]["kapital_startowy"], "godziny": dane.z["operacje"]["godziny_pracownika"],
-                          "cit": dane.z["finanse"]["podatek_cit"], "zus": dane.z["finanse"]["zus_pracodawcy"],
-                          "amortyzacja_prog": dane.z["finanse"]["amortyzacja_prog"],
-                          "utrzymanie_klubu": dane.z["finanse"]["utrzymanie_klubu"],
+                          "zus": dane.z["finanse"]["zus_pracodawcy"], "amortyzacja_prog": dane.z["finanse"]["amortyzacja_prog"],
                           "na_runde": 12 / dane.rund_w_roku, "rund_w_roku": dane.rund_w_roku,
-                          "koszt_zwrotu": dane.z["finanse"]["koszt_zwrotu"], "koszt_magazynowania": dane.z["finanse"]["koszt_magazynowania"],
                           "sprzedaz_sprzetu": dane.z["finanse"]["sprzedaz_sprzetu"]}}
 
 

@@ -1,6 +1,6 @@
 // Inwestycje: stanowiska, sprzęt, wyposażenie dla klientów.
 import { kosztLokali, miejscaLokali } from "./lokale.js";
-import { esc, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const suma = (pozycje, start) => pozycje.filter((p) => p.opis.startsWith(start)).reduce((s, p) => s + p.pozostale, 0);
@@ -12,12 +12,11 @@ export const stanowiska = {
     const pakiety = kat.oferty.stanowiska.pakiety;
     const nowe = v.decyzje.stanowiska || {};
     const koszt = suma(v.koszty_decyzji, "Uruchomienie stanowiska");
-    const utrzymanie = v.lokale ? kosztLokali(v) : naRunde(kat.parametry.utrzymanie_klubu);
-    let html = `<div class="pasek ciemny"><span>${v.lokale ? "Koszt lokali (czynsz i media)" : `${OKRES.przymiotnik} koszt utrzymania lokalu`}: <span class="kwota">${zl(utrzymanie)}</span></span>
+    let html = `<div class="pasek ciemny"><span>Koszt lokali (czynsz i media): <span class="kwota">${zl(kosztLokali(v))}</span></span>
       <span>Nowe stanowiska: <span class="kwota">${zl(koszt)}</span></span></div><div class="dwie" style="margin-top:20px">`;
     for (const typ of TYPY) {
       const maja = v.stan_przed.stanowiska.filter((s) => s.typ === typ).length;
-      const m = v.lokale ? miejscaLokali(v, typ) : null;
+      const m = miejscaLokali(v, typ);
       const miejsca = m ? `<div class="podpowiedz" style="padding:8px 0">Miejsca w lokalach: zajęte ${m.zajete} z ${m.wszystkie}${m.wszystkie ? "" : " – najpierw wybierz lokal (zakładka Lokale)"}</div>` : "";
       html += `<div class="kafel"><div class="kg kg-pelny">
         ${esc(kat.oferty.stanowiska.typy[typ].nazwa)} – liczba posiadanych: <span style="font-size:22px">${maja}</span></div><div class="kt">${miejsca}

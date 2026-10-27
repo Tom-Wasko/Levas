@@ -212,6 +212,7 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   zdarzenia, wypadki), Handel; nowe wyniki w Inwestycje ▸ Stanowiska (liczba, miejsca w lokalach, obłożenie,
   stanowiska konkurencji – `rynek.stanowiska`) i HR ▸ Szkolenia (`wyniki.szkolenia`, efekt w karcie);
   z panelu MG usunięty wybór „bez lokali”; wszystkie zakładki sprawdzone w node na widoku prawdziwej gry
-  (pytanie 28)
+  (pytanie 28); dosprzątanie po F4.6: z danych Levasa usunięte nieużywane parametry Revasa (`podatek_cit`,
+  `utrzymanie_klubu`, `koszt_magazynowania`, `koszt_zwrotu`), na pulpicie „PIT liniowy” zamiast CIT
 
 Plan kroków 1–4 (bez giełdy) zrealizowany.

@@ -156,5 +156,4 @@ Silnik i klucze danych mają jeszcze nazwy z Revasa (zmiana nazw razem z przebud
 | zasób (`zasoby`) | składnik |
 | prowadzący, `godziny_prowadzacego` | kucharz, czas kuchni na porcję |
 | `grupa` | porcji naraz (w kebabie 1) |
-| `utrzymanie_klubu` | utrzymanie lokalu |
 | stanowisko typu `kuchnia` / `kasa` | stanowisko kuchenne / kasowe (nazwy i zawody: `katalog.yaml` → `stanowiska.typy`) |

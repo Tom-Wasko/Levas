@@ -181,18 +181,10 @@ finanse:
     wartosc: 4806
     pewnosc: potwierdzone
     zrodlo: dashboard r1
-  podatek_cit:
-    wartosc: 0.19
-    pewnosc: potwierdzone
-    zrodlo: dashboard r1, KPiR (miesięcznie, bez rozliczania strat)
   zus_pracodawcy:
     wartosc: 0.19
     pewnosc: potwierdzone
     zrodlo: KPiR luty–maj
-  utrzymanie_klubu:
-    wartosc: 2000
-    pewnosc: potwierdzone
-    zrodlo: KPiR, stanowiska r9
   amortyzacja_prog:
     wartosc: 10000
     pewnosc: potwierdzone
@@ -211,14 +203,6 @@ finanse:
     pewnosc: zalozenie
     zrodlo: 'gra z lokalami (F3a.6): stawki roczne jak w wykazie stawek amortyzacyjnych – budynki i lokale niemieszkalne
       2,5%, grunt bez amortyzacji, sprzęt i wyposażenie 20%; amortyzacja liniowa co rundę'
-  koszt_magazynowania:
-    wartosc: 50
-    pewnosc: potwierdzone
-    zrodlo: 'KPiR: 50 PLN/mies., gdy zostaje zapas'
-  koszt_zwrotu:
-    wartosc: 0.1
-    pewnosc: potwierdzone
-    zrodlo: 'dostawcy: koszt zwrotu 10%'
   sprzedaz_sprzetu:
     wartosc: 0.5
     pewnosc: skalibrowane
