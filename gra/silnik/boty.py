@@ -12,7 +12,8 @@ Poziomy (dane/boty.yaml: poziomy, gra z lokalami; bez lokali – zawsze dawne re
   w lokalu), a zamawia tylko to, co kuchnia zdąży sprzedać;
 - trudny – jak średni, a do tego poprawia prognozę o błąd z poprzedniej rundy, wybiera cenę o największej
   oczekiwanej marży (po koszcie składników i pracy), reklamuje się tylko z wolną kuchnią i bierze kolejny
-  gotowy lokal, gdy obecne nie nadążają.
+  gotowy lokal, gdy obecne nie nadążają;
+- niemożliwy – jak trudny, ale oszukuje: klienci bez powodu wolą jego lokale (przewaga_popytu, silnik/runda.py).
 """
 from __future__ import annotations
 
@@ -62,6 +63,13 @@ def poziom(dane: Dane, konf: dict, nazwa: str) -> dict:
     """Ustawienia poziomu bota z konfiguracji gry (firmy[].poziom; bez niego – średni)."""
     klucz = next((f.get("poziom") for f in konf.get("firmy", []) if f["nazwa"] == nazwa), None) or DOMYSLNY_POZIOM
     return (dane.boty.get("poziomy") or {}).get(klucz) or {}
+
+
+def przewaga_popytu(dane: Dane, konf: dict, nazwa: str) -> float:
+    """Mnożnik atrakcyjności lokali firmy z poziomu bota (niemożliwy > 1); drużyny graczy – zawsze 1."""
+    if not any(f["nazwa"] == nazwa and f.get("bot") for f in konf.get("firmy", [])):
+        return 1.0
+    return poziom(dane, konf, nazwa).get("przewaga_popytu", 1.0)
 
 
 def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict,

@@ -636,3 +636,10 @@ _brak_
 - `losowe.yaml`: 2 nowe wypadki w lokalu – Inwazja biedronek (październik, szkoda na sprzęcie) i Szkielet Bogdan
   (Halloween, szkoda w lokalu albo sława w internecie).
 - Testy 266 OK, dane sprawdzone.
+
+### P19 – Bot „niemożliwy” (27.10)
+- Nowy poziom botów `niemozliwy` (dane/boty.yaml): planuje jak trudny (szerszy wybór cen, do 3 lokali, wcześniej
+  otwiera kolejny), a do tego oszukuje – `przewaga_popytu: 1.3`, czyli klienci wolą jego lokale o 30% (jak stała,
+  niewidoczna kampania). Dotyczy tylko botów, nigdy drużyn graczy.
+- Mistrz gry wybiera go tak jak inne poziomy (lista poziomów bierze się z danych) – przy zakładaniu gry i w trakcie.
+- Test: przy tej samej strategii niemożliwy sprzedaje więcej niż trudny. Testy 267 OK.

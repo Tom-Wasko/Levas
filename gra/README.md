@@ -62,8 +62,8 @@ dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.
 drużyny wysłały decyzje, *Zamknij rundę* – także bez decyzji wszystkich, *Cofnij rundę*, strona każdej firmy,
 plik gry), **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund)
 i **Drużyny** (skład drużyn, nowe konta uczniów, nowe hasło). Runda zamyka się sama, gdy wszystkie drużyny
-wyślą decyzje. Przy zakładaniu gry każdy bot dostaje poziom (łatwy / średni / trudny – na razie zapisany, działa
-od F4.4), poziom można zmienić w trakcie gry (od następnej rundy).
+wyślą decyzje. Przy zakładaniu gry każdy bot dostaje poziom (łatwy / średni / trudny / niemożliwy – ten ostatni
+oszukuje: klienci bez powodu wolą jego lokale), poziom można zmienić w trakcie gry (od następnej rundy).
 
 **Prowadzenie gry** (zakładka *Decyzje* panelu mistrza gry):
 

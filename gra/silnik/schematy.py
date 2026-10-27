@@ -445,6 +445,7 @@ class PoziomBota(Schemat):
     narzut_pracy: float = Field(1.0, ge=1)
     obsluga_kampanii: float | None = Field(None, ge=0, le=1)
     kolejny_lokal: KolejnyLokalBota | None = None
+    przewaga_popytu: float = Field(1.0, ge=1)   # niemożliwy: mnożnik atrakcyjności lokali bota (oszustwo)
 
 
 class PlikBotow(Plik):

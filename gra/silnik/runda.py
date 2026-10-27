@@ -20,6 +20,7 @@ import numpy as np
 from . import awarie as aw
 from . import banki as bk
 from . import biuro as bo
+from . import boty as bt
 from . import czas_wlasciciela as cw
 from . import handel as hd
 from . import karta as kw
@@ -163,6 +164,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             zk = ((s.wyniki.get(r - 1) or {}).get(nazwa, {}).get("karta") or {}).get("zadowolenie_klientow")
             mn_firmy = f.baza_klientow * (1 - info[nazwa]["harpagon_presja"]["odplyw"])   # Harpagon odstrasza gości
             mn_firmy *= zd.mnoznik_popytu(f, r)   # skutki eventów w parkach
+            mn_firmy *= bt.przewaga_popytu(dane, konfiguracja, nazwa)   # bot niemożliwy oszukuje
             ceny = {u: max(0.01, f.ceny[u].cena - f.ceny[u].rabat) for u in f.oferta if u in f.ceny}
             oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, ceny, {
                 "wyposazenie": mnoznik_wyposazenia(dane, f.wyposazenie), "reklama": 0.0, "mnoznik_firmy": mn_firmy,

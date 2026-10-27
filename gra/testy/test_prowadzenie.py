@@ -113,7 +113,7 @@ def test_mistrz_gry_oglada_druzyne_uczniow_tylko_do_odczytu(client, gra, uczen):
 def test_poziom_botow(client, gra):
     bot = next(f for f in _mg(client, gra)["firmy"] if f["bot"])
     assert bot["poziom"] == "trudny"
-    assert set(_mg(client, gra)["prowadzenie"]["poziomy"]) == {"latwy", "sredni", "trudny"}
+    assert set(_mg(client, gra)["prowadzenie"]["poziomy"]) == {"latwy", "sredni", "trudny", "niemozliwy"}
     assert _ustaw(client, gra, poziom={"firma": "Bot", "poziom": "latwy"}).status_code == 200
     assert next(f for f in _mg(client, gra)["firmy"] if f["bot"])["poziom"] == "latwy"
     assert _ustaw(client, gra, poziom={"firma": "Bot", "poziom": "mistrz"}).status_code == 400

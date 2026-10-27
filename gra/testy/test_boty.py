@@ -1,4 +1,4 @@
-"""Poziomy botów (F4.4): łatwy, średni i trudny różnią się sposobem planowania, a nie tylko mnożnikami."""
+"""Poziomy botów (F4.4, P19): łatwy, średni, trudny i niemożliwy różnią się sposobem planowania (niemożliwy – oszukuje)."""
 import pytest
 
 from balans.symuluj import rozegraj
@@ -51,3 +51,17 @@ def test_latwy_bot_nie_reklamuje_sie_i_nie_daje_promocji():
         for n in ("A", "B"):
             assert not g.decyzje[r].get(n, {}).get("kampanie")
             assert not g.decyzje[r].get(n, {}).get("promocje")
+
+
+def test_niemozliwy_bot_oszukuje_popytem():
+    """Poziom niemożliwy (P19): przy tej samej strategii klienci wolą jego lokale; drużyn graczy to nie dotyczy."""
+    dane = dane_domyslne()
+    konf = {"firmy": [{"nazwa": "A", "bot": "tani", "poziom": "niemozliwy"}, {"nazwa": "B", "bot": "tani", "poziom": "trudny"},
+                      {"nazwa": "C", "bot": None, "poziom": "niemozliwy"}]}
+    assert boty.przewaga_popytu(dane, konf, "A") == dane.boty["poziomy"]["niemozliwy"]["przewaga_popytu"] > 1
+    assert boty.przewaga_popytu(dane, konf, "B") == boty.przewaga_popytu(dane, konf, "C") == 1
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "zrownowazony")], 6, 5, poziomy={"A": "niemozliwy", "B": "trudny"})
+    for _ in range(6):
+        s = g.przelicz(wymus=True)
+    sprzedaz = {n: sum(v["sprzedaz"] for r in range(2, 7) for v in s.wyniki[r][n]["sprzedaz"].values()) for n in "AB"}
+    assert sprzedaz["A"] > sprzedaz["B"]
