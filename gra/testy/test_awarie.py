@@ -22,6 +22,25 @@ def pewne_wypadki(monkeypatch):
     monkeypatch.setattr(aw, "zasady", lambda dane: {**oryginal(dane), "szansa": 1.0, "od_rundy": 2})
 
 
+def test_szansa_rosnie_bez_wypadku_i_wraca_po_wypadku():
+    """P11: +4 pp. za każdą rundę bez wypadku (od otwarcia lokalu / od rundy wypadków), sufit, reset po wypadku."""
+    from silnik.model import Firma, Lokal
+    dane = dane_domyslne()
+    z = aw.zasady(dane)
+    assert z["przyrost"] == pytest.approx(0.04) and z["szansa"] < z["szansa_max"] <= 0.4
+    od = z["od_rundy"]
+    f = Firma(nazwa="X", gotowka=0, lokale=[Lokal(id="centrum_3", forma="najem", od_rundy=1, dziala_od=1)])
+    assert aw.szansa_wypadku(dane, f, od) == pytest.approx(z["szansa"])
+    assert aw.szansa_wypadku(dane, f, od + 3) == pytest.approx(z["szansa"] + 3 * z["przyrost"])
+    assert aw.szansa_wypadku(dane, f, od + 50) == pytest.approx(z["szansa_max"])
+    f.wypadki = {"x": od + 5}
+    assert aw.szansa_wypadku(dane, f, od + 5) == pytest.approx(z["szansa"] + 5 * z["przyrost"])   # wypadek z tej rundy nie liczy się
+    assert aw.szansa_wypadku(dane, f, od + 6) == pytest.approx(z["szansa"])                     # reset
+    assert aw.szansa_wypadku(dane, f, od + 8) == pytest.approx(z["szansa"] + 2 * z["przyrost"])
+    f2 = Firma(nazwa="Y", gotowka=0, lokale=[Lokal(id="centrum_3", forma="najem", od_rundy=od, dziala_od=od + 4)])           # późne otwarcie
+    assert aw.szansa_wypadku(dane, f2, od + 4) == pytest.approx(z["szansa"])
+
+
 def _surowe(plik):
     return yaml.safe_load((KATALOG_DANYCH / "zdarzenia" / plik).read_text(encoding="utf-8"))
 

@@ -36,7 +36,12 @@ export const ubezpieczenia = {
       <div class="pasek ciemny"><span>Karencja: <span class="kwota">${rund(U.karencja_rund)}</span></span>
         <span>Wypadki od rundy: <span class="kwota">${U.od_rundy}</span></span>
         <span>Najwyższa szkoda: <span class="kwota">${zl2(U.max_strata)}</span></span>
+        ${U.ryzyko ? `<span>Ryzyko wypadku w tym tygodniu: <span class="kwota">${proc(U.ryzyko.szansa, 0)}</span></span>` : ""}
         ${D ? `<span>Składki w tej rundzie: <span class="kwota">${zl2(D.skladki)}</span></span>` : ""}</div>`
+      + (U.ryzyko ? `<p class="podpowiedz">Agent przegląda statystyki: „${U.ryzyko.rundy_bez_wypadku
+        ? `${U.ryzyko.rundy_bez_wypadku} ${U.ryzyko.rundy_bez_wypadku === 1 ? "tydzień" : U.ryzyko.rundy_bez_wypadku < 5 ? "tygodnie" : "tygodni"} bez wypadku? Statystycznie coś się już szykuje.”`
+        : "Świeża sprawa – licznik spokoju dopiero rusza.”"} Ryzyko rośnie o ${proc(U.ryzyko.przyrost, 0)} za każdy spokojny tydzień
+        (od ${proc(U.ryzyko.bazowa, 0)} do najwyżej ${proc(U.ryzyko.maks, 0)}), a po wypadku spada do ${proc(U.ryzyko.bazowa, 0)}.</p>` : "")
       + tabela("Polisy", ["Polisa", "Pokrycie", "Franszyza", `Składka${naOkres()}`, "Stan", ""], wiersze, { klasy: ["l"], sortuj: false })
       + (maLokal ? "" : `<p class="podpowiedz">Polisy są dla firm z lokalem.</p>`)
       + (zmiany.length ? `<div class="komunikat">${zmiany.join("<br>")}</div>` : "")

@@ -1085,6 +1085,8 @@ class ZasadyWypadkow(Schemat):
     od_rundy: int = Field(ge=1)
     szansa: float = Field(gt=0, le=1)      # na rundę i drużynę z działającym lokalem
     max_strata: float = Field(gt=0)        # zł – górna granica jednej szkody
+    przyrost: float = Field(default=0, ge=0)     # P11: + za każdą rundę bez wypadku (reset po wypadku)
+    szansa_max: float = Field(default=1, gt=0, le=1)
 
 
 class Polisa(Schemat):

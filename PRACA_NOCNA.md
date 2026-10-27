@@ -581,3 +581,7 @@ _brak_
   w dane/mapa/reklama.yaml; nasycenie x → maks·(1 − e^(−x/maks))). Pomiar (3 boty, lokal A w Centrum, runda 5):
   jedna kampania +4…+10% popytu A, trzy tanie (ulotki + grupa + degustacja) ok. +12%, wszystkie kanały naraz ok. +28%;
   konkurent w tej samej strefie −0…−2%. W wynikach Agencji tabela „Łączne przyciąganie (po sufocie)” – ile uciekło.
+- **P11 (27.10):** wypadki – szansa 8% + 4 pp. za każdą rundę bez wypadku (`zasady.przyrost`), sufit 40%
+  (`szansa_max`), po wypadku od nowa; licznik od rundy wypadków / otwarcia lokalu (silnik/awarie.py `szansa_wypadku`).
+  Symulacja: ok. 2,6 wypadku na grę przy starcie od rundy 4 (ok. 1,7 od rundy 9). W Ubezpieczeniach „Ryzyko wypadku
+  w tym tygodniu” i komentarz agenta.

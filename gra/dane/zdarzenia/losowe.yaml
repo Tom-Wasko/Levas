@@ -13,7 +13,9 @@ zrodlo: 'Notatka „Zdarzenia i historie” (rzadkie wypadki, limit straty, ubez
   – założenie F3b.5, do kalibracji w kroku 5'
 zasady:
   od_rundy: 4          # pierwsze tygodnie bez wypadków – drużyny dopiero się urządzają
-  szansa: 0.08         # na rundę i drużynę: przy 26 rundach średnio niecałe 2 wypadki na grę
+  szansa: 0.08         # w pierwszej rundzie z wypadkami i zaraz po wypadku; z przyrostem ok. 2–3 wypadki na grę
+  przyrost: 0.04       # P11 (odpowiedź 17): +4 pp. za każdą rundę bez wypadku, po wypadku od nowa
+  szansa_max: 0.4      # sufit – „im dłużej spokojnie, tym bliżej katastrofy”, ale nie co tydzień
   max_strata: 8000     # zł – górna granica jednej szkody
 ubezpieczyciel:
   nazwa: TUW „Pod Koziołkiem”

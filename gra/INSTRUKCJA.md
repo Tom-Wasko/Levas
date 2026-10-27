@@ -172,7 +172,9 @@ Jeśli kilka drużyn wybierze to samo, każda dostaje tę samą nagrodę. Bez wy
 (bez czasu właściciela).
 
 Czasem coś przytrafia się **tylko Tobie** – w lokalu. Rożen odmawia posłuszeństwa, kot sąsiada wchodzi do kuchni.
-Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji).
+Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji). Im dłużej spokojnie, tym
+groźniej: ryzyko wypadku rośnie o 4 punkty procentowe za każdy tydzień bez wypadku (od 8% do najwyżej 40%), a po
+wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 
 ## 13. Rozwój
 

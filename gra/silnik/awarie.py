@@ -1,7 +1,8 @@
 """Wypadki w lokalu i ubezpieczyciel (gra z lokalami, F3b.5; notatka „Zdarzenia i historie”).
 
 Dane: `dane/zdarzenia/losowe.yaml`. Od rundy `zasady.od_rundy` drużyna z działającym lokalem ma co rundę szansę
-`zasady.szansa` (strumień „wypadki”), że zacznie się u niej wypadek – historia w kilku scenach rozgrywana jak eventy
+(`szansa_wypadku`: `zasady.szansa` + `zasady.przyrost` za każdą rundę bez wypadku, najwyżej `zasady.szansa_max`; po
+wypadku od nowa – P11; strumień „wypadki”), że zacznie się u niej wypadek – historia w kilku scenach rozgrywana jak eventy
 w parkach (silnik/zdarzenia.py), ale tylko w tej jednej drużynie. Naraz najwyżej jeden otwarty wypadek, żaden się nie
 powtarza (`Firma.wypadki`: id → runda początku). Ok. 80% historii jest komicznych, reszta (`powazna`) – bez żartów.
 
@@ -44,6 +45,21 @@ def _dziala(f: Firma, runda: int) -> bool:
     return any(lok.dziala_od <= runda for lok in f.lokale)
 
 
+def rundy_bez_wypadku(dane: Dane, f: Firma, runda: int) -> int:
+    """Ile rund przed tą minęło bez nowego wypadku – od ostatniego wypadku, a bez wypadków od rundy, w której
+    wypadki mogą się zacząć (i działa już lokal)."""
+    otwarcie = min((lok.dziala_od for lok in f.lokale), default=runda)
+    poczatek = max(zasady(dane)["od_rundy"], otwarcie)
+    wczesniej = [r + 1 for r in f.wypadki.values() if r < runda]
+    return max(0, runda - max([poczatek, *wczesniej]))
+
+
+def szansa_wypadku(dane: Dane, f: Firma, runda: int) -> float:
+    z = zasady(dane)
+    sufit = max(z.get("szansa_max", 1.0), z["szansa"])   # sufit nie obniża szansy bazowej
+    return min(sufit, z["szansa"] + z.get("przyrost", 0.0) * rundy_bez_wypadku(dane, f, runda))
+
+
 def startuje(dane: Dane, f: Firma, runda: int, ziarno) -> str | None:
     """Wypadek, który zaczyna się w tej rundzie u firmy (None – żaden). Wynik nie zależy od tego, czy runda została już
     rozegrana (wypadek z tej rundy w `Firma.wypadki` nie blokuje)."""
@@ -54,7 +70,7 @@ def startuje(dane: Dane, f: Firma, runda: int, ziarno) -> str | None:
         return None   # poprzedni wypadek jeszcze trwa
     kandydaci = [h for h in historie(dane) if h not in wczesniej]
     los = strumien(ziarno, runda, "wypadki", f.nazwa)
-    if not kandydaci or los.random() >= zasady(dane)["szansa"]:
+    if not kandydaci or los.random() >= szansa_wypadku(dane, f, runda):
         return None
     return kandydaci[int(los.integers(len(kandydaci)))]
 
@@ -141,8 +157,12 @@ def widok(dane: Dane, f: Firma, runda: int, info: dict | None, wyniki: dict, fir
     U = ubezpieczyciel(dane)
     rap = [(r, (wyniki[r].get(firma) or {}).get("ubezpieczenia")) for r in sorted(wyniki) if r < runda]
     rap = [(r, x) for r, x in rap if x]
-    return {"nazwa": U["nazwa"], "karencja_rund": U["karencja_rund"], "od_rundy": zasady(dane)["od_rundy"],
-            "max_strata": zasady(dane)["max_strata"],
+    z = zasady(dane)
+    return {"nazwa": U["nazwa"], "karencja_rund": U["karencja_rund"], "od_rundy": z["od_rundy"],
+            "max_strata": z["max_strata"],
+            "ryzyko": {"szansa": round(szansa_wypadku(dane, f, runda), 4), "bazowa": z["szansa"],
+                       "przyrost": z.get("przyrost", 0.0), "maks": z.get("szansa_max", 1.0),
+                       "rundy_bez_wypadku": rundy_bez_wypadku(dane, f, runda)} if runda >= z["od_rundy"] and f.lokale else None,
             "oferta": [{"rodzaj": k, "nazwa": p["nazwa"], "opis": p["opis"], "pokrycie": p["pokrycie"],
                         "franszyza": p["franszyza"], "skladka": skladka(dane, f, k)} for k, p in U["polisy"].items()],
             "posiadane": {k: v for k, v in f.polisy.items()},
