@@ -126,3 +126,28 @@ def test_zwolniony_wraca_do_puli():
     _runda(g, A={"zatrudnij": [_z(k, 1)]})
     s = _runda(g, A={"zwolnij": [k["id"]]})
     assert k["id"] in {x["id"] for x in s.kandydaci}
+
+
+def test_wlasciciel_na_stanowisku_jako_pracownik_1_gwiazdka():
+    from silnik.model import WLASCICIEL, WlascicielNaStanowisku
+    from silnik.operacje import kasjerzy
+    g, s = _start()
+    f = s.firmy["A"].model_copy(deep=True)
+    kasa = f.stanowisko("kasa", 1)
+    assert f.pracownik_stanowiska(kasa) is None and not kasjerzy(g.dane, f)
+    f.wlasciciel_na = WlascicielNaStanowisku(typ="kasa", nr=1, godziny=12, zawod="Kasjer", zadowolenie_klientow=0.5,
+                                             ryzyko_reklamacji=0.1)
+    p = f.pracownik_stanowiska(kasa)
+    assert (p.id, p.gwiazdki, p.pensja) == (WLASCICIEL, 1, 0) and kasjerzy(g.dane, f) == [kasa]
+    assert f.godziny_stanowiska(kasa, 40) == 12 and f.godziny_stanowiska(f.stanowisko("kuchnia", 1), 40) == 0
+    # w grze: godziny z puli czasu właściciela, bez pensji, tylko w tej rundzie; za dużo godzin – odrzucone
+    k1 = _kandydat(s, 1)
+    s2 = _runda(g, A={"zatrudnij": [_z(k1, 1)], "wlasciciel_stanowisko": {"typ": "kasa", "nr": 1, "godziny": 10}},
+                B={"wlasciciel_stanowisko": {"typ": "kasa", "nr": 1, "godziny": 25}})
+    a, b = s2.wyniki[2]["A"], s2.wyniki[2]["B"]
+    assert a["wlasciciel_stanowisko"]["przyjete"] and 0 <= a["wlasciciel_stanowisko"]["wykorzystanie"] <= 1
+    assert any(p["opis"] == "Praca na stanowisku: Kasa nr 1" and p["godziny"] == 10 and p["przyjete"]
+               for p in a["czas_wlasciciela"]["pozycje"])
+    assert list(s2.firmy["A"].pracownicy) == [k1["id"]] and s2.firmy["A"].wlasciciel_na is None
+    assert not b["wlasciciel_stanowisko"]["przyjete"]
+    assert any("Właściciel nie stanie" in t for t in _bledy(s2, 2, "B", "zatrudnienie"))

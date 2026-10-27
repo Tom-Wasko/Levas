@@ -22,8 +22,11 @@ export const zatrudnienie = {
       if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Inwestycje → Stanowiska.</p>`; continue; }
       html += `<div class="siatka waska">${st.map((s) => {
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
+        const wl = v.decyzje.wlasciciel_stanowisko;
+        if (!p && wl && wl.typ === typ && wl.nr === s.nr) return kafelWlasciciela(v, s, edycja);
         if (!p) return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}</div><div class="kt srodek"><div class="awatar pusty">+</div>
-          <button class="btn jasny" data-akcja="kandydaci" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Zatrudnij pracownika →</button></div></div>`;
+          <button class="btn jasny" data-akcja="kandydaci" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Zatrudnij pracownika →</button>
+          ${v.lokale ? `<button class="btn jasny maly" style="margin-top:6px" data-akcja="wlasciciel" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Stań sam (właściciel)</button>` : ""}</div></div>`;
         const nowy = p.od_rundy === v.runda;
         return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}</div>
           <div class="kt srodek" data-akcja="profil" data-id="${esc(p.id)}" style="cursor:pointer"><div class="awatar">${inicjaly(p.imie_nazwisko)}</div>
@@ -31,6 +34,8 @@ export const zatrudnienie = {
           <b class="akcent">${zl(p.pensja)}</b>${p.premia ? `<br><span class="podpowiedz">premia ${zl(p.premia)}</span>` : ""}</div></div>`;
       }).join("")}</div>`;
     }
+    if (v.lokale) html += `<p class="podpowiedz">Brakuje rąk do pracy? Właściciel może sam stanąć na jednym wolnym stanowisku – pracuje jak
+      pracownik 1★, bez pensji, ale każda godzina schodzi z puli <a data-zakladka-k="czas_wlasciciela">czasu właściciela</a>.</p>`;
     return html;
   },
   wyniki({ v, kat }) {
@@ -43,6 +48,9 @@ export const zatrudnienie = {
     const wyk = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...ZAWODY.map((z) => proc(r.wykorzystanie[f][z]))]);
     const pensje = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...ZAWODY.map((z) => r.wynagrodzenia[f][z] ? zl(r.wynagrodzenia[f][z]) : "–")]);
     const moi = (v.wyniki?.pracownicy || []).map((p) => [esc(p.imie_nazwisko), esc(p.zawod), gw(p.gwiazdki), `nr ${p.stanowisko}`, proc(p.wykorzystanie), zl(p.pensja)]);
+    const wl = v.wyniki?.wlasciciel_stanowisko;
+    if (wl?.przyjete) moi.push([`<b>Właściciel</b> <span class="podpowiedz">(${licz(wl.godziny, 1)} h)</span>`, esc(kat.oferty.stanowiska.typy[wl.typ]?.kto || wl.typ),
+      gw(1), `nr ${wl.nr}`, proc(wl.wykorzystanie || 0), "bez pensji"]);
     return tabela("Liczba pracowników", ["Zespół", ...ZAWODY], liczba, { klasy: ["l"] })
       + tabela("Wykorzystanie czasu pracowników", ["Zespół", ...ZAWODY], wyk, { klasy: ["l"] })
       + tabela("Średnie wynagrodzenie pracowników", ["Zespół", ...ZAWODY], pensje, { klasy: ["l"] })
@@ -66,6 +74,14 @@ export const zatrudnienie = {
         d.zatrudnij = [...(d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n)), { kandydat: k, typ: t, nr: +n, pensja, umowa, ...(kanal ? { kanal } : {}) }];
       });
     },
+    wlasciciel: (el, c) => oknoWlasciciela(c, el.dataset.t, +el.dataset.n),
+    "potwierdz-wlasciciela": async (el, c) => {
+      const godziny = +document.getElementById("w-godziny").value;
+      if (!(godziny > 0)) return toast("Podaj liczbę godzin większą od zera.");
+      zamknijOkno();
+      await c.zmien((d) => { d.wlasciciel_stanowisko = { typ: el.dataset.t, nr: +el.dataset.n, godziny }; });
+    },
+    "zejdz-wlasciciel": (el, c) => c.zmien((d) => { delete d.wlasciciel_stanowisko; }),
     profil: (el, c) => oknoProfilu(c, el.dataset.id),
     "zapisz-profil": async (el, c) => {
       const id = el.dataset.id, nowy = el.dataset.nowy === "1";
@@ -89,6 +105,35 @@ export const zatrudnienie = {
     },
   },
 };
+
+// P5: właściciel jako pracownik 1★ na jednym wolnym stanowisku (godziny z puli czasu właściciela)
+function kafelWlasciciela(v, s, edycja) {
+  const wl = v.decyzje.wlasciciel_stanowisko, plan = v.wlasciciel_stanowisko;
+  const odrzucone = plan && plan.typ === wl.typ && plan.nr === wl.nr && !plan.przyjete;
+  return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}<span class="pigulka inf">właściciel</span></div>
+    <div class="kt srodek"><div class="awatar">Ty</div><b>Właściciel</b><br>${gw(1)}<br>
+    <span class="podpowiedz">${licz(wl.godziny, 1)} h w tym tygodniu · bez pensji</span>
+    ${odrzucone ? `<br><span class="minus">${esc(plan.powod)}</span>` : ""}
+    <div style="margin-top:6px"><button class="btn jasny maly" data-akcja="wlasciciel" data-t="${s.typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Zmień godziny</button>
+    <button class="btn czarny maly" data-akcja="zejdz-wlasciciel" ${edycja ? "" : "disabled"}>Zejdź</button></div></div></div>`;
+}
+
+function oknoWlasciciela({ v }, typ, nr) {
+  const C = v.czas_wlasciciela, teraz = v.decyzje.wlasciciel_stanowisko;
+  const juz = teraz && teraz.typ === typ && teraz.nr === nr && v.wlasciciel_stanowisko?.przyjete ? teraz.godziny : 0;
+  const wolne = Math.max(0, (C?.wolne || 0) + juz);
+  const inne = teraz && !(teraz.typ === typ && teraz.nr === nr)
+    ? `<div class="komunikat">Właściciel stoi już na innym stanowisku (nr ${teraz.nr}) – przejdzie tutaj.</div>` : "";
+  okno(`Właściciel na stanowisku nr ${nr}`, `${inne}<p>Właściciel pracuje jak pracownik <b>1★</b> (niższa jakość dań, częstsze
+      reklamacje), nie dostaje pensji, ale jego godziny schodzą z puli czasu właściciela – zabraknie ich na zakupy w dyskontach,
+      rekrutację i eventy w parkach.</p>
+    <label class="pole">Godziny w tym tygodniu (wolne teraz: ${licz(wolne, 1)} h, pełny etat: 40 h)
+      <input type="number" id="w-godziny" min="1" max="${Math.max(1, Math.floor(wolne))}" step="1" value="${Math.max(1, Math.min(8, Math.floor(wolne)))}"></label>
+    <p class="podpowiedz">W prawdziwym biznesie to częsty start: właściciel sam staje za ladą, zanim stać go na etat. Uważaj tylko,
+      żeby nie zabrakło mu czasu na prowadzenie firmy.</p>`,
+    { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
+      <button class="btn pom" data-akcja="potwierdz-wlasciciela" data-t="${typ}" data-n="${nr}">Potwierdź</button>` });
+}
 
 function oknoKandydatow({ v, kat }, typ, nr) {
   const typy = kat.oferty.stanowiska.typy, zawody = typy[typ].zawody;

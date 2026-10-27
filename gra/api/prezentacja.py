@@ -207,6 +207,8 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     v["srodki_trwale"] = ewidencja(f)
     v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
                              else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
+    v["wlasciciel_stanowisko"] = ((info or {}).get("wlasciciel_stanowisko") if edycja
+                                  else stan.wyniki[runda][firma].get("wlasciciel_stanowisko"))
     v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
     zam = ((info.get("kampanie") or {}) if edycja else (stan.wyniki[runda][firma].get("reklama_agencje") or {}))
     v["reklama"] = rk.widok(dane, f, runda, poprzedni.rynek.get(runda - 1), zam.get("zamowione"))

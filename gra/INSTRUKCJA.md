@@ -126,11 +126,13 @@ widoczna w wynikach Sprzedaży i bolesna dla zadowolenia klientów.
 - **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3)
   i szkoleniami (od tygodnia 7). Niezadowoleni pracują gorzej i odchodzą.
 - Zwolnienie i odejście mają okres wypowiedzenia – pracownik przez ten czas jeszcze pracuje (i kosztuje).
+- **Brakuje rąk?** Właściciel może sam stanąć na jednym wolnym stanowisku (przycisk *Stań sam* w zakładce
+  Zatrudnienie). Pracuje jak pracownik 1★ i nie bierze pensji, ale każda godzina za ladą schodzi z jego 20 godzin.
 
 ## 9. Czas właściciela
 
 Właściciel ma **20 godzin w tygodniu** na sprawy poza lokalem: zakupy w dyskoncie, reakcje na zdarzenia w parkach,
-negocjacje. Gdy godzin zabraknie, kolejne sprawy po prostu się nie odbędą – zobaczysz to na liście błędów.
+negocjacje, a także praca na stanowisku. Gdy godzin zabraknie, kolejne sprawy po prostu się nie odbędą – zobaczysz to na liście błędów.
 Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
 
 ## 10. Marketing

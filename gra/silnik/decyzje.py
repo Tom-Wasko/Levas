@@ -61,7 +61,7 @@ from .dostawcy import zasady_dostaw
 from .finanse import Ksiega, Rachunek, ksieguj
 from .lokale import bledy as bledy_lokali
 from .lokale import wolne_miejsca
-from .model import Cena, Firma, Pracownik, Stanowisko, grosze
+from .model import Cena, Firma, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
 from .operacje import kasjerzy, stanowiska_uslugi
 
 
@@ -275,6 +275,10 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/dostawcy.py)
     zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
                                                 (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
+    # właściciel na wolnym stanowisku: pracownik 1★ bez pensji, godziny z puli czasu właściciela (P5)
+    firma.wlasciciel_na = None
+    if kadry_ok and d.get("wlasciciel_stanowisko"):
+        info["wlasciciel_stanowisko"] = _wlasciciel_na_stanowisku(dane, firma, d["wlasciciel_stanowisko"], czas)
     info["czas_wlasciciela"] = czas.podsumowanie()
     for z in zamowienia:
         ilosc, cena = z["ilosc"], z.pop("cena")
@@ -365,6 +369,26 @@ def gotowe_uslugi(dane: Dane, firma: Firma) -> dict[str, list[str]]:
     return braki
 
 
+def _wlasciciel_na_stanowisku(dane: Dane, firma: Firma, w: dict, czas: cw.Czas) -> dict:
+    typ, nr = w.get("typ"), int(w.get("nr") or 0)
+    godziny = round(min(float(w.get("godziny") or 0), dane.z["operacje"]["godziny_pracownika"]), 2)
+    wynik = {"typ": typ, "nr": nr, "godziny": godziny, "przyjete": False, "powod": None}
+    st = firma.stanowisko(typ, nr)
+    if st is None or st.pracownik or godziny <= 0:
+        wynik["powod"] = "stanowisko nie istnieje albo ma pracownika"
+        return wynik
+    nazwa = dane.typy_stanowisk[typ]["kto"]
+    if not czas.wez(godziny, f"Praca na stanowisku: {nazwa} nr {nr}", "zatrudnienie"):
+        wynik["powod"] = "brak czasu właściciela"
+        return wynik
+    r = dane.rynek_pracy["losowanie"]["wg_gwiazdek"]["1"]   # jak przeciętny kandydat 1★
+    firma.wlasciciel_na = WlascicielNaStanowisku(
+        typ=typ, nr=nr, godziny=godziny, zawod=dane.zawody_typu(typ)[0],
+        zadowolenie_klientow=round(sum(r["zk"]) / 2, 2), ryzyko_reklamacji=round(sum(r["ryzyko"]) / 2, 2))
+    wynik["przyjete"] = True
+    return wynik
+
+
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
                  tryb_kredytu: str = "na_biezaco", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
@@ -391,6 +415,9 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
                       f"{date.fromisoformat(s['termin']):%d.%m}) – zamów mniej albo bliżej dnia sprzedaży.")
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
+        wl = (info or {}).get("wlasciciel_stanowisko")
+        if wl and not wl["przyjete"]:
+            dodaj("czerwony", "zatrudnienie", f"Właściciel nie stanie na stanowisku nr {wl['nr']}: {wl['powod']}.")
         for tekst in (info or {}).get("uwagi_rynku_pracy", []):
             dodaj("czerwony", "zatrudnienie", tekst)
         for tekst in ((info or {}).get("kampanie") or {}).get("uwagi", []):

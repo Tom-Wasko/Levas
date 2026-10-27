@@ -555,3 +555,11 @@ _brak_
   <e-mail> --mg` nadaje rolę MG kontu założonemu przez Microsoft. Ważne: klasa w sieci szkoły po
   `http://192.168…` nie zaloguje się kontem Microsoft (Microsoft wymaga https poza localhost) – do tego
   potrzebny serwer z certyfikatem; do tego czasu loginy i hasła.
+- **Odpowiedzi 27.10 (po powrocie):** P9 – 3–4 eventy w parkach na rundę, opcje po 2–5 h czasu właściciela;
+  P6 – wypowiedzenie 2 rundy w obu kierunkach (zwolniony pracuje i dostaje pensję jeszcze 2 rundy);
+  P12 – przycisk „przelej z firmy do portfela” w panelu klubu (na koncie firmy zwykła wypłata własna) +
+  „zasada milczenia”; P14 – prawdziwe terminy meczów Motoru Lublin (wyszukać).
+- **P5 (27.10):** właściciel może stanąć na jednym wolnym stanowisku (kuchnia albo kasa) – przycisk „Stań sam
+  (właściciel)” w HR → Zatrudnienie; pracuje jak 1★ (zadowolenie i ryzyko reklamacji jak przeciętny kandydat 1★),
+  bez pensji, godziny (do 40) z puli czasu właściciela; za mało czasu – odrzucone (lista błędów). Tylko w tej
+  rundzie (decyzja na każdą rundę). W wynikach – wiersz „Właściciel” w „Twoi pracownicy”. Instrukcja i PDF uzupełnione.

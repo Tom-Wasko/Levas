@@ -88,6 +88,20 @@ class Pracownik(Model):
     premia = _kwota("premia")
 
 
+WLASCICIEL = "wlasciciel"   # id właściciela na stanowisku (nie ma go w Firma.pracownicy)
+
+
+class WlascicielNaStanowisku(Model):
+    """Właściciel sam staje na wolnym stanowisku w tej rundzie (P5): pracownik 1★ bez pensji, godziny z puli
+    czasu właściciela (silnik/czas_wlasciciela.py)."""
+    typ: str
+    nr: int
+    godziny: float
+    zawod: str
+    zadowolenie_klientow: float
+    ryzyko_reklamacji: float
+
+
 class Stanowisko(Model):
     nr: int
     typ: str                      # "kuchnia" albo "kasa" (silnik/dane.py: TYPY_STANOWISK)
@@ -335,6 +349,7 @@ class Firma(Model):
     portfel_gr: int | None = None   # prywatny portfel właściciela (silnik/wlasciciel.py); None – oszczędności z danych
     zaproszenia: list[int] = Field(default_factory=list)    # rundy z otwartym klubem (silnik/kasyno.py)
     oferty_handlu: list[OfertaHandlu] = Field(default_factory=list)   # wystawione innym drużynom (silnik/handel.py)
+    wlasciciel_na: WlascicielNaStanowisku | None = None   # tylko w trakcie rundy (silnik/decyzje.py)
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
     promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
@@ -369,7 +384,22 @@ class Firma(Model):
         return next((s for s in self.stanowiska if s.typ == typ and s.nr == nr), None)
 
     def pracownik_stanowiska(self, s: Stanowisko) -> Pracownik | None:
-        return self.pracownicy.get(s.pracownik) if s.pracownik else None
+        if s.pracownik:
+            return self.pracownicy.get(s.pracownik)
+        w = self.wlasciciel_na
+        if w is None or (w.typ, w.nr) != (s.typ, s.nr):
+            return None
+        return Pracownik(id=WLASCICIEL, imie_nazwisko="Właściciel", zawod=w.zawod, gwiazdki=1,
+                         pensja_preferowana_gr=0, koszt_rekrutacji_gr=0, koszt_odprawy_gr=0,
+                         zadowolenie_klientow=w.zadowolenie_klientow, ryzyko_reklamacji=w.ryzyko_reklamacji,
+                         stanowisko=s.nr)
+
+    def godziny_stanowiska(self, s: Stanowisko, godziny_pracownika: float) -> float:
+        """Godziny pracy na stanowisku w rundzie: etat pracownika albo godziny właściciela (0 – nieobsadzone)."""
+        if s.pracownik:
+            return godziny_pracownika if s.pracownik in self.pracownicy else 0.0
+        w = self.wlasciciel_na
+        return min(godziny_pracownika, w.godziny) if w and (w.typ, w.nr) == (s.typ, s.nr) else 0.0
 
 
 class StanGry(Model):

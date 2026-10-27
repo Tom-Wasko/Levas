@@ -280,6 +280,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             w["karta_kebab"] = kw.kebab(dane, f, w, netto, zadluzenie(f))
             f.rozwoj_poprzedni = w["karta"]["rozwoj_firmy"]
 
+    for f in s.firmy.values():   # właściciel na stanowisku – tylko w tej rundzie
+        f.wlasciciel_na = None
     s.runda = r
     s.wyniki[r] = wyniki
     s.rynek[r] = _rynek_publiczny(dane, s, r, oferty, wyniki, rynek)
@@ -342,6 +344,18 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
             uzycie = 0.0
         prac.append({**do_slownika(p), "wykorzystanie": round(min(1.0, uzycie), 4)})
     w["pracownicy"] = prac
+    wl = f.wlasciciel_na
+    if wl:   # właściciel na stanowisku (P5): wykorzystanie jego godzin
+        if not obsluga:
+            uzycie = 0.0
+        elif wl.typ == KUCHNIA:
+            uzycie = obsluga["godziny_stanowisk"].get(wl.nr, 0.0) / wl.godziny
+        else:
+            pojemnosc = sum(f.godziny_stanowiska(s, godz) for s in kasjerzy(dane, f))
+            uzycie = obsluga["godziny_kasy"] / pojemnosc if pojemnosc else 0.0
+        w["wlasciciel_stanowisko"] = {**info["wlasciciel_stanowisko"], "wykorzystanie": round(min(1.0, uzycie), 4)}
+    elif info.get("wlasciciel_stanowisko"):
+        w["wlasciciel_stanowisko"] = info["wlasciciel_stanowisko"]
 
     # sprzęt – obłożenie
     sprzet = []
