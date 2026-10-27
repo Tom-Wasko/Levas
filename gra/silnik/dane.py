@@ -499,6 +499,9 @@ def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
         for x in st.get("polisy", []):
             if x not in polisy:
                 brak(x, f"boty.yaml: {s}.polisy", "rodzaj polisy", "zdarzenia/losowe.yaml: ubezpieczyciel.polisy")
+    det = d.zdarzenia["detektyw"]["detektyw"]["budynek"]
+    if det and det not in {b["id"] for b in d.mapa["budynki"]}:
+        brak(det, "zdarzenia/detektyw.yaml: detektyw", "budynek", "mapa/budynki.yaml")
     urz = d.zdarzenia["urzad"]
     if urz["urzad"]["budynek"] and urz["urzad"]["budynek"] not in {b["id"] for b in d.mapa["budynki"]}:
         brak(urz["urzad"]["budynek"], "zdarzenia/urzad.yaml: urzad", "budynek", "mapa/budynki.yaml")

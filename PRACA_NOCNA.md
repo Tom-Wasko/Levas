@@ -613,3 +613,10 @@ _brak_
 ### P15 – tydzień 1 przygotowawczy, MG go nie zmienia (27.10)
 - Harmonogram odblokowań: zakładek tygodnia 1 (nazwa firmy, misja, oferta, stanowiska, bank, biuro rachunkowe…) mistrz gry nie przesuwa – ani przy zakładaniu gry (API), ani w trakcie (panel MG). Nie da się też przenieść żadnego elementu do tygodnia 1 (najwcześniej tydzień 2).
 - Panel MG: te pola są wyszarzone z dopiskiem „tydzień przygotowawczy”; instrukcja i PDF – jedno zdanie.
+
+### P16 – Konkurencja i detektyw (27.10)
+- Nowa zakładka **Klienci i strefy ▸ Konkurencja** (Decyzje + Wyniki). Każdy widzi ogólny obraz rynku z poprzedniej rundy: lokale, liczba dań, przedział cen, reklama tak/nie, promocje tak/nie, udział w klientach (własny wiersz oznaczony „Wy”).
+- Detektyw „Sokole Oko” – Zenon Lupa: nowy budynek na mapie (dworzec, obok Harpagona), dane w `dane/zdarzenia/detektyw.yaml`, moduł `silnik/konkurencja.py`. Od tygodnia 2 (element harmonogramu „Detektyw” – mistrz gry może przesunąć). Cena 300–800 zł brutto (co 10 zł, losowana co rundę dla drużyny), 2 h właściciela; bez wolnych godzin – czerwony błąd, bez kosztu. Jedno zlecenie na rundę.
+- Raport w wynikach: gotówka, przychody/koszty/dochód netto, zadłużenie, zadowolenie klientów, menu (ceny, popyt, sprzedaż, przychód, reklamacje), lokale, załoga (zawód × gwiazdki, średnia pensja), kampanie i promocje.
+- 15% wpadki: raport i tak przychodzi, ale śledzony dostaje w wynikach komiczną historię z nazwą zleceniodawcy. Boty nie zatrudniają detektywa. Teksty komiczne (powitania, raporty, wpadki, ofiary).
+- Testy: `testy/test_konkurencja.py` (6). INSTRUKCJA (rozdz. 13 i tabela odblokowań) + PDF.

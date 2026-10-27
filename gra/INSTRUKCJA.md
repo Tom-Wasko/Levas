@@ -186,6 +186,10 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 - **Handel z drużynami** (od tygodnia 5) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
   i z fakturą. Druga drużyna widzi Twoją ofertę od razu i może się targować: przyjąć, odrzucić albo dać kontrofertę –
   i tak na przemian, najwyżej 3 kontroferty. Przyjęta cena to umowa, towar przychodzi na początku następnego tygodnia.
+- **Konkurencja** (Klienci i strefy ▸ Konkurencja) – ogólny obraz rywali widzi każdy: lokale, przedział cen,
+  reklama i promocje, udział w klientach. Dokładne dane jednego rywala (od tygodnia 2) zbierze detektyw „Sokole Oko”
+  z biura przy dworcu: 300–800 zł i 2 godziny właściciela. Raport przychodzi po tygodniu, ale w 15% przypadków
+  detektyw wpada – i rywal dowiaduje się, kto go śledził.
 - **Analiza „co jeśli”** (od tygodnia 2) – przewidywany wynik tygodnia dla Twoich decyzji, zanim je wyślesz.
 
 ## 14. Kiedy co się odblokowuje
@@ -193,7 +197,7 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 | Tydzień | Nowe zakładki |
 |---|---|
 | 1 | Mapa, Lokale, Menu, Stanowiska, Bank, Biuro rachunkowe, Kalendarz miejski |
-| 2 | Sprzęt, Zatrudnienie, Rynek pracy, Dostawcy, Świeżość, Sprzedaż, Promocje, Parki, Ubezpieczenia, raporty finansowe, Analiza |
+| 2 | Sprzęt, Zatrudnienie, Rynek pracy, Dostawcy, Świeżość, Sprzedaż, Promocje, Parki, Ubezpieczenia, raporty finansowe, Analiza, detektyw |
 | 3 | Karta wyników, Udogodnienia, Agencje reklamowe, nowe dania w menu |
 | 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali |
 | 5 | Handel z drużynami, kolejne kampanie reklamowe |

@@ -2,7 +2,7 @@
 
 Element harmonogramu to zakładka (katalog.yaml: rundy.harmonogram_lokali.zakladki) albo element mapy z własnym
 terminem w danych: kanały rekrutacji, późniejsi dostawcy, licytacje i przejęcia lokali, promocje, kanały agencji
-reklamowych, eventy w parkach, wypadki, handel między drużynami (bez klubu z kasynem – mistrz gry o nim nie wie,
+reklamowych, eventy w parkach, wypadki, handel między drużynami, detektyw (bez klubu z kasynem – mistrz gry o nim nie wie,
 silnik/kasyno.py). Mistrz gry może zmienić
 tydzień każdego elementu (konfiguracja gry: `odblokowanie` – {element: tydzień}, tylko zmiany względem danych) – poza
 tygodniem 1 (P15): to tydzień przygotowawczy, jego zakładek nie da się przesunąć ani przenieść niczego do niego.
@@ -77,7 +77,8 @@ def elementy(dane: Dane) -> dict[str, dict]:
     z = dane.zdarzenia or {}
     for klucz, nazwa, sciezka in (("parki", "Eventy w parkach", ("parki", "zasady")),
                                   ("wypadki", "Wypadki w lokalu", ("losowe", "zasady")),
-                                  ("handel", "Handel między drużynami", ("handel", "handel"))):
+                                  ("handel", "Handel między drużynami", ("handel", "handel")),
+                                  ("detektyw", "Detektyw – dokładne dane konkurencji", ("detektyw", "detektyw"))):
         if sciezka[0] in z:
             dodaj(klucz, nazwa, "Zdarzenia" if klucz != "handel" else "Handel", [("zdarzenia", *sciezka, "od_rundy")])
     return el

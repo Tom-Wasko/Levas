@@ -241,7 +241,7 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 - [x] P14 Kalendarz wrzesień–grudzień: mecze (Motor Lublin), wpływ wydarzeń na konkretne dania, sezonowość
   tygodniowa dopasowana do wydarzeń – pytania 21 i 27
 - [x] P15 Harmonogram: tydzień 1 przygotowawczy, MG nie przesuwa zakładek tygodnia 1 – pytanie 24
-- [ ] P16 Konkurencja: ogólny obraz rywali dla wszystkich (Decyzje/Wyniki), dokładne dane – detektyw z mapy
+- [x] P16 Konkurencja: ogólny obraz rywali dla wszystkich (Decyzje/Wyniki), dokładne dane – detektyw z mapy
   (300–800 zł + 2 h, 15% wpadki) – pytanie 26
 - [ ] P17 Sprzątanie: usunąć zbędne pozostałości Revasa (`dane_revas/`, martwy kod) – pytanie 27
 - [ ] P18 Nowe historyjki (parki, zdarzenia) – do 15:00, po wszystkim innym – pytanie 12

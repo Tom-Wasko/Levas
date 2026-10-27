@@ -24,6 +24,7 @@ CELE = frozenset({
     "dostawcy",    # ceny dostawców w trybie losowym: runda = miesiąc (0 = styczeń)
     "gazetki",     # promocje w gazetkach dyskontów: runda, dostawca
     "harpagon",    # wizyty Harpagona u dłużnika: runda, firma
+    "detektyw",    # cena, wpadka i teksty detektywa (silnik/konkurencja.py): runda, firma, co
     "handel",      # tekst przekazania towaru/sprzętu między drużynami (silnik/handel.py): runda, id oferty
     "kasyno",      # zaproszenie i gry w klubie (silnik/kasyno.py): runda, firma[, nr zakładu]
     "kandydaci",   # rynek pracy: runda 0 = pula startowa

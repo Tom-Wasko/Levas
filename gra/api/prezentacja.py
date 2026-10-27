@@ -11,6 +11,7 @@ from silnik import handel as hd
 from silnik import harmonogram as hm
 from silnik import kalendarz as kl
 from silnik import kasyno as kas
+from silnik import konkurencja as kn
 from silnik import lichwiarz as lw
 from silnik import magazyn as mag
 from silnik import promocje as pm
@@ -90,6 +91,8 @@ def stan_po_szkicu(gra: Gra, firma: str):
     if gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
         info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
+        info["konkurencja"] = kn.zlec(gra.dane, f, d, r, gra.konfiguracja["ziarno"], sorted(stan.firmy), ks, rach, czas,
+                                      podglad=True)   # wpadka – dopiero w przeliczeniu
         info["czas_wlasciciela"] = czas.podsumowanie()
     bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
                          lokal, info)
@@ -102,6 +105,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     bledy += hd.bledy(info["handel"])
     bledy += pr.bledy(gra.dane, stan.firmy, firma, r, przejecia)
     bledy += (info.get("zdarzenia") or {}).get("bledy", [])
+    bledy += kn.bledy(info.get("konkurencja"))
     return stan, f, ks, info, bledy
 
 
@@ -235,6 +239,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     v["handel"] = hd.widok(dane, poprzedni.firmy, firma, runda, info.get("handel") if edycja
                            else stan.wyniki[runda][firma].get("handel"),
                            gra.decyzje.get(runda, {}) if edycja else None)
+    v["konkurencja"] = kn.widok(dane, firma, runda, gra.konfiguracja["ziarno"], v.get("rynek"),
+                                info.get("konkurencja") if edycja
+                                else (stan.wyniki[runda][firma].get("konkurencja") or {}).get("zlecenie"))
     klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
                      else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
     if klub:

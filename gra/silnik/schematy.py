@@ -1308,6 +1308,32 @@ class PlikHandlu(Plik):
         return self
 
 
+class ZasadyDetektywa(Schemat):
+    nazwa: str
+    budynek: str | None = None              # budynek na mapie (mapa/budynki.yaml)
+    od_rundy: int = Field(ge=2)             # tydzień 1 jest przygotowawczy
+    koszt_min: float = Field(gt=0)          # zł brutto za zlecenie, losowane co rundę
+    koszt_maks: float = Field(gt=0)
+    krok: float = Field(gt=0)
+    godziny: float = Field(ge=0)            # godziny właściciela
+    szansa_wpadki: float = Field(ge=0, le=1)
+
+
+class PlikDetektywa(Plik):
+    """dane/zdarzenia/detektyw.yaml: przegląd konkurencji i detektyw (silnik/konkurencja.py, P16)."""
+    detektyw: ZasadyDetektywa
+    powitania: list[str] = Field(min_length=1)
+    raporty: list[str] = Field(min_length=1)    # {rywal}
+    wpadki: list[str] = Field(min_length=1)     # zleceniodawca: {rywal}
+    ofiary: list[str] = Field(min_length=1)     # śledzony: {kto}
+
+    @model_validator(mode="after")
+    def _widelki(self):
+        if self.detektyw.koszt_min > self.detektyw.koszt_maks:
+            raise ValueError("detektyw: koszt_min większy niż koszt_maks")
+        return self
+
+
 SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "parki.yaml": PlikParkow,
     "magazyn.yaml": PlikMagazynu,
@@ -1316,6 +1342,7 @@ SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "wlasciciel.yaml": PlikWlasciciela,
     "kasyno.yaml": PlikKasyna,
     "handel.yaml": PlikHandlu,
+    "detektyw.yaml": PlikDetektywa,
 }
 
 

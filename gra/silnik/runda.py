@@ -24,6 +24,7 @@ from . import czas_wlasciciela as cw
 from . import handel as hd
 from . import karta as kw
 from . import kasyno as kas
+from . import konkurencja as kn
 from . import lichwiarz as lw
 from . import lokale as lk
 from . import magazyn as mag
@@ -121,6 +122,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/zdarzenia.py)
             czas = cw.z_podsumowania(info[nazwa]["czas_wlasciciela"])
             info[nazwa]["zdarzenia"] = zd.rozegraj(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa], czas)
+            # detektyw: zlecenie obserwacji rywala – godziny i koszt teraz, raport po wynikach wszystkich firm
+            info[nazwa]["konkurencja"] = kn.zlec(dane, f, d, r, ziarno, nazwy, ksiegi[nazwa], rachunki[nazwa], czas, podglad)
+            bledy[nazwa] += kn.bledy(info[nazwa]["konkurencja"])
             info[nazwa]["czas_wlasciciela"] = czas.podsumowanie()
             s.kandydaci += info[nazwa]["zdarzenia"].pop("kandydaci")
             bledy[nazwa] += info[nazwa]["zdarzenia"]["bledy"]
@@ -296,6 +300,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         s.rynek[r]["kampanie"] = rk.publiczne(dane, kampanie)
     if pm.zasady(dane):   # promocje widać na drzwiach lokali
         s.rynek[r]["promocje"] = pm.publiczne(dane, s.firmy)
+    kn.raporty(dane, wyniki, {n: info[n].get("konkurencja") for n in nazwy}, r, ziarno)   # raporty detektywa i wpadki
     return s
 
 

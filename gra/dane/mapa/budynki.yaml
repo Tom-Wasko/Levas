@@ -437,3 +437,14 @@ budynki:
     y: 8
     szer: 1
     gl: 1
+- id: detektyw
+  nazwa: Biuro detektywistyczne „Sokole Oko”
+  rodzaj: detektyw
+  strefa: dworzec
+  opis: Nad lombardem przy dworcu. Zenon Lupa śledzi konkurencję za gotówkę – dyskretnie, przynajmniej w teorii.
+  zakladka: konkurencja
+  mapa:
+    x: 10
+    y: 12
+    szer: 1
+    gl: 1
