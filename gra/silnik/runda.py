@@ -260,7 +260,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         w["srodki_trwale"] = ewidencja(f)
         if kampanie:
             w["reklama_agencje"] = {"zamowione": (info[nazwa].get("kampanie") or {}).get("zamowione", []),
-                                    "kampanie": kampanie["kampanie"].get(nazwa, []), "pula_stref": kampanie["pula"]}
+                                    "kampanie": kampanie["kampanie"].get(nazwa, []), "pula_stref": kampanie["pula"],
+                                    "laczne": {z: {"suma": x, "dziala": kampanie["firmy"][nazwa][z]}   # P10: sufit
+                                               for z, x in kampanie["suma"].get(nazwa, {}).items()}}
         w["bank"] = {"poczatek": info[nazwa].get("bank"), "koniec": bank_koniec, "leasing": info[nazwa].get("leasing"),
                      "historia": bk.historia(f, r), "debet_ponad_limit": bk.debet_ponad_limit(dane, f)}
         w["harpagon"] = {"poczatek": info[nazwa].get("harpagon"), "presja": info[nazwa].get("harpagon_presja"),

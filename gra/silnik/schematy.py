@@ -806,6 +806,8 @@ class ModelReklamy(Schemat):
     okno_nasycenia: int = Field(ge=1)
     wygasanie: float = Field(ge=0, lt=1)
     prog_wygasania: float = Field(gt=0, le=1)
+    maks_przyciagania: float = Field(default=10.0, gt=0)   # P10: sufit sumy kampanii firmy w strefie (nasycenie)
+    maks_puli: float = Field(default=10.0, gt=0)           # sufit poszerzenia puli strefy przez wszystkie kampanie
 
 
 class PlikReklamy(Plik):

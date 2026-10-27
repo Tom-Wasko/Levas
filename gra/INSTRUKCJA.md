@@ -142,7 +142,8 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   ma wolne ręce. Promocji nadajesz własną, ozdobną nazwę – na wynik nie wpływa, na humor klientów owszem.
 - **Agencje reklamowe** (od tygodnia 3) – kampanie w strefach: ulotki, plakaty, radio, internet. Kampania
   przyciąga więcej głodnych i podbiera klientów konkurencji. Kilka firm reklamujących się tak samo w jednej strefie
-  zagłusza się nawzajem, a ta sama kampania powtarzana w kółko nudzi.
+  zagłusza się nawzajem, a ta sama kampania powtarzana w kółko nudzi. Kampanie się sumują, ale **z sufitem**: jedna
+  daje zwykle +4–10% popytu, kilka naraz ok. +10–30% – dalsze dokładanie to już głównie wydatek.
 
 ## 11. Pieniądze
 

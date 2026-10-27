@@ -577,3 +577,7 @@ _brak_
   (1→2, 2→3, 3→5), więc w 20 h właściciela nie zmieszczą się wszystkie; w zakładce Zdarzenia ramka z wolnym
   czasem właściciela. Uwaga: przy 14 historiach i ~60 eventach na grę historie wracają co ~4 rundy – P18 (nowe
   historie) to złagodzi.
+- **P10 (27.10):** reklama – siła kanałów ×2 i sufit sumy kampanii (`model.maks_przyciagania: 0.7`, `maks_puli: 0.15`
+  w dane/mapa/reklama.yaml; nasycenie x → maks·(1 − e^(−x/maks))). Pomiar (3 boty, lokal A w Centrum, runda 5):
+  jedna kampania +4…+10% popytu A, trzy tanie (ulotki + grupa + degustacja) ok. +12%, wszystkie kanały naraz ok. +28%;
+  konkurent w tej samej strefie −0…−2%. W wynikach Agencji tabela „Łączne przyciąganie (po sufocie)” – ile uciekło.

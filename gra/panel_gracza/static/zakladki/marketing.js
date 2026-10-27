@@ -43,7 +43,8 @@ export const agencje = {
   odblokowanie: (v) => !!v.reklama && v.runda >= (v.harmonogram?.reklama ?? 1), ukryta: (v) => !v.reklama,
   info: () => `Zamów kampanię w jednej z agencji na mieście. Kampania w strefie przyciąga do miasta więcej głodnych (korzystają też sąsiedzi)
     i podbiera klientów konkurencji. Kilka firm reklamujących się tak samo w tej samej strefie zagłusza się nawzajem, a ta sama kampania powtórzona
-    zaraz po poprzedniej działa słabiej. Po końcu kampania jeszcze przez chwilę wygasa.`,
+    zaraz po poprzedniej działa słabiej. Po końcu kampania jeszcze przez chwilę wygasa. Kampanie się sumują, ale z sufitem:
+    jedna daje zwykle kilka procent popytu więcej, kilka naraz – ok. +10% … +30%, a dalsze dokładanie już prawie nic nie zmienia.`,
   decyzje({ v, edycja }) {
     const R = v.reklama;
     if (!R) return `<p class="podpowiedz">Agencje reklamowe działają w grze z lokalami.</p>`;
@@ -51,6 +52,9 @@ export const agencje = {
     let html = `<div class="pasek ciemny"><span>Zamówione kampanie: <span class="kwota">${zam.length}</span></span>
       <span>Koszt (netto): <span class="kwota">${zl(zam.reduce((s, x) => s + x.koszt, 0))}</span></span></div>`;
     html += trwajaceHtml(v, R.trwajace.filter((x) => x.od_rundy < v.runda), "Twoje kampanie z poprzednich rund – działają w tej rundzie");
+    if (R.model?.maks_przyciagania) html += `<p class="podpowiedz">Sufit reklamy: przyciąganie wszystkich Twoich kampanii w jednej strefie
+      nasyca się do +${proc(R.model.maks_przyciagania, 0)} (to ok. +30% popytu), poszerzenie puli strefy – do +${proc(R.model.maks_puli, 0)}.
+      Pierwsze kampanie działają prawie w pełni, każda kolejna – coraz słabiej.</p>`;
     for (const a of R.agencje) {
       html += `<div class="pasek ciemny" style="margin-top:22px"><span>${esc(a.nazwa)}</span><span>${RODZAJ[a.rodzaj] || esc(a.rodzaj)}</span></div>
         <p class="podpowiedz">${esc(a.opis)}</p>
@@ -65,6 +69,10 @@ export const agencje = {
     let html = raporty.map((x) => `<div class="kafel"><div class="kg">${esc(x.nazwa)} – ${esc(x.strefa_nazwa)}</div>
       <div class="kt"><p>${esc(x.tekst)}</p></div></div>`).join("");
     html += trwajaceHtml(v, W.kampanie, "Twoje kampanie w tej rundzie") || `<p class="podpowiedz">W tej rundzie nie działała żadna Twoja kampania.</p>`;
+    const L = Object.entries(W.laczne || {});
+    if (L.length) html += tabela("Łączne przyciąganie w strefach (po sufocie)", ["Strefa", "Suma kampanii", "Działa naprawdę", "Uciekło przez sufit"],
+      L.map(([z, x]) => [esc(v.reklama?.strefy?.[z] ?? z), `+${proc(x.suma, 1)}`, `+${proc(x.dziala, 1)}`,
+        x.suma - x.dziala > 0.005 ? `<span class="minus">${proc(x.suma - x.dziala, 1)}</span>` : "–"]), { klasy: ["l"] });
     const k = v.rynek?.kampanie || {};
     html += tabela("Kampanie na mieście (widać je na słupach i w radiu)", ["Firma", "Wydatki w rundzie", "Kampanie"],
       Object.entries(k).map(([f, x]) => [esc(nazwaFirmy(v, f)), zl(x.wydatki),

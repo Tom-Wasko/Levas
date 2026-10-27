@@ -8,8 +8,12 @@ agencja × kanał × strefa (`dane/mapa/reklama.yaml`), zamiast reklamy tradycyj
   wszystkie lokale, najwięcej reklamujący się) i firma przyciąga mieszkańców strefy (popyt.atrakcyjnosc –
   `reklama_strefy`, odbiera klientów konkurencji). Zagłuszanie: inne firmy z trwającą kampanią tego samego rodzaju
   w tej strefie (kampanie na całe miasto – w każdej strefie). Wygasanie: po końcu efekt × wygasanie co rundę.
+- Sufit (P10): suma kampanii firmy w strefie nasyca się do `maks_przyciagania` (x → maks · (1 − e^(−x/maks))),
+  poszerzenie puli strefy – do `maks_puli`; kilka kampanii razem daje kebabowi ok. +10% … +30% popytu, nie więcej.
 """
 from __future__ import annotations
+
+import math
 
 from .dane import Dane
 from .finanse import Ksiega, Rachunek, ksieguj
@@ -99,6 +103,11 @@ def zamow(dane: Dane, f: Firma, d: dict, runda: int, ks: Ksiega, rach: Rachunek)
     return info
 
 
+def nasycenie(x: float, maks: float) -> float:
+    """Suma efektów kampanii z sufitem: dla małych x prawie x, przy wielu kampaniach dochodzi do `maks`."""
+    return maks * (1 - math.exp(-x / maks)) if x > 0 else 0.0
+
+
 def _waga(m: dict, k: Kampania, runda: int) -> tuple[float, str] | None:
     if runda < k.od_rundy:
         return None
@@ -119,7 +128,7 @@ def efekty_rundy(dane: Dane, firmy: dict[str, Firma], runda: int, ziarno=None) -
         for k in f.kampanie:
             if k.od_rundy <= runda <= k.do_rundy and kanal(dane, k.agencja, k.kanal):
                 aktywne.setdefault((R["agencje"][k.agencja]["rodzaj"], k.strefa), set()).add(n)
-    wynik = {"pula": {z: 0.0 for z in strefy}, "firmy": {}, "kampanie": {}}
+    wynik = {"pula": {z: 0.0 for z in strefy}, "firmy": {}, "suma": {}, "kampanie": {}}
     for n, f in firmy.items():
         przyc = {}
         for k in f.kampanie:
@@ -151,8 +160,9 @@ def efekty_rundy(dane: Dane, firmy: dict[str, Firma], runda: int, ziarno=None) -
                 wpis["tekst"] = " ".join(t.replace("{strefa}", wpis["strefa_nazwa"]).split())
             wynik["kampanie"].setdefault(n, []).append(wpis)
         if przyc:
-            wynik["firmy"][n] = {z: round(x, 4) for z, x in przyc.items()}
-    wynik["pula"] = {z: round(x, 4) for z, x in wynik["pula"].items()}
+            wynik["firmy"][n] = {z: round(nasycenie(x, m["maks_przyciagania"]), 4) for z, x in przyc.items()}
+            wynik["suma"][n] = {z: round(x, 4) for z, x in przyc.items()}   # przed sufitem (do wyników)
+    wynik["pula"] = {z: round(nasycenie(x, m["maks_puli"]), 4) for z, x in wynik["pula"].items()}
     return wynik
 
 

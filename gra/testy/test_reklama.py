@@ -81,11 +81,28 @@ def test_nasycenie_i_wygasanie():
     f.kampanie = [_kampania(od=3, do=3)]
     pula = rk.kanal(dane, "papier_przyjmie", "ulotki")["pula"]
     fazy = [rk.efekty_rundy(dane, {"A": f}, r) for r in (2, 3, 4, 5, 6, 7)]
-    assert fazy[0]["kampanie"] == {} and fazy[1]["pula"]["centrum"] == pytest.approx(pula)
-    assert fazy[2]["kampanie"]["A"][0]["faza"] == "wygasa" and fazy[2]["pula"]["centrum"] == pytest.approx(pula * m["wygasanie"])
-    assert fazy[3]["pula"]["centrum"] == pytest.approx(pula * m["wygasanie"] ** 2)
+    P = lambda x: pytest.approx(rk.nasycenie(x, m["maks_puli"]), abs=1e-4)   # P10: sufit sumy kampanii
+    assert fazy[0]["kampanie"] == {} and fazy[1]["pula"]["centrum"] == P(pula)
+    assert fazy[2]["kampanie"]["A"][0]["faza"] == "wygasa" and fazy[2]["pula"]["centrum"] == P(pula * m["wygasanie"])
+    assert fazy[3]["pula"]["centrum"] == P(pula * m["wygasanie"] ** 2)
     assert fazy[5]["kampanie"] == {}                                                       # poniżej progu – koniec
-    assert fazy[1]["firmy"]["A"] == {"centrum": pytest.approx(rk.kanal(dane, "papier_przyjmie", "ulotki")["przyciaganie"])}
+    przyc = rk.kanal(dane, "papier_przyjmie", "ulotki")["przyciaganie"]
+    assert fazy[1]["firmy"]["A"] == {"centrum": pytest.approx(rk.nasycenie(przyc, m["maks_przyciagania"]), abs=1e-4)}
+    assert fazy[1]["suma"]["A"] == {"centrum": pytest.approx(przyc)}
+
+
+def test_sufit_sumy_kampanii():
+    """P10: kampanie się sumują z nasyceniem – jedna prawie w pełni, wiele naraz nie przekroczy sufitu."""
+    dane, f = _firma_z_lokalem()
+    m = rk.zasady(dane)["model"]
+    R = rk.zasady(dane)["agencje"]
+    f.kampanie = [_kampania(agencja=a, kanal=k, strefa=None if kan["zasieg"] == "miasto" else "centrum", od=5, do=5)
+                  for a, ag in R.items() for k, kan in ag["kanaly"].items() if kan["zasieg"] == "miasto" or "centrum" in (kan.get("strefy") or ["centrum"])]
+    ef = rk.efekty_rundy(dane, {"A": f}, 5)
+    suma, dziala = ef["suma"]["A"]["centrum"], ef["firmy"]["A"]["centrum"]
+    assert suma > m["maks_przyciagania"] * 0.9 and dziala < m["maks_przyciagania"] and dziala < suma
+    assert ef["pula"]["centrum"] < m["maks_puli"]
+    assert rk.nasycenie(0.1, m["maks_przyciagania"]) > 0.09   # mała kampania – prawie bez strat
 
 
 def test_zagluszanie_ten_sam_rodzaj_i_radio_w_kazdej_strefie():

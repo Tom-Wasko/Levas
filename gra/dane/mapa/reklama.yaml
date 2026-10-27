@@ -13,13 +13,16 @@ opis: 'Agencje reklamowe gry z lokalami (silnik/reklama.py). Kampania trwa `rund
 zrodlo: 'notatka „Elementy mapy” (kilka agencji, każda z własnymi kanałami: ulotki i plakaty, internet i social media,
   radio i billboardy, lokalne wydarzenia; kampanie z listy; reklama poszerza pulę i odbiera klientów konkurencji; ten
   sam kanał w tej samej strefie osłabia kampanie) i „Ustalenia gry” (runda 3 – część kanałów, runda 5 – wszystkie);
-  liczby – założenie F3b.2 (kampania ok. 2–15% tygodniowego utargu lokalu, efekt kilka–kilkanaście procent)'
+  liczby – założenie F3b.2 (kampania ok. 2–15% tygodniowego utargu lokalu); P10 (odpowiedź 14): jedna
+  kampania ok. +4–10% popytu lokalu, kilka razem ok. +10–30% – sufit maks_przyciagania i maks_puli'
 model:
   zagluszanie: 0.5
   nasycenie: 0.3
   okno_nasycenia: 4
   wygasanie: 0.5
   prog_wygasania: 0.1
+  maks_przyciagania: 0.7   # P10: suma kampanii firmy w strefie nasyca się do +70% atrakcyjności (≈ +30% popytu)
+  maks_puli: 0.15          # poszerzenie puli strefy przez wszystkie kampanie – najwyżej +15%
 agencje:
   papier_przyjmie:
     nazwa: Drukarnia „Papier Przyjmie”
@@ -33,8 +36,8 @@ agencje:
         zasieg: strefa
         rundy: 1
         koszt: 300
-        pula: 0.02
-        przyciaganie: 0.06
+        pula: 0.04
+        przyciaganie: 0.12
         teksty:
         - 'Roznosiciel Kacper rozdał w strefie {strefa} 2 000 ulotek, w tym 400 jednemu panu, który „zbiera na rozpałkę”.
           Reszta trafiła za wycieraczki, do skrzynek i – według świadków – do paszczy psa sąsiada. Pies od tamtej pory
@@ -47,8 +50,8 @@ agencje:
         zasieg: strefa
         rundy: 2
         koszt: 600
-        pula: 0.02
-        przyciaganie: 0.08
+        pula: 0.04
+        przyciaganie: 0.16
         teksty:
         - 'Plakaty w strefie {strefa} wiszą na każdym słupie między ogłoszeniem „Zaginął kot Mruczek” a „Znaleziono kota,
           chyba Mruczek”. Twój kebab wygląda na nich apetyczniej niż oba koty razem.'
@@ -67,8 +70,8 @@ agencje:
         zasieg: strefa
         rundy: 1
         koszt: 250
-        pula: 0.01
-        przyciaganie: 0.05
+        pula: 0.02
+        przyciaganie: 0.1
         teksty:
         - 'Post na grupie „Strefa {strefa} – Uwaga, Policja / Sprzedam / Oddam” zebrał 214 komentarzy. 180 to kłótnia
           o to, czy kebab może mieć ananasa. Wygrałeś: wszyscy już znają nazwę lokalu.'
@@ -80,8 +83,8 @@ agencje:
         zasieg: strefa
         rundy: 2
         koszt: 1500
-        pula: 0.04
-        przyciaganie: 0.15
+        pula: 0.08
+        przyciaganie: 0.3
         teksty:
         - 'Kebabowa Królowa nagrała w strefie {strefa} 47 ujęć jednego gryza w zwolnionym tempie. Sos kapnął jej na
           kamerę, co podbiło film do 300 tysięcy wyświetleń. Komentarz numer jeden: „gdzie to jest, jadę”.'
@@ -100,8 +103,8 @@ agencje:
         zasieg: strefa
         rundy: 3
         koszt: 1200
-        pula: 0.03
-        przyciaganie: 0.1
+        pula: 0.06
+        przyciaganie: 0.2
         teksty:
         - 'Billboard przy rondzie w strefie {strefa} jest tak duży, że kierowcy robią dodatkowe kółko, żeby doczytać
           menu. Korki wzrosły o 4%, sprzedaż – też. Drogowcy pytają, czy możesz zmniejszyć czcionkę.'
@@ -113,8 +116,8 @@ agencje:
         zasieg: miasto
         rundy: 2
         koszt: 2500
-        pula: 0.015
-        przyciaganie: 0.05
+        pula: 0.03
+        przyciaganie: 0.1
         teksty:
         - 'Spot leciał między „Majteczkami w kropeczki” a prognozą pogody. Lektor tak przejął się rolą, że wymienił
           wszystkie sosy z nazwy, a potem jeszcze raz, bo „słuchacze mogli nie dosłyszeć”. Cały Lublin nuci jingiel.'
@@ -133,8 +136,8 @@ agencje:
         zasieg: strefa
         rundy: 1
         koszt: 700
-        pula: 0.03
-        przyciaganie: 0.1
+        pula: 0.06
+        przyciaganie: 0.2
         teksty:
         - 'Na festynie w strefie {strefa} Twoje stoisko stało między dmuchanym zamkiem a kołem gospodyń wiejskich.
           Panie z koła najpierw patrzyły podejrzliwie, potem wzięły przepis na sos. Wymiana: przepis na pierogi.'
@@ -149,8 +152,8 @@ agencje:
         - politechnika
         rundy: 1
         koszt: 2500
-        pula: 0.08
-        przyciaganie: 0.2
+        pula: 0.16
+        przyciaganie: 0.4
         teksty:
         - 'Noc Kebaba w strefie {strefa}: DJ grał do trzeciej, Ty kroiłeś do czwartej. Pierwszy rok studiów już wie,
           gdzie się je po kolokwium. Ktoś z politechniki zaproponował, żeby zrobić z tego przedmiot obieralny.'
