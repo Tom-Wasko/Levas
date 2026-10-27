@@ -217,6 +217,11 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    zrobione: przejęcia i licytacje lokali przez boty, zwalnianie pracowników. Pytania: czy takie różnice poziomów
    wystarczą? czy trudny bot ma też przejmować i licytować lokale? czy Premium ma reklamować się taniej (np. bez
    billboardu)? (zapisane 27.10)
+26. **„Co jeśli” (F4.5).** W podglądzie inne drużyny powtarzają decyzje z poprzedniej rundy: ceny, prognozę,
+   zamówienia, kampanie, reklamę, promocje, polisy i higienę (jednorazowe – lokal, zatrudnienia, sprzęt, kredyty,
+   handel – nie). Wcześniej (jak w Revasie) podgląd brał robocze decyzje rywali, czyli zdradzał np. ich nowe ceny.
+   Pytania: czy lista powtarzanych decyzji jest dobra? czy podgląd ma też pokazywać ryzyko zdarzeń losowych
+   (teraz wypadki i wynik kasyna są w podglądzie pomijane)? (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -456,3 +461,6 @@ _brak_
 - 27.10 05:55 – F4.4 gotowe: poziomy botów łatwy/średni/trudny (planowanie obsady dzień po dniu z rachunkiem
   opłacalności, zamówienia w granicach przepustowości, wybór ceny, reklama tylko przy nadążającej obsłudze, drugi
   lokal), narzędzie `gra/balans_botow.py`, test `test_boty.py`; pytanie 25. Start F4.5 („co jeśli”).
+- 27.10 06:10 – F4.5 gotowe: „co jeśli” w `silnik/co_jesli.py` – inne drużyny powtarzają decyzje z poprzedniej
+  rundy (bez zdradzania roboczych decyzji rywali), opis i wiersz przeterminowanego towaru w zakładce Analiza;
+  pytanie 26. Start F4.6 (sprzątanie).

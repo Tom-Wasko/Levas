@@ -21,15 +21,14 @@ from gry import serwisy
 from gry.models import Gra
 from konta import druzyny
 from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
+from silnik import co_jesli
 from silnik import harmonogram as hm
 from silnik import kasyno as kas
 from silnik.biuro import ukryj
-from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
 from silnik.limity import naruszenia
 from silnik.lokale import tryb_lokali
-from silnik.runda import przelicz_runde
 
 from .prezentacja import katalogi, przeglad_mg, tabela_wynikow, widok
 
@@ -506,8 +505,8 @@ def api_dane_wariantu(request, id_, firma):
 @require_POST
 @api
 def api_podglad(request, id_, firma):
-    """Przewidywany wynik bieżącej rundy dla decyzji (bez zapisu). Boty decydują jak zwykle,
-    pozostali gracze – według swoich roboczych decyzji.
+    """Przewidywany wynik bieżącej rundy dla decyzji (bez zapisu, silnik/co_jesli.py). Boty decydują
+    jak zwykle, inne drużyny powtarzają decyzje z poprzedniej rundy (ich robocze decyzje są tajne).
     Body: {"warianty": [nazwa wariantu albo "biezace"]} – domyślnie bieżące."""
     g = serwisy.wczytaj(id_)
     sprawdz_firme(request, id_, g, firma)
@@ -517,21 +516,11 @@ def api_podglad(request, id_, firma):
     nazwy = cialo(request, wymagane=False).get("warianty") or ["biezace"]
     zapisane = _warianty(kopia, firma)
     nazwy = [n for n in nazwy if n == "biezace" or n in zapisane]
-    stan = kopia.stan(kopia.runda - 1)
     r = kopia.runda
-    baza = {
-        f["nazwa"]: (
-            decyzje_bota(kopia.dane, stan, f["nazwa"], f["bot"], r, kopia.konfiguracja)
-            if f["bot"]
-            else kopia.szkic(f["nazwa"])
-        )
-        for f in kopia.konfiguracja["firmy"]
-    }
+    warianty = [g.szkic(firma) if n == "biezace" else zapisane[n] for n in nazwy]
+    stany = co_jesli.przewiduj(kopia, firma, warianty)
     wyniki = []
-    for nazwa in nazwy:
-        dec = deepcopy(baza)
-        dec[firma] = g.szkic(firma) if nazwa == "biezace" else zapisane[nazwa]
-        s = przelicz_runde(kopia.dane, stan, dec, kopia.konfiguracja, podglad=True)
+    for nazwa, s in zip(nazwy, stany, strict=True):
         w = s.wyniki[r][firma]
         if s.firmy[firma].deklaracja:  # samodzielna księgowość: bez podatków rundy
             w = ukryj(w, podglad=True)

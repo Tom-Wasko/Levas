@@ -193,5 +193,10 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   poprzedniej rundy, wybór ceny o największej oczekiwanej marży, kampanie tylko przy nadążającej obsłudze,
   drugi lokal (`kolejny_lokal`); narzędzie `gra/balans_botow.py`; test `test_boty.py`. Bez przejęć i licytacji
   przez boty (pytanie 25)
+- [x] F4.5 „Co jeśli” – `silnik/co_jesli.py`: podgląd bieżącej rundy na kopii stanu dla kilku wariantów decyzji;
+  boty decydują jak zwykle, inne drużyny powtarzają decyzje z poprzedniej rundy (`POWTARZANE`: ceny, prognoza,
+  zamówienia, kampanie, reklama, promocje, polisy, higiena – bez jednorazowych), więc podgląd nie zdradza
+  roboczych decyzji rywali; API `podglad` korzysta z modułu; zakładka Analiza: opis założenia i wiersz „Towar
+  przeterminowany”; test `test_co_jesli.py` (m.in. podgląd = wynik, gdy rywal naprawdę powtarza decyzje)
 
-Zadania F4.5–F4.7 – jeszcze nie zaczęte.
+Zadania F4.6–F4.7 – jeszcze nie zaczęte.

@@ -206,12 +206,13 @@ const METRYKI = [
   ["Przychody", (w) => zl(w.kpir.przychody)], ["Koszty", (w) => zl(w.kpir.koszty)],
   ["Dochód do opodatkowania", (w) => zl(w.kpir.dochod)], ["Podatek", (w) => zl(w.kpir.podatek)],
   ["<b>Dochód netto</b>", (w) => `<b>${zl(w.kpir.dochod_netto)}</b>`], ["Saldo po rundzie", (w) => zl(w.gotowka)],
+  ["Towar przeterminowany", (w) => (w.magazyn?.sanepid ? zl(w.magazyn.sanepid.przeterminowane || 0) : "–")],
   ...WSKAZNIKI.map(([k, n]) => [n, (w) => wsk(w.karta?.[k])]),
 ];
 
 export const analiza = {
   tytul: "Analiza", tytulPelny: "Analiza – co jeśli", ikona: "◎", odblokowanie: (v) => v.edycja && v.runda >= 2,
-  info: "Dodatek spoza REVAS: przewidywany wynik bieżącej rundy dla Twoich decyzji (boty decydują jak zwykle). Zapisz kilka wariantów decyzji i porównaj je. To przewidywanie modelu, nie wynik gry.",
+  info: "Dodatek spoza REVAS: przewidywany wynik bieżącej rundy dla Twoich decyzji. Boty decydują jak zwykle, a inne drużyny – których decyzji nie znasz – powtarzają swoje decyzje z poprzedniej rundy (ceny, zamówienia, reklamę, promocje). Zapisz kilka wariantów decyzji i porównaj je. To przewidywanie modelu, nie wynik gry.",
   decyzje({ v, kat }) {
     const warianty = v.warianty || [];
     let html = `<div class="kafel"><div class="kg">Warianty decyzji tej rundy</div><div class="kt">
