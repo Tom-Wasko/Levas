@@ -37,6 +37,5 @@ def naruszenia(dane: Dane, firma: Firma, decyzje: dict, runda: int) -> list[str]
                      f"podkupienia razem) – w decyzjach jest {p['nowi']}.")
     lokal = decyzje.get("lokal") or {}
     if lokal.get("id") and runda < s["lokal"]["od_rundy"]:
-        wynik.append(f"Kolejny lokal można wziąć co {s['lokal']['co_rund']} rundy – najwcześniej w rundzie "
-                     f"{s['lokal']['od_rundy']}.")
+        wynik.append(lk.komunikat_odpoczynku(dane, firma, runda))
     return wynik

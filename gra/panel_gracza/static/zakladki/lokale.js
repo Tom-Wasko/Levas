@@ -88,7 +88,8 @@ export const lokale = {
     const strefa = lokale.filtr && kat.mapa.strefy[lokale.filtr] ? lokale.filtr : "";
     let html = `<div class="pasek ciemny"><span>Twoje lokale: <span class="kwota">${L.moje.length}</span></span>
       <span>Koszt lokali: <span class="kwota">${zl(kosztLokali(v))}</span>${naOkres()}</span>
-      <span>${v.runda < L.nowy_od ? `Kolejny lokal od rundy <span class="kwota">${L.nowy_od}</span>` : "Możesz wziąć lokal w tej rundzie"}</span></div>`;
+      <span>${v.runda < L.nowy_od ? `Kolejny lokal od rundy <span class="kwota">${L.nowy_od}</span>` : "Możesz wziąć lokal w tej rundzie"}</span></div>`
+      + (L.odpoczynek ? `<p class="podpowiedz">${esc(L.odpoczynek)}</p>` : "");
     if (L.decyzja && L.decyzja.przyjety === false) html += `<div class="komunikat">${esc(L.decyzja.powod)}</div>`;
     if (wyb) {
       const lok = lokalMapy(kat, wyb.id);

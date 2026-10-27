@@ -48,6 +48,24 @@ def runda_nowego_lokalu(dane: Dane, firma: Firma) -> int:
     return max((lok.od_rundy + co for lok in firma.lokale), default=1)
 
 
+# lokal „co 3 rundy” (P8): zamiast suchego limitu – właściciel musi odpocząć po ostatniej przeprowadzce
+ODPOCZYNEK = (
+    "Właściciel musi odpocząć po ostatniej przeprowadzce – wciąż śni mu się umowa najmu w trzech egzemplarzach.",
+    "Właściciel leży na kanapie z mrożonym kebabem na czole i mówi, że jeszcze jeden lokal w tym tygodniu "
+    "i sam zacznie się obracać na rożnie.",
+    "Lekarz rodzinny zalecił właścicielowi „trzy tygodnie bez notariuszy”. Recepta wisi na lodówce, magnesem w kształcie falafela.",
+    "Rodzina schowała właścicielowi długopis, pieczątkę i telefon do agenta nieruchomości. Najpierw ma się odstresować.",
+    "Właściciel zapisał się na jogę dla przedsiębiorców. Instruktor twierdzi, że pozycja „podpisuję kolejną umowę” "
+    "to najczęstsza przyczyna kontuzji kręgosłupa.",
+)
+
+
+def komunikat_odpoczynku(dane: Dane, firma: Firma, runda: int) -> str:
+    """Dlaczego jeszcze nie można wziąć kolejnego lokalu – z żartem (tekst zależy od rundy, żeby się nie nudził)."""
+    return (f"{ODPOCZYNEK[runda % len(ODPOCZYNEK)]} Kolejny lokal można wziąć co "
+            f"{dane.mapa['zasady']['nowy_lokal_co_rund']} rundy – najwcześniej w rundzie {runda_nowego_lokalu(dane, firma)}.")
+
+
 def dziala_od(dane: Dane, lok: dict, runda: int) -> int:
     if lok["typ"] == "dzialka":
         return runda + lok["budowa_rund"]
@@ -96,8 +114,7 @@ def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete
     if lok["id"] in zajete_lokale:
         return f"{lok['nazwa']} zajęła już firma {zajete_lokale[lok['id']]}."
     if runda < runda_nowego_lokalu(dane, firma):
-        return (f"Kolejny lokal można wziąć co {dane.mapa['zasady']['nowy_lokal_co_rund']} rundy "
-                f"(najwcześniej w rundzie {runda_nowego_lokalu(dane, firma)}).")
+        return komunikat_odpoczynku(dane, firma, runda)
     if forma == "najem" and lok.get("czynsz") is None:
         return f"{lok['nazwa']} jest tylko na sprzedaż."
     if forma == "kupno" and lok.get("cena") is None:

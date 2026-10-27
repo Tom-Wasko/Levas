@@ -570,3 +570,5 @@ _brak_
 - **P7 (27.10):** opisy dydaktyczne – zwijana ramka 📘 „jak to działa naprawdę” (zakladki/lekcje.js) w zakładkach
   VAT, KPiR, Podatki (PIT i ZUS), Bank i Raport finansowy: przykłady liczbowe, różnica zysk/gotówka, RRSO, ulga na start,
   terminy JPK/ZUS/PIT. Stawki i progi podane ogólnie (bez konkretnych kwot, które co roku się zmieniają).
+- **P8 (27.10):** lokal „co 3 rundy” – zamiast suchego limitu 5 rotujących żartów „właściciel musi odpocząć”
+  (silnik/lokale.py `ODPOCZYNEK`), w odrzuceniu zapisu, liście błędów, zakładce Lokale i na mapie.

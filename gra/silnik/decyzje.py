@@ -47,6 +47,7 @@ from . import awarie as aw
 from . import biuro as bo
 from . import czas_wlasciciela as cw
 from . import limity as lm
+from . import lokale as lk
 from . import menu as mn
 from . import promocje as pm
 from . import reklama as rk
@@ -446,7 +447,7 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("niebieski", "zatrudnienie", f"Wykorzystany limit nowych pracowników w tej rundzie "
                   f"({lim['pracownicy']['limit']}) – kolejnych przyjmiesz w następnej rundzie.")
         if firma.lokale and runda < lim["lokal"]["od_rundy"]:
-            dodaj("niebieski", "lokale", f"Kolejny lokal możesz wziąć od rundy {lim['lokal']['od_rundy']}.")
+            dodaj("niebieski", "lokale", lk.komunikat_odpoczynku(dane, firma, runda))
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

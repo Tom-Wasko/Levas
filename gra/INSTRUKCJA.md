@@ -174,7 +174,8 @@ Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karenc
 ## 13. Rozwój
 
 - **Wyposażenie dla klientów** (od tygodnia 4) – stoliki i krzesła, darmowe WiFi, telewizor z meczami: podnosi zadowolenie klientów.
-- **Kolejny lokal** można wziąć co 3 rundy. Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
+- **Kolejny lokal** można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
+  bez litości). Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
 - **Handel z drużynami** (od tygodnia 5) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
   i z fakturą.
 - **Analiza „co jeśli”** (od tygodnia 2) – przewidywany wynik tygodnia dla Twoich decyzji, zanim je wyślesz.

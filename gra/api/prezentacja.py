@@ -36,6 +36,7 @@ from silnik.finanse import Ksiega, Rachunek
 from silnik.gra import Gra
 from silnik.lokale import (
     dostepne,
+    komunikat_odpoczynku,
     koszt_wejscia,
     runda_nowego_lokalu,
     stan_lokali,
@@ -299,6 +300,8 @@ def _lokale(gra: Gra, firma: str, runda: int, f: Firma, poprzedni, stan, info: d
             "zajete": zajete(stan.firmy) if info is None else zaj,
             "moje": stan_lokali(dane, f, runda),
             "nowy_od": runda_nowego_lokalu(dane, poprzedni.firmy[firma]),
+            "odpoczynek": komunikat_odpoczynku(dane, poprzedni.firmy[firma], runda)
+            if runda < runda_nowego_lokalu(dane, poprzedni.firmy[firma]) else None,
             "decyzja": decyzja}
 
 

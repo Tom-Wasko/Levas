@@ -124,7 +124,7 @@ export const mapa = {
       let html = opisLokalu(c.kat, lok), przyciski = "";
       if (oferta) {
         przyciski = przyciskiLokalu(c.v, c.d, oferta, c.edycja);
-        if (c.v.runda < c.v.lokale.nowy_od) html += `<p class="podpowiedz">Kolejny lokal możesz wziąć od rundy ${c.v.lokale.nowy_od}.</p>`;
+        if (c.v.runda < c.v.lokale.nowy_od) html += `<p class="podpowiedz">${esc(c.v.lokale.odpoczynek || `Kolejny lokal możesz wziąć od rundy ${c.v.lokale.nowy_od}.`)}</p>`;
       }
       if (moje && !oferta) {
         html += `<p><b>Twój lokal</b> (${moje.forma === "najem" ? "najem" : "własność"}) – ${moje.dziala ? "działa" : `zacznie działać w rundzie ${moje.dziala_od}`}.</p>`;
