@@ -20,42 +20,54 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    (strefy, lokale, sklepy, banki, podatki 2026, parki, kalendarz, PCG64), ale tego folderu nie ma na dysku,
    a repo `Tom-Wasko/Levas-stary` ma tylko notatki. Do czasu odpowiedzi: F2.5 (PCG64) piszę od zera,
    a dane do F3a biorę z notatek. (zadane: 25.10 21:50, do wysłania w poniedziałek o 6:00)
-
+Są na branch 'kod' w Tom-Wasko/Levas-stary
 2. **Start gry i runda 1 (F2.7).** Przyjąłem: runda 1 = tydzień 5–11.10.2026 (początek roku akademickiego) i jest
    tygodniem przygotowań bez sprzedaży (jak w Revasie). Czy data i tydzień przygotowań są dobre? Zmiana to tylko
    `rundy.kalendarz.start` w `dane/katalog.yaml`. (zadane: 25.10 22:20, do wysłania w poniedziałek o 6:00)
+pierwszy tyg września na start, wrzesien jest jako wprowadzenie a jak studenci wrócą to zaczyna sie zabawa
 
 3. **Logowanie kontem Microsoft (F3a.1).** Kod jest gotowy, ale potrzebna jest aplikacja zarejestrowana
    w Microsoft Entra ID szkoły (identyfikator klienta, sekret, identyfikator dzierżawy) – to zrobi administrator
    szkolnego Microsoft 365 albo Ty, jeśli masz dostęp. Czy mam przygotować krótką instrukcję krok po kroku?
    Do tego czasu działa własny login i hasło. (zadane: 26.10 0:40, do wysłania w poniedziałek o 6:00)
+zrób instrukcje w plliku md
+
 4. **Czas właściciela (F3a.7).** Przyjąłem 20 h na rundę (tydzień), tyle samo dla każdej drużyny – firma ma jednego
    właściciela, więc liczba osób w drużynie nie zmienia puli. Na razie zużywa ją tylko odbiór osobisty w dyskontach
    (1–1,5 h za dzień zakupów), później pracuj.pl i parki. Czy 20 h jest dobre i czy pula ma rosnąć z liczbą osób
    w drużynie? (zadane: 26.10 5:30, do wysłania w poniedziałek o 6:00)
+20h jest ok, najwyzej sie zmieni. wlasciciel tez moze uzupelniac roboczogodziny pracownikow jesli ich zabraknie
+
 5. **Agencja pracy (F3a.8).** Przyjąłem: pracuj.pl – kandydaci 1–2★, 150 zł + 2 h czasu właściciela;
    agencja – 2–3★, koszt = koszt rekrutacji kandydata; headhunter (od rundy 4) – 3★, 3 × koszt rekrutacji, a za
    podkupienie 50% oferowanej pensji. Limit 3 nowych osób na rundę, okres wypowiedzenia 2/4/13 rund (staż od 0/26/156
    rund). Staż liczę od zatrudnienia w grze – notatki mówią o „losowym stażu” kandydatów w puli; czy kandydaci
    mają przychodzić z losowym stażem (wtedy ten staż liczy się do okresu wypowiedzenia)? Czy kwoty i gwiazdki pasują?
    (zadane: 26.10 5:45, do wysłania w poniedziałek o 6:00)
+ok, ale 13 rund to az dużo
+
 6. **Banki (F3a.9).** Przyjąłem 6 banków z mapy: Crédit Agricole (kredyt na start bez historii, 11,9%),
    PKO BP (inwestycyjny pod zastaw 7,9%, do 70% wartości), Pekao (leasing 7,5%, wpłata 10%), ING (lokaty do 4%),
    mBank (konto i terminal 0 zł, prowizja 0,79%), Santander (limit 40 000 zł, 16,9%). Kwoty to mój szacunek na 10.2026.
    „Historia firmy” = 4 rundy od otwarcia pierwszego lokalu; 70% sprzedaży płacone kartą; 3 rundy bez raty → bank
    przejmuje zastaw (kupiony lokal staje się wynajmowany). Czy banki, oprocentowanie i te zasady pasują?
    (zadane: 26.10 6:05)
+ok
 
 7. **Harpagon (F3a.10).** Przyjąłem: pożyczka 500–20 000 zł, 5% na rundę (tydzień) od całego długu, termin 4 rundy;
    po terminie: 1. runda – przypomnienie, od 2. – odsetki karne 10%, od 3. – co rundę jedna losowa wizyta (szkody
    800–3000 zł w KPiR jako „Naprawa szkód w lokalu”, albo atrakcyjność lokali −30% w tej rundzie, albo odejście
    losowego pracownika bez wypowiedzenia). Dług u Harpagona nie wchodzi do wskaźnika zadłużenia w karcie wyników
    i boty z niego nie korzystają. Czy te wartości i zasady pasują? (zadane: 26.10)
+ok
+
 8. **Księgowość JDG (F3a.11).** Przyjąłem: wszystkie ceny w danych są brutto (VAT wydzielany z kwoty, także opłaty
    banków i czynsz); rozliczenie VAT/PIT/ZUS co rundę (tydzień), nie co miesiąc; zdrowotna od dochodu tej rundy,
    minimum 324,41 zł/mies.; ZUS społeczny preferencyjny 420,86 zł/mies. po 26 rundach ulgi (czyli w grze na 26 rund
    go nie ma); kwoty ZUS 2026 z pamięci; lokal, działka i budowa budynku bez VAT; próg amortyzacji liczony od brutto.
    Czy tak może zostać? (nie wysłane – okno pytań minęło; zapisane 26.10 18:25)
+ok, dodaj krótkie opisy wytłumaczające co jest czym, rzeby miało charakter dydaktyczny
+
 9. **Biura rachunkowe i samodzielna księgowość (F3a.13).** Przyjąłem:
    - 5 biur (ceny brutto/mies., przeliczane na tydzień): J.K.Ś. 690 zł do 80 dok. + 4,92 zł, 4 osoby w kadrach
      w cenie, bez błędów; Pod Trybunałem 6,15 zł/dok., min. 246 zł, ryzyko 3%; Pani Halinka 369 zł do 40 dok.
@@ -69,6 +81,8 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    - w deklaracji JS podpowiada stawkę VAT jednym wyborem na dokument (faktura z kilkoma stawkami – stawka
      przeważająca, poprawna kwota VAT i tak jest w deklaracji).
    Czy ceny, kary i zasady pasują? (zapisane 26.10)
+ok
+
 10. **Panel mistrza gry (F3a.14).** Przyjąłem:
    - zamykanie o ustalonej godzinie = tygodniowe terminy (dzień + godzina, np. wt 8:00 i czw 8:00); runda
      zamyka się w pierwszym terminie po zamknięciu poprzedniej (zamknięta wcześniej ręcznie albo przez
@@ -85,10 +99,13 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
      pracownicy) i wyniki firm w każdej rundzie (przychody, koszty, dochód netto, gotówka, zadłużenie, wynik
      działalności); średnik i przecinek dziesiętny pod polskiego Excela.
    Czy tak może zostać? (zapisane 26.10)
+ok
+
 11. **Limity (F3a.15).** Do limitu 3 nowych pracowników liczę zatrudnienia z puli **i** oferty podkupienia
    (także te, które pracownik odrzuci – oferta jest złożona w tej rundzie); zastąpienie kandydata na tym samym
    stanowisku się nie liczy. Lokal „co 3 rundy” liczę od rundy wzięcia poprzedniego lokalu (lokal z rundy 1 →
    kolejny od rundy 4), nie od chwili, gdy zacznie działać. Czy tak? (zapisane 26.10)
+tak, jesli ktos sprobuje kupic lokal przed uplywem 3 dni to napisz że właściciel musi sobie odpocząć/odstresować się czy coś takiego
 
 12. **Parki (F3b.1).** Założenia do sprawdzenia: porcja jedzenia w evencie kosztuje 9 zł (koszt towaru, bez VAT);
    gotówka z eventów (nagrody, opłaty) bez VAT; od rundy 2 **co rundę** jedna historia, ta sama dla wszystkich
@@ -96,6 +113,8 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    rundę, nagrody 210–1200 zł, straty 120–400 zł; 12 historii komicznych i 2 poważne (biegacz, zaginione dziecko); 4 nowe parki na
    mapie (Ogród Botaniczny, Park Bronowicki, Park Rury, Błonia); boty wybierają losowo spośród opcji do 3 h;
    pan Zbyszek (kucharz 2★) trafia na rynek pracy tylko dla drużyny, która go zaprosiła. Czy tak? (zapisane 26.10)
+chcę żeby w każdej rundzie było kilka eventów do wyboru w różnych parkach. na runde, ale zrob tak ze jesli gracz weźnie wszystkie to zabraknie mu czasu właściciela na inne rzeczy 
+Dodaj kolejne hjistoryjki (jak skończysz wszyststkie inne poprawki to generuj aż do 15:00)
 
 13. **Magazyn (zmiana 26.10).** Liczby do sprawdzenia (`zalozenia.yaml` → `magazyn`): wynajem 1 zł za litr nadmiaru
    (jednorazowo za dostawę, nie za dzień), termin −2 dni, VAT 23%; sanepid: szansa 3% co rundę + 0,05 pp. za litr
@@ -105,6 +124,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    ≥ 200 zł, szansa 40% na rundę, raz na grę; oddanie bez kosztu w KPiR (był kosztem przy zakupie). Uwaga: jedno
    wyrzucone opakowanie mięsa to już ok. +14 pp. szansy kontroli – może za ostro? Gra bez lokali (`dane_revas/`)
    zostaje ze zwrotami i kosztem magazynowania. Czy tak? (zapisane 26.10)
+lubie jak jest ostra kara za błędy, więc zostaw
 
 14. **Agencje reklamowe (F3b.2).** Liczby do sprawdzenia (`dane/mapa/reklama.yaml`): kampanie 250–2500 zł netto
    (w strefie × pula strefy, więc w Centrum ok. 20% drożej), efekt: +1–8% puli strefy i +5–20% atrakcyjności u jej
@@ -114,6 +134,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    w tej strefie (w teście kampania degustacji + ulotek: firma +4% popytu, sąsiad bez zmian). Radio działa w całym
    mieście, ale słabiej. W grze z lokalami **nie ma** już reklamy tradycyjnej i internetowej z Revasa (zakładki
    ukryte). Czy tak? (zapisane 26.10)
+chcę żeby wzrost popytu w kebabie z reklamy był mniej więcej w zakresie (+10% do +30%)
 
 15. **Promocje (F3b.3).** Liczby do sprawdzenia (`dane/mapa/promocje.yaml`): 2 za 1 – przyciąganie +50% → min. +20%
    (−8 pp./rundę), koszt włączenia 150 zł; zestaw – dopłata 4 zł brutto, napój 1,80 zł netto, +18% → +10%, 100 zł;
@@ -124,6 +145,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    a wtedy promocja tylko obcina cenę – w grze 4 botów promocje zmniejszały przychód o 5–30%; dlatego boty
    włączają promocje dopiero, gdy w poprzedniej rundzie obsłużyły ≥ 90% popytu (w praktyce rzadko). To lekcja dla
    graczy („promocja, gdy masz wolne moce”), ale może warto osłabić rabaty? Czy tak? (zapisane 27.10)
+jest ok
 
 16. **Licytacje i przejęcia (F3b.4).** Zamiast `oferty.py` i `koniec_najmu.py` z planu – jeden moduł
    `silnik/przejecia.py`. Spór o lokal rozstrzyga teraz najwyższa oferta względem ceny wywoławczej (czynszu albo
@@ -136,6 +158,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    Uproszczenia: kaucja wraca do najemcy „z zewnątrz” (nie z kasy właściciela, który jej nie dostał); stanowiska
    najemcy zostają w jego ewidencji środków trwałych (amortyzacja) także po wyprowadzce; brak podatku od
    nieruchomości; boty nie licytują i nie kupują budynków. Czy tak? (zapisane 27.10)
+ok
 
 17. **Wypadki i ubezpieczyciel (F3b.5).** Liczby do sprawdzenia (`dane/zdarzenia/losowe.yaml`): wypadki od rundy 4,
    szansa 8% na rundę (średnio niecałe 2 wypadki na grę), szkody 500–4200 zł w scenie, limit 8000 zł za jedną szkodę
@@ -144,6 +167,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    (zw), składka zwolniona z VAT; polisa chroni przed wypadkiem tylko, gdy chroniła w rundzie jego początku (ciąg
    dalszy też); wypowiedzenie – od razu, bez zwrotu składki. Nazwa ubezpieczyciela: TUW „Pod Koziołkiem”. Czy tak?
    (zapisane 27.10)
+w każdej kolejnej rundzie bez wypadku zwiększ szansę
 
 18. **Urząd i sanepid (F3b.6).** Rejestracja w CEIDG – bezpłatna i tylko informacyjna (bez decyzji). Odbiór sanepidu
    w rundzie, w której lokal ma zacząć działać; przy higienie „brak” odmowa i lokal czeka 1 rundę (powtarza się do
@@ -152,6 +176,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    Błysk-Pol + HACCP 1300 zł (×0,45). Skargi w historiach (Gołąb Zenon „zostaw”: +10 pp. przez 2 rundy, Pani Halina
    „zignoruj”: +12 pp. przez 2 rundy). Boty: zrównoważony i tani – mop, premium – HACCP, agresywny – firma. Ratusz na
    mapie otwiera teraz zakładkę Urząd i sanepid (lista błędów nadal w menu). Czy tak? (zapisane 27.10)
+ok
 
 19. **Kasyno i portfel właściciela (F3b.7).** Liczby: oszczędności na start 2000 zł; zaproszenie od rundy 4, szansa
    8% na rundę, najwyżej 2 w grze; do 5 zakładów w rundzie, stawka 10–2000 zł; ruletka europejska (kolor/parzyste
@@ -162,6 +187,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    się bez klubu, więc portfel i wpłaty z wygranych mogą wyjść inaczej. Wypłata własna nie zmienia podatku (PIT
    od dochodu JDG). Pytania: czy portfel też ukrywać przed MG? czy eksport ma zawierać zakłady (MG mógłby je
    wtedy zobaczyć w pliku)? czy liczby takie? (zapisane 27.10)
+właściciel ma mieć możliwość wyciągnąć pieniądze z konta kebaba, gdzieś w panelu kasyna dodaj jhakąś ironiczną/metaforyczn przesłankę rzeby gracze nie poinformowali mistrza o istnieniu kasyna
 
 20. **Handel między drużynami (F3b.8).** Założenia: od rundy 5 (notatka „Ustalenia gry”); towar i sprzęt – **bez
    lokali** (notatka „Prawidła świata” wymienia też lokale: przekazanie najmu/własności z kaucją, nakładami
@@ -171,6 +197,7 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    potem wygasa); towar sprawdzany na stan po tygodniu sprzedaży, a przy przyjęciu – czy nadal jest; boty nie
    handlują. Pytania: czy widełki i limity takie? czy dodać negocjację (kontroferta adresata) albo handel w tej
    samej rundzie? czy handel lokalami robić teraz? (zapisane 27.10)
+tak, chce negocjacje
 
 21. **Kalendarz miejski (F3b.9).** Założenia: kalendarz przeniesiony z `mapa/popyt.yaml` do
    `dane/kalendarz/kalendarz.yaml`; 23 wydarzenia od października do kwietnia, mnożniki puli stref dobrane „na oko”
@@ -180,6 +207,8 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    frytek w sesji). Notatka „Zdarzenia i historie” (koziołki do końca sesji) – zostawione na później. Pytania: czy
    lista i mnożniki takie? czy wydarzenia mają też zmieniać popyt na konkretne dania? czy dodać mecze Motoru na
    Arenie Lublin? (zapisane 27.10)
+dodaj kilka meczy, konkretne dania to fajny pomysł
+
 22. **Karta wyników dla kebabu (F4.1).** Założenia (`zalozenia.yaml → karta_wynikow.kebab`, wszystkie „na oko”):
    kolejki −0,15 × udział klientów, którzy nie doczekali się obsługi; brakujące dania −0,3 × udział dań-dni
    wyłączonych; mandat sanepidu −0,05; każdy wypadek w lokalu −0,03; przepracowanie −0,5 × nadwyżka wykorzystania
@@ -188,12 +217,16 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    „umowa” i „zmiany w zatrudnieniu” działają jak w Revasie (zmiany mają wagę 0), „świeżość” liczę pośrednio (braki
    w menu, sanepid), „wartość sprzętu” jest w majątku. Pytania: czy wagi takie? czy dodać do karty kontrole skarbówki
    lub zaległości? czy przy notatce „Ustalenia gry” wpisać ostateczne wzory? (zapisane 27.10)
+zrób jak uważasz że będzie najlepiej
+
 23. **Lista błędów (F4.2).** Założenia (`zalozenia.yaml → lista_bledow`): pomarańczowe ostrzeżenie, gdy składniki
    kosztują ponad 50% ceny dania (koszt liczony po średniej cenie zapasu, a bez zapasu – po najtańszej średniej cenie
    z danych), czerwone poniżej kosztu; ostrzeżenie o przeterminowaniu liczone z prognozy popytu (pole „prognoza”
    w Ofercie) i dopiero od 20 zł straty w tygodniu. Komunikaty z lekkim humorem („klienci sami sobie tego nie
    zrobią”). Pytania: czy progi takie? czy brak gotówki na zamówienie ma blokować zamówienie (teraz: ostrzeżenie,
    płaci kredyt odnawialny)? (zapisane 27.10)
+ok, tak ostrzeżenie, humor jest fajny
+
 24. **Harmonogram odblokowań (F4.3).** Tygodnie domyślne jak w REVAS (`katalog.yaml → rundy.harmonogram_lokali`):
    tydzień 1 to tydzień przygotowań (bez dostaw i sprzedaży), więc Sprzęt, Ceny dań, Dostawcy i Zatrudnienie
    otwierają się w tygodniu 2 – notatka „Ustalenia gry” mówi o dostawcach i pracuj.pl od rundy 1. Mistrz gry może
@@ -203,6 +236,8 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    Klub z kasynem nie jest w harmonogramie (mistrz gry o nim nie wie). Pytania: czy tydzień 1 ma zostać
    przygotowawczy? ubezpieczyciel „od rundy 3” z notatek – na razie bez blokady; czy MG ma móc przesuwać też zakładki
    tygodnia 1 (teraz tak – można je opóźnić)? (zapisane 27.10)
+tyg1 jest przygotowawczy, nie mg nie ma takiej mocy
+
 25. **Poziomy botów (F4.4).** Poziomy różnią się sposobem planowania (`dane/boty.yaml → poziomy`, `silnik/boty.py`):
    **łatwy** – stare proste reguły (osobna kuchnia na danie, zamówienia na cały przewidywany popyt, błąd prognozy
    ±25%, zatrudnia losowego kandydata z zawodu, bez kampanii i promocji); **średni** – planuje obsadę i sprzęt na
@@ -217,11 +252,15 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    zrobione: przejęcia i licytacje lokali przez boty, zwalnianie pracowników. Pytania: czy takie różnice poziomów
    wystarczą? czy trudny bot ma też przejmować i licytować lokale? czy Premium ma reklamować się taniej (np. bez
    billboardu)? (zapisane 27.10)
+jeśli będziesz miał czas to stwórz boty 'niemożliwy' który będzie robił wszystko jak tylko możliwie najlepiej, tylko jeśli będziesz miał wolny czas. jesli nie to zapisz gdzies do rzeczy do zrobienmia w przyszlosci
+
 26. **„Co jeśli” (F4.5).** W podglądzie inne drużyny powtarzają decyzje z poprzedniej rundy: ceny, prognozę,
    zamówienia, kampanie, reklamę, promocje, polisy i higienę (jednorazowe – lokal, zatrudnienia, sprzęt, kredyty,
    handel – nie). Wcześniej (jak w Revasie) podgląd brał robocze decyzje rywali, czyli zdradzał np. ich nowe ceny.
    Pytania: czy lista powtarzanych decyzji jest dobra? czy podgląd ma też pokazywać ryzyko zdarzeń losowych
    (teraz wypadki i wynik kasyna są w podglądzie pomijane)? (zapisane 27.10)
+daj każddemu graczowi ogólny obraz tego co robią jego przeciwnicy w zakładce decyzje/wyniki, natomiast jeśli bedzie on chcaił bardziej dokładne dane to musi zatrudnić szpiega albo cos takiego
+
 27. **Sprzątanie (F4.6).** Usunąłem tryb „gra bez lokali” (stary Revas: gotowy lokal na start, popyt i reklama
    z Revasa, zwroty do dostawców) – Levas ma teraz jeden tryb: gra z mapą miasta. Da się go przywrócić z commita
    `9930e14`. Zostało bez zmian: sezonowość popytu nadal miesięczna (`uslugi.yaml → sezonowosc`, 12 wartości –
@@ -229,12 +268,16 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    testów mechaniki obsługi. Pytania: czy usunąć tryb Revasa na stałe (w tym `dane_revas/` i zakładkę Marketing
    z reklamą Revasa w panelu)? czy sezonowość ma być tygodniowa (np. wakacje, sesja, święta – część jest już
    w kalendarzu miasta)? (zapisane 27.10)
+morzesz usuwac nie potrzebne rzeczy, zrob bardziej dopasowana sezonowosc do obecnych wydarzen, skup się na okresie czasy (wrezsień-grudzień)
+
 28. **Zakładki (F4.7).** Menu: „Oferta” → „Menu”, „Zdarzenia” → „Parki” (pełny tytuł: Parki – eventy, zdarzenia
    i wypadki), „Magazyn i świeżość” jako podzakładka Dostawców, nowa zakładka Finanse ▸ VAT (wydzielona
    z Podatków, z krótkim komicznym wstępem o panu Zenonie z urzędu skarbowego), wyniki dla Stanowisk i Szkoleń.
    Pytania: czy nazwy i grupowanie pasują (np. Parki jako osobna pozycja menu czy pod Klientami)? czy zostawić
    pana Zenona? Zakładki bez trybu wyników (Pulpit, Mapa, Lista błędów, Wyślij, Analiza) i bez decyzji (Karta,
    Raport, KPiR) zostały celowo – to podglądy/raporty. (zapisane 27.10)
+jest ok , na razie sie tym nie przejmuj
+
 
 ## Odłożone zadania
 
@@ -483,3 +526,10 @@ _brak_
   245 testów; pytanie 28. Plan kroków 1–4 (bez giełdy) zrealizowany.
 - 27.10 06:45 – dosprzątanie: nieużywane parametry Revasa usunięte z `dane/zalozenia.yaml` (zostają w
   `dane_revas/`), pulpit pokazuje stawkę PIT liniowego.
+- 27.10 07:40 – odpowiedzi użytkownika (plik + czat). Na czacie: start pon. 1.09.**2025** (prawdziwy kalendarz),
+  18 pełnych rund; kredyt domyślnie „na bieżąco”; „Zamów brakujące” domyślnie wyłączone, opcja MG; parki – te same
+  eventy dla wszystkich, każdy może wziąć każdy i dostaje tę samą nagrodę; szpieg – detektyw z mapy (300–800 zł,
+  2 h, 15% wpadki); negocjacje na żywo w rundzie; właściciel jako pracownik 1★ (ręcznie); reklama – **suma**
+  kampanii +10…30%; wypowiedzenie – jedno, 2 rundy; wypadki +4 pp. za rundę bez wypadku; tutorial – strona
+  w grze + md + PDF; stary Levas – tylko lista różnic, jeśli starczy czasu; serwerów na 8765 nie ruszać.
+  Lista zadań: `POSTEP.md` → „Poprawki 27.10” (P1–P20).

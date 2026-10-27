@@ -216,3 +216,34 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   `utrzymanie_klubu`, `koszt_magazynowania`, `koszt_zwrotu`), na pulpicie „PIT liniowy” zamiast CIT
 
 Plan kroków 1–4 (bez giełdy) zrealizowany.
+
+## Poprawki 27.10 (odpowiedzi w PRACA_NOCNA.md i na czacie)
+
+Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POSTEP + PRACA_NOCNA, commit i push.
+
+- [ ] P1 Tworzenie gier – `graj` nie startuje drugiego serwera na zajętym porcie (dwa serwery na 8765, stary
+  z nieaktualnym kodem)
+- [ ] P2 Domyślne ustawienia: start pon. 1.09.2025, 18 pełnych rund (do 4.01.2026), kapitał 40 000 zł, kredyt
+  „na bieżąco”, przycisk „Zamów brakujące” w Dostawcach domyślnie wyłączony – opcja MG (nowa gra i trwająca gra);
+  wrzesień – wprowadzenie (studenci wracają w październiku)
+- [ ] P3 Tutorial dla graczy: strona „Jak grać” w panelu + `INSTRUKCJA.md` + PDF
+- [ ] P4 Instrukcja logowania kontem Microsoft (`gra/LOGOWANIE_MICROSOFT.md`) – pytanie 3
+- [ ] P5 Właściciel jako pracownik 1★ (ręcznie, godziny z puli 20 h, bez pensji) – pytanie 4
+- [ ] P6 Jedno wypowiedzenie: 2 rundy dla wszystkich – pytanie 5
+- [ ] P7 Krótkie opisy dydaktyczne w zakładkach finansów (VAT, KPiR, PIT, ZUS, bank…) – pytanie 8
+- [ ] P8 Lokal „co 3 rundy”: komunikat, że właściciel musi odpocząć – pytanie 11
+- [ ] P9 Parki: co rundę kilka eventów (te same dla wszystkich, każdy może wziąć każdy, ta sama nagroda), każdy
+  kosztuje czas właściciela – wszystkie naraz nie zmieszczą się w 20 h – pytanie 12
+- [ ] P10 Reklama: suma kampanii daje kebabowi ok. +10% … +30% popytu – pytanie 14
+- [ ] P11 Wypadki: +4 pp. szansy za każdą rundę bez wypadku (reset po wypadku) – pytanie 17
+- [ ] P12 Kasyno: wypłata z konta kebaba w panelu klubu + ironiczna „zasada milczenia” – pytanie 19
+- [ ] P13 Handel: negocjacje na żywo w rundzie (oferta → kontroferta, maks. 3) – pytanie 20
+- [ ] P14 Kalendarz wrzesień–grudzień: mecze (Motor Lublin), wpływ wydarzeń na konkretne dania, sezonowość
+  tygodniowa dopasowana do wydarzeń – pytania 21 i 27
+- [ ] P15 Harmonogram: tydzień 1 przygotowawczy, MG nie przesuwa zakładek tygodnia 1 – pytanie 24
+- [ ] P16 Konkurencja: ogólny obraz rywali dla wszystkich (Decyzje/Wyniki), dokładne dane – detektyw z mapy
+  (300–800 zł + 2 h, 15% wpadki) – pytanie 26
+- [ ] P17 Sprzątanie: usunąć zbędne pozostałości Revasa (`dane_revas/`, martwy kod) – pytanie 27
+- [ ] P18 Nowe historyjki (parki, zdarzenia) – do 15:00, po wszystkim innym – pytanie 12
+- [ ] P19 (jeśli czas) bot „niemożliwy”; inaczej wpis w rzeczach na przyszłość – pytanie 25
+- [ ] P20 (jeśli czas) przegląd starego Levasa (`Tom-Wasko/Levas-stary`, branch `kod`) – lista różnic – pytanie 1

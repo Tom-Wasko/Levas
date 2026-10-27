@@ -164,3 +164,15 @@ def test_mistrz_gry_zaklada_konta_i_druzyny(django_user_model, gra):
     uczen = Client()
     uczen.force_login(django_user_model.objects.create_user("ala", password="x"))
     assert uczen.get("/admin/").status_code == 302  # uczeń nie wchodzi do panelu administracyjnego
+
+
+def test_graj_nie_startuje_na_zajetym_porcie():
+    import socket
+
+    from django.core.management import CommandError, call_command
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        s.listen()
+        with pytest.raises(CommandError, match="zajęty"):
+            call_command("graj", port=s.getsockname()[1], bez_przegladarki=True)
