@@ -193,6 +193,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["wyniki"] = w.get(firma)
         v["rynek"] = poprzedni.rynek.get(runda - 1)
         v["karta_skumulowana"] = karta_skumulowana(gra, runda - 1) if runda - 1 >= 2 else {}
+        v["dzielnik_karty"] = dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]
         v["historia"] = [{"runda": r, "miesiac": dane.nazwa_rundy(r), "skrot": dane.skrot_rundy(r), "karta": poprzedni.wyniki[r][firma].get("karta"),
                           "dochod_netto": poprzedni.wyniki[r][firma]["kpir"]["dochod_netto"],
                           "gotowka": poprzedni.wyniki[r][firma]["gotowka"]}

@@ -294,6 +294,29 @@ karta_wynikow:
       wzor: 1 − dług / (majątek + skumulowany dochód netto), min 0
     pewnosc: zalozenie
     zrodlo: instrukcja; Fruukulele z kredytem 0,2–0,6
+  kebab:
+    wartosc:
+      zadowolenie_klientow:
+        brakujace_dania: -0.3
+        kolejki: -0.15
+        kontrola_z_mandatem: -0.05
+        wypadek: -0.03
+      zadowolenie_pracownikow:
+        prog_przepracowania: 0.85
+        przepracowanie: -0.5
+      rozwoj_firmy:
+        kolejny_lokal: 0.08
+        przyrost_dan_i_pracownikow: 0.031
+      wskaznik_zadluzenia:
+        waga_harpagona: 1.5
+    pewnosc: zalozenie
+    zrodlo: 'F4.1, notatka „Ustalenia gry” (karta wyników): w grze z lokalami wskaźniki Revasa dostają składniki kebabowe
+      (silnik/karta.py → kebab). Zadowolenie klientów: cena względem ceny preferowanej strefy lokalu (zamiast średniej
+      rynku), brakujące dania = udział dań-dni wyłączonych z braku składnika, kolejki = udział klientów utraconych w tym
+      tygodniu z braku rąk lub sprzętu (czas obsługi), kontrola sanepidu z mandatem, każdy wypadek w lokalu. Zadowolenie
+      pracowników: przepracowanie = średnia nadwyżka wykorzystania czasu ponad próg. Rozwój: każdy kolejny lokal i przyrost
+      dań w menu i pracowników (jak w dawnym wzorze Revasa). Zadłużenie: dług u Harpagona liczony z wagą (lichwiarz
+      straszy bardziej niż bank). Wartości – założenia do potwierdzenia (PRACA_NOCNA, pyt. 22)'
 losowosc:
   reklamacje:
     wartosc: dwumianowo_ryzyko_pracownika

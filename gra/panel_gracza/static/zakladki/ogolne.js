@@ -8,6 +8,31 @@ const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekono
 
 let skumulowana = false;
 
+// składniki kebabowe karty (gra z lokalami, silnik/karta.py → kebab): wskaźnik, miernik, jak pokazać miarę
+const SKLADNIKI_KEBABU = [
+  ["zadowolenie_klientow", "kolejki", "Klienci, którzy nie doczekali się obsługi", (m) => proc(m.kolejki)],
+  ["zadowolenie_klientow", "brakujace_dania", "Dania wyłączone z braku składnika (dania × dni)", (m) => proc(m.brakujace_dania)],
+  ["zadowolenie_klientow", "kontrola_z_mandatem", "Mandat sanepidu", (m) => zl(m.mandat)],
+  ["zadowolenie_klientow", "wypadki", "Wypadki w lokalu", (m) => licz(m.wypadki)],
+  ["zadowolenie_pracownikow", "przepracowanie", "Przepracowanie (wykorzystanie czasu ponad próg)", (m) => proc(m.przepracowanie)],
+  ["rozwoj_firmy", "kolejne_lokale", "Lokale", (m) => licz(m.lokale)],
+  ["wskaznik_zadluzenia", "dlug_harpagona", "Dług u Harpagona", (m) => zl(m.dlug_harpagona)],
+];
+
+function kartaKebabu(v) {
+  const K = v.wyniki?.karta_kebab;
+  if (!K || skumulowana) return "";
+  const nazwa = Object.fromEntries(WSKAZNIKI);
+  const plus = (x) => x ? `<span class="${x > 0 ? "plus" : "minus"}">${x > 0 ? "+" : "−"}${wsk(Math.abs(x))}</span>` : "–";
+  const wiersze = [["Zadowolenie klientów", "Cena względem ceny preferowanej w strefie lokalu", proc(K.miary.cena_wzgledem_strefy, 0), "we wzorze"]]
+    .concat(SKLADNIKI_KEBABU.map(([s, k, opis, miara]) => [nazwa[s], opis, miara(K.miary), plus(K.skladniki[s]?.[k])]));
+  return tabela("Skąd Twoja karta – sprawy kebabowe", ["Wskaźnik", "Miernik", "W minionym tygodniu", "Poprawka"], wiersze,
+    { klasy: ["l", "l"], sortuj: false })
+    + `<p class="podpowiedz">Kolejki, braki w menu, mandaty i wypadki obniżają zadowolenie klientów – a od niego zależy, ilu
+      klientów przyjdzie w następnym tygodniu. Przepracowana załoga jest mniej zadowolona, każdy kolejny lokal podnosi
+      rozwój firmy, a dług u Harpagona waży w zadłużeniu więcej niż kredyt bankowy.</p>`;
+}
+
 function planRundy(v, kat) {
   // lista kontrolna decyzji bieżącej rundy (na podstawie stanu po roboczych decyzjach)
   const r = v.runda, st = v.stan, braki = Object.values(st.gotowe_uslugi || {}).flat();
@@ -81,9 +106,10 @@ export const karta_wynikow = {
         <button class="btn ${skumulowana ? "jasny" : "pom"}" data-akcja="karta-skum" data-s="0">Karta wyników</button>
         <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.runda >= 4 ? "" : "disabled"}>Skumulowana karta wyników</button></div>
       ${tabela("Ranking zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n)], wiersze, { klasy: ["l"] })}
+      ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>
       <div class="wykres"><canvas id="w-historia"></canvas></div>
-      <p class="podpowiedz">Wynik działalności = iloczyn pozostałych wskaźników (0 przy stracie). Wynik ekonomiczny = dochód netto / 20 000 PLN.
+      <p class="podpowiedz">Wynik działalności = iloczyn pozostałych wskaźników (0 przy stracie). Wynik ekonomiczny = dochód netto rundy / ${zl(v.dzielnik_karty)}.
       Zadowolenie i rozwój liczone są ze skalibrowanych wzorów (dane/zalozenia.yaml) – mogą odbiegać od prawdziwej gry.</p>`;
   },
   po({ v }) {

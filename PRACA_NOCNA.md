@@ -180,6 +180,14 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    frytek w sesji). Notatka „Zdarzenia i historie” (koziołki do końca sesji) – zostawione na później. Pytania: czy
    lista i mnożniki takie? czy wydarzenia mają też zmieniać popyt na konkretne dania? czy dodać mecze Motoru na
    Arenie Lublin? (zapisane 27.10)
+22. **Karta wyników dla kebabu (F4.1).** Założenia (`zalozenia.yaml → karta_wynikow.kebab`, wszystkie „na oko”):
+   kolejki −0,15 × udział klientów, którzy nie doczekali się obsługi; brakujące dania −0,3 × udział dań-dni
+   wyłączonych; mandat sanepidu −0,05; każdy wypadek w lokalu −0,03; przepracowanie −0,5 × nadwyżka wykorzystania
+   czasu ponad 85%; każdy kolejny lokal +0,08 do rozwoju; dług u Harpagona liczony ×1,5 w zadłużeniu. Cena porównywana
+   z ceną preferowaną strefy lokalu, a nie ze średnią rynku. Z tabeli w „Ustaleniach gry” nie dodałem jeszcze:
+   „umowa” i „zmiany w zatrudnieniu” działają jak w Revasie (zmiany mają wagę 0), „świeżość” liczę pośrednio (braki
+   w menu, sanepid), „wartość sprzętu” jest w majątku. Pytania: czy wagi takie? czy dodać do karty kontrole skarbówki
+   lub zaległości? czy przy notatce „Ustalenia gry” wpisać ostateczne wzory? (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -410,3 +418,5 @@ _brak_
   w KPiR obu stron, zakładka Handel z drużynami; pytanie 20. Start F3b.9 (kalendarz miejski).
 - 27.10 04:45 – F3b.9 gotowe: kalendarz miejski w `dane/kalendarz/` (23 wydarzenia z historiami, daty ruchome),
   zakładka Kalendarz miejski; pytanie 21. Start F4.1.
+- 27.10 04:57 – F4.1 gotowe: karta wyników ze składnikami kebabowymi (kolejki, braki w menu, sanepid, wypadki,
+  przepracowanie, lokale, Harpagon), rozbicie w zakładce Karta wyników; pytanie 22. Start F4.2 (lista błędów).

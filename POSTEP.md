@@ -158,4 +158,16 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   (`kalendarz.tydzien`). Zakładka **Kalendarz miejski** w grupie Klienci i strefy (Decyzje: bieżący tydzień,
   następne 4 i przegląd wszystkich tygodni; Wyniki: miniony tydzień i klienci stref); test `test_kalendarz.py`
 
-Zadania F4.1–F4.7 – jeszcze nie zaczęte.
+## F4 – dopasowanie starych funkcji (bez giełdy)
+- [x] F4.1 Karta wyników dla kebabu – `silnik/karta.py` (`kebab`, `miary_kebabu`, `cena_wzgledem_strefy`; parametry
+  `zalozenia.yaml → karta_wynikow.kebab`). W grze z lokalami 5 wskaźników Revasa dostaje składniki kebabowe z wyników
+  tygodnia: zadowolenie klientów – cena względem ceny preferowanej strefy lokalu (zamiast średniej rynku), kolejki
+  (klienci utraceni z braku rąk lub sprzętu), dania wyłączone z braku składnika, mandat sanepidu, wypadki w lokalu;
+  zadowolenie pracowników – przepracowanie (wykorzystanie czasu ponad próg); rozwój – kolejne lokale; zadłużenie –
+  dług u Harpagona z wagą 1,5. Iloczyn liczony od nowa (0 przy stracie), karta skumulowana = średnia kart (od rundy 4),
+  zadowolenie klientów nadal wpływa na popyt następnej rundy. Wyniki rundy: `karta_kebab` (miary i poprawki);
+  zakładka **Karta wyników** – tabela „Skąd Twoja karta – sprawy kebabowe” i dzielnik wyniku ekonomicznego z danych
+  (4 615 zł tygodniowo zamiast „20 000”). Kodu `ocena.py` starego Levasa nie ma na dysku – wzory z notatki
+  „Ustalenia gry”; test `test_karta.py`
+
+Zadania F4.2–F4.7 – jeszcze nie zaczęte.

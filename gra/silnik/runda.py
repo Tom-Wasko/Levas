@@ -379,6 +379,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 wyniki[nazwa]["swiezosc"] = strefowy["swiezosc"][nazwa]
                 mag.dolicz_oddane(strefowy["swiezosc"][nazwa], (info[nazwa].get("zdarzenia") or {}).get("oddane"))
                 _straty_w_zasobach(wyniki[nazwa]["zasoby"], strefowy["swiezosc"][nazwa]["straty"])
+            if "karta" in wyniki[nazwa] and f.lokale:   # składniki kebabowe karty – po zebraniu wyników tygodnia
+                wyniki[nazwa]["karta_kebab"] = kw.kebab(dane, f, wyniki[nazwa], netto, zadluzenie(f))
+                f.rozwoj_poprzedni = wyniki[nazwa]["karta"]["rozwoj_firmy"]
 
     s.runda = r
     s.wyniki[r] = wyniki
@@ -548,7 +551,10 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
         def srednia_rynku(u, v):
             ceny = [o["cena"] for o in (oferty or {}).get(u, {}).values()]
             return float(np.mean(ceny)) if ceny else v["cena_po_rabacie"]
-        r_rynek = sum(v["sprzedaz"] * v["cena_po_rabacie"] / srednia_rynku(u, v) for u, v in sprzedane.items()) / klienci
+        if f.lokale and dane.mapa:   # gra z lokalami: cena względem ceny preferowanej strefy lokalu (F4.1)
+            r_rynek = kw.cena_wzgledem_strefy(dane, sprzedane)
+        else:
+            r_rynek = sum(v["sprzedaz"] * v["cena_po_rabacie"] / srednia_rynku(u, v) for u, v in sprzedane.items()) / klienci
         jakosc = menu.jakosc_dania if f.lokale else (lambda dane, q: mnoznik_jakosci(dane, *q))
         q_sr = sum(v["sprzedaz"] * jakosc(dane, v["jakosc"]) for v in sprzedane.values()) / klienci
         reklamacje = sum(v["reklamacje"] for v in sprzedane.values()) / klienci
