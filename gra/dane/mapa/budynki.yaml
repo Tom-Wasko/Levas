@@ -88,8 +88,9 @@ budynki:
   nazwa: Ratusz i Sanepid
   rodzaj: urzad
   strefa: stare_miasto
-  opis: Urzędnik sprawdzi, czego brakuje w twoich decyzjach (Lista błędów).
-  zakladka: lista_bledow
+  opis: Rejestracja firmy, odbiór lokalu przez sanepid, higiena i kontrole. Urzędnik sprawdzi też, czego brakuje
+    w twoich decyzjach (Lista błędów).
+  zakladka: urzad
   mapa:
     x: 11
     y: 5

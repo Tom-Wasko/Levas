@@ -52,6 +52,7 @@ from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import srodki_trwale as st_trwale
 from . import swiezosc as sw
+from . import urzad as urz
 from . import zdarzenia as zd
 from .dane import KASA, KUCHNIA, Dane
 from .dostawcy import zasady_dostaw
@@ -400,6 +401,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         for tekst in ((info or {}).get("promocje") or {}).get("uwagi", []):
             dodaj("czerwony", pm.ZAKLADKA, tekst)
         for b in aw.bledy((info or {}).get("ubezpieczenia")):
+            dodaj(b["poziom"], b["zakladka"], b["tekst"])
+        for b in urz.bledy(dane, (info or {}).get("urzad")):
             dodaj(b["poziom"], b["zakladka"], b["tekst"])
         for b in bo.bledy(dane, firma, d):
             dodaj(b["poziom"], b["zakladka"], b["tekst"])

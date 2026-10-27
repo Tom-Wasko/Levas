@@ -74,7 +74,10 @@ historie:
       - id: zostaw
         tekst: Zostawiasz go – może sam wyleci
         wynik: >-
-          Zenon nie wylatuje. Zenon się rozgląda. Zenon wyraźnie ocenia metraż.
+          Zenon nie wylatuje. Zenon się rozgląda. Zenon wyraźnie ocenia metraż. Klient przy oknie robi mu zdjęcie
+          na tle krajalnicy i z miną obywatela wysyła je do sanepidu.
+        skutki:
+        - {typ: kontrola, szansa: 0.1, rund: 2, opis: Zdjęcie Zenona na tle krajalnicy w skrzynce sanepidu}
         nastepna:
         - {scena: rodzina, za_ile_rund: 1}
     nagranie:
@@ -136,7 +139,10 @@ historie:
       - id: zignoruj
         tekst: Udajesz, że listu nie było
         wynik: >-
-          List znika z drzwi. Następnego dnia wisi znowu, tym razem z przypisem i bibliografią.
+          List znika z drzwi. Następnego dnia wisi znowu, tym razem z przypisem i bibliografią. Do przypisu
+          dołączona jest informacja, że kopia poszła do sanepidu – listem poleconym, za potwierdzeniem odbioru.
+        skutki:
+        - {typ: kontrola, szansa: 0.12, rund: 2, opis: Skarga pani Haliny do sanepidu (z bibliografią)}
         nastepna:
         - {scena: pranie, za_ile_rund: 1}
     stala_klientka:

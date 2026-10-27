@@ -255,9 +255,10 @@ class OtwartaHistoria(Model):
 
 
 class Efekt(Model):
-    """Skutek eventu trwający kilka rund: mnożnik popytu albo godziny właściciela mniej (silnik/zdarzenia.py)."""
-    typ: str                      # "popyt" | "czas"
-    wartosc: float                # mnożnik albo godziny
+    """Skutek eventu trwający kilka rund: mnożnik popytu, godziny właściciela mniej albo dodatek do szansy kontroli
+    sanepidu (silnik/zdarzenia.py, silnik/urzad.py)."""
+    typ: str                      # "popyt" | "czas" | "kontrola"
+    wartosc: float                # mnożnik, godziny albo szansa
     od_rundy: int
     do_rundy: int
     opis: str = ""
@@ -312,6 +313,8 @@ class Firma(Model):
     efekty: list[Efekt] = Field(default_factory=list)
     wypadki: dict[str, int] = Field(default_factory=dict)   # wypadki w lokalu (silnik/awarie.py): id → runda początku
     polisy: dict[str, int] = Field(default_factory=dict)    # polisy ubezpieczyciela: rodzaj → runda początku ochrony
+    higiena: str | None = None    # poziom higieny lokali (silnik/urzad.py); None – domyślny z danych
+    odbiory: dict[str, int] = Field(default_factory=dict)   # lokal → runda odbioru przez sanepid
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
     promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami

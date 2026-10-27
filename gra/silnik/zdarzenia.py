@@ -165,6 +165,9 @@ def _skutek(f: Firma, s: dict, hid: str, runda: int, ks: Ksiega, rach: Rachunek,
     elif s["typ"] == "czas":    # od następnej rundy (w tej czas jest już rozdzielony)
         f.efekty.append(Efekt(typ="czas", wartosc=s["godziny"], od_rundy=runda + 1, do_rundy=runda + s["rund"],
                               opis=s["opis"]))
+    elif s["typ"] == "kontrola":   # od tej rundy (kontrola sanepidu jest na koniec rundy)
+        f.efekty.append(Efekt(typ="kontrola", wartosc=s["szansa"], od_rundy=runda, do_rundy=runda + s["rund"] - 1,
+                              opis=s["opis"]))
     elif s["typ"] == "kandydat":
         kandydaci.append({**s["kandydat"], "id": f"zd_{hid}_{f.nazwa}_{runda}", "tylko_dla": f.nazwa})
     return None

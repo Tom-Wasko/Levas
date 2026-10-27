@@ -18,12 +18,13 @@ import { harpagon } from "./harpagon.js";
 import { podatki } from "./podatki.js";
 import { zdarzenia } from "./zdarzenia.js";
 import { ubezpieczenia } from "./ubezpieczenia.js";
+import { urzad } from "./urzad.js";
 
-const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, przejecia, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
+const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, przejecia, urzad, klienci, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
   dostawcy, swiezosc, czas_wlasciciela, zdarzenia, agencje, promocje, tradycyjny, internetowy, sprzedaz, raport, kpir, podatki, bank, harpagon, biuro, ubezpieczenia, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
-export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", przejecia: "lokale", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
+export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", przejecia: "lokale", urzad: "urzad", klienci: "klienci", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", rynek_pracy: "rynek_pracy", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar", zdarzenia: "zdarzenia",
   agencje: "tradycyjny", promocje: "procent", tradycyjny: "tradycyjny", internetowy: "internetowy", sprzedaz: "sprzedaz", raport: "raport", kpir: "kpir", podatki: "podatki", bank: "bank", harpagon: "harpagon",
   biuro: "biuro", ubezpieczenia: "tarcza", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
@@ -35,7 +36,7 @@ export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnieni
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { klucz: "karta_wynikow", tytul: "Karta wyników", ikona: "karta" },
-  { klucz: "lokale", tytul: "Lokale", ikona: "lokale", pod: ["lokale", "przejecia"] },
+  { klucz: "lokale", tytul: "Lokale", ikona: "lokale", pod: ["lokale", "przejecia", "urzad"] },
   { klucz: "klienci", tytul: "Klienci i strefy", ikona: "klienci" },
   { klucz: "oferta", tytul: "Oferta", ikona: "oferta" },
   { klucz: "inwestycje", tytul: "Inwestycje", ikona: "inwestycje", pod: ["stanowiska", "sprzet", "wyposazenie", "srodki_trwale"] },

@@ -15,6 +15,7 @@ from silnik import reklama as rk
 from silnik import rozliczenie as rz
 from silnik import rynek_pracy as rp
 from silnik import swiezosc
+from silnik import urzad as urz
 from silnik import zdarzenia as zd
 from silnik.dane import Dane
 from silnik.decyzje import (
@@ -76,6 +77,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     if lokale:
         info["bank"], info["leasing"] = bank_info, bk.leasing_wez(gra.dane, f, d, r, ks, rach)
         info["harpagon"], info["przejecia"] = harpagon_info, przejecia
+        info["urzad"] = urz.ustaw(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach)
     if lokale and gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
         info["zdarzenia"] = zd.rozegraj(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach, czas, podglad=True)
@@ -188,7 +190,10 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
         v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
         przet = sum(x["wartosc"] for x in ((v.get("wyniki") or {}).get("swiezosc") or {}).get("straty", []) if x["powod"] == "termin")
-        v["magazyn"] = mag.ryzyko(dane, f, runda, przet)
+        v["magazyn"] = mag.ryzyko(dane, f, runda, przet, urz.modyfikatory(dane, f, runda))
+        if urz.dane_urzedu(dane):
+            v["urzad"] = urz.widok(dane, f, runda, info.get("urzad") if edycja else stan.wyniki[runda][firma].get("urzad"),
+                                   poprzedni.wyniki, firma, przet)
         v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
         v["srodki_trwale"] = ewidencja(f)
         v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja

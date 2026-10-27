@@ -38,6 +38,7 @@ const P = {
   portfel: '<path d="M20 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2"/><path d="M16 12h5v4h-5a2 2 0 0 1 0-4z"/>',
   rynek_pracy: '<circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M1.5 19c.5-3 2.6-4.6 5.5-4.6s5 1.6 5.5 4.6M11.5 19c.5-3 2.6-4.6 5.5-4.6s5 1.6 5.5 4.6M9.5 12.5l5-1"/>',
   zdarzenia: '<path d="M12 22v-6M8 22h8"/><path d="M12 16c-4 0-6-2.5-6-5.5C6 7.5 8.7 4 12 2c3.3 2 6 5.5 6 8.5S16 16 12 16z"/>',
+  urzad: '<path d="M3 21h18M4 9h16M12 3l8 6H4l8-6z"/><path d="M6 9v9M10 9v9M14 9v9M18 9v9M4 18h16"/>',
   tarcza: '<path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/>',
   zegar: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   wykres: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',

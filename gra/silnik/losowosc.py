@@ -33,6 +33,7 @@ CELE = frozenset({
     "reklamacje",  # reklamacje: runda, firma, usługa
     "rynek_pracy", # remisy w licytacjach i ofertach podkupienia: runda, rodzaj, id osoby
     "sanepid",     # kontrola sanepidu w lokalu (silnik/magazyn.py): runda, firma
+    "odbior",      # tekst odbioru lokalu przez sanepid (silnik/urzad.py): runda, firma, lokal
     "promocje",    # komiczny raport z pierwszej rundy promocji: runda, firma, typ
     "reklama",     # tekst raportu agencji reklamowej (silnik/reklama.py): runda, firma, agencja, kanał
     "zdarzenia",   # ciąg dalszy historii z parku: runda, firma, historia

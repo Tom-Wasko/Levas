@@ -33,6 +33,7 @@ from . import przejecia as pr
 from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
+from . import urzad as urz
 from . import zdarzenia as zd
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
@@ -131,6 +132,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["leasing"] = bk.leasing_wez(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
             info[nazwa]["harpagon"] = harpagon_info
             info[nazwa]["przejecia"] = info_przejecia
+            # higiena i odbiór lokali przez sanepid – po lokalach i inwestycjach (silnik/urzad.py)
+            info[nazwa]["urzad"] = urz.ustaw(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa])
         if tryb_lokali:  # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
             zatrudnieni = set(info[nazwa]["zatrudnieni"])
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
@@ -277,7 +280,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:   # bez zwrotów i kosztu magazynowania: wynajęta chłodnia i kontrola sanepidu
             zwroty = {}
             info[nazwa]["magazyn"] = mag.koniec_rundy(dane, f, r, ziarno, (strefowy or {}).get("swiezosc", {}).get(nazwa) or {},
-                                                      ks, rach)
+                                                      ks, rach, urz.modyfikatory(dane, f, r))
         else:
             zwroty = _zwroty(dane, f, d, info[nazwa], ks, rach, r)
             if sum(f.magazyn.values()) > 1e-6:
@@ -327,6 +330,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             if aw.dane_wypadkow(dane):
                 wyniki[nazwa]["ubezpieczenia"] = aw.raport(info[nazwa].get("ubezpieczenia"), info[nazwa].get("zdarzenia"))
             wyniki[nazwa]["magazyn"] = info[nazwa].get("magazyn")
+            if urz.dane_urzedu(dane):
+                wyniki[nazwa]["urzad"] = urz.raport(info[nazwa].get("urzad"), info[nazwa].get("magazyn"))
             wyniki[nazwa]["biuro"] = info[nazwa].get("biuro")
             wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")
             wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej

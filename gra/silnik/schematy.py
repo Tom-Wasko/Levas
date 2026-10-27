@@ -397,6 +397,7 @@ class Strategia(Schemat):
     kampanie: list[str] = Field(default_factory=list)   # gra z lokalami: "agencja/kanał" z mapa/reklama.yaml
     promocje: list[PromocjaBota] = Field(default_factory=list)   # gra z lokalami: typy z mapa/promocje.yaml
     polisy: list[str] = Field(default_factory=list)   # gra z lokalami: rodzaje polis z zdarzenia/losowe.yaml
+    higiena: str | None = None   # gra z lokalami: poziom higieny z zdarzenia/urzad.yaml (None – domyślny)
 
 
 class UstawieniaBotow(Schemat):
@@ -897,17 +898,20 @@ class KosztOpcji(Schemat):
     porcje: int = Field(default=0, ge=0)       # porcje jedzenia (zasady.koszt_porcji zł)
 
 
-SKUTKI_POLA = {"kwota": ("gotowka", "szkoda"), "mnoznik": ("popyt",), "godziny": ("czas",), "kandydat": ("kandydat",)}
+SKUTKI_POLA = {"kwota": ("gotowka", "szkoda"), "mnoznik": ("popyt",), "godziny": ("czas",), "kandydat": ("kandydat",),
+               "szansa": ("kontrola",)}
 
 
 class Skutek(Schemat):
-    # oddaj_zapas – tylko bank żywności; szkoda – tylko wypadki w lokalu (losowe.yaml, silnik/awarie.py)
-    typ: Literal["gotowka", "popyt", "czas", "kandydat", "oddaj_zapas", "szkoda"]
+    # oddaj_zapas – tylko bank żywności; szkoda – tylko wypadki w lokalu (losowe.yaml, silnik/awarie.py);
+    # kontrola – skarga do sanepidu: większa szansa kontroli (silnik/urzad.py)
+    typ: Literal["gotowka", "popyt", "czas", "kandydat", "oddaj_zapas", "szkoda", "kontrola"]
     opis: str = Field(min_length=3)
     kwota: float | None = None                          # gotowka: + przychód, − koszt; szkoda: koszt (> 0)
     polisa: str | None = None                           # szkoda: rodzaj polisy, która ją pokrywa (None – żadna)
     mnoznik: float | None = Field(default=None, gt=0)    # popyt: mnożnik atrakcyjności lokali
     godziny: float | None = Field(default=None, gt=0)    # czas: o tyle mniej godzin właściciela
+    szansa: float | None = Field(default=None, gt=0, le=1)   # kontrola: dodatek do szansy kontroli sanepidu
     rund: int = Field(default=1, ge=1)
     kandydat: ZnanyKandydat | None = None               # kandydat: osoba tylko dla tej drużyny
 
@@ -1124,10 +1128,59 @@ class PlikMagazynu(Plik):
     bank_zywnosci: BankZywnosci
 
 
+class Rejestracja(Schemat):
+    pkd: str
+    opis_pkd: str
+    tekst: str = Field(min_length=3)
+
+
+class Urzad(Schemat):
+    nazwa: str
+    budynek: str | None                    # id z mapa/budynki.yaml
+    rejestracja: Rejestracja
+
+
+class Odbior(Schemat):
+    odroczenie_rund: int = Field(ge=1)
+    teksty_ok: list[str] = Field(min_length=1)
+    teksty_odmowa: list[str] = Field(min_length=1)
+
+
+class PoziomHigieny(Schemat):
+    nazwa: str
+    opis: str
+    koszt: float = Field(ge=0)             # zł miesięcznie (brutto) za działający lokal
+    dodatek: float = Field(ge=0, le=1)     # do części szansy kontroli z problemów
+    mnoznik: float = Field(gt=0)           # mnoży część szansy z problemów (z dodatkami)
+    mandat: float = Field(ge=0)            # zł – doliczane do mandatu
+    odbior: bool                           # czy sanepid odbierze lokal przy tym poziomie
+
+
+class Higiena(Schemat):
+    domyslna: str
+    poziomy: dict[str, PoziomHigieny] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _domyslna(self):
+        if self.domyslna not in self.poziomy:
+            raise ValueError(f"higiena.domyslna {self.domyslna!r} nie jest poziomem")
+        if not self.poziomy[self.domyslna].odbior:
+            raise ValueError("higiena.domyslna musi pozwalać na odbiór lokalu")
+        return self
+
+
+class PlikUrzedu(Plik):
+    """dane/zdarzenia/urzad.yaml: rejestracja firmy, odbiór lokalu i higiena (silnik/urzad.py)."""
+    urzad: Urzad
+    odbior: Odbior
+    higiena: Higiena
+
+
 SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "parki.yaml": PlikParkow,
     "magazyn.yaml": PlikMagazynu,
     "losowe.yaml": PlikWypadkow,
+    "urzad.yaml": PlikUrzedu,
 }
 
 

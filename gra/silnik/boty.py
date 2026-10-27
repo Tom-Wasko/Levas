@@ -270,4 +270,6 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         d["zdarzenia"] = zd.wybor_bota(dane, f, runda, konf["ziarno"])
     if lokale and aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
         d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
+    if lokale and st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
+        d["higiena"] = st["higiena"]
     return d

@@ -83,7 +83,7 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
 
 def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
     """Eventy (`dane/zdarzenia/`): parki (F3b.1), sanepid i bank żywności (magazyn), wypadki i ubezpieczyciel (losowe,
-    F3b.5). Brak katalogu = gra bez eventów."""
+    F3b.5), urząd i higiena (urzad, F3b.6). Brak katalogu = gra bez eventów."""
     if not (katalog / "parki.yaml").exists():
         return None
     return {n.removesuffix(".yaml"): s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"})
@@ -457,6 +457,12 @@ def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
         for x in st.get("polisy", []):
             if x not in polisy:
                 brak(x, f"boty.yaml: {s}.polisy", "rodzaj polisy", "zdarzenia/losowe.yaml: ubezpieczyciel.polisy")
+    urz = d.zdarzenia["urzad"]
+    if urz["urzad"]["budynek"] and urz["urzad"]["budynek"] not in {b["id"] for b in d.mapa["budynki"]}:
+        brak(urz["urzad"]["budynek"], "zdarzenia/urzad.yaml: urzad", "budynek", "mapa/budynki.yaml")
+    for s, st in d.boty["strategie"].items():
+        if st.get("higiena") and st["higiena"] not in urz["higiena"]["poziomy"]:
+            brak(st["higiena"], f"boty.yaml: {s}.higiena", "poziom higieny", "zdarzenia/urzad.yaml: higiena.poziomy")
     for plik, h in pliki:
         co = f"zdarzenia/{plik}.yaml: {h['id']}"
         if h["park"] and h["park"] not in parki:

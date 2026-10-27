@@ -15,6 +15,7 @@ function kosztTekst(k) {
 function skutekTekst(s) {
   if (s.typ === "gotowka") return `${esc(s.opis)}: <span class="${s.kwota >= 0 ? "plus" : "minus"}">${zl2(s.kwota)}</span>`;
   if (s.typ === "popyt") return `${esc(s.opis)}: popyt ${s.mnoznik >= 1 ? "+" : ""}${proc(s.mnoznik - 1, 0)} przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
+  if (s.typ === "kontrola") return `${esc(s.opis)}: szansa kontroli sanepidu +${proc(s.szansa, 0)} przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
   if (s.typ === "czas") return `${esc(s.opis)}: ${licz(s.godziny, 1)} h właściciela mniej przez ${s.rund} ${s.rund === 1 ? "rundę" : "rundy"}`;
   if (s.typ === "oddaj_zapas") return `${esc(s.opis)}${s.oddane ? `: ${zl2(s.oddane)}` : ""} – znika z zaplecza (bez kosztu w KPiR, był kosztem przy zakupie)`;
   if (s.typ === "szkoda") return `${esc(s.opis)}: szkoda <span class="minus">${zl2(-s.kwota)}</span>${s.odszkodowanie

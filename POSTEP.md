@@ -112,5 +112,16 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   w rundzie początku wypadku; boty z polisami wg strategii (`boty.yaml` → `polisy`); wyniki rundy `ubezpieczenia`;
   zakładka **Finanse → Ubezpieczenia** (Decyzje: kup/wypowiedz, składki; Wyniki: składki, szkody, odszkodowania,
   historia szkód), zakładka Zdarzenia pokazuje wypadki i szkody; test `test_awarie.py`
+- [x] F3b.6 Urząd i sanepid (gra z lokalami) – `silnik/urzad.py`, dane `dane/zdarzenia/urzad.yaml` (schemat
+  `PlikUrzedu`): rejestracja w CEIDG (PKD 56.10.A, bezpłatna, tylko opis); odbiór lokalu przez sanepid w rundzie,
+  w której lokal ma zacząć działać – przy higienie bez odbioru odmowa i lokal rusza rundę później, do skutku
+  (`Firma.odbiory`, strumień `odbior`); decyzja `higiena: poziom` (`Firma.higiena`, trwa do zmiany): 4 poziomy
+  (brak / mop i grafik – domyślny / firma „Błysk-Pol” / Błysk-Pol + HACCP) z kosztem miesięcznym za działający lokal
+  (KPiR, VAT 23%) i wpływem na kontrolę sanepidu (dodatek do szansy, mnożnik części z problemów, dodatek do
+  mandatu); nowy skutek historii `kontrola` (skarga do sanepidu – `Efekt` „kontrola”, dodatek do szansy kontroli
+  przez kilka rund; dodany do historii Gołąb Zenon i Pani Halina); boty z higieną wg strategii; ratusz na mapie
+  otwiera zakładkę **Lokale → Urząd i sanepid** (Decyzje: rejestracja, lokale i odbiory, poziomy higieny, ryzyko
+  kontroli, skargi; Wyniki: koszt, odbiory, kontrola, historia kontroli), odmowa odbioru na liście błędów; test
+  `test_urzad.py`
 
-Zadania F3b.6–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+Zadania F3b.7–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

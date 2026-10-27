@@ -145,6 +145,14 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    dalszy też); wypowiedzenie – od razu, bez zwrotu składki. Nazwa ubezpieczyciela: TUW „Pod Koziołkiem”. Czy tak?
    (zapisane 27.10)
 
+18. **Urząd i sanepid (F3b.6).** Rejestracja w CEIDG – bezpłatna i tylko informacyjna (bez decyzji). Odbiór sanepidu
+   w rundzie, w której lokal ma zacząć działać; przy higienie „brak” odmowa i lokal czeka 1 rundę (powtarza się do
+   skutku). Poziomy higieny (zł/mies. brutto za działający lokal): brak 0 zł (+6 pp. szansy kontroli, +400 zł do
+   mandatu, bez odbioru), mop i grafik 120 zł (domyślny), firma „Błysk-Pol” 750 zł (część szansy z problemów ×0,7),
+   Błysk-Pol + HACCP 1300 zł (×0,45). Skargi w historiach (Gołąb Zenon „zostaw”: +10 pp. przez 2 rundy, Pani Halina
+   „zignoruj”: +12 pp. przez 2 rundy). Boty: zrównoważony i tani – mop, premium – HACCP, agresywny – firma. Ratusz na
+   mapie otwiera teraz zakładkę Urząd i sanepid (lista błędów nadal w menu). Czy tak? (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -366,3 +374,5 @@ _brak_
   wypowiedzenia z rozliczeniem nakładów, wyprowadzki, zakładka Licytacje i przejęcia; pytanie 16. Start F3b.5.
 - 27.10 – F3b.5 gotowe: wypadki w lokalu (10 historii, 8 komicznych), ubezpieczyciel z polisami na lokal, sprzęt i OC,
   zakładka Ubezpieczenia, boty z polisami; pytanie 17. Start F3b.6 (urząd/sanepid).
+- 27.10 – F3b.6 gotowe: odbiór lokalu przez sanepid, 4 poziomy higieny z kosztem i wpływem na kontrole, skargi
+  w historiach, zakładka Urząd i sanepid; pytanie 18. Start F3b.7 (kasyno).

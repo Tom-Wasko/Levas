@@ -46,6 +46,7 @@ strategie:
     promocje:
     - {typ: zestaw, nazwa: Zestaw Złotego Środka}
     polisy: [lokal, oc]          # gra z lokalami: polisy ubezpieczyciela (dane/zdarzenia/losowe.yaml)
+    higiena: podstawowa          # gra z lokalami: poziom higieny (dane/zdarzenia/urzad.yaml)
   tani:
     nazwa: Tani Kebab Nocny
     cena: 0.78
@@ -66,6 +67,7 @@ strategie:
     - {typ: happy_hours, nazwa: Tanie Godziny Nocnego}
     - {typ: studencka, nazwa: Indeks Głodomora}
     polisy: []                   # oszczędza na wszystkim, także na ubezpieczeniu
+    higiena: podstawowa          # mop i grafik – bez tego sanepid nie odbierze lokalu
   premium:
     nazwa: Kebab Premium
     cena: 1.08
@@ -85,6 +87,7 @@ strategie:
     promocje:
     - {typ: karta, nazwa: Złota Karta Sułtana}
     polisy: [lokal, sprzet, oc]
+    higiena: haccp
   agresywny:
     nazwa: Kebab Głośny Marketing
     cena: 0.8
@@ -113,6 +116,7 @@ strategie:
     - {typ: dwa_za_jeden, nazwa: Podwójny Cios}
     - {typ: happy_hours, nazwa: Godzina Szału}
     polisy: [oc]
+    higiena: firma
   nasladowca:
     nazwa: Kebab Naśladowca
     cena: null

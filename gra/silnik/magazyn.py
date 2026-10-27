@@ -5,6 +5,7 @@
 - Sanepid: co rundę szansa kontroli rośnie z litrami w wynajętej chłodni i wartością przeterminowanego towaru
   (strumień „sanepid”); kontrola z zastrzeżeniami to mandat poza KPiR (rodzaj „kary”) i mniejszy popyt w kolejnych
   rundach (`Firma.efekty`). Teksty kontroli – `dane/zdarzenia/magazyn.yaml`, liczby – zalozenia.yaml magazyn.sanepid.
+  Higiena lokalu i skargi z historii (silnik/urzad.py, `modyfikatory`) zmieniają część szansy z problemów i mandat.
 - Bank żywności: historia z `dane/zdarzenia/magazyn.yaml` (silnik/zdarzenia.py), gdy w lokalu zostało dużo jedzenia
   z krótkim terminem – `zapas_do_oddania` wybiera te partie, `oddaj` zabiera je z magazynu.
 """
@@ -29,16 +30,21 @@ def zasady_sanepidu(dane: Dane) -> dict | None:
     return (dane.z.get("magazyn") or {}).get("sanepid")
 
 
-def szansa_kontroli(dane: Dane, litry: float, przeterminowane: float) -> dict:
-    """{"szansa", "problem"}: szansa kontroli w rundzie i jej część z problemów (wynajem, przeterminowany towar)."""
+def szansa_kontroli(dane: Dane, litry: float, przeterminowane: float, mod: dict | None = None) -> dict:
+    """{"szansa", "problem"}: szansa kontroli w rundzie i jej część z problemów (wynajem, przeterminowany towar,
+    higiena i skargi z `mod` – silnik/urzad.py)."""
     z = zasady_sanepidu(dane)
     problem = z["szansa_za_litr_wynajmu"] * litry + z["szansa_za_zl_przeterminowanych"] * przeterminowane
-    return {"szansa": round(min(z["szansa_max"], z["szansa_bazowa"] + problem), 4), "problem": round(problem, 4)}
+    if mod:
+        problem = (problem + mod["dodatek"]) * mod["mnoznik"]
+    szansa = min(z["szansa_max"], z["szansa_bazowa"] + problem)
+    return {"szansa": round(szansa, 4), "problem": round(problem, 4)}
 
 
-def mandat(dane: Dane, litry: float, przeterminowane: float) -> float:
+def mandat(dane: Dane, litry: float, przeterminowane: float, mod: dict | None = None) -> float:
     z = zasady_sanepidu(dane)
     k = z["mandat_min"] + z["mandat_za_litr_wynajmu"] * litry + z["mandat_za_zl_przeterminowanych"] * przeterminowane
+    k += mod["mandat"] if mod else 0
     return float(min(z["mandat_max"], max(z["mandat_min"], round(k / 50) * 50)))
 
 
@@ -46,7 +52,8 @@ def _zl(kwota: float) -> str:
     return f"{kwota:,.0f}".replace(",", " ") + " zł"
 
 
-def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksiega, rach: Rachunek) -> dict:
+def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksiega, rach: Rachunek,
+                 mod: dict | None = None) -> dict:
     """Koszt wynajętej chłodni i kontrola sanepidu po dniach rundy (raport świeżości z popyt.rynek_lokali).
     Zwraca {"wynajem": {"litry", "koszt"}, "sanepid": {...} | None}."""
     wyn = raport.get("wynajem") or []
@@ -59,8 +66,9 @@ def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksi
         return wynik
     z = zasady_sanepidu(dane)
     przet = round(sum(s["wartosc"] for s in raport.get("straty", []) if s["powod"] == "termin"), 2)
-    sz = szansa_kontroli(dane, litry, przet)
-    kontrola = {**sz, "litry": litry, "przeterminowane": przet, "kontrola": False, "mandat": 0.0, "tekst": None}
+    sz = szansa_kontroli(dane, litry, przet, mod)
+    kontrola = {**sz, "litry": litry, "przeterminowane": przet, "kontrola": False, "mandat": 0.0, "tekst": None,
+                **({"higiena": mod["higiena"], "skargi": mod["skargi"]} if mod else {})}
     wynik["sanepid"] = kontrola
     los = strumien(ziarno, runda, "sanepid", f.nazwa)
     if los.random() >= sz["szansa"]:
@@ -71,7 +79,7 @@ def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksi
     lista = teksty["kontrole_mandat" if z_mandatem else "kontrole_ok"]
     tekst = lista[int(los.integers(len(lista)))]
     if z_mandatem:
-        kwota = mandat(dane, litry, przet)
+        kwota = mandat(dane, litry, przet, mod)
         rach.zapisz(f, MANDAT, -kwota, "kary")
         f.efekty.append(Efekt(typ="popyt", wartosc=z["popyt_po_mandacie"], od_rundy=runda + 1,
                               do_rundy=runda + z["rund_spadku"], opis="Protokół sanepidu krąży po Lublinie"))
@@ -81,15 +89,15 @@ def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksi
     return wynik
 
 
-def ryzyko(dane: Dane, f: Firma, runda: int, przeterminowane_poprzednio: float = 0.0) -> dict | None:
+def ryzyko(dane: Dane, f: Firma, runda: int, przeterminowane_poprzednio: float = 0.0, mod: dict | None = None) -> dict | None:
     """Szacunek do decyzji: wynajem z planu dostaw rundy i przeterminowany towar jak w poprzedniej rundzie."""
     if zasady_sanepidu(dane) is None or not f.lokale:
         return None
     plan = sw.plan_wynajmu(dane, f, runda)
     litry = round(sum(x["litry"] for x in plan), 1)
-    return {**szansa_kontroli(dane, litry, przeterminowane_poprzednio), "litry": litry,
+    return {**szansa_kontroli(dane, litry, przeterminowane_poprzednio, mod), "litry": litry,
             "przeterminowane": round(przeterminowane_poprzednio, 2),
-            "mandat": mandat(dane, litry, przeterminowane_poprzednio)}
+            "mandat": mandat(dane, litry, przeterminowane_poprzednio, mod)}
 
 
 # --- bank żywności ------------------------------------------------------------------------------------------------
