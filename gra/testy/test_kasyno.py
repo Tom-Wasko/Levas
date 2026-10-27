@@ -123,6 +123,22 @@ def test_zaproszenie_i_zaklady(zawsze_zaproszenie):
     assert s.firmy["A"].zaproszenia == [2, 3]
 
 
+def test_przelew_z_firmy_w_klubie(zawsze_zaproszenie):
+    """P12: przelew z firmy (wypłata własna) w rundzie z klubem wystarcza na stawkę większą niż portfel;
+    na koncie firmy to zwykła wypłata własna, bez śladu klubu."""
+    g = _gra(("A", None), ("Bot", "tani"))
+    s = _runda(g)
+    automat = next(k for k, x in kas.dane_kasyna(g.dane)["gry"].items() if x["typ"] == "automat")
+    przed = wl.portfel(g.dane, s.firmy["A"])
+    zaklady = [{"gra": automat, "zaklad": None, "stawka": (przed + 1000) / 2}] * 2   # razem więcej niż portfel
+    s = _runda(g, A={"wyplata_wlasna": 1000, "kasyno": zaklady})
+    Z = s.wyniki[2]["A"]["kasyno"]["gry"]
+    assert not Z["odrzucone"] and Z["stawki"] == przed + 1000
+    assert s.wyniki[2]["A"]["wlasciciel"]["wyplata"] == 1000
+    opisy = json.dumps(s.wyniki[2]["A"]["rachunek"], ensure_ascii=False)
+    assert "Wypłata własna właściciela" in opisy and not any(x in opisy for x in ("Nocna", "Waldemar", "klub"))
+
+
 def test_podglad_bez_wynikow_i_ukrycie(zawsze_zaproszenie):
     from api.prezentacja import widok
     g = _gra()

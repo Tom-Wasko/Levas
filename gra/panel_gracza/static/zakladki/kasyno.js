@@ -1,6 +1,29 @@
 // Adres z wizytówki (silnik/kasyno.py): zakładka widoczna tylko w rundzie z zaproszeniem albo z wynikami gier.
 // Decyzja `kasyno`: lista {gra, zaklad, stawka} – stawki z portfela właściciela, wynik dopiero po zamknięciu rundy.
+// P12: przelew z firmy do portfela wprost z klubu – to zwykła decyzja `wyplata_wlasna` (silnik/wlasciciel.py), więc
+// na koncie firmy widać tylko „wypłatę własną właściciela”; wypłata idzie przed zakładami, można ją od razu postawić.
 import { esc, tabela, toast, zl2 } from "./wspolne.js";
+
+const ZASADA_MILCZENIA = `<div class="karta"><h3>Zasada milczenia</h3><p>Nad barem wisi oprawiona w złotą ramkę
+  tabliczka: „Pierwsza zasada Nocnej 13: księgowa nie musi wiedzieć wszystkiego. Druga zasada: mistrz gry tym bardziej”.
+  Pan Waldemar poleruje kieliszek i dodaje półgłosem, że ostatni gość, który opowiadał o klubie na mieście, prowadzi
+  teraz stoisko z watą cukrową na dworcu PKS – „bardzo uczciwa praca, tylko trochę klejąca”.</p>
+  <p class="podpowiedz">Klub to tajemnica drużyny. Kto mówi o nim mistrzowi gry, ten sam rozumie, że kebab
+  i hazard to dwa różne fartuchy.</p></div>`;
+
+function przelewHtml(W, d, edycja) {
+  if (!W) return "";
+  const juz = d.wyplata_wlasna;
+  return `<div class="karta"><h3>Bankomat w kącie</h3><p>Bankomat ma naklejkę „Prowizja: 0 zł. Wstyd: gratis”. Możesz
+    przelać pieniądze z konta firmy do prywatnego portfela – w księgach firmy będzie to zwykła wypłata własna
+    właściciela, bez słowa o tym, dokąd poszły.</p>
+    ${juz ? `<p>W tej rundzie przelewasz z firmy do portfela <span class="kwota">${zl2(juz)}</span>.</p>` : ""}
+    ${edycja ? `<div class="przyciski"><label class="pole">Kwota<input type="number" id="ks-przelew" min="1" step="100"
+      value="${juz || 500}"></label><button class="btn" data-akcja="ks-przelew">${juz ? "Zmień przelew" : "Przelej z firmy do portfela"}</button>
+      ${juz ? `<button class="btn jasny" data-akcja="ks-przelew-usun">Anuluj przelew</button>` : ""}</div>
+      <p class="podpowiedz">Na koncie firmy: ${zl2(W.gotowka_firmy)}. Wypłata przychodzi przed zakładami, więc można ją
+      postawić jeszcze dziś. Ten sam przelew widać w zakładce Portfel właściciela.</p>` : ""}</div>`;
+}
 
 function zakladyHtml(Z, edycja) {
   if (!Z?.zaklady?.length) return "";
@@ -38,7 +61,9 @@ export const kasyno = {
     return `<div class="karta"><p>${esc(K.zaproszenie)}</p></div>
       <div class="karta"><h3>${esc(K.klub.nazwa)}</h3><p>${esc(K.klub.tekst)}</p></div>
       ${W ? `<div class="pasek ciemny"><span>W portfelu na początku rundy: <span class="kwota">${zl2(W.portfel_przed)}</span></span>
-        ${D ? `<span>Po stawkach: <span class="kwota">${zl2(W.portfel_po)}</span></span>` : ""}</div>` : ""}`
+        ${d.wyplata_wlasna ? `<span>Przelew z firmy: <span class="kwota">${zl2(d.wyplata_wlasna)}</span></span>` : ""}
+        ${D || d.wyplata_wlasna ? `<span>Po przelewie i stawkach: <span class="kwota">${zl2(W.portfel_po)}</span></span>` : ""}</div>` : ""}`
+      + ZASADA_MILCZENIA + przelewHtml(W, d, edycja)
       + zakladyHtml(D, edycja) + odrzuconeHtml(D)
       + (edycja && ile < L.maks ? Object.entries(K.gry).map(([id, g]) => grafHtml(id, g, L)).join("") : "")
       + `<p class="podpowiedz">Najwyżej ${L.maks} zakładów w rundzie, stawka od ${zl2(L.min_stawka)} do ${zl2(L.maks_stawka)}.
@@ -61,6 +86,12 @@ export const kasyno = {
       const zaklad = document.getElementById(`ks-zaklad-${id}`)?.value ?? null;
       await c.zmien((d) => { d.kasyno = [...(d.kasyno || []), { gra: id, zaklad, stawka }]; });
     },
+    "ks-przelew": async (el, c) => {
+      const kwota = +document.getElementById("ks-przelew").value;
+      if (!(kwota > 0)) return toast("Podaj kwotę przelewu.");
+      await c.zmien((d) => { d.wyplata_wlasna = kwota; });
+    },
+    "ks-przelew-usun": (el, c) => c.zmien((d) => { delete d.wyplata_wlasna; }),
     "ks-usun": (el, c) => c.zmien((d) => {
       d.kasyno = (d.kasyno || []).filter((_, i) => i !== +el.dataset.i);
       if (!d.kasyno.length) delete d.kasyno;

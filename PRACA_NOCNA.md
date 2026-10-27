@@ -585,3 +585,7 @@ _brak_
   (`szansa_max`), po wypadku od nowa; licznik od rundy wypadków / otwarcia lokalu (silnik/awarie.py `szansa_wypadku`).
   Symulacja: ok. 2,6 wypadku na grę przy starcie od rundy 4 (ok. 1,7 od rundy 9). W Ubezpieczeniach „Ryzyko wypadku
   w tym tygodniu” i komentarz agenta.
+- **P12 (27.10):** w klubie (zakładka Nocna 13) karta „Bankomat w kącie” z przyciskiem „Przelej z firmy do portfela” –
+  to ta sama decyzja `wyplata_wlasna` co w Portfelu właściciela, więc na koncie firmy widać tylko zwykłą „Wypłatę własną
+  właściciela (poza KPiR)”; wypłata idzie przed zakładami, można ją postawić w tej samej rundzie. Do tego karta
+  „Zasada milczenia” (ironiczna tabliczka nad barem + historia o stoisku z watą cukrową). Instrukcja celowo milczy o klubie.

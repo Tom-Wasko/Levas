@@ -236,7 +236,7 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
   kosztuje czas właściciela – wszystkie naraz nie zmieszczą się w 20 h – pytanie 12
 - [x] P10 Reklama: suma kampanii daje kebabowi ok. +10% … +30% popytu – pytanie 14
 - [x] P11 Wypadki: +4 pp. szansy za każdą rundę bez wypadku (reset po wypadku) – pytanie 17
-- [ ] P12 Kasyno: wypłata z konta kebaba w panelu klubu + ironiczna „zasada milczenia” – pytanie 19
+- [x] P12 Kasyno: wypłata z konta kebaba w panelu klubu + ironiczna „zasada milczenia” – pytanie 19
 - [ ] P13 Handel: negocjacje na żywo w rundzie (oferta → kontroferta, maks. 3) – pytanie 20
 - [ ] P14 Kalendarz wrzesień–grudzień: mecze (Motor Lublin), wpływ wydarzeń na konkretne dania, sezonowość
   tygodniowa dopasowana do wydarzeń – pytania 21 i 27
