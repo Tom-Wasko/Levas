@@ -1,6 +1,6 @@
-# Eventy w parkach (F3b.1, silnik/zdarzenia.py) – co rundę jedna historia, ta sama dla wszystkich drużyn
+# Eventy w parkach (F3b.1, P9; silnik/zdarzenia.py) – co rundę 3–4 historie, te same dla wszystkich drużyn
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: 'Co rundę w jednym z parków Lublina dzieje się coś, w czym każda drużyna może wziąć udział (niezależnie od
+opis: 'Co rundę w parkach Lublina dzieją się 3–4 rzeczy, w których każda drużyna może wziąć udział (niezależnie od
   innych). Historia ma kilka scen w kolejnych rundach; wybór w scenie zmienia dalszy ciąg. Opcje kosztują czas
   właściciela, gotówkę albo porcje jedzenia (porcja = koszt_porcji zł). Bez wyboru gra bierze opcję domyślną
   (zawsze bez czasu właściciela). Skutki: gotowka (+ przychód, − koszt; bez VAT), popyt (mnożnik atrakcyjności
@@ -12,6 +12,7 @@ zrodlo: 'Notatka „Elementy mapy” (Parki: prawdziwe parki Lublina, jeden even
   kwoty i siła skutków – założenie F3b.1, do kalibracji w kroku 5'
 zasady:
   od_rundy: 2          # w rundzie 1 drużyny dopiero otwierają lokale
+  eventow_na_runde: [3, 4]   # P9: 3–4 historie na rundę, opcje po 2–5 h – czasu właściciela nie starczy na wszystko
   koszt_porcji: 9      # zł za porcję rozdaną w parku (składniki i opakowanie)
 historie:
 
@@ -29,7 +30,7 @@ historie:
       opcje:
       - id: kebab
         tekst: Dajesz mu kebaba i siadasz na chwilę
-        koszt: {czas: 1, porcje: 1}
+        koszt: {czas: 2, porcje: 1}
         wynik: >-
           Pan Zbyszek je powoli, z namaszczeniem, i ocenia sos: „Za dużo czosnku, za mało odwagi”. Coś zapisuje na
           serwetce i chowa ją do kieszeni marynarki.
@@ -89,7 +90,7 @@ historie:
       opcje:
       - id: zagraj
         tekst: Siadasz do partii
-        koszt: {czas: 2}
+        koszt: {czas: 3}
         wynik: >-
           Partia trwa dwie godziny. Profesor gra czarnymi, mruczy coś o ciągu Fibonacciego i w końcówce… robi się
           ciemno. Partię odłożono do przyszłego tygodnia.
@@ -133,7 +134,7 @@ historie:
       opcje:
       - id: maskotka
         tekst: Mówisz, że tak – to Gienia, maskotka lokalu, i częstujesz klasę
-        koszt: {czas: 2, porcje: 15}
+        koszt: {czas: 3, porcje: 15}
         wynik: >-
           Dzieci karmią Gienię frytkami pod nadzorem, a Gienia pozuje do zdjęć jak zawodowa modelka. Nauczycielka
           wpisuje do dziennika: „Zajęcia terenowe – przyroda i gastronomia”.
@@ -158,7 +159,7 @@ historie:
         - {typ: popyt, mnoznik: 1.05, rund: 3, opis: Budka Gieni w Parku Ludowym}
       - id: przebranie
         tekst: Kupujesz strój wiewiórki i sam tańczysz przy wejściu
-        koszt: {czas: 1, gotowka: 90}
+        koszt: {czas: 2, gotowka: 90}
         wynik: Strój jest za duży, ogon się ciągnie, ale entuzjazm masz ogromny. Ciąg dalszy za tydzień.
         nastepna:
         - {scena: upal, za_ile_rund: 1}
@@ -196,7 +197,7 @@ historie:
         - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Logo na banerze konkursu}
       - id: zawodnik
         tekst: Startujesz w konkursie
-        koszt: {czas: 3}
+        koszt: {czas: 5}
         wynik: >-
           Po siódmym cebularzu przestajesz czuć dłonie, po dziewiątym – sens życia. Sędziowie liczą okruszki.
           Wyniki ogłoszą w przyszłym tygodniu.
@@ -233,7 +234,7 @@ historie:
       opcje:
       - id: szukaj
         tekst: Idziesz szukać jamnika
-        koszt: {czas: 3}
+        koszt: {czas: 5}
         wynik: Przeczesujesz park z kawałkiem mięsa w dłoni, wołając „Kebab! Kebab!”. Przechodnie się oglądają.
         nastepna:
         - {scena: znaleziony, za_ile_rund: 1, szansa: 0.6}
@@ -268,7 +269,7 @@ historie:
       opcje:
       - id: przepros
         tekst: Przepraszasz i częstujesz oboje
-        koszt: {czas: 1, porcje: 2}
+        koszt: {czas: 2, porcje: 2}
         wynik: Przeprosiny przyjęte. Jamnik dostaje plasterek mięsa bez przypraw, pani Teresa – kebab z podwójnym sosem.
         skutki:
         - {typ: popyt, mnoznik: 1.02, rund: 2, opis: Pani Teresa udobruchana}
@@ -294,7 +295,7 @@ historie:
       opcje:
       - id: pomoc
         tekst: Udzielasz pierwszej pomocy i zostajesz do przyjazdu karetki
-        koszt: {czas: 2}
+        koszt: {czas: 3}
         wynik: >-
           Układasz poszkodowanego w pozycji bezpiecznej i kontrolujesz oddech do przyjazdu ratowników. Biegacz
           trafia do szpitala, jego stan jest stabilny.
@@ -324,7 +325,7 @@ historie:
       opcje:
       - id: zgoda
         tekst: Zgadzasz się i podajesz najlepszy kebab
-        koszt: {czas: 1, porcje: 3}
+        koszt: {czas: 2, porcje: 3}
         wynik: Influencerka próbuje, kamera się kręci, a Ty pocisz się bardziej niż rożen. Odcinek wyjdzie w przyszłym tygodniu.
         nastepna:
         - {scena: zachwyt, za_ile_rund: 1, szansa: 0.5}
@@ -372,7 +373,7 @@ historie:
       opcje:
       - id: catering
         tekst: Robisz catering (płatny ze zbiórki)
-        koszt: {czas: 3, porcje: 40}
+        koszt: {czas: 5, porcje: 40}
         wynik: Sąsiedzi jedzą, chwalą i robią sobie zdjęcia z Twoimi kebabami. Pan Wiesław chodzi z puszką. Liczenie – w przyszłym tygodniu.
         nastepna:
         - {scena: zbiorka, za_ile_rund: 1, szansa: 0.7}
@@ -420,7 +421,7 @@ historie:
       opcje:
       - id: stoisko
         tekst: Stawiasz przy kolejce stoisko „Tu pachnie lepiej”
-        koszt: {czas: 3, gotowka: 100, porcje: 20}
+        koszt: {czas: 5, gotowka: 100, porcje: 20}
         wynik: >-
           Kontrast działa: po trzech minutach przy kwiecie ludzie ustawiają się do Ciebie jak do apteki. Ogrodnik
           prosi, żebyś przesunął stoisko, bo „kwiat ma kompleksy”.
@@ -457,7 +458,7 @@ historie:
       opcje:
       - id: zgoda
         tekst: Zgadzasz się na badania w Twoim lokalu
-        koszt: {czas: 2}
+        koszt: {czas: 3}
         wynik: >-
           Przez tydzień pani Marta dosypuje do sosów ziół i ankietuje klientów. Jeden klient pyta, czy to legalne.
           Jest – to tymianek.
@@ -474,7 +475,7 @@ historie:
       opcje:
       - id: wspolautor
         tekst: Zostajesz współautorem (trzeba przeczytać i poprawić tekst)
-        koszt: {czas: 2}
+        koszt: {czas: 3}
         wynik: >-
           Artykuł „Thymus vulgaris a satysfakcja konsumenta lokalu gastronomicznego w Lublinie” trafia do
           czasopisma. Twój kebab ma teraz numer DOI.
@@ -506,7 +507,7 @@ historie:
         - {scena: kolekcjoner, za_ile_rund: 2, szansa: 0.5}
       - id: karta
         tekst: Wyjaśniasz, że od 1569 roku sporo się zmieniło, i przyjmujesz kartę
-        koszt: {czas: 1, porcje: 30}
+        koszt: {czas: 2, porcje: 30}
         wynik: Hetman płaci zbliżeniowo, z kamienną twarzą. Chorąży prosi o fakturę na „Rzeczpospolitą Obojga Narodów”.
         skutki:
         - {typ: gotowka, kwota: 750, opis: Kebaby dla szlachty (płatność kartą)}
@@ -539,7 +540,7 @@ historie:
         - {scena: krytycy, za_ile_rund: 1}
       - id: dziesiec
         tekst: Dajesz dziesięć – na wersję kameralną
-        koszt: {czas: 1, porcje: 10}
+        koszt: {czas: 2, porcje: 10}
         wynik: 'Artysta wybiera minimalizm: „Konsumpcja (wersja kameralna)”. Krytycy chwalą odwagę ograniczenia.'
         skutki:
         - {typ: popyt, mnoznik: 1.02, rund: 1, opis: Logo w katalogu Nocy Kultury}
@@ -554,7 +555,7 @@ historie:
       opcje:
       - id: sprzatnij
         tekst: Pomagasz rozebrać instalację przed wizytą sanepidu
-        koszt: {czas: 2}
+        koszt: {czas: 3}
         wynik: Rozbieracie instalację o świcie. Sława zostaje, zapach też – ale krócej.
         skutki:
         - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Sława po Nocy Kultury}
@@ -580,14 +581,14 @@ historie:
       opcje:
       - id: morsuj
         tekst: Wchodzisz do wody
-        koszt: {czas: 2}
+        koszt: {czas: 3}
         wynik: Wchodzisz do wody z okrzykiem, którego nie powtórzysz przy dzieciach. Prezes mierzy czas zegarkiem z 1985 roku.
         nastepna:
         - {scena: gablota, za_ile_rund: 1, szansa: 0.6}
         - {scena: katar, za_ile_rund: 1, szansa: 0.4}
       - id: herbata
         tekst: Przywozisz morsom herbatę w termosach i kebaby
-        koszt: {czas: 2, porcje: 25}
+        koszt: {czas: 3, porcje: 25}
         wynik: >-
           Morsy jedzą kebaby w kąpielówkach przy zerze stopni. Ktoś robi zdjęcie, które obiega lubelski internet
           z podpisem „Hartujemy się od środka”.
@@ -624,7 +625,7 @@ historie:
       opcje:
       - id: szukaj
         tekst: Dołączasz do poszukiwań
-        koszt: {czas: 3}
+        koszt: {czas: 5}
         wynik: >-
           Razem z ratownikami przeszukujecie brzeg. Po godzinie chłopiec odnajduje się przy wypożyczalni rowerów
           wodnych – przestraszony, ale cały.
@@ -632,7 +633,7 @@ historie:
         - {scena: rodzice, za_ile_rund: 1}
       - id: kartka
         tekst: Wywieszasz w lokalu kartkę z rysopisem
-        koszt: {czas: 1}
+        koszt: {czas: 2}
         wynik: Pracownik rozpoznaje chłopca na przystanku przy lokalu i dzwoni na policję. Wszystko kończy się dobrze.
         skutki:
         - {typ: popyt, mnoznik: 1.01, rund: 1, opis: Pomoc w poszukiwaniach}

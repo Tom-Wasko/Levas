@@ -232,7 +232,7 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 - [x] P6 Jedno wypowiedzenie: 2 rundy dla wszystkich – pytanie 5
 - [x] P7 Krótkie opisy dydaktyczne w zakładkach finansów (VAT, KPiR, PIT, ZUS, bank…) – pytanie 8
 - [x] P8 Lokal „co 3 rundy”: komunikat, że właściciel musi odpocząć – pytanie 11
-- [ ] P9 Parki: co rundę kilka eventów (te same dla wszystkich, każdy może wziąć każdy, ta sama nagroda), każdy
+- [x] P9 Parki: co rundę kilka eventów (te same dla wszystkich, każdy może wziąć każdy, ta sama nagroda), każdy
   kosztuje czas właściciela – wszystkie naraz nie zmieszczą się w 20 h – pytanie 12
 - [ ] P10 Reklama: suma kampanii daje kebabowi ok. +10% … +30% popytu – pytanie 14
 - [ ] P11 Wypadki: +4 pp. szansy za każdą rundę bez wypadku (reset po wypadku) – pytanie 17

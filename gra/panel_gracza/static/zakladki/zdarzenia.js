@@ -1,5 +1,5 @@
-// Zdarzenia – eventy w parkach (gra z lokalami, silnik/zdarzenia.py). Co rundę w jednym z parków zaczyna się historia,
-// ta sama dla wszystkich drużyn; każda drużyna wybiera reakcję (decyzja `zdarzenia: {historia: opcja}`). Do tego
+// Zdarzenia – eventy w parkach (gra z lokalami, silnik/zdarzenia.py). Co rundę w parkach zaczynają się 3–4 historie,
+// te same dla wszystkich drużyn (P9: opcje po 2–5 h – czasu właściciela nie starczy na wszystko); każda drużyna wybiera reakcję (decyzja `zdarzenia: {historia: opcja}`). Do tego
 // historie jednej drużyny: bank żywności i wypadki w lokalu (silnik/awarie.py – szkody i polisy).
 import { esc, licz, proc, tabela, zl2 } from "./wspolne.js";
 
@@ -54,7 +54,8 @@ function rozegranaHtml(w) {
 
 export const zdarzenia = {
   tytul: "Parki i zdarzenia", tytulPelny: "Parki – eventy, zdarzenia i wypadki", ikona: "zdarzenia", odblokowanie: (v) => !!v.zdarzenia, ukryta: (v) => !v.zdarzenia,
-  info: `Co tydzień w jednym z parków na <a data-zakladka-k="mapa">mapie miasta</a> dzieje się coś, co widzą wszystkie drużyny.
+  info: `Co tydzień w parkach na <a data-zakladka-k="mapa">mapie miasta</a> dzieją się 3–4 rzeczy, które widzą wszystkie drużyny.
+    Na wszystko nie starczy czasu – reakcja zajmuje zwykle 2–5 h z 20 h właściciela, więc trzeba wybierać.
     Jak zareagujesz, zależy od Ciebie: reakcja może kosztować czas właściciela, gotówkę albo porcje jedzenia, a jej skutki
     – pieniądze, klienci, nowy pracownik – bywają odłożone w czasie. Bez wyboru gra wybiera reakcję domyślną.
     Czasem coś przytrafia się tylko Tobie – w lokalu. Wypadki kosztują, a część kosztów zwraca
@@ -62,8 +63,10 @@ export const zdarzenia = {
   decyzje({ v, edycja }) {
     const Z = v.zdarzenia;
     if (!Z) return `<p class="podpowiedz">Brak danych.</p>`;
-    const wybory = v.decyzje?.zdarzenia || {};
-    return (Z.aktywne.length ? Z.aktywne.map((s) => scenaHtml(s, wybory[s.historia], edycja)).join("")
+    const wybory = v.decyzje?.zdarzenia || {}, C = v.czas_wlasciciela;
+    const czas = C && Z.aktywne.length ? `<div class="komunikat">Wolny czas właściciela: <b>${licz(C.wolne, 1)} h</b> z ${licz(C.pula, 1)} h.
+      W tym tygodniu ${Z.aktywne.length === 1 ? "jedna sprawa czeka" : Z.aktywne.length < 5 ? `${Z.aktywne.length} sprawy czekają` : `${Z.aktywne.length} spraw czeka`} – na wszystkie czasu raczej nie starczy.</div>` : "";
+    return czas + (Z.aktywne.length ? Z.aktywne.map((s) => scenaHtml(s, wybory[s.historia], edycja)).join("")
       : `<p class="podpowiedz">${v.runda < Z.od_rundy ? `Parki budzą się do życia od rundy ${Z.od_rundy}.` : "W tej rundzie w parkach spokojnie."}</p>`)
       + (Z.oczekujace.length ? `<p class="podpowiedz">Czekają na ciąg dalszy: ${Z.oczekujace.map((o) => `${esc(o.tytul)} (runda ${o.runda})`).join(", ")}.</p>` : "")
       + efektyHtml(Z.efekty)

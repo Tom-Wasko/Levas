@@ -1,7 +1,9 @@
 """Eventy w parkach (gra z lokalami, F3b.1; notatki „Elementy mapy” i „Zdarzenia i historie”).
 
-Dane: `dane/zdarzenia/parki.yaml`. Od rundy `zasady.od_rundy` co rundę w jednym z parków zaczyna się historia – ta
-sama dla wszystkich drużyn (kolejność losowana bez powtórzeń w cyklu wszystkich historii, strumień „parki”). Każda
+Dane: `dane/zdarzenia/parki.yaml`. Od rundy `zasady.od_rundy` co rundę w parkach zaczyna się kilka historii
+(`zasady.eventow_na_runde`, P9: 3–4) – tych samych dla wszystkich drużyn (talia wszystkich historii tasowana na nowo
+po wyczerpaniu, strumień „parki”; w jednej rundzie bez powtórzeń). Opcje kosztują po 2–5 h, więc nie starczy czasu
+właściciela na wszystko – trzeba wybierać. Każda
 drużyna przeżywa ją osobno: w scenie wybiera opcję (decyzja `zdarzenia: {historia: opcja}`, bez wyboru – opcja
 domyślna), opcje kosztują czas właściciela, gotówkę i porcje jedzenia. Ciąg dalszy czeka w `Firma.historie` na swoją
 rundę (z szansą, strumień „zdarzenia”). Skutki: gotówka (bez VAT), mnożnik popytu i mniej godzin właściciela
@@ -46,22 +48,37 @@ def _tekst(dane: Dane, f: Firma, runda: int, h: dict, tekst: str) -> str:
     return tekst.replace("{wartosc}", f"za ok. {mag.wartosc_zapasu(dane, f, runda):,.0f} zł".replace(",", "\u00a0"))
 
 
-def event_parku(dane: Dane, ziarno, runda: int) -> str | None:
-    """Historia, która zaczyna się w parku w tej rundzie (ta sama dla wszystkich drużyn); None – jeszcze nie ma."""
+def eventy_parku(dane: Dane, ziarno, runda: int) -> list[str]:
+    """Historie, które zaczynają się w parkach w tej rundzie (te same dla wszystkich drużyn); [] – jeszcze nie ma.
+    Talia wszystkich historii: co rundę z wierzchu 3–4 różne, po wyczerpaniu nowe tasowanie (powtórka dopiero
+    w kolejnej talii; historia, która w tej rundzie już jest, czeka na następną)."""
     if not dane.zdarzenia or runda < zasady(dane)["od_rundy"]:
-        return None
+        return []
     ids = list(historie_parkow(dane))
-    cykl, i = divmod(runda - zasady(dane)["od_rundy"], len(ids))
-    return ids[int(strumien(ziarno, cykl, "parki").permutation(len(ids))[i])]
+    mn, mx = zasady(dane).get("eventow_na_runde", (1, 1))
+    talia, nr = [], 0
+    for r in range(zasady(dane)["od_rundy"], runda + 1):
+        ile = min(len(ids), mn + int(strumien(ziarno, r, "parki", "ile").integers(mx - mn + 1)))
+        teraz = []
+        while len(teraz) < ile:
+            if not talia:
+                talia = [ids[int(i)] for i in strumien(ziarno, nr, "parki").permutation(len(ids))]
+                nr += 1
+            h = next((x for x in talia if x not in teraz), None)
+            talia.remove(h)
+            teraz.append(h)
+        if r == runda:
+            return teraz
+    return []
 
 
 def aktywne(dane: Dane, f: Firma, runda: int, ziarno) -> list[OtwartaHistoria]:
     """Sceny firmy w tej rundzie: event parku (gdy firma nie jest już w tej historii), bank żywności, wypadek
     w lokalu i ciągi dalsze."""
     wynik = [h for h in f.historie if h.runda <= runda]
-    hid = event_parku(dane, ziarno, runda)
-    if hid and all(h.historia != hid for h in f.historie):
-        wynik.insert(0, OtwartaHistoria(historia=hid, scena=historie(dane)[hid]["start"], runda=runda))
+    nowe = [OtwartaHistoria(historia=hid, scena=historie(dane)[hid]["start"], runda=runda)
+            for hid in eventy_parku(dane, ziarno, runda) if all(h.historia != hid for h in f.historie)]
+    wynik[:0] = nowe
     if mag.startuje(dane, f, runda, ziarno):
         b = mag.bank(dane)["historia"]
         wynik.append(OtwartaHistoria(historia=b["id"], scena=b["start"], runda=runda))

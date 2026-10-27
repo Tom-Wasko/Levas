@@ -572,3 +572,8 @@ _brak_
   terminy JPK/ZUS/PIT. Stawki i progi podane ogólnie (bez konkretnych kwot, które co roku się zmieniają).
 - **P8 (27.10):** lokal „co 3 rundy” – zamiast suchego limitu 5 rotujących żartów „właściciel musi odpocząć”
   (silnik/lokale.py `ODPOCZYNEK`), w odrzuceniu zapisu, liście błędów, zakładce Lokale i na mapie.
+- **P9 (27.10):** parki – co rundę 3–4 historie (`zasady.eventow_na_runde: [3, 4]`), te same dla wszystkich drużyn,
+  z talii tasowanej na nowo po wyczerpaniu (w jednej rundzie bez powtórzeń). Czas opcji przeskalowany do 2–5 h
+  (1→2, 2→3, 3→5), więc w 20 h właściciela nie zmieszczą się wszystkie; w zakładce Zdarzenia ramka z wolnym
+  czasem właściciela. Uwaga: przy 14 historiach i ~60 eventach na grę historie wracają co ~4 rundy – P18 (nowe
+  historie) to złagodzi.

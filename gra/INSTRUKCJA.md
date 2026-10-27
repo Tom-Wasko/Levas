@@ -163,10 +163,12 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
 
 ## 12. Parki, zdarzenia i wypadki
 
-Od tygodnia 2 w parkach Lublina co tydzień dzieje się coś, co widzą wszystkie drużyny: festyn, zlot food trucków,
-pan Zbyszek z ławki, profesor przy szachownicy, wiewiórka Gienia. Wybierasz reakcję – może kosztować czas właściciela, gotówkę albo
-porcje jedzenia, a skutki (pieniądze, klienci, nowy pracownik) bywają odłożone w czasie. Bez wyboru gra wybiera
-reakcję domyślną.
+Od tygodnia 2 w parkach Lublina co tydzień dzieją się **3–4 rzeczy naraz** – te same dla wszystkich drużyn: konkurs
+jedzenia cebularzy, pan Zbyszek z ławki, profesor przy szachownicy, wiewiórka Gienia. Wybierasz reakcję – może kosztować
+czas właściciela (zwykle 2–5 h), gotówkę albo porcje jedzenia, a skutki (pieniądze, klienci, nowy pracownik) bywają
+odłożone w czasie. **Na wszystko nie starczy czasu** – właściciel ma 20 h w tygodniu, więc wybierz to, co się opłaca.
+Jeśli kilka drużyn wybierze to samo, każda dostaje tę samą nagrodę. Bez wyboru gra wybiera reakcję domyślną
+(bez czasu właściciela).
 
 Czasem coś przytrafia się **tylko Tobie** – w lokalu. Rożen odmawia posłuszeństwa, kot sąsiada wchodzi do kuchni.
 Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji).

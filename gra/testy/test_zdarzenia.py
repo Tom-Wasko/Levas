@@ -14,8 +14,8 @@ JSON = "application/json"
 @pytest.fixture
 def zbyszek(monkeypatch):
     """W rundzie 2 zaczyna się historia pana Zbyszka, potem w parkach spokój."""
-    oryginal = zd.event_parku
-    monkeypatch.setattr(zd, "event_parku", lambda dane, ziarno, r: "pan_zbyszek" if r == 2 and oryginal(dane, ziarno, r) else None)
+    oryginal = zd.eventy_parku
+    monkeypatch.setattr(zd, "eventy_parku", lambda dane, ziarno, r: ["pan_zbyszek"] if r == 2 and oryginal(dane, ziarno, r) else [])
 
 
 def _sceny(s, r, firma):
@@ -32,12 +32,25 @@ def test_dane_historii():
 
 
 def test_kolejnosc_bez_powtorzen():
+    """P9: co rundę 3–4 różne historie; zanim któraś się powtórzy, przejdą wszystkie."""
     g = _gra()
     z, n = zd.zasady(g.dane), len(zd.historie_parkow(g.dane))
     ziarno = g.konfiguracja["ziarno"]
-    assert zd.event_parku(g.dane, ziarno, z["od_rundy"] - 1) is None
-    cykl = [zd.event_parku(g.dane, ziarno, r) for r in range(z["od_rundy"], z["od_rundy"] + n)]
-    assert sorted(cykl) == sorted(zd.historie_parkow(g.dane))
+    assert zd.eventy_parku(g.dane, ziarno, z["od_rundy"] - 1) == []
+    rundy = [zd.eventy_parku(g.dane, ziarno, r) for r in range(z["od_rundy"], z["od_rundy"] + 12)]
+    assert all(3 <= len(e) <= 4 and len(set(e)) == len(e) for e in rundy)
+    assert {len(e) for e in rundy} == {3, 4}
+    kolejno = [h for e in rundy for h in e]
+    assert len(set(kolejno[:n])) >= n - 3   # talia: pierwsza powtórka najwcześniej na styku talii
+    assert set(kolejno[:n + 3]) == set(zd.historie_parkow(g.dane))
+    assert rundy[0] == zd.eventy_parku(g.dane, ziarno, z["od_rundy"])   # deterministycznie
+
+
+def test_opcje_po_2_do_5_godzin():
+    g = _gra()
+    czasy = {o["koszt"]["czas"] for h in zd.historie_parkow(g.dane).values() for sc in h["sceny"].values()
+             for o in sc["opcje"]}
+    assert czasy - {0} and min(czasy - {0}) >= 2 and max(czasy) <= 5
 
 
 def test_ta_sama_historia_dla_wszystkich_i_ciag_dalszy(zbyszek):

@@ -1041,6 +1041,13 @@ class Historia(Schemat):
 class ZasadyZdarzen(Schemat):
     od_rundy: int = Field(ge=1)
     koszt_porcji: float = Field(gt=0)
+    eventow_na_runde: tuple[int, int] = (1, 1)   # [min, max] – ile historii zaczyna się w parkach w jednej rundzie
+
+    @model_validator(mode="after")
+    def _zakres(self):
+        if not 1 <= self.eventow_na_runde[0] <= self.eventow_na_runde[1]:
+            raise ValueError("eventow_na_runde: [min, max], 1 <= min <= max")
+        return self
 
 
 def skutki_historii(h: Historia) -> list[Skutek]:
