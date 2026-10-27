@@ -602,3 +602,10 @@ _brak_
   widok po ruchu drugiej drużyny (znacznik w /api/gry/<id>/stan/<firma>).
 - Testy: stany negocjacji i limit kontr, pełna negocjacja → umowa → transakcja po uzgodnionej cenie, odrzucenie.
   INSTRUKCJA (md + pdf) – zdanie o targowaniu się.
+
+### P14 – kalendarz wrzesień–grudzień: mecze, dania, płynna sezonowość (27.10)
+- 7 prawdziwych domowych meczów Motoru Lublin (Ekstraklasa, jesień 2025, Arena Lublin): 14.09 Termalica, 29.09 Radomiak, 17.10 GKS Katowice, 24.10 Widzew, 8.11 Wisła Płock, 1.12 Legia, 14.12 Jagiellonia (zaległy). Źródła: pl.wikipedia „Motor Lublin (piłka nożna) w sezonie 2025/2026”, fotmob. Każdy mecz ma własny komiczny opis (bez zdradzania wyniku).
+- Nowy rodzaj wydarzenia `sport` i pole `rok` (mecze tylko w 2025, nie powtarzają się co roku). Mecz: Zygmuntowskie ×1,6–2,2, Dworzec ×1,15, Centrum ×1,05.
+- Nowe pole `dania` – wydarzenie zmienia popyt na konkretne dania w swoich strefach: mecz (kebab w bułce, frytki, napój ↑, talerz ↓), Wigilia (falafel ×1,6), Konfrontacje Teatralne (falafel), Halloween (mniej sosu czosnkowego), Andrzejki, Black Friday, Sylwester itd. Widoczne w zakładce Kalendarz miejski.
+- Sezonowość dań płynna z dnia na dzień (interpolacja między środkami miesięcy) zamiast skoku 1. dnia miesiąca. Wrzesień w strefach uczelni nie jest już liczony podwójnie (miesiąc + „Wakacje studenckie”).
+- Wydarzenia styczeń–kwiecień zostawiłem (przydają się przy dłuższych grach ustawionych przez MG).

@@ -2,7 +2,11 @@
 
 Każda strefa ma własną pulę klientów na każde danie i każdy dzień rundy:
 
-    pula = popyt roczny / 52 × sezonowość dania × pula strefy × miesiąc strefy × kalendarz × waga dnia × szum
+    pula = popyt roczny / 52 × sezonowość dania × pula strefy × miesiąc strefy × kalendarz (strefa i danie)
+           × waga dnia × szum
+
+Sezonowość dania (P14) zmienia się płynnie z dnia na dzień: 12 wartości z uslugi.yaml to środki miesięcy, między
+nimi – liniowo (koniec września to już trochę październik).
 
 Klienci strefy wybierają lokal (model logitowy z opcją zewnętrzną A_0 – bary spoza gry, obiad w domu):
 
@@ -45,6 +49,23 @@ wydarzenia = kal.wydarzenia              # wydarzenia kalendarza miejskiego w dn
 mnoznik_kalendarza = kal.mnoznik
 
 
+def _srodek_miesiaca(rok: int, miesiac: int) -> date:
+    poczatek = date(rok, miesiac, 1)
+    return poczatek + (date(rok + miesiac // 12, miesiac % 12 + 1, 1) - poczatek) / 2
+
+
+def sezon(wartosci: list[float], dzien: date) -> float:
+    """Sezonowość w dniu `dzien`: wartości miesięczne w środku miesiąca, pomiędzy – interpolacja liniowa."""
+    srodek = _srodek_miesiaca(dzien.year, dzien.month)
+    if dzien >= srodek:
+        a, b = srodek, _srodek_miesiaca(dzien.year + dzien.month // 12, dzien.month % 12 + 1)
+        wa, wb = wartosci[dzien.month - 1], wartosci[dzien.month % 12]
+    else:
+        a, b = _srodek_miesiaca(dzien.year - (dzien.month == 1), (dzien.month - 2) % 12 + 1), srodek
+        wa, wb = wartosci[(dzien.month - 2) % 12], wartosci[dzien.month - 1]
+    return wa + (wb - wa) * (dzien - a).days / (b - a).days
+
+
 def wagi_dni(dane: Dane, strefa: str, dni: list[date], kalendarz: bool = True) -> np.ndarray:
     """Udział każdego dnia w tygodniowej puli strefy (średnio 1/7 na dzień) × kalendarz miejski."""
     p = dane.mapa["popyt"]
@@ -76,14 +97,17 @@ def pule(dane: Dane, runda: int, ziarno=None, reklama: dict[str, float] | None =
     dni = dni_rundy(dane, runda)
     m = dane.miesiac_rundy(runda)
     szum = p["model"]["szum_proc"]
+    sezony = {u: np.array([sezon(du["sezonowosc"], d) for d in dni]) for u, du in dane.uslugi.items()}
+    trwajace = [kal.aktywne(dane, d) for d in dni]
     wynik = {}
     for z, ps in p["strefy"].items():
         baza = ps["pula"] * (ps["miesiace"][m] if ps.get("miesiace") else 1.0) * len(dni) / 7
         wagi = wagi_dni(dane, z, dni)
         wynik[z] = {}
         for u, du in dane.uslugi.items():
-            tyg = du["popyt_roczny"] / 52 * du["sezonowosc"][m] * baza
-            dzienne = tyg * 7 / len(dni) * wagi
+            tyg = du["popyt_roczny"] / 52 * baza
+            dania = np.array([kal.mnoznik_dania(dane, z, u, d, t) for d, t in zip(dni, trwajace, strict=True)])
+            dzienne = tyg * 7 / len(dni) * wagi * sezony[u] * dania
             if ziarno is not None and szum > 0:
                 dzienne = dzienne * np.exp(strumien(ziarno, runda, "popyt", "strefa", z, u).normal(0, szum, len(dni)))
             wynik[z][u] = dzienne * (1 + (reklama or {}).get(z, 0.0))

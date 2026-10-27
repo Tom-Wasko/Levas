@@ -1332,6 +1332,8 @@ class WydarzenieKalendarza(Schemat):
     do: str | int
     wzgledem: str | None = None   # klucz z `ruchome` (np. wielkanoc)
     strefy: dict[str, float] = Field(min_length=1)
+    dania: dict[str, float] = Field(default_factory=dict)   # P14: mnożnik popytu na danie w strefach wydarzenia
+    rok: int | None = None        # wydarzenie jednego roku (np. mecz z terminarza); None – co roku
 
     @model_validator(mode="after")
     def _daty(self):
@@ -1342,6 +1344,8 @@ class WydarzenieKalendarza(Schemat):
             raise ValueError("z `wzgledem` od i do to liczby dni, od ≤ do")
         if any(m < 0 for m in self.strefy.values()):
             raise ValueError("mnożniki stref nie mogą być ujemne")
+        if any(m < 0 for m in self.dania.values()):
+            raise ValueError("mnożniki dań nie mogą być ujemne")
         return self
 
 

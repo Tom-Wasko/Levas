@@ -457,7 +457,7 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
 
 
 def _sprawdz_kalendarz(d: Dane, bledy: list[str], brak):
-    """Kalendarz miejski: strefy z mapy, daty ruchome na każdy rok gry o domyślnej długości."""
+    """Kalendarz miejski: strefy z mapy, dania z uslugi.yaml, daty ruchome na każdy rok gry o domyślnej długości."""
     k = d.kalendarz_miasta
     if not k:
         return
@@ -465,6 +465,9 @@ def _sprawdz_kalendarz(d: Dane, bledy: list[str], brak):
         for s in w["strefy"]:
             if s != "wszystkie" and s not in d.mapa["strefy"]:
                 brak(s, f"kalendarz/kalendarz.yaml: {w['nazwa']}", "strefa", "mapa/strefy.yaml")
+        for u in w.get("dania") or {}:
+            if u not in d.uslugi:
+                brak(u, f"kalendarz/kalendarz.yaml: {w['nazwa']}", "danie", "uslugi.yaml")
     lata = range(d.data_rundy(1).year, d.data_rundy(d.katalog_ofert["rundy"]["domyslna_liczba"] + 1).year + 1)
     for n, daty in k["ruchome"].items():
         for rok in lata:

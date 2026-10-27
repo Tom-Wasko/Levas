@@ -95,3 +95,46 @@ def test_widok_kalendarza():
     _runda(g)
     v = widok(g, "A")["kalendarz_miasta"]
     assert v["biezacy"]["runda"] == 2 and v["poprzedni"]["runda"] == 1
+
+
+def test_mecze_motoru_i_dania():
+    """P14: siedem domowych meczów Motoru jesienią 2025 (tylko w 2025), mnożniki dań w strefach wydarzenia."""
+    d = dane_domyslne()
+    k = kl.dane_kalendarza(d)
+    mecze = [w for w in k["wydarzenia"] if w["rodzaj"] == "sport"]
+    dni = sorted(dz for w in mecze for dz in _dni_wydarzenia(d, w["nazwa"], date(2025, 9, 1), date(2025, 12, 31)))
+    assert dni == [date(2025, 9, 14), date(2025, 9, 29), date(2025, 10, 17), date(2025, 10, 24), date(2025, 11, 8),
+                   date(2025, 12, 1), date(2025, 12, 14)]
+    assert not any(_dni_wydarzenia(d, w["nazwa"], date(2026, 9, 1), date(2026, 12, 31)) for w in mecze)
+    legia = date(2025, 12, 1)
+    assert kl.mnoznik(d, "zygmuntowskie", legia) == 2.2
+    assert kl.mnoznik_dania(d, "zygmuntowskie", "frytki", legia) == 1.3
+    assert kl.mnoznik_dania(d, "felin", "frytki", legia) == 1.0          # strefa bez meczu – bez zmian
+    assert kl.mnoznik_dania(d, "felin", "falafel", date(2025, 12, 24)) == 1.6   # Wigilia – „wszystkie”
+    w = kl.tydzien(d, _runda_z(d, legia))
+    assert next(x for x in w["wydarzenia"] if x["rodzaj"] == "sport")["dania"]["napoj"] > 1
+    # pula: frytek w dniu meczu przybywa bardziej niż klientów strefy
+    r = _runda_z(d, legia)
+    i = pp.dni_rundy(d, r).index(legia)
+    pz = pp.pule(d, r)["zygmuntowskie"]
+    assert pz["frytki"][i] / pz["frytki"][i + 1] > pz["falafel"][i] / pz["falafel"][i + 1] * 1.25
+
+
+def test_sezonowosc_plynna():
+    s = [float(m) for m in range(1, 13)]
+    assert pp.sezon(s, date(2025, 10, 16)) == 10 and pp.sezon(s, date(2025, 11, 16)) == 11
+    assert 10 < pp.sezon(s, date(2025, 10, 31)) < 11 and 9 < pp.sezon(s, date(2025, 10, 1)) < 10
+    assert 12 > pp.sezon(s, date(2025, 12, 31)) > 1 and 1 < pp.sezon(s, date(2026, 1, 5)) < 12   # przez Nowy Rok
+    d = dane_domyslne()
+    napoj = d.uslugi["napoj"]["sezonowosc"]
+    tyg = [pp.sezon(napoj, d.data_rundy(r)) for r in range(1, 19)]
+    assert tyg[0] > tyg[8] > tyg[-3]   # wrzesień → listopad → grudzień: coraz mniej zimnych napojów
+
+
+def test_schemat_dan_kalendarza(tmp_path):
+    w = yaml.safe_load((KATALOG_DANYCH / "kalendarz" / "kalendarz.yaml").read_text(encoding="utf-8"))
+    with pytest.raises(ValidationError):
+        PlikKalendarza.model_validate({**w, "wydarzenia": [{**w["wydarzenia"][0], "dania": {"frytki": -1}}]})
+    kat = _kopia(tmp_path)
+    _zmien(kat, "kalendarz/kalendarz.yaml", lambda d: d["wydarzenia"][0].update(dania={"pierogi_ruskie": 2}))
+    assert any("pierogi_ruskie" in b for b in sprawdz(kat))

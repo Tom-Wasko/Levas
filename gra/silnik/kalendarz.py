@@ -2,8 +2,10 @@
 
 Święta, rok akademicki (sesja, przerwy), ferie, okazje handlowe i wydarzenia w Lublinie w kolejnych tygodniach gry.
 Wydarzenie mnoży dzienną pulę klientów strefy (popyt.wagi_dni): klucz strefy wygrywa z „wszystkie”, mnożniki kilku
-wydarzeń tego samego dnia się mnożą. Daty stałe co roku ('MM-DD', zakres może przechodzić przez Nowy Rok) albo
-ruchome – przesunięcie w dniach od daty z `ruchome` na dany rok (Wielkanoc, Black Friday, ferie).
+wydarzeń tego samego dnia się mnożą. Wydarzenie może też zmieniać popyt na konkretne dania (`dania`, P14) – w strefach,
+których dotyczy (wymienionych albo wszystkich przy kluczu „wszystkie”); mecze Motoru Lublin na Arenie to rodzaj `sport`.
+Daty stałe co roku ('MM-DD', zakres może przechodzić przez Nowy Rok; `rok` – tylko w tym roku, np. terminarz meczów)
+albo ruchome – przesunięcie w dniach od daty z `ruchome` na dany rok (Wielkanoc, Black Friday, ferie).
 """
 from __future__ import annotations
 
@@ -31,7 +33,10 @@ def _baza(k: dict, klucz: str, rok: int) -> date | None:
 
 
 def trwa(k: dict, w: dict, dzien: date) -> bool:
-    """Czy wydarzenie `w` trwa w dniu `dzien` (data ruchoma bez daty na ten rok – nie ma wydarzenia)."""
+    """Czy wydarzenie `w` trwa w dniu `dzien` (data ruchoma bez daty na ten rok – nie ma wydarzenia; `rok` – tylko
+    w tym roku)."""
+    if w.get("rok") is not None and dzien.year != w["rok"]:
+        return False
     if w["wzgledem"] is None:
         return _w_zakresie(dzien, w["od"], w["do"])
     for rok in (dzien.year - 1, dzien.year, dzien.year + 1):   # przesunięcie może przejść na sąsiedni rok
@@ -39,6 +44,21 @@ def trwa(k: dict, w: dict, dzien: date) -> bool:
         if b and b + timedelta(days=w["od"]) <= dzien <= b + timedelta(days=w["do"]):
             return True
     return False
+
+
+def aktywne(dane: Dane, dzien: date) -> list[dict]:
+    """Wydarzenia trwające w dniu `dzien`."""
+    k = dane_kalendarza(dane)
+    return [w for w in (k["wydarzenia"] if k else []) if trwa(k, w, dzien)]
+
+
+def mnoznik_dania(dane: Dane, strefa: str, usluga: str, dzien: date, trwajace: list[dict] | None = None) -> float:
+    """Mnożnik popytu na danie w strefie w danym dniu (1 – bez zmian); `trwajace` – gotowa lista z aktywne()."""
+    m = 1.0
+    for w in aktywne(dane, dzien) if trwajace is None else trwajace:
+        if w.get("dania") and (strefa in w["strefy"] or WSZYSTKIE in w["strefy"]):
+            m *= w["dania"].get(usluga, 1.0)
+    return m
 
 
 def mnoznik(dane: Dane, strefa: str, dzien: date) -> float:
@@ -52,14 +72,15 @@ def mnoznik(dane: Dane, strefa: str, dzien: date) -> float:
 
 
 def wydarzenia(dane: Dane, dni: list[date]) -> list[dict]:
-    """Wydarzenia w podanych dniach: {"nazwa", "rodzaj", "rodzaj_nazwa", "opis", "dni": [ISO], "strefy": {strefa: ×}}."""
+    """Wydarzenia w podanych dniach: {"nazwa", "rodzaj", "rodzaj_nazwa", "opis", "dni": [ISO], "strefy": {strefa: ×},
+    "dania": {danie: ×}}."""
     k = dane_kalendarza(dane)
     wynik = []
     for w in (k["wydarzenia"] if k else []):
         trafione = [d.isoformat() for d in dni if trwa(k, w, d)]
         if trafione:
             wynik.append({"nazwa": w["nazwa"], "rodzaj": w["rodzaj"], "rodzaj_nazwa": k["rodzaje"][w["rodzaj"]],
-                          "opis": w["opis"], "dni": trafione, "strefy": w["strefy"]})
+                          "opis": w["opis"], "dni": trafione, "strefy": w["strefy"], "dania": w.get("dania") or {}})
     return wynik
 
 

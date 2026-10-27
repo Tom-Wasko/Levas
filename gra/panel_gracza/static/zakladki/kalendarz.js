@@ -1,6 +1,7 @@
 // Kalendarz miejski (gra z lokalami, silnik/kalendarz.py, dane/kalendarz/kalendarz.yaml): święta, uczelnie, ferie,
-// okazje handlowe i wydarzenia w Lublinie – zmiana puli klientów stref w każdym tygodniu gry.
-import { esc, licz, nazwaRundy, tabela } from "./wspolne.js";
+// okazje handlowe, mecze Motoru na Arenie i wydarzenia w Lublinie – zmiana puli klientów stref w każdym tygodniu gry
+// i popytu na konkretne dania (P14).
+import { esc, licz, nazwaRundy, nazwaUslugi, tabela } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
@@ -17,8 +18,11 @@ function wydarzeniaHtml(t, kat, rodzaje) {
   if (!t.wydarzenia.length) return `<p class="podpowiedz">Zwykły tydzień – w mieście nic szczególnego się nie dzieje.</p>`;
   return t.wydarzenia.map((w) => {
     const mn = Object.entries(w.strefy).map(([s, m]) => `${s === "wszystkie" ? "reszta miasta" : esc(nazwaStrefy(kat, s))} ×${m}`).join(", ");
+    const dania = Object.entries(w.dania || {}).sort((a, b) => b[1] - a[1])
+      .map(([u, m]) => `<span class="${m > 1 ? "plus" : "minus"}">${esc(nazwaUslugi(kat, u))} ×${m}</span>`).join(", ");
     return `<div class="karta"><b>${esc(w.nazwa)}</b> <span class="podpowiedz">${esc(rodzaje[w.rodzaj] || w.rodzaj)} ·
-      ${w.dni.map(dataKrotka).join(", ")}</span><p>${esc(w.opis)}</p><div class="podpowiedz">Pula klientów w dniu wydarzenia: ${mn}</div></div>`;
+      ${w.dni.map(dataKrotka).join(", ")}</span><p>${esc(w.opis)}</p><div class="podpowiedz">Pula klientów w dniu wydarzenia: ${mn}</div>
+      ${dania ? `<div class="podpowiedz">Popyt na dania w tych strefach: ${dania}</div>` : ""}</div>`;
   }).join("") + strefyHtml(t, kat);
 }
 
@@ -36,9 +40,10 @@ function przeglad(K, kat, biezaca) {
 
 export const kalendarz = {
   tytul: "Kalendarz miejski", ikona: "kalendarz", ukryta: (v) => !v.kalendarz_miasta,
-  info: `Lublin żyje rytmem uczelni, świąt i wydarzeń. Sesja zapełnia Miasteczko Akademickie głodnymi studentami,
-    przerwa świąteczna je wyludnia, a jarmark ściąga tłumy na Stare Miasto. Wydarzenie zmienia liczbę klientów
-    strefy w dniu, w którym trwa – zaplanuj obsadę, zamówienia i promocje, zanim tydzień się zacznie.`,
+  info: `Lublin żyje rytmem uczelni, świąt i wydarzeń. Powrót studentów zapełnia Miasteczko Akademickie, przerwa
+    świąteczna je wyludnia, jarmark ściąga tłumy na Stare Miasto, a w dzień meczu Motoru kolejka pod Areną sięga
+    horyzontu. Wydarzenie zmienia liczbę klientów strefy w dniu, w którym trwa, a często też to, co jedzą (kibice –
+    kebab w bułce i frytki, Wigilia – falafel). Zaplanuj obsadę, zamówienia i promocje, zanim tydzień się zacznie.`,
   decyzje({ v, kat }) {
     const K = v.kalendarz_miasta;
     if (!K) return `<p class="podpowiedz">Brak kalendarza miejskiego.</p>`;
@@ -51,7 +56,8 @@ export const kalendarz = {
           (${zakres(t)}): ${t.wydarzenia.map((w) => esc(w.nazwa)).join(", ")}${strefyHtml(t, kat)}</div>`).join("") : "")
       + przeglad(K, kat, B.runda)
       + `<p class="podpowiedz">Zmiana klientów w tygodniu uwzględnia dzień tygodnia: święto w sobotę waży więcej niż
-        w poniedziałek. Zmiany pór roku (lato nad Zalewem, zima w Centrum) są już w zwykłej puli strefy.</p>`;
+        w poniedziałek. Zmiany pór roku (lato nad Zalewem, zima w Centrum) są już w zwykłej puli strefy, a smaki
+        zmieniają się z tygodnia na tydzień: im zimniej, tym więcej kebabów i mniej zimnych napojów.</p>`;
   },
   wyniki({ v, kat }) {
     const K = v.kalendarz_miasta, P = K?.poprzedni, R = v.rynek?.strefy;

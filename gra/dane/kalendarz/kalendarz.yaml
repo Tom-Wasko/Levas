@@ -6,13 +6,16 @@ opis: >-
 zrodlo: >-
   Notatki „Prawidła świata” (kalendarz miejski: święta, sesja i wakacje studentów, wydarzenia w mieście – zmieniają
   popyt w strefach) i „Menu i składniki” (popyt zależny od kalendarza miejskiego). Mnożniki, daty ferii i wydarzeń
-  miejskich – założenia gry (do potwierdzenia); wcześniej kalendarz był w mapa/popyt.yaml (F3a.4).
+  miejskich – założenia gry (do potwierdzenia); wcześniej kalendarz był w mapa/popyt.yaml (F3a.4). Mecze Motoru
+  Lublin – prawdziwe domowe mecze Ekstraklasy jesienią 2025 (Wikipedia: „Motor Lublin (piłka nożna) w sezonie
+  2025/2026”); `dania` – mnożnik popytu na danie w strefach wydarzenia (P14, „na oko”).
 rodzaje:
   swieto: Święto
   uczelnie: Uczelnie
   szkoly: Szkoły
   handel: Okazja handlowa
   miasto: Wydarzenie w mieście
+  sport: Mecz na Arenie
 ruchome:
   wielkanoc:
     2025: '04-20'
@@ -51,6 +54,8 @@ wydarzenia:
   do: '09-01'
   strefy:
     wszystkie: 1.05
+  dania:
+    kebab_w_tortilli: 1.3
 - nazwa: Powrót studentów
   rodzaj: uczelnie
   opis: >-
@@ -62,6 +67,9 @@ wydarzenia:
     akademickie: 1.6
     politechnika: 1.5
     dworzec: 1.3
+  dania:
+    kebab_box: 1.2
+    frytki: 1.2
 - nazwa: Inauguracja roku akademickiego
   rodzaj: uczelnie
   opis: >-
@@ -73,15 +81,21 @@ wydarzenia:
     akademickie: 1.35
     politechnika: 1.3
     centrum: 1.1
+  dania:
+    talerz_kebab: 1.25
 - nazwa: Konfrontacje Teatralne
   rodzaj: miasto
   opis: >-
     Na Starym Mieście aktorzy w białych maskach chodzą na szczudłach i udają drzewa. Widzowie po trzech godzinach
-    spektaklu bez słów wychodzą z jednym pragnieniem – coś zjeść i wreszcie z kimś porozmawiać.
+    spektaklu bez słów wychodzą z jednym pragnieniem – coś zjeść i wreszcie z kimś porozmawiać. Zamawiają głównie
+    falafel, „bo jest bardziej awangardowy”.
   od: '10-08'
   do: '10-17'
   strefy:
     stare_miasto: 1.15
+  dania:
+    falafel: 1.4
+    napoj: 1.15
 - nazwa: Otrzęsiny pierwszego roku
   rodzaj: uczelnie
   opis: >-
@@ -93,6 +107,9 @@ wydarzenia:
     akademickie: 1.4
     politechnika: 1.25
     centrum: 1.1
+  dania:
+    frytki: 1.3
+    napoj: 1.25
 - nazwa: Halloween
   rodzaj: miasto
   opis: >-
@@ -103,6 +120,9 @@ wydarzenia:
   strefy:
     akademickie: 1.3
     stare_miasto: 1.25
+  dania:
+    dodatek: 0.7
+    kebab_box: 1.2
 - nazwa: Wszystkich Świętych
   rodzaj: swieto
   opis: >-
@@ -112,6 +132,8 @@ wydarzenia:
   do: '11-01'
   strefy:
     wszystkie: 0.6
+  dania:
+    kebab_box: 1.25
 - nazwa: Święto Niepodległości
   rodzaj: swieto
   opis: >-
@@ -123,6 +145,9 @@ wydarzenia:
     wszystkie: 0.8
     centrum: 1.5
     stare_miasto: 1.3
+  dania:
+    kebab_w_bulce: 1.3
+    frytki: 1.2
 - nazwa: Black Friday
   rodzaj: handel
   opis: >-
@@ -135,6 +160,9 @@ wydarzenia:
     centrum: 1.35
     zygmuntowskie: 1.2
     lsm_czuby: 1.15
+  dania:
+    kebab_box: 1.3
+    napoj: 1.2
 - nazwa: Andrzejki
   rodzaj: uczelnie
   opis: >-
@@ -145,16 +173,22 @@ wydarzenia:
   strefy:
     akademickie: 1.3
     stare_miasto: 1.2
+  dania:
+    dodatek: 1.4
 - nazwa: Jarmark bożonarodzeniowy
   rodzaj: miasto
   opis: >-
     Na Placu po Farze stoją drewniane budki z grzańcem, piernikami i pluszowymi koziołkami w czapkach Mikołaja.
-    Grzaniec rozgrzewa, pierniki zaklejają zęby, a kebab okazuje się jedynym obiadem w promieniu kilometra.
+    Grzaniec rozgrzewa, pierniki zaklejają zęby, a kebab okazuje się jedynym obiadem w promieniu kilometra. Twoich
+    napojów nikt nie chce – z grzańcem się nie wygrywa.
   od: '12-05'
   do: '12-23'
   strefy:
     stare_miasto: 1.25
     centrum: 1.1
+  dania:
+    napoj: 0.8
+    falafel: 1.15
 - nazwa: Mikołajki
   rodzaj: miasto
   opis: >-
@@ -165,6 +199,8 @@ wydarzenia:
   strefy:
     stare_miasto: 1.3
     centrum: 1.15
+  dania:
+    napoj: 1.3
 - nazwa: Przerwa świąteczna na uczelniach
   rodzaj: uczelnie
   opis: >-
@@ -178,12 +214,17 @@ wydarzenia:
 - nazwa: Wigilia i Boże Narodzenie
   rodzaj: swieto
   opis: >-
-    Dwanaście potraw w każdym domu – kebab nie jest jedną z nich (jeszcze). Twoi kucharze i tak przychodzą do pracy
-    po karpia, który miał być w wannie, ale uciekł.
+    Dwanaście potraw w każdym domu – kebab nie jest jedną z nich (jeszcze). Wigilia jest bezmięsna, więc nieliczni
+    klienci biorą falafel i przysięgają babci przez telefon, że to karp w panierce. Twoi kucharze i tak przychodzą
+    do pracy po karpia, który miał być w wannie, ale uciekł.
   od: '12-24'
   do: '12-26'
   strefy:
     wszystkie: 0.35
+  dania:
+    falafel: 1.6
+    kebab_w_bulce: 0.8
+    talerz_kebab: 0.8
 - nazwa: Sylwester
   rodzaj: miasto
   opis: >-
@@ -194,6 +235,136 @@ wydarzenia:
   strefy:
     stare_miasto: 2.0
     centrum: 1.4
+  dania:
+    kebab_w_bulce: 1.3
+    frytki: 1.4
+    dodatek: 1.3
+- nazwa: 'Mecz Motoru: Motor Lublin – Bruk-Bet Termalica Nieciecza'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Niedziela na Arenie. Przyjeżdża Termalica z Niecieczy – wsi, która ma mniej mieszkańców niż jedna trybuna
+    stadionu. Kibice gości mieszczą się w jednym busie i jeszcze zostaje miejsce na bęben. Gospodarze świętują
+    z zapasem: kebab w bułce, frytki i napój, najlepiej wszystko naraz, w drodze na trybunę.
+  od: '09-14'
+  do: '09-14'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Radomiak Radom'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Mecz w poniedziałek wieczorem – kibice idą na Arenę prosto z pracy, w krawatach pod szalikami. Lublin i Radom
+    od lat spierają się, kto ma ładniejszy dworzec i gdzie jest gorszy kebab. Spór o dworzec trwa, spór o kebab
+    rozstrzyga się dziś przy Twojej ladzie.
+  od: '09-29'
+  do: '09-29'
+  strefy:
+    zygmuntowskie: 1.6
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – GKS Katowice'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Piątkowy wieczór, przyjeżdżają kibice ze Śląska i od progu pytają o roladę z kluskami. Kucharz tłumaczy, że ma
+    tylko kebab, ale „po lubelsku”. Ślązacy naradzają się, zamawiają po dwa i do końca meczu nikt już nie wspomina
+    o roladzie.
+  od: '10-17'
+  do: '10-17'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Widzew Łódź'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Drugi piątek z rzędu na Arenie. Kibice Widzewa przyjeżdżają pociągiem spóźnionym tylko 40 minut – to rekord
+    sezonu. Przy Stadionowej tłum w czerwieni i tłum w żółto-biało-niebieskim stoją w jednej kolejce po frytki
+    i bardzo się starają, żeby się nawzajem nie zauważyć.
+  od: '10-24'
+  do: '10-24'
+  strefy:
+    zygmuntowskie: 1.9
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Wisła Płock'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Sobotnie popołudnie, listopadowy chłód. Kibic z szóstego rzędu od dwudziestu lat przynosi na mecz ten sam termos,
+    tę samą czapkę i ten sam pech. W przerwie pół trybuny biegnie po coś ciepłego, a druga połowa krzyczy, żeby
+    przy okazji przynieść im też.
+  od: '11-08'
+  do: '11-08'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Legia Warszawa'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Legia w Lublinie – w poniedziałek, w grudniu, przy minus dwóch. Stolica przyjeżdża z flagami, Lublin czeka
+    z bębnami i kebabem. Sprzedawca szalików przy Stadionowej zarabia w jeden wieczór więcej niż przez cały
+    październik i ze szczęścia stawia kucharzom frytki.
+  od: '12-01'
+  do: '12-01'
+  strefy:
+    zygmuntowskie: 2.2
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Jagiellonia Białystok'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Mecz zaległy z sierpnia: miał być w krótkich spodenkach, jest w czapkach z pomponem. Kibice Jagiellonii
+    opowiadają o żubrach, kibice Motoru – o koziołkach, i nikt nie wie, kto wygrał tę rozmowę. Na Arenie prószy
+    śnieg, a kolejka po kebab bije rekord frekwencji.
+  od: '12-14'
+  do: '12-14'
+  strefy:
+    zygmuntowskie: 1.9
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
 - nazwa: Nowy Rok
   rodzaj: swieto
   opis: >-

@@ -74,7 +74,9 @@ co jeszcze zostało do zrobienia):
 
 > **Wskazówka.** We wrześniu studenci jeszcze siedzą u rodziców – Miasteczko Akademickie świeci pustkami aż do
 > ostatniego weekendu miesiąca. Prawdziwy ruch zaczyna się w październiku. Kalendarz miejski (Klienci i strefy ▸
-> Kalendarz) pokazuje, co i kiedy dzieje się w mieście.
+> Kalendarz) pokazuje, co i kiedy dzieje się w mieście – także mecze Motoru na Arenie (tłum kibiców pod stadionem,
+> więcej kebabów w bułce, frytek i napojów) i to, jak wydarzenia zmieniają popyt na konkretne dania (w Wigilię
+> wygrywa falafel). Im zimniej, tym więcej kebabów, a mniej zimnych napojów.
 
 ## 5. Tydzień 2 – otwarcie
 
