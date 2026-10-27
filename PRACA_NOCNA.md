@@ -188,6 +188,12 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    „umowa” i „zmiany w zatrudnieniu” działają jak w Revasie (zmiany mają wagę 0), „świeżość” liczę pośrednio (braki
    w menu, sanepid), „wartość sprzętu” jest w majątku. Pytania: czy wagi takie? czy dodać do karty kontrole skarbówki
    lub zaległości? czy przy notatce „Ustalenia gry” wpisać ostateczne wzory? (zapisane 27.10)
+23. **Lista błędów (F4.2).** Założenia (`zalozenia.yaml → lista_bledow`): pomarańczowe ostrzeżenie, gdy składniki
+   kosztują ponad 50% ceny dania (koszt liczony po średniej cenie zapasu, a bez zapasu – po najtańszej średniej cenie
+   z danych), czerwone poniżej kosztu; ostrzeżenie o przeterminowaniu liczone z prognozy popytu (pole „prognoza”
+   w Ofercie) i dopiero od 20 zł straty w tygodniu. Komunikaty z lekkim humorem („klienci sami sobie tego nie
+   zrobią”). Pytania: czy progi takie? czy brak gotówki na zamówienie ma blokować zamówienie (teraz: ostrzeżenie,
+   płaci kredyt odnawialny)? (zapisane 27.10)
 
 ## Odłożone zadania
 
@@ -420,3 +426,5 @@ _brak_
   zakładka Kalendarz miejski; pytanie 21. Start F4.1.
 - 27.10 04:57 – F4.1 gotowe: karta wyników ze składnikami kebabowymi (kolejki, braki w menu, sanepid, wypadki,
   przepracowanie, lokale, Harpagon), rozbicie w zakładce Karta wyników; pytanie 22. Start F4.2 (lista błędów).
+- 27.10 05:11 – F4.2 gotowe: lista błędów dla dań (sprzęt, kucharz, cena wobec kosztu składników), przeterminowanie
+  przy prognozie, zamówienia ponad saldo; pytanie 23. Start F4.3 (odblokowywanie zakładek).

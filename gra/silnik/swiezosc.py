@@ -281,5 +281,50 @@ def podsumowanie(dane: Dane, firma: Firma, runda: int) -> dict:
                        for p in sorted(firma.partie, key=lambda p: (p.termin or "9999", p.dostawa, p.zasob))]}
 
 
-__all__ = ["dostepne", "jakosc_skladnika", "nowa_partia", "ostrzezenia", "plan_wynajmu", "podsumowanie", "pojemnosc", "przyjmij",
+def przeterminowanie(dane: Dane, firma: Firma, runda: int) -> list[dict]:
+    """Lista błędów (F4.2): szacunek partii, które przy prognozie popytu (`Firma.oferta`, dania w sprzedaży)
+    przeterminują się w tej rundzie, zanim trafią do dań. Zużycie FIFO jak w `zuzyj` (najpierw najkrótszy termin, potem
+    zamienniki), dzienne zużycie wg wag dni strefy pierwszego działającego lokalu (z kalendarzem), bez limitów obsługi.
+    [{"zasob", "ilosc" (opakowania), "wartosc" (zł), "termin" (pierwszy)}]; składniki dań bez prognozy – pominięte."""
+    from . import popyt as pp  # popyt korzysta ze świeżości – import w funkcji
+    lokale = [lok for lok in firma.lokale if lok.dziala_od <= runda]
+    dania = [u for u in firma.oferta if u in firma.ceny]
+    if not lokale or not dania:
+        return []
+    dni = pp.dni_rundy(dane, runda)
+    wagi = pp.wagi_dni(dane, dane.lokale[lokale[0].id]["strefa"], dni)
+    wagi = wagi / wagi.sum()
+    potrzeba, bez_prognozy = {}, set()
+    for u in dania:
+        for z, ile in dane.uslugi[u]["zasoby"].items():
+            if not firma.oferta[u]:
+                bez_prognozy.add(z)
+            potrzeba[z] = potrzeba.get(z, 0.0) + firma.oferta[u] * ile / dane.zasoby[z]["opakowanie"]
+    staly = "9999-12-31"
+    wynik = []
+    for nazwa, tydzien in potrzeba.items():
+        if nazwa in bez_prognozy:
+            continue
+        partie = [(p, 1.0 if p.zasob == nazwa else przelicznik(dane, p.zasob)) for z in [nazwa] + zamienniki(dane, nazwa)
+                  for p in firma.partie if p.zasob == z and p.ilosc > EPS]
+        zostalo = {id(p): p.ilosc for p, _ in partie}
+        straty: dict[str, dict] = {}
+        for i, d in enumerate(dni):
+            iso, braknie = d.isoformat(), tydzien * float(wagi[i])
+            for p, mn in sorted((x for x in partie if x[0].dostawa <= iso and (x[0].termin or staly) >= iso),
+                                key=lambda x: (x[0].zasob != nazwa, x[0].termin or staly, x[0].dostawa)):
+                bierz = min(zostalo[id(p)], braknie / mn)
+                zostalo[id(p)] -= bierz
+                braknie -= bierz * mn
+            for p, _ in partie:
+                if p.termin == iso and zostalo[id(p)] > EPS:
+                    s = straty.setdefault(p.zasob, {"zasob": p.zasob, "ilosc": 0.0, "wartosc": 0.0, "termin": iso})
+                    s["ilosc"] += zostalo[id(p)]
+                    s["wartosc"] += p.wartosc_gr / 100 * zostalo[id(p)] / p.ilosc
+                    zostalo[id(p)] = 0.0
+        wynik += [{**s, "ilosc": round(s["ilosc"], 2), "wartosc": round(s["wartosc"], 2)} for s in straty.values()]
+    return wynik
+
+
+__all__ = ["dostepne", "jakosc_skladnika", "nowa_partia", "ostrzezenia", "plan_wynajmu", "podsumowanie", "pojemnosc", "przeterminowanie", "przyjmij",
            "uzgodnij", "wynajem", "wyrzuc", "zajete", "zamienniki", "zuzyj"]

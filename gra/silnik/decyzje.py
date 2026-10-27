@@ -45,12 +45,13 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
 from __future__ import annotations
 
 import math
-from datetime import timedelta
+from datetime import date, timedelta
 
 from . import awarie as aw
 from . import biuro as bo
 from . import czas_wlasciciela as cw
 from . import limity as lm
+from . import menu as mn
 from . import promocje as pm
 from . import reklama as rk
 from . import rozliczenie as rz
@@ -388,15 +389,25 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
     `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/lokale.py: wybierz; None – gra bez lokali),
     `info` – wynik `zastosuj` (odrzucone stanowiska)."""
-    wynik = []
+    wynik, konkretne = [], set()   # konkretne – dania z błędem sprzętu lub kucharza (bez ogólnego „brak stanowiska”)
 
     def dodaj(poziom, zakladka, tekst):
         wynik.append({"poziom": poziom, "zakladka": zakladka, "tekst": tekst})
 
     if lokal is not None:
         bledy_lokali(dane, firma, runda, lokal, dodaj)
+        for b in mn.bledy(dane, firma, runda):
+            dodaj(b["poziom"], b["zakladka"], b["tekst"])
+            if b["zakladka"] != "oferta":
+                konkretne.add(b["danie"])
         for poziom, tekst in sw.ostrzezenia(dane, firma, runda):
             dodaj(poziom, "swiezosc", tekst)
+        for s in sw.przeterminowanie(dane, firma, runda):
+            if s["wartosc"] >= dane.z["lista_bledow"]["przeterminowanie_min_zl"]:
+                ile = f"{s['ilosc']:.1f}".replace(".", ",")
+                dodaj("pomaranczowy", "swiezosc", f"{s['zasob']}: przy Twojej prognozie popytu ok. {ile} opak. "
+                      f"(ok. {s['wartosc']:.0f} zł) przeterminuje się, zanim trafi do dań (termin "
+                      f"{date.fromisoformat(s['termin']):%d.%m}) – zamów mniej albo bliżej dnia sprzedaży.")
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
         for tekst in (info or {}).get("uwagi_rynku_pracy", []):
@@ -444,14 +455,20 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
     if runda >= 2:
         for u, braki in gotowe_uslugi(dane, firma).items():
             for b in braki:
-                dodaj("czerwony", "oferta", f"{dane.uslugi[u]['nazwa']}: {b}.")
+                if not (u in konkretne and b.startswith("brak stanowiska")):
+                    dodaj("czerwony", "oferta", f"{dane.uslugi[u]['nazwa']}: {b}.")
         for u in firma.oferta:
             if not firma.oferta.get(u):
                 dodaj("niebieski", "oferta", f"{dane.uslugi[u]['nazwa']}: nie podano prognozy popytu.")
     puste = [s for s in firma.stanowiska if not s.pracownik]
     if puste and runda >= 2:
         dodaj("niebieski", "hr_zatrudnienie", f"Puste stanowiska: {len(puste)} (nie generują kosztów).")
-    if firma.gotowka < 0:
+    zakupy = sum(z["wartosc"] for zz in (info or {}).get("zakupy_zasobow", {}).values() for z in zz)
+    if firma.gotowka < 0 and lokal is not None and zakupy > -firma.gotowka:
+        dodaj("pomaranczowy", "dostawcy", f"Na koncie brakuje ok. {-firma.gotowka:,.0f} zł, a same zamówienia u dostawców "
+              f"to {zakupy:,.0f} zł – jeśli sprzedaż tego nie pokryje, zapłaci za nie kredyt odnawialny (z odsetkami). "
+              "Zamów mniej albo zadbaj o finansowanie.".replace(",", " "))
+    elif firma.gotowka < 0:
         if tryb_kredytu == "na_biezaco":
             dodaj("pomaranczowy", "finanse_bank", "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny "
                   f"(ok. {-firma.gotowka:,.0f} PLN).".replace(",", " "))

@@ -129,12 +129,15 @@ const DOKAD = { lokale: "lokale", stanowiska: "stanowiska", oferta: "oferta", fi
 export const lista_bledow = {
   tytul: "Lista błędów", ikona: "☰",
   info: "Sprawdź, czy podjęto wszystkie najważniejsze decyzje. Czerwone – poważne braki, pomarańczowe i niebieskie – informacyjne.",
-  decyzje({ v }) {
+  decyzje(c) {
+    const v = c.v;
+    // klucze Revasa (finanse_bank…) → zakładka; w grze z lokalami silnik podaje od razu klucz zakładki (swiezosc, zatrudnienie…)
+    const dokad = (z) => DOKAD[z] || (c.dostepna(z) ? z : null);
     if (!v.lista_bledow.length) return `<div class="komunikat ok">Brak uwag – wszystkie najważniejsze decyzje są podjęte.</div>`;
     const kol = { czerwony: 0, pomaranczowy: 1, niebieski: 2 };
     return [...v.lista_bledow].sort((a, b) => kol[a.poziom] - kol[b.poziom]).map((b) =>
       `<div class="blad ${b.poziom}"><span class="tx">${esc(b.tekst)}</span>
-       ${DOKAD[b.zakladka] ? `<button class="btn jasny maly" data-akcja="popraw" data-z="${DOKAD[b.zakladka]}">Popraw</button>` : ""}</div>`).join("");
+       ${dokad(b.zakladka) ? `<button class="btn jasny maly" data-akcja="popraw" data-z="${dokad(b.zakladka)}">Popraw</button>` : ""}</div>`).join("");
   },
   akcje: { popraw: (el, c) => c.idz(el.dataset.z, "decyzje") },
 };

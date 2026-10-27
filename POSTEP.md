@@ -170,4 +170,12 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   (4 615 zł tygodniowo zamiast „20 000”). Kodu `ocena.py` starego Levasa nie ma na dysku – wzory z notatki
   „Ustalenia gry”; test `test_karta.py`
 
-Zadania F4.2–F4.7 – jeszcze nie zaczęte.
+- [x] F4.2 Lista błędów dla nowych decyzji – `silnik/menu.py` (`bledy`, `koszt_porcji`): danie bez sprzętu, brak
+  kucharza (konkretne powody zamiast ogólnego „brak stanowiska”), cena poniżej kosztu składników (czerwone) i składniki
+  ponad 50% ceny (pomarańczowe); `silnik/swiezosc.py` (`przeterminowanie`): partie, które przy prognozie popytu
+  przeterminują się w tygodniu (FIFO, wagi dni strefy, próg 20 zł); zamówienia u dostawców ponad saldo konta. Progi
+  w `zalozenia.yaml → lista_bledow`. Brak czasu właściciela, limity, chłodnia – były już wcześniej (F3a/F3b).
+  Przycisk „Popraw” prowadzi też do nowych zakładek (Magazyn i świeżość, Zatrudnienie, Zdarzenia…); test
+  `test_lista_bledow.py`
+
+Zadania F4.3–F4.7 – jeszcze nie zaczęte.
