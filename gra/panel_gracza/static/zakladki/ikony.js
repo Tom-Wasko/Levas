@@ -42,6 +42,7 @@ const P = {
   handel: '<path d="M3 8h14l-3-3M21 16H7l3 3"/>',
   klucz: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3M14.5 8.5l2.5 2.5"/>',
   tarcza: '<path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/>',
+  kalendarz: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
   zegar: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   wykres: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
   procent: '<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',

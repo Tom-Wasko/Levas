@@ -7,6 +7,7 @@ nie zmienia wyników gry. Uruchomienie: `python -m silnik.dane sprawdz`.
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Any, Literal
 
@@ -595,14 +596,6 @@ class PopytStrefy(Schemat):
     miesiace: list[float] | None = Field(default=None, min_length=12, max_length=12)
 
 
-class WydarzenieKalendarza(Schemat):
-    nazwa: str
-    opis: str
-    od: str = Field(pattern=r"^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")
-    do: str = Field(pattern=r"^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")
-    strefy: dict[str, float] = Field(min_length=1)
-
-
 class WagiJakosciDania(Schemat):
     skladniki: float = Field(ge=0)
     kucharze: float = Field(ge=0)
@@ -618,7 +611,6 @@ class PlikPopytu(Plik):
     model: ModelPopytu
     dni_tygodnia: DniTygodnia
     strefy: dict[str, PopytStrefy]
-    kalendarz: list[WydarzenieKalendarza] = []
 
 
 # --- mapa/banki.yaml (F3a.9) ---
@@ -1284,6 +1276,53 @@ SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "kasyno.yaml": PlikKasyna,
     "handel.yaml": PlikHandlu,
 }
+
+
+# --- kalendarz/kalendarz.yaml (F3b.9) ---
+
+DATA_MD = r"^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"   # 'MM-DD'
+
+
+class WydarzenieKalendarza(Schemat):
+    nazwa: str
+    rodzaj: str
+    opis: str = Field(min_length=3)
+    od: str | int                 # 'MM-DD' albo – z `wzgledem` – dni od daty ruchomej
+    do: str | int
+    wzgledem: str | None = None   # klucz z `ruchome` (np. wielkanoc)
+    strefy: dict[str, float] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _daty(self):
+        if self.wzgledem is None:
+            if not all(isinstance(x, str) and re.match(DATA_MD, x) for x in (self.od, self.do)):
+                raise ValueError("od i do: data 'MM-DD' (albo `wzgledem` i przesunięcie w dniach)")
+        elif not (isinstance(self.od, int) and isinstance(self.do, int) and self.od <= self.do):
+            raise ValueError("z `wzgledem` od i do to liczby dni, od ≤ do")
+        if any(m < 0 for m in self.strefy.values()):
+            raise ValueError("mnożniki stref nie mogą być ujemne")
+        return self
+
+
+class PlikKalendarza(Plik):
+    rodzaje: dict[str, str] = Field(min_length=1)
+    ruchome: dict[str, dict[int, str]]
+    wydarzenia: list[WydarzenieKalendarza]
+
+    @model_validator(mode="after")
+    def _odwolania(self):
+        for n, lata in self.ruchome.items():
+            if any(not re.match(DATA_MD, d) for d in lata.values()):
+                raise ValueError(f"ruchome.{n}: daty 'MM-DD'")
+        for w in self.wydarzenia:
+            if w.rodzaj not in self.rodzaje:
+                raise ValueError(f"{w.nazwa}: rodzaj {w.rodzaj!r} – nie ma w `rodzaje`")
+            if w.wzgledem is not None and w.wzgledem not in self.ruchome:
+                raise ValueError(f"{w.nazwa}: wzgledem {w.wzgledem!r} – nie ma w `ruchome`")
+        return self
+
+
+SCHEMATY_KALENDARZA: dict[str, type[BaseModel]] = {"kalendarz.yaml": PlikKalendarza}
 
 
 SCHEMATY: dict[str, type[BaseModel]] = {

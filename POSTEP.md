@@ -148,4 +148,14 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   sprzedaży. Podgląd liczy przyjęcie na kopii stanu. Zakładka **Handel z drużynami** (Decyzje/Wyniki); test
   `test_handel.py`
 
-Zadania F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3b.9 Kalendarz miejski (gra z lokalami) – `silnik/kalendarz.py` (`dane/kalendarz/kalendarz.yaml`, schemat
+  `PlikKalendarza`; kalendarz przeniesiony z `mapa/popyt.yaml`): 23 wydarzenia na 26 tygodni od 5.10 – święta
+  (Wszystkich Świętych, 11 listopada, Boże Narodzenie, Nowy Rok, Trzech Króli, Tłusty czwartek, Wielkanoc), uczelnie
+  (otrzęsiny, Andrzejki, przerwy, sesja zimowa), ferie, okazje handlowe (Black Friday, Walentynki, Dzień Kobiet)
+  i wydarzenia w mieście (Konfrontacje Teatralne, Halloween, jarmark, Mikołajki, Sylwester, pierwszy dzień wiosny),
+  każde z komiczną historią. Daty stałe 'MM-DD' albo ruchome (`wzgledem`: Wielkanoc, Black Friday, ferie – daty na
+  każdy rok, sprawdzane na lata gry); mnożniki dziennej puli stref (`popyt.wagi_dni`), zmiana tygodniowej puli stref
+  (`kalendarz.tydzien`). Zakładka **Kalendarz miejski** w grupie Klienci i strefy (Decyzje: bieżący tydzień,
+  następne 4 i przegląd wszystkich tygodni; Wyniki: miniony tydzień i klienci stref); test `test_kalendarz.py`
+
+Zadania F4.1–F4.7 – jeszcze nie zaczęte.

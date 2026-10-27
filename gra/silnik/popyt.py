@@ -24,6 +24,7 @@ from datetime import date, timedelta
 
 import numpy as np
 
+from . import kalendarz as kal
 from . import menu
 from . import promocje as pm
 from . import reklama as rk
@@ -33,8 +34,6 @@ from .losowosc import strumien
 from .model import Firma
 from .operacje import jakosc_uslugi, kasjerzy, obsluz
 
-WSZYSTKIE = "wszystkie"   # klucz kalendarza: każda strefa
-
 
 def dni_rundy(dane: Dane, runda: int) -> list[date]:
     """Dni rundy (tydzień: 7 dni od poniedziałku rundy; runda miesięczna – dni miesiąca)."""
@@ -42,35 +41,16 @@ def dni_rundy(dane: Dane, runda: int) -> list[date]:
     return [a + timedelta(days=i) for i in range((b - a).days)]
 
 
-def _w_zakresie(dzien: date, od: str, do: str) -> bool:
-    md = dzien.strftime("%m-%d")
-    return od <= md <= do if od <= do else (md >= od or md <= do)  # zakres przez Nowy Rok
+wydarzenia = kal.wydarzenia              # wydarzenia kalendarza miejskiego w dniach rundy (silnik/kalendarz.py)
+mnoznik_kalendarza = kal.mnoznik
 
 
-def wydarzenia(dane: Dane, dni: list[date]) -> list[dict]:
-    """Wydarzenia kalendarza w podanych dniach: {"nazwa", "opis", "dni": [ISO], "strefy": {strefa: mnożnik}}."""
-    wynik = []
-    for w in dane.mapa["popyt"].get("kalendarz", []):
-        trafione = [d.isoformat() for d in dni if _w_zakresie(d, w["od"], w["do"])]
-        if trafione:
-            wynik.append({"nazwa": w["nazwa"], "opis": w["opis"], "dni": trafione, "strefy": w["strefy"]})
-    return wynik
-
-
-def mnoznik_kalendarza(dane: Dane, strefa: str, dzien: date) -> float:
-    m = 1.0
-    for w in dane.mapa["popyt"].get("kalendarz", []):
-        if _w_zakresie(dzien, w["od"], w["do"]):
-            m *= w["strefy"].get(strefa, w["strefy"].get(WSZYSTKIE, 1.0))
-    return m
-
-
-def wagi_dni(dane: Dane, strefa: str, dni: list[date]) -> np.ndarray:
-    """Udział każdego dnia w tygodniowej puli strefy (średnio 1/7 na dzień) × kalendarz."""
+def wagi_dni(dane: Dane, strefa: str, dni: list[date], kalendarz: bool = True) -> np.ndarray:
+    """Udział każdego dnia w tygodniowej puli strefy (średnio 1/7 na dzień) × kalendarz miejski."""
     p = dane.mapa["popyt"]
     tydzien = p["strefy"][strefa].get("dni") or p["dni_tygodnia"]["wagi"]
     sr = sum(tydzien) / 7
-    return np.array([tydzien[d.weekday()] / sr / 7 * mnoznik_kalendarza(dane, strefa, d) for d in dni])
+    return np.array([tydzien[d.weekday()] / sr / 7 * (kal.mnoznik(dane, strefa, d) if kalendarz else 1.0) for d in dni])
 
 
 def szczyt(dane: Dane, strefa: str, runda: int) -> float:

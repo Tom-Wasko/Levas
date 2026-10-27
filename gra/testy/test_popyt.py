@@ -124,9 +124,7 @@ def test_sprawdz_wykrywa_bledy_popytu(tmp_path):
 
     def zmien(d):
         d["strefy"].pop("felin")
-        d["kalendarz"][0]["strefy"] = {"atlantyda": 2.0}
 
     _zmien(kat, "mapa/popyt.yaml", zmien)
     bledy = sprawdz(kat)
     assert any("felin" in b and "bez popytu" in b for b in bledy), bledy
-    assert any("atlantyda" in b for b in bledy), bledy

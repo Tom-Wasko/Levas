@@ -8,6 +8,7 @@ from silnik import banki as bk
 from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
 from silnik import handel as hd
+from silnik import kalendarz as kl
 from silnik import kasyno as kas
 from silnik import lichwiarz as lw
 from silnik import magazyn as mag
@@ -201,6 +202,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
         zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
         v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
+        v["kalendarz_miasta"] = kl.widok(dane, runda, gra.konfiguracja["liczba_rund"])
         v["swiezosc"] = swiezosc.podsumowanie(dane, f, runda)
         przet = sum(x["wartosc"] for x in ((v.get("wyniki") or {}).get("swiezosc") or {}).get("straty", []) if x["powod"] == "termin")
         v["magazyn"] = mag.ryzyko(dane, f, runda, przet, urz.modyfikatory(dane, f, runda))

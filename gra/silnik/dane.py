@@ -19,6 +19,7 @@ from pydantic import ValidationError
 from .schematy import (
     OPCJONALNE,
     SCHEMATY,
+    SCHEMATY_KALENDARZA,
     SCHEMATY_MAPY,
     SCHEMATY_ZDARZEN,
     PlikBankow,
@@ -72,7 +73,7 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     st, lo, bu, po, me, ba, ha, bi, re, pm = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
-            "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy", "kalendarz") if k in po},
+            "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy")},
             "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")},
             "banki": PlikBankow.model_validate(ba).model_dump(exclude={"opis", "zrodlo"}),  # z domyślnymi polami
             "harpagon": PlikHarpagona.model_validate(ha).model_dump(exclude={"opis", "zrodlo"}),
@@ -88,6 +89,14 @@ def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
         return None
     return {n.removesuffix(".yaml"): s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"})
             for n, s in SCHEMATY_ZDARZEN.items()}   # z domyślnymi polami
+
+
+def _wczytaj_kalendarz(katalog: Path) -> dict | None:
+    """Kalendarz miejski (`dane/kalendarz/`, F3b.9): święta, uczelnie, ferie, wydarzenia. Brak katalogu = bez kalendarza."""
+    if not (katalog / "kalendarz.yaml").exists():
+        return None
+    return {k: v for n, s in SCHEMATY_KALENDARZA.items()
+            for k, v in s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"}).items()}
 
 
 class Dane:
@@ -114,6 +123,7 @@ class Dane:
         self.z: dict = _wartosci(self.zalozenia_pelne)
         self.mapa: dict | None = _wczytaj_mape(katalog / "mapa")
         self.zdarzenia: dict | None = _wczytaj_zdarzenia(katalog / "zdarzenia")
+        self.kalendarz_miasta: dict | None = _wczytaj_kalendarz(katalog / "kalendarz")
         self.podatki: dict | None = _wartosci(p["podatki_2026.yaml"]) if "podatki_2026.yaml" in p else None   # JDG (F3a.11)
 
     @cached_property
@@ -142,7 +152,7 @@ class Dane:
         """Skrót danych i założeń – w grze wieloosobowej wszyscy muszą mieć ten sam."""
         h = hashlib.sha256()
         for plik in sorted([*self.katalog.glob("*.yaml"), *self.katalog.glob("mapa/*.yaml"),
-                              *self.katalog.glob("zdarzenia/*.yaml")]):
+                              *self.katalog.glob("zdarzenia/*.yaml"), *self.katalog.glob("kalendarz/*.yaml")]):
             h.update(plik.read_bytes())
         return h.hexdigest()[:12]
 
@@ -258,6 +268,17 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
             except ValidationError as e:
                 for b in e.errors():
                     bledy.append(f"zdarzenia/{nazwa}: {'.'.join(map(str, b['loc']))}: {b['msg']}")
+    kal = katalog / "kalendarz"
+    if kal.exists():
+        for nazwa, schemat in SCHEMATY_KALENDARZA.items():
+            if not (kal / nazwa).exists():
+                bledy.append(f"brak pliku dane/kalendarz/{nazwa}")
+                continue
+            try:
+                schemat.model_validate(_wczytaj(kal / nazwa))
+            except ValidationError as e:
+                for b in e.errors():
+                    bledy.append(f"kalendarz/{nazwa}: {'.'.join(map(str, b['loc']))}: {b['msg']}")
     if bledy:
         return bledy
 
@@ -331,6 +352,8 @@ def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
         for n in st["internet"]:
             if n not in narzedzia:
                 brak(n, f"boty.yaml: {s}.internet", "narzędzie", "katalog.yaml: narzedzia_internetowe")
+    if d.kalendarz_miasta and not d.mapa:
+        bledy.append("kalendarz/: kalendarz miejski wymaga mapy (dane/mapa/)")
     if d.mapa:
         bledy += _sprawdz_mape(d, brak)
         agencje = d.mapa["reklama"]["agencje"]
@@ -425,12 +448,25 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
     po = m["popyt"]
     for s in sorted(set(m["strefy"]) ^ set(po["strefy"])):
         bledy.append(f"mapa/popyt.yaml: strefa {s} " + ("bez popytu" if s in m["strefy"] else "nie ma jej w mapa/strefy.yaml"))
-    for w in po.get("kalendarz", []):
-        for s in w["strefy"]:
-            if s != "wszystkie" and s not in m["strefy"]:
-                brak(s, f"mapa/popyt.yaml: kalendarz: {w['nazwa']}", "strefa", "mapa/strefy.yaml")
+    _sprawdz_kalendarz(d, bledy, brak)
     _sprawdz_zdarzenia(d, bledy, brak)
     return bledy
+
+
+def _sprawdz_kalendarz(d: Dane, bledy: list[str], brak):
+    """Kalendarz miejski: strefy z mapy, daty ruchome na każdy rok gry o domyślnej długości."""
+    k = d.kalendarz_miasta
+    if not k:
+        return
+    for w in k["wydarzenia"]:
+        for s in w["strefy"]:
+            if s != "wszystkie" and s not in d.mapa["strefy"]:
+                brak(s, f"kalendarz/kalendarz.yaml: {w['nazwa']}", "strefa", "mapa/strefy.yaml")
+    lata = range(d.data_rundy(1).year, d.data_rundy(d.katalog_ofert["rundy"]["domyslna_liczba"] + 1).year + 1)
+    for n, daty in k["ruchome"].items():
+        for rok in lata:
+            if rok not in daty:
+                bledy.append(f"kalendarz/kalendarz.yaml: ruchome.{n}: brak daty na rok {rok} (rok gry)")
 
 
 def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):

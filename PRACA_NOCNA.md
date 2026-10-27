@@ -172,6 +172,15 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    handlują. Pytania: czy widełki i limity takie? czy dodać negocjację (kontroferta adresata) albo handel w tej
    samej rundzie? czy handel lokalami robić teraz? (zapisane 27.10)
 
+21. **Kalendarz miejski (F3b.9).** Założenia: kalendarz przeniesiony z `mapa/popyt.yaml` do
+   `dane/kalendarz/kalendarz.yaml`; 23 wydarzenia od października do kwietnia, mnożniki puli stref dobrane „na oko”
+   (np. przerwa świąteczna – Miasteczko i Politechnika ×0,35, jarmark – Stare Miasto ×1,25, Wielkanoc – całe miasto
+   ×0,45); daty ferii zimowych w lubelskim (2026: od 2.02, 2027: od 18.01, 2028: od 14.02) to założenie –
+   trzeba sprawdzić w harmonogramie MEN; kalendarz zmienia tylko liczbę klientów stref (nie dań – np. więcej
+   frytek w sesji). Notatka „Zdarzenia i historie” (koziołki do końca sesji) – zostawione na później. Pytania: czy
+   lista i mnożniki takie? czy wydarzenia mają też zmieniać popyt na konkretne dania? czy dodać mecze Motoru na
+   Arenie Lublin? (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -399,3 +408,5 @@ _brak_
   (zaproszenia, ruletka i automat, ukryty przed MG); pytanie 19. Start F3b.8 (handel między drużynami).
 - 27.10 04:35 – F3b.8 gotowe: oferty towaru i sprzętu dla innych drużyn, przyjęcie w następnej rundzie, faktury
   w KPiR obu stron, zakładka Handel z drużynami; pytanie 20. Start F3b.9 (kalendarz miejski).
+- 27.10 04:45 – F3b.9 gotowe: kalendarz miejski w `dane/kalendarz/` (23 wydarzenia z historiami, daty ruchome),
+  zakładka Kalendarz miejski; pytanie 21. Start F4.1.

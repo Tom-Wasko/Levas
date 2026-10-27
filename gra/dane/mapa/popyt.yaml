@@ -1,4 +1,4 @@
-# Popyt strefowy (gra z lokalami): pule klientów stref, dni tygodnia, wybór lokalu, kalendarz miejski
+# Popyt strefowy (gra z lokalami): pule klientów stref, dni tygodnia, wybór lokalu (kalendarz miejski – dane/kalendarz/)
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Klienci stref Lublina (krok F3a.4, silnik/popyt.py). Pula strefy na danie i dzień = popyt roczny dania / 52
   × sezonowość dania × pula strefy × miesiąc strefy × kalendarz × waga dnia tygodnia × szum. Klienci strefy wybierają
@@ -7,7 +7,7 @@ opis: 'Klienci stref Lublina (krok F3a.4, silnik/popyt.py). Pula strefy na danie
   A_0 – opcja zewnętrzna (bary spoza gry, obiad w domu). Odległość – między środkami stref na siatce mapy (pola).'
 zrodlo: 'założenia F3a.4 (do potwierdzenia): pule dobrane tak, żeby jeden lokal 2★ po cenie preferowanej w Centrum
   miał popyt zbliżony do firmy w Revasie z 4 firmami (kalibracja: testy/test_popyt.py); dni tygodnia i strefy – wg
-  opisów klientów stref w mapa/strefy.yaml; pełny kalendarz miejski – krok F3b.9'
+  opisów klientów stref w mapa/strefy.yaml; kalendarz miejski – dane/kalendarz/kalendarz.yaml (F3b.9)'
 model:
   opcja_zewnetrzna: 1.0
   elastycznosc_ceny: 2.0
@@ -69,67 +69,3 @@ strefy:
     wrazliwosc_ceny: 0.9
     dni: [0.7, 0.7, 0.75, 0.8, 1.0, 1.6, 1.4]
     miesiace: [0.5, 0.5, 0.6, 0.8, 1.2, 1.6, 1.8, 1.8, 1.3, 0.9, 0.6, 0.5]
-# Wydarzenia kalendarza (co roku; od/do – miesiąc-dzień, zakres przez Nowy Rok dozwolony). strefy: mnożnik puli,
-# klucz "wszystkie" – każda strefa (mnożniki kilku wydarzeń się mnożą). Pełny kalendarz miejski – krok F3b.9.
-kalendarz:
-  - nazwa: Wszystkich Świętych
-    opis: Pół miasta jedzie na cmentarze, druga połowa stoi w korku do cmentarza. Głodni są wszyscy, ale nikt nie ma
-      jak dojechać do kebaba.
-    od: '11-01'
-    do: '11-01'
-    strefy:
-      wszystkie: 0.6
-  - nazwa: Święto Niepodległości
-    opis: Parada w Centrum, flagi na balkonach i kolejka po kebaba dłuższa niż kolejka po lody w lipcu.
-    od: '11-11'
-    do: '11-11'
-    strefy:
-      wszystkie: 0.8
-      centrum: 1.5
-      stare_miasto: 1.3
-  - nazwa: Przerwa świąteczna na uczelniach
-    opis: Studenci wyjeżdżają do domów, gdzie babcia gotuje lepiej niż Ty. Miasteczko akademickie pustoszeje.
-    od: '12-21'
-    do: '01-06'
-    strefy:
-      akademickie: 0.35
-      politechnika: 0.35
-  - nazwa: Wigilia i Boże Narodzenie
-    opis: Dwanaście potraw w każdym domu – kebab nie jest jedną z nich (jeszcze).
-    od: '12-24'
-    do: '12-26'
-    strefy:
-      wszystkie: 0.35
-  - nazwa: Sylwester
-    opis: Koncert na placu Zamkowym. O północy fajerwerki, o pierwszej – kolejka po kebaba aż do Bramy Krakowskiej.
-    od: '12-31'
-    do: '12-31'
-    strefy:
-      stare_miasto: 2.0
-      centrum: 1.4
-  - nazwa: Nowy Rok
-    opis: Miasto śpi do południa, a potem szuka czegoś tłustego na ratunek.
-    od: '01-01'
-    do: '01-01'
-    strefy:
-      wszystkie: 0.6
-  - nazwa: Sesja zimowa
-    opis: Studenci nie mają czasu gotować, bo uczą się do egzaminów (a przynajmniej tak mówią rodzicom).
-    od: '01-26'
-    do: '02-08'
-    strefy:
-      akademickie: 1.2
-      politechnika: 1.2
-  - nazwa: Przerwa międzysemestralna
-    opis: Po sesji studenci uciekają w góry albo do rodziców. Zostają tylko ci z poprawką.
-    od: '02-09'
-    do: '02-22'
-    strefy:
-      akademickie: 0.5
-      politechnika: 0.5
-  - nazwa: Walentynki
-    opis: Kolacja przy świecach na Starym Mieście. Część par kończy wieczór przy kebabie – i to są te szczęśliwe.
-    od: '02-14'
-    do: '02-14'
-    strefy:
-      stare_miasto: 1.4
