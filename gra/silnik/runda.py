@@ -23,6 +23,7 @@ from . import banki as bk
 from . import biuro as bo
 from . import czas_wlasciciela as cw
 from . import karta as kw
+from . import kasyno as kas
 from . import lichwiarz as lw
 from . import lokale as lk
 from . import magazyn as mag
@@ -34,6 +35,7 @@ from . import reklama as rk
 from . import rozliczenie as rz
 from . import rynek_pracy as rp
 from . import urzad as urz
+from . import wlasciciel as wl
 from . import zdarzenia as zd
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
@@ -113,6 +115,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:   # sześć banków z mapy, produkty w dowolnym banku (silnik/banki.py)
             bank_info = bk.poczatek_rundy(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
             harpagon_info = lw.poczatek_rundy(dane, f, d, r, rachunki[nazwa])   # gotówka poza KPiR
+            # wypłata własna → klub (tylko z zaproszeniem) → wpłata własna; prywatny portfel, poza KPiR
+            portfel_info = wl.poczatek_rundy(dane, f, d, r, rachunki[nazwa], ziarno, podglad)
         else:
             if d.get("bank") and d["bank"] in dane.dostepne("banki", r):
                 f.bank = d["bank"]
@@ -131,6 +135,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["ksiegowosc"] = ksiegowosc
             info[nazwa]["leasing"] = bk.leasing_wez(dane, f, d, r, ksiegi[nazwa], rachunki[nazwa])
             info[nazwa]["harpagon"] = harpagon_info
+            info[nazwa]["wlasciciel"], info[nazwa]["kasyno"] = portfel_info
             info[nazwa]["przejecia"] = info_przejecia
             # higiena i odbiór lokali przez sanepid – po lokalach i inwestycjach (silnik/urzad.py)
             info[nazwa]["urzad"] = urz.ustaw(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa])
@@ -139,6 +144,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
                 + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
         bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
+        if tryb_lokali:
+            bledy[nazwa] += wl.bledy(info[nazwa]["wlasciciel"], info[nazwa]["kasyno"])
         if tryb_lokali and dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/zdarzenia.py)
             czas = cw.z_podsumowania(info[nazwa]["czas_wlasciciela"])
             info[nazwa]["zdarzenia"] = zd.rozegraj(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa], czas)
@@ -289,6 +296,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if tryb_lokali:
             bank_koniec = bk.koniec_rundy(dane, f, r, ks, rach)
             info[nazwa]["harpagon_odsetki"] = lw.koniec_rundy(dane, f, r)   # doliczone do długu, poza KPiR
+            if not podglad:   # zaproszenie do klubu na następną rundę
+                info[nazwa]["zaproszenie"] = kas.zaproszenie(dane, f, r, ziarno, konfiguracja["liczba_rund"])
         elif f.bank:
             bank_koniec_miesiaca(f, dane.pozycje("banki")[f.bank], r, ks, rach, dane.rund_w_roku)
         if tryb_lokali:   # biura z mapy albo samodzielna księgowość (silnik/biuro.py)
@@ -333,6 +342,11 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             if urz.dane_urzedu(dane):
                 wyniki[nazwa]["urzad"] = urz.raport(info[nazwa].get("urzad"), info[nazwa].get("magazyn"))
             wyniki[nazwa]["biuro"] = info[nazwa].get("biuro")
+            if wl.dane_portfela(dane):
+                wyniki[nazwa]["wlasciciel"] = {**(info[nazwa].get("wlasciciel") or {}), "portfel": wl.portfel(dane, f)}
+            klub = kas.raport(info[nazwa].get("kasyno"), info[nazwa].get("zaproszenie"))
+            if klub:
+                wyniki[nazwa]["kasyno"] = klub
             wyniki[nazwa]["ksiegowosc"] = info[nazwa].get("ksiegowosc")
             wyniki[nazwa]["samodzielnie"] = f.deklaracja is not None   # deklaracje za tę rundę – w następnej
             wyniki[nazwa]["rynek_pracy"] = info[nazwa].get("rynek_pracy")

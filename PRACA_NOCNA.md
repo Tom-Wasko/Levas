@@ -153,6 +153,16 @@ Dziennik i zasady samodzielnej pracy Claude nad planem implementacji (kolejne za
    „zignoruj”: +12 pp. przez 2 rundy). Boty: zrównoważony i tani – mop, premium – HACCP, agresywny – firma. Ratusz na
    mapie otwiera teraz zakładkę Urząd i sanepid (lista błędów nadal w menu). Czy tak? (zapisane 27.10)
 
+19. **Kasyno i portfel właściciela (F3b.7).** Liczby: oszczędności na start 2000 zł; zaproszenie od rundy 4, szansa
+   8% na rundę, najwyżej 2 w grze; do 5 zakładów w rundzie, stawka 10–2000 zł; ruletka europejska (kolor/parzyste
+   ×2, tuzin ×3, zero ×36), automat: 55% nic, 28% zwrot, 12% ×2, 4% ×5, 1% ×10 (zwrot ok. 82%). Ukrywanie:
+   mistrz gry nie widzi ani klubu, ani **portfela** (jego zmiany zdradzałyby klub) – wpłaty i wypłaty własne widać
+   tylko jako operacje na koncie firmy; drużyna prowadzona przez MG nie ma więc ani klubu, ani portfela.
+   `LEVAS_KASYNO=0` ukrywa tylko klub, portfel zostaje. Eksport gry jest bez zakładów – po imporcie gra przelicza
+   się bez klubu, więc portfel i wpłaty z wygranych mogą wyjść inaczej. Wypłata własna nie zmienia podatku (PIT
+   od dochodu JDG). Pytania: czy portfel też ukrywać przed MG? czy eksport ma zawierać zakłady (MG mógłby je
+   wtedy zobaczyć w pliku)? czy liczby takie? (zapisane 27.10)
+
 ## Odłożone zadania
 
 _brak_
@@ -376,3 +386,5 @@ _brak_
   zakładka Ubezpieczenia, boty z polisami; pytanie 17. Start F3b.6 (urząd/sanepid).
 - 27.10 – F3b.6 gotowe: odbiór lokalu przez sanepid, 4 poziomy higieny z kosztem i wpływem na kontrole, skargi
   w historiach, zakładka Urząd i sanepid; pytanie 18. Start F3b.7 (kasyno).
+- 27.10 01:25 – F3b.7 gotowe: portfel właściciela (wpłata/wypłata własna poza KPiR) i tajny klub przy ul. Nocnej
+  (zaproszenia, ruletka i automat, ukryty przed MG); pytanie 19. Start F3b.8 (handel między drużynami).

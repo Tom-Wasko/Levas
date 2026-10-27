@@ -41,7 +41,9 @@ export const dashboard = {
     const boty = v.gra.firmy.filter((f) => f.bot).map((f) => esc(f.nazwa));
     const stali = (v.gra.konkurenci_stali || []).map((k) => esc(k.nazwa));
     const rynek = [boty.length ? `boty: ${boty.join(", ")}` : "", stali.length ? `stałe ceny: ${stali.join(", ")}` : ""].filter(Boolean).join(" · ");
-    return `${status}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
+    const klub = v.kasyno?.otwarte ? `<div class="komunikat">${esc(v.kasyno.zaproszenie)}
+      · <a data-zakladka-k="kasyno">${esc(v.kasyno.adres)}</a></div>` : "";
+    return `${status}${klub}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
       ${kafel("Nazwa i logo firmy", "osoba", `<div><div class="awatar">${esc(d.nazwa.slice(0, 2).toUpperCase())}</div>${esc(d.nazwa)}</div>`)}
       ${kafel("Miejsce", "karta", d.miejsce ? `${d.miejsce} / ${d.liczba_firm}` : `<span class="maly-tekst">Ranking dostępny od rundy 3</span>`)}
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}
@@ -96,7 +98,7 @@ export const karta_wynikow = {
 };
 
 const DOKAD = { lokale: "lokale", stanowiska: "stanowiska", oferta: "oferta", finanse_bank: "bank", finanse_biuro: "biuro", hr_zatrudnienie: "zatrudnienie",
-  inwestycje_sprzet: "sprzet", dostawcy: "dostawcy", sprzedaz: "sprzedaz" };
+  inwestycje_sprzet: "sprzet", dostawcy: "dostawcy", sprzedaz: "sprzedaz", wlasciciel: "wlasciciel", kasyno: "kasyno" };
 
 export const lista_bledow = {
   tytul: "Lista błędów", ikona: "☰",

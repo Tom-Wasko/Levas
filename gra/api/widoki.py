@@ -9,6 +9,7 @@ from copy import deepcopy
 from datetime import datetime
 from functools import wraps
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -20,6 +21,7 @@ from gry import serwisy
 from gry.models import Gra
 from konta import druzyny
 from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
+from silnik import kasyno as kas
 from silnik.biuro import ukryj
 from silnik.boty import decyzje_bota
 from silnik.dane import dane_domyslne
@@ -94,6 +96,32 @@ def sprawdz_firme(request, id_: str, g: GraSilnika, firma: str) -> None:
         raise BladZapytania("Nie ma takiej firmy w grze.", 404)
     if not moze_firme(request.user, id_, firma):
         raise BladZapytania("To nie jest firma Twojej drużyny.", 403)
+
+
+def _bez_klubu(request) -> bool:
+    """Klub z silnik/kasyno.py jest tajny: mistrz gry go nie widzi,
+    a LEVAS_KASYNO=0 wyłącza go na serwerze."""
+    return jest_mg(request.user) or not settings.LEVAS_KASYNO
+
+
+def _dla(request, v: dict) -> dict:
+    """Widok firmy bez klubu dla mistrza gry (także bez portfela właściciela)
+    i przy wyłączonym klubie."""
+    return kas.ukryj(v, portfel=jest_mg(request.user)) if _bez_klubu(request) else v
+
+
+def _bez_klubu_w_decyzjach(decyzje: dict) -> dict:
+    """Plik gry (eksport) bez zakładów w klubie – także w zapisanych wariantach."""
+    wynik = {}
+    for r, rd in decyzje.items():
+        rd = {k: kas.ukryj_decyzje(d) for k, d in rd.items()}
+        if isinstance(rd.get("_warianty"), dict):
+            rd["_warianty"] = {
+                f: {n: kas.ukryj_decyzje(d) for n, d in w.items()}
+                for f, w in rd["_warianty"].items()
+            }
+        wynik[r] = rd
+    return wynik
 
 
 def _warianty(g: GraSilnika, firma: str) -> dict:
@@ -302,6 +330,7 @@ def api_widok(request, id_, firma):
 def _z_druzyna(request, v: dict, id_: str, g: GraSilnika, firma: str) -> dict:
     """Do widoku firmy: skład drużyny, kto ostatnio zapisał / wysłał decyzje, pauza i termin
     zamknięcia rundy, wgląd mistrza gry tylko do odczytu."""
+    v = _dla(request, v)
     sklad = druzyny.sklad(id_).get(firma, [])
     v["druzyna"] = {"sklad": sklad, "autorzy": druzyny.autorzy(g, firma)}
     v["prowadzenie"] = hg.prowadzenie(id_)
@@ -375,6 +404,8 @@ def api_decyzje(request, id_, firma):
             raise BladZapytania("Decyzje są wysłane – najpierw wróć do podejmowania decyzji.")
         _moze_zmieniac(request, id_, firma)
         _sprawdz_wersje(request, g, firma)
+        if _bez_klubu(request):
+            d = kas.ukryj_decyzje(d)
         # limity (silnik/limity.py): zapis z przekroczeniem jest odrzucony
         if tryb_lokali(g.dane, g.konfiguracja):
             bledy = naruszenia(g.dane, g.stan().firmy[firma], d, g.runda)
@@ -438,10 +469,11 @@ def api_warianty(request, id_, firma):
     with serwisy.zmiana(id_) as g:
         sprawdz_firme(request, id_, g, firma)
         if request.method == "PUT":
-            _warianty(g, firma)[nazwa] = d.get("decyzje") or deepcopy(g.szkic(firma))
+            nowe = d.get("decyzje") or deepcopy(g.szkic(firma))
+            _warianty(g, firma)[nazwa] = kas.ukryj_decyzje(nowe) if _bez_klubu(request) else nowe
         else:
             _warianty(g, firma).pop(request.GET.get("nazwa", ""), None)
-    return odpowiedz(widok(g, firma))
+    return odpowiedz(_dla(request, widok(g, firma)))
 
 
 @require_GET
@@ -451,7 +483,9 @@ def api_dane_wariantu(request, id_, firma):
     sprawdz_firme(request, id_, g, firma)
     zapisane = g.decyzje.get(g.runda, {}).get("_warianty", {}).get(firma, {})
     w = zapisane.get(request.GET.get("nazwa", ""))
-    return odpowiedz(w) if w is not None else blad("Nie ma takiego wariantu.", 404)
+    if w is None:
+        return blad("Nie ma takiego wariantu.", 404)
+    return odpowiedz(kas.ukryj_decyzje(w) if _bez_klubu(request) else w)
 
 
 @require_POST
@@ -486,6 +520,8 @@ def api_podglad(request, id_, firma):
         w = s.wyniki[r][firma]
         if s.firmy[firma].deklaracja:  # samodzielna księgowość: bez podatków rundy
             w = ukryj(w, podglad=True)
+        if _bez_klubu(request):
+            w = kas.ukryj_wyniki(w, portfel=jest_mg(request.user))
         wyniki.append(
             {
                 "nazwa": "Bieżące decyzje" if nazwa == "biezace" else nazwa,
@@ -501,7 +537,9 @@ def api_podglad(request, id_, firma):
 @tylko_mg
 def api_eksport(request, id_):
     g = serwisy.wczytaj(id_)
-    tresc = json.dumps(g.do_slownika(), ensure_ascii=False, indent=1)
+    plik = g.do_slownika()
+    plik["decyzje"] = _bez_klubu_w_decyzjach(plik["decyzje"])
+    tresc = json.dumps(plik, ensure_ascii=False, indent=1)
     r = HttpResponse(tresc, content_type="application/json; charset=utf-8")
     r["Content-Disposition"] = content_disposition_header(True, f"{id_}.json")
     return r

@@ -124,6 +124,8 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # gra nie wysy
 LEVAS_REJESTRACJA = os.environ.get("LEVAS_REJESTRACJA") == "1"
 # Gra na własnym komputerze (`manage.py graj`): automatyczne lokalne konto mistrza gry.
 LEVAS_LOKALNIE = os.environ.get("LEVAS_LOKALNIE") == "1"
+# Dodatkowe miejsce w mieście dla drużyn (domyślnie włączone); LEVAS_KASYNO=0 je wyłącza.
+LEVAS_KASYNO = os.environ.get("LEVAS_KASYNO", "1") == "1"
 
 # Plik gry przy imporcie może mieć kilka MB (decyzje wszystkich rund).
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024

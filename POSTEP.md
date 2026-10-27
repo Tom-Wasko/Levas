@@ -124,4 +124,17 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
   kontroli, skargi; Wyniki: koszt, odbiory, kontrola, historia kontroli), odmowa odbioru na liście błędów; test
   `test_urzad.py`
 
-Zadania F3b.7–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.
+- [x] F3b.7 Kasyno (ukryte przed MG) i portfel właściciela (gra z lokalami) – `silnik/wlasciciel.py`
+  (`dane/zdarzenia/wlasciciel.yaml`, schemat `PlikWlasciciela`): prywatny portfel (`Firma.portfel_gr`, start
+  z oszczędności 2000 zł), decyzje `wyplata_wlasna` / `wplata_wlasna` poza KPiR (rodzaj „wlasciciel” na rachunku,
+  przycinane do gotówki firmy / portfela); kolejność: wypłata → klub → wpłata. `silnik/kasyno.py`
+  (`dane/zdarzenia/kasyno.yaml`, schemat `PlikKasyna`): klub „Pod Złotym Kaflem”, ul. Nocna 13 – bez budynku na
+  mapie i pozycji w menu; od rundy 4 szansa 8% na zaproszenie na następną rundę (najwyżej 2 w grze, boty nie
+  dostają, `Firma.zaproszenia`, strumień `kasyno`); decyzja `kasyno: [{gra, zaklad, stawka}]` – ruletka
+  (37 pól, kolory, parzyste, tuziny, zero) i automat „Jednoręki Zenek”, do 5 zakładów, 10–2000 zł, z portfela;
+  podgląd zdejmuje stawki bez wyniku. Mistrz gry nie widzi klubu ani portfela (`kas.ukryj` w `api/widoki.py`:
+  widok, warianty, podgląd, eksport; przegląd i CSV i tak bez nich), `LEVAS_KASYNO=0` wyłącza klub na serwerze.
+  Zakładki **Finanse → Portfel właściciela** i **Nocna 13** (ukryta poza rundą z zaproszeniem i rundą po niej;
+  Decyzje/Wyniki), komunikat z zaproszeniem na Dashboardzie; test `test_kasyno.py`
+
+Zadania F3b.8–F3b.9, F4.1–F4.7 – jeszcze nie zaczęte.

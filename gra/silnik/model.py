@@ -49,7 +49,7 @@ class Model(BaseModel):
         d = dict(d)
         for k in zl:
             v = d.pop(k)
-            d[k + GR] = {n: grosze(x) for n, x in v.items()} if isinstance(v, dict) else grosze(v)
+            d[k + GR] = {n: grosze(x) for n, x in v.items()} if isinstance(v, dict) else None if v is None else grosze(v)
         return d
 
 
@@ -315,6 +315,8 @@ class Firma(Model):
     polisy: dict[str, int] = Field(default_factory=dict)    # polisy ubezpieczyciela: rodzaj → runda początku ochrony
     higiena: str | None = None    # poziom higieny lokali (silnik/urzad.py); None – domyślny z danych
     odbiory: dict[str, int] = Field(default_factory=dict)   # lokal → runda odbioru przez sanepid
+    portfel_gr: int | None = None   # prywatny portfel właściciela (silnik/wlasciciel.py); None – oszczędności z danych
+    zaproszenia: list[int] = Field(default_factory=list)    # rundy z otwartym klubem (silnik/kasyno.py)
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
     promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
@@ -374,7 +376,7 @@ def _na_zlote(x: Any) -> Any:
         wynik = {}
         for k, v in x.items():
             if isinstance(k, str) and k.endswith(GR):
-                wynik[k[: -len(GR)]] = {n: g / 100 for n, g in v.items()} if isinstance(v, dict) else v / 100
+                wynik[k[: -len(GR)]] = {n: g / 100 for n, g in v.items()} if isinstance(v, dict) else None if v is None else v / 100
             else:
                 wynik[k] = _na_zlote(v)
         return wynik

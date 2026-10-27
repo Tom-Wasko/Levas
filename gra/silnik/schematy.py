@@ -1176,11 +1176,93 @@ class PlikUrzedu(Plik):
     higiena: Higiena
 
 
+class Portfel(Schemat):
+    oszczednosci: float = Field(ge=0)      # zł prywatnych oszczędności właściciela na start
+
+
+class PlikWlasciciela(Plik):
+    """dane/zdarzenia/wlasciciel.yaml: prywatny portfel właściciela – wpłaty i wypłaty własne (silnik/wlasciciel.py)."""
+    portfel: Portfel
+
+
+class Klub(Schemat):
+    nazwa: str
+    adres: str
+    tekst: str = Field(min_length=3)
+
+
+class Zaproszenie(Schemat):
+    od_rundy: int = Field(ge=1)
+    szansa: float = Field(ge=0, le=1)
+    maks: int = Field(ge=0)
+    teksty: list[str] = Field(min_length=1)
+
+
+class LimitZakladow(Schemat):
+    maks: int = Field(ge=1)
+    min_stawka: float = Field(gt=0)
+    maks_stawka: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _zakres(self):
+        if self.min_stawka > self.maks_stawka:
+            raise ValueError("zaklady.min_stawka większa niż maks_stawka")
+        return self
+
+
+class ZakladRuletki(Schemat):
+    nazwa: str
+    mnoznik: float = Field(gt=0)           # wypłata = stawka × mnożnik (razem ze stawką)
+    wygrywa: list[int] = Field(min_length=1)
+
+
+class WynikAutomatu(Schemat):
+    szansa: float = Field(gt=0, le=1)
+    mnoznik: float = Field(ge=0)
+    tekst: str = Field(min_length=3)
+
+
+class GraKasyna(Schemat):
+    typ: Literal["ruletka", "automat"]
+    nazwa: str
+    opis: str
+    pola: int | None = None                # ruletka: liczba pól koła (0 … pola−1)
+    zaklady: dict[str, ZakladRuletki] | None = None
+    teksty_wygrana: list[str] | None = None
+    teksty_przegrana: list[str] | None = None
+    wyniki: list[WynikAutomatu] | None = None
+
+    @model_validator(mode="after")
+    def _typ(self):
+        if self.typ == "ruletka":
+            if not (self.pola and self.zaklady and self.teksty_wygrana and self.teksty_przegrana) or self.wyniki:
+                raise ValueError(f"ruletka {self.nazwa!r}: potrzebne pola, zaklady i teksty (bez wyniki)")
+            for k, z in self.zaklady.items():
+                if any(not 0 <= n < self.pola for n in z.wygrywa) or len(set(z.wygrywa)) != len(z.wygrywa):
+                    raise ValueError(f"ruletka {self.nazwa!r}, zakład {k!r}: liczby spoza koła albo powtórzone")
+        else:
+            if not self.wyniki or self.zaklady or self.pola:
+                raise ValueError(f"automat {self.nazwa!r}: potrzebne wyniki (bez pola i zaklady)")
+            if abs(sum(w.szansa for w in self.wyniki) - 1) > 1e-6:
+                raise ValueError(f"automat {self.nazwa!r}: szanse wyników nie sumują się do 1")
+        return self
+
+
+class PlikKasyna(Plik):
+    """dane/zdarzenia/kasyno.yaml: tajny klub, zaproszenia i gry (silnik/kasyno.py)."""
+    kasyno: Klub
+    zaproszenie: Zaproszenie
+    zaklady: LimitZakladow
+    gry: dict[str, GraKasyna] = Field(min_length=1)
+
+
 SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "parki.yaml": PlikParkow,
     "magazyn.yaml": PlikMagazynu,
     "losowe.yaml": PlikWypadkow,
     "urzad.yaml": PlikUrzedu,
+    "wlasciciel.yaml": PlikWlasciciela,
+    "kasyno.yaml": PlikKasyna,
 }
 
 

@@ -104,6 +104,7 @@ RODZAJE_OPERACJI = {"kpir": "Zapisy w KPiR", "korekta": "Korekty zapisów w KPiR
                     "podatki": "Podatki i składki", "inwestycje": "Inwestycje (lokale, budowa, środki trwałe)",
                     "kredyty": "Kredyty", "lokaty": "Lokaty", "kaucje": "Kaucje za lokale",
                     "harpagon": "Harpagon (poza księgami)",
+                    "wlasciciel": "Wpłaty i wypłaty własne właściciela (poza KPiR)",
                     "kary": "Mandaty i kary (poza KPiR – nie są kosztem podatkowym)"}
 
 

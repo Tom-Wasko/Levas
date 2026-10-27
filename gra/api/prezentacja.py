@@ -7,6 +7,7 @@ from silnik import awarie as aw
 from silnik import banki as bk
 from silnik import biuro as bo
 from silnik import czas_wlasciciela as cw
+from silnik import kasyno as kas
 from silnik import lichwiarz as lw
 from silnik import magazyn as mag
 from silnik import promocje as pm
@@ -16,6 +17,7 @@ from silnik import rozliczenie as rz
 from silnik import rynek_pracy as rp
 from silnik import swiezosc
 from silnik import urzad as urz
+from silnik import wlasciciel as wl
 from silnik import zdarzenia as zd
 from silnik.dane import Dane
 from silnik.decyzje import (
@@ -70,6 +72,8 @@ def stan_po_szkicu(gra: Gra, firma: str):
         d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
     bank_info = bk.poczatek_rundy(gra.dane, f, d, r, ks, rach) if lokale else None
     harpagon_info = lw.poczatek_rundy(gra.dane, f, d, r, rach) if lokale else None   # wizyty – dopiero w przeliczeniu
+    # portfel właściciela i klub: stawki schodzą, wyniki gier – dopiero w przeliczeniu
+    portfel_info = wl.poczatek_rundy(gra.dane, f, d, r, rach, gra.konfiguracja["ziarno"], podglad=True) if lokale else (None, None)
     info = zastosuj(gra.dane, f, d, r, stan.kandydaci, ceny_rundy(gra.dane, gra.konfiguracja["ziarno"], r,
                                                                   gra.konfiguracja.get("ceny_dostawcow", "dane")), ks, rach,
                     lokale)
@@ -77,6 +81,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     if lokale:
         info["bank"], info["leasing"] = bank_info, bk.leasing_wez(gra.dane, f, d, r, ks, rach)
         info["harpagon"], info["przejecia"] = harpagon_info, przejecia
+        info["wlasciciel"], info["kasyno"] = portfel_info
         info["urzad"] = urz.ustaw(gra.dane, f, d, r, gra.konfiguracja["ziarno"], ks, rach)
     if lokale and gra.dane.zdarzenia:   # eventy w parkach: koszty wybranych opcji (skutki – dopiero w przeliczeniu)
         czas = cw.z_podsumowania(info["czas_wlasciciela"])
@@ -89,6 +94,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
         odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]
         bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
         bledy += lw.bledy(gra.dane, f, harpagon_info, r)
+        bledy += wl.bledy(*portfel_info)
         bledy += pr.bledy(gra.dane, stan.firmy, firma, r, przejecia)
         bledy += (info.get("zdarzenia") or {}).get("bledy", [])
     return stan, f, ks, info, bledy
@@ -216,6 +222,13 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
                       "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}
         v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)
+        if wl.dane_portfela(dane):
+            v["wlasciciel"] = wl.widok(dane, fp, f, info.get("wlasciciel") if edycja
+                                       else stan.wyniki[runda][firma].get("wlasciciel"))
+        klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
+                         else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
+        if klub:
+            v["kasyno"] = klub
         u = lw.ustawienia(dane)
         v["harpagon"] = {"przed": lw.stan(dane, fp, runda), "po": lw.stan(dane, f, runda),
                          "decyzja": info.get("harpagon"),
