@@ -16,6 +16,7 @@ urlpatterns = [
     path("gry/<str:id_>/decyzje/<str:firma>", w.api_decyzje),
     path("gry/<str:id_>/stan/<str:firma>", w.api_stan),
     path("gry/<str:id_>/wyslij/<str:firma>", w.api_wyslij),
+    path("gry/<str:id_>/logo/<str:firma>", w.api_logo),
     path("gry/<str:id_>/przelicz", w.api_przelicz),
     path("gry/<str:id_>/cofnij", w.api_cofnij),
     path("gry/<str:id_>/warianty/<str:firma>", w.api_warianty),

@@ -257,6 +257,16 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .pigulka.inf { background: var(--pom-jasny); color: var(--pom-ciemny); }
 .awatar { width: 66px; height: 66px; border-radius: 50%; border: 2px solid var(--pom); display: grid; place-items: center; margin: 0 auto 8px;
   font-weight: 800; font-size: 20px; color: var(--pom); background: var(--pom-jasny); }
+.logo-firmy { width: 66px; height: 66px; object-fit: contain; display: block; margin: 0 auto 8px; border-radius: 8px; }
+/* marka firmy w rundzie 1 (zakladki/ogolne.js: formularzMarki) */
+.marka { display: flex; gap: 20px; align-items: flex-start; background: #fff; border: 1px solid var(--linia); border-radius: var(--r); padding: 16px; margin-bottom: 8px; }
+.marka-znak { flex: 0 0 90px; }
+.marka-pola { flex: 1; display: grid; gap: 12px; min-width: 0; }
+.kolory-firmy { display: flex; flex-wrap: wrap; gap: 8px; }
+.kolor-firmy { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--linia); cursor: pointer; }
+.kolor-firmy.wybrany { box-shadow: 0 0 0 3px var(--tekst); }
+.kolor-firmy:disabled { opacity: .3; cursor: not-allowed; }
+@media (max-width: 600px) { .marka { flex-direction: column; } }
 .awatar.pusty { color: #c8c8cc; border: 2px dashed #d6d6da; background: #fff; font-size: 28px; }
 .srodek { text-align: center; }
 .stopka { text-align: center; color: var(--szary); font-size: 11px; padding: 20px; }

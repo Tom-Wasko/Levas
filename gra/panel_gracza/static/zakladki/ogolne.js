@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji, analiza (podgląd wyniku rundy).
-import { esc, godzina, inicjaly, termin as terminSlownie, naOkres, naRunde, OKRES, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, godzina, inicjaly, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -33,6 +33,42 @@ function kartaKebabu(v) {
       rozwój firmy, a dług u Harpagona waży w zadłużeniu więcej niż kredyt bankowy.</p>`;
 }
 
+const MAKS_LOGO_KB = 300;   // konta/druzyny.py: MAKS_LOGO_KB
+
+// marka firmy z roboczymi decyzjami (nazwa, slogan i kolor wchodzą po przeliczeniu rundy 1)
+function mojaMarka(v, d) {
+  const m = marka(v, v.firma);
+  return { ...m, nazwa: d.nazwa || m.nazwa, slogan: d.misja ?? m.slogan, kolor: d.kolor || m.kolor };
+}
+
+const znakFirmy = (m) => m.logo
+  ? `<img class="logo-firmy" src="${esc(m.logo)}" alt="Logo firmy ${esc(m.nazwa)}">`
+  : `<div class="awatar" style="border-color:${esc(m.kolor)};color:${esc(m.kolor)}">${esc(m.nazwa.slice(0, 2).toUpperCase())}</div>`;
+
+// runda 1: nazwa, slogan, kolor na mapie i logo firmy (logo – osobny zapis, api/widoki.py: api_logo)
+function formularzMarki(v, d) {
+  const m = mojaMarka(v, d);
+  const zajete = Object.fromEntries(v.gra.firmy.filter((f) => f.nazwa !== v.firma).map((f) => [marka(v, f.nazwa).kolor, marka(v, f.nazwa).nazwa]));
+  const kolory = KOLORY_FIRM.map((k) => `<button class="kolor-firmy ${k === m.kolor ? "wybrany" : ""}" style="background:${k}" data-akcja="marka-kolor"
+    data-kolor="${k}" title="${zajete[k] ? `ten kolor ma ${esc(zajete[k])}` : "wybierz ten kolor"}" ${zajete[k] ? "disabled" : ""}></button>`).join("");
+  return `<div class="sekcja-tytul">Runda 1: Twoja marka</div><div class="marka">
+    <div class="marka-znak">${znakFirmy(m)}</div>
+    <div class="marka-pola">
+      <label class="pole">Nazwa firmy<input type="text" maxlength="40" value="${esc(d.nazwa || m.nazwa)}" data-zmiana="marka-nazwa"></label>
+      <label class="pole">Slogan<input type="text" maxlength="80" value="${esc(m.slogan)}" placeholder="np. Kebab, do którego się wraca" data-zmiana="marka-slogan"></label>
+      <div class="pole">Kolor firmy na mapie<div class="kolory-firmy">${kolory}</div></div>
+      <label class="pole">Logo (PNG albo JPG, najwyżej ${MAKS_LOGO_KB} KB)<input type="file" accept="image/png,image/jpeg" data-zmiana="marka-logo"></label>
+      ${m.logo ? `<button class="btn jasny maly" data-akcja="marka-bez-logo">Usuń logo</button>` : ""}
+      <p class="podpowiedz">Nazwę, slogan, kolor i logo wybieracie w pierwszej rundzie – od drugiej rundy zobaczą je inne firmy,
+        a Wasze lokale na mapie będą miały ten kolor.</p>
+    </div></div>`;
+}
+
+const wyslijLogo = async (c, logo) => {
+  c.ustaw(await c.api(`/api/gry/${GRA}/logo/${encodeURIComponent(FIRMA)}`, { method: "PUT", body: JSON.stringify({ logo }) }));
+  toast(logo ? "Logo zapisane." : "Logo usunięte.");
+};
+
 function planRundy(v, kat) {
   // lista kontrolna decyzji bieżącej rundy (na podstawie stanu po roboczych decyzjach)
   const r = v.runda, st = v.stan, braki = Object.values(st.gotowe_uslugi || {}).flat();
@@ -56,8 +92,9 @@ function planRundy(v, kat) {
 
 export const dashboard = {
   tytul: "Dashboard", ikona: "▦",
-  decyzje({ v, kat }) {
-    const d = v.dashboard, p = kat.parametry;
+  decyzje({ v, kat, d: szkic }) {
+    const d = v.dashboard, p = kat.parametry, m = mojaMarka(v, szkic);
+    const rundaMarki = v.edycja && v.runda === v.gra.runda_startowa && !v.tylko_odczyt;
     const kafel = (t, ik, tresc) => `<div class="kafel"><div class="kg"><span>${t}</span>${ikona(ik, 18)}</div><div class="kt">${tresc}</div></div>`;
     const ludzie = v.gra.firmy.filter((f) => !f.bot).map((f) => f.nazwa);
     const status = ludzie.length > 1 ? `<div class="komunikat">Gracze w tej grze: ${ludzie.map((n) =>
@@ -68,8 +105,8 @@ export const dashboard = {
     const rynek = [boty.length ? `boty: ${boty.join(", ")}` : "", stali.length ? `stałe ceny: ${stali.join(", ")}` : ""].filter(Boolean).join(" · ");
     const klub = v.kasyno?.otwarte ? `<div class="komunikat">${esc(v.kasyno.zaproszenie)}
       · <a data-zakladka-k="kasyno">${esc(v.kasyno.adres)}</a></div>` : "";
-    return `${status}${klub}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
-      ${kafel("Nazwa i logo firmy", "osoba", `<div><div class="awatar">${esc(d.nazwa.slice(0, 2).toUpperCase())}</div>${esc(d.nazwa)}</div>`)}
+    return `${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
+      ${kafel("Nazwa i logo firmy", "osoba", `<div class="srodek">${znakFirmy(m)}<b>${esc(m.nazwa)}</b>${m.slogan ? `<div class="maly-tekst">„${esc(m.slogan)}”</div>` : ""}</div>`)}
       ${kafel("Miejsce", "karta", d.miejsce ? `${d.miejsce} / ${d.liczba_firm}` : `<span class="maly-tekst">Ranking dostępny od rundy 3</span>`)}
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}
         <div class="maly-tekst">${v.gra.zakonczona ? "Gra zakończona" : `Bieżąca runda: ${v.gra.runda}`} · ${v.gra.firmy.length + stali.length} firm na rynku</div>
@@ -86,6 +123,22 @@ export const dashboard = {
         <br>Kredyt odnawialny: ${v.gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "jak w grze (jednocześnie)"}
         ${d.lokaty ? `<br>Lokaty: ${zl(d.lokaty)}` : ""}${d.zadluzenie ? `<br>Zadłużenie: ${zl(d.zadluzenie)}` : ""}</div>`)}
     </div>${(v.historia || []).length > 1 ? `<div class="wykres"><canvas id="w-dash"></canvas></div>` : ""}`;
+  },
+  zmiany: {
+    "marka-nazwa": (el, c) => c.zmien((d) => { d.nazwa = el.value.trim().slice(0, 40); }),
+    "marka-slogan": (el, c) => c.zmien((d) => { d.misja = el.value.trim().slice(0, 80); }),
+    "marka-logo": async (el, c) => {
+      const plik = el.files?.[0];
+      if (!plik) return;
+      if (!["image/png", "image/jpeg"].includes(plik.type)) return toast("Logo musi być obrazkiem PNG albo JPG.");
+      if (plik.size > MAKS_LOGO_KB * 1024) return toast(`Logo jest za duże (${Math.ceil(plik.size / 1024)} KB) – najwyżej ${MAKS_LOGO_KB} KB.`);
+      const dane = await new Promise((ok, zle) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = zle; r.readAsDataURL(plik); });
+      await wyslijLogo(c, dane);
+    },
+  },
+  akcje: {
+    "marka-kolor": (el, c) => c.zmien((d) => { d.kolor = el.dataset.kolor; }),
+    "marka-bez-logo": (el, c) => wyslijLogo(c, ""),
   },
   po({ v }) {
     const h = v.historia || [];

@@ -144,7 +144,16 @@ export function wykres(id, typ, etykiety, serie, opcje = {}) {
 }
 
 export const nazwaUslugi = (kat, u) => kat.uslugi[u]?.nazwa ?? u;
-export const nazwaFirmy = (v, f) => v.rynek?.firmy?.[f] ?? f;
+export const nazwaFirmy = (v, f) => v.marki?.[f]?.nazwa ?? v.rynek?.firmy?.[f] ?? f;
+
+// kolory firm na mapie (bez pomarańczowego i zielonego – to Twój lokal i lokal wybrany w tej rundzie)
+export const KOLORY_FIRM = ["#2d73d6", "#e5333f", "#9b51e0", "#f2b705", "#17a2b8", "#d63384", "#34495e", "#795548"];
+
+// marka firmy (runda 1: nazwa, slogan, kolor, logo – api/prezentacja.py: marki); bez wybranego koloru – z palety
+export function marka(v, f) {
+  const m = v.marki?.[f] || {}, nr = Math.max(0, v.gra.firmy.findIndex((x) => x.nazwa === f));
+  return { nazwa: m.nazwa || f, slogan: m.slogan || "", logo: m.logo || "", kolor: m.kolor || KOLORY_FIRM[nr % KOLORY_FIRM.length] };
+}
 
 // Opis dydaktyczny (P7): zwijana ramka „jak to działa naprawdę”; punkty to gotowy HTML (bez danych gracza).
 export function lekcja(tytul, punkty) {

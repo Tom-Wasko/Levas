@@ -1,6 +1,6 @@
 // Mapa miasta (prototyp): izometryczny Lublin ze strefami, lokalami i budynkami – alternatywa dla menu.
 // Kliknięcie budynku otwiera jego zakładkę, kliknięcie lokalu – opis i najem/kupno, własnego lokalu – zakładki firmy.
-import { esc, nazwaFirmy, okno, toast, zamknijOkno } from "./wspolne.js";
+import { esc, marka, nazwaFirmy, okno, toast, zamknijOkno } from "./wspolne.js";
 import { nazwaStrefy, opisLokalu, przyciskiLokalu, wybranyLokal } from "./lokale.js";
 
 const PW = 22, PH = 11;  // połowa pola siatki na ekranie (romb 44 × 22 px)
@@ -62,15 +62,16 @@ function lokal(g, v, d, kat, lok) {
   const wyb = wybranyLokal(d)?.id === lok.id;
   const kto = v.lokale.zajete[lok.id];
   const stan = moje ? (wyb ? "wybrany" : "moj") : kto ? "zajety" : "wolny";
+  const kolor = stan === "zajety" ? marka(v, kto).kolor : LOKAL[stan];   // lokal innej firmy – w jej kolorze
   const ktoNapis = moje ? (wyb ? "wybrany przez Ciebie w tej rundzie" : "Twój lokal") : kto ? `zajęty: ${nazwaFirmy(v, kto)}` : "wolny";
   const tytul = `<title>${esc(lok.nazwa)} (${esc(nazwaStrefy(kat, lok.strefa))}) – ${esc(ktoNapis)}</title>`;
   let ksztalt;
   if (lok.typ === "dzialka" && (stan === "wolny" || (moje && !moje.dziala))) {
-    ksztalt = `<polygon points="${pkt(romb(g, x + 0.1, y + 0.1, 0.8, 0.8))}" fill="${stan === "wolny" ? "#d8bf8f" : LOKAL[stan]}"
+    ksztalt = `<polygon points="${pkt(romb(g, x + 0.1, y + 0.1, 0.8, 0.8))}" fill="${stan === "wolny" ? "#d8bf8f" : kolor}"
       stroke="#8a6d3b" stroke-dasharray="3 2" stroke-width="1.2"/>`;
   } else {
     const h = moje && !moje.dziala ? 8 : 16;
-    ksztalt = bryla(g, x + 0.18, y + 0.18, 0.64, 0.64, h, LOKAL[stan], stan === "wolny" ? "#555" : "rgba(0,0,0,.3)");
+    ksztalt = bryla(g, x + 0.18, y + 0.18, 0.64, 0.64, h, kolor, stan === "wolny" ? "#555" : "rgba(0,0,0,.3)");
   }
   const znacznik = stan === "wolny" || stan === "wybrany" || stan === "moj"
     ? (() => { const [a, b] = g.p(x + 0.5, y + 0.5, lok.typ === "dzialka" ? 6 : 26); return `<circle cx="${a}" cy="${b}" r="3.2" fill="${LOKAL[stan === "wolny" ? "moj" : stan]}" stroke="#fff"/>`; })() : "";
@@ -95,9 +96,13 @@ function rysujMape(c) {
     ${teren}${obiekty.map((o) => o.html).join("")}${napisy}</svg>`;
 }
 
+// lokale innych firm – w kolorze firmy (marka z rundy 1)
+const firmyNaMapie = (v) => [...new Set(Object.values(v.lokale.zajete))].filter((f) => f !== v.firma)
+  .map((f) => `<span><i style="background:${esc(marka(v, f).kolor)}"></i>${esc(marka(v, f).nazwa)}</span>`).join("");
+
 const legenda = (v) => `<div class="mapa-legenda">
-  ${v.lokale ? Object.entries({ moj: "Twój lokal", wybrany: "wybrany w tej rundzie", wolny: "wolny lokal", zajety: "lokal innej firmy" })
-    .map(([k, n]) => `<span><i style="background:${LOKAL[k]}"></i>${n}</span>`).join("") + `<span><i style="background:#d8bf8f"></i>wolna działka</span>` : ""}
+  ${v.lokale ? Object.entries({ moj: "Twój lokal", wybrany: "wybrany w tej rundzie", wolny: "wolny lokal" })
+    .map(([k, n]) => `<span><i style="background:${LOKAL[k]}"></i>${n}</span>`).join("") + `<span><i style="background:#d8bf8f"></i>wolna działka</span>` + firmyNaMapie(v) : ""}
   ${Object.entries({ bank: "bank", urzad: "ratusz", dostawca: "dostawcy", sklep: "sklepy", reklama: "reklama", szkola: "szkolenia" })
     .map(([k, n]) => `<span><i style="background:${BUDYNKI[k][0]}"></i>${n}</span>`).join("")}</div>`;
 

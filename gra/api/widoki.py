@@ -8,6 +8,7 @@ import json
 from copy import deepcopy
 from datetime import datetime
 from functools import wraps
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -351,6 +352,9 @@ def _z_druzyna(request, v: dict, id_: str, g: GraSilnika, firma: str) -> dict:
     v = _dla(request, v)
     sklad = druzyny.sklad(id_).get(firma, [])
     v["druzyna"] = {"sklad": sklad, "autorzy": druzyny.autorzy(g, firma)}
+    for f, wersja in druzyny.loga(id_).items():
+        marka = v.setdefault("marki", {}).setdefault(f, {"nazwa": f})
+        marka["logo"] = f"/api/gry/{id_}/logo/{quote(f)}?w={wersja}"
     v["prowadzenie"] = hg.prowadzenie(id_)
     v["tylko_odczyt"] = _tylko_odczyt(request, id_, firma, sklad)
     return v
@@ -431,6 +435,36 @@ def api_decyzje(request, id_, firma):
             raise BladZapytania(" ".join(bledy))
         g.ustaw_decyzje(firma, d)
         druzyny.autor(g, firma, request.user)
+    return odpowiedz(_z_druzyna(request, widok(g, firma), id_, g, firma))
+
+
+@require_http_methods(["GET", "PUT"])
+@api
+def api_logo(request, id_, firma):
+    """Logo firmy: obrazek widzą wszyscy gracze tej gry (mapa, dashboard),
+    wgrać je można w pierwszej rundzie."""
+    if request.method == "GET":
+        if not (jest_mg(request.user) or id_ in gry_ucznia(request.user)):
+            raise BladZapytania("To nie jest Twoja gra.", 403)
+        from gry.models import Druzyna
+
+        zapis = Druzyna.objects.filter(gra_id=id_, firma=firma).values_list("logo", flat=True)
+        obraz = druzyny.logo(zapis.first() or "")
+        if not obraz:
+            raise BladZapytania("Firma nie ma logo.", 404)
+        r = HttpResponse(obraz[1], content_type=obraz[0])
+        r["Cache-Control"] = "private, max-age=86400"
+        return r
+    d = cialo(request)
+    with serwisy.zmiana(id_) as g:
+        sprawdz_firme(request, id_, g, firma)
+        _moze_zmieniac(request, id_, firma)
+        if g.zakonczona or g.runda != g.runda_startowa:
+            raise BladZapytania("Logo firmy wybiera się w pierwszej rundzie gry.")
+        try:
+            druzyny.ustaw_logo(id_, firma, str(d.get("logo") or ""))
+        except ValidationError as e:
+            raise BladZapytania(" ".join(e.messages)) from e
     return odpowiedz(_z_druzyna(request, widok(g, firma), id_, g, firma))
 
 

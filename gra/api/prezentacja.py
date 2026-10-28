@@ -187,6 +187,10 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     v["ceny_sprzedazy_sprzetu"] = {n: {q: cena_sprzedazy_sprzetu(dane, c) for q, c in s["ceny"].items()}
                                    for n, s in dane.sprzet.items()}
 
+    # marki firm (nazwa, slogan, kolor na mapie) – logo dopisuje api/widoki.py (_z_druzyna)
+    v["marki"] = {n: {"nazwa": f.nazwa_wyswietlana or n, "slogan": f.misja, "kolor": f.kolor}
+                  for n, f in poprzedni.firmy.items()}
+
     # wyniki poprzedniej rundy (widoczne w tej rundzie)
     if runda - 1 in poprzedni.wyniki:
         w = poprzedni.wyniki.get(runda - 1, {})

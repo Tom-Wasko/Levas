@@ -44,6 +44,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
 from __future__ import annotations
 
 import math
+import re
 from datetime import date, timedelta
 
 from . import awarie as aw
@@ -138,6 +139,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         firma.nazwa_wyswietlana = d["nazwa"]
     if "misja" in d:
         firma.misja = d["misja"]
+    if re.fullmatch(r"#[0-9a-fA-F]{6}", str(d.get("kolor") or "")):
+        firma.kolor = d["kolor"].lower()
     if "oferta" in d:
         nowa = {u: int(p or 0) for u, p in d["oferta"].items() if u in dane.uslugi}
         rundy = dane.katalog_ofert["rundy"]

@@ -60,6 +60,8 @@ class Druzyna(models.Model):
     czlonkowie = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="druzyny", blank=True, verbose_name="uczniowie"
     )
+    # logo firmy wgrane w pierwszej rundzie: PNG/JPG jako data URL (konta/druzyny.py: ustaw_logo)
+    logo = models.TextField(blank=True, default="")
 
     class Meta:
         verbose_name = "drużyna"

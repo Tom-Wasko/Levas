@@ -165,3 +165,27 @@ def test_csrf_wymagany_poza_testami(mistrz):
         headers={"X-CSRFToken": token},
     )
     assert r.status_code == 200
+
+
+def test_marka_firmy_w_pierwszej_rundzie(client):
+    """Runda 1: nazwa, slogan i kolor (decyzje) oraz wgrane logo (PNG/JPG) – widoczne dla innych firm."""
+    import base64
+
+    id_ = _nowa(client)
+    png = "data:image/png;base64," + base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"0" * 64).decode()
+    r = client.put(_url(id_, "logo"), {"logo": png}, content_type="application/json")
+    assert r.status_code == 200, r.json()
+    logo = r.json()["marki"][GRACZ]["logo"]
+    obraz = client.get(logo)
+    assert obraz.status_code == 200 and obraz["Content-Type"] == "image/png" and obraz.content.startswith(b"\x89PNG")
+    zly = "data:image/png;base64," + base64.b64encode(b"<svg></svg>").decode()
+    r = client.put(_url(id_, "logo"), {"logo": zly}, content_type="application/json")
+    assert r.status_code == 400 and "PNG albo JPG" in r.json()["blad"]
+
+    client.put(_url(id_, "decyzje"), {"nazwa": "Kebab Test", "misja": "Zawsze ciepły", "kolor": "#2D73D6"},
+               content_type="application/json")
+    client.post(_url(id_, "wyslij"), {"wyslane": True}, content_type="application/json")
+    v = client.get(_url(id_, "widok")).json()
+    assert v["marki"][GRACZ] == {"nazwa": "Kebab Test", "slogan": "Zawsze ciepły", "kolor": "#2d73d6", "logo": logo}
+    r = client.put(_url(id_, "logo"), {"logo": ""}, content_type="application/json")
+    assert r.status_code == 400 and "pierwszej rundzie" in r.json()["blad"]

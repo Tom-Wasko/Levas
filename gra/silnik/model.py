@@ -321,7 +321,8 @@ class Firma(Model):
     nazwa: str
     bot: str | None = None
     nazwa_wyswietlana: str = ""
-    misja: str = ""
+    misja: str = ""               # slogan firmy (runda 1: nazwa, logo, kolor, slogan)
+    kolor: str = ""               # kolor firmy na mapie (#rrggbb); pusty – kolor z palety panelu
     gotowka_gr: int = 0
     stanowiska: list[Stanowisko] = Field(default_factory=list)
     lokale: list[Lokal] = Field(default_factory=list)

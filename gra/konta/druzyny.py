@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
+import hashlib
 import re
 import secrets
 
@@ -15,6 +18,8 @@ from .role import jest_mg
 MAKS_CZLONKOW = 4  # [[Zarys aplikacji]]: drużyny 1–4 osób
 ZNAKI_HASLA = "abcdefghjkmnpqrstuvwxyz23456789"  # bez l/1, o/0 – hasło przepisuje się z kartki
 DLUGOSC_HASLA = 8
+MAKS_LOGO_KB = 300  # logo firmy (runda 1) – mały obrazek, trzymany w bazie jako data URL
+FORMATY_LOGO = {"image/png": b"\x89PNG", "image/jpeg": b"\xff\xd8\xff"}
 
 
 def nazwa(user) -> str:
@@ -41,6 +46,45 @@ def sprawdz_sklad(id_gry: str, firma: str, uzytkownicy) -> None:
     if zajeci:
         login, f = sorted(zajeci.items())[0]
         raise ValidationError(f"{login} gra już w drużynie {f}.")
+
+
+def logo(data_url: str) -> tuple[str, bytes] | None:
+    """(typ, bajty) obrazka z data URL; None – brak albo uszkodzony."""
+    m = re.fullmatch(r"data:(image/(?:png|jpeg));base64,([A-Za-z0-9+/=\s]+)", data_url or "")
+    if not m:
+        return None
+    try:
+        bajty = base64.b64decode(m.group(2), validate=False)
+    except (binascii.Error, ValueError):
+        return None
+    return (m.group(1), bajty) if bajty.startswith(FORMATY_LOGO[m.group(1)]) else None
+
+
+def ustaw_logo(id_gry: str, firma: str, data_url: str) -> None:
+    """Logo firmy (PNG albo JPG, najwyżej MAKS_LOGO_KB); pusty tekst usuwa logo.
+    Błąd: `ValidationError`."""
+    from gry.models import Druzyna
+
+    if data_url:
+        obraz = logo(data_url)
+        if not obraz:
+            raise ValidationError("Logo musi być obrazkiem PNG albo JPG.")
+        if len(obraz[1]) > MAKS_LOGO_KB * 1024:
+            raise ValidationError(
+                f"Logo jest za duże – najwyżej {MAKS_LOGO_KB} KB. "
+                "Zmniejsz obrazek i wgraj go jeszcze raz."
+            )
+    d, _ = Druzyna.objects.get_or_create(gra_id=id_gry, firma=firma)
+    d.logo = data_url or ""
+    d.save(update_fields=["logo"])
+
+
+def loga(id_gry: str) -> dict[str, str]:
+    """{firma: wersja logo} – wersja (skrót treści) odświeża obrazek w przeglądarce po zmianie."""
+    from gry.models import Druzyna
+
+    zapisane = Druzyna.objects.filter(gra_id=id_gry).exclude(logo="").values_list("firma", "logo")
+    return {f: hashlib.sha1(lg.encode()).hexdigest()[:10] for f, lg in zapisane}
 
 
 def sklad(id_gry: str) -> dict[str, list[dict]]:
