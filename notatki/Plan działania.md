@@ -1,4 +1,4 @@
-[[Główny obraz]] · [[Plan implementacji]]
+[[Główny obraz]] · [[Plan optymalizacji]] · [[Plan implementacji]] (archiwum)
 
 # Plan działania
 
@@ -10,11 +10,11 @@
    - **3b – reszta:** parki, agencje reklamowe, promocje, licytacje, wypadki i ubezpieczenia, urząd, handel między drużynami, kalendarz miejski.
 4. Dopasowanie starych funkcji (z Revasa) do nowych – karta wyników, lista błędów, odblokowywanie zakładek, boty, analiza „co jeśli”.
 
-Szczegóły kroków 1–4: [[Plan implementacji]].
+Kroki 1–4 są zrobione (28.10.2026, `POSTEP.md`). Ich plan – [[Plan implementacji]] – jest już archiwum.
 
 ## Optymalizacyjne
-5. Kalibracja algorytmów i testy.
-6. Analiza i ewentualne ulepszenia.
+5. Kalibracja algorytmów i testy – [[Plan optymalizacji]], część B.
+6. Analiza i ewentualne ulepszenia – [[Plan optymalizacji]], część A (analiza oczami gracza).
 7. Przedstawienie Marcinowi.
 
 ## Graficzne

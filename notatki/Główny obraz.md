@@ -14,7 +14,7 @@ W folderze `revas_26/` znajdują się wszystkie materiały, których używamy do
 
 ## Najważniejsze ustalenia (skrót)
 - Drużyny 1–4 osób, wszystkie na jednej wspólnej mapie Lublina.
-- 2–3 rundy na tydzień rzeczywisty, domyślnie 26 rund (pół roku gry). Długość gry i moment zamknięcia rundy ustala mistrz gry.
+- 2–3 rundy na tydzień rzeczywisty, domyślnie 18 rund (18 tygodni gry: od września do początku stycznia). Długość gry i moment zamknięcia rundy ustala mistrz gry.
 - Kapitał startowy: 40 000 zł.
 - Firma to JDG: KPiR, VAT, ZUS i PIT, wszystko rozliczane co tydzień.
 - Ocena: karta wyników Revasa dostosowana do kebabu.

@@ -8,12 +8,14 @@ Każdy element ma plusy i minusy – nie ma jednego najlepszego wyboru.
 - Wiele lokalizacji w strefach Lublina; wszystkie drużyny grają na jednej wspólnej mapie.
 - **Globalna pula lokali** – ta sama dla wszystkich drużyn. Lokal zajęty przez jedną drużynę znika z oferty dla pozostałych.
 - Lokale można wynajmować albo kupować; ceny i czynsze zależą od strefy.
+- Gdy o ten sam lokal w jednej rundzie walczy kilka drużyn, wygrywa wyższa oferta (licytacja od rundy 1); przegrany dostaje wyjaśnienie.
+- Lokale innych drużyn są na mapie w kolorze ich firmy (kolor wybierany w rundzie 1), a legenda mówi, która to firma.
 
 | Typ | Gotowy po | Plusy | Minusy |
 |---|---|---|---|
 | Lokal gotowy do działania | od razu | sprzedaż od pierwszej rundy | najwyższy czynsz lub cena, cudzy układ i sprzęt |
-| Lokal niewyposażony | 1 runda urządzania | niższy czynsz, własny wybór sprzętu | trzeba kupić całe wyposażenie |
-| Pusta działka | 3–4 rundy budowy | najtańsza, własność, dobre miejsca | długa budowa, duży wydatek na start |
+| Lokal niewyposażony | 1 runda urządzania | czynsz i cena kupna niższe niż gotowego, własny wybór sprzętu | trzeba kupić całe wyposażenie (w rundzie urządzania – lokal rusza od razu gotowy) |
+| Pusta działka | 3–4 rundy budowy | najtańsza, własność, dobre miejsca | długa budowa, duży wydatek na start; stanowiska, sprzęt i ludzi kupuje się już w ostatniej rundzie budowy |
 
 - Jeden z lokali należy do **Tymka** i jest wystawiony na sprzedaż.
 - Limit: nowy lokal najwyżej co 3 rundy ([[Prawidła świata]]).
@@ -40,7 +42,7 @@ Prawdziwe banki, każdy specjalizuje się w czymś innym. Sześć budynków – 
 | Bank            | Specjalizacja       | W praktyce                                                                         |
 | --------------- | ------------------- | ---------------------------------------------------------------------------------- |
 | Crédit Agricole | kredyt na start     | szybka decyzja, kredyt dla firmy bez historii, wyższe oprocentowanie               |
-| PKO BP          | kredyt inwestycyjny | najniższe oprocentowanie dużych kwot, wymaga zastawu (lokal, sprzęt), długa spłata |
+| PKO BP          | kredyt inwestycyjny | najniższe oprocentowanie dużych kwot, wymaga zastawu (lokal, sprzęt), długa spłata; dostępny od wzięcia lokalu, także na zakup lokalu w tej samej rundzie (kupowany lokal jako zastaw) |
 | Pekao           | leasing sprzętu     | sprzęt kuchenny w ratach, raty w kosztach                                          |
 | ING             | lokaty              | najlepsze oprocentowanie lokat, lokaty tygodniowe i dłuższe                        |
 | mBank           | tanie konto firmowe | najniższe opłaty za konto, przelewy i terminal płatniczy                           |
@@ -56,7 +58,7 @@ Prawdziwe banki, każdy specjalizuje się w czymś innym. Sześć budynków – 
 ## Biuro rachunkowe
 - Kilka biur z różnymi ofertami (cena za dokument, ryczałt, obsługa kadr). Jedno należy do **Jakuba Klimka-Ślęzaka** (Biuro Rachunkowe J.K.Ś.).
 - Biuro prowadzi za drużynę KPiR, VAT, ZUS i PIT, ale kosztuje.
-- **Samodzielna księgowość** (uproszczona): drużyna sama wpisuje zapisy i deklaracje, a gra je sprawdza i pokazuje błędy. Błąd w deklaracji oznacza korektę i karę.
+- **Samodzielna księgowość** (uproszczona): drużyna sama wpisuje zapisy i deklaracje, a gra je sprawdza i pokazuje błędy. Błąd w deklaracji oznacza korektę i karę. Nad tabelą dokumentów jest instrukcja krok po kroku, jak samemu wypełnić KPiR i deklaracje.
 
 ## Parki
 - Prawdziwe parki Lublina: Ogród Saski, Park Ludowy, Park Bronowicki, Park Rury, Ogród Botaniczny UMCS, Błonia pod Zamkiem, Zalew Zemborzycki.

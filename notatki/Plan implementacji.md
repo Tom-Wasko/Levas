@@ -1,5 +1,7 @@
 [[Plan działania]] · [[Główny obraz]] · [[Ustalenia gry]] · [[Technologia]]
 
+> **Nieużywany od 28.10.2026 – archiwum.** Kroki 1–4 są zrobione (wszystkie zadania F, P i Q odhaczone w `POSTEP.md`). Aktualny plan: [[Plan optymalizacji]].
+
 # Plan implementacji – kroki 1–4
 
 Plan technicznej części [[Plan działania]]: od opisu projektu do pełnej gry gotowej do kalibracji. Pełna mapa, układ UI i ilustracje (kroki 8–10) oraz kalibracja (krok 5) są poza tym planem; w 3a powstaje tylko prototyp mapy (F3a.3).

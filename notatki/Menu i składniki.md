@@ -6,9 +6,9 @@ Menu to **stała lista dań ze stałymi recepturami** – drużyna nie wymyśla 
 
 ## Decyzje drużyny (co rundę, osobno dla każdego lokalu)
 - Które dania są w menu. Danie wymaga sprzętu – bez rożna nie ma kebaba.
-- Cena brutto każdego dania.
+- Cena brutto każdego dania – w widełkach od 50% do 200% ceny rynkowej (procenty w `dane/mapa/menu.yaml`); cenę spoza widełek gra odrzuca i wyjaśnia to na liście błędów.
 - Skąd i jakiej jakości składniki kupuje (1–3★; lepsze są droższe).
-- **Plan dostaw na cały tydzień:** ilość każdego składnika na każdy dzień dostawy danego dostawcy (p. „Psucie się przy decyzjach co tydzień”). Za dużo oznacza straty, za mało – utraconą sprzedaż.
+- **Plan dostaw na cały tydzień:** ilość każdego składnika na każdy dzień dostawy danego dostawcy (p. „Psucie się przy decyzjach co tydzień”). Za dużo oznacza straty, za mało – utraconą sprzedaż. Automatyczne zamawianie rozkłada dostawy na dni tygodnia, a każdą pozycję zamówienia rundy można usunąć.
 
 ## Lista dań (roboczo)
 | Danie | Receptura (1 porcja) | Sprzęt | Cena rynkowa brutto |
@@ -51,7 +51,7 @@ Receptury i ceny pochodzą ze starego Levasa (`dane/menu/kategorie.yaml`). Wybie
 Drużyna decyduje raz na rundę (tydzień), ale terminy ważności liczą się w dniach. Dlatego:
 1. **Decyzja = plan dostaw na 7 dni.** Dla każdego dostawcy drużyna wpisuje ilość na każdy jego dzień dostawy. Piekarnia dowozi codziennie, hurtownie i producent mięsa 1–2 razy w tygodniu, z dyskontu przywozi się towar samemu w wybrany dzień (czas właściciela).
 2. **Silnik liczy tydzień dzień po dniu.** Rano przychodzą dostawy, w ciągu dnia klienci (popyt z losowością) zużywają składniki od najstarszej partii, wieczorem przeterminowane partie idą do strat. Termin liczy się razem z dniem dostawy: bułki z poniedziałku (2 dni) sprzedaje się w poniedziałek i wtorek, a we wtorek wieczorem idą do strat.
-3. **W trakcie tygodnia nic się nie zmienia.** Drużyna nie widzi, jak idzie sprzedaż, i musi przewidzieć popyt (więcej w piątek i sobotę, kalendarz miejski). Planuje na podstawie raportu z poprzedniej rundy.
+3. **W trakcie tygodnia nic się nie zmienia.** Drużyna nie widzi, jak idzie sprzedaż, i musi przewidzieć popyt (więcej w piątek i sobotę, kalendarz miejski). Gra nie podaje gotowej prognozy: drużyna liczy ją sama z pul klientów stref, dni tygodnia i wydarzeń (zakładka Klienci i strefy) oraz z raportu poprzedniej rundy i wpisuje w Menu.
 4. **Raport po rundzie:** sprzedaż, braki i straty dzień po dniu dla każdego składnika.
 
 ```

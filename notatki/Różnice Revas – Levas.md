@@ -24,7 +24,7 @@ Porównanie lokalnego Revasa (`revas_26/revas_gra`) z Levasem. To krok 1 z [[Pla
 | | Revas | Levas |
 |---|---|---|
 | Branża | klub fitness / biuro podróży | kebab |
-| Runda | miesiąc, 10 rund | tydzień, domyślnie 26 rund, 2–3 rundy na tydzień rzeczywisty |
+| Runda | miesiąc, 10 rund | tydzień, domyślnie 18 rund, 2–3 rundy na tydzień rzeczywisty |
 | Kapitał startowy | 40 000 zł | 40 000 zł |
 | Forma prawna i podatki | CIT 19%, rozliczenie miesięczne | JDG: KPiR, VAT, ZUS, PIT, rozliczenie tygodniowe |
 | Rynek | firmy nie dzielą puli klientów | wspólna pula klientów w każdej strefie Lublina |

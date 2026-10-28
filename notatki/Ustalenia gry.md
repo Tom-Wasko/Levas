@@ -9,8 +9,9 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 |---|---|
 | Runda | 1 tydzień w świecie gry |
 | Tempo | 2–3 rundy na tydzień rzeczywisty; moment zamknięcia rundy ustala mistrz gry (ręcznie albo o ustalonej godzinie) |
-| Długość gry | ustala mistrz gry, domyślnie 26 rund (pół roku) |
+| Długość gry | ustala mistrz gry, domyślnie 18 rund (18 tygodni: od września do początku stycznia) |
 | Drużyny | 1–4 osób, wszystkie na jednej wspólnej mapie Lublina |
+| Marka firmy | w rundzie 1 drużyna wybiera nazwę, slogan, kolor (w nim jej lokale na mapie) i wgrywa logo (PNG albo JPG) |
 | Boty | mistrz gry włącza je albo nie i wybiera poziom trudności |
 | Kapitał startowy | 40 000 zł |
 | Miasto | Lublin, 10 stref (Stare Miasto, Centrum, Miasteczko Akademickie, Politechnika, Dworzec, Zygmuntowskie, LSM i Czuby, Czechów i Kalinowszczyzna, Felin, Zemborzyce) |
@@ -32,8 +33,10 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 |---|---|
 | Nowi pracownicy | najwyżej 3 na rundę |
 | Nowy lokal | najwyżej co 3 rundy |
-| Pusta działka → lokal | 3–4 rundy |
-| Lokal niewyposażony → gotowy | 1 runda |
+| Pusta działka → lokal | 3–4 rundy; w ostatniej rundzie budowy można już kupić stanowiska i sprzęt oraz zatrudnić ludzi – lokal rusza od razu gotowy do sprzedaży |
+| Lokal niewyposażony → gotowy | 1 runda; w tej rundzie kupuje się wyposażenie i zatrudnia ludzi – lokal rusza od razu gotowy |
+| Ceny dań | od 50% do 200% ceny rynkowej (cena spoza widełek jest odrzucana) |
+| Kredyt inwestycyjny | od wzięcia lokalu (wynajętego albo kupionego), także na zakup lokalu w tej samej rundzie |
 | Pojedynczy sprzęt, mebel | od razu |
 | Kasyno | otwarte tylko na 1 rundę po zaproszeniu |
 
@@ -48,15 +51,15 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 - Zleceniobiorca odchodzi od razu.
 - Kontroferta obecnego pracodawcy: w tej samej rundzie, przed decyzją pracownika.
 - Wypowiedzenie najmu przez nowego właściciela budynku: 4 rundy (KC art. 673, 678); rozliczenie ulepszeń wg KC art. 676.
-- Licytacja: wygrywa najwyższa oferta w rundzie; przy remisie decyduje losowanie.
+- Licytacja: wygrywa najwyższa oferta w rundzie; przy remisie decyduje losowanie. Licytacja lokali działa od rundy 1; przegrana drużyna widzi obie oferty i wyjaśnienie, co zrobić następnym razem.
 
 ## Odblokowywanie zakładek – domyślny harmonogram *(roboczo, mistrz gry może zmienić)*
 | Runda | Co się odblokowuje |
 |---|---|
-| 1 | Lokale (najem, kupno), Menu, Dostawcy (dyskonty, hurtownie), HR (pracuj.pl), Finanse (bank, biuro rachunkowe) |
+| 1 | Marka firmy (nazwa, slogan, kolor, logo), Lokale (najem, kupno, licytacja), Menu, Dostawcy (dyskonty, hurtownie), HR (pracuj.pl), Finanse (bank, biuro rachunkowe) |
 | 2 | Producent mięsa, agencja pracy, promocje, parki |
 | 3 | Agencje reklamowe (część kanałów), ubezpieczyciel |
-| 4 | Karta skumulowana, headhunter (podkupywanie), licytacje i przejęcia lokali |
+| 4 | Karta skumulowana, headhunter (podkupywanie), przejęcia lokali |
 | 5 | Wszystkie kanały reklamy, handel między drużynami |
 
 ## Karta wyników *(roboczo, wzory w kroku 4)*
