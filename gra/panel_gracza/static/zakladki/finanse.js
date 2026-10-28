@@ -1,6 +1,6 @@
 // Finanse: raport finansowy, KPiR, bank, biuro rachunkowe.
 import { akcjeBanku, decyzjeBanku, wynikiBanku } from "./banki.js";
-import { LEKCJA_BANK, LEKCJA_KPIR, LEKCJA_RAPORT } from "./lekcje.js";
+import { krokiKpir, LEKCJA_BANK, LEKCJA_KPIR, LEKCJA_RAPORT } from "./lekcje.js";
 import { esc, OKRES, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
 
 const GRUPY = [
@@ -267,6 +267,7 @@ function decyzjeKsiegowosci({ v, edycja }) {
     <p class="podpowiedz">Wpisz każdy dokument do kolumny KPiR (albo „poza KPiR”) i wybierz stawkę VAT (0% – bez VAT). Kwoty są brutto;
       netto i VAT liczymy z wybranej stawki. Na początku przeliczenia urząd sprawdzi deklaracje: różnicę dopłacisz albo odzyskasz,
       a za każdą deklarację pomyloną o złotówkę lub więcej zapłacisz ${zl(S.kara_blad)}.</p>
+    ${krokiKpir(K, !Z.zaksiegowane)}
     ${znane && edycja ? `<button class="btn" data-akcja="ks-podpowiedzi">Wpisz zapisy znane z poprzednich deklaracji (${znane})</button>` : ""}
     ${tabela(`Dokumenty (${Z.zaksiegowane} z ${D.dokumenty.length} zaksięgowanych)`, ["Lp.", "Dokument", "Opis", "Kwota brutto", "Kolumna KPiR", "VAT"], wiersze,
       { klasy: ["", "l", "l", "r", "l", "l"] })}

@@ -265,5 +265,5 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 - [x] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)
 - [x] Q10 Popyt liczony samodzielnie: bez gotowej prognozy w Menu i w Klientach i strefach
 - [x] Q11 Runda 1: nazwa firmy, wgrane logo, kolor, slogan; mapa pokazuje, kto ma który lokal
-- [ ] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
+- [x] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
 - [ ] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)

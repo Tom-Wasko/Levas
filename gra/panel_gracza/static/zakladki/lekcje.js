@@ -1,5 +1,27 @@
 // Opisy dydaktyczne do zakładek finansów (P7): jak to działa w prawdziwej firmie. Zwinięte – nie zasłaniają decyzji.
-import { lekcja } from "./wspolne.js";
+import { esc, lekcja, zl } from "./wspolne.js";
+
+// Samodzielna księgowość (gra z lokalami): co po kolei zrobić z dokumentami i deklaracjami. Reguły kolumn –
+// silnik/biuro.py (WYJASNIENIA); otwarta, dopóki nic nie zaksięgowano.
+export function krokiKpir(K, otwarta) {
+  const kolumny = Object.entries(K.wyjasnienia || {}).map(([k, w]) => `<li><b>${esc(K.kolumny[k] || k)}</b> – ${esc(w)}</li>`).join("");
+  const html = lekcja("Jak samemu wypełnić KPiR i deklaracje – krok po kroku", [
+    `<b>1. Weź dokumenty z poprzedniej rundy.</b> W tabeli niżej jest każdy dokument tamtej rundy: faktury, rachunki, wyciągi
+     i umowy. „+” to pieniądze, które wpłynęły do firmy, „−” – te, które wypłynęły.`,
+    `<b>2. Każdemu dokumentowi wybierz kolumnę KPiR.</b> Zadaj sobie pytanie: czy to przychód, koszt, czy ani jedno, ani drugie?<ul>${kolumny}</ul>`,
+    `<b>3. Wybierz stawkę VAT.</b> Taką, jaka jest na dokumencie dla tego towaru albo usługi. Dokument bez VAT (np. wyciąg,
+     umowa, przelew do urzędu) – 0%. Faktura z kilkoma stawkami ma je już rozpisane – tam nic nie wybierasz.`,
+    `<b>4. Sprawdź, czy zaksięgowano wszystko.</b> Nad tabelą widać, ile dokumentów z ilu ma kolumnę – każdy musi ją mieć.`,
+    `<b>5. Policz deklaracje.</b> Tabela „Z Twoich zapisów” liczy je z Twoich wpisów: dochód = przychody − koszty,
+     VAT do zapłaty = należny − naliczony − nadwyżka z poprzedniej rundy, zaliczka PIT od dochodu narastająco minus zaliczki już wpłacone,
+     składka zdrowotna od dochodu (najmniej minimalna).`,
+    `<b>6. Wpisz kwoty w deklaracjach do urzędu.</b> Przepisz je ręcznie albo przyciskiem „Przepisz kwoty wyliczone z zapisów”.`,
+    `<b>7. Wyślij decyzje rundy.</b> Deklaracje idą razem z nimi. Przy przeliczeniu urząd je sprawdzi: różnicę dopłacisz
+     albo odzyskasz, a za każdą pomyloną deklarację zapłacisz mandat ${zl(K.samodzielna.kara_blad)}. Co poszło nie tak –
+     zakładka z wynikami biura w następnej rundzie.`,
+  ]);
+  return otwarta ? html.replace('<details class="lekcja">', '<details class="lekcja" open>') : html;
+}
 
 export const LEKCJA_VAT = lekcja("Jak działa VAT – w grze i naprawdę", [
   `<b>VAT płaci klient, firma go tylko „przenosi”.</b> Ze sprzedaży zbierasz VAT należny, przy zakupach płacisz dostawcom
