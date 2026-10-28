@@ -12,7 +12,7 @@ const BUDYNKI = {  // rodzaj → kolor dachu i wysokość
   uczelnia: ["#3f51b5", 34], media: ["#455a64", 28], lichwiarz: ["#3b2f2f", 16],
   ubezpieczenia: ["#43a047", 26], detektyw: ["#5d4037", 18],
 };
-const LOKAL = { moj: "#e45f26", wybrany: "#00c06a", wolny: "#ffffff", zajety: "#9aa0a8" };
+const LOKAL = { moj: "#1e9e5a", wybrany: "#e45f26", wolny: "#ffffff", zajety: "#9aa0a8" };
 const FIRMA = ["oferta", "stanowiska", "sprzet", "zatrudnienie", "sprzedaz", "kpir"];
 
 function geometria(siatka) {

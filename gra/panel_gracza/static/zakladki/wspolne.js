@@ -120,7 +120,7 @@ export function toast(tekst) {
 
 const wykresy = [];
 export function wyczyscWykresy() { while (wykresy.length) wykresy.pop().destroy(); }
-export const KOLORY = ["#e45f26", "#2d73d6", "#00c06a", "#9b51e0", "#f2b705", "#e5333f", "#17a2b8", "#795548"];
+export const KOLORY = ["#1e9e5a", "#2d73d6", "#e45f26", "#9b51e0", "#f2b705", "#e5333f", "#17a2b8", "#795548"];
 // kolory wykresów z bieżącego motywu (zmienne CSS --wykres-*); kolor serii może być nazwą zmiennej, np. "--wykres-linia"
 const zmienna = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 function paleta() {
@@ -146,7 +146,7 @@ export function wykres(id, typ, etykiety, serie, opcje = {}) {
 export const nazwaUslugi = (kat, u) => kat.uslugi[u]?.nazwa ?? u;
 export const nazwaFirmy = (v, f) => v.marki?.[f]?.nazwa ?? v.rynek?.firmy?.[f] ?? f;
 
-// kolory firm na mapie (bez pomarańczowego i zielonego – to Twój lokal i lokal wybrany w tej rundzie)
+// kolory firm na mapie (bez zielonego i pomarańczowego – to Twój lokal i lokal wybrany w tej rundzie)
 export const KOLORY_FIRM = ["#2d73d6", "#e5333f", "#9b51e0", "#f2b705", "#17a2b8", "#d63384", "#34495e", "#795548"];
 
 // marka firmy (runda 1: nazwa, slogan, kolor, logo – api/prezentacja.py: marki); bez wybranego koloru – z palety

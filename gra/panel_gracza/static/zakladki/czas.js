@@ -11,7 +11,7 @@ function czasHtml(C, tytul) {
       <span>Wykorzystane: <span class="kwota">${licz(C.wykorzystane, 1)} h</span></span>
       <span>Wolne: <span class="kwota">${licz(C.wolne, 1)} h</span></span></div>
     <div style="height:10px;border-radius:5px;background:var(--tlo-2, #e6e6e6);margin:8px 0;overflow:hidden">
-      <div style="height:100%;width:${proc}%;background:${proc >= 100 ? "#e5333f" : "#e45f26"}"></div></div>`
+      <div style="height:100%;width:${proc}%;background:${proc >= 100 ? "#e5333f" : "#1e9e5a"}"></div></div>`
     + tabela(tytul, ["Na co", "Zakładka", "Godziny", "Status"],
       C.pozycje.length ? C.pozycje.map((p) => [esc(p.opis), `<a data-zakladka-k="${esc(p.zakladka)}">${esc(ZAKLADKA[p.zakladka] || p.zakladka)}</a>`,
         `${licz(p.godziny, 1)} h`, p.przyjete ? "zaplanowane" : `<span class="minus">odrzucone – brak czasu</span>`])

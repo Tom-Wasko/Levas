@@ -1,27 +1,27 @@
 /* Levas (kebab) – wygląd na wzór fitnessclub.revas.pl, dopracowany */
 :root {
-  --pom: #e45f26;
-  --pom-ciemny: #c64b15;
-  --pom-jasny: #fff1ea;
-  --pom-mgla: #fde3d6;
+  --pom: #1e9e5a;
+  --pom-ciemny: #157a45;
+  --pom-jasny: #eaf7ef;
+  --pom-mgla: #d3efdf;
   --czarny: #1f1f22;
   --tekst: #2b2b30;
   --szary: #70707a;
   --szary-jasny: #f4f4f6;
-  --linia: #ebe7e4;
-  --zielony: #12a85f;
+  --linia: #e3e9e5;
+  --zielony: #0b7a3e;
   --zielony-jasny: #e3f6ec;
   --czerwony: #d93445;
   --czerwony-jasny: #fdeaec;
   --niebieski: #2d6fd2;
   --zolty: #f0a020;
-  --tlo: #f5f2ef;
+  --tlo: #f1f5f2;
   --karta: #ffffff;
-  --cien: 0 1px 2px rgba(30, 20, 10, .05), 0 4px 16px rgba(30, 20, 10, .06);
-  --cien-mocny: 0 8px 30px rgba(30, 20, 10, .14);
+  --cien: 0 1px 2px rgba(10, 30, 20, .05), 0 4px 16px rgba(10, 30, 20, .06);
+  --cien-mocny: 0 8px 30px rgba(10, 30, 20, .14);
   --r: 10px;
   --pomaranczowy: var(--pom);
-  --wykres-paleta: #e45f26, #2d73d6, #00c06a, #9b51e0, #f2b705, #e5333f, #17a2b8, #795548;
+  --wykres-paleta: #1e9e5a, #2d73d6, #e45f26, #9b51e0, #f2b705, #e5333f, #17a2b8, #795548;
   --wykres-linia: #1f1f22;
   --wykres-utracona: #f7b9a4;
   --wykres-tekst: #666;
@@ -104,7 +104,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
   border-radius: 6px; text-decoration: none; transition: background .12s, color .12s; }
 .przelacznik a.aktywny { background: #fff; color: var(--pom); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
 .przelacznik a.wylaczony { opacity: .35; pointer-events: none; }
-.podzakladki { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 22px; border-bottom: 1px solid var(--linia); background: #fcfbfa; }
+.podzakladki { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 22px; border-bottom: 1px solid var(--linia); background: #fafcfb; }
 .podzakladki a { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--linia);
   background: #fff; color: var(--tekst); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; text-decoration: none; }
 .podzakladki a:hover { border-color: var(--pom); color: var(--pom); }
@@ -162,7 +162,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
   transition: background .12s, box-shadow .12s, transform .05s; text-decoration: none; white-space: nowrap; }
 .btn:active { transform: translateY(1px); }
 .btn.pom { background: var(--pom); color: #fff; }
-.btn.pom:hover { background: var(--pom-ciemny); box-shadow: 0 3px 10px rgba(228,95,38,.3); }
+.btn.pom:hover { background: var(--pom-ciemny); box-shadow: 0 3px 10px rgba(30,158,90,.3); }
 .btn.czarny { background: var(--czarny); color: #fff; }
 .btn.czarny:hover { background: #000; }
 .btn.zielony { background: var(--zielony); color: #fff; }
@@ -175,7 +175,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
 .btn[disabled] { opacity: .4; cursor: not-allowed; box-shadow: none; }
 input[type=number], input[type=text], input[type=password], select { font-family: inherit; font-size: 12px; padding: 8px 10px;
   border: 1px solid #dcd8d4; border-radius: 7px; width: 100%; background: #fff; color: var(--tekst); transition: border-color .12s, box-shadow .12s; }
-input:focus, select:focus { outline: none; border-color: var(--pom); box-shadow: 0 0 0 3px rgba(228,95,38,.15); }
+input:focus, select:focus { outline: none; border-color: var(--pom); box-shadow: 0 0 0 3px rgba(30,158,90,.15); }
 input.krotkie { width: 92px; }
 input:disabled, select:disabled { background: var(--szary-jasny); color: var(--szary); }
 label.pole { display: flex; flex-direction: column; gap: 5px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--szary); }
@@ -184,8 +184,8 @@ label.pole { display: flex; flex-direction: column; gap: 5px; font-size: 10.5px;
 .tab-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--linia); background: #fff; }
 table.t { width: 100%; border-collapse: collapse; font-size: 12px; }
 table.t th { text-transform: uppercase; font-size: 10px; font-weight: 700; padding: 11px 10px; border-bottom: 1px solid var(--linia);
-  background: #faf8f6; text-align: center; color: var(--szary); letter-spacing: .02em; }
-table.t td { padding: 10px; border-top: 1px solid #f2efec; text-align: center; font-variant-numeric: tabular-nums; }
+  background: #f7faf8; text-align: center; color: var(--szary); letter-spacing: .02em; }
+table.t td { padding: 10px; border-top: 1px solid #ebf0ec; text-align: center; font-variant-numeric: tabular-nums; }
 table.t tbody tr:hover td { background: var(--pom-jasny); }
 table.t th[data-sort] { cursor: pointer; user-select: none; }
 table.t th[data-sort]:hover { color: var(--pom); }
