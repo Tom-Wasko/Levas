@@ -147,6 +147,25 @@ export const dashboard = {
   },
 };
 
+// Wnioski z poprzedniej rundy (silnik/wnioski.py): co się udało i co poprawić – z zakładką, w której to zrobić
+export const wnioski = {
+  tytul: "Wnioski z rundy", ikona: "ok",
+  info: "Co wyszło w poprzedniej rundzie i co zrobić, żeby kolejna poszła lepiej.",
+  decyzje({ v, tytulZakladki }) {
+    const W = v.wnioski;
+    if (!W) return `<div class="komunikat">Wnioski pojawią się po przeliczeniu pierwszej rundy – wtedy zobaczycie, co się udało
+      i co warto poprawić.</div>`;
+    const dobre = W.dobre.map((t) => `<li>${esc(t)}</li>`).join("");
+    const rady = W.do_poprawy.map((r) => `<div class="kafel"><div class="kg">${esc(r.tytul)}</div><div class="kt">
+      <p>${esc(r.co)}</p><p><b>Co zrobić:</b> ${esc(r.rada)}</p></div>
+      <div class="kd"><a class="btn jasny maly" data-zakladka-k="${esc(r.zakladka)}">Przejdź: ${esc(tytulZakladki(r.zakladka))}</a></div></div>`).join("");
+    return `<div class="sekcja-tytul">Runda ${v.runda - 1}: co się udało</div><ul class="wnioski-dobre">${dobre}</ul>
+      <div class="sekcja-tytul">Co poprawić w rundzie ${v.runda}</div>
+      ${rady ? `<div class="siatka">${rady}</div><p class="podpowiedz">Nie wszystko naraz – zacznijcie od pierwszej rady.
+        Każda poprawka od razu działa w tej rundzie.</p>` : `<div class="komunikat">Nic nie wymaga poprawy – tak trzymać!</div>`}`;
+  },
+};
+
 export const karta_wynikow = {
   tytul: "Karta wyników", ikona: "☷", wynikiOd: 3, odblokowanie: "karta_wynikow",
   info: () => "Karta wyników pokazuje rezultaty decyzji podjętych w poprzedniej rundzie.",

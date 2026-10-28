@@ -1,5 +1,5 @@
 // Rejestr zakładek i układ menu (układ jak w REVAS; każda nowa funkcja ma decyzje i wyniki).
-import { analiza, dashboard, karta_wynikow, lista_bledow, wyslij } from "./ogolne.js";
+import { analiza, dashboard, karta_wynikow, lista_bledow, wnioski, wyslij } from "./ogolne.js";
 import { oferta } from "./oferta.js";
 import { sprzet, srodki_trwale, stanowiska, wyposazenie } from "./inwestycje.js";
 import { szkolenia, udogodnienia, zatrudnienie } from "./hr.js";
@@ -25,11 +25,11 @@ import { handel } from "./handel.js";
 import { kalendarz } from "./kalendarz.js";
 import { konkurencja } from "./konkurencja.js";
 
-const ZAKLADKI = { dashboard, mapa, karta_wynikow, lokale, przejecia, urzad, klienci, kalendarz, konkurencja, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
+const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, lokale, przejecia, urzad, klienci, kalendarz, konkurencja, oferta, stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, rynek_pracy, udogodnienia, szkolenia,
   dostawcy, swiezosc, czas_wlasciciela, zdarzenia, agencje, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia, wlasciciel, kasyno, lista_bledow, wyslij, analiza };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
-export const IKONY = { dashboard: "dashboard", mapa: "mapa", lokale: "lokale", przejecia: "lokale", urzad: "urzad", klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
+export const IKONY = { dashboard: "dashboard", mapa: "mapa", wnioski: "ok", lokale: "lokale", przejecia: "lokale", urzad: "urzad", klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", rynek_pracy: "rynek_pracy", udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", czas_wlasciciela: "zegar", zdarzenia: "zdarzenia",
   agencje: "tradycyjny", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir", vat: "procent", podatki: "podatki", bank: "bank", harpagon: "harpagon",
   biuro: "biuro", ubezpieczenia: "tarcza", wlasciciel: "portfel", kasyno: "klucz", lista_bledow: "bledy", wyslij: "wyslij", analiza: "analiza" };
@@ -46,6 +46,7 @@ export const ELEMENT = { karta_wynikow: "karta_wynikow", agencje: "reklama", pro
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { klucz: "karta_wynikow", tytul: "Karta wyników", ikona: "karta" },
+  { klucz: "wnioski", tytul: "Wnioski z rundy", ikona: "ok" },
   { klucz: "lokale", tytul: "Lokale", ikona: "lokale", pod: ["lokale", "przejecia", "urzad"] },
   { klucz: "klienci", tytul: "Klienci i strefy", ikona: "klienci", pod: ["klienci", "kalendarz", "konkurencja"] },
   { klucz: "oferta", tytul: "Menu", ikona: "oferta" },

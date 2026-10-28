@@ -258,6 +258,8 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .awatar { width: 66px; height: 66px; border-radius: 50%; border: 2px solid var(--pom); display: grid; place-items: center; margin: 0 auto 8px;
   font-weight: 800; font-size: 20px; color: var(--pom); background: var(--pom-jasny); }
 .logo-firmy { width: 66px; height: 66px; object-fit: contain; display: block; margin: 0 auto 8px; border-radius: 8px; }
+.wnioski-dobre { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; }
+.wnioski-dobre li::before { content: "✓"; color: var(--zielony); font-weight: 800; margin-right: 8px; }
 /* marka firmy w rundzie 1 (zakladki/ogolne.js: formularzMarki) */
 .marka { display: flex; gap: 20px; align-items: flex-start; background: #fff; border: 1px solid var(--linia); border-radius: var(--r); padding: 16px; margin-bottom: 8px; }
 .marka-znak { flex: 0 0 90px; }

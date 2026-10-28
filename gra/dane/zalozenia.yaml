@@ -366,3 +366,19 @@ lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
     pewnosc: zalozenie
     zrodlo: 'F4.2: ostrzeżenie o składniku, który przy prognozie popytu przeterminuje się przed użyciem, dopiero od tej
       wartości straty w tygodniu (drobne resztki nie zaśmiecają listy błędów; PRACA_NOCNA, pyt. 23)'
+wnioski:   # gra z lokalami (Q13): zakładka „Wnioski z rundy” – od jakich progów pojawia się rada (silnik/wnioski.py)
+  utracona:
+    wartosc: 0.1
+    pewnosc: zalozenie
+    zrodlo: 'test gry 28.10: rada „klienci odeszli” dla dania, gdy nieobsłużona część chętnych to co najmniej tyle
+      (drobne straty w szczycie nie zaśmiecają wniosków)'
+  prognoza:
+    wartosc: 0.3
+    pewnosc: zalozenie
+    zrodlo: 'test gry 28.10: rada o prognozie popytu (Menu), gdy różni się od prawdziwego popytu dania o co najmniej
+      tyle w górę albo w dół'
+  bledy_max:
+    wartosc: 3
+    pewnosc: zalozenie
+    zrodlo: 'test gry 28.10: najwyżej tyle czerwonych punktów listy błędów rundy we wnioskach (reszta – zakładka Lista
+      błędów), żeby wnioski nie zniechęcały'

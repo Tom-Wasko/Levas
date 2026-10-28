@@ -47,6 +47,7 @@ from silnik.lokale import (
 from silnik.model import Firma, do_slownika
 from silnik.popyt import widok_popytu
 from silnik.srodki_trwale import ewidencja
+from silnik.wnioski import wnioski
 
 
 def _firma_slownik(f: Firma) -> dict:
@@ -195,6 +196,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     if runda - 1 in poprzedni.wyniki:
         w = poprzedni.wyniki.get(runda - 1, {})
         v["wyniki"] = w.get(firma)
+        v["wnioski"] = wnioski(dane, v["wyniki"])   # zakładka „Wnioski z rundy”
         v["rynek"] = poprzedni.rynek.get(runda - 1)
         v["karta_skumulowana"] = karta_skumulowana(gra, runda - 1) if runda - 1 >= 2 else {}
         v["dzielnik_karty"] = dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]

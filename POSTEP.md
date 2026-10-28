@@ -266,4 +266,4 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 - [x] Q10 Popyt liczony samodzielnie: bez gotowej prognozy w Menu i w Klientach i strefach
 - [x] Q11 Runda 1: nazwa firmy, wgrane logo, kolor, slogan; mapa pokazuje, kto ma który lokal
 - [x] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
-- [ ] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)
+- [x] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)
