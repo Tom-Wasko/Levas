@@ -417,8 +417,9 @@ def oferty_konkurencji(dane: Dane, stan, runda: int, firma: str) -> dict[str, di
 
 
 def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float | None = None) -> dict:
-    """Zakładka „Klienci i strefy” (decyzje): dni rundy sprzedaży z wydarzeniami, prognoza dla lokali firmy (jakość
-    ze stanowisk lokalu, bez nich – zakładane 2★), pule i potencjał stref. stan – stan na początku rundy (konkurencja)."""
+    """Zakładka „Klienci i strefy” (decyzje): dni rundy sprzedaży z wydarzeniami, pule stref i potencjał nowego lokalu
+    (zakładka Lokale; własne lokale – jakość ze stanowisk, bez nich zakładane 2★). Bez gotowej prognozy dla lokali
+    firmy – popyt drużyna liczy sama (test gry 28.10). stan – stan na początku rundy (konkurencja)."""
     r = max(runda, 2)
     dni = dni_rundy(dane, r)
     nazwy = dane.mapa["popyt"]["dni_tygodnia"]["nazwy"]
@@ -431,25 +432,20 @@ def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float 
         for ofl in lokale.values():
             for o in ofl.values():
                 o["reklama_strefy"] = (ef or {}).get("firmy", {}).get(n, {})
-    moje, zalozone = {}, []
+    moje = {}
     wspolne = {"zadowolenie": mnoznik_zadowolenia(dane, zadowolenie),
                "reklama_strefy": (ef or {}).get("firmy", {}).get(firma.nazwa, {})}
     for lok in firma.lokale:
         if lok.dziala_od > r:
             continue
         strefa, v = dane.lokale[lok.id]["strefa"], widok_lokalu(firma, lok.id)
-        for u in dane.uslugi:  # prognoza każdego dania (także jeszcze nie w menu – do decyzji w Ofercie)
+        for u in dania:   # własne lokale konkurują z nowym lokalem o klientów strefy
             c = firma.ceny.get(u)
             cena = max(0.01, c.cena - c.rabat) if c else dane.uslugi[u]["cena_preferowana"] * dane.mapa["popyt"]["strefy"][strefa]["cena"]
             q = jakosc_uslugi(dane, v, u) if kasjerzy(dane, v) else None
-            if q is None:
-                zalozone.append(f"{lok.id}|{u}")
             moje.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q or (2, 2, 2), **wspolne}
     pm.efekty_ofert(dane, firma, moje, r, dni)
-    prog = prognoza(dane, r, {**konkurencja, firma.nazwa: moje}, firma.nazwa, pula_rekl)
-    w_menu = {lok: {u: o for u, o in x.items() if u in dania} for lok, x in moje.items()}
-    prog["dni"] = prognoza(dane, r, {**konkurencja, firma.nazwa: w_menu}, firma.nazwa, pula_rekl)["dni"]  # tylko dania menu
-    pot = potencjal_stref(dane, r, {**konkurencja, firma.nazwa: w_menu}, dania, pula_rekl)
+    pot = potencjal_stref(dane, r, {**konkurencja, firma.nazwa: moje}, dania, pula_rekl)
     pr = pule(dane, r, reklama=pula_rekl)
     lokale_stref: dict[str, list[str]] = {}
     for n, g in stan.firmy.items():
@@ -461,6 +457,4 @@ def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float 
                   "firmy": sorted(lokale_stref.get(z, []))}
               for z, ps in dane.mapa["popyt"]["strefy"].items()}
     return {"runda": r, "dni": [{"data": d.isoformat(), "dzien": nazwy[d.weekday()]} for d in dni],
-            "wydarzenia": wydarzenia(dane, dni), "prognoza": prog, "zalozone": zalozone, "dania": dania,
-            "szczyt": {lok: round(szczyt(dane, dane.lokale[lok]["strefa"], r), 3) for lok in moje},
-            "strefy": strefy}
+            "wydarzenia": wydarzenia(dane, dni), "dania": dania, "strefy": strefy}

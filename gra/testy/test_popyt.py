@@ -106,17 +106,17 @@ def test_boty_w_strefach_sprzedaja_i_gra_jest_szybka():
     assert 400 < pod[("F0", "centrum")][KEBAB]["dni"].sum() < 1500
 
 
-def test_widok_popytu_prognoza_i_potencjal():
+def test_widok_popytu_pule_bez_gotowej_prognozy():
     from api.prezentacja import widok
     g = _gra()
     v = widok(g, "A")
     p = v["popyt"]
-    assert p["runda"] == 2 and p["prognoza"]["lokale"] == {} and len(p["dni"]) == 7
-    assert all(s["potencjal"] > 0 for s in p["strefy"].values())
+    assert p["runda"] == 2 and len(p["dni"]) == 7
+    assert all(s["potencjal"] > 0 and s["pula"] > 0 for s in p["strefy"].values())
     _runda(g, A=_lokal("centrum_3"))
     p = widok(g, "A")["popyt"]
-    assert set(p["prognoza"]["lokale"]) == {"centrum_3"} and p["prognoza"]["dania"][KEBAB] > 0
-    assert len(p["prognoza"]["dni"]) == 7 and "centrum_3" in p["szczyt"]
+    assert "prognoza" not in p and "szczyt" not in p      # popyt drużyna liczy sama (test gry 28.10)
+    assert len(p["strefy"]["centrum"]["dni"]) == 7 and "A" in p["strefy"]["centrum"]["firmy"]
 
 
 def test_sprawdz_wykrywa_bledy_popytu(tmp_path):

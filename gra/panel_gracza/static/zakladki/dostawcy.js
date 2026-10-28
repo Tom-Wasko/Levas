@@ -40,13 +40,11 @@ function dostawy(kat, z, potrzeba, stan, udzialy, dozwolone) {
   return wynik;
 }
 
-// Udziały dni rundy w sprzedaży do rozłożenia dostaw: prognoza dzienna, a bez niej (np. lokal wzięty w tej rundzie –
-// jeszcze bez prognozy) wagi dni stref lokali firmy, a bez lokali – po równo. null – gra bez dni dostaw.
+// Udziały dni rundy w sprzedaży do rozłożenia dostaw: wagi dni stref lokali firmy, a bez lokali – po równo.
+// null – gra bez dni dostaw.
 function udzialyDni(v) {
   const dni = dniDostaw(v);
   if (!dni) return null;
-  const p = v.popyt?.prognoza?.dni;
-  if (p?.length === dni.length && p.some((x) => x > 0)) return p;
   const wagi = (v.lokale?.moje || []).map((l) => v.popyt?.strefy?.[l.strefa]?.dni).filter((w) => w?.length === dni.length);
   return wagi.length ? dni.map((_, i) => wagi.reduce((s, w) => s + w[i], 0)) : dni.map(() => 1);
 }
@@ -207,6 +205,7 @@ export const dostawcy = {
     "zam-wyczysc": (el, c) => c.zmien((d) => { d.zamowienia = []; }),
     "auto-zamow": async (el, c) => {
       const q = +document.getElementById("auto-jakosc").value, zapas = +document.getElementById("auto-zapas").value;
+      if (!Object.values(c.v.stan.oferta).some((p) => p > 0)) return toast("Najpierw wpisz prognozę popytu dań w zakładce Menu – zamówienia liczone są na prognozowanych klientów.");
       const nowe = planZamowien(c, q, zapas);
       if (!nowe.length) return toast("Zapas w magazynie wystarcza na prognozowanych klientów.");
       await c.zmien((d) => { d.zamowienia = nowe; });

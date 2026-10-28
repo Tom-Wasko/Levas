@@ -1,9 +1,8 @@
 // Klienci i strefy: popyt strefowy w grze z lokalami (silnik/popyt.py, dane/mapa/popyt.yaml) – pule klientów stref,
-// dni tygodnia, kalendarz miejski, prognoza dla lokali firmy i wyniki dzień po dniu.
-import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres } from "./wspolne.js";
+// dni tygodnia, kalendarz miejski i wyniki dzień po dniu. Bez gotowej prognozy – popyt drużyna liczy sama (test gry 28.10).
+import { esc, licz, nazwaFirmy, proc, tabela, wykres } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 
-const nazwaLokalu = (kat, id) => kat.mapa.lokale.find((l) => l.id === id)?.nazwa ?? id;
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
 const POZIOM = (x) => x >= 1.08 ? "wysokie" : x <= 0.92 ? "niskie" : "średnie";
 const WRAZLIWOSC = (x) => x >= 1.25 ? "duża" : x <= 0.8 ? "mała" : "średnia";
@@ -16,34 +15,24 @@ function wydarzeniaHtml(lista, kat) {
   }).join("");
 }
 
-function prognozaLokali(v, kat) {
-  const P = v.popyt, dania = P.dania;
-  const lok = Object.keys(P.prognoza.lokale);
-  if (!lok.length) return `<p class="podpowiedz">Nie masz jeszcze działającego lokalu – wybierz go w zakładce <a data-zakladka-k="lokale">Lokale</a>.
-    Potencjał stref poniżej podpowiada, gdzie klientów jest najwięcej.</p>`;
-  const wiersze = dania.map((u) => [esc(nazwaUslugi(kat, u)), ...lok.map((l) => licz(P.prognoza.lokale[l][u])),
-    licz(lok.reduce((s, l) => s + (P.prognoza.lokale[l][u] || 0), 0))]);
-  const zal = P.zalozone.filter((x) => dania.includes(x.split("|")[1]));
-  return tabela("Prognoza klientów w Twoich lokalach (dania z menu)", ["Danie", ...lok.map((l) => esc(nazwaLokalu(kat, l))), "Razem"], wiersze, { klasy: ["l"] })
-    + (zal.length ? `<p class="podpowiedz">Część dań nie ma jeszcze stanowiska z pracownikiem i sprzętem w lokalu – prognoza zakłada jakość 2★.</p>` : "")
-    + (P.prognoza.dni.length === P.dni.length ? tabela("Prognoza po dniach", P.dni.map((d) => `${d.dzien}<div class="podpowiedz">${dataKrotka(d.data)}</div>`),
-      [P.prognoza.dni.map((x) => licz(x))]) : "")
-    + `<p class="podpowiedz">Obsługa liczona jest dzień po dniu – godziny pracowników i sprzętu rozkładają się równo na ${P.dni.length} dni.
-      W najmocniejszym dniu przychodzi ${Object.entries(P.szczyt).map(([l, s]) => `${proc(s - 1, 0)} więcej klientów niż średnio (${esc(nazwaLokalu(kat, l))})`).join(", ")} –
-      zbyt mała obsada w szczycie to utracona sprzedaż.</p>`;
+function jakLiczyc(P) {
+  return `<div class="komunikat"><b>Prognozę popytu liczysz sam</b> (zakładka Menu): weź klientów strefy, w której masz lokal
+    (trochę przychodzi też z sąsiednich stref), oceń, jaką ich część przyciągniesz ceną i jakością na tle konkurencji w strefie,
+    i pamiętaj, że część klientów zawsze idzie do barów spoza gry. Obsługa liczona jest dzień po dniu – godziny pracowników
+    i sprzętu rozkładają się równo na ${P.dni.length} dni, więc w najmocniejszym dniu strefy zbyt mała obsada to utracona sprzedaż.</div>`;
 }
 
 function strefyDecyzje(v, kat) {
   const P = v.popyt;
   const najmocniejszy = (s) => s.dni.length ? P.dni[s.dni.indexOf(Math.max(...s.dni))].dzien : "–";
-  const wiersze = Object.entries(P.strefy).sort(([, a], [, b]) => b.potencjal - a.potencjal).map(([k, s]) => [
+  const wiersze = Object.entries(P.strefy).sort(([, a], [, b]) => b.pula - a.pula).map(([k, s]) => [
     `<span class="kropka" style="background:${esc(kat.mapa.strefy[k].kolor)}"></span>${esc(nazwaStrefy(kat, k))}`,
-    licz(s.pula), licz(s.potencjal), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), najmocniejszy(s),
+    licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), najmocniejszy(s),
     s.firmy.length ? s.firmy.map((f) => f === v.firma ? "<b>Ty</b>" : esc(nazwaFirmy(v, f))).join(", ") : "–"]);
-  return tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Nowy lokal 2★ – szacunek", "Ceny", "Wrażliwość na cenę", "Najwięcej klientów", "Lokale firm"],
-    wiersze, { klasy: ["l", "", "", "l", "l", "l", "l"] })
-    + `<p class="podpowiedz">Klienci strefy i szacunek dla nowego lokalu – dania z Twojego menu, w rundzie sprzedaży. Szacunek: lokal 2★ w tej strefie,
-      ceny na poziomie strefy, przy obecnych lokalach konkurencji (z cenami z poprzedniej rundy).</p>`;
+  return tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Ceny", "Wrażliwość na cenę", "Najwięcej klientów", "Lokale firm"],
+    wiersze, { klasy: ["l", "", "l", "l", "l", "l"] })
+    + `<p class="podpowiedz">Klienci strefy – wszyscy chętni na dania z Twojego menu w rundzie sprzedaży, zanim podzielą się między lokale
+      (Twoje i konkurencji) i bary spoza gry.</p>`;
 }
 
 function wynikiDni(k) {
@@ -79,7 +68,7 @@ export const klienci = {
     const dni = `${dataKrotka(P.dni[0].data)}–${dataKrotka(P.dni[P.dni.length - 1].data)}`;
     return `<div class="pasek ciemny"><span>Runda sprzedaży: <span class="kwota">${P.runda}</span></span><span>Dni: <span class="kwota">${dni}</span></span>
       <span>Wydarzenia w mieście: <span class="kwota">${P.wydarzenia.length || "brak"}</span></span></div>`
-      + wydarzeniaHtml(P.wydarzenia, kat) + prognozaLokali(v, kat) + strefyDecyzje(v, kat);
+      + wydarzeniaHtml(P.wydarzenia, kat) + jakLiczyc(P) + strefyDecyzje(v, kat);
   },
   wyniki({ v, kat }) {
     const k = v.wyniki?.klienci, R = v.rynek?.strefy;
