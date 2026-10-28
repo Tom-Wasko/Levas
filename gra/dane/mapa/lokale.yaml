@@ -7,17 +7,18 @@ opis: 'Lokale do najmu lub kupna. Kwoty w złotych, czynsz i utrzymanie (media) 
   kaucja_miesiecy × czynsz (zwrotna po końcu najmu).'
 zrodlo: 'założenie F3a.3: czynsz = metraż × stawka strefy (strefy.yaml: czynsz_m2; gotowy +25%), cena kupna ≈ 40
   miesięcznych czynszów (gotowy +10%; ceny rynkowe przeskalowane do kapitału gry), działka = m² gruntu × 3 × czynsz_m2,
-  budowa 900 zł/m², adaptacja 250 zł/m², media 300 zł + 25 zł/m²; rząd wielkości (oferty najmu w Lublinie 2025:
+  budowa 900 zł/m², adaptacja 100 zł/m², media 300 zł + 25 zł/m²; niewyposażony: czynsz i cena kupna −25% (test gry
+  28.10: lokal do urządzenia razem z adaptacją i zakupem sprzętu wychodził drożej niż gotowy z zestawem); rząd wielkości (oferty najmu w Lublinie 2025:
   40–130 zł/m²), do kalibracji w kroku 5'
 zasady:
   nowy_lokal_co_rund: 3
   kaucja_miesiecy: 2
   urzadzanie_rund: 1
-  # licytacje i przejęcia (od rundy 4): kilka drużyn o ten sam lokal – wygrywa najwyższa oferta względem ceny
+  # licytacje (od rundy 1, test gry 28.10) i przejęcia (od rundy 4): kilka drużyn o ten sam lokal – wygrywa najwyższa oferta względem ceny
   # wywoławczej (czynszu albo ceny), remis – losowanie; kupno budynku z najemcą, wypowiedzenie 4 rundy (KC art. 673,
   # 678), rozliczenie nakładów najemcy (KC art. 676): zatrzymanie – właściciel płaci ulepszenia_zwrot × nakłady,
   # przywrócenie stanu – najemca płaci przywrocenie_koszt × nakłady
-  licytacje_od_rundy: 4
+  licytacje_od_rundy: 1
   oferta_max: 3
   przejecia_od_rundy: 4
   wypowiedzenie_rund: 4
@@ -119,8 +120,8 @@ lokale:
   miejsca:
     kuchnia: 2
     kasa: 1
-  czynsz: 6000
-  adaptacja: 14000
+  czynsz: 4500
+  adaptacja: 5500
   utrzymanie: 1700
   mapa:
     x: 11
@@ -151,8 +152,8 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 7700
-  adaptacja: 17500
+  czynsz: 5800
+  adaptacja: 7000
   utrzymanie: 2050
   od_rundy: 6
   mapa:
@@ -184,8 +185,8 @@ lokale:
   miejsca:
     kuchnia: 2
     kasa: 1
-  czynsz: 5000
-  adaptacja: 12500
+  czynsz: 3800
+  adaptacja: 5000
   utrzymanie: 1550
   mapa:
     x: 8
@@ -216,8 +217,8 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 7500
-  adaptacja: 19000
+  czynsz: 5600
+  adaptacja: 7500
   utrzymanie: 2200
   mapa:
     x: 7
@@ -281,8 +282,8 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 4500
-  adaptacja: 15000
+  czynsz: 3400
+  adaptacja: 6000
   utrzymanie: 1800
   mapa:
     x: 4
@@ -297,8 +298,8 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 6000
-  adaptacja: 20000
+  czynsz: 4500
+  adaptacja: 8000
   utrzymanie: 2300
   od_rundy: 8
   mapa:
@@ -331,9 +332,9 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 3900
-  cena: 156000
-  adaptacja: 16000
+  czynsz: 2900
+  cena: 117000
+  adaptacja: 6500
   utrzymanie: 1900
   mapa:
     x: 4
@@ -397,8 +398,8 @@ lokale:
   miejsca:
     kuchnia: 4
     kasa: 2
-  czynsz: 6300
-  adaptacja: 22500
+  czynsz: 4700
+  adaptacja: 9000
   utrzymanie: 2550
   mapa:
     x: 9
@@ -413,8 +414,8 @@ lokale:
   miejsca:
     kuchnia: 2
     kasa: 1
-  czynsz: 3500
-  adaptacja: 12500
+  czynsz: 2600
+  adaptacja: 5000
   utrzymanie: 1550
   mapa:
     x: 11
@@ -446,9 +447,9 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 3500
-  cena: 140000
-  adaptacja: 17500
+  czynsz: 2600
+  cena: 105000
+  adaptacja: 7000
   utrzymanie: 2050
   mapa:
     x: 14
@@ -514,9 +515,9 @@ lokale:
   miejsca:
     kuchnia: 2
     kasa: 1
-  czynsz: 3000
-  cena: 121000
-  adaptacja: 14000
+  czynsz: 2200
+  cena: 91000
+  adaptacja: 5500
   utrzymanie: 1700
   mapa:
     x: 4
@@ -565,9 +566,9 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 2700
-  cena: 108000
-  adaptacja: 15000
+  czynsz: 2000
+  cena: 81000
+  adaptacja: 6000
   utrzymanie: 1800
   mapa:
     x: 6
@@ -634,9 +635,9 @@ lokale:
   miejsca:
     kuchnia: 3
     kasa: 2
-  czynsz: 2400
-  cena: 98000
-  adaptacja: 17500
+  czynsz: 1800
+  cena: 74000
+  adaptacja: 7000
   utrzymanie: 2050
   mapa:
     x: 20
@@ -687,9 +688,9 @@ lokale:
   miejsca:
     kuchnia: 2
     kasa: 1
-  czynsz: 2000
-  cena: 80000
-  adaptacja: 12500
+  czynsz: 1500
+  cena: 60000
+  adaptacja: 5000
   utrzymanie: 1550
   mapa:
     x: 11

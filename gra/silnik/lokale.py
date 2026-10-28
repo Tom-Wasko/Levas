@@ -134,7 +134,7 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
     if not decyzja or not decyzja.get("id"):
         return {}
     info = {"id": decyzja["id"], "forma": decyzja.get("forma")}
-    powod = powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale) or przegrana
+    powod = przegrana or powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale)   # przegrana – z wyjaśnieniem
     if powod:
         return {**info, "przyjety": False, "powod": powod}
     lok, forma = dane.lokale[decyzja["id"]], decyzja["forma"]
@@ -166,12 +166,18 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
     return {**info, "przyjety": True, "powod": None, "dziala_od": nowy.dziala_od}
 
 
+def mozna_wyposazac(lok: Lokal, runda: int) -> bool:
+    """Lokal działa albo to ostatnia runda budowy / urządzania: można kupić stanowiska i sprzęt i zatrudnić ludzi,
+    a lokal rusza od razu gotowy do sprzedaży (stanowiska nie sprzedają, dopóki lokal nie działa – popyt.py)."""
+    return lok.dziala_od <= runda + 1
+
+
 def wolne_miejsca(dane: Dane, firma: Firma, runda: int) -> dict[str, list[str]]:
-    """Wolne miejsca na nowe stanowiska w działających lokalach: typ → lista id lokali (id powtórzone tyle razy,
-    ile miejsc), w kolejności wzięcia lokali."""
+    """Wolne miejsca na nowe stanowiska w lokalach, które można wyposażać (mozna_wyposazac): typ → lista id lokali
+    (id powtórzone tyle razy, ile miejsc), w kolejności wzięcia lokali."""
     wynik: dict[str, list[str]] = {t: [] for t in TYPY_STANOWISK}
     for lok in firma.lokale:
-        if lok.dziala_od > runda:
+        if not mozna_wyposazac(lok, runda):
             continue
         for typ in TYPY_STANOWISK:
             zajetych = sum(1 for s in firma.stanowiska_typu(typ) if s.lokal == lok.id)
@@ -213,7 +219,11 @@ def bledy(dane: Dane, firma: Firma, runda: int, info: dict, dodaj) -> None:
         d = dane.lokale[lok.id]
         if lok.dziala_od > runda:
             co = "Budowa" if d["typ"] == "dzialka" else "Urządzanie"
-            dodaj("niebieski", "lokale", f"{co}: {d['nazwa']} – lokal zacznie działać w rundzie {lok.dziala_od}.")
+            jak = ("kup stanowiska kuchni i kasy (Inwestycje), sprzęt na stanowiska i zatrudnij pracowników (Kadry), "
+                   f"a od rundy {lok.dziala_od} lokal od razu sprzedaje.")
+            kiedy = ("Już w tej rundzie możesz go wyposażyć: " + jak) if mozna_wyposazac(lok, runda) \
+                else f"W rundzie {lok.dziala_od - 1} będzie można go wyposażyć: " + jak
+            dodaj("niebieski", "lokale", f"{co}: {d['nazwa']} – lokal zacznie działać w rundzie {lok.dziala_od}. {kiedy}")
 
 
 def stan_lokali(dane: Dane, firma: Firma, runda: int) -> list[dict]:
@@ -223,7 +233,7 @@ def stan_lokali(dane: Dane, firma: Firma, runda: int) -> list[dict]:
         d = dane.lokale[lok.id]
         wynik.append({"id": lok.id, "nazwa": d["nazwa"], "adres": d["adres"], "strefa": d["strefa"], "typ": d["typ"],
                       "forma": lok.forma, "od_rundy": lok.od_rundy, "dziala_od": lok.dziala_od,
-                      "dziala": lok.dziala_od <= runda, "czynsz": lok.czynsz, "utrzymanie": d["utrzymanie"],
+                      "dziala": lok.dziala_od <= runda, "wyposazanie": mozna_wyposazac(lok, runda), "czynsz": lok.czynsz, "utrzymanie": d["utrzymanie"],
                       "wlasciciel": lok.wlasciciel, "najem_do": lok.najem_do,
                       "miejsca": d["miejsca"],
                       "zajete": {t: sum(1 for s in firma.stanowiska_typu(t) if s.lokal == lok.id)

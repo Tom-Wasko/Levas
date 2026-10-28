@@ -25,14 +25,16 @@ def _kpir(s, r, firma, poczatek):
     return [p for p in s.wyniki[r][firma]["kpir"]["pozycje"] if p["opis"].startswith(poczatek)]
 
 
-def test_przed_runda_licytacji_oferta_bez_znaczenia_i_spor_rozstrzyga_losowanie():
+def test_licytacja_od_pierwszej_rundy_przegrany_dostaje_wyjasnienie():
     g = _gra()
+    assert g.dane.mapa["zasady"]["licytacje_od_rundy"] == 1   # test gry 28.10: dwie drużyny chcą ten sam lokal
     s = _runda(g, A={"lokal": {"id": "centrum_3", "forma": "najem", "oferta": 9000}},
                B={"lokal": {"id": "centrum_3", "forma": "najem", "oferta": 5000}})
     (p,) = s.rynek[1]["przejecia"]["przetargi"]
-    assert p["remis"] and [o["kwota"] for o in p["oferty"]] == [5000, 5000]
-    zwyciezca = s.firmy[p["zwyciezca"]].lokale[0]
-    assert zwyciezca.czynsz == 5000
+    assert p["zwyciezca"] == "A" and not p["remis"] and [o["kwota"] for o in p["oferty"]] == [9000, 5000]
+    assert s.firmy["A"].lokale[0].czynsz == 9000
+    powod = s.wyniki[1]["B"]["lokal_decyzja"]["powod"]
+    assert "9 000,00 zł wobec Twojej 5 000,00 zł" in powod and "wyższy czynsz" in powod
 
 
 def test_od_rundy_licytacji_wygrywa_wyzsza_oferta_i_placi_swoja_kwote():

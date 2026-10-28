@@ -9,7 +9,8 @@ Decyzje rundy:
 
 Licytacja: o ten sam lokal (albo budynek) w jednej rundzie walczy kilka drużyn – wygrywa najwyższa oferta
 względem ceny wywoławczej (czynszu przy najmie, ceny przy kupnie), remis rozstrzyga losowanie. Przed rundą
-`licytacje_od_rundy` oferty są równe cenie wywoławczej, więc każdy spór kończy się losowaniem.
+`licytacje_od_rundy` oferty są równe cenie wywoławczej, więc każdy spór kończy się losowaniem. Przegrany dostaje
+wyjaśnienie: oferty obu stron i co zrobić następnym razem.
 
 Przejęcie: kupujący wchodzi w umowę najmu (KC art. 678) – najemca płaci ten sam czynsz, ale nowemu
 właścicielowi (jego przychód z VAT). Najemca kupujący swój lokal – wykup: najem zamienia się we własność, kaucja
@@ -33,6 +34,7 @@ from .lokale import oferta, powod_odrzucenia
 from .losowosc import strumien
 from .model import Firma, KupionyBudynek, Lokal, StanGry, Stanowisko
 from .rynek_pracy import jako_kandydat
+from .zaleglosci import zl as _zl
 
 ZAKLADKA = "przejecia"
 ULEPSZENIA = ("zatrzymaj", "przywroc")
@@ -156,12 +158,17 @@ def licytacje(dane: Dane, firmy: dict[str, Firma], decyzje: dict, runda: int, zi
         zwyciezca = remis[int(strumien(ziarno, runda, "licytacje", rodzaj, lok_id).integers(len(remis)))]["firma"] \
             if len(remis) > 1 else remis[0]["firma"]
         lok = dane.lokale[lok_id]
+        wygrana = next(o for o in oferty if o["firma"] == zwyciezca)
+        co = "czynsz" if wygrana["forma"] == "najem" else "cenę"
         for o in oferty:
             if o["firma"] != zwyciezca:
                 przegrane[(o["firma"], rodzaj)] = (
                     f"{lok['nazwa']}: licytację wygrała firma {nazwa_firmy(firmy, zwyciezca)} – "
-                    + ("remis, zdecydowało losowanie (notariusz rzucał monetą trzy razy, bo za pierwszym razem upadła na kant)."
-                       if len(remis) > 1 and o in remis else "jej oferta była wyższa."))
+                    + ("remis, zdecydowało losowanie (notariusz rzucał monetą trzy razy, bo za pierwszym razem upadła "
+                       "na kant)." if len(remis) > 1 and o in remis else
+                       f"jej oferta była wyższa ({_zl(wygrana['kwota'])} wobec Twojej {_zl(o['kwota'])}).")
+                    + f" Wybierz inny wolny lokal albo następnym razem zaproponuj wyższy {co} w polu „Twoja oferta”"
+                    + " w zakładce Lokale – pieniądze za ten lokal nie zostały pobrane.")
         przetargi.append({"id": lok_id, "rodzaj": rodzaj, "zwyciezca": zwyciezca, "remis": len(remis) > 1,
                           "oferty": sorted(oferty, key=lambda o: (-o["stosunek"], o["firma"]))})
     return {"przegrane": przegrane, "przetargi": przetargi}

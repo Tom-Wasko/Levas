@@ -93,15 +93,17 @@ def test_kupno_wymaga_gotowki_a_sprzet_kupionego_lokalu_jest_majatkiem():
     assert "tylko na sprzedaż" in s.wyniki[2]["A"]["lokal_decyzja"]["powod"]
 
 
-def test_stanowiska_tylko_na_wolnych_miejscach_w_dzialajacym_lokalu():
+def test_stanowiska_tylko_na_wolnych_miejscach_w_lokalu_do_wyposazenia():
     g = _gra()
-    # niewyposażony lokal: adaptacja (KPiR), działa od następnej rundy – w rundzie wzięcia brak miejsc
+    # niewyposażony lokal: adaptacja (KPiR), działa od następnej rundy – stanowiska można kupić już w rundzie wzięcia
     s = _runda(g, A=_lokal("centrum_2") | {"stanowiska": {"kuchnia": 1}})
     lok = g.dane.lokale["centrum_2"]
-    assert s.firmy["A"].lokale[0].dziala_od == 2 and s.firmy["A"].stanowiska == []
+    f = s.firmy["A"]
+    assert f.lokale[0].dziala_od == 2 and [(st.typ, st.lokal) for st in f.stanowiska] == [("kuchnia", "centrum_2")]
     assert any(p["opis"].startswith("Adaptacja lokalu") for p in s.wyniki[1]["A"]["kpir"]["pozycje"])
-    assert any(b["zakladka"] == "stanowiska" for b in s.wyniki[1]["A"]["lista_bledow"])
     assert not any(p["opis"].startswith("Tygodniowy koszt utrzymania") for p in s.wyniki[1]["A"]["kpir"]["pozycje"])
+    assert any("Już w tej rundzie możesz go wyposażyć" in b["tekst"] for b in s.wyniki[1]["A"]["lista_bledow"])
+    assert [x["wyposazanie"] for x in s.wyniki[1]["A"]["lokale"]] == [True]
     s = _runda(g, A={"stanowiska": {"kuchnia": 5, "kasa": 1}})
     f = s.firmy["A"]
     assert len(f.stanowiska_typu("kuchnia")) == lok["miejsca"]["kuchnia"] and len(f.stanowiska_typu("kasa")) == 1
@@ -112,17 +114,17 @@ def test_dzialka_budowa_w_ratach_potem_lokal_bez_sprzetu():
     g = _gra()
     lok = g.dane.lokale["czechow_3"]
     n = lok["budowa_rund"]
-    s = _runda(g, A=_lokal("czechow_3", "kupno"))
-    assert s.firmy["A"].lokale[0].dziala_od == 1 + n
+    assert n >= 2   # wyposażanie dopiero w ostatniej rundzie budowy
+    s = _runda(g, A=_lokal("czechow_3", "kupno") | {"stanowiska": {"kuchnia": 1}})
+    assert s.firmy["A"].lokale[0].dziala_od == 1 + n and s.firmy["A"].stanowiska == []
     raty = []
     for r in range(1, n + 2):
-        s = s if r == 1 else _runda(g)
+        s = s if r == 1 else _runda(g, A={"stanowiska": {"kuchnia": 2, "kasa": 1}} if r == n else {})
         raty += _rachunek(s, r, "A", "Budowa lokalu")
         bledy = [b["tekst"] for b in s.wyniki[r]["A"]["lista_bledow"] if b["zakladka"] == "lokale"]
         assert any("Budowa" in b for b in bledy) == (r <= n)
+        assert len(s.firmy["A"].stanowiska) == (3 if r >= n else 0)
     assert sum(raty) == pytest.approx(-lok["koszt_budowy"]) and len(raty) == n
-    s = _runda(g, A={"stanowiska": {"kuchnia": 2, "kasa": 1}})
-    assert len(s.firmy["A"].stanowiska) == 3
 
 
 def test_boty_wynajmuja_lokale_i_graja_cala_gre():

@@ -256,10 +256,10 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 - [x] Q2 HR: większe okno składania oferty
 - [x] Q3 Dostawcy: lista zamówień rundy z usuwaniem pozycji
 - [x] Q4 Dostawcy: „Zamów brakujące” rozkłada dostawy na dni także bez prognozy dziennej (nie wszystko na 1 dzień)
-- [ ] Q5 Lokale: komunikat, jak wyposażyć działkę i lokal niewyposażony; stanowiska, sprzęt i zatrudnienie już
+- [x] Q5 Lokale: komunikat, jak wyposażyć działkę i lokal niewyposażony; stanowiska, sprzęt i zatrudnienie już
   w ostatniej rundzie budowy/urządzania – lokal rusza gotowy do sprzedaży
-- [ ] Q6 Lokale niewyposażone tańsze (czynsz, cena, adaptacja)
-- [ ] Q7 Licytacja lokali od rundy 1 (wyższa oferta wygrywa, przegrany dostaje wyjaśnienie)
+- [x] Q6 Lokale niewyposażone tańsze (czynsz, cena, adaptacja)
+- [x] Q7 Licytacja lokali od rundy 1 (wyższa oferta wygrywa, przegrany dostaje wyjaśnienie)
 - [ ] Q8 Kredyt inwestycyjny bez 4 rund historii – od wzięcia lokalu, także na zakup lokalu w tej samej rundzie
   (kupowany lokal jako zastaw)
 - [ ] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)

@@ -12,14 +12,16 @@ export const wybranyLokal = (d) => d.lokal?.id ? d.lokal : null;
 export const kosztLokali = (v) => (v.lokale?.moje || []).reduce((s, l) =>
   s + (l.forma === "najem" ? naRunde(l.czynsz) : 0) + (l.dziala ? naRunde(l.utrzymanie) : 0), 0);
 
+// miejsca na stanowiska: lokale działające i te w ostatniej rundzie budowy / urządzania (już można je wyposażyć)
 export function miejscaLokali(v, typ) {
-  const dzialajace = (v.lokale?.moje || []).filter((l) => l.dziala);
+  const dzialajace = (v.lokale?.moje || []).filter((l) => l.dziala || l.wyposazanie);
   return { wszystkie: dzialajace.reduce((s, l) => s + l.miejsca[typ], 0), zajete: dzialajace.reduce((s, l) => s + l.zajete[typ], 0) };
 }
 
 function status(l) {
   if (l.dziala) return `<span class="pigulka ok">działa</span>`;
-  return `<span class="pigulka inf">${l.typ === "dzialka" ? "budowa" : "urządzanie"} do rundy ${l.dziala_od}</span>`;
+  return `<span class="pigulka inf">${l.typ === "dzialka" ? "budowa" : "urządzanie"} do rundy ${l.dziala_od}</span>`
+    + (l.wyposazanie ? ` <span class="pigulka ok" title="Kup stanowiska i sprzęt (Inwestycje) i zatrudnij ludzi (Kadry) – lokal ruszy od razu gotowy">można wyposażać</span>` : "");
 }
 
 // opis lokalu z mapy (kafel w ofercie i okno na mapie)
@@ -34,7 +36,17 @@ export function opisLokalu(kat, lok) {
     + (lok.cena != null ? w(lok.typ === "dzialka" ? "Cena działki" : "Cena kupna", zl(lok.cena)) : "")
     + (lok.adaptacja ? w("Adaptacja (jednorazowo)", zl(lok.adaptacja)) : "")
     + (lok.koszt_budowy ? w("Budowa", `${zl(lok.koszt_budowy)} w ${lok.budowa_rund} ratach`) : "")
-    + w("Media i utrzymanie", `${zl(naRunde(lok.utrzymanie))}${naOkres()}`);
+    + w("Media i utrzymanie", `${zl(naRunde(lok.utrzymanie))}${naOkres()}`)
+    + jakUruchomic(kat, lok);
+}
+
+// lokal bez sprzętu: kiedy i jak go wyposażyć, żeby od pierwszej rundy działania sprzedawał
+function jakUruchomic(kat, lok) {
+  if (lok.typ === "gotowy") return "";
+  const rund = lok.typ === "dzialka" ? lok.budowa_rund : kat.mapa.zasady.urzadzanie_rund;
+  const kiedy = rund > 1 ? `w ostatniej rundzie ${lok.typ === "dzialka" ? "budowy" : "urządzania"} (${rund}. po wzięciu)` : "już w rundzie wzięcia";
+  return `<p class="podpowiedz"><b>Jak uruchomić:</b> ${lok.typ === "dzialka" ? `budowa trwa ${rund} ${rund === 1 ? "rundę" : "rundy"} – lokal nie sprzedaje i nie płaci mediów, płacisz raty budowy. ` : `urządzanie trwa ${rund === 1 ? "1 rundę" : `${rund} rundy`}. `}`
+    + `Lokal jest pusty: ${kiedy} kup stanowiska kuchni i kasy (Inwestycje), sprzęt na stanowiska i zatrudnij pracowników (Kadry) – w pierwszej rundzie działania lokal od razu sprzedaje.</p>`;
 }
 
 // przyciski Wynajmij / Kup (okno mapy i kafel oferty)
