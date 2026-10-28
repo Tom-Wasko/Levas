@@ -222,6 +222,7 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
   z-index: 50; overflow-y: auto; animation: pojaw .12s ease-out; }
 .okno { background: #fff; border-radius: 14px; width: min(1100px, 100%); box-shadow: var(--cien-mocny); overflow: hidden; }
 .okno.male { width: min(560px, 100%); }
+.okno.srednie { width: min(860px, 100%); }
 .okno .og { background: var(--pom); color: #fff; font-weight: 700; text-transform: uppercase; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; }
 .okno .og .x { cursor: pointer; font-size: 20px; line-height: 1; opacity: .85; }
 .okno .og .x:hover { opacity: 1; }

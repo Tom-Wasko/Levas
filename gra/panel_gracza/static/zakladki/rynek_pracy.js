@@ -135,6 +135,6 @@ function oknoOferty({ v, kat }, id) {
       <option value="zlecenie">Umowa zlecenie</option></select></label></div>
     <p class="podpowiedz">Opłata headhuntera po przyjęciu oferty: ${licz(hh.podkupienie_czesc_pensji * 100)}% oferowanej pensji.
       Obecny pracodawca może złożyć kontrofertę. Gdy pracownik przyjdzie, potrzebuje wolnego stanowiska.</p>`,
-  { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
+  { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="potwierdz-oferte" data-id="${esc(id)}">Złóż ofertę</button>` });
 }

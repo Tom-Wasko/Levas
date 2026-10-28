@@ -97,11 +97,11 @@ export function tabela(tytul, naglowki, wiersze, { stopka = null, klasy = [], so
 }
 
 let _okno = null;
-export function okno(tytul, html, { male = false, przyciski = "" } = {}) {
+export function okno(tytul, html, { male = false, srednie = false, przyciski = "" } = {}) {
   zamknijOkno();
   const z = document.createElement("div");
   z.className = "zaslona";
-  z.innerHTML = `<div class="okno ${male ? "male" : ""}"><div class="og"><span>${tytul}</span><span class="x" data-akcja="zamknij-okno">✕</span></div>
+  z.innerHTML = `<div class="okno ${male ? "male" : srednie ? "srednie" : ""}"><div class="og"><span>${tytul}</span><span class="x" data-akcja="zamknij-okno">✕</span></div>
     <div class="ot">${html}</div>${przyciski ? `<div class="ost">${przyciski}</div>` : ""}</div>`;
   z.addEventListener("click", (e) => { if (e.target === z) zamknijOkno(); });
   document.body.appendChild(z);

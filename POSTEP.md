@@ -253,7 +253,7 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commit i push.
 
 - [x] Q1 Szybkie zmiany decyzji gubią się (np. stawka VAT w KPiR „czasem się nie wybiera”) – wyścig zapisów
-- [ ] Q2 HR: większe okno składania oferty
+- [x] Q2 HR: większe okno składania oferty
 - [ ] Q3 Dostawcy: lista zamówień rundy z usuwaniem pozycji
 - [ ] Q4 Dostawcy: „Zamów brakujące” rozkłada dostawy na dni także bez prognozy dziennej (nie wszystko na 1 dzień)
 - [ ] Q5 Lokale: komunikat, jak wyposażyć działkę i lokal niewyposażony; stanowiska, sprzęt i zatrudnienie już

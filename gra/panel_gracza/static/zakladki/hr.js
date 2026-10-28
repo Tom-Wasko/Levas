@@ -172,7 +172,7 @@ function oknoZatrudnienia({ v, kat }, id, typ, nr) {
     <label class="pole">Forma zatrudnienia<select id="z-umowa"><option value="prace">Umowa o pracę (+${proc(kat.parametry.zus, 0)} ZUS pracodawcy)</option>
       <option value="zlecenie">Umowa zlecenie</option></select></label></div>${kanalyRekrutacji(v, k)}
     <p class="podpowiedz">Pensja wyższa od preferowanej i umowa o pracę podnoszą zadowolenie pracowników.</p>`,
-    { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
+    { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="potwierdz-zatrudnienie" data-k="${esc(id)}" data-t="${typ}" data-n="${nr}">Potwierdź</button>` });
 }
 
