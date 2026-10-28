@@ -247,3 +247,23 @@ Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POS
 - [x] P18 Nowe historyjki (parki, zdarzenia) – do 15:00, po wszystkim innym – pytanie 12
 - [x] P19 (jeśli czas) bot „niemożliwy”; inaczej wpis w rzeczach na przyszłość – pytanie 25
 - [x] P20 (jeśli czas) przegląd starego Levasa (`Tom-Wasko/Levas-stary`, branch `kod`) – lista różnic – pytanie 1
+
+## Poprawki 28.10 (uwagi z testu gry, odpowiedzi na czacie)
+
+Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commit i push.
+
+- [x] Q1 Szybkie zmiany decyzji gubią się (np. stawka VAT w KPiR „czasem się nie wybiera”) – wyścig zapisów
+- [ ] Q2 HR: większe okno składania oferty
+- [ ] Q3 Dostawcy: lista zamówień rundy z usuwaniem pozycji
+- [ ] Q4 Dostawcy: „Zamów brakujące” rozkłada dostawy na dni także bez prognozy dziennej (nie wszystko na 1 dzień)
+- [ ] Q5 Lokale: komunikat, jak wyposażyć działkę i lokal niewyposażony; stanowiska, sprzęt i zatrudnienie już
+  w ostatniej rundzie budowy/urządzania – lokal rusza gotowy do sprzedaży
+- [ ] Q6 Lokale niewyposażone tańsze (czynsz, cena, adaptacja)
+- [ ] Q7 Licytacja lokali od rundy 1 (wyższa oferta wygrywa, przegrany dostaje wyjaśnienie)
+- [ ] Q8 Kredyt inwestycyjny bez 4 rund historii – od wzięcia lokalu, także na zakup lokalu w tej samej rundzie
+  (kupowany lokal jako zastaw)
+- [ ] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)
+- [ ] Q10 Popyt liczony samodzielnie: bez gotowej prognozy w Menu i w Klientach i strefach
+- [ ] Q11 Runda 1: nazwa firmy, wgrane logo, kolor, slogan; mapa pokazuje, kto ma który lokal
+- [ ] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
+- [ ] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)

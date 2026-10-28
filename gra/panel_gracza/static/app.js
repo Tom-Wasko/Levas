@@ -5,7 +5,7 @@ import ZAKLADKI, { ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
 
 const S = { v: null, kat: null, zakladka: "dashboard", tryb: "decyzje", runda: null, d: {}, zapis: Promise.resolve(),
-  nrZapytania: 0, odliczanie: null };
+  nrZapytania: 0, oczekujace: 0, poleZmiany: null, odliczanie: null };
 
 const postep = document.createElement("div");
 postep.className = "postep";
@@ -36,7 +36,7 @@ async function wczytaj(runda = S.runda) {
   if (nr === S.nrZapytania) ustaw(v);
 }
 
-function ustaw(v) {
+function ustaw(v, { poZapisie = false } = {}) {
   S.v = v;
   ustawKalendarz(v.gra.kalendarz);
   S.runda = v.runda;
@@ -45,6 +45,18 @@ function ustaw(v) {
   if (!z || !dostepna(z)) S.zakladka = "dashboard";
   if (S.tryb === "wyniki" && !maWyniki(ZAKLADKI[S.zakladka])) S.tryb = "decyzje";
   if (S.tryb === "decyzje" && !ZAKLADKI[S.zakladka].decyzje && maWyniki(ZAKLADKI[S.zakladka])) S.tryb = "wyniki";
+  if (poZapisie) rysujPoWyjsciuZPola(); else rysuj();
+}
+
+// Po zapisie gracz bywa już w kolejnym polu (otwarta lista stawek VAT, wpisywana kwota) – przerysowanie zamknęłoby
+// listę i skasowało wpisywane znaki, więc karta odświeża się dopiero po wyjściu z pola (pole właśnie zatwierdzone –
+// od razu).
+function rysujPoWyjsciuZPola() {
+  const el = document.activeElement;
+  if (el?.matches?.("#karta select, #karta input") && el !== S.poleZmiany) {
+    el.addEventListener("blur", () => setTimeout(rysujPoWyjsciuZPola), { once: true });
+    return;
+  }
   rysuj();
 }
 
@@ -60,6 +72,7 @@ async function zmien(fn) {
   if (blokada(S.v)) return toast(blokada(S.v));
   if (S.v.wyslane) return toast("Decyzje są wysłane. Wróć do podejmowania decyzji w zakładce „Wyślij decyzje”.");
   fn(S.d);
+  S.oczekujace++;
   S.zapis = S.zapis.then(async () => {
     const nr = ++S.nrZapytania;
     try {
@@ -67,8 +80,11 @@ async function zmien(fn) {
       const wersja = S.v.druzyna?.autorzy?.wersja ?? "";
       const v = await api(`/api/gry/${GRA}/decyzje/${encodeURIComponent(FIRMA)}?wersja=${wersja}`,
         { method: "PUT", body: JSON.stringify(S.d) });
-      if (nr === S.nrZapytania) ustaw(v);
+      // w kolejce czeka nowsza zmiana: szkic S.d już ją ma (ustaw by ją skasował) – tylko nowa wersja do zapisu
+      if (S.oczekujace > 1) S.v = v;
+      else if (nr === S.nrZapytania) ustaw(v, { poZapisie: true });
     } catch (e) { toast(e.message); await wczytaj(); }
+    finally { S.oczekujace--; }
   });
   return S.zapis;
 }
@@ -79,7 +95,9 @@ function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "fun
 const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd) && (!z.wynikiGdy || z.wynikiGdy(S.v)));
 const kluczZakladki = (z) => Object.keys(ZAKLADKI).find((k) => ZAKLADKI[k] === z);
 
-const ctx = () => ({ v: S.v, kat: S.kat, d: S.d, edycja: S.v.edycja && !S.v.wyslane && !blokada(S.v), zmien, api, wczytaj, ustaw, rysuj,
+// v, d i edycja zawsze bieżące – akcja po `await c.zmien(…)` (np. ponowne otwarcie okna) widzi zapisane decyzje
+const ctx = () => ({ get v() { return S.v; }, kat: S.kat, get d() { return S.d; },
+  get edycja() { return S.v.edycja && !S.v.wyslane && !blokada(S.v); }, zmien, api, wczytaj, ustaw, rysuj,
   dostepna: (k) => !!ZAKLADKI[k] && dostepna(ZAKLADKI[k]), tytulZakladki: (k) => ZAKLADKI[k]?.tytul ?? k,
   idz: (k, tryb) => { S.zakladka = k; S.tryb = tryb || (ZAKLADKI[k].decyzje ? "decyzje" : "wyniki"); rysuj(); } });
 
@@ -268,6 +286,7 @@ document.addEventListener("click", async (e) => {
 document.addEventListener("change", async (e) => {
   const el = e.target.closest("[data-zmiana]");
   if (!el) return;
+  S.poleZmiany = el;
   try {
     for (const z of Object.values(ZAKLADKI)) {
       if (z.zmiany && z.zmiany[el.dataset.zmiana]) return await z.zmiany[el.dataset.zmiana](el, ctx(), e);
