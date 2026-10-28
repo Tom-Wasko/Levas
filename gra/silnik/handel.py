@@ -21,7 +21,7 @@ Faktury w KPiR obu stron: towar – u sprzedawcy przychód ze sprzedaży (kol. 7
 u kupującego zakup towarów (kol. 10, VAT naliczony); partie przechodzą z terminem przydatności (najkrótszy
 pierwszy) i są dostarczane w poniedziałek rundy jak dostawa (miejsce w chłodni – silnik/swiezosc.py). Sprzęt –
 u sprzedawcy jak sprzedaż sprzętu (pozostałe przychody, niezamortyzowana wartość w koszty), u kupującego jak zakup
-(środek trwały od progu amortyzacji). Lokale – jeszcze nie (pytanie w PRACA_NOCNA.md).
+(środek trwały od progu amortyzacji). Lokale – jeszcze nie (pytanie w archiwum/PRACA_NOCNA.md).
 """
 from __future__ import annotations
 

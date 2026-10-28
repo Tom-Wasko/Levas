@@ -1,6 +1,7 @@
 # Postęp
 
-Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 commit = 1 zadanie (`F2.1: …`).
+Postęp prac: kroki 1–4 według [Planu implementacji](notatki/Plan%20implementacji.md) (archiwum), kroki 5–6 według
+[Planu optymalizacji](notatki/Plan%20optymalizacji.md) (na dole). 1 commit = 1 zadanie (`F2.1: …`, `B3: …`).
 
 ## Krok 2 – kopia Revasa i przebudowa pod Levas
 - [x] F2.1 Kopia `revas_gra` → `gra/` (bez kalibracji, gry przez GitHub, importu stanu i raportów), pyproject + ruff, testy przechodzą
@@ -217,7 +218,7 @@ Postęp prac według [Planu implementacji](notatki/Plan%20implementacji.md). 1 c
 
 Plan kroków 1–4 (bez giełdy) zrealizowany.
 
-## Poprawki 27.10 (odpowiedzi w PRACA_NOCNA.md i na czacie)
+## Poprawki 27.10 (odpowiedzi w archiwum/PRACA_NOCNA.md i na czacie)
 
 Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POSTEP + PRACA_NOCNA, commit i push.
 
@@ -267,3 +268,31 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 - [x] Q11 Runda 1: nazwa firmy, wgrane logo, kolor, slogan; mapa pokazuje, kto ma który lokal
 - [x] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
 - [x] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)
+
+## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
+
+- [ ] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry
+- [ ] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel) z dziennikami w `raporty/analiza/`
+- [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
+
+## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
+
+## Krok 5 – kalibracja (Plan optymalizacji, część B; instrukcja: `zadania/B_kalibracja.md`)
+
+Po każdym: testy, ruff, `sprawdz`, wpis w `raporty/kalibracja/dziennik.md`, POSTEP, commit i push.
+
+- [ ] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów (`raporty/kalibracja/inwentarz.md`)
+- [ ] B2 Narzędzie porównań par gier `balans/warianty.py` (konteksty, wiele ziaren, równolegle, CSV + md) z testami
+- [ ] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru
+- [ ] B4 Pomiar startowy: dominacje, krzywa trudności, strategie, realia (`raporty/kalibracja/stan_poczatkowy.md`)
+- [ ] B5 Gospodarka i trudność (popyt, koszty, kapitał; pierwszy plus przeciętnej drużyny w rundzie 4–6)
+- [ ] B6 Lokale (typ × forma × strefa, licytacje, przejęcia)
+- [ ] B7 Menu i ceny (dania, marże, widełki, promocje)
+- [ ] B8 Zaopatrzenie (dostawcy, gwiazdki, świeżość, magazyn, auto-zamawianie, handel)
+- [ ] B9 Ludzie (rekrutacja, umowy, pensje, premie, szkolenia, headhunter, czas właściciela)
+- [ ] B10 Marketing (reklama, agencje, promocje, udogodnienia, wyposażenie)
+- [ ] B11 Finanse (banki, kredyty, lokaty, odnawialny; Harpagon i kasyno – ryzykowne, ale czasem opłacalne)
+- [ ] B12 Księgowość i urzędy (samodzielnie / biuro z OC i bez, kary, sanepid, higiena, ubezpieczenia)
+- [ ] B13 Karta wyników (wagi składowych, brak „nabijania”, zgodność z majątkiem netto)
+- [ ] B14 Boty po kalibracji (poziomy wyraźnie różne, każda strategia wygrywa w jakimś kontekście)
+- [ ] B15 Raport końcowy, `zrodlo`/`pewnosc` w YAML, propozycje zmian w notatkach, instrukcja gracza

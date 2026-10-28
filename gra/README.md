@@ -1,9 +1,9 @@
 # Levas – gra
 
-Symulacja biznesowa kebabu w Lublinie, budowana na bazie lokalnego Revasa („Klub fitness”). Na razie (krok 2
-[planu](../notatki/Plan%20implementacji.md)) to mechanika Revasa na Django z danymi kebaba (dania, kucharze, kasa,
-składniki, dostawcy jedzenia), rundami tygodniowymi (26 tygodni) i podstawowym panelem mistrza gry
-(postęp: [`POSTEP.md`](../POSTEP.md)).
+Symulacja biznesowa kebabu w Lublinie, zbudowana na bazie lokalnego Revasa („Klub fitness”): wspólna mapa
+z lokalami, rundy tygodniowe (domyślnie 18), banki, dostawcy, KPiR, urzędy, handel między drużynami, boty
+i panel mistrza gry. Kroki 1–4 są zrobione, teraz kalibracja i analiza według
+[Planu optymalizacji](../notatki/Plan%20optymalizacji.md) (postęp: [`POSTEP.md`](../POSTEP.md)).
 
 ## Uruchomienie
 
