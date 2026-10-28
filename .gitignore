@@ -7,3 +7,4 @@ gra/zapisy/
 gra/lokalne.json
 *.sqlite3
 **/.obsidian/workspace*.json
+gra/narzedzia/

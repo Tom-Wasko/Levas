@@ -186,6 +186,21 @@ def test_graj_nie_startuje_na_zajetym_porcie():
             call_command("graj", port=s.getsockname()[1], bez_przegladarki=True)
 
 
+def test_hostuj_adres_tunelu_i_mistrzowie_z_haslem(django_user_model):
+    """Tryb gry przez internet: adres z komunikatu cloudflared, konto lokalne (bez hasła) się nie liczy."""
+    from konta.middleware import lokalne_konto
+    from panel_gracza.management.commands.hostuj import adres_tunelu, mistrzowie_z_haslem
+
+    linia = "INF |  https://ala-ma-kota-123.trycloudflare.com                                 |"
+    assert adres_tunelu(linia) == "https://ala-ma-kota-123.trycloudflare.com"
+    assert adres_tunelu("INF Requesting new quick Tunnel on trycloudflare.com...") is None
+    lokalne_konto()
+    django_user_model.objects.create_user("ala", password="x")
+    assert mistrzowie_z_haslem() == []
+    call_command("konto", "pani-ania", mg=True, haslo="tajne123")
+    assert mistrzowie_z_haslem() == ["pani-ania"]
+
+
 def test_instrukcja_jak_grac_bez_logowania(client):
     """Strona „Jak grać” z INSTRUKCJA.md – dostępna bez logowania, ze spisem treści, tabelami i ramkami."""
     from panel_gracza.instrukcja import na_html

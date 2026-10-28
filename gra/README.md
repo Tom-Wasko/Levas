@@ -121,6 +121,13 @@ konto ucznia; rola mistrza gry: `manage.py konto <e-mail> --mg`. Serwer pod inny
 **Gra na własnym komputerze** (`start.bat`, `manage.py graj`) loguje się sama na lokalne konto mistrza gry
 `lokalny` – tylko z tego komputera. Sam `runserver` wymaga logowania.
 
+**Gra z kolegami przez internet** (`hostuj.bat`, `manage.py hostuj`): serwer na tym komputerze i darmowy
+tunel Cloudflare – okno pokazuje link `https://<losowe-slowa>.trycloudflare.com` dla kolegów (nowy przy każdym
+uruchomieniu, działa, dopóki okno jest otwarte). Bez konta Cloudflare i ustawień routera; `cloudflared.exe`
+pobiera się raz do `narzedzia/`. Logowanie wymagane także z tego komputera (przez tunel każde zapytanie
+przychodzi z 127.0.0.1, więc konta `lokalny` nie ma) – za pierwszym razem okno zakłada konto mistrza gry
+z hasłem. Kolegom zakłada się konta w zakładce *Drużyny*.
+
 **Wygląd** (lista w nagłówku): klasyczny, *Talerze z kebabem*, *Grafik zmian*, *Kebab nocą* – pliki `panel_gracza/static/motywy/*.css`,
 przełącznik `panel_gracza/static/motyw.js`.
 
