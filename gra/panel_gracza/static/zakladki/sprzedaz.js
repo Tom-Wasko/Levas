@@ -1,5 +1,15 @@
 // Sprzedaż: cennik i rabaty, wyniki sprzedaży na tle konkurencji.
-import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wykres, zl, zl2 } from "./wspolne.js";
+
+const grosze = (x) => Math.round(x * 100) / 100;
+
+// widełki ceny dania (silnik/menu.py: widelki_ceny) – cena rynkowa = preferowana × średni mnożnik cen stref
+function widelki(kat, u) {
+  const g = kat.mapa?.menu?.ceny;
+  if (!g) return null;
+  const s = Object.values(kat.mapa.popyt.strefy), rynkowa = grosze(kat.uslugi[u].cena_preferowana * s.reduce((a, x) => a + x.cena, 0) / s.length);
+  return { rynkowa, min: grosze(rynkowa * g.min), max: grosze(rynkowa * g.max) };
+}
 
 export const sprzedaz = {
   tytul: "Sprzedaż", ikona: "🛒", odblokowanie: "sprzedaz",
@@ -12,16 +22,17 @@ export const sprzedaz = {
       const k = kat.uslugi[u], c = ceny[u], braki = gotowe[u] || [];
       const inni = Object.entries(rynek[u] || {}).filter(([f]) => f !== v.firma).map(([, x]) => x);
       const sr = inni.length ? inni.reduce((a, b) => a + b, 0) / inni.length : null;
-      const wl = !!c;
+      const wl = !!c, wd = widelki(kat, u);
       return [`${esc(k.nazwa)}${braki.filter((b) => !b.includes("włączona")).length ? `<br><span class="podpowiedz" style="color:var(--czerwony)">${braki.filter((b) => !b.includes("włączona")).map(esc).join("; ")}</span>` : ""}`,
-        zl(k.cena_preferowana), sr ? zl2(sr) : "–",
+        `${zl(k.cena_preferowana)}${wd ? `<br><span class="podpowiedz">dozwolone ${zl2(wd.min)}–${zl2(wd.max)}</span>` : ""}`, sr ? zl2(sr) : "–",
         `<button class="btn ${wl ? "zielony" : "czarny"} maly" data-akcja="wlacz-sprzedaz" data-u="${u}" ${edycja ? "" : "disabled"}>${wl ? "✓ Wybrano" : "Wybierz"}</button>`,
-        wl ? `<input type="number" class="krotkie" min="1" step="0.5" value="${c.cena}" data-zmiana="cena" data-u="${u}" ${edycja ? "" : "disabled"}>` : "",
+        wl ? `<input type="number" class="krotkie" min="${wd ? wd.min : 1}" ${wd ? `max="${wd.max}"` : ""} step="0.5" value="${c.cena}" data-zmiana="cena" data-u="${u}" ${edycja ? "" : "disabled"}>` : "",
         wl ? `<input type="number" class="krotkie" min="0" step="0.5" value="${c.rabat}" data-zmiana="rabat" data-u="${u}" ${edycja ? "" : "disabled"}>` : "",
         wl ? `${zl2(c.cena - c.rabat)} <span class="podpowiedz">(${proc((c.cena - c.rabat) / k.cena_preferowana, 0)} pref.)</span>` : ""];
     });
+    const g = kat.mapa?.menu?.ceny;
     return tabela(null, ["Danie", "Preferowana cena", "Średnia cena konkurencji (poprz. runda)", "Sprzedaż", "Cena", "Rabat", "Cena dla klienta"], w, { klasy: ["l"] })
-      + `<p class="podpowiedz">Cena wpływa na popyt i na zadowolenie klientów. Niższa cena od konkurencji przyciąga klientów, a im więcej lokali ma danie w menu, tym mniej klientów przypada na każdą.</p>`;
+      + `<p class="podpowiedz">Cena wpływa na popyt i na zadowolenie klientów. Niższa cena od konkurencji przyciąga klientów, a im więcej lokali ma danie w menu, tym mniej klientów przypada na każdą.${g ? ` Cena musi mieścić się w widełkach: od ${proc(g.min, 0)} do ${proc(g.max, 0)} ceny rynkowej (cena dla klienta po rabacie – nie niżej niż dolna granica).` : ""}</p>`;
   },
   wyniki({ v, kat }) {
     const r = v.rynek, firmy = Object.keys(r.firmy);
@@ -58,7 +69,15 @@ export const sprzedaz = {
     }),
   },
   zmiany: {
-    cena: (el, c) => c.zmien((d) => { d.sprzedaz = { ...c.v.stan.ceny, [el.dataset.u]: { ...c.v.stan.ceny[el.dataset.u], cena: Math.max(1, +el.value || 1) } }; }),
+    cena: (el, c) => {
+      const u = el.dataset.u, wd = widelki(c.kat, u);
+      let cena = Math.max(1, +el.value || 1);
+      if (wd && (cena < wd.min || cena > wd.max)) {
+        cena = Math.min(wd.max, Math.max(wd.min, cena));
+        toast(`${nazwaUslugi(c.kat, u)}: cena musi być między ${zl2(wd.min)} a ${zl2(wd.max)} – ustawiono ${zl2(cena)}.`);
+      }
+      return c.zmien((d) => { d.sprzedaz = { ...c.v.stan.ceny, [u]: { ...c.v.stan.ceny[u], cena } }; });
+    },
     rabat: (el, c) => c.zmien((d) => { d.sprzedaz = { ...c.v.stan.ceny, [el.dataset.u]: { ...c.v.stan.ceny[el.dataset.u], rabat: Math.max(0, +el.value || 0) } }; }),
   },
 };

@@ -116,3 +116,19 @@ def test_zamowienia_ponad_saldo(gra_botow):
     info = {"zakupy_zasobow": {"Hurtownia": [{"wartosc": 100.0}]}}
     lb = lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info=info)
     assert not [b for b in lb if b["zakladka"] == "dostawcy"] and any("kredyt odnawialny" in t for t in _teksty(lb))
+
+
+def test_cena_poza_widelkami_rynku_odrzucona():
+    from test_lokale import _lokal, _runda
+    g = _gra(("A", None), ("B", None))
+    dane = g.dane
+    rynkowa = mn.cena_rynkowa(dane, "kebab_w_bulce")
+    assert mn.widelki_ceny(dane, "kebab_w_bulce") == (round(rynkowa * 0.5, 2), round(rynkowa * 2, 2))
+    _runda(g, A=_lokal("centrum_3"))
+    s = _runda(g, A={"sprzedaz": {"kebab_w_bulce": {"cena": 25}, "kebab_box": {"cena": 200}}})
+    assert set(s.firmy["A"].ceny) == {"kebab_w_bulce"}
+    tekst = _teksty(s.wyniki[2]["A"]["lista_bledow"], "oferta")
+    assert any("za wysoka" in t and "Danie nie weszło do sprzedaży" in t for t in tekst)
+    s = _runda(g, A={"sprzedaz": {"kebab_w_bulce": {"cena": 25, "rabat": 20}}})    # po rabacie 5 zł
+    assert s.firmy["A"].ceny["kebab_w_bulce"].cena == 25 and s.firmy["A"].ceny["kebab_w_bulce"].rabat == 0
+    assert any("za niska" in t and "Zostaje poprzednia cena" in t for t in _teksty(s.wyniki[3]["A"]["lista_bledow"], "oferta"))

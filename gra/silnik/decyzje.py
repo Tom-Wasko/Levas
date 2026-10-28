@@ -153,8 +153,20 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             if u not in firma.uslugi_kiedykolwiek:
                 firma.uslugi_kiedykolwiek.append(u)
     if "sprzedaz" in d and "sprzedaz" in odbl:
-        firma.ceny = {u: Cena(cena=float(c["cena"]), rabat=float(c.get("rabat", 0) or 0))
-                      for u, c in d["sprzedaz"].items() if c and c.get("cena")}
+        ceny = {}
+        for u, c in d["sprzedaz"].items():
+            if not (c and c.get("cena")):
+                continue
+            nowa = Cena(cena=float(c["cena"]), rabat=float(c.get("rabat", 0) or 0))
+            powod = mn.powod_ceny(dane, u, nowa.cena, nowa.rabat)
+            if powod:      # cena spoza widełek (menu.yaml: ceny) – zostaje poprzednia
+                info.setdefault("odrzucone_ceny", []).append(
+                    f"{powod} Zostaje poprzednia cena." if u in firma.ceny else f"{powod} Danie nie weszło do sprzedaży.")
+                if u in firma.ceny:
+                    ceny[u] = firma.ceny[u]
+            else:
+                ceny[u] = nowa
+        firma.ceny = ceny
     if d.get("bank") and d["bank"] in dane.dostepne("banki", runda):
         firma.bank = d["bank"]
     if d.get("biuro") and bo.poprawny_wybor(dane, d["biuro"]):   # biura z mapy albo samodzielna księgowość
@@ -451,6 +463,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
                   f"({lim['pracownicy']['limit']}) – kolejnych przyjmiesz w następnej rundzie.")
         if firma.lokale and runda < lim["lokal"]["od_rundy"]:
             dodaj("niebieski", "lokale", lk.komunikat_odpoczynku(dane, firma, runda))
+        for tekst in (info or {}).get("odrzucone_ceny", []):
+            dodaj("czerwony", "oferta", tekst)
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():
             dodaj("czerwony", "stanowiska", f"Brak miejsca w lokalach na {n} {dane.typy_stanowisk[typ]['nazwa'].lower()} "
                   "– nie zostały uruchomione. Weź większy lub kolejny lokal.")

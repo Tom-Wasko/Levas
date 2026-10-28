@@ -12,3 +12,8 @@ jakosc:
   kucharze: 0.3
   sprzet: 0.2
 zmiana_dania: 0.5
+# widełki ceny dania względem ceny rynkowej (cena preferowana × średni mnożnik cen stref, popyt.yaml): cena z menu
+# najwyżej max, cena dla klienta (po rabacie) najmniej min; cena spoza widełek jest odrzucana (test gry 28.10)
+ceny:
+  min: 0.5
+  max: 2.0

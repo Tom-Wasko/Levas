@@ -26,6 +26,36 @@ def jakosc_dania(dane: Dane, jakosc: tuple[float, float, float]) -> float:
     return mnoznik_jakosci(dane, *jakosc, wagi={"pracownicy": w["kucharze"], "sprzet": w["sprzet"], "zasoby": w["skladniki"]})
 
 
+def cena_rynkowa(dane: Dane, u: str) -> float:
+    """Cena rynkowa dania: cena preferowana × średni mnożnik cen stref (popyt.yaml)."""
+    strefy = list(dane.mapa["popyt"]["strefy"].values())
+    return round(dane.uslugi[u]["cena_preferowana"] * sum(s["cena"] for s in strefy) / len(strefy), 2)
+
+
+def widelki_ceny(dane: Dane, u: str) -> tuple[float, float] | None:
+    """Najniższa cena dla klienta i najwyższa cena z menu (menu.yaml: ceny); None – gra bez lokali."""
+    g = (dane.mapa or {}).get("menu", {}).get("ceny")
+    if not g:
+        return None
+    r = cena_rynkowa(dane, u)
+    return round(r * g["min"], 2), round(r * g["max"], 2)
+
+
+def powod_ceny(dane: Dane, u: str, cena: float, rabat: float) -> str | None:
+    """Dlaczego cena dania jest odrzucona (None – w widełkach)."""
+    w = widelki_ceny(dane, u)
+    if not w:
+        return None
+    g, nazwa = dane.mapa["menu"]["ceny"], dane.uslugi[u]["nazwa"]
+    widelki = (f"dozwolone ceny to od {g['min']:.0%} do {g['max']:.0%} ceny rynkowej ({_zl(cena_rynkowa(dane, u))} zł), "
+               f"czyli {_zl(w[0])}–{_zl(w[1])} zł")
+    if cena > w[1] + EPS:
+        return f"{nazwa}: cena {_zl(cena)} zł jest za wysoka – {widelki}."
+    if cena - rabat < w[0] - EPS:
+        return f"{nazwa}: cena dla klienta {_zl(cena - rabat)} zł (po rabacie) jest za niska – {widelki}."
+    return None
+
+
 def wylaczone(dane: Dane, magazyn: dict, dania) -> dict[str, str]:
     """Dania bez składnika na stanie: {danie: brakujący składnik}."""
     wynik = {}

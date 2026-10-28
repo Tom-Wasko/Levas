@@ -73,7 +73,7 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
             "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy")},
-            "menu": {k: me[k] for k in ("jakosc", "zmiana_dania")},
+            "menu": {k: me[k] for k in ("jakosc", "zmiana_dania", "ceny")},
             "banki": PlikBankow.model_validate(ba).model_dump(exclude={"opis", "zrodlo"}),  # z domyślnymi polami
             "harpagon": PlikHarpagona.model_validate(ha).model_dump(exclude={"opis", "zrodlo"}),
             "biura": PlikBiur.model_validate(bi).model_dump(exclude={"opis", "zrodlo"}),

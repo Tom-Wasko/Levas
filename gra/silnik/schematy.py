@@ -632,9 +632,21 @@ class WagiJakosciDania(Schemat):
     sprzet: float = Field(ge=0)
 
 
+class WidelkiCen(Schemat):
+    min: float = Field(gt=0)
+    max: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _kolejnosc(self):
+        if self.min >= self.max:
+            raise ValueError("ceny: min musi być mniejsze od max")
+        return self
+
+
 class PlikMenu(Plik):
     jakosc: WagiJakosciDania
     zmiana_dania: float = Field(ge=0, le=1)
+    ceny: WidelkiCen
 
 
 class PlikPopytu(Plik):

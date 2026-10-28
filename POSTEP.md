@@ -262,7 +262,7 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 - [x] Q7 Licytacja lokali od rundy 1 (wyższa oferta wygrywa, przegrany dostaje wyjaśnienie)
 - [x] Q8 Kredyt inwestycyjny bez 4 rund historii – od wzięcia lokalu, także na zakup lokalu w tej samej rundzie
   (kupowany lokal jako zastaw)
-- [ ] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)
+- [x] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)
 - [ ] Q10 Popyt liczony samodzielnie: bez gotowej prognozy w Menu i w Klientach i strefach
 - [ ] Q11 Runda 1: nazwa firmy, wgrane logo, kolor, slogan; mapa pokazuje, kto ma który lokal
 - [ ] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
