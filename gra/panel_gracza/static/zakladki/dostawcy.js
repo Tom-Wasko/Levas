@@ -40,11 +40,22 @@ function dostawy(kat, z, potrzeba, stan, udzialy, dozwolone) {
   return wynik;
 }
 
+// Udziały dni rundy w sprzedaży do rozłożenia dostaw: prognoza dzienna, a bez niej (np. lokal wzięty w tej rundzie –
+// jeszcze bez prognozy) wagi dni stref lokali firmy, a bez lokali – po równo. null – gra bez dni dostaw.
+function udzialyDni(v) {
+  const dni = dniDostaw(v);
+  if (!dni) return null;
+  const p = v.popyt?.prognoza?.dni;
+  if (p?.length === dni.length && p.some((x) => x > 0)) return p;
+  const wagi = (v.lokale?.moje || []).map((l) => v.popyt?.strefy?.[l.strefa]?.dni).filter((w) => w?.length === dni.length);
+  return wagi.length ? dni.map((_, i) => wagi.reduce((s, w) => s + w[i], 0)) : dni.map(() => 1);
+}
+
 // Zamówienia na prognozę u najtańszych (jak planowanie.zamowienie_zasobow): z podziałem na dni bez dyskontów
 // i bez dostawców, u których któraś dostawa nie osiąga minimalnego zamówienia.
 function planZamowien(c, q, zapas) {
   const pot = zapotrzebowanie(c.v, c.kat), ceny = c.v.ceny_dostawcow;
-  const udzialy = dniDostaw(c.v) && c.v.popyt?.prognoza?.dni?.length ? c.v.popyt.prognoza.dni : null;
+  const udzialy = udzialyDni(c.v);
   const pomin = new Set(udzialy ? Object.keys(ceny).filter((d) => info(c.v, d).odbior_osobisty) : []);
   for (;;) {
     const tanie = najtansze(ceny, pomin), nowe = [];
@@ -94,6 +105,19 @@ function planDostaw(P, tytul) {
     + P.uwagi.map((u) => `<div class="komunikat">${esc(u)}</div>`).join("");
 }
 
+// Zamówienia rundy – każda pozycja z przyciskiem usunięcia (pozycja = dostawca, składnik, jakość i dzień dostawy).
+function listaZamowien(v, edycja) {
+  const ceny = v.ceny_dostawcow, dni = dniDostaw(v), zam = v.decyzje.zamowienia || [];
+  if (!zam.length) return "";
+  const dzien = (x) => { const d = dni && dni[+x.dzien || 0]; return d ? `${DNI[dzienTyg(d.data)]} <span class="podpowiedz">${+d.data.slice(8)}.${d.data.slice(5, 7)}</span>` : "–"; };
+  const wartosc = (x) => (ceny[x.dostawca]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc;
+  const usun = (i) => `<button class="btn jasny maly" data-akcja="zam-usun" data-i="${i}" title="Usuń pozycję" ${edycja ? "" : "disabled"}>✕ Usuń</button>`;
+  return tabela(`Twoje zamówienia w tej rundzie (${zam.length})`, ["Dostawca", "Składnik", "Jakość", ...(dni ? ["Dostawa"] : []), "Ilość (opak.)", "Wartość", ""],
+    zam.map((x, i) => [esc(x.dostawca), esc(x.zasob), gw(+x.jakosc), ...(dni ? [dzien(x)] : []), licz(x.ilosc), zl2(wartosc(x)), usun(i)]),
+    { klasy: ["l", "l"], stopka: ["Razem", "", "", ...(dni ? [""] : []), "", zl2(zam.reduce((s, x) => s + wartosc(x), 0)),
+      edycja ? `<button class="btn jasny maly" data-akcja="zam-wyczysc">Usuń wszystkie</button>` : ""] });
+}
+
 function zapotrzebowanie(v, kat) {
   const wynik = {};
   for (const [u, p] of Object.entries(v.stan.oferta)) {
@@ -139,6 +163,7 @@ export const dostawcy = {
     let html = `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl2(koszt)}</span></span>${auto}</div>`;
     html += tabela("Zapotrzebowanie na prognozowanych klientów (opakowania)", ["Zasób", "Opakowanie", "Potrzeba wg prognoz", "W magazynie",
       "Zamówione teraz", "Brakuje", "Najtańsze oferty"], wiersze, { klasy: ["l", "l"] });
+    html += listaZamowien(v, edycja);
     if (dniDostaw(v)) html += `<p class="podpowiedz">„Zamów” w grze z lokalami pomija dyskonty (odbiór osobisty, limity) – w nich kupujesz ręcznie w bazie składników.</p>`;
     html += plan;
     const wyn = v.swiezosc?.wynajem;
@@ -173,6 +198,13 @@ export const dostawcy = {
   },
   akcje: {
     baza: (el, c) => oknoBazy(c, el.dataset.d),
+    "zam-usun": (el, c) => {
+      const x = (c.v.decyzje.zamowienia || [])[+el.dataset.i];
+      if (!x) return;
+      const ta = (y) => y.dostawca === x.dostawca && y.zasob === x.zasob && +y.jakosc === +x.jakosc && (+y.dzien || 0) === (+x.dzien || 0);
+      return c.zmien((d) => { d.zamowienia = (d.zamowienia || []).filter((y) => !ta(y)); });
+    },
+    "zam-wyczysc": (el, c) => c.zmien((d) => { d.zamowienia = []; }),
     "auto-zamow": async (el, c) => {
       const q = +document.getElementById("auto-jakosc").value, zapas = +document.getElementById("auto-zapas").value;
       const nowe = planZamowien(c, q, zapas);
