@@ -37,7 +37,7 @@ function porownanie(v, kat) {
   const kom = (kategoria, b, tekst) => naj[kategoria] === b.nazwa ? `<b class="akcent">${tekst}</b>` : tekst;
   return tabela("Porównanie ofert", ["Bank", "Konto + terminal / mies.", "Prowizja od kart", "Lokaty", "Kredyt bez historii", "Kredyt pod zastaw", "Leasing", "Limit w koncie"],
     bankiLista(kat).map((b) => {
-      const bezHist = b.kredyty.find((p) => !p.historia), zastaw = b.kredyty.find((p) => p.zastaw);
+      const bezHist = b.kredyty.find((p) => !p.historia && !p.od_lokalu), zastaw = b.kredyty.find((p) => p.zastaw);
       return [esc(b.nazwa), kom("konto", b, zl(b.konto + b.terminal.abonament)), proc(b.terminal.prowizja, 2),
         kom("lokata", b, Object.entries(b.lokaty).map(([r, o]) => `${r} r.: ${proc(o, 1)}`).join(" · ")),
         bezHist ? kom("kredyt_bez_historii", b, proc(bezHist.oprocentowanie, 1)) : "–",
@@ -73,7 +73,8 @@ function kredyty(v, kat, edycja) {
     { klasy: ["l", "l", "l"] })
     + (nowe.length ? `<p>Nowe kredyty: ${nowe.map((k, i) => `${esc(k.bank)} – ${PRODUKTY[k.produkt]} ${zl(k.kwota)} na ${rundy(k.rund)} <a href="#" data-akcja="bk-usun" data-co="kredyty_wez" data-i="${i}">usuń</a>`).join(", ")}</p>` : "")
     + `<p><button class="btn zielony" data-akcja="bk-nowy-kredyt" ${edycja ? "" : "disabled"}>Weź kredyt</button>
-      <span class="podpowiedz">Historia firmy: ${rundy(v.banki.historia)} (kredyty poza startowym wymagają co najmniej ${rundy(u.historia_rund)}).
+      <span class="podpowiedz">Historia firmy: ${rundy(v.banki.historia)} (kredyty obrotowe wymagają co najmniej ${rundy(u.historia_rund)};
+      inwestycyjny – od wzięcia lokalu, a zastawem może być lokal kupowany w tej rundzie).
       Raty kapitałowe równe + odsetki, od następnej rundy; prowizja od razu w koszty. Brak środków na ratę – odsetki karne
       ${proc(u.stopa_karna, 0)}, a gdy zaległość trwa ${rundy(u.przejecie_po)}, bank przejmuje zastaw (wycena ${proc(u.wycena_zastawu, 0)} wartości netto).</span></p>`;
 }
@@ -154,6 +155,12 @@ export function wynikiBanku({ v }) {
   return html + `<p class="podpowiedz">Historia firmy na koniec ${OKRES.dopelniacz}: ${rundy(w.historia)}.</p>`;
 }
 
+// lokal kupowany w tej rundzie (zakładka Lokale) – zastaw kredytu inwestycyjnego, wartość = cena z oferty
+function kupowanyLokal(c) {
+  const wyb = c.d.lokal, lok = wyb?.forma === "kupno" ? (c.v.lokale?.oferta || []).find((l) => l.id === wyb.id) : null;
+  return lok?.cena ? [{ id: `lokal:${lok.id}`, nazwa: `${lok.typ === "dzialka" ? "Działka" : "Lokal"}: ${lok.adres} (kupowany w tej rundzie)`, wartosc: +wyb.oferta || lok.cena }] : [];
+}
+
 const pole = (id, etykieta, html) => `<label class="pole">${etykieta}${html.replace("<select", `<select id="${id}"`).replace("<input", `<input id="${id}"`)}</label>`;
 const wartosc = (id) => document.getElementById(id)?.value;
 const przyciski = (akcja, tekst) => `<button class="btn jasny" data-akcja="zamknij-okno">Zamknij</button><button class="btn zielony" data-akcja="${akcja}">${tekst}</button>`;
@@ -181,13 +188,14 @@ export const akcjeBanku = {
   },
   "bk-nowy-kredyt": (el, c) => {
     const lista = oferty(c.kat);
-    const opcje = lista.map((p, i) => `<option value="${i}">${esc(p.bank)} – ${esc(p.nazwa)} – ${proc(p.oprocentowanie, 1)}, prowizja ${proc(p.prowizja, 1)}, do ${zl(p.maks_kwota)} / ${rundy(p.maks_rund)}${p.historia ? " (wymaga historii)" : ""}${p.zastaw ? " (pod zastaw)" : ""}</option>`);
-    const zastawy = c.v.banki.zastawy.map((z) => `<option value="${esc(z.id)}">${esc(z.nazwa)} – wartość ${zl(z.wartosc)}</option>`);
+    const opcje = lista.map((p, i) => `<option value="${i}">${esc(p.bank)} – ${esc(p.nazwa)} – ${proc(p.oprocentowanie, 1)}, prowizja ${proc(p.prowizja, 1)}, do ${zl(p.maks_kwota)} / ${rundy(p.maks_rund)}${p.historia ? " (wymaga historii)" : ""}${p.od_lokalu ? " (dla firmy z lokalem)" : ""}${p.zastaw ? " (pod zastaw)" : ""}</option>`);
+    const zastawy = [...c.v.banki.zastawy, ...kupowanyLokal(c)].map((z) => `<option value="${esc(z.id)}">${esc(z.nazwa)} – wartość ${zl(z.wartosc)}</option>`);
     okno("Kredyt", `${pole("bk-k-oferta", "Oferta", `<select>${opcje.join("")}</select>`)}
       <div class="dwie">${pole("bk-k-kwota", "Kwota", `<input type="number" min="100" step="1000" value="10000">`)}
       ${pole("bk-k-rund", `Okres (${OKRES.mnoga})`, `<input type="number" min="1" value="26">`)}</div>
       ${pole("bk-k-zastaw", "Zastaw (kredyt inwestycyjny)", `<select><option value="">– bez zastawu –</option>${zastawy.join("")}</select>`)}
-      <p class="podpowiedz">Pod zastaw można dać kupiony lokal albo kupiony sprzęt (wartość netto po amortyzacji).</p>`,
+      <p class="podpowiedz">Pod zastaw można dać kupiony lokal albo kupiony sprzęt (wartość netto po amortyzacji), a także lokal
+        kupowany w tej rundzie – kredyt wchodzi przed zakupem, więc pokrywa część ceny.</p>`,
     { male: true, przyciski: przyciski("bk-wez-kredyt", "Weź kredyt") });
   },
   "bk-wez-kredyt": async (el, c) => {

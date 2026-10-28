@@ -99,7 +99,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         # wypłata własna → klub (tylko z zaproszeniem) → wpłata własna; prywatny portfel, poza KPiR
         portfel_info = wl.poczatek_rundy(dane, f, d, r, rachunki[nazwa], ziarno, podglad)
         lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa],
-                           przegrane.get((nazwa, "lokal")))
+                           przegrane.get((nazwa, "lokal")), bk.finansowanie_lokalu(dane, f, d, r))
+        bk.kredyty_na_lokal(dane, f, bank_info, r, ksiegi[nazwa], rachunki[nazwa])   # pod zastaw kupionego lokalu
         # kupno budynku z najemcą, wypowiedzenia najmu (silnik/przejecia.py)
         info_przejecia = {"przejecie": pr.przejmij(dane, s.firmy, nazwa, d.get("przejecie"), r,
                                                    przegrane.get((nazwa, "przejecie")), ksiegi[nazwa], rachunki[nazwa]),

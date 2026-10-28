@@ -101,8 +101,10 @@ def oferta(dane: Dane, decyzja: dict, lok: dict, forma: str, runda: int) -> tupl
     return kwota, None
 
 
-def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete_lokale: dict[str, str]) -> str | None:
-    """Dlaczego lokalu nie można wziąć (None – można)."""
+def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete_lokale: dict[str, str],
+                     finansowanie: float = 0.0) -> str | None:
+    """Dlaczego lokalu nie można wziąć (None – można). finansowanie – kredyt tej rundy pod zastaw tego lokalu
+    (silnik/banki.py: finansowanie_lokalu)."""
     lok = dane.lokale.get(decyzja.get("id"))
     forma = decyzja.get("forma")
     if lok is None:
@@ -122,19 +124,19 @@ def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete
     kwota, blad = oferta(dane, decyzja, lok, forma, runda)
     if blad:
         return blad
-    if forma == "kupno" and firma.gotowka < koszt_wejscia(dane, lok, forma, kwota):
+    if forma == "kupno" and firma.gotowka + finansowanie < koszt_wejscia(dane, lok, forma, kwota):
         return f"Za mało gotówki na zakup: potrzeba {koszt_wejscia(dane, lok, forma, kwota):,.0f} zł.".replace(",", " ")
     return None
 
 
 def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_lokale: dict[str, str],
-            ksiega: Ksiega, rachunek: Rachunek, przegrana: str | None = None) -> dict:
+            ksiega: Ksiega, rachunek: Rachunek, przegrana: str | None = None, finansowanie: float = 0.0) -> dict:
     """Decyzja o nowym lokalu. Zwraca {"id", "forma", "oferta", "przyjety", "powod", "dziala_od"} (pusty – brak
     decyzji). `przegrana` – powód przegranej licytacji (silnik/przejecia.py)."""
     if not decyzja or not decyzja.get("id"):
         return {}
     info = {"id": decyzja["id"], "forma": decyzja.get("forma")}
-    powod = przegrana or powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale)   # przegrana – z wyjaśnieniem
+    powod = przegrana or powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale, finansowanie)   # przegrana – z wyjaśnieniem
     if powod:
         return {**info, "przyjety": False, "powod": powod}
     lok, forma = dane.lokale[decyzja["id"]], decyzja["forma"]

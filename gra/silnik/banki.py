@@ -4,8 +4,11 @@ Sześć banków, każdy z inną najlepszą ofertą. Konto firmowe (`firma.bank`)
 (abonament + prowizja od płatności kartą) i limit w koncie (kredyt odnawialny do kwoty limitu; debet ponad limit –
 odsetki karne). Lokaty, kredyty i leasing można brać w dowolnym banku – rozliczają się na koncie firmowym.
 
-Kredyty: „na start” bez historii firmy, pozostałe dopiero po `historia_rund` rundach od otwarcia pierwszego lokalu;
-inwestycyjny – pod zastaw własnego lokalu albo sprzętu (kwota do części wartości netto zastawu). Raty kapitałowe
+Kredyty: „na start” bez historii firmy, obrotowe dopiero po `historia_rund` rundach od otwarcia pierwszego lokalu;
+inwestycyjny (`od_lokalu`) – od wzięcia pierwszego lokalu, pod zastaw własnego lokalu albo sprzętu (kwota do części
+wartości netto zastawu); zastawem może być lokal kupowany w tej samej rundzie (wartość – cena z oferty): kredyt
+liczy się do gotówki na zakup, a wchodzi po decyzji o lokalu (`kredyty_na_lokal`) – gdy lokalu nie uda się kupić,
+kredyt przepada. Raty kapitałowe
 równe + odsetki od pozostałej kwoty, od rundy po zaciągnięciu. Gdy gotówki i wolnego limitu nie starcza na ratę,
 rata nie wchodzi, a kredyt biegnie dalej na odsetkach karnych (niezapłacone odsetki doliczane do długu, zaległe raty
 kapitałowe spłacane razem z najbliższą ratą); po `przejecie_po` rundach z rzędu bank przejmuje zastaw: sprzęt
@@ -19,6 +22,7 @@ from __future__ import annotations
 from . import srodki_trwale as st_trwale
 from .dane import Dane
 from .finanse import Ksiega, Rachunek, ksieguj
+from .lokale import oferta
 from .model import Firma, Kredyt, Leasing, Lokata
 
 EPS = 1e-6
@@ -45,7 +49,7 @@ def najlepsze(dane: Dane) -> dict[str, str]:
     return {
         "konto": min(b, key=lambda x: x["konto"] + x["terminal"]["abonament"])["nazwa"],
         "lokata": max(b, key=lambda x: max(x["lokaty"].values()))["nazwa"],
-        "kredyt_bez_historii": min(((n, k) for n, k in kredyty if not k["historia"]),
+        "kredyt_bez_historii": min(((n, k) for n, k in kredyty if not (k["historia"] or k.get("od_lokalu"))),
                                    key=lambda p: p[1]["oprocentowanie"])[0],
         "kredyt_inwestycyjny": min(((n, k) for n, k in kredyty if k.get("zastaw")),
                                    key=lambda p: p[1]["oprocentowanie"])[0],
@@ -91,6 +95,25 @@ def zastawy(dane: Dane, firma: Firma) -> list[dict]:
     return wynik
 
 
+def nowy_lokal(dane: Dane, decyzje: dict, runda: int) -> dict | None:
+    """Lokal (albo działka) kupowany w tej rundzie jako zastaw kredytu inwestycyjnego; wartość – cena z oferty
+    (tyle wejdzie do ewidencji środków trwałych)."""
+    dl = decyzje.get("lokal") or {}
+    lok = dane.lokale.get(dl.get("id")) if dl.get("forma") == "kupno" else None
+    kwota = oferta(dane, dl, lok, "kupno", runda)[0] if lok and lok.get("cena") else None
+    if not kwota:
+        return None
+    co = "Działka" if lok["typ"] == "dzialka" else "Lokal"
+    return {"id": f"lokal:{lok['id']}", "nazwa": f"{co}: {lok['adres']} (kupowany w tej rundzie)", "wartosc": round(kwota, 2)}
+
+
+def finansowanie_lokalu(dane: Dane, firma: Firma, decyzje: dict, runda: int) -> float:
+    """Kredyty tej rundy pod zastaw kupowanego lokalu, których bank udzieli – gotówka na zakup (silnik/lokale.py)."""
+    nowy = nowy_lokal(dane, decyzje, runda)
+    return sum(float(d["kwota"]) for d in decyzje.get("kredyty_wez", [])
+               if nowy and d.get("zastaw") == nowy["id"] and not powod_kredytu(dane, firma, d, runda, nowy))
+
+
 def _przejmij_zastaw(dane: Dane, firma: Firma, k: Kredyt, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> dict:
     """Bank przejmuje zastaw zaległego kredytu: wycena pomniejsza dług, nadwyżka wraca na konto."""
     u = ustawienia(dane)
@@ -130,8 +153,8 @@ def _przejmij_zastaw(dane: Dane, firma: Firma, k: Kredyt, runda: int, ksiega: Ks
 
 # --- decyzje (początek rundy) ----------------------------------------------------------------------
 
-def powod_kredytu(dane: Dane, firma: Firma, d: dict, runda: int) -> str | None:
-    """Dlaczego bank odmówi kredytu (None – udzieli)."""
+def powod_kredytu(dane: Dane, firma: Firma, d: dict, runda: int, nowy: dict | None = None) -> str | None:
+    """Dlaczego bank odmówi kredytu (None – udzieli). nowy – lokal kupowany w tej rundzie (nowy_lokal) jako zastaw."""
     u = ustawienia(dane)
     bank = banki(dane).get(d.get("bank"))
     if not bank:
@@ -148,10 +171,13 @@ def powod_kredytu(dane: Dane, firma: Firma, d: dict, runda: int) -> str | None:
         return f"kwota najwyżej {produkt['maks_kwota']:,.0f} PLN".replace(",", " ")
     if produkt["historia"] and historia(firma, runda) < u["historia_rund"]:
         return f"bank wymaga {u['historia_rund']} rund historii firmy (od otwarcia pierwszego lokalu)"
+    if produkt.get("od_lokalu") and not firma.lokale and not (nowy and d.get("zastaw") == nowy["id"]):
+        return ("bank udziela go firmie z lokalem – najpierw wynajmij albo kup lokal (zakładka Lokale); "
+                "kupowany lokal może być zastawem już w tej rundzie")
     if any(k.bank == bank["nazwa"] and k.produkt == produkt["produkt"] for k in firma.kredyty):
         return "ten kredyt jest już w spłacie – najpierw spłać poprzedni"
     if produkt.get("zastaw"):
-        z = next((x for x in zastawy(dane, firma) if x["id"] == d.get("zastaw")), None)
+        z = next((x for x in zastawy(dane, firma) + ([nowy] if nowy else []) if x["id"] == d.get("zastaw")), None)
         if not z:
             return "wybierz zastaw (kupiony lokal albo sprzęt, niezastawiony)"
         if kwota > produkt["zastaw"] * z["wartosc"] + EPS:
@@ -160,8 +186,11 @@ def powod_kredytu(dane: Dane, firma: Firma, d: dict, runda: int) -> str | None:
 
 
 def poczatek_rundy(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> dict:
-    """Zmiana konta, zerwane lokaty, spłaty kredytów, nowe kredyty i lokaty (przed zakupami rundy)."""
-    info = {"nowe_lokaty": [], "nowe_kredyty": [], "zerwane_lokaty": [], "splacone_kredyty": [], "odrzucone": []}
+    """Zmiana konta, zerwane lokaty, spłaty kredytów, nowe kredyty i lokaty (przed zakupami rundy). Kredyty pod
+    zastaw lokalu kupowanego w tej rundzie – odłożone do `kredyty_na_lokal` (info["odlozone"])."""
+    info = {"nowe_lokaty": [], "nowe_kredyty": [], "zerwane_lokaty": [], "splacone_kredyty": [], "odrzucone": [],
+            "odlozone": []}
+    nowy = nowy_lokal(dane, decyzje, runda)
     if decyzje.get("bank") in banki(dane):
         firma.bank = decyzje["bank"]
     for lid in decyzje.get("lokaty_zerwij", []):
@@ -179,21 +208,14 @@ def poczatek_rundy(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: 
         elif k:
             info["odrzucone"].append({"co": f"Spłata kredytu nr {k.id}", "powod": "za mało gotówki na koncie"})
     for d in decyzje.get("kredyty_wez", []):
-        powod = powod_kredytu(dane, firma, d, runda)
+        na_nowy = bool(nowy) and d.get("zastaw") == nowy["id"]
+        powod = powod_kredytu(dane, firma, d, runda, nowy if na_nowy else None)
         if powod:
             info["odrzucone"].append({"co": f"Kredyt {d.get('produkt', '')} – {d.get('bank', '')}", "powod": powod})
-            continue
-        produkt = next(p for p in banki(dane)[d["bank"]]["kredyty"] if p["produkt"] == d["produkt"])
-        firma.licznik += 1
-        kwota = float(d["kwota"])
-        k = Kredyt(id=firma.licznik, kwota=kwota, oprocentowanie=produkt["oprocentowanie"], od_rundy=runda,
-                   miesiecy=int(d.get("rund") or d["miesiecy"]), pozostalo=kwota, bank=d["bank"],
-                   produkt=produkt["produkt"], zastaw=d.get("zastaw", "") if produkt.get("zastaw") else "")
-        firma.kredyty.append(k)
-        rachunek.zapisz(firma, f"{produkt['nazwa']} nr {k.id} ({k.bank})", kwota, "kredyty")
-        ksieguj(firma, ksiega, rachunek, f"Prowizja za udzielenie kredytu nr {k.id} ({k.bank})",
-                round(kwota * produkt["prowizja"], 2))
-        info["nowe_kredyty"].append(k.id)
+        elif na_nowy:
+            info["odlozone"].append(d)
+        else:
+            _udziel(dane, firma, d, runda, ksiega, rachunek, info)
     for d in decyzje.get("lokaty_zaloz", []):
         bank = banki(dane).get(d.get("bank") or firma.bank)
         rund = int(d.get("rund") or d.get("miesiecy") or 0)
@@ -211,6 +233,32 @@ def poczatek_rundy(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: 
         rachunek.zapisz(firma, f"Założenie lokaty nr {lokata.id} ({lokata.bank})", -kwota, "lokaty")
         info["nowe_lokaty"].append(lokata.id)
     return info
+
+
+def _udziel(dane: Dane, firma: Firma, d: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek, info: dict) -> None:
+    produkt = next(p for p in banki(dane)[d["bank"]]["kredyty"] if p["produkt"] == d["produkt"])
+    firma.licznik += 1
+    kwota = float(d["kwota"])
+    k = Kredyt(id=firma.licznik, kwota=kwota, oprocentowanie=produkt["oprocentowanie"], od_rundy=runda,
+               miesiecy=int(d.get("rund") or d["miesiecy"]), pozostalo=kwota, bank=d["bank"],
+               produkt=produkt["produkt"], zastaw=d.get("zastaw", "") if produkt.get("zastaw") else "")
+    firma.kredyty.append(k)
+    rachunek.zapisz(firma, f"{produkt['nazwa']} nr {k.id} ({k.bank})", kwota, "kredyty")
+    ksieguj(firma, ksiega, rachunek, f"Prowizja za udzielenie kredytu nr {k.id} ({k.bank})",
+            round(kwota * produkt["prowizja"], 2))
+    info["nowe_kredyty"].append(k.id)
+
+
+def kredyty_na_lokal(dane: Dane, firma: Firma, info: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> None:
+    """Odłożone kredyty pod zastaw lokalu kupowanego w tej rundzie – po decyzji o lokalu (silnik/runda.py)."""
+    for d in info.pop("odlozone", []):
+        powod = powod_kredytu(dane, firma, d, runda)
+        if powod and not any(x["id"] == d["zastaw"] for x in zastawy(dane, firma)):
+            powod = "lokal pod zastaw nie został kupiony (zakładka Lokale)"
+        if powod:
+            info["odrzucone"].append({"co": f"Kredyt {d.get('produkt', '')} – {d.get('bank', '')}", "powod": powod})
+        else:
+            _udziel(dane, firma, d, runda, ksiega, rachunek, info)
 
 
 def leasing_wez(dane: Dane, firma: Firma, decyzje: dict, runda: int, ksiega: Ksiega, rachunek: Rachunek) -> dict:

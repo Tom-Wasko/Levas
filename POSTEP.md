@@ -260,7 +260,7 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
   w ostatniej rundzie budowy/urządzania – lokal rusza gotowy do sprzedaży
 - [x] Q6 Lokale niewyposażone tańsze (czynsz, cena, adaptacja)
 - [x] Q7 Licytacja lokali od rundy 1 (wyższa oferta wygrywa, przegrany dostaje wyjaśnienie)
-- [ ] Q8 Kredyt inwestycyjny bez 4 rund historii – od wzięcia lokalu, także na zakup lokalu w tej samej rundzie
+- [x] Q8 Kredyt inwestycyjny bez 4 rund historii – od wzięcia lokalu, także na zakup lokalu w tej samej rundzie
   (kupowany lokal jako zastaw)
 - [ ] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)
 - [ ] Q10 Popyt liczony samodzielnie: bez gotowej prognozy w Menu i w Klientach i strefach

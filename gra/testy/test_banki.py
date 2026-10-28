@@ -158,3 +158,36 @@ def test_limit_w_koncie_i_debet_ponad_limit():
     assert poz["Odsetki karne od debetu ponad limit"] == round(10000 * 0.19 / 52, 2)
     assert bk.debet_ponad_limit(g.dane, f) == 10000
     assert any("ponad limit" in b["tekst"] for b in bk.bledy(g.dane, f, None, None))
+
+
+def test_kredyt_inwestycyjny_od_wziecia_lokalu_bez_historii():
+    inw = {"bank": "PKO BP", "produkt": "inwestycyjny", "kwota": 20000, "rund": 52}
+    g = _gra(("A", None), ("B", None))
+    s = _runda(g, A={**_lokal("centrum_3"), "bank": "mBank", "kredyty_wez": [{**inw, "zastaw": "lokal:centrum_3"}]},
+               B={"bank": "mBank", "kredyty_wez": [{**inw, "zastaw": "lokal:centrum_3"}]})
+    assert not s.firmy["B"].kredyty and any("firmie z lokalem" in t for t in _bledy(s, 1, "B"))
+    assert not s.firmy["A"].kredyty     # wynajęty lokal nie jest zastawem
+    g, s = _start()
+    zastaw = bk.zastawy(g.dane, s.firmy["B"])[0]
+    s = _runda(g, B={"kredyty_wez": [{**inw, "zastaw": zastaw["id"]}]})   # runda 2 – bez 4 rund historii
+    assert [(k.produkt, k.zastaw) for k in s.firmy["B"].kredyty] == [("inwestycyjny", "lokal:zygmuntowskie_1")]
+
+
+def test_kredyt_inwestycyjny_na_zakup_lokalu_w_tej_samej_rundzie():
+    g = _gra(("A", None), ("B", None))
+    cena = g.dane.lokale["politechnika_3"]["cena"]       # więcej niż kapitał startowy
+    kred = {"bank": "PKO BP", "produkt": "inwestycyjny", "kwota": 60000, "rund": 104, "zastaw": "lokal:politechnika_3"}
+    assert cena > 100000
+    oferta_a = {"lokal": {"id": "politechnika_3", "forma": "kupno", "oferta": cena + 5000}}
+    s = _runda(g, A={**oferta_a, "bank": "mBank", "kredyty_wez": [kred]},
+               B={**_lokal("politechnika_3", "kupno"), "bank": "mBank", "kredyty_wez": [kred]})
+    a = s.firmy["A"]
+    assert [lok.id for lok in a.lokale] == ["politechnika_3"]
+    assert [(k.kwota, k.zastaw) for k in a.kredyty] == [(60000, "lokal:politechnika_3")]
+    assert not bk.zastawy(g.dane, a)                 # kupiony lokal już zastawiony
+    b = s.firmy["B"]   # przegrał licytację – nie ma lokalu pod zastaw, kredyt przepada
+    assert not b.lokale and not b.kredyty
+    assert any("nie został kupiony" in t for t in _bledy(s, 1, "B"))
+    g = _gra(("A", None), ("B", None))
+    s = _runda(g, A={**_lokal("politechnika_3", "kupno"), "bank": "mBank", "kredyty_wez": [{**kred, "kwota": 30000}]})
+    assert not s.firmy["A"].lokale and not s.firmy["A"].kredyty     # za mały kredyt – brak gotówki na zakup

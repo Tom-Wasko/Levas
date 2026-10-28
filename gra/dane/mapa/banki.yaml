@@ -7,7 +7,7 @@ opis: 'Konto firmowe (opłata miesięczna, terminal: abonament miesięczny + pro
 zrodlo: 'Notatka „Elementy mapy” (specjalizacje banków); kwoty i oprocentowanie – szacunek na 10.2026 przy stopie
   referencyjnej NBP ok. 4% (tabele opłat kont firmowych i kredytów dla firm z 2025 r.), do kalibracji w kroku 5'
 udzial_kart: 0.7          # część sprzedaży płacona kartą (prowizja terminala)
-historia_rund: 4          # „firma z historią” – tyle rund od otwarcia pierwszego lokalu (kredyty poza startowym)
+historia_rund: 4          # „firma z historią” – tyle rund od otwarcia pierwszego lokalu (kredyty z historia: true)
 stopa_karna: 0.19         # odsetki za opóźnienie i debet ponad limit (odsetki maksymalne za opóźnienie)
 przejecie_po: 3           # tyle rund z rzędu bez raty → bank przejmuje zastaw (kredyt) albo sprzęt (leasing)
 wycena_zastawu: 0.8       # bank przyjmuje zastaw po tej części wartości netto
@@ -30,8 +30,10 @@ banki:
   lokaty: {1: 0.012, 4: 0.022, 13: 0.028}
   limit: {kwota: 10000, oprocentowanie: 0.135}
   kredyty:
+  # inwestycyjny od wzięcia lokalu, bez historii (test gry 28.10) – zabezpiecza go zastaw, także lokal kupowany
+  # w tej samej rundzie
   - {produkt: inwestycyjny, nazwa: Kredyt inwestycyjny, oprocentowanie: 0.079, prowizja: 0.015, maks_kwota: 300000,
-     maks_rund: 104, historia: true, zastaw: 0.7}
+     maks_rund: 104, od_lokalu: true, zastaw: 0.7}
   - {produkt: obrotowy, nazwa: Kredyt obrotowy, oprocentowanie: 0.109, prowizja: 0.02, maks_kwota: 40000, maks_rund: 52,
      historia: true}
   leasing: {wplata: 0.15, oprocentowanie: 0.089, rund: [26, 52], wykup: 0.01}

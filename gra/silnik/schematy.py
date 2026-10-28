@@ -664,6 +664,7 @@ class ProduktKredytowy(Schemat):
     maks_kwota: float = Field(gt=0)
     maks_rund: int = Field(gt=0)
     historia: bool = False               # wymaga historii firmy (banki.yaml: historia_rund)
+    od_lokalu: bool = False              # dla firmy z lokalem (także kupowanym w tej rundzie – może być zastawem)
     zastaw: float | None = Field(default=None, gt=0, le=1)  # część wartości zastawu, którą bank pożycza
 
 

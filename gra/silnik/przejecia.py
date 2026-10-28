@@ -26,6 +26,7 @@ płaci najemcy `ulepszenia_zwrot` × nakłady i zostają mu stanowiska najemcy; 
 """
 from __future__ import annotations
 
+from . import banki as bk
 from . import srodki_trwale as st_trwale
 from .dane import Dane
 from .decyzje import cena_sprzedazy_sprzetu
@@ -137,7 +138,8 @@ def licytacje(dane: Dane, firmy: dict[str, Firma], decyzje: dict, runda: int, zi
     for nazwa in sorted(firmy):
         d = decyzje.get(nazwa, {})
         dl = d.get("lokal")
-        if dl and dl.get("id") and not powod_odrzucenia(dane, firmy[nazwa], dl, runda, zajete_lokale):
+        if dl and dl.get("id") and not powod_odrzucenia(dane, firmy[nazwa], dl, runda, zajete_lokale,
+                                                         bk.finansowanie_lokalu(dane, firmy[nazwa], d, runda)):
             lok = dane.lokale[dl["id"]]
             wyw = lok["czynsz"] if dl["forma"] == "najem" else lok["cena"]
             zgloszenia.setdefault(("lokal", lok["id"]), []).append(
