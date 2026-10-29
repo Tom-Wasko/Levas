@@ -35,4 +35,5 @@ class Command(BaseCommand):
         adres = f"http://127.0.0.1:{port}/"
         if not bez_przegladarki:
             threading.Timer(1.5, webbrowser.open, [adres]).start()
-        call_command("runserver", f"127.0.0.1:{port}", use_reloader=False)
+        # /static/ przez levas/urls.py (no-cache), nie przez wbudowaną obsługę runserver
+        call_command("runserver", f"127.0.0.1:{port}", use_reloader=False, use_static_handler=False)

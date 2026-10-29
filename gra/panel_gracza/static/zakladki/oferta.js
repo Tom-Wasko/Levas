@@ -8,12 +8,12 @@ const MIESIACE = Array.from({ length: 12 }, (_, i) => {
   return m[0].toUpperCase() + m.slice(1);
 });
 
-// słupek na miesiąc; po najechaniu: mnożnik popytu dania w tym miesiącu
+// słupek na miesiąc (kolumna na całą wysokość); po najechaniu dymek: mnożnik popytu dania w tym miesiącu
 function sezon(u, miesiac) {
   const max = Math.max(...u.sezonowosc);
-  return `<div class="sezon" title="Sezonowość (styczeń–grudzień)">${u.sezonowosc.map((s, i) =>
-    `<i class="${i === miesiac ? "ten" : ""}" style="height:${Math.round((s / max) * 22)}px"
-      title="${MIESIACE[i]}: popyt × ${licz(s, 2)}${i === miesiac ? " (miesiąc sprzedaży)" : ""}"></i>`).join("")}</div>`;
+  return `<div class="sezon">${u.sezonowosc.map((s, i) =>
+    `<i class="${i === miesiac ? "ten" : ""}" data-dymek="${MIESIACE[i]}: popyt × ${licz(s, 2)}${i === miesiac ? " (miesiąc sprzedaży)" : ""}"
+      ><b style="height:${Math.round((s / max) * 22)}px"></b></i>`).join("")}</div>`;
 }
 
 export const prognozaBazowa = (u, miesiac) => Math.round((u.popyt_roczny / OKRES.rund_w_roku) * u.sezonowosc[miesiac]);

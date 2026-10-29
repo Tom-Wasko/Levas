@@ -214,3 +214,11 @@ def test_instrukcja_jak_grac_bez_logowania(client):
     assert h["tytul"] == "Tytuł" and h["spis"] == [{"kotwica": "rozdział-a", "tytul": "Rozdział A"}]
     assert "<b>gruby</b>" in h["tresc"] and "<code>kod</code>" in h["tresc"] and "&lt;x&gt;" in h["tresc"]
     assert "<li>jeden<ul><li>pod</li></ul></li>" in h["tresc"] and 'class="ramka uwaga"' in h["tresc"]
+
+
+def test_pliki_statyczne_bez_logowania_i_bez_pamieci_przegladarki(client):
+    """/static/ przez levas/urls.py: bez logowania, `no-cache` (przeglądarka pyta o zmiany), 304 bez zmian."""
+    r = client.get("/static/zakladki/oferta.js")
+    assert r.status_code == 200 and "no-cache" in r["Cache-Control"]
+    r2 = client.get("/static/zakladki/oferta.js", HTTP_IF_MODIFIED_SINCE=r["Last-Modified"])
+    assert r2.status_code == 304
