@@ -23,7 +23,7 @@ raporty/             wyniki analiz i kalibracji (tworzysz tu pliki)
 notatki/             notatki projektowe autora (Obsidian) – NIE zmieniaj bez zgody (niżej)
 dokumentacja/        STACK.md (technologie, architektura, polecenia), WIEDZA_O_GRZE.md (oryginalny
                      REVAS: karta wyników, mechaniki), ROZNICE_LEVAS_STARY.md (stara wersja Levasa)
-archiwum/            zakończone plany i dzienniki prac (Plan implementacji – tylko do odczytu)
+archiwum/            zakończone plany, dzienniki prac, stary STACK (Plan implementacji – tylko do odczytu)
 plan.txt             prywatny plik autora – nie commituj, nie zmieniaj
 gra/
   silnik/            silnik gry: czysty Python (pydantic, numpy), bez Django
@@ -59,10 +59,10 @@ python -m venv .venv                       # Python 3.12+ (autor: 3.13)
 
 ## Polecenia (z folderu `gra/`)
 ```
-.venv/Scripts/python -m pytest -q                       # ~280 testów, ok. 3 min
+.venv/Scripts/python -m pytest -q                       # ~280 testów, ok. 2 min
 .venv/Scripts/python -m ruff check .                    # linia ≤ 100 znaków
 .venv/Scripts/python -X utf8 -m silnik.dane sprawdz      # schematy i odwołania w dane/*.yaml
-.venv/Scripts/python -X utf8 -m balans.symuluj 12 sredni 7   # gra botów; 12 rund ≈ 5 s
+.venv/Scripts/python -X utf8 -m balans.symuluj 12 sredni 7   # gra botów; 12 rund ≈ 3 s
 node --check plik.mjs                                    # składnia zakładki JS (skopiuj .js jako .mjs)
 ```
 Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
@@ -73,6 +73,7 @@ Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
 - Wyniki rundy są w `stan.wyniki[runda][firma]`: `karta`, `kpir`, `sprzedaz` (popyt, sprzedaż, utracona sprzedaż, przyczyna), `magazyn`, `lista_bledow` i tak dalej. Karta wyników jest w `silnik/wyniki/karta.py`.
 - Losowość pochodzi **tylko** z `silnik/losowosc.py: strumien(ziarno, runda, cel, *klucze)`. To samo ziarno daje ten sam wynik, a testy tego pilnują.
 - Kwoty w stanie są w groszach (`int`, pola `…_gr`), a silnik liczy w złotych przez właściwości.
+- `StanGry.kopia()` (`silnik/model.py`) nie kopiuje raportów minionych rund – `stan.wyniki` i `stan.rynek` dawnych rund są wspólne dla kopii i oryginału, więc są **tylko do odczytu**. Zapisuj wyniki tylko bieżącej rundy.
 - Moduły mechanik: lokale, popyt, konkurencja, menu, dostawcy, magazyn, swiezosc, rynek_pracy, kandydaci, banki, lichwiarz (Harpagon), kasyno, biuro, urzad, awarie, reklama, promocje, handel, przejecia, zdarzenia, wlasciciel, czas_wlasciciela, wnioski, co_jesli i inne.
 
 ## Zasady kodu

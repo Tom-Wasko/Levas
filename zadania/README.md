@@ -15,8 +15,9 @@ Kodu gry nie zmieniaj. Na końcu daj mi krótkie podsumowanie raportu.
 ```
 Przeczytaj AGENTS.md, notatki/Plan optymalizacji.md i zadania/B_kalibracja.md. Wykonaj po kolei
 B1, B2, Z1–Z7, B3 (część potrzebna do pomiaru) i B4 według planu. Po każdym zadaniu testy, ruff,
-sprawdz, wpis w raporty/kalibracja/dziennik.md, POSTEP.md, commit i push. Po B4 zatrzymaj się
-i daj mi podsumowanie pomiaru startowego.
+sprawdz, wpis w raporty/kalibracja/dziennik.md, POSTEP.md, commit i push. Przed pełnym pomiarem
+zapytaj mnie, ile może trwać (bez odpowiedzi – do 1 h). Po B4 zatrzymaj się i daj mi podsumowanie
+pomiaru startowego.
 ```
 
 ## Po przeczytaniu raportu z części A i pomiaru startowego

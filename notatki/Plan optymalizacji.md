@@ -4,7 +4,7 @@
 
 Zastępuje plan implementacji (`archiwum/Plan implementacji.md`, kroki 1–4 zrobione 28.10.2026). Wykonuje go OpenCode (modele Opus 5.5 high albo Fable 5.1). Zasady pracy w repozytorium są w `AGENTS.md`, szczegółowe instrukcje dla sesji w `zadania/`, a gotowe polecenia do wklejenia w `zadania/README.md`. Postęp (checkboxy) jest w `POSTEP.md`, a nie w tej notatce.
 
-Ustalenia z autorem: 28.10.2026 (cele), 29.10.2026 (odpowiedzi na pytania z przeglądu planu – wpisane poniżej).
+Ustalenia z autorem: 28.10.2026 (cele), 29.10.2026 (odpowiedzi na pytania z przeglądu planu, wycena lokalu w majątku netto, inwestor ratunkowy, czas pomiarów – wpisane poniżej).
 
 ## Kolejność
 Sesje idą **po kolei**, nie równolegle: część A działa na dzisiejszych botach i zasadach, a B od kroku B3 je zmienia.
@@ -61,9 +61,9 @@ Sesje idą **po kolei**, nie równolegle: część A działa na dzisiejszych bot
 
 ### Definicje (wspólne dla A i B)
 - **Karta skumulowana** – średni wynik działalności z rund 2..N (runda 1 to przygotowanie), tak samo jak w rankingu mistrza gry.
-- **Majątek netto** = gotówka + zapasy + kupiony lokal (wyceniony np. ceną zakupu albo 80% ceny – ustalić w Z2) + sprzęt po amortyzacji + portfel właściciela − kredyty − debet − zaległości (ZUS, US, czynsz, dostawcy) − dług u Harpagona z odsetkami. Na tej mierze sprawdza się wyjątek Harpagona i kasyna.
+- **Majątek netto** = gotówka + lokaty + kaucje za najem + nadwyżka VAT do przeniesienia + zapasy + kupiony lokal, budynek i grunt **po amortyzacji** (wartość z ewidencji środków trwałych, tak jak w karcie po Z1) + sprzęt po amortyzacji + portfel właściciela − kredyty − debet − zaległości (ZUS, US, czynsz, dostawcy) − dług u Harpagona z odsetkami − wpłaty inwestora ratunkowego (Z3). Sprzęt w leasingu nie jest majątkiem, a przyszłe raty nie są długiem (jak najem). Na tej mierze sprawdza się wyjątek Harpagona i kasyna.
 - **Pierwszy plus** – pierwsza runda z dochodem netto > 0.
-- **Na minusie** – majątek netto na koniec gry < 40 000 zł (kapitał startowy).
+- **Na minusie** – majątek netto na koniec gry < kapitał startowy (dziś 40 000 zł; jeśli B5 zmieni kapitał, próg idzie za nim).
 - **Alarm** – debet ponad limit (krok Z3). W pomiarach „bankructwo” = alarm. Boty nie są ratowane przez inwestora.
 - **Wyraźnie wygrywa** – wersja dobra bije średnią w ≥ 80% par gier (ta sama gra, ziarno i rywale).
 
@@ -76,11 +76,13 @@ Ustalone z autorem 29.10.2026. Każda zmiana ma test w `testy/`.
     - majątek liczy się po amortyzacji, a nie po cenach zakupu;
     - zakup sprzętu nie pompuje rozwoju firmy (inwestycja netto, nie „kupić i sprzedać”);
     - odsetki Harpagona (poza KPiR) obniżają kartę, tak jak koszty w KPiR.
+  - Uwaga na wzór: dziś wynik to iloczyn wskaźników i wyniku ekonomicznego. Przy stracie lepsze wskaźniki nie mogą pogłębiać minusa (lepsza obsługa klientów nie może dawać gorszej karty) – np. część ujemna bez mnożenia przez wskaźniki albo z odwróconą zależnością. Test: przy tej samej stracie lepsze wskaźniki dają wynik nie gorszy.
+  - Zmienia się zasada z notatki „Ustalenia gry” („przy ujemnym wyniku ekonomicznym = 0”) i opis w `gra/INSTRUKCJA.md` – propozycję tekstu notatki zapisać w `raporty/kalibracja/notatki_do_zmiany.md`.
 - **Z2 – majątek netto** jako wynik firmy (`stan.wyniki[r][firma]`), w panelu mistrza gry i w eksporcie CSV; definicja wyżej.
 - **Z3 – debet ponad limit z rosnącymi skutkami.**
   - blokuje inwestycje i nowe kredyty;
   - mistrz gry dostaje alarm w panelu;
-  - mistrz gry może uratować drużynę inwestorem: gotówka w zamian za udział w przyszłych dochodach;
+  - mistrz gry może uratować drużynę inwestorem: gotówka w zamian za udział w przyszłych dochodach; wpłata inwestora odejmuje się od majątku netto i liczy się w karcie jak dług (wskaźnik zadłużenia), więc ratunek pozwala grać dalej, ale nie poprawia miejsca w rankingu (ustalone 29.10.2026); warunki (kwota, udział, czas) w YAML;
   - bez odsetek karnych i bez zajęcia majątku.
 - **Z4 – liczba lokali na mapie zależna od liczby firm** (4–8 firm), popyt bez zmian.
 - **Z5 – bot „jak człowiek”** (nowa strategia, obecne poziomy zostają jako rywale): prognozuje z zeszłotygodniowej sprzedaży, a nie z gotowej prognozy `pp.prognoza` bez szumu; trzy wersje: słaba, średnia, dobra (różnią się staraniem, nie oszukiwaniem).
@@ -96,9 +98,11 @@ Ustalone z autorem 29.10.2026. Każda zmiana ma test w `testy/`.
   Do tego lista hipotez „za dobrych” strategii (z raportu A i z czytania kodu) do sprawdzenia w B4. To kompas kalibracji: kompromisy zapisuje się przed strojeniem.
 - **B2 – narzędzie porównań** `gra/balans/warianty.py` z testami. Rozgrywa pary gier: ta sama gra, ziarno i rywale, a badana firma różni się tylko jedną decyzją (wymuszoną w decyzjach bota). Wymagania:
   - wiele ziaren (≥ 30 w pełnym pomiarze) i różne konteksty: strategia bazowa, długość gry, strefa, liczba firm (4/6/8);
-  - obliczenia równoległe; najpierw profilowanie silnika, żeby wiedzieć, ile gier da się rozegrać;
+  - obliczenia równoległe; najpierw profilowanie silnika, żeby wiedzieć, ile gier da się rozegrać. Punkt wyjścia (29.10.2026, laptop autora, 6 rdzeni): gra 18 rund liczy się w ok. 3,5 s przy 4 firmach, 5 s przy 6 i 6,5 s przy 8, więc para gier na 6 firm to ok. 10 s, a na 5 procesach ok. 300 par w 10 minut. Gra bazowa (bez wymuszonej decyzji) jest wspólna dla wszystkich wariantów z tym samym ziarnem i rywalami – liczyć ją raz;
+  - przyspieszenie silnika nie może zmienić wyników: przed i po zmianie porównać odcisk (skrót) stanów po każdej rundzie kilku gier botów – muszą być identyczne;
   - wynik w CSV i jako tabela md: średnia różnica karty skumulowanej z przedziałem ufności, odsetek wygranych par, majątek netto, pierwszy plus, alarmy;
-  - szybki pomiar (≤ 10 min) do sprawdzania regresji i pełny pomiar uruchamiany w tle.
+  - szybki pomiar (≤ 10 min) do sprawdzania regresji i pełny pomiar uruchamiany w tle, który można przerwać i wznowić z zapisanych CSV. **Ile może trwać pełny pomiar, agent pyta autora przed uruchomieniem** (wieczorem zwykle cała noc, w innym razie do ok. 1 h); bez odpowiedzi – do 1 h;
+  - na koniec B2 jeden szybki pomiar na dzisiejszych zasadach („punkt zero”, zapis w dzienniku), żeby w B4 było widać, co zmieniły kroki Z.
 - **B3 – boty używają wszystkich opcji.** Każda strategia ma parametry dla każdej decyzji: kupno, lokal niewyposażony, działka, banki, dostawcy, gwiazdki, biuro albo samodzielna księgowość, polisy, licytacje i tak dalej. Bot zachowuje swój charakter, ale może sięgnąć po każdą opcję. Przed B4 – tyle, ile trzeba do pomiaru, i poziomy łatwy < średni < trudny; resztę przed obszarem, którego dotyczy.
 - **B4 – pomiar startowy** `raporty/kalibracja/stan_poczatkowy.md` (po krokach Z), tag `kalibracja-start`. Ma pokazać:
   - które opcje dominują, a które są zdominowane, i wynik sprawdzenia hipotez z B1;

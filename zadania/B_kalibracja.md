@@ -16,7 +16,7 @@ Balans jest ważniejszy od realizmu, ale realizm nie może być rażąco złaman
 3. Jeśli istnieje `raporty/analiza_gracza.md`, przeczytaj sekcję „za dobre strategie”. To gotowe tropy dominacji.
 
 ## Zmiany zasad (Z1–Z7)
-To nowe mechaniki ustalone z autorem – nie pytaj o nie ponownie, ale szczegóły widoczne dla gracza (np. teksty alarmu, wycena lokalu w majątku netto) zapisz w dzienniku i w podsumowaniu. Każda zmiana: test w `testy/`, opis w instrukcji gracza (`gra/INSTRUKCJA.md`), jeśli gracz ją zobaczy.
+To nowe mechaniki ustalone z autorem – nie pytaj o nie ponownie. Rozstrzygnięte już szczegóły: lokal w majątku netto po amortyzacji, wpłata inwestora ratunkowego jako dług (w majątku netto i w karcie). Pozostałe szczegóły widoczne dla gracza (np. teksty alarmu, warunki inwestora) zapisz w dzienniku i w podsumowaniu. Gdy zmiana zasady dotyczy notatki autora (np. Z1 a „Ustalenia gry”), propozycję tekstu zapisz w `raporty/kalibracja/notatki_do_zmiany.md`. Każda zmiana: test w `testy/`, opis w instrukcji gracza (`gra/INSTRUKCJA.md`), jeśli gracz ją zobaczy.
 
 ## Testy i zamrożone dane
 Pierwszy krok B2: testy mechanik, które sprawdzają liczby co do grosza (ok. 140 asercji), przełącz na **zamrożoną kopię danych** `gra/testy/dane_zamrozone/` (kopia `gra/dane/` z dnia startu kalibracji). Testy zasad (determinizm, brak liczb w kodzie, schematy, uzgodnienie kasy, boty grają bez błędów) zostają na `gra/dane/`. Dzięki temu zmiana liczby w YAML nie łamie testów wzorów, a łamie testy zasad, gdy coś się naprawdę zepsuje.
@@ -49,8 +49,9 @@ Jeśli masz dostęp do sieci, zweryfikuj te liczby i podaj źródła w `zrodlo`.
 - **Boty to nie gracze.** Bot „niemożliwy” oszukuje przy popycie, więc nie używaj go do oceny opcji. Dzisiejsze boty prognozują z gotowej prognozy bez szumu (`pp.prognoza`), więc widzą więcej niż uczeń – trudność mierz botem „jak człowiek” (Z5). Hipotezy z analizy części A sprawdzaj także „ręcznie”: rozpisz wariant decyzji, który wybrałby rozsądny człowiek.
 - **Liczba firm.** Popyt miasta się nie skaluje, tylko liczba lokali (Z4). Jeśli przy 4 firmach gra jest wyraźnie łatwiejsza niż przy 6, zgłoś to autorowi zamiast stroić popyt.
 - **Goodhart.** Nie strój karty wyników pod boty. Karta ma nagradzać dobrą firmę, a nie konkretny zabieg.
-- **Determinizm.** To samo ziarno musi dawać ten sam wynik. Losowość bierz tylko z `silnik/losowosc.py`.
-- **Czas obliczeń.** 12 rund gry botów trwa ok. 5 s. Szybki pomiar musi mieścić się w ≤ 10 min, żeby dało się go uruchamiać po każdej zmianie.
+- **Determinizm.** To samo ziarno musi dawać ten sam wynik. Losowość bierz tylko z `silnik/losowosc.py`. Gdy przyspieszasz silnik albo przenosisz kod bez zmiany zasad, porównaj odcisk (skrót) stanów po każdej rundzie kilku gier botów przed i po – muszą być identyczne.
+- **Historia rund jest tylko do odczytu.** `StanGry.kopia()` (`silnik/model.py`) nie kopiuje raportów minionych rund (`stan.wyniki`, `stan.rynek`) – kopia dzieli je z oryginałem. Nowe wyniki (np. majątek netto w Z2, alarm w Z3) zapisuj tylko w bieżącej rundzie, nigdy nie zmieniaj wyników rund wcześniejszych.
+- **Czas obliczeń.** Gra 18 rund liczy się w ok. 3,5 s (4 firmy), 5 s (6 firm) i 6,5 s (8 firm) na laptopie autora z 6 rdzeniami, więc szybki pomiar (≤ 10 min, uruchamiany po każdej zmianie) to ok. 300 par gier na 6 firm. Gra bazowa jest wspólna dla wariantów z tym samym ziarnem – licz ją raz. **Przed pełnym pomiarem zapytaj autora, ile może trwać** (wieczorem zwykle cała noc, w innym razie do ok. 1 h; bez odpowiedzi – 1 h). Pełny pomiar zapisuje wyniki na bieżąco do CSV i umie wznowić pracę po przerwaniu.
 - **Długość gry.** Bazowo 18 rund, ale 12 i 26 rund też nie mogą się psuć: np. kupno lokalu może się opłacać dopiero w dłuższej grze, i to jest w porządku.
 
 ## Zakończenie (B15)

@@ -284,13 +284,13 @@ Kolejność: B1, B2, Z1–Z7, B3 (część do pomiaru), B4, **STOP** (autor: rap
 B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
 
 - [ ] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz
-- [ ] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md) z testami
+- [ ] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md, wznawianie pełnego pomiaru) z testami; szybki pomiar „punkt zero” na dzisiejszych zasadach
 
 ### Zmiany zasad (ustalone z autorem 29.10.2026, przed pomiarem startowym)
 
-- [ ] Z1 Karta wyników: strata daje ujemny wynik działalności (proporcjonalnie); budynek w majątku; majątek po amortyzacji; zakup sprzętu nie pompuje rozwoju; odsetki Harpagona obniżają kartę
-- [ ] Z2 Majątek netto w wynikach firmy, panelu mistrza gry i eksporcie CSV
-- [ ] Z3 Debet ponad limit: blokada inwestycji i kredytów, alarm u mistrza gry, inwestor ratunkowy (gotówka za udział w przyszłych dochodach); bez odsetek karnych i zajęcia majątku
+- [ ] Z1 Karta wyników: strata daje ujemny wynik działalności (proporcjonalnie; lepsze wskaźniki nie pogłębiają minusa); budynek w majątku; majątek po amortyzacji; zakup sprzętu nie pompuje rozwoju; odsetki Harpagona obniżają kartę
+- [ ] Z2 Majątek netto w wynikach firmy, panelu mistrza gry i eksporcie CSV (lokal po amortyzacji, lokaty i kaucje, wpłata inwestora jako dług)
+- [ ] Z3 Debet ponad limit: blokada inwestycji i kredytów, alarm u mistrza gry, inwestor ratunkowy (gotówka za udział w przyszłych dochodach, wpłata liczona jak dług); bez odsetek karnych i zajęcia majątku
 - [ ] Z4 Liczba lokali na mapie zależna od liczby firm (4–8), popyt bez zmian
 - [ ] Z5 Bot „jak człowiek” (prognoza z zeszłotygodniowej sprzedaży zamiast `pp.prognoza`), wersje słaba / średnia / dobra
 - [ ] Z6 Kalendarz miejski i święta do kwietnia 2026 (`dane/kalendarz/kalendarz.yaml`)
