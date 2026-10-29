@@ -63,7 +63,8 @@ drużyny wysłały decyzje, *Zamknij rundę* – także bez decyzji wszystkich, 
 plik gry), **Wyniki** (ranking według średniej karty wyników, dochód netto, gotówka, zadłużenie, wykresy rund)
 i **Drużyny** (skład drużyn, nowe konta uczniów, nowe hasło). Runda zamyka się sama, gdy wszystkie drużyny
 wyślą decyzje. Przy zakładaniu gry każdy bot dostaje poziom (łatwy / średni / trudny / niemożliwy – ten ostatni
-oszukuje: klienci bez powodu wolą jego lokale), poziom można zmienić w trakcie gry (od następnej rundy).
+oszukuje: klienci bez powodu wolą jego lokale; albo „jak człowiek” – słaby / średni / dobry: prognozuje tylko z tego,
+co widzi drużyna w zakładkach), poziom można zmienić w trakcie gry (od następnej rundy).
 
 **Prowadzenie gry** (zakładka *Decyzje* panelu mistrza gry):
 

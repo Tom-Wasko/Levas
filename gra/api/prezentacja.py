@@ -149,12 +149,14 @@ def miejsca(skum: dict) -> dict[str, int]:
 
 def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     """Widok firmy w rundzie `runda` (domyślnie bieżąca). Decyzje: bieżąca runda – edytowalne, wcześniejsze – podgląd.
-    Wyniki w rundzie r: skutki decyzji z rundy r−1 (jak w REVAS)."""
+    Wyniki w rundzie r: skutki decyzji z rundy r−1 (jak w REVAS). Po końcu gry runda N+1 to podsumowanie: wyniki
+    ostatniej rundy i końcowe miejsce, bez decyzji (Z7)."""
     dane = gra.dane
     biezaca = gra.runda
-    runda = min(runda or biezaca, biezaca) if not gra.zakonczona else min(runda or biezaca - 1, biezaca - 1)
+    runda = min(runda or biezaca, biezaca)
     runda = max(runda, gra.runda_startowa)
     edycja = runda == biezaca and not gra.zakonczona
+    koniec = runda == biezaca and gra.zakonczona   # podsumowanie po ostatniej rundzie
     v = {"gra": {"nazwa": gra.konfiguracja["nazwa"], "runda": biezaca, "liczba_rund": gra.konfiguracja["liczba_rund"],
                  "zakonczona": gra.zakonczona, "firmy": gra.konfiguracja["firmy"], "wyslane": gra.wyslane(),
                  "brakujace": gra.brakujace(), "ziarno": gra.konfiguracja["ziarno"], "runda_startowa": gra.runda_startowa,
@@ -163,7 +165,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "auto_zamowienia": bool(gra.konfiguracja.get("auto_zamowienia")),
                  "lokale": True,
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
-         "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja,
+         "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja, "koniec": koniec,
          "odblokowane": sorted(dane.odblokowane(runda)),
          "harmonogram": {x["klucz"]: x["tydzien"] for x in hm.widok(dane, runda)}}   # z lokalami: tydzień elementu
 
@@ -172,6 +174,11 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["decyzje"] = gra.szkic(firma)
         v["wyslane"] = firma in gra.wyslane()
         v["warianty"] = sorted(gra.decyzje.get(biezaca, {}).get("_warianty", {}).get(firma, {}))
+    elif koniec:
+        stan = gra.stan(runda - 1)
+        f = stan.firmy[firma]
+        ks, info, bledy = Ksiega([]), {}, []
+        v["decyzje"], v["wyslane"] = {}, True
     else:
         stan = gra.stan(runda)
         f = stan.firmy[firma]
@@ -179,6 +186,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         info, bledy = {}, stan.wyniki[runda][firma]["lista_bledow"]
         v["decyzje"] = {k: w for k, w in gra.decyzje.get(runda, {}).get(firma, {}).items()}
         v["wyslane"] = True
+    wr = stan.wyniki.get(runda, {}).get(firma, {})   # wyniki tej rundy (podgląd minionej rundy)
     poprzedni = gra.stan(runda - 1)
     v["stan"] = _firma_slownik(f)
     v["stan"]["gotowe_uslugi"] = gotowe_uslugi(dane, f)
@@ -219,43 +227,43 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     przet = sum(x["wartosc"] for x in ((v.get("wyniki") or {}).get("swiezosc") or {}).get("straty", []) if x["powod"] == "termin")
     v["magazyn"] = mag.ryzyko(dane, f, runda, przet, urz.modyfikatory(dane, f, runda))
     if urz.dane_urzedu(dane):
-        v["urzad"] = urz.widok(dane, f, runda, info.get("urzad") if edycja else stan.wyniki[runda][firma].get("urzad"),
+        v["urzad"] = urz.widok(dane, f, runda, info.get("urzad") if edycja else wr.get("urzad"),
                                poprzedni.wyniki, firma, przet)
-    v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else stan.wyniki[runda][firma].get("dostawy")
+    v["dostawy_plan"] = (info or {}).get("dostawy") if edycja else wr.get("dostawy")
     v["srodki_trwale"] = ewidencja(f)
     v["czas_wlasciciela"] = ((info or {}).get("czas_wlasciciela") if edycja
-                             else stan.wyniki[runda][firma].get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
+                             else wr.get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
     v["wlasciciel_stanowisko"] = ((info or {}).get("wlasciciel_stanowisko") if edycja
-                                  else stan.wyniki[runda][firma].get("wlasciciel_stanowisko"))
+                                  else wr.get("wlasciciel_stanowisko"))
     v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
-    zam = ((info.get("kampanie") or {}) if edycja else (stan.wyniki[runda][firma].get("reklama_agencje") or {}))
+    zam = ((info.get("kampanie") or {}) if edycja else (wr.get("reklama_agencje") or {}))
     v["reklama"] = rk.widok(dane, f, runda, poprzedni.rynek.get(runda - 1), zam.get("zamowione"))
     if pm.zasady(dane):
         v["promocje"] = pm.widok(dane, f, runda, poprzedni.rynek.get(runda - 1),
-                                 info.get("promocje") if edycja else stan.wyniki[runda][firma].get("promocje"))
+                                 info.get("promocje") if edycja else wr.get("promocje"))
     v["przejecia"] = pr.widok(dane, stan.firmy, firma, runda,
-                              info.get("przejecia") if edycja else stan.wyniki[runda][firma].get("przejecia"),
+                              info.get("przejecia") if edycja else wr.get("przejecia"),
                               (v.get("wyniki") or {}).get("przejecia"))
     if dane.zdarzenia:
         v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
     if aw.dane_wypadkow(dane):
         v["ubezpieczenia"] = aw.widok(dane, f, runda, info.get("ubezpieczenia") if edycja
-                                      else stan.wyniki[runda][firma].get("ubezpieczenia"), poprzedni.wyniki, firma)
+                                      else wr.get("ubezpieczenia"), poprzedni.wyniki, firma)
     fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)
     v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
                   "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}
     v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)
     if wl.dane_portfela(dane):
         v["wlasciciel"] = wl.widok(dane, fp, f, info.get("wlasciciel") if edycja
-                                   else stan.wyniki[runda][firma].get("wlasciciel"))
+                                   else wr.get("wlasciciel"))
     v["handel"] = hd.widok(dane, poprzedni.firmy, firma, runda, info.get("handel") if edycja
-                           else stan.wyniki[runda][firma].get("handel"),
+                           else wr.get("handel"),
                            gra.decyzje.get(runda, {}) if edycja else None)
     v["konkurencja"] = kn.widok(dane, firma, runda, gra.konfiguracja["ziarno"], v.get("rynek"),
                                 info.get("konkurencja") if edycja
-                                else (stan.wyniki[runda][firma].get("konkurencja") or {}).get("zlecenie"))
+                                else (wr.get("konkurencja") or {}).get("zlecenie"))
     klub = kas.widok(dane, fp, runda, info.get("kasyno") if edycja
-                     else (stan.wyniki[runda][firma].get("kasyno") or {}).get("gry"), v.get("wyniki"))
+                     else (wr.get("kasyno") or {}).get("gry"), v.get("wyniki"))
     if klub:
         v["kasyno"] = klub
     u = lw.ustawienia(dane)
@@ -263,7 +271,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                      "decyzja": info.get("harpagon"),
                      "warunki": {k: u[k] for k in ("maks_kwota", "min_kwota", "oprocentowanie_rundy", "termin_rund",
                                                    "odsetki_karne_rundy", "karne_od", "wizyty_od")}}
-    v["podatki"] = _podatki(dane, fp, runda, rz.rejestr(ks) if edycja else stan.wyniki[runda][firma].get("vat"))
+    v["podatki"] = _podatki(dane, fp, runda, rz.rejestr(ks) if edycja else wr.get("vat"))
     v["amortyzacja"] = {"prog": dane.z["finanse"]["amortyzacja_prog"], "stawki": dane.z["finanse"]["amortyzacja_roczna"]}
     v["ksiegowosc"] = bo.widok(dane, fp, f, v["decyzje"], v.get("wyniki"))
     if edycja and fp.deklaracja:   # samodzielna księgowość: wynik podatkowy dopiero po deklaracji drużyny

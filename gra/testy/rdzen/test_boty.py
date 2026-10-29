@@ -110,11 +110,11 @@ def test_bot_jak_czlowiek_bez_historii_bierze_potencjal_lokalu():
     assert not s.wyniki[1]["A"]["sprzedaz"] and all(prog["lokale"][lok][u] > 0 for u in oferta)
 
 
-def test_poziomy_jak_czlowiek_tylko_do_pomiarow():
+def test_poziomy_jak_czlowiek_do_wyboru_mistrza_gry():
     from silnik.schematy import PoziomBota
     poziomy = dane_domyslne().boty["poziomy"]
     wersje = [k for k, p in poziomy.items() if p.get("prognoza_czlowieka")]
-    assert len(wersje) == 3 and all(poziomy[k].get("tylko_pomiar") for k in wersje)
+    assert len(wersje) == 3 and not any(poziomy[k].get("tylko_pomiar") for k in wersje)   # decyzja autora
     with pytest.raises(ValueError, match="prognoza_czlowieka"):
         PoziomBota(nazwa="x", opis="x", prognoza_czlowieka={"rund": 1}, mnozniki_ceny=[1.1])
 

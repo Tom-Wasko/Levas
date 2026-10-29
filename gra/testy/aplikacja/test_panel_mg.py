@@ -98,7 +98,7 @@ def test_miejsce_na_pulpicie_jak_ranking_mistrza_gry():
 
     g = Gra.nowa("Z7", [(f"Bot {k}", k) for k in ("tani", "premium", "zrownowazony", "agresywny")], 8, 7)
     inna = False
-    for r in range(1, 8):   # po ostatniej rundzie pulpit pokazuje rundę N (skutki N−1), mistrz gry – N
+    for r in range(1, 9):   # po ostatniej rundzie pulpit pokazuje podsumowanie (runda N+1) – jak mistrz gry
         g.przelicz(wymus=True)
         if r < 2:
             continue
@@ -107,3 +107,17 @@ def test_miejsce_na_pulpicie_jak_ranking_mistrza_gry():
         karty = g.stan(r).rynek[r]["karta"]
         inna |= mg != pr.miejsca({n: karty[n] for n in mg})
     assert inna   # w tej grze ranking ostatniej rundy choć raz różni się od skumulowanego
+
+
+def test_po_koncu_gry_druzyna_widzi_wyniki_ostatniej_rundy():
+    """Decyzja autora (Z7): po końcu gry widok domyślny to podsumowanie – wyniki rundy N, bez decyzji."""
+    from api import prezentacja as pr
+    from silnik import Gra
+
+    g = Gra.nowa("Koniec", [("A", None), ("B", "zrownowazony")], 3, 5)
+    for _ in range(3):
+        g.przelicz(wymus=True)
+    v = pr.widok(g, "A")
+    assert g.zakonczona and v["koniec"] and not v["edycja"] and v["runda"] == 4 and v["decyzje"] == {}
+    assert v["wyniki"] == g.stan(3).wyniki[3]["A"] and v["dashboard"]["miejsce"] in (1, 2)
+    assert not pr.widok(g, "A", 3)["koniec"]   # wcześniejsze rundy – zwykły podgląd

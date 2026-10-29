@@ -155,12 +155,21 @@ function chipDruzyny(v) {
   return `<span class="chip" title="Drużyna: ${esc(sklad.map((o) => o.nazwa).join(", "))}">${ikona("osoba", 14)}${esc(imiona.join(", "))}</span>`;
 }
 
+// Po końcu gry ostatni element osi to podsumowanie: wyniki ostatniej rundy i końcowe miejsce (Z7).
+const koniecGry = (v, r) => v.gra.zakonczona && r > v.gra.liczba_rund;
+const napisRundy = (v, r) => koniecGry(v, r) ? `Koniec gry (<b>podsumowanie</b>)`
+  : `${esc(nazwaRundy(r))} (<b>runda nr ${r}</b>)${r === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}`;
+
 // Oś rund: każda runda to jeden element (w motywach: talerz na sztandze, kolumna grafiku, pole tablicy wyników).
 function osRund(v, runda) {
-  const lmin = v.gra.runda_startowa || 1, lmax = v.gra.zakonczona ? v.gra.runda - 1 : v.gra.runda;
+  const lmin = v.gra.runda_startowa || 1, lmax = v.gra.runda;
   const dochod = Object.fromEntries((v.historia || []).map((h) => [h.runda, h.dochod_netto]));
   let html = "";
-  for (let r = lmin; r <= v.gra.liczba_rund; r++) {
+  for (let r = lmin; r <= Math.max(lmax, v.gra.liczba_rund); r++) {
+    if (koniecGry(v, r)) {
+      html += `<span class="runda-os ${r === runda ? "ogladana" : ""}" data-r="${r}" data-akcja="runda-idz" title="Koniec gry: wyniki ostatniej rundy i końcowe miejsce"><b>🏁</b></span>`;
+      continue;
+    }
     const rozegrana = r < v.gra.runda, strata = dochod[r] != null && dochod[r] < 0;
     const n = nazwaRundy(r);
     const opis = dochod[r] != null ? `${n}: dochód netto ${zl(dochod[r])}`
@@ -173,12 +182,12 @@ function osRund(v, runda) {
 }
 
 function glowa(v, z, tryb, decyzje, wyniki, runda) {
-  const lmin = v.gra.runda_startowa || 1, lmax = v.gra.zakonczona ? v.gra.runda - 1 : v.gra.runda;
+  const lmin = v.gra.runda_startowa || 1, lmax = v.gra.runda;
   return `<div class="karta-glowa">
       <div class="tytul">${ikona(IKONY[S.zakladka])}${z.tytulPelny || z.tytul}</div>
       <div class="nawigator">
         <span class="strzalka ${runda <= lmin ? "wylaczona" : ""}" data-akcja="runda" data-d="-1" title="Poprzednia runda">${ikona("lewo", 18)}</span>
-        <span class="miesiac" id="nawigator-miesiac">${esc(nazwaRundy(runda))} (<b>runda nr ${runda}</b>)${runda === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}</span>
+        <span class="miesiac" id="nawigator-miesiac">${napisRundy(v, runda)}</span>
         <span class="strzalka ${runda >= lmax ? "wylaczona" : ""}" data-akcja="runda" data-d="1" title="Następna runda">${ikona("prawo", 18)}</span>
         ${osRund(v, runda)}
       </div>
@@ -215,10 +224,12 @@ function rysuj() {
     + (!v.gra.zakonczona && v.prowadzenie?.pauza ? `<span class="chip pom">Gra wstrzymana</span>`
       : !v.gra.zakonczona && v.prowadzenie?.termin ? `<span class="chip" title="Runda zamknie się sama o tej porze">Zamknięcie: ${esc(terminKrotko(v.prowadzenie.termin))}</span>` : "");
   const c = ctx();
-  const wyniki = maWyniki(z), decyzje = !!z.decyzje;
-  const tryb = S.tryb === "wyniki" && wyniki ? "wyniki" : decyzje ? "decyzje" : "wyniki";
+  const wyniki = maWyniki(z), decyzje = !!z.decyzje && !(v.koniec && wyniki);   // po końcu gry – same wyniki
+  const tryb = (S.tryb === "wyniki" || v.koniec) && wyniki ? "wyniki" : decyzje ? "decyzje" : "wyniki";
   const tresc = tryb === "wyniki" ? z.wyniki(c) : z.decyzje(c);
-  const podglad = !v.edycja && v.runda < v.gra.runda
+  const podglad = v.koniec
+    ? `<div class="komunikat">Gra zakończona. Tu są wyniki ostatniej rundy (${v.gra.liczba_rund}) i końcowe miejsce w rankingu; wcześniejsze rundy obejrzysz strzałkami.</div>`
+    : !v.edycja && v.runda < v.gra.runda
     ? `<div class="komunikat">Podgląd rundy ${v.runda} (${v.miesiac}) – decyzje z tej rundy są tylko do odczytu. Wyniki pokazują skutki poprzedniego ${OKRES.dopelniacz}.</div>` : "";
   const zablokowane = v.edycja && blokada(v) && tryb === "decyzje" ? `<div class="komunikat">${esc(blokada(v))}</div>` : "";
   const wyslane = !zablokowane && v.edycja && v.wyslane && tryb === "decyzje" && S.zakladka !== "wyslij"
@@ -238,12 +249,12 @@ function przesunRunde(o) { idzDoRundy((S.celRundy ?? S.v.runda) + o); }
 
 function idzDoRundy(r) {
   const v = S.v;
-  const lmin = v.gra.runda_startowa || 1, lmax = v.gra.zakonczona ? v.gra.runda - 1 : v.gra.runda;
+  const lmin = v.gra.runda_startowa || 1, lmax = v.gra.runda;
   const cel = Math.min(lmax, Math.max(lmin, r));
   S.celRundy = cel;
   document.querySelectorAll(".os-rund .runda-os").forEach((s) => s.classList.toggle("ogladana", +s.dataset.r === cel));
   const napis = document.getElementById("nawigator-miesiac");
-  if (napis) napis.innerHTML = `${esc(nazwaRundy(cel))} (<b>runda nr ${cel}</b>)${cel === v.gra.runda && !v.gra.zakonczona ? "" : " · podgląd"}`;
+  if (napis) napis.innerHTML = napisRundy(v, cel);
   document.querySelectorAll(".nawigator .strzalka").forEach((s) => {
     s.classList.toggle("wylaczona", (+s.dataset.d < 0 && cel <= lmin) || (+s.dataset.d > 0 && cel >= lmax));
   });

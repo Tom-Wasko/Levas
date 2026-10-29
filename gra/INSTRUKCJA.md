@@ -35,6 +35,9 @@ samych klientów, tych samych pracowników i te same lokale.
 | 4 | Wysyłasz decyzje | **Wyślij decyzje** |
 | 5 | Czekasz, aż mistrz gry zamknie rundę | – |
 
+Po ostatniej rundzie gra otwiera się na **podsumowaniu** (🏁 na osi rund): wyniki ostatniego tygodnia i końcowe
+miejsce w rankingu. Wcześniejsze rundy dalej obejrzysz strzałkami.
+
 Gra liczy tydzień **dzień po dniu**: w każdym dniu klienci każdej strefy wybierają lokal, kucharze przygotowują
 dania, dostawy przyjeżdżają w swoje dni, a bułki z poniedziałku we wtorek wieczorem lądują w koszu.
 

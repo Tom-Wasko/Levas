@@ -38,7 +38,8 @@ ustawienia:
 #   przy `pule` razy pula strefy w rundzie sprzedaży / pula w tamtych rundach (zakładka Klienci); danie albo
 #   lokal bez historii – potencjał lokalu (2★, ceny preferowane strefy); wyklucza korekta_prognozy, mnozniki_ceny
 #   i przewaga_popytu (to wymaga znajomości modelu);
-# - tylko_pomiar – poziom do pomiarów (balans/), mistrz gry go nie wybiera.
+# - tylko_pomiar – poziom do pomiarów (balans/), mistrz gry go nie wybiera (wersje „jak człowiek” mistrz gry
+#   wybiera – decyzja autora 29.10.2026).
 poziomy:
   latwy:
     nazwa: Łatwy
@@ -80,7 +81,6 @@ poziomy:
   czlowiek_slaby:
     nazwa: Jak człowiek – słaby
     opis: patrzy tylko na zeszły tydzień, na oko; proste reguły jak łatwy
-    tylko_pomiar: true
     planowanie: proste
     blad_prognozy: 0.25
     losowy_kandydat: true
@@ -90,7 +90,6 @@ poziomy:
   czlowiek_sredni:
     nazwa: Jak człowiek – średni
     opis: zeszły tydzień z małym błędem, planuje obsadę na popyt dzień po dniu
-    tylko_pomiar: true
     planowanie: przepustowosc
     cel_obslugi: 0.97
     narzut_pracy: 1.25
@@ -99,7 +98,6 @@ poziomy:
   czlowiek_dobry:
     nazwa: Jak człowiek – dobry
     opis: średnia z dwóch tygodni poprawiona o pulę strefy z kalendarza, reklama z wolną kuchnią, drugi lokal
-    tylko_pomiar: true
     planowanie: przepustowosc
     cel_obslugi: 0.97
     narzut_pracy: 1.25
