@@ -6,12 +6,12 @@
   <title>Levas Kebab – {{ firma }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styl.css">
-  <link rel="stylesheet" href="/static/motywy/talerze.css">
-  <link rel="stylesheet" href="/static/motywy/grafik.css">
-  <link rel="stylesheet" href="/static/motywy/noc.css">
-  <script src="/static/motyw.js"></script>
-  <script src="/static/vendor/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="{{ statyczne }}styl.css">
+  <link rel="stylesheet" href="{{ statyczne }}motywy/talerze.css">
+  <link rel="stylesheet" href="{{ statyczne }}motywy/grafik.css">
+  <link rel="stylesheet" href="{{ statyczne }}motywy/noc.css">
+  <script src="{{ statyczne }}motyw.js"></script>
+  <script src="{{ statyczne }}vendor/chart.umd.min.js"></script>
 </head>
 <body>
   <header class="naglowek">
@@ -23,6 +23,6 @@
   <div class="stopka">Levas – symulacja lokalu z kebabem na wzór REVAS · mechaniki i założenia: dokumentacja/WIEDZA_O_GRZE.md, dane/*.yaml</div>
   {{ id|json_script:"id-gry" }}{{ firma|json_script:"id-firmy" }}{{ mg|json_script:"mg" }}{{ konto.login|json_script:"login" }}
   <script>window.GRA = JSON.parse(document.getElementById("id-gry").textContent); window.FIRMA = JSON.parse(document.getElementById("id-firmy").textContent); window.MG = JSON.parse(document.getElementById("mg").textContent); window.KONTO = JSON.parse(document.getElementById("login").textContent);</script>
-  <script type="module" src="/static/app.js"></script>
+  <script type="module" src="{{ statyczne }}app.js"></script>
 </body>
 </html>

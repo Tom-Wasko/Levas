@@ -96,7 +96,7 @@ class Command(BaseCommand):
             )
             if not bez_przegladarki:
                 threading.Timer(1.5, webbrowser.open, [lokalny]).start()
-            # /static/ przez levas/urls.py (no-cache), nie przez wbudowaną obsługę runserver
+            # /static/ przez levas/statyczne.py (wersja w adresie), nie przez runserver
             call_command(
                 "runserver", f"127.0.0.1:{port}", use_reloader=False, use_static_handler=False
             )

@@ -217,8 +217,22 @@ def test_instrukcja_jak_grac_bez_logowania(client):
 
 
 def test_pliki_statyczne_bez_logowania_i_bez_pamieci_przegladarki(client):
-    """/static/ przez levas/urls.py: bez logowania, `no-cache` (przeglądarka pyta o zmiany), 304 bez zmian."""
+    """/static/ przez levas/statyczne.py: bez logowania, `no-cache` (przeglądarka pyta o zmiany), 304 bez zmian."""
     r = client.get("/static/zakladki/oferta.js")
     assert r.status_code == 200 and "no-cache" in r["Cache-Control"]
     r2 = client.get("/static/zakladki/oferta.js", HTTP_IF_MODIFIED_SINCE=r["Last-Modified"])
     assert r2.status_code == 304
+
+
+def test_strony_wczytuja_pliki_statyczne_z_wersja_w_adresie(client, tmp_path, settings):
+    """Adres /static/v<wersja>/ zmienia się po zmianie pliku, więc przeglądarka nie poda starego modułu."""
+    from levas import statyczne
+
+    html = client.get("/").content.decode()
+    w = statyczne.wersja()
+    assert f'href="/static/v{w}/styl.css"' in html and '"/static/styl.css"' not in html
+    r = client.get(f"/static/v{w}/zakladki/oferta.js")
+    assert r.status_code == 200 and "no-cache" in r["Cache-Control"]
+    (tmp_path / "nowy.js").write_text("// nowy plik", encoding="utf-8")
+    settings.STATICFILES_DIRS = [tmp_path]
+    assert statyczne.wersja() != w

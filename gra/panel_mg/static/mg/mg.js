@@ -3,7 +3,7 @@
 // Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg), GET /api/gry/<id>/druzyny.
 import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, termin, toast, ustawKalendarz, wsk, wyczyscWykresy,
   wykres, zamknijOkno, zl }
-  from "/static/zakladki/wspolne.js";
+  from "../zakladki/wspolne.js";
 
 const ID = JSON.parse(document.getElementById("id-gry").textContent);
 const URL_GRY = `/api/gry/${encodeURIComponent(ID)}`;

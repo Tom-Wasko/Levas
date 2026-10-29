@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Levas Kebab – panel mistrza gry</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styl.css">
-  <link rel="stylesheet" href="/static/motywy/talerze.css">
-  <link rel="stylesheet" href="/static/motywy/grafik.css">
-  <link rel="stylesheet" href="/static/motywy/noc.css">
-  <link rel="stylesheet" href="/static/mg/mg.css">
-  <script src="/static/motyw.js"></script>
+  <link rel="stylesheet" href="{{ statyczne }}styl.css">
+  <link rel="stylesheet" href="{{ statyczne }}motywy/talerze.css">
+  <link rel="stylesheet" href="{{ statyczne }}motywy/grafik.css">
+  <link rel="stylesheet" href="{{ statyczne }}motywy/noc.css">
+  <link rel="stylesheet" href="{{ statyczne }}mg/mg.css">
+  <script src="{{ statyczne }}motyw.js"></script>
 </head>
 <body>
   <header class="naglowek"><div class="logo"><div class="serce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M8 6h8l-1 4H9z"/><path d="M7.5 10h9l-1 5h-7z"/><path d="M9 15h6l-1 3h-4z"/></svg></div><div>Levas <br>Kebab</div><div class="firma">Mistrz gry</div></div>
@@ -54,7 +54,7 @@
   </main>
   {{ ustawienia|json_script:"ustawienia" }}
   <script type="module">
-    import { esc, tabela } from "/static/zakladki/wspolne.js";
+    import { esc, tabela } from "{{ statyczne }}zakladki/wspolne.js";
     const U = JSON.parse(document.getElementById("ustawienia").textContent);
     const csrf = () => document.cookie.match(/(?:^|; )csrftoken=([^;]*)/)?.[1] ?? "";
     const tb = document.querySelector("#druzyny tbody");
