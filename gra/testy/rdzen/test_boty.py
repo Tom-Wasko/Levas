@@ -140,3 +140,29 @@ def test_zakupy_dodatkowe_bota_zostawiaja_bufor_gotowki():
     budzet = [2300.0]
     assert boty._w_budzecie(poz, 5, [], 6, budzet) == ["C", "D", "E"] and budzet[0] == 0   # B – dopiero od 9
     assert boty._w_budzecie(poz, 5, ["C"], 2, [1e6]) == ["A"]                              # najwyżej 2 sztuki
+
+
+def test_slaby_czlowiek_zamawia_mniej_gdy_kuchnia_nie_nadazyla(monkeypatch):
+    """H17: słaby „jak człowiek” zamawia na cały przewidywany popyt, ale gdy tydzień temu danie traciło klientów
+    w kolejce, zamawia najwyżej tamtą sprzedaż × zamowienia_ze_sprzedazy (agresywny psuł ~27% przychodu)."""
+    zamowione: dict[int, dict] = {}
+    oryginal = boty.zamowienie_zasobow
+
+    def zapisz(dane, f, klienci, *a, **kw):
+        if f.nazwa == "A":
+            zamowione[g.runda] = dict(klienci)
+        return oryginal(dane, f, klienci, *a, **kw)
+
+    monkeypatch.setattr(boty, "zamowienie_zasobow", zapisz)
+    g = Gra.nowa("t", [("A", "agresywny"), ("B", "tani"), ("C", "premium")], 8, 3,
+                 poziomy={"A": "czlowiek_slaby"})
+    for _ in range(8):
+        s = g.przelicz(wymus=True)
+    mnoznik = g.dane.boty["poziomy"]["czlowiek_slaby"]["zamowienia_ze_sprzedazy"]
+    sprawdzone = 0
+    for r, klienci in zamowione.items():
+        for u, x in s.wyniki.get(r - 1, {}).get("A", {}).get("sprzedaz", {}).items():
+            if x.get("przyczyna") in boty.KOLEJKI and u in klienci:
+                assert klienci[u] <= x["sprzedaz"] * mnoznik + 1e-9
+                sprawdzone += 1
+    assert sprawdzone

@@ -294,6 +294,7 @@ Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4
 - [x] B4 Pomiar startowy: dominacje, hipotezy z B1, krzywa trudności, strategie, 4/6/8 firm, realia (`raporty/kalibracja/stan_poczatkowy.md`); tag `kalibracja-start` — zrobione 29.10.2026: 7090 gier; gra za łatwa (pierwszy plus człowieka średniego w rundzie 2 w 62% gier), dominują umowa zlecenie, drugi lokal, mBank i e-Księgi24, przy 4 firmach gra wyraźnie łatwiejsza (pytanie do autora w dzienniku)
 - [x] B5 Gospodarka i trudność (popyt, koszty poza prawem, kapitał; pierwszy plus bota „jak człowiek” średniego w rundzie 4–6) – **do zatwierdzenia przez autora; część A czeka na zatwierdzenie**
   - Zrobione i zatwierdzone przez autora 29.10.2026: nowa mechanika rozruchu nowego lokalu (40% popytu w 1. tygodniu, +10 p.p. co tydzień), pule stref ×0,9 i zakupy botów w budżecie – pierwszy plus średniego w rundach 4–6 w 65/100 gier (było 19/100), słaby bez alarmu poza strategią agresywną (dziennik B5).
+  - Dopisek H17 (29.10.2026, wybór autora „poprawić bota agresywnego”): słaby „jak człowiek” zamawia najwyżej zeszłotygodniową sprzedaż × 1,1 dania, które traciło klientów w kolejce – alarmy słabego agresywnego 8/100 → 0/100, psucie towaru 27% → 7% przychodu, słaba < średnia w 85/100 par (dziennik H17).
 
 ## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
 

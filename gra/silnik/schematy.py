@@ -453,6 +453,7 @@ class PoziomBota(Schemat):
     kolejny_lokal: KolejnyLokalBota | None = None
     przewaga_popytu: float = Field(1.0, ge=1)   # niemożliwy: mnożnik atrakcyjności lokali bota (oszustwo)
     prognoza_czlowieka: PrognozaCzlowieka | None = None
+    zamowienia_ze_sprzedazy: float | None = Field(None, ge=1)   # H17: limit zamówień po kolejce w kuchni
     tylko_pomiar: bool = False   # poziom do pomiarów (balans/), bez wyboru w panelu mistrza gry
 
     @model_validator(mode="after")

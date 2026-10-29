@@ -38,6 +38,8 @@ ustawienia:
 #   przy `pule` razy pula strefy w rundzie sprzedaży / pula w tamtych rundach (zakładka Klienci); danie albo
 #   lokal bez historii – potencjał lokalu (2★, ceny preferowane strefy); wyklucza korekta_prognozy, mnozniki_ceny
 #   i przewaga_popytu (to wymaga znajomości modelu);
+# - zamowienia_ze_sprzedazy – gdy tydzień temu danie traciło klientów w kolejce (kuchnia, kasa), bot
+#   zamawia najwyżej tamtą sprzedaż × ta liczba (człowiek widzi, że towar się psuje; H17);
 # - tylko_pomiar – poziom do pomiarów (balans/), mistrz gry go nie wybiera (wersje „jak człowiek” mistrz gry
 #   wybiera – decyzja autora 29.10.2026).
 poziomy:
@@ -87,6 +89,7 @@ poziomy:
     kampanie: false
     promocje: false
     prognoza_czlowieka: {rund: 1}
+    zamowienia_ze_sprzedazy: 1.1   # H17: gdy kuchnia nie nadążyła, zamawia sprzedaż × 1,1
   czlowiek_sredni:
     nazwa: Jak człowiek – średni
     opis: zeszły tydzień z małym błędem, planuje obsadę na popyt dzień po dniu

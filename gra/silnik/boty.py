@@ -46,6 +46,7 @@ from .rynek import promocje as pm
 from .rynek import reklama as rk
 from .swiat import awarie as aw
 from .swiat import zdarzenia as zd
+from .wyniki.karta import KOLEJKI
 
 DOMYSLNY_POZIOM = "sredni"
 
@@ -467,6 +468,10 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         udzialy_dni = plan["dni"]
     else:
         klienci = {u: prog["dania"].get(u, 0.0) * korekta * st["pokrycie"] for u in oferta}
+        if pz.get("zamowienia_ze_sprzedazy"):   # człowiek: kuchnia nie nadążyła tydzień temu – zamawia mniej
+            sp = (stan.wyniki.get(runda - 1, {}).get(nazwa) or {}).get("sprzedaz", {})
+            klienci = {u: min(k, sp[u]["sprzedaz"] * pz["zamowienia_ze_sprzedazy"])
+                       if sp.get(u, {}).get("przyczyna") in KOLEJKI else k for u, k in klienci.items()}
         udzialy_dni = prog["dni"] or None
         szczyt = max([pp.szczyt(dane, dane.lokale[x]["strefa"], r_sprz) for x in prog_lok] or [1.0])
     prognoza_dan = {u: sum(x.get(u, 0.0) for x in prog_lok.values()) / st["pokrycie"] for u in oferta}

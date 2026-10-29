@@ -329,3 +329,28 @@ wpis na dole.
   przez mistrza gry. Propozycje Z1–Z6 i B5 wpisane do notatek.
 - Testy: nowe `test_rozruch_nowego_lokalu` (`testy/rynek/test_popyt.py`) i
   `test_zakupy_dodatkowe_bota_zostawiaja_bufor_gotowki` (`testy/rdzen/test_boty.py`). Inne testy bez zmian.
+
+## H17 – słaby bot agresywny bez bankructwa (29.10.2026, Claude Code, Opus 5.5)
+- Wybór autora po B5: „poprawić bota agresywnego”. Diagnoza (6 gier, słaby „jak człowiek” agresywny, 6 firm,
+  18 rund): kuchnia obsługuje ok. 37% popytu na 8 dań (brak miejsc w kuchni – przyczyna „pracownicy/sprzęt”),
+  a proste planowanie zamawia towar na cały przewidywany popyt. Psuje się towar za 27% przychodu (przy innych
+  strategiach 7–9%), towary to 68% przychodu. Sprzęt kuchni nie był przyczyną – zakupy w budżecie działają od B5.
+- Zmiana: nowe pole poziomu `zamowienia_ze_sprzedazy` (`dane/boty.yaml`, schemat `PoziomBota`), tylko
+  u `czlowiek_slaby` = 1,1: gdy tydzień temu danie traciło klientów w kolejce (kuchnia lub kasa, `karta.KOLEJKI`),
+  bot zamawia na nie najwyżej tamtą sprzedaż × 1,1 – człowiek widzi, że towar się psuje. Łatwy bez zmian
+  (zostaje najsłabszy, test „planujący bot marnuje mniej towaru”).
+- Wynik (20 ziaren × 5 strategii, jak seria B5; przed = konfiguracja B5):
+
+  | miara | przed | po |
+  |---|---|---|
+  | alarmy wersji słabej | 8/100 (wszystkie agresywny) | **0/100** |
+  | karta słaba / średnia / dobra | −0,01 / 0,23 / 0,34 | 0,05 / 0,23 / 0,34 |
+  | słaba < średnia (pary) | 89/100 | 85/100 |
+  | średnia < dobra (pary) | 92/100 | 92/100 |
+  | pierwszy plus średniej w rundach 4–6 | 65/100 | 65/100 |
+  | psucie towaru słabego agresywnego (% przychodu) | 27% | 7% |
+
+  Średnia i dobra wersja bez zmian (ich planowanie nie korzysta z nowego pola). Strategia agresywna dalej
+  traci (dochód słabej ok. −1 tys. zł za grę) – balans strategii zostaje do B6–B12.
+- Test: nowy `test_slaby_czlowiek_zamawia_mniej_gdy_kuchnia_nie_nadazyla` (`testy/rdzen/test_boty.py`;
+  bez reguły nie przechodzi). Inne testy bez zmian.

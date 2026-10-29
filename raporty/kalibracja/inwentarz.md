@@ -257,6 +257,6 @@ do 40%, szkoda do 8000 zł, karencja 1 runda)
 | H14 | Polisy mają ujemną wartość także dla biednej firmy – nikt rozsądny ich nie kupi | kod | pary: komplet polis / brak, wiele ziaren |
 | H15 | Higiena „podstawowa” wystarcza zawsze – „firma” i „haccp” się nie zwracają | kod, boty | pary: 4 poziomy higieny |
 | H16 | Dyskont z gazetką dominuje zakupy małej firmy (rabat 15–35%), a hurtownia nie zwraca się nigdy przy 1 lokalu | kod | pary: dostawcy wymuszeni |
-| H17 | Łatwy bot agresywny bankrutuje (towary 115% przychodu) – proste planowanie zamawia cały popyt i towar się psuje | gry botów | B3: czy łatwy ma być aż tak słaby |
+| H17 | Łatwy bot agresywny bankrutuje (towary 115% przychodu) – proste planowanie zamawia cały popyt i towar się psuje | gry botów | B3: czy łatwy ma być aż tak słaby; H17 (29.10.2026): słaby „jak człowiek” bez alarmu dzięki `zamowienia_ze_sprzedazy`, łatwy bez zmian |
 
 Hipotezy z raportu części A dopisuje się tu w kroku U (numery H18…), a sprawdza w B6–B12.
