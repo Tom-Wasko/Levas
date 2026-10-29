@@ -1,8 +1,6 @@
 """Dane dla interfejsu: wszystko, czego potrzebuje strona firmy w danej rundzie (jeden słownik JSON)."""
 from __future__ import annotations
 
-from copy import deepcopy
-
 from silnik import harmonogram as hm
 from silnik.dane import Dane
 from silnik.decyzje import (
@@ -59,7 +57,7 @@ def _firma_slownik(f: Firma) -> dict:
 def stan_po_szkicu(gra: Gra, firma: str):
     """Stan firmy po zastosowaniu roboczych decyzji bieżącej rundy (bez sprzedaży) + koszty tych decyzji."""
     r = gra.runda
-    stan = deepcopy(gra.stan(r - 1))
+    stan = gra.stan(r - 1).kopia()
     f = stan.firmy[firma]
     d = gra.szkic(firma)
     ks, rach = Ksiega(vat=rz.reguly_vat(gra.dane)), Rachunek()
@@ -73,7 +71,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     przejecia = {"przejecie": pr.przejmij(gra.dane, stan.firmy, firma, d.get("przejecie"), r, None, ks, rach),
                  "wypowiedzenia": pr.wypowiedz(gra.dane, stan.firmy, firma, d.get("wypowiedz"), r)}
     # limit nowych i ważność ofert podkupienia (licytacje i odpowiedzi pracowników – dopiero w przeliczeniu)
-    dd, _, raport = rp.przed_decyzjami(gra.dane, deepcopy(stan), {firma: d}, r, gra.konfiguracja["ziarno"])
+    dd, _, raport = rp.przed_decyzjami(gra.dane, stan.kopia(), {firma: d}, r, gra.konfiguracja["ziarno"])
     d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
     bank_info = bk.poczatek_rundy(gra.dane, f, d, r, ks, rach)
     harpagon_info = lw.poczatek_rundy(gra.dane, f, d, r, rach)   # wizyty – dopiero w przeliczeniu

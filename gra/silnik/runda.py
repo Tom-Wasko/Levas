@@ -13,8 +13,6 @@ Runda r = tydzień r gry z lokalami (dane/mapa). Kolejność jak w KPiR i banku 
 """
 from __future__ import annotations
 
-from copy import deepcopy
-
 import numpy as np
 
 from . import boty as bt
@@ -65,7 +63,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                    podglad: bool = False) -> StanGry:
     """Zwraca nowy stan po rundzie stan.runda + 1 (stan wejściowy nie jest zmieniany).
     `podglad` – „Analiza – co jeśli”: deklaracje samodzielnej księgowości nie są sprawdzane (silnik/ksiegowosc/biuro.py)."""
-    s = deepcopy(stan)
+    s = stan.kopia()
     r = stan.runda + 1
     if not lk.tryb_lokali(dane, konfiguracja):
         raise ValueError("Gra bez lokali (tryb REVAS) nie jest już obsługiwana – potrzebne dane z mapą miasta.")

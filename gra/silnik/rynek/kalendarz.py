@@ -23,7 +23,7 @@ def dane_kalendarza(dane: Dane) -> dict | None:
 
 
 def _w_zakresie(dzien: date, od: str, do: str) -> bool:
-    md = dzien.strftime("%m-%d")
+    md = f"{dzien.month:02d}-{dzien.day:02d}"
     return od <= md <= do if od <= do else (md >= od or md <= do)  # zakres przez Nowy Rok
 
 
@@ -47,9 +47,17 @@ def trwa(k: dict, w: dict, dzien: date) -> bool:
 
 
 def aktywne(dane: Dane, dzien: date) -> list[dict]:
-    """Wydarzenia trwające w dniu `dzien`."""
+    """Wydarzenia trwające w dniu `dzien` (zapamiętane na danych – popyt pyta o ten sam dzień wiele razy)."""
     k = dane_kalendarza(dane)
-    return [w for w in (k["wydarzenia"] if k else []) if trwa(k, w, dzien)]
+    if not k:
+        return []
+    pamiec = getattr(dane, "_pamiec_kalendarza", None)
+    if pamiec is None or pamiec[0] is not k:   # widok danych gry może mieć inny kalendarz niż dane bazowe
+        pamiec = (k, {})
+        dane._pamiec_kalendarza = pamiec
+    if dzien not in pamiec[1]:
+        pamiec[1][dzien] = [w for w in k["wydarzenia"] if trwa(k, w, dzien)]
+    return list(pamiec[1][dzien])
 
 
 def mnoznik_dania(dane: Dane, strefa: str, usluga: str, dzien: date, trwajace: list[dict] | None = None) -> float:
@@ -63,11 +71,9 @@ def mnoznik_dania(dane: Dane, strefa: str, usluga: str, dzien: date, trwajace: l
 
 def mnoznik(dane: Dane, strefa: str, dzien: date) -> float:
     """Mnożnik puli klientów strefy w danym dniu (1 – zwykły dzień)."""
-    k = dane_kalendarza(dane)
     m = 1.0
-    for w in (k["wydarzenia"] if k else []):
-        if trwa(k, w, dzien):
-            m *= w["strefy"].get(strefa, w["strefy"].get(WSZYSTKIE, 1.0))
+    for w in aktywne(dane, dzien):
+        m *= w["strefy"].get(strefa, w["strefy"].get(WSZYSTKIE, 1.0))
     return m
 
 

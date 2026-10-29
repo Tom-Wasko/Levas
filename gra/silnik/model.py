@@ -9,6 +9,7 @@ Kwoty są trzymane w groszach (pola `…_gr`, int). Silnik liczy w złotych prze
 """
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
@@ -421,6 +422,14 @@ class StanGry(Model):
         if v != WERSJA_STANU:
             raise ValueError(f"Stan zapisany w wersji {v}, a gra obsługuje wersję {WERSJA_STANU}.")
         return v
+
+    def kopia(self) -> StanGry:
+        """Głęboka kopia stanu; raporty minionych rund (`wyniki`, `rynek`) są tylko do odczytu,
+        więc zostają wspólne z oryginałem (kopia całej historii rosła z każdą rundą)."""
+        s = deepcopy(self.model_copy(update={"wyniki": {}, "rynek": {}}))
+        s.wyniki.update(self.wyniki)
+        s.rynek.update(self.rynek)
+        return s
 
 
 def _na_zlote(x: Any) -> Any:
