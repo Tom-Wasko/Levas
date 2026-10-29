@@ -10,6 +10,8 @@ from pomocnicze import _kopia, _zmien
 from silnik import dane as modul_danych
 from silnik.dane import Dane, sprawdz
 
+pytestmark = pytest.mark.dane_gry
+
 SILNIK = Path(modul_danych.__file__).parent
 
 # Liczby, które mogą być w kodzie silnika, bo opisują budowę modelu, a nie grę: indeksy i kroki, jakość

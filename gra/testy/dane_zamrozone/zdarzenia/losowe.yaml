@@ -1,0 +1,610 @@
+# Losowe wypadki w lokalu i ubezpieczyciel (F3b.5, silnik/swiat/awarie.py) – rzadkie historie tylko jednej drużyny
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Od rundy zasady.od_rundy każda drużyna z działającym lokalem ma co rundę szansę zasady.szansa, że w lokalu
+  zacznie się wypadek – historia w 2–4 scenach (format jak w parki.yaml, bez pola park). Naraz najwyżej jeden
+  otwarty wypadek, żaden się nie powtarza. Skutek szkoda: koszt w KPiR (najwyżej zasady.max_strata za szkodę);
+  gdy firma miała polisę danego rodzaju już w rundzie, w której wypadek się zaczął, ubezpieczyciel zwraca
+  (szkoda − franszyza) × pokrycie jako przychód pozostały. Składka co rundę: stala + za_lokal × liczba lokali
+  + od_majatku × majątek (ceny zakupu inwestycji), kwoty miesięczne. Ochrona od karencja_rund rund po zakupie.'
+zrodlo: 'Notatka „Zdarzenia i historie” (rzadkie wypadki, limit straty, ubezpieczenie zmniejsza stratę, ok. 80%
+  komicznych, ok. 20% poważnych bez żartów, lubelskie smaczki, przykłady: Gołąb Zenon, Pani Halina z drugiego
+  piętra, Najazd koziołków, Zalanie z góry); składki – rząd wielkości polis dla małej gastronomii (lokal ok.
+  1,5–2 tys. zł rocznie, OC ok. 1 tys. zł rocznie, sprzęt ok. 2–3% wartości rocznie), szansa, szkody i pokrycie
+  – założenie F3b.5, do kalibracji w kroku 5'
+zasady:
+  od_rundy: 4          # pierwsze tygodnie bez wypadków – drużyny dopiero się urządzają
+  szansa: 0.08         # w pierwszej rundzie z wypadkami i zaraz po wypadku; z przyrostem ok. 2–3 wypadki na grę
+  przyrost: 0.04       # P11 (odpowiedź 17): +4 pp. za każdą rundę bez wypadku, po wypadku od nowa
+  szansa_max: 0.4      # sufit – „im dłużej spokojnie, tym bliżej katastrofy”, ale nie co tydzień
+  max_strata: 8000     # zł – górna granica jednej szkody
+ubezpieczyciel:
+  nazwa: TUW „Pod Koziołkiem”
+  budynek: ubezpieczyciel
+  karencja_rund: 1     # polisa kupiona w rundzie r chroni od rundy r + 1
+  polisy:
+    lokal:
+      nazwa: Polisa na lokal
+      opis: Mury, szyby, instalacje i sufity – ogień, woda, stłuczenia i inne nieszczęścia budowlane.
+      stala: 0
+      za_lokal: 140
+      od_majatku: 0
+      pokrycie: 0.9
+      franszyza: 300
+    sprzet:
+      nazwa: Polisa na sprzęt
+      opis: Sprzęt kuchenny, stanowiska i wyposażenie – kradzież, przepięcia, zalanie, upadki z wysokości.
+      stala: 0
+      za_lokal: 0
+      od_majatku: 0.002
+      pokrycie: 0.85
+      franszyza: 200
+    oc:
+      nazwa: OC działalności
+      opis: Szkody, które firma wyrządzi innym – klientom, sąsiadom i ich praniu.
+      stala: 80
+      za_lokal: 0
+      od_majatku: 0
+      pokrycie: 1
+      franszyza: 100
+historie:
+
+- id: golab_zenon
+  tytul: Gołąb Zenon
+  start: wlot
+  sceny:
+    wlot:
+      tekst: >-
+        Rano przy otwieraniu lokalu słyszysz z kuchni gruchanie. Na półce z przyprawami, między sumakiem a papryką
+        wędzoną, siedzi gołąb. Duży, siwy, z miną inspektora. Wszedł kratką wentylacyjną i najwyraźniej uznał, że
+        lokal jest teraz jego. Pracownik już nazwał go Zenonem.
+      domyslna: zostaw
+      opcje:
+      - id: lap
+        tekst: Łapiesz Zenona na sitko do frytek
+        koszt: {czas: 1}
+        wynik: >-
+          Po czterdziestu minutach pościgu, dwóch przewróconych krzesłach i jednym wywiadzie dla przechodnia
+          Zenon ląduje w sitku i z godnością odlatuje nad Krakowskie Przedmieście. Ktoś nagrał całą akcję telefonem.
+        nastepna:
+        - {scena: nagranie, za_ile_rund: 1}
+      - id: golebiarz
+        tekst: Dzwonisz po pana Józka, gołębiarza z Bronowic
+        koszt: {gotowka: 150}
+        wynik: >-
+          Pan Józek przychodzi z woreczkiem ziarna, mówi do Zenona „no chodź, łobuzie” i gołąb grzecznie wsiada mu
+          na ramię. Na odchodne pan Józek zakłada na kratkę siatkę i nie bierze za nią ani grosza.
+      - id: zostaw
+        tekst: Zostawiasz go – może sam wyleci
+        wynik: >-
+          Zenon nie wylatuje. Zenon się rozgląda. Zenon wyraźnie ocenia metraż. Klient przy oknie robi mu zdjęcie
+          na tle krajalnicy i z miną obywatela wysyła je do sanepidu.
+        skutki:
+        - {typ: kontrola, szansa: 0.1, rund: 2, opis: Zdjęcie Zenona na tle krajalnicy w skrzynce sanepidu}
+        nastepna:
+        - {scena: rodzina, za_ile_rund: 1}
+    nagranie:
+      tekst: >-
+        Nagranie „Szef kebaba kontra gołąb” ma w lubelskim internecie kilkadziesiąt tysięcy wyświetleń. Najczęstszy
+        komentarz: „Zenon zasługiwał na kebaba”. Do lokalu przychodzą ludzie, żeby zobaczyć „to miejsce z gołębiem”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Sława po pościgu za Zenonem}
+    rodzina:
+      tekst: >-
+        Zenon przyprowadził rodzinę. Na okapie siedzą już trzy gołębie, a jeden z nich właśnie dziobie izolację
+        przewodu wentylatora. Wentylator wydaje dźwięk, jakiego nie powinien wydawać żaden wentylator.
+      domyslna: elektryk
+      opcje:
+      - id: elektryk
+        tekst: Wzywasz elektryka i pana Józka naraz
+        koszt: {gotowka: 150}
+        wynik: >-
+          Pan Józek wyprowadza gołębie, elektryk wymienia przegryziony silnik wentylatora i mówi, że „pierwszy raz
+          widzi taką awarię, a robi w zawodzie od Gierka”.
+        skutki:
+        - {typ: szkoda, kwota: 1400, polisa: sprzet, opis: Wentylator przegryziony przez rodzinę Zenona}
+      - id: wlasnorecznie
+        tekst: Wyganiasz je sam i owijasz kabel taśmą
+        koszt: {czas: 2}
+        wynik: >-
+          Gołębie wychodzą obrażone, kabel trzyma się na taśmie i dobrym słowie. Wentylator jęczy, ale działa –
+          przez tydzień. Potem i tak trzeba było go wymienić.
+        skutki:
+        - {typ: szkoda, kwota: 1100, polisa: sprzet, opis: Wentylator po przejściach}
+
+- id: pani_halina
+  tytul: Pani Halina z drugiego piętra
+  start: list
+  sceny:
+    list:
+      tekst: >-
+        Na drzwiach lokalu wisi list napisany starannym pismem nauczycielki polskiego w stanie spoczynku:
+        „Szanowni Państwo. Mój kot od tygodnia pachnie czosnkiem. Ja również. Proszę o natychmiastowe
+        zaprzestanie. Z poważaniem, H. Wróblewska, II piętro”. List jest poprawiony na czerwono – przez nią samą.
+      domyslna: zignoruj
+      opcje:
+      - id: porcja
+        tekst: Zanosisz pani Halinie obiad i przeprosiny
+        koszt: {czas: 0.5, porcje: 2}
+        wynik: >-
+          Pani Halina otwiera drzwi z kotem na rękach, przyjmuje dwie porcje „wyłącznie dla kota” i obiecuje, że
+          „rozważy sprawę”. Za drzwiami słychać, jak kot dostaje najwyżej połowę.
+        nastepna:
+        - {scena: stala_klientka, za_ile_rund: 2}
+      - id: filtr
+        tekst: Montujesz lepszy filtr na okapie
+        koszt: {gotowka: 700}
+        wynik: >-
+          Filtr wyłapuje zapach tak skutecznie, że nawet przechodnie przestają czuć kebab. Pani Halina jest
+          zadowolona. Przechodnie trochę mniej – nie wiedzą, że tu jesteś.
+        skutki:
+        - {typ: popyt, mnoznik: 0.98, rund: 2, opis: Mniej zapachu na ulicy}
+      - id: zignoruj
+        tekst: Udajesz, że listu nie było
+        wynik: >-
+          List znika z drzwi. Następnego dnia wisi znowu, tym razem z przypisem i bibliografią. Do przypisu
+          dołączona jest informacja, że kopia poszła do sanepidu – listem poleconym, za potwierdzeniem odbioru.
+        skutki:
+        - {typ: kontrola, szansa: 0.12, rund: 2, opis: Skarga pani Haliny do sanepidu (z bibliografią)}
+        nastepna:
+        - {scena: pranie, za_ile_rund: 1}
+    stala_klientka:
+      tekst: >-
+        Pani Halina przychodzi co wtorek, zamawia „to samo, co kot” i opowiada wszystkim w kolejce o swoich
+        uczniach z lat siedemdziesiątych. Okazuje się, że uczyła pół Lublina. Pół Lublina zaczyna przychodzić we
+        wtorki, żeby się z nią przywitać.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 3, opis: Absolwenci pani Haliny}
+    pranie:
+      tekst: >-
+        Pani Halina stoi w drzwiach z koszem prania. „Wywiesiłam pościel na balkonie. Teraz moja pościel pachnie
+        jak Państwa sos czosnkowy. To była pościel po mamie”. Kot też przyszedł. Kot patrzy na Ciebie oskarżycielsko.
+      domyslna: odszkodowanie
+      opcje:
+      - id: odszkodowanie
+        tekst: Płacisz za nową pościel i pralnię
+        wynik: >-
+          Pani Halina przyjmuje pieniądze, ale zaznacza, że „pościel po mamie jest niezastąpiona”. Kupuje taką samą
+          w sklepie na Lubartowskiej.
+        skutki:
+        - {typ: szkoda, kwota: 600, polisa: oc, opis: Pościel pani Haliny i pralnia}
+      - id: negocjuj
+        tekst: Proponujesz darmowe obiady do końca miesiąca
+        koszt: {czas: 1, porcje: 6}
+        wynik: >-
+          Pani Halina negocjuje twardo: obiady tak, ale z dodatkowym sosem dla kota. Pościel zostaje, zapach też.
+          Umowa zostaje spisana – poprawnie, z przecinkami.
+
+- id: najazd_koziolkow
+  tytul: Najazd koziołków
+  start: autokar
+  sceny:
+    autokar:
+      tekst: >-
+        Pod lokal podjeżdża autokar. Wysiada z niego czterdzieścioro dzieci w czapkach z rogami – wycieczka
+        szkolna „Śladami lubelskiego koziołka” właśnie skończyła zwiedzanie Starego Miasta i jest głodna. Pani
+        wychowawczyni wygląda, jakby nie spała od Zamościa. Pyta o zniżkę grupową.
+      domyslna: grzecznie
+      opcje:
+      - id: przyjmij
+        tekst: Wpuszczasz wszystkich i dajesz zniżkę
+        koszt: {porcje: 20}
+        wynik: >-
+          Czterdzieści koziołków je, krzyczy, zamienia się frytkami i śpiewa hymn szkoły. Jeden koziołek bada, czy
+          lodówka z napojami jest stabilna. Lodówka z napojami nie jest stabilna.
+        nastepna:
+        - {scena: lodowka, za_ile_rund: 1}
+      - id: w_parku
+        tekst: Proponujesz piknik – zanosisz jedzenie do pobliskiego parku
+        koszt: {czas: 1.5, porcje: 20}
+        wynik: >-
+          Koziołki jedzą na trawie, wychowawczyni pierwszy raz od rana siada. Na koniec dzieci robią Ci laurkę:
+          kebab z rogami i podpis „Najlepszy Pan na świecie (i okolicach)”.
+        nastepna:
+        - {scena: laurka, za_ile_rund: 1}
+      - id: grzecznie
+        tekst: Odmawiasz grzecznie – nie zmieścicie się
+        wynik: >-
+          Autokar odjeżdża do konkurencji. Czterdzieści koziołków macha do Ciebie przez szybę z wyrzutem, jakiego
+          nie powstydziłby się sam herb miasta.
+    lodowka:
+      tekst: >-
+        Lodówka leży na boku, a dookoła rozlewa się jezioro napojów. Koziołek winowajca twierdzi, że „ona sama”.
+        Wychowawczyni podaje Ci kartkę z numerem polisy szkoły, która – jak się okazuje – wygasła w zeszłym roku.
+      domyslna: sprzatnij
+      opcje:
+      - id: sprzatnij
+        tekst: Sprzątasz i wzywasz serwis
+        wynik: >-
+          Serwisant stwierdza pękniętą obudowę i zgięty kompresor. Na pocieszenie dzieci zostawiają Ci rysunek
+          lodówki z rogami. Wisi teraz przy kasie.
+        skutki:
+        - {typ: szkoda, kwota: 1800, polisa: sprzet, opis: Lodówka z napojami po najeździe koziołków}
+    laurka:
+      tekst: >-
+        Wychowawczyni wrzuciła zdjęcie laurki na szkolny profil. Rodzice z całego osiedla przychodzą „do tego Pana
+        od koziołków”, a dyrektorka szkoły pyta o catering na festyn.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 3, opis: Rodzice koziołków}
+      - {typ: gotowka, kwota: 900, opis: Catering na szkolny festyn (zaliczka)}
+
+- id: zalanie_z_gory
+  tytul: Zalanie z góry
+  start: kapanie
+  sceny:
+    kapanie:
+      tekst: >-
+        W środku dnia na ladę zaczyna kapać woda. Potem przestaje kapać i zaczyna lecieć. Z góry słychać ryk:
+        Motor Lublin właśnie strzelił gola, a student z trzeciego piętra, który napuścił wody do wanny „na chwilę”,
+        ogląda mecz od pierwszej minuty.
+      domyslna: administrator
+      opcje:
+      - id: biegnij
+        tekst: Biegniesz na górę i walisz w drzwi
+        koszt: {czas: 1}
+        wynik: >-
+          Student otwiera w szaliku Motoru, z kubkiem w ręku. Patrzy na Ciebie, potem na wodę na korytarzu, potem
+          znowu na Ciebie. „O nie. Ile było?” – pyta. Chodzi mu o wynik meczu.
+        nastepna:
+        - {scena: sufit, za_ile_rund: 1}
+      - id: administrator
+        tekst: Dzwonisz do administratora i podstawiasz wiadra
+        wynik: >-
+          Administrator zakręca wodę w całym pionie po dwudziestu minutach. Wiadra wygrywają z sufitem, ale tylko
+          na punkty.
+        nastepna:
+        - {scena: sufit, za_ile_rund: 1}
+    sufit:
+      tekst: >-
+        Sufit nad ladą ma kształt mapy województwa lubelskiego, z wyraźnie zaznaczonym Zamościem. Fachowiec mówi,
+        że trzeba skuć tynk, osuszyć i pomalować. Student przychodzi z przeprosinami i gitarą.
+      domyslna: remont
+      opcje:
+      - id: remont
+        tekst: Robisz remont od razu
+        wynik: >-
+          Ekipa skuwa, suszy i maluje w trzy noce. Student w ramach przeprosin gra pod lokalem przez cały weekend.
+          Gra całkiem nieźle – ludzie zatrzymują się i zostają na kebaba.
+        skutki:
+        - {typ: szkoda, kwota: 3500, polisa: lokal, opis: Remont sufitu po zalaniu}
+        - {typ: popyt, mnoznik: 1.03, rund: 1, opis: Koncert przeprosinowy studenta}
+      - id: mapa
+        tekst: Zostawiasz plamę jako „mapę regionu” i robisz tylko osuszanie
+        koszt: {gotowka: 400}
+        wynik: >-
+          Plama zostaje i dostaje podpis „Województwo lubelskie, skala 1:1000”. Turyści robią sobie z nią zdjęcia,
+          ale część gości pyta, czy sufit na pewno nie spadnie. Fachowiec mówi, że „raczej nie w tym miesiącu”.
+        skutki:
+        - {typ: popyt, mnoznik: 0.98, rund: 2, opis: Goście patrzą w sufit z niepokojem}
+        nastepna:
+        - {scena: tynk, za_ile_rund: 3, szansa: 0.5}
+    tynk:
+      tekst: >-
+        Fachowiec miał rację: nie w tamtym miesiącu. W tym. Kawałek tynku w kształcie powiatu bialskiego ląduje
+        w pustym na szczęście boksie. Remont trzeba zrobić i tak – tylko większy.
+      skutki:
+      - {typ: szkoda, kwota: 4200, polisa: lokal, opis: Remont sufitu – wersja rozszerzona}
+
+- id: spiewajaca_frytkownica
+  tytul: Śpiewająca frytkownica
+  start: dzwiek
+  sceny:
+    dzwiek:
+      tekst: >-
+        Frytkownica zaczęła wydawać dźwięki. Najpierw ciche bzyczenie, potem coś na kształt melodii. Pracownik
+        przysięga, że rozpoznaje refren przeboju disco polo z wesela kuzyna w Świdniku. Termostat pokazuje to,
+        co chce.
+      domyslna: sluchaj
+      opcje:
+      - id: serwis
+        tekst: Wzywasz serwis pana Wieśka
+        koszt: {gotowka: 250}
+        wynik: >-
+          Pan Wiesiek otwiera obudowę, mówi „no tak, przekaźnik” i wymienia go w kwadrans. Frytkownica milknie.
+          Pracownik jest wyraźnie zawiedziony – zaczynał się uczyć słów.
+      - id: kopnij
+        tekst: Stosujesz metodę serwisową „z kolana”
+        koszt: {czas: 0.5}
+        wynik: >-
+          Po kopnięciu frytkownica na chwilę cichnie, a potem przechodzi do kolejnego utworu z repertuaru. Bardziej
+          rytmicznego.
+        nastepna:
+        - {scena: koncert, za_ile_rund: 1}
+      - id: sluchaj
+        tekst: Uznajesz, że to urok lokalu
+        wynik: >-
+          Klienci nagrywają frytkownicę i śpiewają z nią refren. Jest wesoło. Frytkownica się grzeje – też wesoło,
+          ale bardziej.
+        nastepna:
+        - {scena: koncert, za_ile_rund: 1}
+    koncert:
+      tekst: >-
+        W piątek wieczorem frytkownica daje ostatni koncert: długie, przejmujące „uuuu”, trzask, zapach spalonej
+        elektroniki i cisza. Na sali ktoś bije brawo. Pan Wiesiek ogląda płytkę i kręci głową: „Przepięcie.
+        Ta już nie zaśpiewa”.
+      skutki:
+      - {typ: szkoda, kwota: 2600, polisa: sprzet, opis: Nowa frytkownica po ostatnim koncercie}
+
+- id: hulajnoga
+  tytul: Hulajnoga w witrynie
+  start: huk
+  sceny:
+    huk:
+      tekst: >-
+        Huk, brzęk, cisza. W witrynie lokalu jest dziura w kształcie studenta. Student leży w środku, cały, na
+        stercie serwetek, z hulajnogą elektryczną na nogach. „Hamulce mi się zawiesiły” – mówi. „A mogę od razu
+        zamówić? Skoro już jestem?”
+      domyslna: spisz
+      opcje:
+      - id: spisz
+        tekst: Spisujesz jego dane i dzwonisz po szklarza
+        wynik: >-
+          Student podaje dane, przeprasza i zamawia podwójnego kebaba „na nerwy”. Szklarz wstawia nową szybę na
+          drugi dzień. Student okazuje się raperem z LSM-u i obiecuje „coś napisać”.
+        skutki:
+        - {typ: szkoda, kwota: 2200, polisa: lokal, opis: Nowa witryna po hulajnodze}
+        nastepna:
+        - {scena: piosenka, za_ile_rund: 2, szansa: 0.7}
+      - id: wyrzuc
+        tekst: Wyrzucasz go razem z hulajnogą
+        koszt: {czas: 0.5}
+        wynik: >-
+          Student odjeżdża, kulejąc i pchając hulajnogę. Szybę i tak trzeba wstawić. Klienci, którzy wszystko
+          widzieli, uznają, że „szef jest dziś nie w humorze”.
+        skutki:
+        - {typ: szkoda, kwota: 2200, polisa: lokal, opis: Nowa witryna po hulajnodze}
+        - {typ: popyt, mnoznik: 0.98, rund: 1, opis: Szef nie w humorze}
+    piosenka:
+      tekst: >-
+        Raper z LSM-u dotrzymał słowa. Utwór „Szyba (prosto w kebab)” leci w lubelskich klubach, a refren „hamulce
+        puściły, ale sos trzymał” śpiewa pół akademika. Pod lokal przychodzą ludzie robić zdjęcia przy „tej szybie”.
+      skutki:
+      - {typ: popyt, mnoznik: 1.05, rund: 2, opis: Hit „Szyba (prosto w kebab)”}
+
+- id: kot_kierownik
+  tytul: Kot, który został kierownikiem
+  start: pod_lada
+  sceny:
+    pod_lada:
+      tekst: >-
+        Pod ladą zamieszkał rudy kot. Nikt nie wie, skąd przyszedł. Siedzi na kartonie z serwetkami, patrzy na
+        klientów i każdy, kto spojrzy mu w oczy, zamawia większy zestaw. Klienci mówią na niego „Kierownik”.
+      domyslna: na_zewnatrz
+      opcje:
+      - id: schronisko
+        tekst: Zawozisz go do schroniska na Metalurgicznej
+        koszt: {czas: 1.5}
+        wynik: >-
+          W schronisku kot od razu siada na biurku kierowniczki. Po tygodniu ktoś go adoptuje. Wysyła Ci zdjęcie:
+          kot siedzi na kartonie z napisem „kebab”. Widocznie ma swoje przyzwyczajenia.
+      - id: zostaw
+        tekst: Zostawiasz go – Kierownik zostaje
+        wynik: >-
+          Kierownik dostaje miseczkę w kuchni, imię na tabliczce i konto w mediach społecznościowych, które prowadzi
+          Twój pracownik. Pierwszy post: „Dzisiaj zatwierdziłem dostawę. Kurczak w porządku”.
+        nastepna:
+        - {scena: kontrola, za_ile_rund: 2}
+      - id: na_zewnatrz
+        tekst: Karmisz go, ale na zewnątrz
+        koszt: {porcje: 2}
+        wynik: >-
+          Kierownik przenosi się na parapet przed wejściem. Pracuje teraz jako portier: wita klientów i ocenia
+          ich wzrokiem. Część klientów przychodzi głównie do niego.
+        skutki:
+        - {typ: popyt, mnoznik: 1.02, rund: 3, opis: Kierownik na parapecie}
+    kontrola:
+      tekst: >-
+        Konto Kierownika ma kilka tysięcy obserwujących – w tym, jak się okazuje, kogoś z sanepidu. Do lokalu
+        przychodzi kontrola. Kierownik siedzi na blacie przy krajalnicy i patrzy inspektorce prosto w oczy.
+      domyslna: mandat
+      opcje:
+      - id: mandat
+        tekst: Przyjmujesz mandat i przenosisz Kierownika do domu
+        wynik: >-
+          Inspektorka wypisuje mandat, a na koniec prosi o zdjęcie z Kierownikiem „dla córki”. Kierownik przeprowadza
+          się do Twojego mieszkania i z miejsca zostaje kierownikiem kanapy.
+        skutki:
+        - {typ: gotowka, kwota: -500, opis: Mandat za kota na blacie}
+        - {typ: popyt, mnoznik: 1.03, rund: 2, opis: Obserwujący Kierownika}
+
+- id: zab_pana_ryszarda
+  tytul: Ząb pana Ryszarda
+  start: chrup
+  sceny:
+    chrup:
+      tekst: >-
+        Pan Ryszard, stały klient w wieku słusznym, gryzie kebaba i nagle robi „chrup”. Z bułki wyciąga pestkę
+        oliwki, a z ust – kawałek zęba. Pan Ryszard jest emerytowanym stomatologiem, więc od razu fachowo ocenia
+        szkody: „Szóstka górna. Korona. Drogo”.
+      domyslna: oc
+      opcje:
+      - id: oc
+        tekst: Przepraszasz i zgłaszasz sprawę ubezpieczycielowi
+        wynik: >-
+          Pan Ryszard sam wypełnia formularz szkody, używając słów, których likwidator nie rozumie. Na koniec
+          prosi o kebab bez oliwek – „na drugą stronę”.
+        skutki:
+        - {typ: szkoda, kwota: 1500, polisa: oc, opis: Korona dla pana Ryszarda}
+        nastepna:
+        - {scena: oliwki, za_ile_rund: 1}
+      - id: kolega
+        tekst: Pan Ryszard poleca kolegę dentystę – płacisz z ręki, ale taniej
+        koszt: {czas: 1}
+        wynik: >-
+          Kolega pana Ryszarda przyjmuje na Narutowicza, w gabinecie pamiętającym poprzednią epokę. Jest taniej,
+          ale wizyta trwa trzy godziny, bo panowie wspominają studia.
+        skutki:
+        - {typ: gotowka, kwota: -900, opis: Korona od kolegi pana Ryszarda}
+        nastepna:
+        - {scena: oliwki, za_ile_rund: 1}
+    oliwki:
+      tekst: >-
+        Dostawca oliwek przysyła przeprosiny, nową partię „na pewno bez pestek” i karton gratis. Na kartonie
+        ktoś dopisał długopisem: „pozdrowienia dla pana Ryszarda”.
+      skutki:
+      - {typ: gotowka, kwota: 200, opis: Rekompensata od dostawcy oliwek}
+
+- id: pozar_kuchni
+  tytul: Pożar w kuchni
+  powazna: true
+  start: ogien
+  sceny:
+    ogien:
+      tekst: >-
+        Podczas wieczornego szczytu zapala się olej w frytkownicy. Płomień sięga okapu, kuchnię wypełnia dym.
+        Pracownicy wyprowadzają klientów na ulicę. Ktoś wzywa straż pożarną.
+      domyslna: koc
+      opcje:
+      - id: koc
+        tekst: Gasisz kocem gaśniczym, zanim ogień przejdzie na okap
+        wynik: >-
+          Udaje się zdusić ogień w frytkownicy, ale okap i część instalacji są nadpalone. Strażacy sprawdzają
+          kuchnię kamerą termowizyjną i zalecają przegląd instalacji przed ponownym otwarciem.
+        skutki:
+        - {typ: szkoda, kwota: 2800, polisa: sprzet, opis: Frytkownica i okap po pożarze}
+        nastepna:
+        - {scena: po_pozarze, za_ile_rund: 1}
+      - id: ewakuacja
+        tekst: Wychodzisz z wszystkimi i czekasz na straż
+        wynik: >-
+          Straż przyjeżdża po kilku minutach i gasi pożar. Kuchnia jest okopcona, okap i ściana nad stanowiskiem do
+          remontu. Nikt nie ucierpiał – to najważniejsze.
+        skutki:
+        - {typ: szkoda, kwota: 2800, polisa: sprzet, opis: Frytkownica i okap po pożarze}
+        - {typ: szkoda, kwota: 3000, polisa: lokal, opis: Remont kuchni po pożarze}
+        nastepna:
+        - {scena: po_pozarze, za_ile_rund: 1}
+    po_pozarze:
+      tekst: >-
+        Lokal trzeba przewietrzyć, wyczyścić z sadzy i przejść przegląd instalacji. Firma sprzątająca może
+        przyjechać od razu, za dopłatą, albo w zwykłym terminie.
+      domyslna: zwykly
+      opcje:
+      - id: ekspres
+        tekst: Zamawiasz sprzątanie ekspresowe
+        koszt: {gotowka: 1200}
+        wynik: Lokal jest gotowy po dwóch dniach. Część klientów pyta, czy wszystko w porządku – i zostaje.
+        skutki:
+        - {typ: popyt, mnoznik: 0.93, rund: 1, opis: Lokal zamknięty na dwa dni po pożarze}
+      - id: zwykly
+        tekst: Czekasz na zwykły termin
+        wynik: Lokal jest zamknięty prawie cały tydzień. Klienci w tym czasie znajdują inne miejsca.
+        skutki:
+        - {typ: popyt, mnoznik: 0.8, rund: 1, opis: Lokal zamknięty po pożarze}
+        - {typ: popyt, mnoznik: 0.95, rund: 2, opis: Klienci wracają po przerwie}
+
+- id: wlamanie
+  tytul: Włamanie
+  powazna: true
+  start: rano
+  sceny:
+    rano:
+      tekst: >-
+        Rano zastajesz wyważone drzwi zaplecza. Zniknęły kasa fiskalna z utargiem z wieczora, tablet do zamówień
+        i część drobnego sprzętu. Policja zabezpiecza ślady i prosi o nagrania z monitoringu, którego nie masz.
+      domyslna: zglos
+      opcje:
+      - id: zglos
+        tekst: Zgłaszasz kradzież i wymieniasz zamki
+        koszt: {gotowka: 400}
+        wynik: >-
+          Ślusarz montuje nowe zamki. Policja przyjmuje zgłoszenie – szanse na odzyskanie rzeczy są niewielkie.
+          Brakujący sprzęt trzeba odkupić.
+        skutki:
+        - {typ: szkoda, kwota: 3600, polisa: sprzet, opis: Skradziony sprzęt i kasa}
+      - id: monitoring
+        tekst: Zgłaszasz kradzież i od razu zakładasz monitoring z alarmem
+        koszt: {gotowka: 1500, czas: 1}
+        wynik: >-
+          Firma ochroniarska montuje kamery i czujki jeszcze tego samego dnia. Sąsiedzi z kamienicy dziękują – ich
+          piwnice też są teraz lepiej pilnowane. Skradziony sprzęt trzeba odkupić.
+        skutki:
+        - {typ: szkoda, kwota: 3600, polisa: sprzet, opis: Skradziony sprzęt i kasa}
+        nastepna:
+        - {scena: nagranie, za_ile_rund: 3, szansa: 0.6}
+    nagranie:
+      tekst: >-
+        Kamera nagrywa dwie osoby, które próbują wejść tymi samymi drzwiami. Alarm je płoszy, a nagranie trafia
+        na policję. Po kilku dniach dzwoni dzielnicowy: część rzeczy z pierwszego włamania odnalazła się w lombardzie.
+      skutki:
+      - {typ: gotowka, kwota: 800, opis: Odzyskana część sprzętu (wartość)}
+
+- id: biedronki
+  tytul: Inwazja biedronek
+  start: okno
+  sceny:
+    okno:
+      tekst: >-
+        Październikowe słońce przygrzało i na szybę lokalu przyleciały biedronki azjatyckie – nie dziesięć, nie sto,
+        tylko „cała rodzina z kuzynami”, jak mówi pracownik. Siedzą na witrynie, na menu i na plakacie z promocją.
+        Jedna usiadła klientowi na kebabie i patrzy mu w oczy.
+      domyslna: zostaw
+      opcje:
+      - id: odkurzacz
+        tekst: Wynosisz je odkurzaczem do parku
+        koszt: {czas: 2}
+        wynik: >-
+          Przez dwie godziny chodzisz z odkurzaczem po lokalu jak pogromca duchów, a potem uroczyście wysypujesz
+          biedronki pod lipą na skwerze. Przechodzień pyta, czy to „jakiś happening ekologiczny”. Mówisz, że tak.
+      - id: dezynsekcja
+        tekst: Wzywasz firmę od dezynsekcji
+        koszt: {gotowka: 250}
+        wynik: >-
+          Pan z firmy ogląda szybę, mówi „o, harmonie, typowy październik” i uszczelnia ramy okien. Biedronki
+          przenoszą się do lokalu obok. Sąsiad z lokalu obok patrzy na Ciebie przez szybę z wyrzutem.
+      - id: zostaw
+        tekst: Zostawiasz – w listopadzie same znikną
+        wynik: >-
+          Biedronki nie czekają do listopada. Chowają się w każdej szczelinie lokalu, a klientka robi zdjęcie
+          „biedronka na sałatce” i pyta sanepid w komentarzu, czy to w cenie.
+        skutki:
+        - {typ: kontrola, szansa: 0.08, rund: 2, opis: Zdjęcie biedronki na sałatce}
+        nastepna:
+        - {scena: kasa, za_ile_rund: 1}
+    kasa:
+      tekst: >-
+        Kasa fiskalna zaczęła drukować paragony z kropkami i w końcu zamilkła. Serwisant otwiera obudowę i znajduje
+        w środku kolonię biedronek, które urządziły sobie zimowisko na ciepłej płytce drukarki. „Pierwszy raz widzę
+        kasę na diecie owadziej” – mówi i wystawia fakturę.
+      skutki:
+      - {typ: szkoda, kwota: 900, polisa: sprzet, opis: Kasa fiskalna jako zimowisko biedronek}
+
+- id: szkielet_bogdan
+  tytul: Szkielet Bogdan
+  start: dekoracja
+  sceny:
+    dekoracja:
+      tekst: >-
+        Przed Halloween pracownik kupił plastikowy szkielet naturalnej wielkości, nazwał go Bogdanem i posadził przy
+        oknie z kebabem w dłoni. Wieczorem pod lokal podjeżdża radiowóz: starsza pani z naprzeciwka zgłosiła, że
+        „w barze siedzi nieboszczyk i nikt nic nie robi”.
+      domyslna: przeprosiny
+      opcje:
+      - id: wyjasnij
+        tekst: Wychodzisz do policjantów i przedstawiasz Bogdana
+        koszt: {czas: 1}
+        wynik: >-
+          Policjanci oglądają Bogdana, jeden mówi „dobrze wygląda jak na swój wiek”, drugi robi mu zdjęcie do
+          grupy na komendzie. Zostają na kebabie i płacą, chociaż proponujesz „na koszt Bogdana”.
+        skutki:
+        - {typ: gotowka, kwota: 60, opis: Kolacja patrolu po spotkaniu z Bogdanem}
+        nastepna:
+        - {scena: komenda, za_ile_rund: 1}
+      - id: przeprosiny
+        tekst: Przepraszasz przez okno i zostawiasz Bogdana na miejscu
+        wynik: >-
+          Policjanci machają ręką i odjeżdżają. Bogdan siedzi dalej przy oknie, tuż obok promiennika ciepła, który
+          pracownik włączył, „żeby Bogdanowi nie było zimno”.
+        nastepna:
+        - {scena: topnienie, za_ile_rund: 1}
+    komenda:
+      tekst: >-
+        Zdjęcie Bogdana z komendy trafiło do internetu z podpisem „Najspokojniejszy klient w Lublinie”. Ludzie
+        przychodzą zrobić sobie z nim selfie i przy okazji coś zjeść.
+      skutki:
+      - {typ: popyt, mnoznik: 1.04, rund: 2, opis: Selfie z Bogdanem}
+    topnienie:
+      tekst: >-
+        Bogdan stopił się od promiennika i spłynął na parapet, a razem z nim stopiła się obudowa promiennika
+        i kawałek blatu. W lokalu pachnie plastikiem i trochę horrorem. Pracownik ogłasza żałobę.
+      skutki:
+      - {typ: szkoda, kwota: 650, polisa: lokal, opis: "Stopiony Bogdan, promiennik i blat"}

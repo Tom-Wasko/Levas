@@ -1,0 +1,88 @@
+# Podatki i ZUS jednoosobowej działalności (gra z lokalami, F3a.11: silnik/ksiegowosc/finanse.py – rejestr VAT,
+# silnik/ksiegowosc/rozliczenie.py – rozliczenie tygodnia). Gra Revas (bez mapy) nadal liczy CIT z zalozenia.yaml.
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'JDG na KPiR, czynny podatnik VAT, PIT liniowy. Wszystkie ceny w danych gry są brutto: VAT jest wydzielany
+  z kwoty (netto = brutto / (1 + stawka)), KPiR dostaje netto, rejestr VAT – podatek. Rozliczenie co rundę
+  (uproszczenie – naprawdę co miesiąc): VAT należny − naliczony − nadwyżka z poprzedniej rundy (nadwyżka przechodzi
+  dalej), składki ZUS właściciela, zaliczka PIT liczona narastająco od początku gry. Kwoty deklaracji
+  zaokrąglane do pełnych złotych.'
+zrodlo: 'Notatki „Ustalenia gry” (JDG, PIT liniowy 19%, zdrowotna 4,9% z minimum, ulga na start 26 tygodni,
+  VAT dań 8%, napojów 23%, żywność 5%) i „Prawidła świata”; kwoty ZUS na 2026 (płaca minimalna 4806 zł,
+  preferencyjny ZUS od 30% płacy minimalnej, minimalna zdrowotna 9% od 75% płacy minimalnej, limit odliczenia
+  zdrowotnej) – z pamięci, do weryfikacji przed kalibracją (Plan implementacji: „Przepisy i stawki z pamięci”)'
+pit_liniowy: 0.19
+zdrowotna:
+  stawka: 0.049                # liniowy: od dochodu z KPiR
+  minimalna_miesieczna: 324.41 # 9% × 75% × 4806 zł
+  limit_odliczenia_roczny: 14100
+zus_wlasciciela:
+  ulga_na_start_rund: 26       # 6 miesięcy – tylko składka zdrowotna
+  spoleczne_miesieczne: 420.86 # preferencyjny: emerytalna, rentowa, wypadkowa od 1441,80 zł (bez chorobowej)
+vat:
+  sprzedaz:
+    domyslna: 0.08             # usługa gastronomiczna
+    uslugi:
+      napoj: 0.23              # napoje słodzone i woda – stawka podstawowa
+  zasoby:                      # zakup składników: żywność 5%, napoje i opakowania 23%
+    domyslna: 0.05
+    zasoby:
+      Napój: 0.23
+      Opakowanie: 0.23
+      Box: 0.23
+  koszty:                      # pierwszy pasujący fragment opisu pozycji KPiR; brak dopasowania – bez VAT (zw)
+  - zawiera: Czynsz najmu
+    stawka: 0.23
+  - zawiera: Adaptacja lokalu
+    stawka: 0.23
+  - zawiera: koszt utrzymania lokalu
+    stawka: 0.23
+  - zawiera: Koszt dostawy
+    stawka: 0.23
+  - zawiera: Reklama tradycyjna
+    stawka: 0.23
+  - zawiera: reklamy internetowej
+    stawka: 0.23
+  - zawiera: Kampania reklamowa
+    stawka: 0.23
+  - zawiera: Materiały promocyjne
+    stawka: 0.23
+  - zawiera: Napoje do zestawów
+    stawka: 0.23
+  - zawiera: Szkolenie
+    stawka: 0.23
+  - zawiera: Koszty utrzymania
+    stawka: 0.23
+  - zawiera: Koszt magazynowania
+    stawka: 0.23
+  - zawiera: Wynajem chłodni
+    stawka: 0.23
+  - zawiera: biura rachunkowego
+    stawka: 0.23
+  - zawiera: Obsługa kadrowo-płacowa
+    stawka: 0.23
+  - zawiera: Abonament terminala
+    stawka: 0.23
+  - zawiera: leasing
+    stawka: 0.23
+  - zawiera: Koszt zakupu
+    stawka: 0.23
+  - zawiera: Koszt zatrudnienia
+    stawka: 0.23
+  - zawiera: Headhunter
+    stawka: 0.23
+  - zawiera: Naprawa szkód
+    stawka: 0.23
+  - zawiera: Koszt zwrotu zasobów
+    stawka: 0.23
+  - zawiera: Sprzedaż sprzętu
+    stawka: 0.23
+  - zawiera: Sprzedaż udogodnień
+    stawka: 0.23
+  - zawiera: Sprzedaż wyposażenia
+    stawka: 0.23
+  - zawiera: Rozliczenie ulepszeń lokalu       # nakłady najemcy odkupione przez właściciela (KC art. 676)
+    stawka: 0.23
+  - zawiera: Przywrócenie lokalu
+    stawka: 0.23
+  srodki_trwale: 0.23          # sprzęt, wyposażenie, stanowiska od progu amortyzacji (lokal i działka – bez VAT)
+zus_pracodawcy: 0.2048         # od pensji na umowie o pracę: emerytalna 9,76%, rentowa 6,5%, wypadkowa 1,67%, FP 2,45%, FGŚP 0,1%

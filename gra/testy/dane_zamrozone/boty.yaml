@@ -1,0 +1,175 @@
+# Boty
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku), jakość, docelowa liczba dań, pokrycie popytu,
+  wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia; gra z lokalami: kampanie
+  (agencja/kanał z mapa/reklama.yaml) zamiast reklamy i internetu, bufor_kampanii – gotówka po kampaniach,
+  min_sila_kampanii – słabszej kampanii (po powtórkach) bot nie zamawia; promocje (typ z mapa/promocje.yaml
+  i ozdobna nazwa) – na najdroższe danie w sprzedaży, nowe tylko z buforem gotówki, wszystkie wyłączone, gdy bot
+  obsłużył mniej niż min_obsluga_promocji popytu poprzedniej rundy.'
+zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C), liczba dań dopasowana do menu kebaba
+ustawienia:
+  bufor_gotowki: 30000
+  bufor_kampanii: 12000
+  min_sila_kampanii: 0.5
+  min_obsluga_promocji: 0.9
+  cena_nasladowcy_bez_danych: 0.95
+  krok_ceny: 0.5
+  losuj_z_najlepszych_kandydatow: 3
+  zapas_zasobow: 1.05
+# Poziomy trudności (gra z lokalami): mistrz gry wybiera je dla każdego bota (konfiguracja gry: firmy[].poziom,
+# bez niego – sredni). Same mnożniki pokrycia popytu, błędu ceny i reklamy dawały słabszemu botowi często WIĘKSZY
+# zysk, więc poziomy różnią się sposobem planowania (silnik/boty.py):
+# - planowanie: proste – osobna kuchnia na każde danie i zamówienia na cały przewidywany popyt (towar się psuje,
+#   gdy kuchnia nie nadąża); przepustowosc – kucharze, sztuki sprzętu i kasjerzy na popyt dzień po dniu
+#   (najwyżej tyle, ile miejsc w lokalu), zamówienia tylko na to, co kuchnia sprzeda;
+# - cel_obslugi – najwyżej jaką część popytu (dzień po dniu) bot chce obsłużyć – kolejną osobę zatrudnia tylko,
+#   gdy dodatkowa sprzedaż × (cena − składniki) pokrywa jej koszt (pensja × narzut_pracy – składki);
+# - blad_prognozy – losowy błąd prognozy (± ułamek), losowy_kandydat – zatrudnia kogokolwiek z zawodu;
+# - kampanie / promocje – czy w ogóle reklamuje się w agencjach i daje promocje (dalej wg strategii);
+# - korekta_prognozy – granice poprawki prognozy o popyt / prognozę poprzedniej rundy;
+# - mnozniki_ceny – sprawdzane ceny (× cena strategii): wybiera tę o największej oczekiwanej marży (sprzedaż
+#   w granicach przepustowości × (cena − składniki) − praca obsady; narzut_pracy – pensja × narzut na składki);
+# - obsluga_kampanii – kampanie tylko, gdy plan obsługuje co najmniej tę część popytu każdego lokalu;
+# - kolejny_lokal – kolejny gotowy lokal, gdy żaden lokal nie obsługuje części popytu `obsluga`, gotówki jest
+#   ponad `gotowka`, a firma ma mniej niż `maks_lokali` (co mapa.zasady.nowy_lokal_co_rund rund).
+# - przewaga_popytu – oszustwo poziomu niemożliwego: mnożnik atrakcyjności wszystkich lokali bota (1 – brak).
+poziomy:
+  latwy:
+    nazwa: Łatwy
+    opis: proste reguły, łatwo go przegonić
+    planowanie: proste
+    blad_prognozy: 0.25
+    losowy_kandydat: true
+    kampanie: false
+    promocje: false
+  sredni:
+    nazwa: Średni
+    opis: trzyma się swojej strategii
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    narzut_pracy: 1.25
+  trudny:
+    nazwa: Trudny
+    opis: planuje zapasy, ceny, reklamę i lokale
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    korekta_prognozy: [0.8, 1.25]
+    mnozniki_ceny: [0.9, 0.95, 1.05, 1.1, 1.15]
+    narzut_pracy: 1.25
+    obsluga_kampanii: 0.9
+    kolejny_lokal: {obsluga: 0.85, gotowka: 60000, maks_lokali: 2}
+  niemozliwy:                    # P19 (pytanie 25): dla chętnych – wyzwanie, którego zwykle nie da się wygrać
+    nazwa: Niemożliwy
+    opis: jak trudny, ale oszukuje – klienci bez powodu wolą jego lokale
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    korekta_prognozy: [0.8, 1.25]
+    mnozniki_ceny: [0.9, 0.95, 1.05, 1.1, 1.15, 1.2]
+    narzut_pracy: 1.25
+    obsluga_kampanii: 0.9
+    kolejny_lokal: {obsluga: 0.85, gotowka: 45000, maks_lokali: 3}
+    przewaga_popytu: 1.3         # klienci wolą jego lokale o 30% (jak stała kampania, której nikt nie widzi)
+strategie:
+  zrownowazony:
+    nazwa: Kebab u Zrównoważonego
+    min_kuchnia: 2               # planujący bot (poziom średni i trudny): najmniej miejsc w kuchni lokalu
+    cena: 0.92
+    jakosc: 2
+    uslugi: 6
+    pokrycie: 0.9
+    wyposazenie: 2
+    udogodnienia: 2
+    reklama: {}
+    internet: []
+    szkolenia: 0
+    kampanie:
+    - papier_przyjmie/ulotki
+    promocje:
+    - {typ: zestaw, nazwa: Zestaw Złotego Środka}
+    polisy: [lokal, oc]          # gra z lokalami: polisy ubezpieczyciela (dane/zdarzenia/losowe.yaml)
+    higiena: podstawowa          # gra z lokalami: poziom higieny (dane/zdarzenia/urzad.yaml)
+  tani:
+    nazwa: Tani Kebab Nocny
+    min_kuchnia: 1
+    cena: 0.78
+    jakosc: 1
+    uslugi: 8
+    pokrycie: 0.85
+    wyposazenie: 0
+    udogodnienia: 0
+    reklama:
+      Ulotki: 10
+    internet:
+    - Informacje na forach internetowych
+    szkolenia: 0
+    kampanie:
+    - papier_przyjmie/ulotki
+    - lajk/grupa_osiedlowa
+    promocje:
+    - {typ: happy_hours, nazwa: Tanie Godziny Nocnego}
+    - {typ: studencka, nazwa: Indeks Głodomora}
+    polisy: []                   # oszczędza na wszystkim, także na ubezpieczeniu
+    higiena: podstawowa          # mop i grafik – bez tego sanepid nie odbierze lokalu
+  premium:
+    nazwa: Kebab Premium
+    min_kuchnia: 2
+    cena: 1.08
+    jakosc: 3
+    uslugi: 5
+    pokrycie: 1.0
+    wyposazenie: 6
+    udogodnienia: 9
+    reklama:
+      Smaki Lublina (dziennik): 6
+    internet:
+    - Strona www firmy
+    szkolenia: 2
+    kampanie:
+    - lajk/influencer
+    - fala_koziolka/billboard
+    promocje:
+    - {typ: karta, nazwa: Złota Karta Sułtana}
+    polisy: [lokal, sprzet, oc]
+    higiena: haccp
+  agresywny:
+    nazwa: Kebab Głośny Marketing
+    min_kuchnia: 2
+    cena: 0.8
+    jakosc: 3
+    uslugi: 8
+    pokrycie: 1.0
+    wyposazenie: 6
+    udogodnienia: 6
+    reklama:
+      Ulotki: 20
+      Ekrany LED: 11
+      Smaki Lublina (dziennik): 14
+      Radio Fakty: 21
+    internet:
+    - Strona www firmy
+    - Profil na Facebook
+    - Informacje na forach internetowych
+    szkolenia: 2
+    kampanie:
+    - papier_przyjmie/plakaty
+    - lajk/influencer
+    - fala_koziolka/radio
+    - kozi_grod/degustacja
+    - kozi_grod/noc_kebaba
+    promocje:
+    - {typ: dwa_za_jeden, nazwa: Podwójny Cios}
+    - {typ: happy_hours, nazwa: Godzina Szału}
+    polisy: [oc]
+    higiena: firma
+  nasladowca:
+    nazwa: Kebab Naśladowca
+    min_kuchnia: 2
+    cena: null
+    jakosc: 2
+    uslugi: 6
+    pokrycie: 0.9
+    wyposazenie: 3
+    udogodnienia: 3
+    reklama: {}
+    internet: []
+    szkolenia: 1

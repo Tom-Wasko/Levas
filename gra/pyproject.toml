@@ -8,6 +8,7 @@ requires-python = ">=3.12"
 testpaths = ["testy"]
 DJANGO_SETTINGS_MODULE = "levas.settings"
 pythonpath = [".", "testy"]
+markers = ["dane_gry: test zasad na danych dane/ zamiast zamrożonej kopii testów mechanik"]
 
 [tool.ruff]
 line-length = 100

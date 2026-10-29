@@ -1,0 +1,120 @@
+# Strefy Lublina (mapa miasta)
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Dziesięć stref Lublina na wspólnej mapie gry. mapa: prostokąt w polach siatki (x, y – lewy górny róg, szer
+  × gl); kolor – barwa strefy na mapie. Popyt stref (klienci, ich preferencje) – krok F3a.4.'
+zrodlo: notatka „Ustalenia gry” (lista stref); położenie stref uproszczone względem prawdziwego Lublina
+siatka:
+  szer: 21
+  gl: 20
+strefy:
+  stare_miasto:
+    nazwa: Stare Miasto
+    opis: Turyści, wycieczki szkolne i nocne powroty z pubów. Najwyższe czynsze, kamienice z charakterem i schodami.
+    klienci: Turyści i wieczorne wyjścia – duży ruch w weekendy i wieczorem.
+    kolor: '#e9b872'
+    mapa:
+      x: 11
+      y: 5
+      szer: 4
+      gl: 5
+    czynsz_m2: 110
+  centrum:
+    nazwa: Centrum
+    opis: Biura, urzędy, banki i deptak na Krakowskim Przedmieściu. W dzień ruch jak w ulu, w niedzielę cisza.
+    klienci: Pracownicy biur w porze lunchu, przechodnie na deptaku.
+    kolor: '#f2a65a'
+    mapa:
+      x: 6
+      y: 5
+      szer: 5
+      gl: 5
+    czynsz_m2: 100
+  akademickie:
+    nazwa: Miasteczko Akademickie
+    opis: UMCS, KUL i akademiki. Studenci liczą każdy grosz, ale jedzą o każdej porze, zwłaszcza w sesji.
+    klienci: 'Studenci: niskie ceny, duże porcje, ruch do późna; puste wakacje.'
+    kolor: '#8ecae6'
+    mapa:
+      x: 0
+      y: 5
+      szer: 6
+      gl: 5
+    czynsz_m2: 75
+  politechnika:
+    nazwa: Politechnika
+    opis: Kampus Politechniki przy Nadbystrzyckiej. Inżynierowie wiedzą, ile gramów mięsa powinno być w kebabie.
+    klienci: Studenci i pracownicy uczelni, ruch w dni zajęć.
+    kolor: '#a3c4f3'
+    mapa:
+      x: 0
+      y: 10
+      szer: 5
+      gl: 4
+    czynsz_m2: 60
+  dworzec:
+    nazwa: Dworzec
+    opis: Dworzec PKP i Dworzec Metropolitalny. Klient się spieszy, wraca rzadko, ale jest go dużo.
+    klienci: 'Podróżni w biegu: liczy się szybka obsługa, mało stałych klientów.'
+    kolor: '#cdb4db'
+    mapa:
+      x: 7
+      y: 10
+      szer: 5
+      gl: 4
+    czynsz_m2: 70
+  zygmuntowskie:
+    nazwa: Zygmuntowskie
+    opis: Arena Lublin i hale sportowe. W dzień meczu kolejka do horyzontu, w pozostałe dni spokojnie.
+    klienci: Kibice w dni meczów i koncertów, poza tym okoliczni mieszkańcy.
+    kolor: '#b5e48c'
+    mapa:
+      x: 12
+      y: 10
+      szer: 6
+      gl: 5
+    czynsz_m2: 50
+  lsm_czuby:
+    nazwa: LSM i Czuby
+    opis: Wielkie osiedla z blokami i rodzinami. Klienci wierni, ale wymagający – pamiętają, jaki był sos w zeszłym
+      miesiącu.
+    klienci: Mieszkańcy osiedli i rodziny, stali klienci, dowóz.
+    kolor: '#ffd6a5'
+    mapa:
+      x: 0
+      y: 14
+      szer: 7
+      gl: 6
+    czynsz_m2: 55
+  czechow:
+    nazwa: Czechów i Kalinowszczyzna
+    opis: Osiedla na północy miasta i stoki wąwozów. Dużo mieszkańców, mało konkurencji, sporo spacerowiczów z psami.
+    klienci: Mieszkańcy osiedli, mniejsza konkurencja.
+    kolor: '#caffbf'
+    mapa:
+      x: 3
+      y: 0
+      szer: 12
+      gl: 5
+    czynsz_m2: 45
+  felin:
+    nazwa: Felin
+    opis: Hale, hurtownie i zakłady pracy na wschodzie miasta. Kierowcy i pracownicy zmianowi jedzą szybko i konkretnie.
+    klienci: Pracownicy hal i kierowcy, ruch na zmianach, tanie grunty.
+    kolor: '#d8e2dc'
+    mapa:
+      x: 15
+      y: 2
+      szer: 6
+      gl: 8
+    czynsz_m2: 35
+  zemborzyce:
+    nazwa: Zemborzyce
+    opis: 'Zalew Zemborzycki: plaża, żaglówki i rowery. Latem tłumy, zimą tylko wędkarze i Tymek.'
+    klienci: Sezon letni nad zalewem; zimą bardzo mały ruch.
+    kolor: '#9bf6ff'
+    mapa:
+      x: 8
+      y: 15
+      szer: 9
+      gl: 5
+    czynsz_m2: 40

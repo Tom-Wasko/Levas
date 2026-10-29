@@ -1,0 +1,212 @@
+# Dania (w kodzie: usługi)
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Dania menu (w kodzie silnika: usługi): popyt roczny, sezonowość (styczeń–grudzień), cena preferowana (środek ceny
+  rynkowej brutto), czas kucharza i kasy na porcję w godzinach, kucharz, sprzęt i składniki na porcję; pensje rynkowe (niska/średnia/wysoka).'
+zrodlo: notatki/Menu i składniki.md (receptury i ceny rynkowe brutto ze starego Levasa); popyt, czasy pracy, sezonowość
+  i pensje – założenie F2.6 (do kalibracji w kroku 5)
+uslugi:
+  kebab_w_bulce:
+    nazwa: Kebab w bułce
+    kategoria: Kebaby
+    popyt_roczny: 36000
+    cena_preferowana: 24.5
+    sezonowosc: &id001
+    - 1.05
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.1
+    - 0.95
+    - 0.8
+    - 0.8
+    - 1.0
+    - 1.15
+    - 1.1
+    - 1.05
+    godziny_prowadzacego: 0.05
+    godziny_kasy: 0.02
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Rożen
+    zasoby:
+      Bułka: 1
+      Mięso kebab: 130
+      Warzywa: 60
+      Sos: 40
+      Opakowanie: 1
+  kebab_w_tortilli:
+    nazwa: Kebab w tortilli (rollo)
+    kategoria: Kebaby
+    popyt_roczny: 26400
+    cena_preferowana: 27
+    sezonowosc: *id001
+    godziny_prowadzacego: 0.06
+    godziny_kasy: 0.02
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Rożen
+    zasoby:
+      Tortilla: 1
+      Mięso kebab: 150
+      Warzywa: 80
+      Sos: 40
+      Opakowanie: 1
+  kebab_box:
+    nazwa: Kebab box
+    kategoria: Kebaby
+    popyt_roczny: 21600
+    cena_preferowana: 23
+    sezonowosc: *id001
+    godziny_prowadzacego: 0.06
+    godziny_kasy: 0.02
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Rożen
+    - Frytownica
+    zasoby:
+      Frytki mrożone: 200
+      Mięso kebab: 130
+      Sos: 40
+      Box: 1
+  talerz_kebab:
+    nazwa: Talerz kebab
+    kategoria: Kebaby
+    popyt_roczny: 10800
+    cena_preferowana: 35
+    sezonowosc: *id001
+    godziny_prowadzacego: 0.08
+    godziny_kasy: 0.02
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Rożen
+    - Frytownica
+    zasoby:
+      Mięso kebab: 230
+      Frytki mrożone: 200
+      Surówki: 150
+      Sos: 50
+      Box: 1
+  falafel:
+    nazwa: Falafel (wege)
+    kategoria: Wege i przekąski
+    popyt_roczny: 7200
+    cena_preferowana: 25
+    sezonowosc:
+    - 1.0
+    - 1.05
+    - 1.05
+    - 1.0
+    - 1.0
+    - 1.0
+    - 0.9
+    - 0.9
+    - 1.0
+    - 1.05
+    - 1.05
+    - 1.0
+    godziny_prowadzacego: 0.06
+    godziny_kasy: 0.02
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Frytownica
+    zasoby:
+      Falafel mrożony: 5
+      Pita: 1
+      Warzywa: 80
+      Hummus: 40
+      Opakowanie: 1
+  frytki:
+    nazwa: Frytki
+    kategoria: Wege i przekąski
+    popyt_roczny: 18000
+    cena_preferowana: 11.5
+    sezonowosc: *id001
+    godziny_prowadzacego: 0.04
+    godziny_kasy: 0.01
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Frytownica
+    zasoby:
+      Frytki mrożone: 200
+      Opakowanie: 1
+  napoj:
+    nazwa: Napój
+    kategoria: Napoje i dodatki
+    popyt_roczny: 36000
+    cena_preferowana: 7.5
+    sezonowosc:
+    - 0.8
+    - 0.8
+    - 0.9
+    - 1.0
+    - 1.15
+    - 1.25
+    - 1.3
+    - 1.3
+    - 1.1
+    - 0.9
+    - 0.75
+    - 0.75
+    godziny_prowadzacego: 0.005
+    godziny_kasy: 0.01
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet:
+    - Lodówka na napoje
+    zasoby:
+      Napój: 1
+  dodatek:
+    nazwa: Dodatek (sos, ser, jalapeño)
+    kategoria: Napoje i dodatki
+    popyt_roczny: 18000
+    cena_preferowana: 3
+    sezonowosc: *id001
+    godziny_prowadzacego: 0.005
+    godziny_kasy: 0.005
+    grupa: 1
+    prowadzacy: Kucharz
+    pensje_rynkowe:
+      niska: 4900
+      srednia: 5300
+      wysoka: 5700
+    sprzet: []
+    zasoby:
+      Ser i dodatki: 40
+pensje_rynkowe_kasy:
+  niska: 4850
+  srednia: 4950
+  wysoka: 5100

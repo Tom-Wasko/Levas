@@ -8,13 +8,17 @@ from pathlib import Path
 import yaml
 
 from silnik import Gra
-from silnik.dane import KATALOG_DANYCH, dane_domyslne
+from silnik import dane as modul_danych
+from silnik.dane import KATALOG_GRY, dane_domyslne
 from silnik.ksiegowosc.finanse import vat_z_brutto
+
+DANE_GRY = KATALOG_GRY / "dane"
+DANE_ZAMROZONE = Path(__file__).parent / "dane_zamrozone"   # kopia dane/ ze startu kalibracji (B2)
 
 
 def _kopia(tmp_path: Path) -> Path:
     kat = tmp_path / "dane"
-    shutil.copytree(KATALOG_DANYCH, kat)
+    shutil.copytree(modul_danych.KATALOG_DANYCH, kat)
     return kat
 
 

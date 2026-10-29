@@ -92,6 +92,7 @@ def test_wynik_ekonomiczny():
     assert karta(D, -1000, 1, 1, 1, 1)["wynik_dzialalnosci"] == 0
 
 
+@pytest.mark.dane_gry
 def test_deterministycznosc_i_zapis(tmp_path):
     def gra():
         g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "agresywny")], liczba_rund=4, ziarno=7)

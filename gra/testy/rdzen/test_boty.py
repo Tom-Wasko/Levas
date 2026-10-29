@@ -6,6 +6,8 @@ from silnik import boty
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra
 
+pytestmark = pytest.mark.dane_gry
+
 RUND = 12   # trudny bot otwiera drugi lokal dopiero z zapasem gotówki
 
 

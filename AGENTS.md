@@ -42,7 +42,8 @@ gra/
   panel_gracza/      strony gracza; static/zakladki/*.js – zakładki (moduły ES, rejestr w index.js)
   panel_mg/          panel mistrza gry (/mg/)
   gry/, konta/       modele Django (gry w SQLite), konta i logowanie
-  balans/symuluj.py  symulacja gier botów (balans poziomów)
+  balans/            symuluj.py (gry botów, balans poziomów), warianty.py (pary gier do kalibracji),
+                     odcisk.py (odcisk stanów: przyspieszenie bez zmiany wyników)
   testy/             pytest: podfoldery jak podpakiety silnika (rdzen/, kuchnia/, rynek/…) i aplikacja/
                      (API, panele, konta); wspólne funkcje pomocnicze w pomocnicze.py
   README.md          uruchomienie, opis rozgrywki, słownik nazw kod → gra (usługa = danie itd.)
@@ -63,6 +64,8 @@ python -m venv .venv                       # Python 3.12+ (autor: 3.13)
 .venv/Scripts/python -m ruff check .                    # linia ≤ 100 znaków
 .venv/Scripts/python -X utf8 -m silnik.dane sprawdz      # schematy i odwołania w dane/*.yaml
 .venv/Scripts/python -X utf8 -m balans.symuluj 12 sredni 7   # gra botów; 12 rund ≈ 3 s
+.venv/Scripts/python -X utf8 -m balans.warianty szybki       # pary gier wariantów, ≤ 10 min
+.venv/Scripts/python -X utf8 -m balans.odcisk zapisz|porownaj plik.json   # ~30 s
 node --check plik.mjs                                    # składnia zakładki JS (skopiuj .js jako .mjs)
 ```
 Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.

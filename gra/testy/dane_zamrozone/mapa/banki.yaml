@@ -1,0 +1,80 @@
+# Banki gry z lokalami (F3a.9, silnik/pieniadze/banki.py) – sześć prawdziwych banków, każdy z inną najlepszą ofertą
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Konto firmowe (opłata miesięczna, terminal: abonament miesięczny + prowizja od płatności kartą), lokaty
+  (okres w rundach → oprocentowanie roczne), limit w koncie (kredyt odnawialny uruchamiany sam przy braku gotówki),
+  kredyty (start – bez historii, inwestycyjny – z zastawem, obrotowy) i leasing sprzętu. Oprocentowanie roczne,
+  w rundzie (tygodniu) 1/52. Produkty można brać w dowolnym banku – rozliczają się na koncie firmowym.'
+zrodlo: 'Notatka „Elementy mapy” (specjalizacje banków); kwoty i oprocentowanie – szacunek na 10.2026 przy stopie
+  referencyjnej NBP ok. 4% (tabele opłat kont firmowych i kredytów dla firm z 2025 r.), do kalibracji w kroku 5'
+udzial_kart: 0.7          # część sprzedaży płacona kartą (prowizja terminala)
+historia_rund: 4          # „firma z historią” – tyle rund od otwarcia pierwszego lokalu (kredyty z historia: true)
+stopa_karna: 0.19         # odsetki za opóźnienie i debet ponad limit (odsetki maksymalne za opóźnienie)
+przejecie_po: 3           # tyle rund z rzędu bez raty → bank przejmuje zastaw (kredyt) albo sprzęt (leasing)
+wycena_zastawu: 0.8       # bank przyjmuje zastaw po tej części wartości netto
+czynsz_po_przejeciu: 0.006  # przejęty lokal bank wynajmuje firmie: miesięczny czynsz jako część ceny (gdy lokal nie ma czynszu)
+banki:
+- nazwa: Crédit Agricole
+  specjalizacja: kredyt na start
+  opis: Szybka decyzja i kredyt dla firmy bez historii – za to wyższe oprocentowanie.
+  konto: 29
+  terminal: {abonament: 59, prowizja: 0.013}
+  lokaty: {1: 0.01, 4: 0.02, 13: 0.025}
+  limit: {kwota: 5000, oprocentowanie: 0.149}
+  kredyty:
+  - {produkt: start, nazwa: Kredyt na start, oprocentowanie: 0.119, prowizja: 0.03, maks_kwota: 50000, maks_rund: 52}
+- nazwa: PKO BP
+  specjalizacja: kredyt inwestycyjny
+  opis: Najniższe oprocentowanie dużych kwot i długa spłata, ale pod zastaw lokalu albo sprzętu.
+  konto: 20
+  terminal: {abonament: 49, prowizja: 0.012}
+  lokaty: {1: 0.012, 4: 0.022, 13: 0.028}
+  limit: {kwota: 10000, oprocentowanie: 0.135}
+  kredyty:
+  # inwestycyjny od wzięcia lokalu, bez historii (test gry 28.10) – zabezpiecza go zastaw, także lokal kupowany
+  # w tej samej rundzie
+  - {produkt: inwestycyjny, nazwa: Kredyt inwestycyjny, oprocentowanie: 0.079, prowizja: 0.015, maks_kwota: 300000,
+     maks_rund: 104, od_lokalu: true, zastaw: 0.7}
+  - {produkt: obrotowy, nazwa: Kredyt obrotowy, oprocentowanie: 0.109, prowizja: 0.02, maks_kwota: 40000, maks_rund: 52,
+     historia: true}
+  leasing: {wplata: 0.15, oprocentowanie: 0.089, rund: [26, 52], wykup: 0.01}
+- nazwa: Pekao
+  specjalizacja: leasing sprzętu
+  opis: Sprzęt kuchenny w ratach – raty idą w koszty, a po ostatniej racie wykup za symboliczną kwotę.
+  konto: 25
+  terminal: {abonament: 49, prowizja: 0.012}
+  lokaty: {1: 0.011, 4: 0.021, 13: 0.027}
+  limit: {kwota: 10000, oprocentowanie: 0.139}
+  kredyty:
+  - {produkt: obrotowy, nazwa: Kredyt obrotowy, oprocentowanie: 0.105, prowizja: 0.02, maks_kwota: 40000, maks_rund: 52,
+     historia: true}
+  leasing: {wplata: 0.1, oprocentowanie: 0.075, rund: [26, 52], wykup: 0.01}
+- nazwa: ING
+  specjalizacja: lokaty
+  opis: Najlepsze oprocentowanie lokat – tygodniowych i dłuższych.
+  konto: 20
+  terminal: {abonament: 59, prowizja: 0.013}
+  lokaty: {1: 0.02, 4: 0.035, 13: 0.04}
+  limit: {kwota: 10000, oprocentowanie: 0.135}
+  kredyty:
+  - {produkt: obrotowy, nazwa: Kredyt obrotowy, oprocentowanie: 0.109, prowizja: 0.02, maks_kwota: 40000, maks_rund: 52,
+     historia: true}
+- nazwa: mBank
+  specjalizacja: tanie konto firmowe
+  opis: Konto bez opłaty i terminal bez abonamentu z najniższą prowizją.
+  konto: 0
+  terminal: {abonament: 0, prowizja: 0.0079}
+  lokaty: {1: 0.008, 4: 0.018, 13: 0.022}
+  limit: {kwota: 10000, oprocentowanie: 0.139}
+  kredyty:
+  - {produkt: obrotowy, nazwa: Kredyt obrotowy, oprocentowanie: 0.115, prowizja: 0.025, maks_kwota: 40000, maks_rund: 52,
+     historia: true}
+- nazwa: Santander
+  specjalizacja: limit w koncie
+  opis: Największy limit w koncie – uruchamia się sam, gdy zabraknie gotówki, ale jest drogi.
+  konto: 25
+  terminal: {abonament: 49, prowizja: 0.012}
+  lokaty: {1: 0.01, 4: 0.02, 13: 0.025}
+  limit: {kwota: 40000, oprocentowanie: 0.169}
+  kredyty:
+  - {produkt: obrotowy, nazwa: Kredyt obrotowy, oprocentowanie: 0.112, prowizja: 0.02, maks_kwota: 40000, maks_rund: 52,
+     historia: true}

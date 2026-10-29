@@ -1,0 +1,9 @@
+opis: >-
+  Prywatny portfel właściciela (gra z lokalami, silnik/pieniadze/wlasciciel.py). Właściciel jednoosobowej działalności może
+  wypłacić pieniądze z firmy na swoje potrzeby (wypłata własna) albo dołożyć do firmy własne pieniądze (wpłata
+  własna). Obie operacje są poza KPiR – nie są ani przychodem, ani kosztem.
+zrodlo: >-
+  Ustawa o PIT, art. 14 ust. 3 pkt 1 i art. 23 ust. 1 pkt 1 (wpłaty i wypłaty właściciela nie są przychodem
+  ani kosztem). Oszczędności na start – założenie gry.
+portfel:
+  oszczednosci: 2000      # zł prywatnych oszczędności właściciela na początku gry

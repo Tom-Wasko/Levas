@@ -20,6 +20,8 @@ from silnik.model import (
     zlote,
 )
 
+pytestmark = pytest.mark.dane_gry
+
 KWOTY = st.integers(min_value=-(10**12), max_value=10**12)
 NAZWY = st.text(alphabet="abcąćęłńóśźż|123 ", min_size=1, max_size=12)
 

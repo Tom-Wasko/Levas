@@ -3,15 +3,19 @@ poza KPiR (silnik/ksiegowosc/uzgodnienie.py). Losowe gry botów (hypothesis) –
 ale dokłada losowe decyzje finansowe: kredyty, lokaty, Harpagon, kupno lokalu i działki, sprzedaż sprzętu, zwroty,
 a w grze z lokalami – biuro z mapy albo samodzielną księgowość z (czasem błędnymi) deklaracjami (silnik/ksiegowosc/biuro.py)."""
 
+import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
+from pomocnicze import DANE_GRY
 
 from silnik.boty import decyzje_bota
-from silnik.dane import dane_domyslne
+from silnik.dane import Dane
 from silnik.gra import Gra
 from silnik.pieniadze import banki as bk
 
-D = dane_domyslne()
+pytestmark = pytest.mark.dane_gry
+
+D = Dane(DANE_GRY)
 STRATEGIE = sorted(D.boty["strategie"])
 LOKALE = sorted(D.lokale)
 BANKI = bk.banki(D)

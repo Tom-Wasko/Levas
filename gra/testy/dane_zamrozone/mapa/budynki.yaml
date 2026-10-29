@@ -1,0 +1,450 @@
+# Budynki na mapie miasta – kliknięcie otwiera zakładkę gry
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Budynki na mapie: każdy prowadzi do zakładki gry (zakladka – klucz z panel_gracza/static/zakladki/index.js;
+  null = jeszcze bez zakładki). Własny lokal drużyny otwiera okno z zakładkami firmy. mapa: pola siatki.'
+zrodlo: notatka „Elementy mapy” (banki w dwóch rzędach po trzy, dostawcy, sklepy, parki, agencje, urząd); nazwy
+  banków z mapa/banki.yaml (F3a.9), biur, dostawców i firm szkoleniowych z katalog.yaml i dostawcy.yaml
+budynki:
+- id: bank_1
+  nazwa: Crédit Agricole
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – kredyt na start dla firmy bez historii (dane/mapa/banki.yaml).
+  zakladka: bank
+  mapa:
+    x: 8
+    y: 8
+    szer: 1
+    gl: 1
+- id: bank_2
+  nazwa: PKO BP
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – kredyt inwestycyjny pod zastaw (dane/mapa/banki.yaml).
+  zakladka: bank
+  mapa:
+    x: 9
+    y: 8
+    szer: 1
+    gl: 1
+- id: bank_3
+  nazwa: Pekao
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – leasing sprzętu (dane/mapa/banki.yaml).
+  zakladka: bank
+  mapa:
+    x: 10
+    y: 8
+    szer: 1
+    gl: 1
+- id: bank_4
+  nazwa: ING
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – najlepsze lokaty (dane/mapa/banki.yaml).
+  zakladka: bank
+  mapa:
+    x: 8
+    y: 9
+    szer: 1
+    gl: 1
+- id: bank_5
+  nazwa: mBank
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – najtańsze konto firmowe i terminal (dane/mapa/banki.yaml).
+  zakladka: bank
+  mapa:
+    x: 9
+    y: 9
+    szer: 1
+    gl: 1
+- id: bank_6
+  nazwa: Santander
+  rodzaj: bank
+  strefa: centrum
+  opis: Bank – największy limit w koncie (dane/mapa/banki.yaml).
+  zakladka: bank
+  mapa:
+    x: 10
+    y: 9
+    szer: 1
+    gl: 1
+- id: biura
+  nazwa: Kamienica biur rachunkowych
+  rodzaj: biuro
+  strefa: stare_miasto
+  opis: 'Pięć biur rachunkowych pod jednym dachem (J.K.Ś. Jakuba Klimka-Ślęzaka, Pod Trybunałem, Pani Halinka,
+    e-Księgi24.pl, Debet & Kredyt) i pokój z biurkiem dla tych, którzy księgują sami. Na klatce schodowej
+    pachnie tonerem i drożdżówkami.'
+  zakladka: biuro
+  mapa:
+    x: 13
+    y: 8
+    szer: 2
+    gl: 1
+- id: ratusz
+  nazwa: Ratusz i Sanepid
+  rodzaj: urzad
+  strefa: stare_miasto
+  opis: Rejestracja firmy, odbiór lokalu przez sanepid, higiena i kontrole. Urzędnik sprawdzi też, czego brakuje
+    w twoich decyzjach (Lista błędów).
+  zakladka: urzad
+  mapa:
+    x: 11
+    y: 5
+    szer: 2
+    gl: 2
+- id: poczta
+  nazwa: Poczta Główna
+  rodzaj: poczta
+  strefa: centrum
+  opis: Tu wysyłasz decyzje rundy – list polecony do mistrza gry.
+  zakladka: wyslij
+  mapa:
+    x: 6
+    y: 5
+    szer: 2
+    gl: 1
+- id: agencja_nieruchomosci
+  nazwa: Biuro nieruchomości „Klucz”
+  rodzaj: nieruchomosci
+  strefa: centrum
+  opis: Wszystkie wolne lokale i działki w mieście w jednym katalogu.
+  zakladka: lokale
+  mapa:
+    x: 10
+    y: 5
+    szer: 1
+    gl: 1
+- id: agencja_pracy
+  nazwa: Agencja pracy „Ręce do Rożna”
+  rodzaj: praca
+  strefa: centrum
+  opis: Kandydaci do kuchni i na kasę.
+  zakladka: zatrudnienie
+  mapa:
+    x: 6
+    y: 7
+    szer: 1
+    gl: 1
+- id: piekarnia
+  nazwa: Piekarnia Koziołek
+  rodzaj: dostawca
+  strefa: stare_miasto
+  opis: Świeże bułki i pita codziennie rano.
+  zakladka: dostawcy
+  mapa:
+    x: 14
+    y: 5
+    szer: 1
+    gl: 1
+- id: makro
+  nazwa: Makro
+  rodzaj: dostawca
+  strefa: felin
+  opis: 'Hurtownia: pełny asortyment, dowóz w poniedziałki i czwartki.'
+  zakladka: dostawcy
+  mapa:
+    x: 17
+    y: 2
+    szer: 2
+    gl: 2
+- id: selgros
+  nazwa: Selgros
+  rodzaj: dostawca
+  strefa: felin
+  opis: 'Hurtownia: mięso i napoje, dowóz we wtorki i piątki.'
+  zakladka: dostawcy
+  mapa:
+    x: 16
+    y: 7
+    szer: 2
+    gl: 2
+- id: eurocash
+  nazwa: Eurocash
+  rodzaj: dostawca
+  strefa: felin
+  opis: 'Hurtownia: tanie warzywa i sosy, dowóz w pn, śr i pt.'
+  zakladka: dostawcy
+  mapa:
+    x: 19
+    y: 7
+    szer: 2
+    gl: 2
+- id: biedronka
+  nazwa: Biedronka
+  rodzaj: dostawca
+  strefa: akademickie
+  opis: 'Dyskont – gazetka, odbiór osobisty.'
+  zakladka: dostawcy
+  mapa:
+    x: 4
+    y: 8
+    szer: 2
+    gl: 1
+- id: lidl
+  nazwa: Lidl
+  rodzaj: dostawca
+  strefa: lsm_czuby
+  opis: 'Dyskont – gazetka, odbiór osobisty.'
+  zakladka: dostawcy
+  mapa:
+    x: 2
+    y: 16
+    szer: 2
+    gl: 1
+- id: stokrotka
+  nazwa: Stokrotka
+  rodzaj: dostawca
+  strefa: czechow
+  opis: 'Dyskont – blisko osiedla, odbiór osobisty.'
+  zakladka: dostawcy
+  mapa:
+    x: 5
+    y: 2
+    szer: 2
+    gl: 1
+- id: rozen
+  nazwa: Zakłady Mięsne „Rożen” z Łęcznej
+  rodzaj: dostawca
+  strefa: zemborzyce
+  opis: 'Producent stożków kebab – punkt odbioru zamówień (od rundy 3).'
+  zakladka: dostawcy
+  mapa:
+    x: 9
+    y: 16
+    szer: 2
+    gl: 1
+- id: sprzet_gastro
+  nazwa: Hurtownia sprzętu gastronomicznego
+  rodzaj: sklep
+  strefa: felin
+  opis: Rożny, frytownice, lodówki i kasy fiskalne.
+  zakladka: sprzet
+  mapa:
+    x: 15
+    y: 5
+    szer: 2
+    gl: 1
+- id: market_budowlany
+  nazwa: Park handlowy (Leroy Merlin, IKEA, OBI, Jula, Castorama)
+  rodzaj: sklep
+  strefa: lsm_czuby
+  opis: Meble, stoliki, telewizor z meczami i materiały do urządzenia sali – kupione wyposażenie jest od razu w lokalu.
+  zakladka: wyposazenie
+  mapa:
+    x: 0
+    y: 18
+    szer: 2
+    gl: 2
+- id: stolarnia
+  nazwa: Stolarnia „Lada i Syn”
+  rodzaj: sklep
+  strefa: zygmuntowskie
+  opis: Buduje nowe stanowiska kuchenne i kasowe w twoim lokalu.
+  zakladka: stanowiska
+  mapa:
+    x: 16
+    y: 13
+    szer: 2
+    gl: 1
+- id: galeria
+  nazwa: Galeria „Pod Zegarem”
+  rodzaj: sklep
+  strefa: centrum
+  opis: Ekspresy, fotele do masażu i inne udogodnienia dla załogi.
+  zakladka: udogodnienia
+  mapa:
+    x: 9
+    y: 5
+    szer: 1
+    gl: 1
+- id: akademia
+  nazwa: Akademia Gastro
+  rodzaj: szkola
+  strefa: politechnika
+  opis: 'Szkolenia: Akademia Gastro, Mistrzowie Rożna i Sanepid bez Stresu.'
+  zakladka: szkolenia
+  mapa:
+    x: 0
+    y: 10
+    szer: 2
+    gl: 1
+- id: drukarnia
+  nazwa: Drukarnia „Papier Przyjmie”
+  rodzaj: reklama
+  strefa: akademickie
+  opis: Ulotki za wycieraczki i plakaty na słupach (dane/mapa/reklama.yaml).
+  zakladka: agencje
+  mapa:
+    x: 4
+    y: 5
+    szer: 1
+    gl: 1
+- id: agencja_lajk
+  nazwa: Agencja „Lajk i Spółka”
+  rodzaj: reklama
+  strefa: akademickie
+  opis: Posty na grupach osiedlowych i influencerka z TikToka (dane/mapa/reklama.yaml).
+  zakladka: agencje
+  mapa:
+    x: 5
+    y: 5
+    szer: 1
+    gl: 1
+- id: uczelnia
+  nazwa: Pracownia Analiz UMCS
+  rodzaj: uczelnia
+  strefa: akademickie
+  opis: Studenci ekonomii policzą, co się opłaca (Analiza).
+  zakladka: analiza
+  mapa:
+    x: 0
+    y: 5
+    szer: 2
+    gl: 2
+- id: redakcja
+  nazwa: Redakcja „Kuriera Kebabowego”
+  rodzaj: media
+  strefa: centrum
+  opis: Ranking firm miasta – karta wyników.
+  zakladka: karta_wynikow
+  mapa:
+    x: 6
+    y: 9
+    szer: 1
+    gl: 1
+- id: ogrod_saski
+  nazwa: Ogród Saski
+  rodzaj: park
+  strefa: akademickie
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 2
+    y: 8
+    szer: 2
+    gl: 2
+- id: park_ludowy
+  nazwa: Park Ludowy
+  rodzaj: park
+  strefa: zygmuntowskie
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 12
+    y: 13
+    szer: 2
+    gl: 2
+- id: ogrod_botaniczny
+  nazwa: Ogród Botaniczny UMCS
+  rodzaj: park
+  strefa: akademickie
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 0
+    y: 8
+    szer: 2
+    gl: 2
+- id: park_bronowicki
+  nazwa: Park Bronowicki
+  rodzaj: park
+  strefa: felin
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 18
+    y: 4
+    szer: 2
+    gl: 2
+- id: park_rury
+  nazwa: Park Rury
+  rodzaj: park
+  strefa: lsm_czuby
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 2
+    y: 17
+    szer: 2
+    gl: 2
+- id: blonia
+  nazwa: Błonia pod Zamkiem
+  rodzaj: park
+  strefa: stare_miasto
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 12
+    y: 9
+    szer: 2
+    gl: 1
+- id: zalew
+  nazwa: Zalew Zemborzycki
+  rodzaj: woda
+  strefa: zemborzyce
+  opis: Plaża, żaglówki, wędkarze i morsy – co jakiś czas wydarzenia nad wodą (zakładka Zdarzenia).
+  zakladka: zdarzenia
+  mapa:
+    x: 11
+    y: 17
+    szer: 4
+    gl: 3
+- id: harpagon
+  nazwa: Kantor „U Harpagona”
+  rodzaj: lichwiarz
+  strefa: dworzec
+  opis: Pożyczki od ręki, bez pytań i bez ksiąg. Pytania zadaje się później – i zadaje je Mistrz Jakub.
+  zakladka: harpagon
+  mapa:
+    x: 8
+    y: 12
+    szer: 1
+    gl: 1
+- id: fala_koziolka
+  nazwa: Radio i billboardy „Fala Koziołka”
+  rodzaj: reklama
+  strefa: centrum
+  opis: Spot w radiu na całe miasto i billboardy przy rondach (dane/mapa/reklama.yaml).
+  zakladka: agencje
+  mapa:
+    x: 7
+    y: 6
+    szer: 1
+    gl: 1
+- id: kozi_grod_events
+  nazwa: Agencja eventowa „Kozi Gród Events”
+  rodzaj: reklama
+  strefa: stare_miasto
+  opis: Degustacje na festynach osiedlowych i Noc Kebaba na otrzęsinach (dane/mapa/reklama.yaml).
+  zakladka: agencje
+  mapa:
+    x: 13
+    y: 6
+    szer: 1
+    gl: 1
+- id: ubezpieczyciel
+  nazwa: TUW „Pod Koziołkiem”
+  rodzaj: ubezpieczenia
+  strefa: centrum
+  opis: Polisy na lokal, sprzęt i OC – odszkodowania po wypadkach w lokalu (dane/zdarzenia/losowe.yaml).
+  zakladka: ubezpieczenia
+  mapa:
+    x: 7
+    y: 8
+    szer: 1
+    gl: 1
+- id: detektyw
+  nazwa: Biuro detektywistyczne „Sokole Oko”
+  rodzaj: detektyw
+  strefa: dworzec
+  opis: Nad lombardem przy dworcu. Zenon Lupa śledzi konkurencję za gotówkę – dyskretnie, przynajmniej w teorii.
+  zakladka: konkurencja
+  mapa:
+    x: 10
+    y: 12
+    szer: 1
+    gl: 1

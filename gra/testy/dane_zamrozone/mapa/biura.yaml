@@ -1,0 +1,100 @@
+# Biura rachunkowe w Levasie (F3a.13, silnik/ksiegowosc/biuro.py) – gra z lokalami; w grze Revas zostają biura z katalog.yaml
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Oferty biur w Kamienicy biur rachunkowych. Kwoty miesięczne, brutto (z VAT 23%), w rundzie tygodniowej
+  przeliczane jak czynsz (× 12/52); limit dokumentów w ryczałcie – też na rundę (zaokrąglony). Dokument = zapis
+  w KPiR, faktura za środek trwały, operacja poza KPiR (kredyt, lokata, kaucja, podatek) i faktura biura za rundę.
+  Kadry: opłata za każdego pracownika (właściciel się nie liczy), `w_cenie` – tylu ludzi bez dopłaty.
+  `ryzyko_bledu` – szansa na rundę, że biuro pomyli się w deklaracji: firma płaci `kara_bledu` (mandat z urzędu),
+  biuro z ubezpieczeniem OC (`oc: true`) oddaje ją w tej samej rundzie. Teksty błędów: {kara}, {biuro}.'
+zrodlo: 'Notatka „Elementy mapy” (kilka biur z różnymi ofertami: cena za dokument, ryczałt, obsługa kadr; biuro
+  Jakuba Klimka-Ślęzaka; samodzielna księgowość z kontrolą błędów i karą), „Prawidła świata” (realne ceny);
+  cenniki biur KPiR + VAT dla małej JDG (2025/2026): ryczałt 250–900 zł netto, 4–8 zł netto za dokument,
+  kadry 30–60 zł netto za osobę – założenie F3a.13, do kalibracji w kroku 5'
+
+szacunek_dokumentow: 30   # ile dokumentów na rundę zakłada szacunek opłaty, zanim drużyna ma własne dokumenty (i bot)
+biura:
+- id: jks
+  nazwa: Biuro Rachunkowe J.K.Ś.
+  wlasciciel: Jakub Klimek-Ślęzak
+  opis: 'Jakub Klimek-Ślęzak przyjmuje w gabinecie, w którym segregatory stoją alfabetycznie, a w każdym
+    segregatorze – też alfabetycznie, tylko od tyłu, „żeby urzędnik się zmęczył”. Pan Jakub nie pomylił się
+    w deklaracji od 1998 roku, kiedy to wpisał w PIT o jedno zero za mało i do dziś co roku wysyła urzędowi
+    kartkę z przeprosinami. Ryczałt obejmuje kadry do czterech osób, bo „ludzie to też dokumenty, tylko
+    bardziej się ruszają”.'
+  ryczalt: 690
+  dokumenty_w_ryczalcie: 80
+  za_dokument: 4.92
+  minimum: 0
+  kadry: {w_cenie: 4, etat: 45, zlecenie: 25}
+  ryzyko_bledu: 0
+  oc: true
+- id: trybunal
+  nazwa: Księgowość Pod Trybunałem
+  opis: 'Biuro na parterze kamienicy przy Trybunale. Pani Kierowniczka liczy wszystko na sztuki: dokumenty,
+    spinacze i westchnienia klientów („to też jest czas pracy”). Płacisz za każdy dokument, ale tylko za ten,
+    który przyniesiesz – zgubionego paragonu nie policzą, za to długo o nim porozmawiają.'
+  ryczalt: 0
+  dokumenty_w_ryczalcie: 0
+  za_dokument: 6.15
+  minimum: 246
+  kadry: {w_cenie: 0, etat: 61.5, zlecenie: 30.75}
+  ryzyko_bledu: 0.03
+  oc: true
+- id: halinka
+  nazwa: Pani Halinka – księgowość z sercem
+  opis: 'Pani Halinka prowadzi księgi w kuchni swojego mieszkania na trzecim piętrze, między pelargonią
+    a słoikiem z guzikami. Do każdej deklaracji dołącza drożdżówkę. Ryczałt obejmuje czterdzieści dokumentów
+    miesięcznie – „więcej się na stole nie mieści, kiedy rosół stygnie”. Raz na jakiś czas kot Mruczek
+    przestawia przecinek, ale Pani Halinka ma ubezpieczenie i bardzo przeprasza.'
+  ryczalt: 369
+  dokumenty_w_ryczalcie: 40
+  za_dokument: 7.38
+  minimum: 0
+  kadry: {w_cenie: 0, etat: 49.2, zlecenie: 24.6}
+  ryzyko_bledu: 0.06
+  oc: true
+- id: eksiegi
+  nazwa: e-Księgi24.pl
+  opis: 'Księgowość w chmurze: wrzucasz zdjęcie faktury, a algorytm „KsięgoBot 3000” sam ją księguje, sam
+    wylicza VAT i sam wysyła deklarację, zanim zdążysz zapytać, co właściwie wysłał. Najtaniej w mieście.
+    Regulamin ma 74 strony; na stronie 71 drobnym drukiem: „Za błędy algorytmu odpowiada Klient, ponieważ
+    to Klient zrobił zdjęcie”.'
+  ryczalt: 0
+  dokumenty_w_ryczalcie: 0
+  za_dokument: 3.69
+  minimum: 123
+  kadry: {w_cenie: 0, etat: 73.8, zlecenie: 36.9}
+  ryzyko_bledu: 0.12
+  oc: false
+- id: debet_kredyt
+  nazwa: Kancelaria Podatkowa Debet & Kredyt
+  opis: 'Dwóch wspólników: pan Debet zawsze ma rację po lewej stronie, pan Kredyt – po prawej. Kłócą się
+    o każdą fakturę, więc żadna nie przejdzie bez sprawdzenia dwa razy. Jeden stały ryczałt bez limitu
+    dokumentów („możecie przynieść nawet paragon za gumę do żucia – i tak się o niego pokłócimy”) i najtańsze
+    kadry w mieście.'
+  ryczalt: 984
+  dokumenty_w_ryczalcie: null   # bez limitu
+  za_dokument: 0
+  minimum: 0
+  kadry: {w_cenie: 0, etat: 36.9, zlecenie: 18.45}
+  ryzyko_bledu: 0
+  oc: true
+
+bledy:   # losowy błąd biura w deklaracji (ryzyko_bledu) – firma płaci {kara}
+- 'Urząd skarbowy przysyła pismo: „W deklaracji VAT za ubiegły tydzień w polu »podatek należny« wpisano numer
+  telefonu Pani Kierowniczki”. {biuro} tłumaczy, że to był bardzo ważny telefon. Mandat: {kara}.'
+- 'W deklaracji PIT przecinek przesunął się o jedno miejsce w prawo i Twój dochód urósł dziesięciokrotnie.
+  Urząd skarbowy był zachwycony – do czasu korekty. {biuro} przeprasza i obiecuje, że przecinek dostał
+  naganę. Mandat za błędną deklarację: {kara}.'
+- 'Deklaracja poszła do urzędu w Levasie Dolnym, którego nie ma, bo „na liście rozwijanej był wyżej”.
+  Zanim dotarła do właściwego urzędu, minął termin. {biuro} wysyła kwiaty, urząd – mandat: {kara}.'
+
+samodzielna:   # samodzielna księgowość (uproszczona): drużyna księguje dokumenty i składa deklaracje
+  kara_blad: 200     # za każdą błędną deklarację (VAT, zaliczka PIT, składka zdrowotna) – różnica od 1 zł
+  kara_brak: 500     # deklaracje niezłożone w terminie (urząd rozlicza z urzędu, z poprawnych zapisów)
+  opis: 'Księgujesz sam: po każdej rundzie dostajesz paczkę dokumentów z rundy – faktury, paragony, listy płac,
+    wyciągi z banku. W następnej rundzie wpisujesz każdy do kolumny KPiR (albo „poza KPiR”) z właściwą stawką
+    VAT i składasz trzy deklaracje: VAT, zaliczkę na PIT i składkę zdrowotną. Podatki płacisz z deklaracji,
+    o tydzień później niż z biurem. Urząd sprawdza wszystko: różnicę dopłacasz (albo dostajesz zwrot), a za każdą
+    błędną deklarację płacisz mandat. Błędne zapisy pokazujemy z wyjaśnieniem – kosztują tylko wtedy, gdy
+    zepsują deklarację. W ostatniej rundzie gry rozliczenie robi urząd (bez mandatu).'

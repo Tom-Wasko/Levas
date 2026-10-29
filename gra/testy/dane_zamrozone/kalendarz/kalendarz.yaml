@@ -1,0 +1,479 @@
+opis: >-
+  Kalendarz miejski Lublina (gra z lokalami, silnik/rynek/kalendarz.py): święta, rok akademicki (sesja, przerwy), szkoły
+  (ferie), okazje handlowe i wydarzenia w mieście. Każde wydarzenie mnoży dzienną pulę klientów w strefach
+  (klucz `wszystkie` – każda strefa bez własnego mnożnika). Daty stałe jako 'MM-DD' (zakres może przechodzić przez
+  Nowy Rok); daty ruchome – `wzgledem` (klucz z `ruchome`) i przesunięcie w dniach `od`/`do`.
+zrodlo: >-
+  Notatki „Prawidła świata” (kalendarz miejski: święta, sesja i wakacje studentów, wydarzenia w mieście – zmieniają
+  popyt w strefach) i „Menu i składniki” (popyt zależny od kalendarza miejskiego). Mnożniki, daty ferii i wydarzeń
+  miejskich – założenia gry (do potwierdzenia); wcześniej kalendarz był w mapa/popyt.yaml (F3a.4). Mecze Motoru
+  Lublin – prawdziwe domowe mecze Ekstraklasy jesienią 2025 (Wikipedia: „Motor Lublin (piłka nożna) w sezonie
+  2025/2026”); `dania` – mnożnik popytu na danie w strefach wydarzenia (P14, „na oko”).
+rodzaje:
+  swieto: Święto
+  uczelnie: Uczelnie
+  szkoly: Szkoły
+  handel: Okazja handlowa
+  miasto: Wydarzenie w mieście
+  sport: Mecz na Arenie
+ruchome:
+  wielkanoc:
+    2025: '04-20'
+    2026: '04-05'
+    2027: '03-28'
+    2028: '04-16'
+  black_friday:            # piątek po czwartym czwartku listopada
+    2025: '11-28'
+    2026: '11-27'
+    2027: '11-26'
+    2028: '11-24'
+  ferie_zimowe:            # poniedziałek pierwszego tygodnia ferii w województwie lubelskim (założenie)
+    2025: '01-27'
+    2026: '02-02'
+    2027: '01-18'
+    2028: '02-14'
+wydarzenia:
+- nazwa: Wakacje studenckie
+  rodzaj: uczelnie
+  opis: >-
+    Wrzesień: studenci jeszcze odsypiają lato u rodziców, a Miasteczko Akademickie należy do gołębi i ekip
+    remontowych malujących akademiki na ten sam beżowy kolor co rok temu. Dobry czas, żeby spokojnie przygotować
+    lokal, zanim w październiku wróci głodna fala.
+  od: '09-01'
+  do: '09-30'
+  strefy:
+    akademickie: 0.35
+    politechnika: 0.4
+    centrum: 0.9
+- nazwa: Początek roku szkolnego
+  rodzaj: szkoly
+  opis: >-
+    Uczniowie wracają do szkół, rodzice odprowadzają pierwszaków i szukają czegoś, co da się zjeść jedną ręką,
+    drugą trzymając tornister w kształcie dinozaura.
+  od: '09-01'
+  do: '09-01'
+  strefy:
+    wszystkie: 1.05
+  dania:
+    kebab_w_tortilli: 1.3
+- nazwa: Powrót studentów
+  rodzaj: uczelnie
+  opis: >-
+    Ostatni weekend września: pociągi z Rzeszowa, Zamościa i Białej Podlaskiej przywożą studentów ze słoikami od
+    mamy. Słoiki starczają do wtorku – od środy zaczyna się sezon na kebab.
+  od: '09-26'
+  do: '09-30'
+  strefy:
+    akademickie: 1.6
+    politechnika: 1.5
+    dworzec: 1.3
+  dania:
+    kebab_box: 1.2
+    frytki: 1.2
+- nazwa: Inauguracja roku akademickiego
+  rodzaj: uczelnie
+  opis: >-
+    Rektorzy w togach, gaudeamus i przemówienia o „nowym rozdziale”. Po uroczystości cały rozdział – w liczbie
+    kilku tysięcy osób – szuka obiadu w promieniu pięciuset metrów od auli.
+  od: '10-01'
+  do: '10-03'
+  strefy:
+    akademickie: 1.35
+    politechnika: 1.3
+    centrum: 1.1
+  dania:
+    talerz_kebab: 1.25
+- nazwa: Konfrontacje Teatralne
+  rodzaj: miasto
+  opis: >-
+    Na Starym Mieście aktorzy w białych maskach chodzą na szczudłach i udają drzewa. Widzowie po trzech godzinach
+    spektaklu bez słów wychodzą z jednym pragnieniem – coś zjeść i wreszcie z kimś porozmawiać. Zamawiają głównie
+    falafel, „bo jest bardziej awangardowy”.
+  od: '10-08'
+  do: '10-17'
+  strefy:
+    stare_miasto: 1.15
+  dania:
+    falafel: 1.4
+    napoj: 1.15
+- nazwa: Otrzęsiny pierwszego roku
+  rodzaj: uczelnie
+  opis: >-
+    Pierwszoroczniacy przechodzą „chrzest” w fontannie na Placu Litewskim, a potem – mokrzy, dumni i głodni – szukają
+    czegoś ciepłego. Starsze roczniki twierdzą, że w ich czasach fontanna była zimniejsza.
+  od: '10-15'
+  do: '10-17'
+  strefy:
+    akademickie: 1.4
+    politechnika: 1.25
+    centrum: 1.1
+  dania:
+    frytki: 1.3
+    napoj: 1.25
+- nazwa: Halloween
+  rodzaj: miasto
+  opis: >-
+    Pół Miasteczka Akademickiego przebiera się za zombie, druga połowa za studentów po sesji – trudno ich odróżnić.
+    Wampiry zamawiają kebab „bez czosnku”, a kucharze nie wiedzą, czy to żart.
+  od: '10-31'
+  do: '10-31'
+  strefy:
+    akademickie: 1.3
+    stare_miasto: 1.25
+  dania:
+    dodatek: 0.7
+    kebab_box: 1.2
+- nazwa: Wszystkich Świętych
+  rodzaj: swieto
+  opis: >-
+    Pół miasta jedzie na cmentarz przy Lipowej, druga połowa stoi w korku do cmentarza przy Lipowej. Głodni są
+    wszyscy, ale nikt nie ma jak dojechać do kebaba.
+  od: '11-01'
+  do: '11-01'
+  strefy:
+    wszystkie: 0.6
+  dania:
+    kebab_box: 1.25
+- nazwa: Święto Niepodległości
+  rodzaj: swieto
+  opis: >-
+    Parada w Centrum, flagi na balkonach i kolejka po kebaba dłuższa niż kolejka po lody w lipcu. Pan z orkiestry
+    dętej zamawia z tubą pod pachą – tuba dostaje osobne frytki.
+  od: '11-11'
+  do: '11-11'
+  strefy:
+    wszystkie: 0.8
+    centrum: 1.5
+    stare_miasto: 1.3
+  dania:
+    kebab_w_bulce: 1.3
+    frytki: 1.2
+- nazwa: Black Friday
+  rodzaj: handel
+  opis: >-
+    Galerie handlowe otwierają się o szóstej rano, a o szóstej pięć ktoś już niesie trzy telewizory i jeden toster.
+    Po ośmiu godzinach polowania na promocje klienci jedzą wszystko, co nie jest przecenione o 70%.
+  wzgledem: black_friday
+  od: 0
+  do: 0
+  strefy:
+    centrum: 1.35
+    zygmuntowskie: 1.2
+    lsm_czuby: 1.15
+  dania:
+    kebab_box: 1.3
+    napoj: 1.2
+- nazwa: Andrzejki
+  rodzaj: uczelnie
+  opis: >-
+    W akademikach leje się wosk przez klucz, a z kształtów wychodzą wyłącznie kebaby. Wróżka z trzeciego piętra
+    przepowiada wszystkim „wielką miłość do sosu czosnkowego” – jak dotąd ma 100% trafności.
+  od: '11-29'
+  do: '11-30'
+  strefy:
+    akademickie: 1.3
+    stare_miasto: 1.2
+  dania:
+    dodatek: 1.4
+- nazwa: Jarmark bożonarodzeniowy
+  rodzaj: miasto
+  opis: >-
+    Na Placu po Farze stoją drewniane budki z grzańcem, piernikami i pluszowymi koziołkami w czapkach Mikołaja.
+    Grzaniec rozgrzewa, pierniki zaklejają zęby, a kebab okazuje się jedynym obiadem w promieniu kilometra. Twoich
+    napojów nikt nie chce – z grzańcem się nie wygrywa.
+  od: '12-05'
+  do: '12-23'
+  strefy:
+    stare_miasto: 1.25
+    centrum: 1.1
+  dania:
+    napoj: 0.8
+    falafel: 1.15
+- nazwa: Mikołajki
+  rodzaj: miasto
+  opis: >-
+    Biegacze w strojach Mikołaja okrążają Zamek, a po biegu tłum czerwonych czapek szturmuje bary. Kasjer pyta
+    „na miejscu czy na wynos?”, a słyszy w odpowiedzi „ho, ho, ho”.
+  od: '12-06'
+  do: '12-06'
+  strefy:
+    stare_miasto: 1.3
+    centrum: 1.15
+  dania:
+    napoj: 1.3
+- nazwa: Przerwa świąteczna na uczelniach
+  rodzaj: uczelnie
+  opis: >-
+    Studenci wyjeżdżają do domów, gdzie babcia gotuje lepiej niż Ty i nie liczy za dokładkę. Miasteczko
+    akademickie pustoszeje, a w akademiku zostaje tylko kot portiera i doktorant z grantem.
+  od: '12-21'
+  do: '01-06'
+  strefy:
+    akademickie: 0.35
+    politechnika: 0.35
+- nazwa: Wigilia i Boże Narodzenie
+  rodzaj: swieto
+  opis: >-
+    Dwanaście potraw w każdym domu – kebab nie jest jedną z nich (jeszcze). Wigilia jest bezmięsna, więc nieliczni
+    klienci biorą falafel i przysięgają babci przez telefon, że to karp w panierce. Twoi kucharze i tak przychodzą
+    do pracy po karpia, który miał być w wannie, ale uciekł.
+  od: '12-24'
+  do: '12-26'
+  strefy:
+    wszystkie: 0.35
+  dania:
+    falafel: 1.6
+    kebab_w_bulce: 0.8
+    talerz_kebab: 0.8
+- nazwa: Sylwester
+  rodzaj: miasto
+  opis: >-
+    Koncert na Placu Zamkowym. O północy fajerwerki, o pierwszej – kolejka po kebaba aż do Bramy Krakowskiej. Ktoś
+    składa życzenia noworoczne rożnowi.
+  od: '12-31'
+  do: '12-31'
+  strefy:
+    stare_miasto: 2.0
+    centrum: 1.4
+  dania:
+    kebab_w_bulce: 1.3
+    frytki: 1.4
+    dodatek: 1.3
+- nazwa: 'Mecz Motoru: Motor Lublin – Bruk-Bet Termalica Nieciecza'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Niedziela na Arenie. Przyjeżdża Termalica z Niecieczy – wsi, która ma mniej mieszkańców niż jedna trybuna
+    stadionu. Kibice gości mieszczą się w jednym busie i jeszcze zostaje miejsce na bęben. Gospodarze świętują
+    z zapasem: kebab w bułce, frytki i napój, najlepiej wszystko naraz, w drodze na trybunę.
+  od: '09-14'
+  do: '09-14'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Radomiak Radom'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Mecz w poniedziałek wieczorem – kibice idą na Arenę prosto z pracy, w krawatach pod szalikami. Lublin i Radom
+    od lat spierają się, kto ma ładniejszy dworzec i gdzie jest gorszy kebab. Spór o dworzec trwa, spór o kebab
+    rozstrzyga się dziś przy Twojej ladzie.
+  od: '09-29'
+  do: '09-29'
+  strefy:
+    zygmuntowskie: 1.6
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – GKS Katowice'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Piątkowy wieczór, przyjeżdżają kibice ze Śląska i od progu pytają o roladę z kluskami. Kucharz tłumaczy, że ma
+    tylko kebab, ale „po lubelsku”. Ślązacy naradzają się, zamawiają po dwa i do końca meczu nikt już nie wspomina
+    o roladzie.
+  od: '10-17'
+  do: '10-17'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Widzew Łódź'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Drugi piątek z rzędu na Arenie. Kibice Widzewa przyjeżdżają pociągiem spóźnionym tylko 40 minut – to rekord
+    sezonu. Przy Stadionowej tłum w czerwieni i tłum w żółto-biało-niebieskim stoją w jednej kolejce po frytki
+    i bardzo się starają, żeby się nawzajem nie zauważyć.
+  od: '10-24'
+  do: '10-24'
+  strefy:
+    zygmuntowskie: 1.9
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Wisła Płock'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Sobotnie popołudnie, listopadowy chłód. Kibic z szóstego rzędu od dwudziestu lat przynosi na mecz ten sam termos,
+    tę samą czapkę i ten sam pech. W przerwie pół trybuny biegnie po coś ciepłego, a druga połowa krzyczy, żeby
+    przy okazji przynieść im też.
+  od: '11-08'
+  do: '11-08'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Legia Warszawa'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Legia w Lublinie – w poniedziałek, w grudniu, przy minus dwóch. Stolica przyjeżdża z flagami, Lublin czeka
+    z bębnami i kebabem. Sprzedawca szalików przy Stadionowej zarabia w jeden wieczór więcej niż przez cały
+    październik i ze szczęścia stawia kucharzom frytki.
+  od: '12-01'
+  do: '12-01'
+  strefy:
+    zygmuntowskie: 2.2
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Jagiellonia Białystok'
+  rodzaj: sport
+  rok: 2025
+  opis: >-
+    Mecz zaległy z sierpnia: miał być w krótkich spodenkach, jest w czapkach z pomponem. Kibice Jagiellonii
+    opowiadają o żubrach, kibice Motoru – o koziołkach, i nikt nie wie, kto wygrał tę rozmowę. Na Arenie prószy
+    śnieg, a kolejka po kebab bije rekord frekwencji.
+  od: '12-14'
+  do: '12-14'
+  strefy:
+    zygmuntowskie: 1.9
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: Nowy Rok
+  rodzaj: swieto
+  opis: >-
+    Miasto śpi do południa, a potem szuka czegoś tłustego na ratunek. Postanowienie „od jutra dieta” trzyma się
+    średnio do 13:20.
+  od: '01-01'
+  do: '01-01'
+  strefy:
+    wszystkie: 0.6
+- nazwa: Trzech Króli
+  rodzaj: swieto
+  opis: >-
+    Orszak przechodzi przez Stare Miasto z wielbłądem, który – według organizatorów – jest „prawie prawdziwy”. Sklepy
+    zamknięte, więc kto nie poszedł za orszakiem, idzie za zapachem rożna.
+  od: '01-06'
+  do: '01-06'
+  strefy:
+    wszystkie: 0.7
+    stare_miasto: 1.3
+- nazwa: Ferie zimowe
+  rodzaj: szkoly
+  opis: >-
+    Uczniowie mają dwa tygodnie wolnego. Połowa rodzin wyjeżdża w góry stać w kolejce do wyciągu, druga połowa
+    zostaje i spędza ferie w galerii handlowej – dzieci przy automatach, rodzice przy ladzie z jedzeniem.
+  wzgledem: ferie_zimowe
+  od: 0
+  do: 13
+  strefy:
+    centrum: 1.1
+    lsm_czuby: 0.9
+    czechow: 0.9
+- nazwa: Sesja zimowa
+  rodzaj: uczelnie
+  opis: >-
+    Studenci nie mają czasu gotować, bo uczą się do egzaminów (a przynajmniej tak mówią rodzicom). Notatki kserowane
+    o trzeciej w nocy, energetyk i kebab – trzy filary nauki na lubelskich uczelniach.
+  od: '01-26'
+  do: '02-08'
+  strefy:
+    akademickie: 1.2
+    politechnika: 1.2
+- nazwa: Tłusty czwartek
+  rodzaj: swieto
+  opis: >-
+    Cały Lublin stoi w kolejkach do cukierni, a ludzie liczą pączki, nie kalorie. Do kebaba przychodzą tylko ci,
+    którzy zjedli już osiem i potrzebują „czegoś słonego na przełamanie”.
+  wzgledem: wielkanoc
+  od: -52
+  do: -52
+  strefy:
+    wszystkie: 0.85
+- nazwa: Przerwa międzysemestralna
+  rodzaj: uczelnie
+  opis: >-
+    Po sesji studenci uciekają w góry albo do rodziców. Zostają tylko ci z poprawką – zamawiają „to co zwykle” i
+    patrzą w okno z miną filozofa.
+  od: '02-09'
+  do: '02-22'
+  strefy:
+    akademickie: 0.5
+    politechnika: 0.5
+- nazwa: Walentynki
+  rodzaj: handel
+  opis: >-
+    Kolacja przy świecach na Starym Mieście. Część par kończy wieczór przy kebabie – i to są te szczęśliwe. Jedna
+    para zamawia „jeden duży, dwa widelce” i kłóci się, kto zje ostatnią frytkę.
+  od: '02-14'
+  do: '02-14'
+  strefy:
+    stare_miasto: 1.4
+- nazwa: Dzień Kobiet
+  rodzaj: handel
+  opis: >-
+    Kwiaciarnie przy Krakowskim Przedmieściu wyprzedają tulipany do jedenastej. Panowie, którzy nie zdążyli, ratują
+    sytuację zaproszeniem „na coś dobrego” – czyli do Ciebie.
+  od: '03-08'
+  do: '03-08'
+  strefy:
+    stare_miasto: 1.15
+    centrum: 1.1
+- nazwa: Pierwszy dzień wiosny
+  rodzaj: miasto
+  opis: >-
+    Uczniowie topią Marzannę w Bystrzycy, studenci „wagarują w celach naukowych” nad Zalewem Zemborzyckim. Marzanna
+    płynie do Wisły, a głodni wagarowicze – do najbliższego baru.
+  od: '03-21'
+  do: '03-21'
+  strefy:
+    zemborzyce: 1.5
+    stare_miasto: 1.2
+    akademickie: 1.15
+- nazwa: Przerwa wielkanocna na uczelniach
+  rodzaj: uczelnie
+  opis: >-
+    Studenci wracają do domów na święconkę i mazurka. W akademiku zostają pisanki z zeszłego roku i jeden student,
+    który twierdzi, że „pisze magisterkę”.
+  wzgledem: wielkanoc
+  od: -3
+  do: 2
+  strefy:
+    akademickie: 0.5
+    politechnika: 0.5
+- nazwa: Wielkanoc
+  rodzaj: swieto
+  opis: >-
+    W sobotę koszyczki ze święconką, w niedzielę śniadanie do obiadu, w poniedziałek – śmigus-dyngus. Kto wyjdzie
+    z domu, wraca mokry. Kebab na wynos jest w tym tygodniu bardziej na wynos niż zwykle.
+  wzgledem: wielkanoc
+  od: -1
+  do: 1
+  strefy:
+    wszystkie: 0.45

@@ -1,0 +1,94 @@
+opis: 'Promocje w grze z lokalami (F3b.3; notatka „Prawidła świata”: promocje z listy, drużyna może nadać im
+  własną, ozdobną nazwę – nazwa nie wpływa na wynik). Promocja trwa, dopóki drużyna jej nie wyłączy; obejmuje jedno
+  danie (zakres „danie”) albo całe menu, wybrane dni tygodnia (0 = poniedziałek) i klientów z wybranych stref
+  (brak – wszystkie). Objęci promocją klienci: przyciąganie – mnożnik atrakcyjności lokalu (1 + przyciąganie) w ich
+  oczach, rabat – część ceny porcji, której lokal nie dostaje, porcje – porcji na klienta (2 za 1: dwie porcje,
+  podwójne składniki i czas kuchni), dopłata – zł brutto ponad cenę dania (zestaw), koszt_dodatku – zł netto za
+  dodatek do zestawu (napój, KPiR – towary, VAT 23%). Przyciąganie zmienia się z każdą rundą trwania o `przyrost`
+  (znużenie albo przywiązanie), w granicach przyciaganie_min–przyciaganie_max. koszt_startu – zł netto przy włączeniu
+  (plakaty, karty), VAT 23%. Najwyżej `limit_aktywnych` promocji naraz, każdy rodzaj raz.'
+zrodlo: 'Założenia projektowe Levasa (roboczo, do kalibracji w kroku 5); teksty – własne.'
+od_rundy: 2
+limit_aktywnych: 2
+nazwa_max: 40
+typy:
+  dwa_za_jeden:
+    nazwa: 2 za 1
+    opis: Drugi taki sam gratis. Klient płaci za jedną porcję, a dostaje dwie – kuchnia robi podwójnie.
+    zakres: danie
+    rabat: 0.5
+    porcje: 2
+    przyciaganie: 0.5
+    przyrost: -0.08
+    przyciaganie_min: 0.2
+    przyciaganie_max: 0.5
+    koszt_startu: 150
+    teksty:
+    - 'Pierwszy dzień „{nazwa}”: pan Zdzisław przyszedł z bratem bliźniakiem i przez kwadrans udowadniał, że to on
+      jest tym drugim. Dostali po dwie porcje „{danie}”. Brat też.'
+    - 'Na „{nazwa}” przyszła cała drużyna futsalu z Felina. Kapitan zamówił „{danie}” na dwóch, potem „na czterech”,
+      a na koniec poprosił o fakturę na klub. Kuchnia do dziś słyszy w nocy brzęk łopatki.'
+  zestaw:
+    nazwa: Zestaw z napojem
+    opis: Danie z napojem w zestawie za kilka złotych więcej. Klienci lubią zestawy, a napój kupujesz osobno.
+    zakres: danie
+    doplata: 4
+    koszt_dodatku: 1.8
+    przyciaganie: 0.18
+    przyrost: -0.02
+    przyciaganie_min: 0.1
+    przyciaganie_max: 0.18
+    koszt_startu: 100
+    teksty:
+    - 'Zestaw „{nazwa}” ruszył. Pierwszy klient długo studiował tablicę, po czym zapytał, czy można zestaw bez
+      „{danie}”, ale z dwoma napojami. Można. Za dopłatą.'
+    - 'Hurtownia przywiozła napoje do „{nazwa}” w kolorze, którego nie ma w przyrodzie. Studenci uznali, że to
+      „energetyk o smaku poniedziałku”. Schodzi lepiej niż „{danie}”.'
+  happy_hours:
+    nazwa: Happy hours
+    opis: Taniej w słabsze dni tygodnia (poniedziałek–czwartek) na całe menu. Weekend bez zmian.
+    zakres: wszystkie
+    dni: [0, 1, 2, 3]
+    rabat: 0.2
+    przyciaganie: 0.35
+    przyrost: -0.03
+    przyciaganie_min: 0.2
+    przyciaganie_max: 0.35
+    koszt_startu: 120
+    teksty:
+    - '„{nazwa}” w pierwszy poniedziałek: o 15:00 przed lokalem ustawiła się kolejka, o 15:01 ktoś zaczął nucić
+      hymn, o 15:02 kolejka śpiewała już na głosy. Sanepid nie ma przepisu na chóry.'
+    - 'Plakat „{nazwa}” zawisł na drzwiach. Pani z kwiaciarni naprzeciwko odwiesiła swój: „Happy hours u nas
+      codziennie, bo kwiaty nie pachną kebabem”. Wojna plakatowa trwa.'
+  karta:
+    nazwa: Karta stałego klienta
+    opis: Pieczątka za każdy zakup i rabat na całe menu. Na początku mało kto ją ma, z każdym tygodniem klienci
+      przywiązują się bardziej.
+    zakres: wszystkie
+    rabat: 0.1
+    przyciaganie: 0.05
+    przyrost: 0.03
+    przyciaganie_min: 0.05
+    przyciaganie_max: 0.22
+    koszt_startu: 400
+    teksty:
+    - 'Karty „{nazwa}” przyszły z drukarni. Na odwrocie zamiast „10. kebab gratis” wydrukowano „10. kebab
+      gratis?”. Klienci uznali, że to egzystencjalne pytanie, i zbierają pieczątki z jeszcze większym zapałem.'
+    - 'Pan Henryk z „{nazwa}” ma już trzy karty: „roboczą”, „weekendową” i „na czarną godzinę”. Twierdzi, że
+      pieczątki się nie sumują, tylko „dojrzewają”.'
+  studencka:
+    nazwa: Zniżka studencka
+    opis: Rabat na całe menu dla studentów – działa na mieszkańców stref Akademickie i Politechnika.
+    zakres: wszystkie
+    strefy_klientow: [akademickie, politechnika]
+    rabat: 0.15
+    przyciaganie: 0.4
+    przyrost: 0
+    przyciaganie_min: 0.4
+    przyciaganie_max: 0.4
+    koszt_startu: 80
+    teksty:
+    - 'Pierwszy dzień „{nazwa}”: legitymację pokazał student pierwszego roku, doktorant, emerytowany profesor
+      i pan, który „studiuje życie”. Kasjer przyjął wszystkie, a profesor zostawił napiwek w postaci wykładu.'
+    - 'Samorząd studencki ogłosił „{nazwa}” na fanpage’u jako „najważniejsze osiągnięcie kadencji”. Pod postem
+      312 komentarzy, z czego 300 to zdjęcia kebabów.'

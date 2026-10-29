@@ -276,7 +276,7 @@ Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4
 **STOP** (autor wybiera pozycje U), U, K, B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
 
 - [x] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz — zrobione 29.10.2026: inwentarz wszystkich decyzji z kompromisami (obszary B6–B12), 17 hipotez (H1–H17) z 9 gier botów i kodu, docstring uzupełniony, dziennik z pytaniem P1 (ZUS przy zleceniu).
-- [ ] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md, wznawianie pełnego pomiaru) z testami; szybki pomiar „punkt zero” na dzisiejszych zasadach
+- [x] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md, wznawianie pełnego pomiaru) z testami; szybki pomiar „punkt zero” na dzisiejszych zasadach — zrobione 29.10.2026: zamrożone dane testów mechanik (znacznik `dane_gry` dla testów zasad), `balans/odcisk.py`, `balans/warianty.py` z 28 wariantami i testami, profil (40% czasu w `linprog`), punkt zero 522 gier w 9,7 min (dominują zlecenie, mBank, e-Księgi24 i pełne polisy; dziennik).
 
 ### Zmiany zasad (ustalone z autorem 29.10.2026, przed pomiarem startowym)
 

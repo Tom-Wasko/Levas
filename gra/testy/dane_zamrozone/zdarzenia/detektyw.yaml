@@ -1,0 +1,59 @@
+opis: >-
+  Konkurencja i detektyw (gra z lokalami, silnik/rynek/konkurencja.py). Każda drużyna widzi ogólny obraz rywali z poprzedniej
+  rundy: liczbę lokali, przedział cen, czy się reklamują i mają promocje, udział w popycie. Dokładne dane jednego
+  rywala (gotówka, ceny i sprzedaż dań, załoga, kampanie, przychód i dochód) zbiera detektyw z mapy – za zlecenie
+  płaci się w zł i w godzinach właściciela, a detektyw czasem wpada i rywal dowiaduje się, kto go śledził.
+zrodlo: >-
+  Odpowiedzi do PRACA_NOCNA.md, pytanie 26 (27.10): ogólny obraz dla wszystkich, dokładne dane – szpieg; detektyw
+  z mapy, 300–800 zł i 2 h właściciela, 15% szansy wpadki (rywal wie, kto szpiegował). Teksty – założenia gry.
+detektyw:
+  nazwa: Biuro detektywistyczne „Sokole Oko” – Zenon Lupa
+  budynek: detektyw
+  od_rundy: 2            # tydzień 1 jest przygotowawczy – nie ma jeszcze kogo śledzić
+  koszt_min: 300         # zł brutto za zlecenie; cena losowana co rundę dla każdej drużyny
+  koszt_maks: 800
+  krok: 10               # cena co 10 zł
+  godziny: 2             # godziny właściciela na rozmowę z detektywem
+  szansa_wpadki: 0.15    # rywal dowiaduje się, kto zlecił obserwację (raport i tak przychodzi)
+powitania:
+- >-
+  Biuro mieści się nad lombardem przy dworcu. Zenon Lupa przyjmuje w płaszczu, choć w środku jest 26 stopni, i mówi
+  szeptem, choć w pokoju jesteście sami. Cennik ma wypisany kredą na tablicy, a stawka „zmienia się z pogodą”.
+- >-
+  Na drzwiach wisi kartka „Zaraz wracam”, a pod nią druga: „Już wróciłem, tylko się ukrywam”. Detektyw wychodzi zza
+  firanki, sprawdza, czy nikt Cię nie śledził, i proponuje kawę z termosu, który „widział więcej niż niejeden sąd”.
+- >-
+  Zenon Lupa ogląda Twoją wizytówkę pod lupą tak długo, aż zaczyna się tlić. Przeprasza, gasi ją kawą i mówi, że
+  dla takiego klienta zrobi zniżkę. Nie robi. Ale przynajmniej się uśmiecha.
+raporty:
+- >-
+  Raport przyszedł w szarej kopercie z napisem „NIE OTWIERAĆ” – co, jak tłumaczy Lupa, „najlepiej odstrasza
+  ciekawskich”. W środku: notatki pisane ołówkiem, paragon za kebab u {rywal} (do rozliczenia) i zdjęcie, na którym
+  widać głównie palec detektywa.
+- >-
+  Lupa przez trzy dni siedział naprzeciwko lokalu {rywal} w przebraniu krzaka. Krzak zamówił dwa razy frytki i raz
+  zapytał o fakturę. Raport jest dokładny, a krzak – jak mówi detektyw – „do odzyskania przy następnym zleceniu”.
+- >-
+  Detektyw zatrudnił się u {rywal} na jeden dzień jako „pomocnik do cebuli” i zrezygnował po czterech godzinach,
+  ze łzami w oczach. Zdążył jednak przepisać cennik, policzyć załogę i podsłuchać, ile wyszło w kasie.
+wpadki:
+- >-
+  Detektyw wpadł: obserwował lokal {rywal} przez gazetę z dziurkami na oczy, tyle że gazeta była do góry nogami,
+  a on stał w kolejce jako jedyny klient. Kucharz poczęstował go frytkami i zapytał, kto go przysłał. Lupa powiedział
+  prawdę – „bo kłamstwo kosztuje ekstra”.
+- >-
+  Wpadka: Lupa schował się w kontenerze na śmieci za lokalem {rywal}, a tego dnia akurat przyjechała śmieciarka.
+  Uratował go kierowca, ale wcześniej Lupa zdążył krzyknąć nazwę zleceniodawcy jak hasło ratunkowe.
+- >-
+  Detektyw został rozpoznany po płaszczu – w Lublinie nikt nie nosi płaszcza w październiku w lokalu z grillem.
+  {rywal} zrobił(a) mu zdjęcie, a on, z zawodowej grzeczności, podpisał je nazwą klienta.
+ofiary:
+- >-
+  Pod lokalem kręcił się mężczyzna w płaszczu i z gazetą do góry nogami. Gdy go zagadnięto, zjadł frytki, wręczył
+  wizytówkę „Sokole Oko” i wyznał, że śledzi Was na zlecenie: {kto}. Zostawił napiwek, więc w sumie jest remis.
+- >-
+  Wasz kucharz znalazł w kontenerze za lokalem detektywa z notesem. Detektyw, wyciągany za kołnierz, wyrecytował:
+  „Zlecenie: {kto}, stawka standardowa, proszę nie dzwonić na policję, mam alergię na radiowozy”.
+- >-
+  Klient w płaszczu przez godzinę liczył Waszych pracowników na palcach, mylił się i liczył od nowa. Przyłapany
+  przyznał, że jest detektywem i że wysłał go(ją) {kto}. Na pożegnanie zostawił ocenę „5 gwiazdek, polecam”.

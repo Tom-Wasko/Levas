@@ -88,6 +88,9 @@ przeglądarka ── HTML (szablony) ──▶ panel_gracza / panel_mg / konta
 
 ### Narzędzia poboczne
 - `balans/symuluj.py` – gry samych botów do pomiaru balansu (`python -X utf8 -m balans.symuluj 12 sredni 7`).
+- `balans/warianty.py` – pary gier (badana firma różni się jedną decyzją) do kalibracji: `szybki` (≤ 10 min),
+  `pelny` (w tle, wznawiany z `gry.csv`), `raport`, `lista`; wyniki w `raporty/kalibracja/pomiary/`.
+- `balans/odcisk.py` – odcisk stanów gier botów przed i po zmianie kodu bez zmiany zasad (`zapisz` / `porownaj`).
 - `narzedzia/cloudflared.exe` – pobierany raz przez `hostuj`.
 
 ## Testy i jakość

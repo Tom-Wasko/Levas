@@ -1,0 +1,714 @@
+# Lokale i działki – globalna pula (lokal zajęty przez drużynę znika z oferty innych)
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Lokale do najmu lub kupna. Kwoty w złotych, czynsz i utrzymanie (media) miesięczne – silnik przelicza je
+  na rundę. gotowy: działa od razu, sprzęt wynajmującego (przy najmie nie można go sprzedać); niewyposazony: 1 runda
+  urządzania, jednorazowa adaptacja, cały sprzęt trzeba kupić; dzialka: tylko kupno, budowa budowa_rund rund, koszt_budowy
+  płatny w równych ratach co rundę budowy. miejsca: ile stanowisk każdego typu zmieści lokal. Kaucja przy najmie:
+  kaucja_miesiecy × czynsz (zwrotna po końcu najmu).'
+zrodlo: 'założenie F3a.3: czynsz = metraż × stawka strefy (strefy.yaml: czynsz_m2; gotowy +25%), cena kupna ≈ 40
+  miesięcznych czynszów (gotowy +10%; ceny rynkowe przeskalowane do kapitału gry), działka = m² gruntu × 3 × czynsz_m2,
+  budowa 900 zł/m², adaptacja 100 zł/m², media 300 zł + 25 zł/m²; niewyposażony: czynsz i cena kupna −25% (test gry
+  28.10: lokal do urządzenia razem z adaptacją i zakupem sprzętu wychodził drożej niż gotowy z zestawem); rząd wielkości (oferty najmu w Lublinie 2025:
+  40–130 zł/m²), do kalibracji w kroku 5'
+zasady:
+  nowy_lokal_co_rund: 3
+  kaucja_miesiecy: 2
+  urzadzanie_rund: 1
+  # licytacje (od rundy 1, test gry 28.10) i przejęcia (od rundy 4): kilka drużyn o ten sam lokal – wygrywa najwyższa oferta względem ceny
+  # wywoławczej (czynszu albo ceny), remis – losowanie; kupno budynku z najemcą, wypowiedzenie 4 rundy (KC art. 673,
+  # 678), rozliczenie nakładów najemcy (KC art. 676): zatrzymanie – właściciel płaci ulepszenia_zwrot × nakłady,
+  # przywrócenie stanu – najemca płaci przywrocenie_koszt × nakłady
+  licytacje_od_rundy: 1
+  oferta_max: 3
+  przejecia_od_rundy: 4
+  wypowiedzenie_rund: 4
+  ulepszenia_zwrot: 0.5
+  przywrocenie_koszt: 0.3
+zestawy:
+  podstawowy:
+    nazwa: Zestaw podstawowy (★)
+    opis: 'Używany sprzęt po poprzednim najemcy: działa, choć rożen skrzypi przy każdym obrocie.'
+    stanowiska:
+    - typ: kuchnia
+      sprzet:
+        Rożen: 1
+        Frytownica: 1
+        Lodówka na napoje: 1
+        Szafa chłodnicza: 1
+        Zamrażarka: 1
+    - typ: kasa
+      sprzet:
+        Kasa fiskalna: 1
+        Lada z witryną: 1
+        Tablica menu: 1
+  solidny:
+    nazwa: Zestaw solidny (★★)
+    opis: Zadbany sprzęt średniej klasy z kompletną kasą.
+    stanowiska:
+    - typ: kuchnia
+      sprzet:
+        Rożen: 2
+        Frytownica: 2
+        Lodówka na napoje: 2
+        Szafa chłodnicza: 2
+        Zamrażarka: 2
+    - typ: kasa
+      sprzet:
+        Kasa fiskalna: 2
+        Lada z witryną: 2
+        Tablica menu: 2
+  podwojny:
+    nazwa: Zestaw podwójny (★★)
+    opis: Dwie linie kuchenne i kasa – lokal po dużej sieci, która „zmieniła strategię”.
+    stanowiska:
+    - typ: kuchnia
+      sprzet:
+        Rożen: 2
+        Frytownica: 2
+        Lodówka na napoje: 2
+        Szafa chłodnicza: 2
+        Zamrażarka: 2
+    - typ: kuchnia
+      sprzet:
+        Rożen: 2
+        Frytownica: 2
+    - typ: kasa
+      sprzet:
+        Kasa fiskalna: 2
+        Lada z witryną: 2
+        Tablica menu: 2
+lokale:
+- id: stare_miasto_1
+  nazwa: Kamienica przy Grodzkiej
+  strefa: stare_miasto
+  typ: gotowy
+  adres: ul. Grodzka 14
+  opis: Sklepione piwnice, w których podobno straszy. Duch jest wegetarianinem i krytykuje każdy kebab.
+  metraz: 45
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 6200
+  utrzymanie: 1400
+  mapa:
+    x: 13
+    y: 5
+- id: stare_miasto_2
+  nazwa: Lokal przy Rynku
+  strefa: stare_miasto
+  typ: gotowy
+  adres: Rynek 8
+  opis: Widok na Trybunał Koronny i ceny jak w Trybunale. Turyści robią zdjęcia witryny, czasem coś kupią.
+  metraz: 85
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  zestaw: podwojny
+  czynsz: 11700
+  utrzymanie: 2400
+  mapa:
+    x: 14
+    y: 6
+- id: stare_miasto_3
+  nazwa: Piwnica na Bramowej
+  strefa: stare_miasto
+  typ: niewyposazony
+  adres: ul. Bramowa 3
+  opis: Surowe mury i 14 schodów w dół. Dostawca mięsa już zapowiedział, że chce dodatek za schody.
+  metraz: 55
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  czynsz: 4500
+  adaptacja: 5500
+  utrzymanie: 1700
+  mapa:
+    x: 11
+    y: 7
+- id: stare_miasto_4
+  nazwa: Okienko na Złotej
+  strefa: stare_miasto
+  typ: gotowy
+  adres: ul. Złota 2
+  opis: 'Najmniejszy lokal w mieście: kucharz i kasjer muszą się mijać bokiem, ale kolejka sama się ustawia.'
+  metraz: 30
+  miejsca:
+    kuchnia: 1
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 4100
+  utrzymanie: 1050
+  mapa:
+    x: 13
+    y: 7
+- id: stare_miasto_5
+  nazwa: Kamienica na Kowalskiej
+  strefa: stare_miasto
+  typ: niewyposazony
+  adres: ul. Kowalska 6
+  opis: Pod Bramą Krakowską, z oknami na deptak. Konserwator zabytków chce zatwierdzić kolor szyldu.
+  metraz: 70
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 5800
+  adaptacja: 7000
+  utrzymanie: 2050
+  od_rundy: 6
+  mapa:
+    x: 12
+    y: 8
+- id: centrum_1
+  nazwa: Deptak – Krakowskie Przedmieście
+  strefa: centrum
+  typ: gotowy
+  adres: Krakowskie Przedmieście 21
+  opis: Najbardziej uczęszczany chodnik w Lublinie. Gołębie też to wiedzą.
+  metraz: 60
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  zestaw: solidny
+  czynsz: 7500
+  utrzymanie: 1800
+  mapa:
+    x: 6
+    y: 6
+- id: centrum_2
+  nazwa: Lokal na Peowiaków
+  strefa: centrum
+  typ: niewyposazony
+  adres: ul. Peowiaków 9
+  opis: Po kwiaciarni – przez pierwszy miesiąc wszystko będzie pachnieć różami, nawet czosnkowy sos.
+  metraz: 50
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  czynsz: 3800
+  adaptacja: 5000
+  utrzymanie: 1550
+  mapa:
+    x: 8
+    y: 6
+- id: centrum_3
+  nazwa: Narożnik na Chmielnej
+  strefa: centrum
+  typ: gotowy
+  adres: ul. Chmielna 4
+  opis: Narożnik z dwiema witrynami. Poprzedni najemca wyjechał nagle, zostawił sprzęt i kota.
+  metraz: 40
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 5000
+  utrzymanie: 1300
+  mapa:
+    x: 10
+    y: 6
+- id: centrum_4
+  nazwa: Parter przy 3 Maja
+  strefa: centrum
+  typ: niewyposazony
+  adres: ul. 3 Maja 12
+  opis: Duża sala po banku. Sejf został, szyfru nikt nie zna.
+  metraz: 75
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 5600
+  adaptacja: 7500
+  utrzymanie: 2200
+  mapa:
+    x: 7
+    y: 7
+- id: centrum_5
+  nazwa: Pawilon na Okopowej
+  strefa: centrum
+  typ: gotowy
+  adres: ul. Okopowa 7
+  opis: Przy przystanku, na którym zatrzymuje się pół miasta. Kierowcy trolejbusów dostają tu kawę gratis od zawsze.
+  metraz: 50
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: solidny
+  czynsz: 6200
+  utrzymanie: 1550
+  od_rundy: 10
+  mapa:
+    x: 9
+    y: 7
+- id: akademickie_1
+  nazwa: Bar pod akademikiem
+  strefa: akademickie
+  typ: gotowy
+  adres: ul. Radziszewskiego 16
+  opis: Okno wychodzi na akademik. O 2 w nocy studenci składają zamówienia, opuszczając koszyk na sznurku.
+  metraz: 45
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 4200
+  utrzymanie: 1400
+  mapa:
+    x: 3
+    y: 5
+- id: akademickie_2
+  nazwa: Budka na Sowińskiego
+  strefa: akademickie
+  typ: gotowy
+  adres: ul. Sowińskiego 10
+  opis: Kultowa budka, w której jadło trzy pokolenia studentów. Każde twierdzi, że kiedyś było lepiej.
+  metraz: 30
+  miejsca:
+    kuchnia: 1
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 2800
+  utrzymanie: 1050
+  mapa:
+    x: 2
+    y: 6
+- id: akademickie_3
+  nazwa: Lokal na Langiewicza
+  strefa: akademickie
+  typ: niewyposazony
+  adres: ul. Langiewicza 20
+  opis: Po punkcie ksero. Na ścianie wciąż wisi cennik „Notatki z mikro – 5 zł”.
+  metraz: 60
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 3400
+  adaptacja: 6000
+  utrzymanie: 1800
+  mapa:
+    x: 4
+    y: 6
+- id: akademickie_4
+  nazwa: Parter przy Głębokiej
+  strefa: akademickie
+  typ: niewyposazony
+  adres: ul. Głęboka 11
+  opis: Nowy budynek z mieszkaniami dla studentów, gotowy w połowie semestru.
+  metraz: 80
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 4500
+  adaptacja: 8000
+  utrzymanie: 2300
+  od_rundy: 8
+  mapa:
+    x: 1
+    y: 7
+- id: politechnika_1
+  nazwa: Pawilon przy Nadbystrzyckiej
+  strefa: politechnika
+  typ: gotowy
+  adres: ul. Nadbystrzycka 38
+  opis: Między wydziałami. Studenci mechaniki już zaproponowali ulepszenie rożna z silnikiem krokowym.
+  metraz: 45
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 3400
+  cena: 119000
+  utrzymanie: 1400
+  mapa:
+    x: 2
+    y: 10
+- id: politechnika_2
+  nazwa: Lokal na Zana
+  strefa: politechnika
+  typ: niewyposazony
+  adres: ul. Zana 32
+  opis: Przy dużym skrzyżowaniu. Parking jest, ale ktoś go zawsze zajmuje.
+  metraz: 65
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 2900
+  cena: 117000
+  adaptacja: 6500
+  utrzymanie: 1900
+  mapa:
+    x: 4
+    y: 10
+- id: politechnika_3
+  nazwa: Bar przy akademiku Politechniki
+  strefa: politechnika
+  typ: gotowy
+  adres: ul. Nadbystrzycka 42
+  opis: Duży bar z poprzednim właścicielem, który chętnie doradzi – czy tego chcesz, czy nie.
+  metraz: 55
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: solidny
+  czynsz: 4100
+  cena: 145000
+  utrzymanie: 1700
+  mapa:
+    x: 1
+    y: 11
+- id: dworzec_1
+  nazwa: Kiosk przy Placu Dworcowym
+  strefa: dworzec
+  typ: gotowy
+  adres: pl. Dworcowy 1
+  opis: Ludzie biegną na pociąg z kebabem w ręku. Rozkład jazdy wisi nad kasą – ważniejszy niż menu.
+  metraz: 30
+  miejsca:
+    kuchnia: 1
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 2600
+  utrzymanie: 1050
+  mapa:
+    x: 10
+    y: 10
+- id: dworzec_2
+  nazwa: Lokal przy Dworcu Metropolitalnym
+  strefa: dworzec
+  typ: gotowy
+  adres: ul. Gazowa 4
+  opis: Nowoczesne szkło i stal. Głos z megafonu zapowiada opóźnienia w rytm skwierczącej frytownicy.
+  metraz: 60
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  zestaw: solidny
+  czynsz: 5200
+  utrzymanie: 1800
+  mapa:
+    x: 7
+    y: 11
+- id: dworzec_3
+  nazwa: Hala na Młyńskiej
+  strefa: dworzec
+  typ: niewyposazony
+  adres: ul. Młyńska 15
+  opis: Dawny magazyn mąki. Mąka jest wszędzie, nawet w miejscach, które dopiero odkryjesz.
+  metraz: 90
+  miejsca:
+    kuchnia: 4
+    kasa: 2
+  czynsz: 4700
+  adaptacja: 9000
+  utrzymanie: 2550
+  mapa:
+    x: 9
+    y: 11
+- id: dworzec_4
+  nazwa: Lokal na Kunickiego
+  strefa: dworzec
+  typ: niewyposazony
+  adres: ul. Kunickiego 40
+  opis: Długa ulica, dużo bloków i nikt nie sprzedaje tu kebaba. Na razie.
+  metraz: 50
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  czynsz: 2600
+  adaptacja: 5000
+  utrzymanie: 1550
+  mapa:
+    x: 11
+    y: 11
+- id: zygmuntowskie_1
+  nazwa: Budka pod Areną
+  strefa: zygmuntowskie
+  typ: gotowy
+  adres: ul. Stadionowa 1
+  opis: W dniu meczu sprzedaje się tu więcej niż przez cały tydzień. Kibice śpiewają zamówienia.
+  metraz: 35
+  miejsca:
+    kuchnia: 1
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 2200
+  cena: 77000
+  utrzymanie: 1200
+  mapa:
+    x: 12
+    y: 10
+- id: zygmuntowskie_2
+  nazwa: Lokal w Alejach Zygmuntowskich
+  strefa: zygmuntowskie
+  typ: niewyposazony
+  adres: al. Zygmuntowskie 5
+  opis: Przestronny parter przy parku Ludowym. Wiewiórki zaglądają przez okno, licząc na frytki.
+  metraz: 70
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 2600
+  cena: 105000
+  adaptacja: 7000
+  utrzymanie: 2050
+  mapa:
+    x: 14
+    y: 10
+- id: zygmuntowskie_3
+  nazwa: Działka przy Krochmalnej
+  strefa: zygmuntowskie
+  typ: dzialka
+  adres: ul. Krochmalna 30
+  opis: Pusty plac po starej krochmalni. Można postawić własny pawilon z ogródkiem na mecze.
+  metraz: 110
+  miejsca:
+    kuchnia: 5
+    kasa: 3
+  cena: 68000
+  budowa_rund: 3
+  koszt_budowy: 99000
+  utrzymanie: 3050
+  mapa:
+    x: 16
+    y: 10
+- id: lsm_czuby_1
+  nazwa: Pawilon na Wileńskiej
+  strefa: lsm_czuby
+  typ: gotowy
+  adres: ul. Wileńska 3
+  opis: Pawilon handlowy z lat 70. Pani z warzywniaka obok będzie sprawdzać świeżość twojej sałaty.
+  metraz: 45
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 3100
+  cena: 109000
+  utrzymanie: 1400
+  mapa:
+    x: 0
+    y: 14
+- id: lsm_czuby_2
+  nazwa: Lokal przy Jana Pawła II
+  strefa: lsm_czuby
+  typ: gotowy
+  adres: al. Jana Pawła II 13
+  opis: Duży lokal przy głównej alei Czubów. Kiedyś pizzeria, której nazwę wszyscy pamiętają, a nikt jej nie lubił.
+  metraz: 90
+  miejsca:
+    kuchnia: 4
+    kasa: 2
+  zestaw: podwojny
+  czynsz: 6200
+  cena: 218000
+  utrzymanie: 2550
+  mapa:
+    x: 2
+    y: 14
+- id: lsm_czuby_3
+  nazwa: Lokal na Filaretów
+  strefa: lsm_czuby
+  typ: niewyposazony
+  adres: ul. Filaretów 18
+  opis: W samym środku LSM. Spółdzielnia wymaga, by szyld był „stonowany i niekrzykliwy”.
+  metraz: 55
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  czynsz: 2200
+  cena: 91000
+  adaptacja: 5500
+  utrzymanie: 1700
+  mapa:
+    x: 4
+    y: 14
+- id: lsm_czuby_4
+  nazwa: Działka przy Armii Krajowej
+  strefa: lsm_czuby
+  typ: dzialka
+  adres: ul. Armii Krajowej 60
+  opis: Narożna działka przy drodze wylotowej. Idealna pod lokal z oknem dla kierowców.
+  metraz: 120
+  miejsca:
+    kuchnia: 5
+    kasa: 3
+  cena: 82000
+  budowa_rund: 4
+  koszt_budowy: 108000
+  utrzymanie: 3300
+  mapa:
+    x: 6
+    y: 14
+- id: czechow_1
+  nazwa: Lokal na Kompozytorów Polskich
+  strefa: czechow
+  typ: gotowy
+  adres: ul. Kompozytorów Polskich 8
+  opis: Między blokami nazwanymi od kompozytorów. Okap gra trochę jak Chopin – w tonacji h-moll.
+  metraz: 50
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 2800
+  cena: 99000
+  utrzymanie: 1550
+  mapa:
+    x: 4
+    y: 0
+- id: czechow_2
+  nazwa: Pawilon na Paderewskiego
+  strefa: czechow
+  typ: niewyposazony
+  adres: ul. Paderewskiego 2
+  opis: Pawilon przy szkole. Rodzice są czujni, dzieci jeszcze bardziej głodne.
+  metraz: 60
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 2000
+  cena: 81000
+  adaptacja: 6000
+  utrzymanie: 1800
+  mapa:
+    x: 6
+    y: 0
+- id: czechow_3
+  nazwa: Działka przy Szeligowskiego
+  strefa: czechow
+  typ: dzialka
+  adres: ul. Szeligowskiego 25
+  opis: Działka przy wąwozie. Spacerowicze z psami to gotowi klienci, a psy – gotowi krytycy.
+  metraz: 110
+  miejsca:
+    kuchnia: 5
+    kasa: 3
+  cena: 54000
+  budowa_rund: 3
+  koszt_budowy: 99000
+  utrzymanie: 3050
+  mapa:
+    x: 8
+    y: 0
+- id: czechow_4
+  nazwa: Budka na Kalinowszczyźnie
+  strefa: czechow
+  typ: gotowy
+  adres: ul. Kalinowszczyzna 70
+  opis: Przy pętli autobusowej. Kierowcy jedzą tu od lat i znają historię każdego sosu.
+  metraz: 30
+  miejsca:
+    kuchnia: 1
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 1700
+  cena: 59000
+  utrzymanie: 1050
+  od_rundy: 4
+  mapa:
+    x: 10
+    y: 0
+- id: felin_1
+  nazwa: Bar przy hali na Doświadczalnej
+  strefa: felin
+  typ: gotowy
+  adres: ul. Doświadczalna 30
+  opis: Bar dla pracowników hal. Obiad ma być szybko, dużo i z dodatkowym sosem – reszta to szczegóły.
+  metraz: 55
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  zestaw: podstawowy
+  czynsz: 2400
+  cena: 85000
+  utrzymanie: 1700
+  mapa:
+    x: 16
+    y: 2
+- id: felin_2
+  nazwa: Pawilon na Witosa
+  strefa: felin
+  typ: niewyposazony
+  adres: ul. Witosa 12
+  opis: Przy obwodnicy. Ciężarówki zatrzymują się tylko wtedy, gdy szyld widać z kilometra.
+  metraz: 70
+  miejsca:
+    kuchnia: 3
+    kasa: 2
+  czynsz: 1800
+  cena: 74000
+  adaptacja: 7000
+  utrzymanie: 2050
+  mapa:
+    x: 20
+    y: 2
+- id: felin_3
+  nazwa: Działka przy Mełgiewskiej
+  strefa: felin
+  typ: dzialka
+  adres: ul. Mełgiewska 80
+  opis: Duża i tania działka w strefie przemysłowej. Sąsiad – zakład produkcji kartonów – obiecał zniżkę na pudełka.
+  metraz: 130
+  miejsca:
+    kuchnia: 5
+    kasa: 3
+  cena: 68000
+  budowa_rund: 4
+  koszt_budowy: 117000
+  utrzymanie: 3550
+  mapa:
+    x: 15
+    y: 3
+- id: zemborzyce_1
+  nazwa: Budka z zapiekankami nad Zalewem
+  strefa: zemborzyce
+  typ: gotowy
+  adres: ul. Żeglarska 1
+  opis: Lokal Tymka. Tymek rzuca gastronomię, bo zostaje influencerem jogi dla kotów. Sprzedaje budkę ze sprzętem,
+    zapasem serwetek i jednym kotem, który nie chciał ćwiczyć.
+  metraz: 35
+  miejsca:
+    kuchnia: 1
+    kasa: 1
+  zestaw: podstawowy
+  cena: 45000
+  utrzymanie: 1200
+  tylko_kupno: true
+  wlasciciel: Tymek
+  mapa:
+    x: 9
+    y: 15
+- id: zemborzyce_2
+  nazwa: Pawilon przy plaży
+  strefa: zemborzyce
+  typ: niewyposazony
+  adres: ul. Krężnicka 10
+  opis: Pawilon przy plaży miejskiej. Latem złota żyła, zimą bardzo dobre miejsce na przemyślenia.
+  metraz: 50
+  miejsca:
+    kuchnia: 2
+    kasa: 1
+  czynsz: 1500
+  cena: 60000
+  adaptacja: 5000
+  utrzymanie: 1550
+  mapa:
+    x: 11
+    y: 15
+- id: zemborzyce_3
+  nazwa: Działka nad Zalewem
+  strefa: zemborzyce
+  typ: dzialka
+  adres: ul. Żeglarska 20
+  opis: Działka z widokiem na żaglówki. Można zbudować lokal z tarasem – o ile mewy pozwolą.
+  metraz: 110
+  miejsca:
+    kuchnia: 5
+    kasa: 3
+  cena: 72000
+  budowa_rund: 3
+  koszt_budowy: 99000
+  utrzymanie: 3050
+  mapa:
+    x: 13
+    y: 15

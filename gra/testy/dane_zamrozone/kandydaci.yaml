@@ -1,0 +1,291 @@
+# Rynek pracy
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Rynek pracy: znane osoby (kucharze i kasjerzy) i parametry losowania nowych kandydatów (wg gwiazdek).'
+zrodlo: znani – założenie F2.6 (osoby fikcyjne, pensje 1★ 4810–4950, 2★ 5000–5300, 3★ 5400–5800); losowanie – listy kandydatów
+  gier REVAS
+znani:
+- imie_nazwisko: Mehmet Yılmaz
+  gwiazdki: 3
+  zawod: Kucharz
+  pensja_preferowana: 5700
+  koszt_rekrutacji: 600
+  koszt_odprawy: 2850
+  zadowolenie_klientow: 0.99
+  ryzyko_reklamacji: 0.02
+- imie_nazwisko: Halina Rożnowska
+  gwiazdki: 3
+  zawod: Kucharz
+  pensja_preferowana: 5500
+  koszt_rekrutacji: 500
+  koszt_odprawy: 2750
+  zadowolenie_klientow: 0.97
+  ryzyko_reklamacji: 0.02
+- imie_nazwisko: Ołeksandr Kowalenko
+  gwiazdki: 2
+  zawod: Kucharz
+  pensja_preferowana: 5250
+  koszt_rekrutacji: 400
+  koszt_odprawy: 2100
+  zadowolenie_klientow: 0.93
+  ryzyko_reklamacji: 0.04
+- imie_nazwisko: Ayşe Demir
+  gwiazdki: 2
+  zawod: Kucharz
+  pensja_preferowana: 5150
+  koszt_rekrutacji: 350
+  koszt_odprawy: 2060
+  zadowolenie_klientow: 0.91
+  ryzyko_reklamacji: 0.05
+- imie_nazwisko: Tadeusz Sosik
+  gwiazdki: 2
+  zawod: Kucharz
+  pensja_preferowana: 5050
+  koszt_rekrutacji: 300
+  koszt_odprawy: 1515
+  zadowolenie_klientow: 0.88
+  ryzyko_reklamacji: 0.07
+- imie_nazwisko: Kamil Frytkowski
+  gwiazdki: 1
+  zawod: Kucharz
+  pensja_preferowana: 4950
+  koszt_rekrutacji: 250
+  koszt_odprawy: 1485
+  zadowolenie_klientow: 0.79
+  ryzyko_reklamacji: 0.1
+- imie_nazwisko: Bartłomiej Czosnek
+  gwiazdki: 1
+  zawod: Kucharz
+  pensja_preferowana: 4880
+  koszt_rekrutacji: 200
+  koszt_odprawy: 1464
+  zadowolenie_klientow: 0.75
+  ryzyko_reklamacji: 0.12
+- imie_nazwisko: Iryna Melnyk
+  gwiazdki: 1
+  zawod: Kucharz
+  pensja_preferowana: 4820
+  koszt_rekrutacji: 200
+  koszt_odprawy: 1446
+  zadowolenie_klientow: 0.77
+  ryzyko_reklamacji: 0.11
+- imie_nazwisko: Zuzanna Pita
+  gwiazdki: 3
+  zawod: Kasjer
+  pensja_preferowana: 5400
+  koszt_rekrutacji: 400
+  koszt_odprawy: 2700
+  zadowolenie_klientow: 0.99
+  ryzyko_reklamacji: 0.01
+- imie_nazwisko: Emre Kaya
+  gwiazdki: 2
+  zawod: Kasjer
+  pensja_preferowana: 5100
+  koszt_rekrutacji: 300
+  koszt_odprawy: 1530
+  zadowolenie_klientow: 0.88
+  ryzyko_reklamacji: 0.06
+- imie_nazwisko: Natalia Szybka
+  gwiazdki: 2
+  zawod: Kasjer
+  pensja_preferowana: 5000
+  koszt_rekrutacji: 250
+  koszt_odprawy: 1500
+  zadowolenie_klientow: 0.86
+  ryzyko_reklamacji: 0.07
+- imie_nazwisko: Wiesław Reszta
+  gwiazdki: 1
+  zawod: Kasjer
+  pensja_preferowana: 4900
+  koszt_rekrutacji: 200
+  koszt_odprawy: 1470
+  zadowolenie_klientow: 0.78
+  ryzyko_reklamacji: 0.1
+- imie_nazwisko: Daria Bondarenko
+  gwiazdki: 1
+  zawod: Kasjer
+  pensja_preferowana: 4810
+  koszt_rekrutacji: 200
+  koszt_odprawy: 1443
+  zadowolenie_klientow: 0.74
+  ryzyko_reklamacji: 0.12
+losowanie:
+  zrodlo: listy kandydatów i profile pracowników (gry ATH i A/B/C); liczby kandydatów – założenie (ATH zatrudnił 18 osób
+    w 5 miesięcy)
+  na_start: 12
+  co_runde: 6
+  wiek:
+  - 22
+  - 50
+  udzial_kobiet: 0.55
+  gwiazdki:
+    '1': 0.45
+    '2': 0.4
+    '3': 0.15
+  krok_pensji: 5
+  wg_gwiazdek:
+    '1':
+      pensja:
+      - 4785
+      - 4950
+      zk:
+      - 0.7
+      - 0.82
+      ryzyko:
+      - 0.08
+      - 0.15
+    '2':
+      pensja:
+      - 5005
+      - 5170
+      zk:
+      - 0.8
+      - 0.89
+      ryzyko:
+      - 0.05
+      - 0.1
+    '3':
+      pensja:
+      - 5280
+      - 5500
+      zk:
+      - 0.95
+      - 1.0
+      ryzyko:
+      - 0.01
+      - 0.03
+  koszty_rekrutacji:
+  - 200
+  - 250
+  - 300
+  - 350
+  - 400
+  - 500
+  - 600
+  - 700
+  odprawa_czesc_pensji:
+  - 0.3
+  - 0.35
+  - 0.4
+  - 0.5
+  - 0.6
+agencja:
+  zrodlo: notatki „Elementy mapy” (Agencja pracy, limit 3), „Ustalenia gry” (odblokowanie, okres wypowiedzenia),
+    „Prawidła świata” (KP art. 36); opłaty, gwiazdki w kanałach i czas właściciela – założenie F3a.8
+  limit_nowych: 3
+  kanaly:
+    pracuj:
+      nazwa: pracuj.pl (ogłoszenie)
+      od_rundy: 1
+      gwiazdki: [1, 2]
+      oplata: 150
+      mnoznik_rekrutacji: 0
+      czas_wlasciciela: 2
+    agencja:
+      nazwa: Agencja pracy
+      od_rundy: 2
+      gwiazdki: [2, 3]
+      oplata: 0
+      mnoznik_rekrutacji: 1
+      czas_wlasciciela: 0
+    headhunter:
+      nazwa: Headhunter
+      od_rundy: 4
+      gwiazdki: [3]
+      oplata: 0
+      mnoznik_rekrutacji: 3
+      czas_wlasciciela: 0
+      podkupienie_czesc_pensji: 0.5
+  wypowiedzenie:
+  - staz_od: 0       # jedna długość dla wszystkich (P6): 2 rundy, w obie strony (zwolnienie i odejście)
+    rund: 2
+imiona_kobiet:
+- Anna
+- Katarzyna
+- Magdalena
+- Agnieszka
+- Joanna
+- Monika
+- Ewa
+- Natalia
+- Karolina
+- Aleksandra
+- Paulina
+- Marta
+- Zofia
+- Weronika
+- Julia
+- Beata
+- Iwona
+- Justyna
+- Sylwia
+- Dorota
+imiona_mezczyzn:
+- Piotr
+- Krzysztof
+- Tomasz
+- Paweł
+- Marcin
+- Michał
+- Jakub
+- Adam
+- Łukasz
+- Mateusz
+- Kamil
+- Bartosz
+- Rafał
+- Grzegorz
+- Wojciech
+- Marek
+- Dariusz
+- Szymon
+- Filip
+- Damian
+nazwiska:
+- m: Kowalski
+  k: Kowalska
+- m: Wiśniewski
+  k: Wiśniewska
+- m: Wójcik
+  k: Wójcik
+- m: Kamiński
+  k: Kamińska
+- m: Lewandowski
+  k: Lewandowska
+- m: Zieliński
+  k: Zielińska
+- m: Szymański
+  k: Szymańska
+- m: Woźniak
+  k: Woźniak
+- m: Dąbrowski
+  k: Dąbrowska
+- m: Kozłowski
+  k: Kozłowska
+- m: Jankowski
+  k: Jankowska
+- m: Mazur
+  k: Mazur
+- m: Kwiatkowski
+  k: Kwiatkowska
+- m: Krawczyk
+  k: Krawczyk
+- m: Piotrowski
+  k: Piotrowska
+- m: Grabowski
+  k: Grabowska
+- m: Nowakowski
+  k: Nowakowska
+- m: Pawłowski
+  k: Pawłowska
+- m: Michalski
+  k: Michalska
+- m: Król
+  k: Król
+- m: Wieczorek
+  k: Wieczorek
+- m: Jabłoński
+  k: Jabłońska
+- m: Wróbel
+  k: Wróbel
+- m: Majewski
+  k: Majewska

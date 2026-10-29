@@ -1,0 +1,421 @@
+# Dostawcy
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Dostawcy jedzenia: rodzaj, dni dostaw (0 = poniedziałek), koszt dostawy (darmowa od progu zamówienia), minimalne zamówienie,
+  odbiór osobisty w dyskoncie (czas właściciela, limit opakowań na składnik na dzień), gazetki (co tydzień kilka składników
+  taniej). Ceny: miesiąc → dostawca → składnik → jakość → cena za opakowanie; w miesiącach bez danych cena waha się losowo
+  wokół tej bazy.'
+zrodlo: notatka „Elementy mapy” (dyskonty, hurtownie, producent mięsa, piekarnia – marki z notatki); ceny, dni dostaw, progi
+  i limity – założenie F3a.6 (ceny względem dawnej hurtowni z F2.6), do kalibracji w kroku 5
+pierwsi:
+- Piekarnia Koziołek
+- Biedronka
+- Lidl
+- Stokrotka
+- Makro
+- Selgros
+- Eurocash
+- Zakłady Mięsne „Rożen” z Łęcznej
+wszyscy_od_miesiaca: styczen
+dostawcy:
+  Piekarnia Koziołek:
+    rodzaj: piekarnia
+    opis: Świeże bułki, pita i tortille – dowóz codziennie rano, osobna ilość na każdy dzień.
+    dni_dostaw:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    koszt_dostawy: 15
+    darmowa_od: 150
+  Biedronka:
+    rodzaj: dyskont
+    opis: Dobre ceny przy małych ilościach, gazetka z promocjami. Towar przywozisz sam.
+    dni_dostaw:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    odbior_osobisty: true
+    godziny_odbioru: 1.5
+    limit_opakowan: 4
+    gazetka:
+      pozycji: 3
+      rabat_min: 0.15
+      rabat_max: 0.35
+  Lidl:
+    rodzaj: dyskont
+    opis: Tydzień kuchni śródziemnomorskiej co tydzień – falafel i pita w gazetce bywają tanie.
+    dni_dostaw:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    odbior_osobisty: true
+    godziny_odbioru: 1.5
+    limit_opakowan: 4
+    gazetka:
+      pozycji: 3
+      rabat_min: 0.15
+      rabat_max: 0.35
+  Stokrotka:
+    rodzaj: dyskont
+    opis: Lubelski dyskont przy osiedlu – blisko, ale trochę drożej. Ma surówki.
+    dni_dostaw:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    odbior_osobisty: true
+    godziny_odbioru: 1.0
+    limit_opakowan: 4
+    gazetka:
+      pozycji: 2
+      rabat_min: 0.1
+      rabat_max: 0.25
+  Makro:
+    rodzaj: hurtownia
+    opis: Ceny hurtowe i pełny asortyment. Dowóz w poniedziałki i czwartki.
+    dni_dostaw:
+    - 0
+    - 3
+    koszt_dostawy: 79
+    darmowa_od: 1000
+  Selgros:
+    rodzaj: hurtownia
+    opis: Hurtownia z dobrym mięsem i napojami. Dowóz we wtorki i piątki.
+    dni_dostaw:
+    - 1
+    - 4
+    koszt_dostawy: 69
+    darmowa_od: 900
+  Eurocash:
+    rodzaj: hurtownia
+    opis: Najtańsze warzywa i sosy, bez dań wege. Dowóz w poniedziałki, środy i piątki.
+    dni_dostaw:
+    - 0
+    - 2
+    - 4
+    koszt_dostawy: 89
+    darmowa_od: 1200
+  Zakłady Mięsne „Rożen” z Łęcznej:
+    rodzaj: producent
+    opis: 'Producent stożków kebab: najlepsza cena i jakość mięsa, ale tylko większe zamówienia. Dowóz we wtorki i piątki.'
+    dni_dostaw:
+    - 1
+    - 4
+    minimalne_zamowienie: 800
+    od_rundy: 3
+ceny:
+  pazdziernik:
+    Piekarnia Koziołek:
+      Bułka:
+        '1': 37.62
+        '2': 42.32
+        '3': 48.91
+      Tortilla:
+        '1': 20.6
+        '2': 24.72
+        '3': 28.84
+      Pita:
+        '1': 41.47
+        '2': 46.07
+        '3': 53.45
+    Biedronka:
+      Bułka:
+        '1': 38.52
+        '2': 43.34
+      Tortilla:
+        '1': 18.03
+        '2': 21.64
+      Pita:
+        '1': 45.67
+        '2': 50.75
+      Warzywa:
+        '1': 26.73
+        '2': 32.08
+      Sos:
+        '1': 56.45
+        '2': 67.74
+      Frytki mrożone:
+        '1': 55.8
+        '2': 66.96
+      Hummus:
+        '1': 34.52
+        '2': 42.19
+      Ser i dodatki:
+        '1': 47.97
+        '2': 57.57
+      Napój:
+        '1': 47.04
+        '2': 52.27
+    Lidl:
+      Bułka:
+        '1': 39.38
+        '2': 44.3
+      Tortilla:
+        '1': 18.03
+        '2': 21.64
+      Pita:
+        '1': 45.67
+        '2': 50.75
+      Pita mrożona:
+        '1': 35.34
+        '2': 39.52
+      Warzywa:
+        '1': 26.73
+        '2': 32.08
+      Sos:
+        '1': 56.45
+        '2': 67.74
+      Frytki mrożone:
+        '1': 55.8
+        '2': 66.96
+      Falafel mrożony:
+        '1': 65.17
+        '2': 76.34
+      Hummus:
+        '1': 34.52
+        '2': 42.19
+      Ser i dodatki:
+        '1': 47.97
+        '2': 57.57
+      Napój:
+        '1': 48.11
+        '2': 53.46
+    Stokrotka:
+      Bułka:
+        '1': 40.23
+        '2': 45.26
+      Tortilla:
+        '1': 18.82
+        '2': 22.58
+      Pita:
+        '1': 47.64
+        '2': 52.93
+      Warzywa:
+        '1': 27.92
+        '2': 33.5
+      Surówki:
+        '1': 42.76
+        '2': 51.31
+      Sos:
+        '1': 58.78
+        '2': 70.54
+      Frytki mrożone:
+        '1': 58.2
+        '2': 69.84
+      Hummus:
+        '1': 35.99
+        '2': 43.98
+      Ser i dodatki:
+        '1': 49.99
+        '2': 59.99
+      Napój:
+        '1': 49.18
+        '2': 54.65
+    Makro:
+      Bułka:
+        '1': 42.8
+        '2': 48.15
+        '3': 55.64
+      Tortilla:
+        '1': 19.6
+        '2': 23.52
+        '3': 27.44
+      Pita:
+        '1': 49.11
+        '2': 54.57
+        '3': 63.3
+      Pita mrożona:
+        '1': 37.2
+        '2': 41.6
+        '3': 47.8
+      Mięso kebab:
+        '1': 313.4
+        '2': 356.63
+        '3': 421.47
+      Mięso kebab mrożone:
+        '1': 258.0
+        '2': 293.0
+        '3': 347.0
+      Warzywa:
+        '1': 29.7
+        '2': 35.64
+        '3': 43.56
+      Surówki:
+        '1': 44.08
+        '2': 52.9
+        '3': 63.92
+      Sos:
+        '1': 58.2
+        '2': 69.84
+        '3': 85.36
+      Frytki mrożone:
+        '1': 60.0
+        '2': 72.0
+        '3': 85.0
+      Falafel mrożony:
+        '1': 68.6
+        '2': 80.36
+        '3': 96.04
+      Hummus:
+        '1': 36.72
+        '2': 44.88
+        '3': 55.08
+      Ser i dodatki:
+        '1': 50.5
+        '2': 60.6
+        '3': 72.72
+      Napój:
+        '1': 53.46
+        '2': 59.4
+        '3': 69.3
+      Opakowanie:
+        '1': 72.1
+        '2': 82.4
+        '3': 97.85
+      Box:
+        '1': 155.2
+        '2': 174.6
+        '3': 203.7
+    Selgros:
+      Bułka:
+        '1': 43.66
+        '2': 49.11
+        '3': 56.75
+      Tortilla:
+        '1': 19.99
+        '2': 23.99
+        '3': 27.99
+      Pita:
+        '1': 50.09
+        '2': 55.66
+        '3': 64.57
+      Pita mrożona:
+        '1': 37.94
+        '2': 42.43
+        '3': 48.76
+      Mięso kebab:
+        '1': 307.13
+        '2': 349.5
+        '3': 413.04
+      Mięso kebab mrożone:
+        '1': 250.26
+        '2': 284.21
+        '3': 336.59
+      Warzywa:
+        '1': 30.29
+        '2': 36.35
+        '3': 44.43
+      Surówki:
+        '1': 44.96
+        '2': 53.96
+        '3': 65.2
+      Sos:
+        '1': 59.36
+        '2': 71.24
+        '3': 87.07
+      Frytki mrożone:
+        '1': 61.2
+        '2': 73.44
+        '3': 86.7
+      Falafel mrożony:
+        '1': 69.97
+        '2': 81.97
+        '3': 97.96
+      Hummus:
+        '1': 37.45
+        '2': 45.78
+        '3': 56.18
+      Ser i dodatki:
+        '1': 51.51
+        '2': 61.81
+        '3': 74.17
+      Napój:
+        '1': 51.86
+        '2': 57.62
+        '3': 67.22
+      Opakowanie:
+        '1': 74.26
+        '2': 84.87
+        '3': 100.79
+      Box:
+        '1': 159.86
+        '2': 179.84
+        '3': 209.81
+    Eurocash:
+      Bułka:
+        '1': 42.37
+        '2': 47.67
+        '3': 55.08
+      Tortilla:
+        '1': 19.4
+        '2': 23.28
+        '3': 27.17
+      Pita:
+        '1': 48.62
+        '2': 54.02
+        '3': 62.67
+      Pita mrożona:
+        '1': 36.83
+        '2': 41.18
+        '3': 47.32
+      Mięso kebab:
+        '1': 310.27
+        '2': 353.06
+        '3': 417.26
+      Mięso kebab mrożone:
+        '1': 255.42
+        '2': 290.07
+        '3': 343.53
+      Warzywa:
+        '1': 28.81
+        '2': 34.57
+        '3': 42.25
+      Surówki:
+        '1': 42.76
+        '2': 51.31
+        '3': 62.0
+      Sos:
+        '1': 57.04
+        '2': 68.44
+        '3': 83.65
+      Frytki mrożone:
+        '1': 59.4
+        '2': 71.28
+        '3': 84.15
+      Ser i dodatki:
+        '1': 49.99
+        '2': 59.99
+        '3': 71.99
+      Napój:
+        '1': 52.93
+        '2': 58.81
+        '3': 68.61
+      Opakowanie:
+        '1': 71.38
+        '2': 81.58
+        '3': 96.87
+      Box:
+        '1': 153.65
+        '2': 172.85
+        '3': 201.66
+    Zakłady Mięsne „Rożen” z Łęcznej:
+      Mięso kebab:
+        '2': 307.3
+        '3': 363.17
+      Mięso kebab mrożone:
+        '2': 263.7
+        '3': 312.3

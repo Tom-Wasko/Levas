@@ -31,7 +31,7 @@ from .schematy import (
 )
 
 KATALOG_GRY = Path(__file__).resolve().parents[1]
-KATALOG_DANYCH = KATALOG_GRY / "dane"
+KATALOG_DANYCH = KATALOG_GRY / "dane"   # testy mechanik: zamrożona kopia (testy/conftest.py)
 
 MIESIACE = ["styczen", "luty", "marzec", "kwiecien", "maj", "czerwiec", "lipiec", "sierpien", "wrzesien",
             "pazdziernik", "listopad", "grudzien"]
@@ -99,8 +99,8 @@ def _wczytaj_kalendarz(katalog: Path) -> dict | None:
 
 
 class Dane:
-    def __init__(self, katalog: Path = KATALOG_DANYCH):
-        self.katalog = katalog
+    def __init__(self, katalog: Path | None = None):
+        self.katalog = katalog = katalog or KATALOG_DANYCH
         self.pliki: dict[str, dict] = {p.name: _wczytaj(p) for p in sorted(katalog.glob("*.yaml"))}
         p = self.pliki
         self.uslugi: dict = p["uslugi.yaml"]["uslugi"]
@@ -230,8 +230,9 @@ class Dane:
         return {n: p for n, p in self.pozycje(rodzaj).items() if p.get("od_rundy", 1) <= runda}
 
 
-def sprawdz(katalog: Path = KATALOG_DANYCH) -> list[str]:
+def sprawdz(katalog: Path | None = None) -> list[str]:
     """Błędy danych: brakujące pliki, schematy, założenia i odwołania między plikami (pusta lista = dane dobre)."""
+    katalog = katalog or KATALOG_DANYCH
     bledy = []
     for nazwa in [*SCHEMATY, "zalozenia.yaml"]:
         if not (katalog / nazwa).exists() and nazwa not in OPCJONALNE:
@@ -517,9 +518,13 @@ def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
                     brak(sk["kandydat"]["zawod"], f"{co}.{nazwa}", "zawód", "katalog.yaml: stanowiska.typy")
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=2)
+def _wczytane(katalog: Path) -> Dane:
+    return Dane(katalog)
+
+
 def dane_domyslne() -> Dane:
-    return Dane()
+    return _wczytane(KATALOG_DANYCH)
 
 
 def main(argv: list[str]) -> int:

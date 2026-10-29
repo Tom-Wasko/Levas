@@ -8,6 +8,8 @@ import pytest
 from silnik import Gra
 from silnik.losowosc import CELE, strumien
 
+pytestmark = pytest.mark.dane_gry
+
 SILNIK = Path(strumien.__code__.co_filename).parent
 
 

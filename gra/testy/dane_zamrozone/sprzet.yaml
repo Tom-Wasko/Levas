@@ -1,0 +1,97 @@
+# Sprzęt
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Sprzęt stanowisk: typ stanowiska (kuchnia – kucharz, kasa – kasjer), ceny w 3 jakościach, utrzymanie miesięczne.
+  Do F2.7 sprzęt kupuje się na stanowisko (jak w Revasie). Szafa chłodnicza i zamrażarka (gra z lokalami, F3a.5) nie są
+  potrzebne do żadnego dania – dają miejsce w chłodni i zamrażarce firmy (pojemnosc_l w litrach).'
+zrodlo: założenie F2.6 (ceny sprzętu gastronomicznego, rząd wielkości); do kalibracji w kroku 5
+sprzet:
+  Rożen:
+    dla: kuchnia
+    ceny:
+      '1': 2500
+      '2': 4500
+      '3': 7000
+    utrzymanie:
+      '1': 60
+      '2': 40
+      '3': 30
+  Frytownica:
+    dla: kuchnia
+    ceny:
+      '1': 1500
+      '2': 2800
+      '3': 4500
+    utrzymanie:
+      '1': 40
+      '2': 30
+      '3': 20
+  Lodówka na napoje:
+    dla: kuchnia
+    ceny:
+      '1': 1200
+      '2': 2000
+      '3': 3200
+    utrzymanie:
+      '1': 30
+      '2': 25
+      '3': 20
+  Szafa chłodnicza:
+    dla: kuchnia
+    przechowywanie: chlodnia
+    pojemnosc_l:
+      '1': 600
+      '2': 800
+      '3': 1000
+    ceny:
+      '1': 2200
+      '2': 3500
+      '3': 5200
+    utrzymanie:
+      '1': 60
+      '2': 45
+      '3': 35
+  Zamrażarka:
+    dla: kuchnia
+    przechowywanie: zamrazarka
+    pojemnosc_l:
+      '1': 250
+      '2': 300
+      '3': 400
+    ceny:
+      '1': 1400
+      '2': 2200
+      '3': 3400
+    utrzymanie:
+      '1': 45
+      '2': 35
+      '3': 25
+  Kasa fiskalna:
+    dla: kasa
+    ceny:
+      '1': 900
+      '2': 1500
+      '3': 2400
+    utrzymanie:
+      '1': 20
+      '2': 10
+      '3': 0
+  Lada z witryną:
+    dla: kasa
+    ceny:
+      '1': 1500
+      '2': 2500
+      '3': 4000
+    utrzymanie:
+      '1': 15
+      '2': 10
+      '3': 5
+  Tablica menu:
+    dla: kasa
+    ceny:
+      '1': 300
+      '2': 600
+      '3': 1200
+    utrzymanie:
+      '1': 0
+      '2': 0
+      '3': 0

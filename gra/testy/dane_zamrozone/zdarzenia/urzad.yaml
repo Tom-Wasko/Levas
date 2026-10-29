@@ -1,0 +1,84 @@
+# Urząd i sanepid w grze z lokalami (F3b.6, silnik/ksiegowosc/urzad.py): rejestracja firmy, odbiór lokalu przez sanepid,
+# higiena lokalu (decyzja) i jej wpływ na kontrole sanepidu z silnik/kuchnia/magazyn.py
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Higiena – decyzja `higiena: poziom` (trwa, dopóki drużyna jej nie zmieni; bez decyzji – higiena.domyslna).
+  Koszt poziomu (zł miesięcznie, brutto z VAT) za każdy działający lokal, co rundę. Kontrola sanepidu
+  (silnik/kuchnia/magazyn.py): część szansy z problemów (wynajęta chłodnia, przeterminowany towar) plus dodatek poziomu
+  i skarg (skutek kontrola w historiach) mnożona przez mnoznik poziomu; do mandatu dolicza się mandat poziomu.
+  Odbiór: w rundzie, w której lokal ma zacząć działać, sanepid go odbiera – przy poziomie z odbior: false
+  odmawia i lokal zaczyna działać odbior.odroczenie_rund rund później (do skutku).'
+zrodlo: 'Plan implementacji F3b.6 i notatka „Elementy mapy” (Urząd / Sanepid – rejestracja firmy, zgoda na otwarcie
+  lokalu, kontrole: higiena, przeterminowany towar, mandaty); rejestracja w CEIDG i wpis do rejestru zakładów
+  sanepidu są bezpłatne (wpis do rejestru zakładów – na wniosek przed rozpoczęciem działalności); koszty sprzątania
+  – rząd wielkości ofert firm sprzątających dla małej gastronomii w 2026 r.; szanse – założenie F3b.6, do
+  kalibracji w kroku 5'
+urzad:
+  nazwa: Ratusz i Sanepid
+  budynek: ratusz
+  rejestracja:
+    pkd: 56.10.A
+    opis_pkd: Restauracje i inne stałe placówki gastronomiczne
+    tekst: >-
+      Firmę rejestrujesz w CEIDG przez internet, w piżamie, w osiem minut. Najdłużej trwa wybór kodu PKD: urzędniczka
+      przez telefon odradza „56.10.B – ruchome placówki gastronomiczne”, bo „kebab na rolkach to jeszcze nie ten etap”.
+      Wpis jest bezpłatny, a lokal przed otwarciem musi jeszcze odebrać sanepid.
+odbior:
+  odroczenie_rund: 1
+  teksty_ok:
+  - >-
+    Pani z sanepidu obchodzi lokal z latarką, choć jest południe. Zagląda za lodówkę, pod zlew i do szuflady
+    ze sztućcami, wącha mop, kiwa głową nad grafikiem sprzątania przyklejonym do lodówki i podpisuje decyzję
+    o wpisie do rejestru zakładów. „Proszę tak trzymać” – mówi. Pracownik do końca dnia nie odkłada mopa.
+  - >-
+    Odbiór lokalu trwa dwadzieścia minut. Inspektor sprawdza bieżącą wodę, umywalkę do mycia rąk, oddzielne deski
+    do mięsa i warzyw, po czym długo przygląda się pojemnikowi z sosem czosnkowym. Okazuje się, że chciał tylko
+    zapytać o przepis. Wpis do rejestru – jest. Przepis – tajemnica firmy.
+  teksty_odmowa:
+  - >-
+    Inspektor sanepidu staje w drzwiach, robi krok, przykleja się butem do podłogi i już nie robi drugiego.
+    Z miejsca, w którym utknął, wypisuje odmowę wpisu do rejestru zakładów: „brak procedur utrzymania czystości”.
+    Lokal może ruszyć dopiero po ponownym odbiorze – czyli najwcześniej za {rund} rundę, i to pod warunkiem,
+    że ktoś wreszcie kupi mop.
+  - >-
+    Na odbiorze sanepidu wychodzi, że plan sprzątania lokalu brzmi w całości „jakoś to będzie”. Pani inspektor
+    docenia szczerość, ale nie aż tak: odmowa, ponowny odbiór za {rund} rundę. Wychodząc, przez chwilę stoi
+    przy witrynie i patrzy na ślady palców, jakby to były odciski z kryminału.
+higiena:
+  domyslna: podstawowa
+  poziomy:
+    brak:
+      nazwa: Sprzątamy, jak się pobrudzi
+      opis: Żadnych środków ani grafiku – czysto jest wtedy, kiedy akurat jest czysto. Sanepid nie odbierze takiego
+        lokalu, a każda kontrola kończy się prawie na pewno mandatem.
+      koszt: 0
+      dodatek: 0.06
+      mnoznik: 1
+      mandat: 400
+      odbior: false
+    podstawowa:
+      nazwa: Mop i grafik na lodówce
+      opis: Pracownicy sprzątają po zamknięciu według grafiku, środki czystości kupowane w hurtowni. Wystarcza do
+        odbioru lokalu, ale kontrola trafiona na gorszy dzień potrafi coś znaleźć.
+      koszt: 120
+      dodatek: 0
+      mnoznik: 1
+      mandat: 0
+      odbior: true
+    firma:
+      nazwa: Firma sprzątająca „Błysk-Pol”
+      opis: Ekipa pana Bogdana przychodzi trzy razy w tygodniu w nocy i zostawia zapach cytryny, który nie schodzi do
+        południa. Mniejsze ryzyko, że kontrola przyczepi się do wynajętej chłodni albo przeterminowanego towaru.
+      koszt: 750
+      dodatek: 0
+      mnoznik: 0.7
+      mandat: 0
+      odbior: true
+    haccp:
+      nazwa: Błysk-Pol i audyt HACCP
+      opis: Do sprzątania dochodzi co miesiąc audytor HACCP, który wszystko opisuje, mierzy i laminuje. Inspektor
+        sanepidu widzi segregator z procedurami i łagodnieje – kontrola rzadziej kończy się mandatem.
+      koszt: 1300
+      dodatek: 0
+      mnoznik: 0.45
+      mandat: 0
+      odbior: true

@@ -78,12 +78,15 @@ def przewaga_popytu(dane: Dane, konf: dict, nazwa: str) -> float:
 
 
 def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict,
-                   min_kuchnia: int = 0) -> dict | None:
+                   min_kuchnia: int = 0, strefy: list[str] | None = None) -> dict | None:
     """Gotowy lokal do najmu wg strategii: tani – najniższy czynsz, premium – Stare Miasto i Centrum, inni – środek
     stawki. Losowanie spośród trzech najlepszych (ziarno gry), żeby boty nie biły się zawsze o ten sam lokal.
-    min_kuchnia – najmniej miejsc w kuchni (planujący bot; bez takich lokali – każdy)."""
+    min_kuchnia – najmniej miejsc w kuchni (planujący bot; bez takich lokali – każdy); strefy – tylko lokale w tych
+    strefach (strategia: strefy, np. pomiar w balans/warianty.py; bez wolnych – każda strefa)."""
     wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy)) if lok["typ"] == "gotowy" and lok.get("czynsz")]
     wolne = [lok for lok in wolne if lok["miejsca"][KUCHNIA] >= min_kuchnia] or wolne
+    if strefy:
+        wolne = [lok for lok in wolne if lok["strefa"] in strefy] or wolne
     if not wolne:
         return None
     if strategia_klucz == "tani":
@@ -327,7 +330,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         # bez lokalu: najem gotowego lokalu; dalsze decyzje liczone tak, jakby lokal już był (przegrany spór o lokal
         # – stanowiska odrzucone, ponowna próba w następnej rundzie)
         d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf,
-                                    st.get("min_kuchnia", 0) if planuje else 0)
+                                    st.get("min_kuchnia", 0) if planuje else 0, st.get("strefy"))
         if d["lokal"] is None and not f.lokale:
             return d
         if d["lokal"] is not None:
@@ -390,7 +393,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 and all(p["czesc"] < drugi["obsluga"] for p in plan["lokale"].values()) \
                 and f.gotowka > drugi["gotowka"] and len(f.lokale) < drugi["maks_lokali"] \
                 and runda >= lk.runda_nowego_lokalu(dane, f) and all(x.dziala_od <= runda for x in f.lokale):
-            d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0))
+            d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0),
+                                        st.get("strefy"))
             if d["lokal"] is None:
                 d.pop("lokal")
             else:
