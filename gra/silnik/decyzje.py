@@ -226,7 +226,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             ksieguj(firma, ksiega, rachunek, f"Sprzedaż sprzętu: {s['nazwa']}",
                     cena_sprzedazy_sprzetu(dane, dane.sprzet[s["nazwa"]]["ceny"][str(q)]), "przychod_pozostaly")
             wartosc = dane.sprzet[s["nazwa"]]["ceny"][str(q)]      # majątek po cenie zakupu (rozwój firmy)
-            firma.majatek -= wartosc
+            st_trwale.zmniejsz_majatek(firma, wartosc)
             info["sprzedany_majatek"] += wartosc
     for s in d.get("sprzet_kup", []) if sprzet_ok else []:
         st = firma.stanowisko(s["typ"], int(s["nr"]))
@@ -348,7 +348,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                 st_trwale.sprzedaj(firma, n, ksiega)
                 ksieguj(firma, ksiega, rachunek, f"Sprzedaż {nazwa_pozycji}: {n}",
                         pozycje[n]["cena"] * dane.z["finanse"]["sprzedaz_udogodnien"], "przychod_pozostaly")
-                firma.majatek -= pozycje[n]["cena"]
+                st_trwale.zmniejsz_majatek(firma, pozycje[n]["cena"])
                 info["sprzedany_majatek"] += pozycje[n]["cena"]
         for n in d.get(f"{rodzaj}_kup", []):
             if n in pozycje and n not in posiadane and pozycje[n]["od_rundy"] <= runda:

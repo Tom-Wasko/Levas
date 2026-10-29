@@ -89,7 +89,8 @@ def test_wynik_ekonomiczny():
     k = karta(D, 10 * dz, 1.2, 0.9, 1.1, 1.0)
     assert k["wynik_ekonomiczny"] == pytest.approx(10)
     assert k["wynik_dzialalnosci"] == pytest.approx(10 * 1.2 * 0.9 * 1.1, abs=0.001)
-    assert karta(D, -1000, 1, 1, 1, 1)["wynik_dzialalnosci"] == 0
+    waga = D.z["karta_wynikow"]["strata"]["waga"]   # Z1: strata daje ujemny wynik (wcześniej 0)
+    assert karta(D, -10 * dz, 1, 1, 1, 1)["wynik_dzialalnosci"] == pytest.approx(-10 * waga)
 
 
 @pytest.mark.dane_gry

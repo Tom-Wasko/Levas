@@ -210,7 +210,7 @@ def _wyprowadzka(dane: Dane, s: StanGry, nazwa: str, umowa: Lokal, runda: int, z
             cena = dane.sprzet[n]["ceny"][str(q)]
             st_trwale.sprzedaj(najemca, f"{n} ({st.typ} {st.nr})", ks_n)
             ksieguj(najemca, ks_n, rach_n, f"Sprzedaż sprzętu: {n}", cena_sprzedazy_sprzetu(dane, cena), "przychod_pozostaly")
-            najemca.majatek -= cena
+            st_trwale.zmniejsz_majatek(najemca, cena)
             info["sprzedany_sprzet"] += cena_sprzedazy_sprzetu(dane, cena)
     # nakłady najemcy (KC art. 676)
     if umowa.naklady > 0 and umowa.ulepszenia == "zatrzymaj":

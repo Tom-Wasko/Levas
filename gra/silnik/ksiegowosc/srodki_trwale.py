@@ -57,6 +57,20 @@ def amortyzuj(dane: Dane, firma: Firma, runda: int, ksiega: Ksiega) -> None:
             st.umorzenie = round(st.umorzenie + odpis, 2)
 
 
+def amortyzuj_majatek(dane: Dane, firma: Firma, majatek_przed: float) -> None:
+    """Amortyzacja sumy inwestycji do karty (Z1): tańsze zakupy są od razu w kosztach, więc do rozwoju firmy
+    majątek traci na wartości jak sprzęt – liniowo od sumy sprzed rundy (zakupy rundy od następnej)."""
+    odpis = round(min(firma.majatek, majatek_przed) * stawka(dane, "sprzet") / dane.rund_w_roku, 2)
+    firma.umorzenie_majatku = round(min(firma.majatek, firma.umorzenie_majatku + odpis), 2)
+
+
+def zmniejsz_majatek(firma: Firma, wartosc: float) -> None:
+    """Sprzedaż (albo utrata) części majątku po cenie zakupu: umorzenie maleje w tej samej proporcji."""
+    if firma.majatek > 0:
+        firma.umorzenie_majatku = round(firma.umorzenie_majatku * max(0.0, 1 - wartosc / firma.majatek), 2)
+    firma.majatek -= wartosc
+
+
 def ewidencja(firma: Firma) -> list[dict]:
     """Tabela ewidencji środków trwałych (zakładka Inwestycje)."""
     return [{"nazwa": s.nazwa, "rodzaj": s.rodzaj, "od_rundy": s.od_rundy, "stawka": s.stawka, "wartosc": s.wartosc,

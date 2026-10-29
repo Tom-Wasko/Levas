@@ -228,6 +228,13 @@ karta_wynikow:
     wartosc: 4615
     pewnosc: zalozenie
     zrodlo: 'F2.7: 20 000 z Revasa (ATH r3–r9, dochód miesięczny) × 12/52 – ta sama skala dla dochodu tygodniowego'
+  strata:
+    wartosc:
+      waga: 1.0
+    pewnosc: zalozenie
+    zrodlo: 'Z1 (29.10.2026, ustalone z autorem): przy stracie wynik działalności = waga × wynik ekonomiczny
+      (ujemny, proporcjonalny do straty, bez mnożenia przez wskaźniki); wcześniej 0 przy każdej stracie. Do
+      sprawdzenia w B5/B6 (skala straty względem zysku mnożonego przez wskaźniki)'
   zadowolenie_klientow:
     wartosc:
       stala: 0.8486

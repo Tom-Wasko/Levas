@@ -181,7 +181,7 @@ export const karta_wynikow = {
       ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>
       <div class="wykres"><canvas id="w-historia"></canvas></div>
-      <p class="podpowiedz">Wynik działalności = iloczyn pozostałych wskaźników (0 przy stracie). Wynik ekonomiczny = dochód netto rundy / ${zl(v.dzielnik_karty)}.
+      <p class="podpowiedz">Wynik działalności = iloczyn pozostałych wskaźników; przy stracie ujemny, proporcjonalny do straty. Wynik ekonomiczny = (dochód netto rundy − odsetki Harpagona) / ${zl(v.dzielnik_karty)}.
       Zadowolenie i rozwój liczone są ze skalibrowanych wzorów (dane/zalozenia.yaml) – mogą odbiegać od prawdziwej gry.</p>`;
   },
   po({ v }) {

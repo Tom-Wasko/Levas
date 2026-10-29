@@ -135,7 +135,7 @@ def _przejmij_zastaw(dane: Dane, firma: Firma, k: Kredyt, runda: int, ksiega: Ks
         wartosc = sr.wartosc - sr.umorzenie if sr else 0.0
         if st and nazwa in st.sprzet:
             q = st.sprzet.pop(nazwa)
-            firma.majatek -= dane.sprzet[nazwa]["ceny"][str(q)]
+            st_trwale.zmniejsz_majatek(firma, dane.sprzet[nazwa]["ceny"][str(q)])
         st_trwale.sprzedaj(firma, sr_nazwa, ksiega)
         opis = sr_nazwa
     wycena = round(wartosc * u["wycena_zastawu"], 2)

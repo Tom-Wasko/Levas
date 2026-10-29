@@ -4,9 +4,10 @@ import copy
 import math
 
 import pytest
-from pomocnicze import _gra
+from pomocnicze import _gra, _lokal, _runda
 
-from silnik.model import PozyczkaHarpagona
+from silnik.ksiegowosc import srodki_trwale as st_trwale
+from silnik.model import PozyczkaHarpagona, SrodekTrwaly
 from silnik.wyniki import karta as kw
 
 WSKAZNIKI = ("wynik_ekonomiczny", "zadowolenie_pracownikow", "zadowolenie_klientow", "rozwoj_firmy", "wskaznik_zadluzenia")
@@ -23,10 +24,12 @@ def gra_botow():
 def test_karta_kebabowa_w_grze(gra_botow):
     g, s = gra_botow
     p = g.dane.z["karta_wynikow"]["kebab"]
+    waga = g.dane.z["karta_wynikow"]["strata"]["waga"]
     for r in range(2, 6):
         for n, w in s.wyniki[r].items():
             k, kk = w["karta"], w["karta_kebab"]
-            iloczyn = math.prod(k[x] for x in WSKAZNIKI) if k["wynik_ekonomiczny"] >= 0 else 0.0
+            iloczyn = (math.prod(k[x] for x in WSKAZNIKI) if k["wynik_ekonomiczny"] >= 0
+                       else waga * k["wynik_ekonomiczny"])   # Z1: strata – ujemny wynik bez wskaźników
             assert k["wynik_dzialalnosci"] == pytest.approx(iloczyn, abs=2e-3), (r, n)
             m = kk["miary"]
             assert 0 <= m["kolejki"] <= 1 and 0 <= m["brakujace_dania"] <= 1 and m["lokale"] == 1
@@ -106,3 +109,56 @@ def test_karta_skumulowana_i_widok(gra_botow):
             sum(s.wyniki[r][n]["karta"]["zadowolenie_klientow"] for r in range(2, 6)) / 4, abs=1e-3)
     v = widok(g, "Tani")
     assert v["wyniki"]["karta_kebab"]["miary"] and v["dzielnik_karty"] == g.dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]
+
+
+def test_strata_daje_ujemny_wynik_niezalezny_od_wskaznikow(gra_botow):
+    # Z1: wynik proporcjonalny do straty; przy tej samej stracie lepsze wskaźniki nie dają gorszego wyniku
+    dane = gra_botow[0].dane
+    dz, waga = dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"], dane.z["karta_wynikow"]["strata"]["waga"]
+    for strata in (0.1, 2.0, 5.0):
+        slabe = kw.karta(dane, -strata * dz, 0.4, 0.5, 0.6, 0.5)["wynik_dzialalnosci"]
+        dobre = kw.karta(dane, -strata * dz, 1.2, 1.1, 1.0, 1.0)["wynik_dzialalnosci"]
+        assert dobre >= slabe and dobre == pytest.approx(-strata * waga, abs=1e-3)
+    assert kw.karta(dane, -5 * dz, 1, 1, 1, 1)["wynik_dzialalnosci"] < kw.karta(dane, -dz, 1, 1, 1, 1)["wynik_dzialalnosci"]
+    assert kw.karta(dane, 0.0, 1, 1, 1, 1)["wynik_dzialalnosci"] == 0
+
+
+def test_majatek_karty_po_amortyzacji_z_lokalem_i_budynkiem(gra_botow):
+    g, s = gra_botow
+    f = copy.deepcopy(s.firmy["Zrown"])
+    f.majatek, f.umorzenie_majatku = 20000, 0
+    f.srodki_trwale = [SrodekTrwaly(nazwa="Lokal: a", rodzaj="lokal", wartosc=300000, od_rundy=1, stawka=0.025,
+                                    umorzenie=1000),
+                       SrodekTrwaly(nazwa="Budynek: b", rodzaj="budynek", wartosc=100000, od_rundy=1, stawka=0.025),
+                       SrodekTrwaly(nazwa="Stanowiska", rodzaj="sprzet", wartosc=12000, od_rundy=1, stawka=0.2)]
+    assert kw.majatek_karty(f) == 20000 + 299000 + 100000   # sprzęt z ewidencji jest już w sumie inwestycji
+    st_trwale.amortyzuj_majatek(g.dane, f, 20000)
+    odpis = round(20000 * g.dane.z["finanse"]["amortyzacja_roczna"]["sprzet"] / g.dane.rund_w_roku, 2)
+    assert f.umorzenie_majatku == odpis and kw.majatek_karty(f) == pytest.approx(419000 - odpis)
+    st_trwale.zmniejsz_majatek(f, 5000)                   # sprzedaż ćwiartki – umorzenie maleje w tej proporcji
+    assert f.majatek == 15000 and f.umorzenie_majatku == pytest.approx(0.75 * odpis, abs=0.01)
+    # w grze majątek do karty maleje co rundę bez nowych zakupów
+    assert all(x.umorzenie_majatku > 0 for x in s.firmy.values() if x.majatek > 0)
+
+
+def test_odkup_sprzetu_nie_pompuje_rozwoju(gra_botow):
+    dane = gra_botow[0].dane
+    def roz(majatek, kupione, sprzedane, szczyt):
+        return kw.rozwoj_firmy(dane, majatek, kupione, 0, 1, None, sprzedane, 20000, szczyt)
+    nic = roz(20000, 0, 0, 20000)
+    nowy = roz(25000, 5000, 0, 20000)
+    odkup = roz(25000, 5000, 0, 25000)                    # ten sam sprzęt był już w majątku – sprzedany i odkupiony
+    assert nowy > odkup == roz(25000, 0, 0, 25000) > nic
+    assert roz(25000, 5000, 0, 22000) == roz(25000, 3000, 0, 20000)   # liczy się tylko część ponad szczyt
+    assert roz(15000, 0, 5000, 20000) < roz(15000, 0, 0, 20000)       # sprzedaż dalej obniża rozwój
+
+
+def test_odsetki_harpagona_obnizaja_karte():
+    g = _gra(("A", None), ("B", None))
+    _runda(g, A={**_lokal("centrum_3"), "harpagon_wez": 10000}, B=_lokal("dworzec_1"))
+    s = _runda(g)
+    w = s.wyniki[2]["A"]
+    odsetki = w["harpagon"]["odsetki"]["odsetki"]
+    assert odsetki > 0
+    dz = g.dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]
+    assert w["karta"]["wynik_ekonomiczny"] == pytest.approx((w["kpir"]["dochod_netto"] - odsetki) / dz, abs=1e-3)

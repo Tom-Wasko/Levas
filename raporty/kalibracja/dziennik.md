@@ -61,3 +61,31 @@ wpis na dole.
     zmienia charakter strategii, a nie tylko jedną decyzję. W B4 czytać warianty strategii z podziałem na
     konteksty (sekcje raportu).
 - Dalej: Z1–Z7, potem B3 (część do pomiaru) i B4.
+
+## Z1 – karta wyników (29.10.2026, Claude Code, Opus 5.5)
+- **Strata:** wynik działalności = `strata.waga` × wynik ekonomiczny. Nowy parametr
+  `karta_wynikow → strata → waga` = 1,0 (założenie). Nie mnoży się przez wskaźniki, więc przy tej samej stracie
+  wynik od nich nie zależy. Do sprawdzenia w B5/B6: czy strata na rozruchu nie waży za dużo wobec zysku, który
+  mnoży się przez wskaźniki (iloczyn zwykle < 1).
+- **Majątek do karty:** `karta.majatek_karty`, czyli suma inwestycji po amortyzacji puli plus kupione lokale,
+  budynki i grunt z ewidencji (netto).
+  - Tańsze zakupy (< 10 tys. zł, czyli prawie cały sprzęt i wyposażenie) idą od razu w koszty i nie trafiają do
+    ewidencji. Dlatego suma inwestycji ma własne umorzenie `Firma.umorzenie_majatku`.
+  - Odpis liniowy według stawki sprzętu, od sumy sprzed rundy (`srodki_trwale.amortyzuj_majatek`).
+  - Przy sprzedaży umorzenie maleje proporcjonalnie (`zmniejsz_majatek`, pięć miejsc sprzedaży).
+  - Ten majątek trafia też do wskaźnika zadłużenia.
+- **Odkup:** zakupy podnoszą rozwój tylko ponad `Firma.szczyt_majatku` – najwyższą sumę inwestycji po cenach
+  zakupu z minionych rund. Sprzedaż dalej obniża rozwój.
+  - Zakup lokalu nie jest „inwestycją” w rozwoju (jak dotąd); podnosi tylko majątek. Inaczej jeden zakup za
+    300 tys. zł dałby rozwój ×4 w jednym tygodniu.
+- **Harpagon:** odsetki z rundy obniżają dochód do karty (`runda._netto_karty`). KPiR się nie zmienia.
+- Testy:
+  - nowe w `testy/wyniki/test_karta.py`: strata, majątek po amortyzacji z lokalem i budynkiem, odkup, odsetki
+    Harpagona;
+  - zmienione: `test_karta_kebabowa_w_grze` (oczekiwany wynik przy stracie) i `test_wynik_ekonomiczny` w
+    `test_mechaniki.py` (strata daje −10 × waga zamiast 0).
+- Tekst dla gracza: `INSTRUKCJA.md` §3 i podpowiedź karty w `ogolne.js`. Propozycja do notatki „Ustalenia gry”:
+  `notatki_do_zmiany.md`.
+- Zmienia wyniki gier (odcisk inny, celowo).
+- `balans/warianty.py`: karta to teraz średnia z rund 2..N, jak w definicji z planu (w punkcie zero była suma
+  rund, czyli Δ karta ×17; kolejność firm i oceny wariantów bez zmian).

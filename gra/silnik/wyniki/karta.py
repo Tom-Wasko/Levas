@@ -1,11 +1,13 @@
 """Karta wyników: 5 wskaźników i wynik działalności (iloczyn). Wzory i parametry: dane/zalozenia.yaml → karta_wynikow.
 
 - wynik ekonomiczny = dochód netto / 20 000 (potwierdzone na 7 rundach gry ATH),
-- wynik działalności = iloczyn wskaźników; 0, gdy wynik ekonomiczny < 0,
+- wynik działalności = iloczyn wskaźników; przy stracie (Z1) ujemny, proporcjonalny do straty i bez mnożenia
+  przez wskaźniki (lepsza obsługa nie pogłębia minusa); odsetki Harpagona (poza KPiR) obniżają dochód do karty,
 - zadowolenie pracowników – skalibrowane na 17 kartach (gra A/B/C online z 6 miejscami + ATH; błąd średni 0,0006),
 - zadowolenie klientów – skalibrowane na 17 kartach (błąd LOO 0,024): liczba usług (efekt rośnie do 6 usług),
   cena względem średniej rynku, utracona sprzedaż z poprzedniego miesiąca, wyposażenie,
-- rozwój firmy – przybliżenie (niska pewność),
+- rozwój firmy – przybliżenie (niska pewność); majątek po amortyzacji z kupionymi lokalami, budynkami i gruntem,
+  odkup do najwyższej dawnej sumy inwestycji nie jest inwestycją (Z1),
 - wskaźnik zadłużenia – 1 bez kredytu (założenie dla wzoru z kredytem).
 Kalibracja: kalibracja/kalibracja_online.py.
 
@@ -20,6 +22,14 @@ import math
 from ..dane import Dane
 
 EPS = 1e-9
+NIERUCHOMOSCI = ("lokal", "budynek", "grunt")   # rodzaje środków trwałych poza sumą inwestycji firmy
+
+
+def majatek_karty(f) -> float:
+    """Majątek do karty (Z1): suma inwestycji po amortyzacji + kupione lokale, budynki i grunt z ewidencji
+    środków trwałych (wartość netto)."""
+    nieruchomosci = sum(s.wartosc - s.umorzenie for s in f.srodki_trwale if s.rodzaj in NIERUCHOMOSCI)
+    return round(f.majatek - f.umorzenie_majatku + nieruchomosci, 2)
 
 
 def zadowolenie_klientow(dane: Dane, liczba_uslug: int, cena_wzgledem_rynku: float, utracona_poprzednio: float,
@@ -48,13 +58,19 @@ def zadowolenie_pracownikow(dane: Dane, placa_wzgledna: float, sprzet_gwiazdki: 
 
 
 def rozwoj_firmy(dane: Dane, majatek: float, inwestycje: float, przyrost: int, uslugi_i_pracownicy: int,
-                 poprzedni: float | None, sprzedany_majatek: float = 0.0, majatek_przed: float | None = None) -> float:
-    """majatek – po cenach zakupu, po odjęciu sprzedanego; inwestycje netto = zakupy − wartość sprzedanego, odniesione do
-    majątku sprzed miesiąca (co najmniej skala) – analiza_od_nowa.py: 21 kart (ATH 11 mies., A/B/C), LOO 0,106."""
+                 poprzedni: float | None, sprzedany_majatek: float = 0.0, majatek_przed: float | None = None,
+                 szczyt: float | None = None) -> float:
+    """majatek – majątek do karty (majatek_karty); inwestycje netto = zakupy − wartość sprzedanego (po cenach zakupu),
+    odniesione do sumy inwestycji sprzed miesiąca (co najmniej skala) – analiza_od_nowa.py: 21 kart (ATH 11 mies.,
+    A/B/C), LOO 0,106. Z1: zakupy liczą się tylko ponad `szczyt` – najwyższą sumę inwestycji z minionych rund, więc
+    sprzedaż i odkup tego samego sprzętu nie pompują rozwoju."""
     p = dane.z["karta_wynikow"]["rozwoj_firmy"]
     if majatek_przed is not None and "inwestycje_netto" in p:
+        netto = inwestycje - sprzedany_majatek
+        if szczyt is not None and netto > 0:
+            netto = min(netto, max(0.0, majatek_przed + netto - szczyt))
         return round(p["stala"] + p["majatek"] * math.log1p(max(0.0, majatek) / p["majatek_skala"])
-                     + p["inwestycje_netto"] * (inwestycje - sprzedany_majatek) / max(majatek_przed, p["majatek_skala"]), 3)
+                     + p["inwestycje_netto"] * netto / max(majatek_przed, p["majatek_skala"]), 3)
     x = (p["majatek"] * math.log1p(majatek / p["majatek_skala"]) + p["inwestycje_wzgledne"] * inwestycje / max(majatek, 1)
          + p["przyrost_uslug_i_pracownikow"] * przyrost / max(uslugi_i_pracownicy, 1))
     if poprzedni is not None:
@@ -73,7 +89,8 @@ def wskaznik_zadluzenia(dlug: float, majatek: float, skumulowany_dochod: float) 
 
 def karta(dane: Dane, dochod_netto: float, zk: float, zp: float, roz: float, zad: float) -> dict:
     we = round(dochod_netto / dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"], 3)
-    wd = round(we * zp * zk * roz * zad, 3) if we >= 0 else 0.0
+    # strata (Z1): ujemny wynik proporcjonalny do straty, bez wskaźników – lepsze wskaźniki nie pogłębiają minusa
+    wd = round(we * zp * zk * roz * zad, 3) if we >= 0 else round(we * dane.z["karta_wynikow"]["strata"]["waga"], 3)
     return {"wynik_dzialalnosci": wd, "wynik_ekonomiczny": we, "zadowolenie_pracownikow": zp,
             "zadowolenie_klientow": zk, "rozwoj_firmy": roz, "wskaznik_zadluzenia": zad}
 
@@ -134,7 +151,7 @@ def kebab(dane: Dane, f, w: dict, netto: float, zadluzenie_bankowe: float) -> di
     zp = max(0.0, k["zadowolenie_pracownikow"] + sum(sp.values())) if k["zadowolenie_pracownikow"] else 0.0
     roz = max(0.0, k["rozwoj_firmy"] + sum(sr.values()))
     dlug = zadluzenie_bankowe + p["wskaznik_zadluzenia"]["waga_harpagona"] * m["dlug_harpagona"]
-    zad = wskaznik_zadluzenia(dlug, f.majatek, f.skumulowany_dochod_netto)
+    zad = wskaznik_zadluzenia(dlug, majatek_karty(f), f.skumulowany_dochod_netto)
     skladniki["wskaznik_zadluzenia"] = {"dlug_harpagona": zad - k["wskaznik_zadluzenia"]}
     w["karta"] = karta(dane, netto, round(zk, 3), round(zp, 3), round(roz, 3), zad)
     return {"miary": m, "skladniki": {s: {x: round(y, 4) for x, y in d.items() if abs(y) > EPS}

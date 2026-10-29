@@ -47,14 +47,24 @@ Na końcu liczy się **wynik działalności** z karty wyników, sumowany przez w
 
 | Składnik | Co mierzy | Jak go poprawić |
 |---|---|---|
-| Wynik ekonomiczny | Dochód netto tygodnia | Sprzedawać więcej i z sensowną marżą, pilnować kosztów |
+| Wynik ekonomiczny | Dochód netto tygodnia (minus odsetki Harpagona) | Sprzedawać więcej i z sensowną marżą, pilnować kosztów |
 | Zadowolenie klientów | Czy klienci są zadowoleni | Rozsądne ceny, dobra jakość, szersze menu, nikt nie odchodzi z kolejki |
 | Zadowolenie pracowników | Czy załodze dobrze się pracuje | Uczciwe pensje, dobry sprzęt, udogodnienia, szkolenia |
-| Rozwój firmy | Czy firma inwestuje | Sprzęt, wyposażenie, kolejne lokale |
+| Rozwój firmy | Czy firma inwestuje i ile jest warta | Nowy sprzęt i wyposażenie, kupione lokale, kolejne lokale |
 | Wskaźnik zadłużenia | Jaką część firmy finansuje bank | Nie żyć na kredycie dłużej, niż trzeba |
 
-Iloczyn działa bezlitośnie: **tydzień ze stratą daje wynik 0**, a słaby jeden składnik ciągnie w dół wszystkie
-pozostałe. Lepiej być dobrym we wszystkim niż genialnym w jednym.
+Iloczyn działa bezlitośnie: słaby jeden składnik ciągnie w dół wszystkie pozostałe. Lepiej być dobrym we
+wszystkim niż genialnym w jednym.
+
+**Tydzień ze stratą daje wynik ujemny** – tym niższy, im większa strata (proporcjonalnie do wyniku ekonomicznego,
+bez mnożenia przez pozostałe składniki). Mała strata na rozruchu kosztuje mało, duża – dużo.
+
+Kilka zasad, które warto znać:
+- **Odsetki Harpagona** nie trafiają do KPiR, ale karta je widzi: obniżają wynik ekonomiczny tak jak koszty.
+- **Majątek traci na wartości.** Sprzęt i wyposażenie liczą się w rozwoju firmy po amortyzacji, a kupiony lokal,
+  budynek i działka – według ewidencji środków trwałych.
+- **Sprzedaż i odkup to nie inwestycja.** Rozwój podnoszą tylko zakupy ponad najwyższą wartość majątku, jaką
+  firma już miała. Sprzedaż sprzętu obniża rozwój, a odkupienie go potem nie daje nic ekstra.
 
 ## 4. Tydzień 1 – przygotowanie lokalu (1–7 września)
 

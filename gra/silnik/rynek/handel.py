@@ -333,7 +333,7 @@ def _wykonaj(dane: Dane, firmy: dict[str, Firma], sprzedawca: str, kupujacy: str
     st_trwale.sprzedaj(s, f"{o.nazwa} ({o.stanowisko} {o.nr})", ks_s)
     ksieguj(s, ks_s, rach_s, f"Sprzedaż sprzętu: {o.nazwa} dla drużyny {nazwa(k)}", o.cena, "przychod_pozostaly",
             stawka=stawka)
-    s.majatek -= dane.sprzet[o.nazwa]["ceny"][str(q)]   # majątek po cenie zakupu (jak przy sprzedaży sprzętu)
+    st_trwale.zmniejsz_majatek(s, dane.sprzet[o.nazwa]["ceny"][str(q)])   # po cenie zakupu, jak sprzedaż sprzętu
     cel.sprzet[o.nazwa] = q
     st_trwale.zakup(dane, k, ks_k, rach_k, f"Koszt zakupu: {o.nazwa} od drużyny {nazwa(s)}",
                     f"{o.nazwa} ({cel.typ} {cel.nr})", "sprzet", o.cena, runda)

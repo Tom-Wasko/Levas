@@ -29,7 +29,7 @@ from .ksiegowosc.finanse import (
     wyrownaj_gotowke,
     zadluzenie,
 )
-from .ksiegowosc.srodki_trwale import amortyzuj, ewidencja
+from .ksiegowosc.srodki_trwale import amortyzuj, amortyzuj_majatek, ewidencja
 from .ksiegowosc.uzgodnienie import uzgodnij
 from .kuchnia import magazyn as mag
 from .kuchnia import menu
@@ -219,6 +219,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                               + sum(wy[n]["utrzymanie"] for n in f.wyposazenie)))
         lk.koszty_rundy(dane, f, r, ks, rach, s.firmy)
         amortyzuj(dane, f, r, ks)
+        amortyzuj_majatek(dane, f, info[nazwa]["majatek_przed"])
         # wynajęta chłodnia i kontrola sanepidu (silnik/kuchnia/magazyn.py)
         info[nazwa]["magazyn"] = mag.koniec_rundy(dane, f, r, ziarno, (strefowy or {}).get("swiezosc", {}).get(nazwa) or {},
                                                   ks, rach, urz.modyfikatory(dane, f, r))
@@ -292,7 +293,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             mag.dolicz_oddane(strefowy["swiezosc"][nazwa], (info[nazwa].get("zdarzenia") or {}).get("oddane"))
             _straty_w_zasobach(w["zasoby"], strefowy["swiezosc"][nazwa]["straty"])
         if "karta" in w and f.lokale:   # składniki kebabowe karty – po zebraniu wyników tygodnia
-            w["karta_kebab"] = kw.kebab(dane, f, w, netto, zadluzenie(f))
+            w["karta_kebab"] = kw.kebab(dane, f, w, _netto_karty(netto, info[nazwa]), zadluzenie(f))
             f.rozwoj_poprzedni = w["karta"]["rozwoj_firmy"]
 
     for f in s.firmy.values():   # właściciel na stanowisku – tylko w tej rundzie
@@ -413,10 +414,16 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
 
     # karta wyników
     if r >= 2:
-        w["karta"] = _karta(dane, f, r, sprzedaz, info, start, netto)
+        w["karta"] = _karta(dane, f, r, sprzedaz, info, start, _netto_karty(netto, info))
+    f.szczyt_majatku = max(f.szczyt_majatku, f.majatek)
     f.poprzednio_uslug = len(f.oferta)
     f.poprzednio_pracownikow = len(f.pracownicy)
     return w
+
+
+def _netto_karty(netto: float, info: dict) -> float:
+    """Dochód netto do karty: odsetki Harpagona (poza KPiR) obniżają wynik jak koszty (Z1)."""
+    return round(netto - ((info.get("harpagon_odsetki") or {}).get("odsetki") or 0.0), 2)
 
 
 def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict, netto: float) -> dict:
@@ -449,10 +456,12 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
                                     zmiany if r > 2 else 0.0) if prac else 0.0
 
     przyrost = max(0, len(f.oferta) - f.poprzednio_uslug) + max(0, len(f.pracownicy) - f.poprzednio_pracownikow)
-    roz = kw.rozwoj_firmy(dane, f.majatek, info["inwestycje"], przyrost, len(f.oferta) + len(f.pracownicy),
-                          f.rozwoj_poprzedni, info.get("sprzedany_majatek", 0.0), info.get("majatek_przed"))
+    maj = kw.majatek_karty(f)
+    roz = kw.rozwoj_firmy(dane, maj, info["inwestycje"], przyrost, len(f.oferta) + len(f.pracownicy),
+                          f.rozwoj_poprzedni, info.get("sprzedany_majatek", 0.0), info.get("majatek_przed"),
+                          f.szczyt_majatku)
     f.rozwoj_poprzedni = roz
-    zad = kw.wskaznik_zadluzenia(zadluzenie(f), f.majatek, f.skumulowany_dochod_netto)
+    zad = kw.wskaznik_zadluzenia(zadluzenie(f), maj, f.skumulowany_dochod_netto)
     return kw.karta(dane, netto, zk, zp, roz, zad)
 
 

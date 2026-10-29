@@ -172,8 +172,9 @@ def _majatek(w: dict) -> float:
 
 
 def miary(s, rund: int) -> dict:
-    karty = {n: sum(s.wyniki[r][n].get("karta", {}).get("wynik_dzialalnosci", 0)
-                    for r in range(1, rund + 1)) for n in s.firmy}
+    # karta skumulowana (plan): średni wynik działalności z rund 2..N, jak ranking mistrza gry
+    karty = {n: sum(s.wyniki[r][n]["karta"]["wynik_dzialalnosci"] for r in range(2, rund + 1))
+             / max(1, rund - 1) for n in s.firmy}
     ws = [s.wyniki[r][BADANA] for r in range(1, rund + 1)]
     plus = next((r for r, w in enumerate(ws, 1) if w["kpir"]["dochod_netto"] > 0), rund + 1)
     # alarm = debet ponad limit konta (plan; po Z3 – pole alarm w wynikach)
@@ -322,7 +323,7 @@ def raport(katalog: Path) -> str:
     czas = sum(float(g["czas_s"]) for g in gry)
     tekst = [f"# Pomiar wariantów: {katalog.name}", "",
              f"{len(gry)} gier, {len(lista)} par, {len(konteksty)} kontekstów, czas gier "
-             f"{czas / 60:.0f} min (suma procesów). Karta = suma wyników działalności z rund gry. "
+             f"{czas / 60:.0f} min (suma procesów). Karta = średni wynik działalności z rund 2..N. "
              f"Ocena: „lepszy”/„gorszy” – ≥ {DOMINACJA:.0%} wygranych par i przedział bez zera; "
              "„szum” – reszta.", "", "## Wszystkie konteksty", "", NAGLOWEK]
     tekst += [_wiersz(w, podsumuj([p for p in lista if p["wariant"] == w])) for w in warianty]
