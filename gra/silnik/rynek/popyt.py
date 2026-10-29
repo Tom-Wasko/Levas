@@ -122,13 +122,15 @@ def mnoznik_zadowolenia(dane: Dane, zadowolenie: float | None) -> float:
     return (zadowolenie / m["zadowolenie_odniesienie"]) ** m["zadowolenie_wykladnik"]
 
 
-def atrakcyjnosc(dane: Dane, strefa_klienta: str, usluga: str, o: dict) -> float:
+def atrakcyjnosc(dane: Dane, strefa_klienta: str, usluga: str, o: dict, jakosc: float | None = None) -> float:
     """o: {"strefa", "cena" (po rabacie), "jakosc": (p, s, z), "wyposazenie", "reklama", "mnoznik_firmy", "zadowolenie",
-    "reklama_strefy": {strefa klienta: ułamek} – kampanie agencji reklamowych firmy}."""
+    "reklama_strefy": {strefa klienta: ułamek} – kampanie agencji reklamowych firmy}; jakosc – gotowy mnożnik
+    jakości dania (menu.jakosc_dania), gdy liczony raz dla wielu stref."""
     p = dane.mapa["popyt"]
     ps = p["strefy"][strefa_klienta]
     r = o["cena"] / (dane.uslugi[usluga]["cena_preferowana"] * ps["cena"])
-    return (menu.jakosc_dania(dane, o["jakosc"]) * math.exp(-p["model"]["elastycznosc_ceny"] * ps["wrazliwosc_ceny"] * (r - 1))
+    q = menu.jakosc_dania(dane, o["jakosc"]) if jakosc is None else jakosc
+    return (q * math.exp(-p["model"]["elastycznosc_ceny"] * ps["wrazliwosc_ceny"] * (r - 1))
             * math.exp(-odleglosc(dane, strefa_klienta, o["strefa"]) / p["model"]["zasieg"])
             * o.get("zadowolenie", 1.0) * o.get("wyposazenie", 1.0) * o.get("mnoznik_firmy", 1.0)
             * (1 + o.get("reklama", 0.0) + (o.get("reklama_strefy") or {}).get(strefa_klienta, 0.0)))
@@ -146,10 +148,11 @@ def podzial(dane: Dane, pule_rundy: dict, oferty: dict[str, dict[tuple[str, str]
     a0 = dane.mapa["popyt"]["model"]["opcja_zewnetrzna"]
     wynik: dict = {}
     for u, lokale in oferty.items():
+        jakosc = {k: menu.jakosc_dania(dane, o["jakosc"]) for k, o in lokale.items()}   # nie zależy od strefy
         for z, pz in pule_rundy.items():
             a = {}
             for k, o in lokale.items():
-                a[k] = atrakcyjnosc(dane, z, u, o)
+                a[k] = atrakcyjnosc(dane, z, u, o, jakosc[k])
                 for e in _promocje_strefy(o, z):
                     a[k] = a[k] * (1 + e["przyciaganie"] * e["maska"])
             mianownik = a0 + sum(a.values())
