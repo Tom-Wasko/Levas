@@ -494,6 +494,12 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
                   + ", ".join(dane.uslugi[u]["nazwa"] for u in rundy["uslugi_startowe"]) + ".")
     if przyrost > limit or (d.get("oferta") and set(d["oferta"]) - set(firma.oferta)):
         dodaj("czerwony", "oferta", f"W tej rundzie liczba dań może wzrosnąć najwyżej o {limit} – nadmiarowe nie zostały dodane.")
+    if not firma.oferta:   # bez dań w rundzie 1 runda 2 mija bez sprzedaży (nowe dania dopiero od nowe_uslugi_od_rundy)
+        od = rundy["nowe_uslugi_od_rundy"]
+        dodaj("czerwony", "oferta", "Menu jest puste – wybierz dania w zakładce Menu. W rundzie 2 sprzedajesz tylko dania "
+              f"wybrane w rundzie 1, nowe można dodać od rundy {od}." if runda == 1
+              else f"Menu jest puste – w tej rundzie nic nie sprzedasz. Nowe dania dodasz od rundy {od}." if runda < od
+              else "Menu jest puste – wybierz dania w zakładce Menu.")
     if not firma.bank and not d.get("bank"):
         dodaj("czerwony", "finanse_bank", "Nie wybrano banku.")
     if not firma.biuro and not d.get("biuro"):

@@ -132,3 +132,15 @@ def test_cena_poza_widelkami_rynku_odrzucona():
     s = _runda(g, A={"sprzedaz": {"kebab_w_bulce": {"cena": 25, "rabat": 20}}})    # po rabacie 5 zł
     assert s.firmy["A"].ceny["kebab_w_bulce"].cena == 25 and s.firmy["A"].ceny["kebab_w_bulce"].rabat == 0
     assert any("za niska" in t and "Zostaje poprzednia cena" in t for t in _teksty(s.wyniki[3]["A"]["lista_bledow"], "oferta"))
+
+
+def test_puste_menu(gra_botow):
+    """Bez dań w rundzie 1 runda 2 mija bez sprzedaży – czerwony błąd przypomina o wyborze dań."""
+    dane, f, r = _firma(gra_botow)
+    od = dane.katalog_ofert["rundy"]["nowe_uslugi_od_rundy"]
+    assert not any(t.startswith("Menu jest puste") for t in _teksty(lista_bledow(dane, f, {}, r, list(f.oferta))))
+    f.oferta = {}
+    for runda, tekst in ((1, "W rundzie 2 sprzedajesz tylko dania wybrane w rundzie 1"), (2, "nic nie sprzedasz"),
+                         (od, "wybierz dania w zakładce Menu")):
+        b = [b for b in lista_bledow(dane, f, {}, runda, []) if b["tekst"].startswith("Menu jest puste")]
+        assert len(b) == 1 and b[0]["poziom"] == "czerwony" and b[0]["zakladka"] == "oferta" and tekst in b[0]["tekst"]
