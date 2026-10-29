@@ -2,34 +2,38 @@
 
 # Plan optymalizacji – kroki 5–6
 
-Zastępuje plan implementacji (`archiwum/Plan implementacji.md`, kroki 1–4 zrobione 28.10.2026). Wykonuje go OpenCode (modele Opus 5.5 high albo Fable 5.1). Zasady pracy w repozytorium są w `AGENTS.md`, szczegółowe instrukcje dla sesji w `zadania/`, a gotowe polecenia do wklejenia w `zadania/README.md`. Postęp (checkboxy) jest w `POSTEP.md`, a nie w tej notatce.
+Zastępuje plan implementacji (`archiwum/Plan implementacji.md`, kroki 1–4 zrobione 28.10.2026). Część B wykonuje Claude Code albo OpenCode (Opus 5.5), część A – Fable 5.1 w OpenCode. Zasady pracy w repozytorium są w `AGENTS.md`, szczegółowe instrukcje dla sesji w `zadania/`, a gotowe polecenia do wklejenia w `zadania/README.md`. Postęp (checkboxy) jest w `POSTEP.md`, a nie w tej notatce.
 
 Ustalenia z autorem: 28.10.2026 (cele), 29.10.2026 (odpowiedzi na pytania z przeglądu planu, wycena lokalu w majątku netto, inwestor ratunkowy, czas pomiarów – wpisane poniżej).
 
 ## Kolejność
-Sesje idą **po kolei**, nie równolegle: część A działa na dzisiejszych botach i zasadach, a B od kroku B3 je zmienia.
+Sesje idą **po kolei**, nie równolegle. Zmiana z 29.10.2026: najpierw pierwsza część B (do B5 włącznie), potem część A, a na końcu kalibracja obszarów. Dzięki temu A ocenia grę już po zmianach zasad i z docelową trudnością, czyli tę, w którą zagrają uczniowie, a uwagi z A trafiają do gry **przed** strojeniem obszarów (każda nowa mechanika zmienia balans, więc nic nie trzeba kalibrować dwa razy).
 
-1. **Część A – analiza oczami gracza** (Fable 5.1, `zadania/A_analiza_gracza.md`). Kod się nie zmienia, powstaje tylko raport z propozycjami.
-2. **B1 – inwentarz decyzji** i hipotezy „za dobrych” strategii (z raportu A).
-3. **B2 – narzędzie porównań**, profilowanie silnika i wymuszanie decyzji bota.
-4. **Z – zmiany zasad** ustalone z autorem (niżej): karta wyników, majątek netto, debet ponad limit z alarmem i inwestorem, liczba lokali zależna od liczby firm, bot „jak człowiek”, kalendarz do kwietnia 2026.
-5. **B3 – boty**, tylko część potrzebna do pomiaru, oraz monotoniczność poziomów: łatwy < średni < trudny.
-6. **B4 – pomiar startowy** i tag w git `kalibracja-start` (punkt odniesienia „przed”).
-7. **STOP – decyzja autora.** Autor czyta raport z A i pomiar startowy. Zatwierdzone pozycje z A trafiają do `POSTEP.md` jako U1, U2… i są wdrażane **przed** kalibracją obszarów, których dotyczą, bo każda nowa mechanika zmienia balans.
-8. **B5 – gospodarka i trudność.** Zmienione liczby czekają na **zatwierdzenie autora** przed dalszą pracą, bo od nich zależy cała reszta.
-9. **B6–B12 – obszar po obszarze.** Przed każdym obszarem dokończyć tę część B3, która go dotyczy (boty muszą umieć użyć badanych opcji).
-10. **B13 – karta wyników**: tylko wagi składowych (wzory zmienia już krok Z), potem szybki pomiar wszystkich obszarów.
-11. **B14 – boty po kalibracji** i sprawdzenie, że cele trudności z B5 nadal są spełnione.
-12. **B15 – raport końcowy.**
+1. **B1 – inwentarz decyzji** i hipotezy „za dobrych” strategii (z czytania kodu i gier botów; hipotezy z raportu A dochodzą w kroku 9).
+2. **B2 – narzędzie porównań**, profilowanie silnika i wymuszanie decyzji bota.
+3. **Z – zmiany zasad** ustalone z autorem (niżej): karta wyników, majątek netto, debet ponad limit z alarmem i inwestorem, liczba lokali zależna od liczby firm, bot „jak człowiek”, kalendarz do kwietnia 2026.
+4. **B3 – boty**, tylko część potrzebna do pomiaru, oraz monotoniczność poziomów: łatwy < średni < trudny.
+5. **B4 – pomiar startowy** i tag w git `kalibracja-start` (punkt odniesienia „przed”). Podsumowanie dla autora, potem od razu B5.
+6. **B5 – gospodarka i trudność.** Zmienione liczby czekają na **zatwierdzenie autora**, bo od nich zależy cała reszta. **Część A czeka na to zatwierdzenie.**
+7. **Część A – analiza oczami gracza** (Fable 5.1 w OpenCode, `zadania/A_analiza_gracza.md`) na `main` po zatwierdzonym B5. Kod się nie zmienia, powstaje tylko raport z propozycjami. Raport z B4 Fable czyta dopiero po rozegraniu gier, przed pisaniem raportu.
+8. **STOP – decyzja autora.** Autor czyta raport z A i wybiera pozycje do wdrożenia. Trafiają do `POSTEP.md` jako U1, U2…
+9. **U – wdrożenie uwag z A**, każda pozycja z testem, commitem i pushem. „Za dobre” strategie z raportu A dopisać do inwentarza B1 jako hipotezy dla B6–B12.
+10. **K – kontrola po U**: szybki pomiar wszystkich obszarów i celów trudności z B5. Jeśli U zepsuło cele trudności, poprawić liczby z B5 (**do zatwierdzenia przez autora**); nowe dominacje w obszarach zostają dla B6–B12.
+11. **B6–B12 – obszar po obszarze.** Przed każdym obszarem dokończyć tę część B3, która go dotyczy (boty muszą umieć użyć badanych opcji).
+12. **B13 – karta wyników**: tylko wagi składowych (wzory zmienia już krok Z), potem szybki pomiar wszystkich obszarów.
+13. **B14 – boty po kalibracji** i sprawdzenie, że cele trudności z B5 nadal są spełnione.
+14. **B15 – raport końcowy.**
 
 ## Część A – analiza oczami gracza (krok 6)
+Gra na wersji po B1–B5: zasady Z1–Z7 są już wdrożone, a gospodarka ma zatwierdzone liczby z B5. A ocenia też nowe zasady (karta ze stratą, majątek netto, alarm i inwestor, bot „jak człowiek”) – czy są zrozumiałe dla ucznia i nauczyciela.
+
 - **A1 – przygotowanie.** Przeczytać instrukcję gracza, notatki i kod zakładek, a potem uruchomić grę.
 - **A2 – rozgrywka.** Trzy pełne gry (18 rund, z botami), każda jako inna persona:
   - uczeń-nowicjusz bez wiedzy o firmach i księgowości;
   - ambitny gracz szukający luk i najlepszej strategii (Optymalizator); swoje strategie ocenia kartą wyników skumulowaną (średnia rund 2..N, jak ranking) i majątkiem netto na koniec, a nie samą gotówką;
   - nauczyciel jako mistrz gry, który prowadzi grę z kilkoma drużynami „uczniów” o zaplanowanych błędach (np. drużyna bez zamówień, drużyna w debecie, drużyna bez deklaracji) i sprawdza, czy panel `/mg/` pozwala te problemy zauważyć i omówić.
 
-  W każdej rundzie trzeba obejrzeć to, co widzi gracz, i prowadzić dziennik wrażeń.
+  W każdej rundzie trzeba obejrzeć to, co widzi gracz, i prowadzić dziennik wrażeń. Raport z pomiaru startowego (`raporty/kalibracja/stan_poczatkowy.md`) i dziennik kalibracji czytać dopiero po grach – żeby nie stracić spojrzenia z zewnątrz, a w raporcie nie powtarzać znalezionych już dominacji, tylko wskazać różnice.
 - **A3 – raport** `raporty/analiza_gracza.md`. Zawiera:
   - problemy (z dowodami);
   - propozycje zmian istniejących elementów;
@@ -95,7 +99,7 @@ Ustalone z autorem 29.10.2026. Każda zmiana ma test w `testy/`.
   - czy boty jej używają;
   - **zamierzony kompromis**, czyli kiedy dana opcja powinna wygrywać.
 
-  Do tego lista hipotez „za dobrych” strategii (z raportu A i z czytania kodu) do sprawdzenia w B4. To kompas kalibracji: kompromisy zapisuje się przed strojeniem.
+  Do tego lista hipotez „za dobrych” strategii (z czytania kodu i gier botów) do sprawdzenia w B4; hipotezy z raportu A dopisuje się w kroku U i sprawdza w B6–B12. To kompas kalibracji: kompromisy zapisuje się przed strojeniem.
 - **B2 – narzędzie porównań** `gra/balans/warianty.py` z testami. Rozgrywa pary gier: ta sama gra, ziarno i rywale, a badana firma różni się tylko jedną decyzją (wymuszoną w decyzjach bota). Wymagania:
   - wiele ziaren (≥ 30 w pełnym pomiarze) i różne konteksty: strategia bazowa, długość gry, strefa, liczba firm (4/6/8);
   - obliczenia równoległe; najpierw profilowanie silnika, żeby wiedzieć, ile gier da się rozegrać. Punkt wyjścia (29.10.2026, laptop autora, 6 rdzeni): gra 18 rund liczy się w ok. 3,5 s przy 4 firmach, 5 s przy 6 i 6,5 s przy 8, więc para gier na 6 firm to ok. 10 s, a na 5 procesach ok. 300 par w 10 minut. Gra bazowa (bez wymuszonej decyzji) jest wspólna dla wszystkich wariantów z tym samym ziarnem i rywalami – liczyć ją raz;
@@ -111,6 +115,7 @@ Ustalone z autorem 29.10.2026. Każda zmiana ma test w `testy/`.
   - wpływ liczby firm (4/6/8);
   - tabelę realiów: nasze liczby wobec orientacyjnych widełek z rzeczywistości.
 - **B5 – gospodarka i trudność.** Popyt (pule stref, dni tygodnia, elastyczność ceny, jakość), koszty niezależne od prawa (czynsz, pensje ponad płacę minimalną, składniki) i kapitał startowy, tak żeby spełnić cele trudności. **Wynik do zatwierdzenia przez autora.**
+- **K – kontrola po U.** Po wdrożeniu uwag z A szybki pomiar wszystkich obszarów i celów trudności (pierwszy plus, alarmy, wersje bota „jak człowiek”) wobec wyniku B5. Wynik w dzienniku; zmiana liczb B5 tylko za zgodą autora.
 - **B6 – lokale.** Typ (gotowy, niewyposażony, działka) × forma (najem, kupno) × strefa, do tego licytacje i przejęcia.
 - **B7 – menu i ceny.** Dania, marże, widełki 50–200% i promocje.
 - **B8 – zaopatrzenie.** Dostawcy, gwiazdki, świeżość, magazyn i chłodnia, automatyczne zamawianie, handel między drużynami.

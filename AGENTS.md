@@ -12,7 +12,7 @@ Levas to edukacyjna symulacja biznesowa dla uczniów i studentów. Gra się tak:
 
 W grze biorą udział boty o 5 strategiach i 4 poziomach. Levas powstał z kopii gry REVAS (klub fitness), przebudowanej na kebab i rozbudowanej o nowe mechaniki.
 
-**Stan (29.10.2026):** kroki 1–4 są zrobione (cała gra grywalna). Teraz kolej na kroki 5–6: analizę (A) i kalibrację (B) według `notatki/Plan optymalizacji.md` – sesje po kolei, najpierw A. Zadania i postęp są w `POSTEP.md`, instrukcje dla sesji w `zadania/` (polecenia do wklejenia: `zadania/README.md`).
+**Stan (29.10.2026):** kroki 1–4 są zrobione (cała gra grywalna). Teraz kolej na kroki 5–6: kalibrację (B) i analizę (A) według `notatki/Plan optymalizacji.md` – sesje po kolei: B1–B5, potem A, uwagi z A (U), kontrola K i B6–B15. Zadania i postęp są w `POSTEP.md`, instrukcje dla sesji w `zadania/` (polecenia do wklejenia: `zadania/README.md`).
 
 ## Mapa repozytorium
 ```

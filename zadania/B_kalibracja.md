@@ -1,6 +1,6 @@
 # Zadanie B – kalibracja i balans (krok 5)
 
-Wykonawca: **Opus 5.5 (high)** albo **Fable 5.1** w OpenCode. Najpierw przeczytaj `AGENTS.md`, potem `notatki/Plan optymalizacji.md`. Cele, definicje (karta skumulowana, majątek netto, pierwszy plus, alarm), kolejność, zmiany zasad Z1–Z7, zadania B1–B15 i kryteria „zbalansowania” są tam i obowiązują. Zaczynasz dopiero po zakończeniu części A.
+Wykonawca: **Opus 5.5** w Claude Code albo OpenCode (lub Fable 5.1). Najpierw przeczytaj `AGENTS.md`, potem `notatki/Plan optymalizacji.md`. Cele, definicje (karta skumulowana, majątek netto, pierwszy plus, alarm), kolejność, zmiany zasad Z1–Z7, zadania B1–B15 i kryteria „zbalansowania” są tam i obowiązują. Kolejność od 29.10.2026: B1–B5 **przed** częścią A, potem A (Fable), wdrożenie uwag U, kontrola K i B6–B15.
 
 ## Twoja rola
 Jesteś projektantem systemów gry i analitykiem danych. Masz dostroić wszystkie parametry i funkcje Levasa tak, żeby:
@@ -11,7 +11,7 @@ Jesteś projektantem systemów gry i analitykiem danych. Masz dostroić wszystki
 Balans jest ważniejszy od realizmu, ale realizm nie może być rażąco złamany.
 
 ## Od czego zacząć sesję
-1. Otwórz `POSTEP.md` i znajdź pierwsze nieodhaczone zadanie w kolejności z planu: B1, B2, Z1–Z7, B3 (część do pomiaru), B4, potem U (jeśli autor je zatwierdził) i B5–B15. Po B4 **zatrzymaj się** i poczekaj na decyzję autora o raporcie z A; po B5 poczekaj na zatwierdzenie liczb gospodarki.
+1. Otwórz `POSTEP.md` i znajdź pierwsze nieodhaczone zadanie w kolejności z planu: B1, B2, Z1–Z7, B3 (część do pomiaru), B4, B5; potem – po części A i wyborze autora – U, K i B6–B15. Po B4 daj autorowi podsumowanie i od razu rób B5. Po B5 **zatrzymaj się** i poczekaj na zatwierdzenie liczb gospodarki (część A też na nie czeka). B6–B15 zaczynasz dopiero po U i K.
 2. Przeczytaj `raporty/kalibracja/dziennik.md`. To twoja pamięć między sesjami. Po każdym kroku zapisuj w nim: co zmierzono, co zmieniono, co wyszło i co dalej.
 3. Jeśli istnieje `raporty/analiza_gracza.md`, przeczytaj sekcję „za dobre strategie”. To gotowe tropy dominacji.
 
@@ -20,6 +20,9 @@ To nowe mechaniki ustalone z autorem – nie pytaj o nie ponownie. Rozstrzygnię
 
 ## Testy i zamrożone dane
 Pierwszy krok B2: testy mechanik, które sprawdzają liczby co do grosza (ok. 140 asercji), przełącz na **zamrożoną kopię danych** `gra/testy/dane_zamrozone/` (kopia `gra/dane/` z dnia startu kalibracji). Testy zasad (determinizm, brak liczb w kodzie, schematy, uzgodnienie kasy, boty grają bez błędów) zostają na `gra/dane/`. Dzięki temu zmiana liczby w YAML nie łamie testów wzorów, a łamie testy zasad, gdy coś się naprawdę zepsuje.
+
+## Kontrola po U (K)
+Po wdrożeniu uwag z A (U1, U2…): szybki pomiar wszystkich obszarów i celów trudności z B5 (pierwszy plus bota „jak człowiek” średniego, wersja słaba bez alarmu, wersja dobra wyraźnie wygrywa). Porównaj z wynikiem B5 w dzienniku. Jeśli cele trudności się rozjechały, zaproponuj poprawkę liczb B5 i poczekaj na zgodę autora. Nowe dominacje w obszarach zapisz jako hipotezy w inwentarzu – zajmiesz się nimi w B6–B12. „Za dobre” strategie z raportu A dopisz do inwentarza w kroku U.
 
 ## Metoda (dla każdego obszaru B5–B13)
 0. **Boty.** Dokończ tę część B3, która dotyczy obszaru: boty muszą umieć wybrać każdą badaną opcję.

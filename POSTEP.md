@@ -269,19 +269,11 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 - [x] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
 - [x] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)
 
-## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
-
-Pierwsza sesja; gra na dzisiejszych zasadach i botach. Kolejność całości i polecenia: `zadania/README.md`.
-
-- [ ] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry
-- [ ] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/`
-- [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
-
-## Krok 5 – kalibracja (Plan optymalizacji, część B; instrukcja: `zadania/B_kalibracja.md`)
+## Krok 5 – kalibracja, część pierwsza: B1–B5 (Plan optymalizacji, część B; instrukcja: `zadania/B_kalibracja.md`)
 
 Po każdym: testy, ruff, `sprawdz`, wpis w `raporty/kalibracja/dziennik.md`, POSTEP, commit, `git pull --rebase` i push.
-Kolejność: B1, B2, Z1–Z7, B3 (część do pomiaru), B4, **STOP** (autor: raport z A → U), B5 (**zatwierdza autor**),
-B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
+Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4, B5 (**zatwierdza autor**), potem część A,
+**STOP** (autor wybiera pozycje U), U, K, B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
 
 - [ ] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz
 - [ ] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md, wznawianie pełnego pomiaru) z testami; szybki pomiar „punkt zero” na dzisiejszych zasadach
@@ -300,13 +292,23 @@ B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
 
 - [ ] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru; przed B4 – część do pomiaru i poziomy łatwy < średni < trudny
 - [ ] B4 Pomiar startowy: dominacje, hipotezy z B1, krzywa trudności, strategie, 4/6/8 firm, realia (`raporty/kalibracja/stan_poczatkowy.md`); tag `kalibracja-start`
-- [ ] **STOP:** autor czyta raport z A i pomiar startowy, wybiera pozycje U
+- [ ] B5 Gospodarka i trudność (popyt, koszty poza prawem, kapitał; pierwszy plus bota „jak człowiek” średniego w rundzie 4–6) – **do zatwierdzenia przez autora; część A czeka na zatwierdzenie**
+
+## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
+
+Fable 5.1 w OpenCode, po zatwierdzeniu B5; gra na wersji po zmianach zasad Z i gospodarce z B5. Polecenia: `zadania/README.md`.
+
+- [ ] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry
+- [ ] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/`
+- [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
+- [ ] **STOP:** autor czyta raport z A i wybiera pozycje U
 
 ## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
 
-## Kalibracja obszarów
+- [ ] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu
 
-- [ ] B5 Gospodarka i trudność (popyt, koszty poza prawem, kapitał; pierwszy plus bota „jak człowiek” średniego w rundzie 4–6) – **do zatwierdzenia przez autora**
+## Krok 5 – kalibracja, część druga: obszary B6–B15
+
 - [ ] B6 Lokale (typ × forma × strefa, licytacje, przejęcia)
 - [ ] B7 Menu i ceny (dania, marże, widełki, promocje)
 - [ ] B8 Zaopatrzenie (dostawcy, gwiazdki, świeżość, magazyn, auto-zamawianie, handel)
