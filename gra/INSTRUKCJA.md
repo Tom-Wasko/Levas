@@ -113,7 +113,7 @@ roku akademickiego i wydarzeń w mieście (sesja, Halloween, jarmark, mecze). Kl
 - **odległości** – sąsiednie strefy też przychodzą, ale mniej chętnie,
 - **zadowolenia** – firmy, z której klienci wyszli zadowoleni, wracają chętniej.
 - **renomy lokalu** – nowy lokal dopiero zdobywa stałych bywalców: w pierwszym tygodniu sprzedaży
-  przychodzi mniej więcej połowa klientów, co tydzień więcej, aż po kilku tygodniach lokal jest „znany”.
+  przychodzi niecała połowa klientów, co tydzień więcej, aż po kilku tygodniach lokal jest „znany”.
   Tak samo jest z każdym kolejnym lokalem – zaplanuj na start mniejszą obsadę i zamówienia.
 
 Dwa lokale w jednej strefie dzielą tych samych klientów, a część ludzi i tak zje u konkurencji spoza gry albo

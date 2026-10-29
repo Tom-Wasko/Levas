@@ -265,7 +265,7 @@ wpis na dole.
   tego nie stroić bez zgody – w B5 kalibruję na 6 firmach.
 - Dalej: B5 od razu (gospodarka i trudność), potem stop do zatwierdzenia.
 
-## B5 – gospodarka i trudność (29.10.2026, Claude Code, Opus 5.5) – **czeka na zatwierdzenie autora**
+## B5 – gospodarka i trudność (29.10.2026, Claude Code, Opus 5.5) – zatwierdzone przez autora
 - Pomiary: `pomiary/b5_trudnosc` (6 poziomów × 5 strategii × 20 ziaren, 6 firm, 18 rund, rywale średni),
   `b5_firmy` (4 i 8 firm), `b5_dlugosc` (12 i 26 rund), `b5_szybki` (regresja wariantów). Porównanie z B4:
   `b4_trudnosc`, `b4_firmy_trudnosc`, `b4_dlugosc`. Szukanie liczb: skrypt par na kopii `dane/`
@@ -321,5 +321,8 @@ wpis na dole.
      „Ustaleń gry” w `notatki_do_zmiany.md`.
   2. Czy zatwierdzić pule stref ×0,9 i regułę zakupów bota?
   3. Strategia agresywna zostaje „pułapką” do B6–B12 – czy tak może być?
+- **Odpowiedzi autora (29.10.2026): 4 × tak** – rozruch nowego lokalu zostaje, pule ×0,9 i zakupy bota
+  w budżecie zatwierdzone, strategia agresywna zostaje do B6–B12, przy 4 firmach gra może być łatwiejsza
+  (popyt nie zależy od liczby firm; pytanie z B4 zamknięte).
 - Testy: nowe `test_rozruch_nowego_lokalu` (`testy/rynek/test_popyt.py`) i
   `test_zakupy_dodatkowe_bota_zostawiaja_bufor_gotowki` (`testy/rdzen/test_boty.py`). Inne testy bez zmian.
