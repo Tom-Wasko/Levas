@@ -1,6 +1,6 @@
 # Menu i świeżość w grze z lokalami: jakość dania, wyłączanie dań bez składnika
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: 'Menu w grze z lokalami (krok F3a.5, silnik/menu.py; terminy i przechowywanie składników – zasoby.yaml, pojemność
+opis: 'Menu w grze z lokalami (krok F3a.5, silnik/kuchnia/menu.py; terminy i przechowywanie składników – zasoby.yaml, pojemność
   chłodni i zamrażarki – sprzet.yaml). Jakość dania = średnia ważona współczynników gwiazdek składników, kucharzy
   i sprzętu (wagi niżej; współczynniki gwiazdek – zalozenia.yaml). Danie, któremu rano brakuje składnika (i jego
   zamiennika), jest wyłączone do następnej dostawy: zmiana_dania jego klientów bierze inne danie z menu lokalu

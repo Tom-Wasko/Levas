@@ -1,4 +1,4 @@
-# Losowe wypadki w lokalu i ubezpieczyciel (F3b.5, silnik/awarie.py) – rzadkie historie tylko jednej drużyny
+# Losowe wypadki w lokalu i ubezpieczyciel (F3b.5, silnik/swiat/awarie.py) – rzadkie historie tylko jednej drużyny
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Od rundy zasady.od_rundy każda drużyna z działającym lokalem ma co rundę szansę zasady.szansa, że w lokalu
   zacznie się wypadek – historia w 2–4 scenach (format jak w parki.yaml, bez pola park). Naraz najwyżej jeden

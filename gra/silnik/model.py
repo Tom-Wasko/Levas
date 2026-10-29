@@ -94,7 +94,7 @@ WLASCICIEL = "wlasciciel"   # id właściciela na stanowisku (nie ma go w Firma.
 
 class WlascicielNaStanowisku(Model):
     """Właściciel sam staje na wolnym stanowisku w tej rundzie (P5): pracownik 1★ bez pensji, godziny z puli
-    czasu właściciela (silnik/czas_wlasciciela.py)."""
+    czasu właściciela (silnik/ludzie/czas_wlasciciela.py)."""
     typ: str
     nr: int
     godziny: float
@@ -114,7 +114,7 @@ class Stanowisko(Model):
 
 
 class OfertaHandlu(Model):
-    """Oferta sprzedaży innej drużynie (silnik/handel.py): wystawiona w rundzie `runda`, do przyjęcia w następnej."""
+    """Oferta sprzedaży innej drużynie (silnik/rynek/handel.py): wystawiona w rundzie `runda`, do przyjęcia w następnej."""
     id: str
     do: str                       # drużyna adresat
     typ: str                      # "towar" albo "sprzet"
@@ -141,7 +141,7 @@ class Lokal(Model):
     czynsz_gr: int = 0            # miesięczny (najem)
     kaucja_gr: int = 0
     cena_gr: int = 0              # cena zakupu (kupno)
-    # przejęcie budynku przez inną drużynę (silnik/przejecia.py): najem trwa dalej, czynsz idzie do właściciela
+    # przejęcie budynku przez inną drużynę (silnik/nieruchomosci/przejecia.py): najem trwa dalej, czynsz idzie do właściciela
     wlasciciel: str | None = None
     najem_do: int | None = None   # po wypowiedzeniu: ostatnia runda najmu
     ulepszenia: str | None = None # rozliczenie nakładów po wypowiedzeniu: "zatrzymaj" | "przywroc" (KC art. 676)
@@ -154,7 +154,7 @@ class Lokal(Model):
 
 
 class KupionyBudynek(Model):
-    """Budynek kupiony razem z najemcą – inną drużyną (silnik/przejecia.py); po końcu najmu – lokal właściciela."""
+    """Budynek kupiony razem z najemcą – inną drużyną (silnik/nieruchomosci/przejecia.py); po końcu najmu – lokal właściciela."""
     id: str                       # id lokalu z mapy
     od_rundy: int
     cena_gr: int
@@ -164,7 +164,7 @@ class KupionyBudynek(Model):
 
 
 class Partia(Model):
-    """Dostawa składnika w grze z lokalami (silnik/swiezosc.py): zużywana od najkrótszego terminu (FIFO)."""
+    """Dostawa składnika w grze z lokalami (silnik/kuchnia/swiezosc.py): zużywana od najkrótszego terminu (FIFO)."""
     zasob: str
     jakosc: int
     ilosc: float                  # opakowania (pozostało)
@@ -184,7 +184,7 @@ class Lokata(Model):
     oprocentowanie: float
     od_rundy: int
     miesiecy: int
-    bank: str = ""                # gra z lokalami: bank lokaty (silnik/banki.py)
+    bank: str = ""                # gra z lokalami: bank lokaty (silnik/pieniadze/banki.py)
 
     kwota = _kwota("kwota")
 
@@ -196,7 +196,7 @@ class Kredyt(Model):
     od_rundy: int
     miesiecy: int
     pozostalo_gr: int             # dług do spłaty (z zaległymi ratami kapitałowymi i doliczonymi odsetkami)
-    bank: str = ""                # gra z lokalami (silnik/banki.py): bank, produkt i zastaw
+    bank: str = ""                # gra z lokalami (silnik/pieniadze/banki.py): bank, produkt i zastaw
     produkt: str = ""             # "start" | "inwestycyjny" | "obrotowy"
     zastaw: str = ""              # "lokal:<id>" | "sprzet:<typ>:<nr>:<nazwa>"
     zalegle: int = 0              # rund z rzędu bez zapłaconej raty
@@ -208,7 +208,7 @@ class Kredyt(Model):
 
 
 class Leasing(Model):
-    """Sprzęt w leasingu (gra z lokalami, silnik/banki.py): na stanowisku, ale własność banku do wykupu."""
+    """Sprzęt w leasingu (gra z lokalami, silnik/pieniadze/banki.py): na stanowisku, ale własność banku do wykupu."""
     id: int
     bank: str
     typ: str
@@ -229,7 +229,7 @@ class Leasing(Model):
 
 
 class PozyczkaHarpagona(Model):
-    """Pożyczka od lichwiarza Harpagona (gra z lokalami, silnik/lichwiarz.py) – poza KPiR."""
+    """Pożyczka od lichwiarza Harpagona (gra z lokalami, silnik/pieniadze/lichwiarz.py) – poza KPiR."""
     kwota_gr: int
     dlug_gr: int                      # kapitał + naliczone odsetki
     od_rundy: int
@@ -243,7 +243,7 @@ class PozyczkaHarpagona(Model):
 
 
 class RozliczenieJDG(Model):
-    """Stan rozliczeń jednoosobowej działalności (gra z lokalami, silnik/rozliczenie.py) – narastająco od startu gry."""
+    """Stan rozliczeń jednoosobowej działalności (gra z lokalami, silnik/ksiegowosc/rozliczenie.py) – narastająco od startu gry."""
     vat_nadwyzka_gr: int = 0          # nadwyżka VAT naliczonego do przeniesienia na następną rundę
     dochod_gr: int = 0                # dochód z KPiR narastająco (straty pomniejszają)
     zdrowotna_odliczona_gr: int = 0   # zapłacona zdrowotna odliczona od dochodu (do limitu rocznego)
@@ -280,7 +280,7 @@ class SrodekTrwaly(Model):
 
 
 class OtwartaHistoria(Model):
-    """Ciąg dalszy historii z eventu w parku (silnik/zdarzenia.py) – scena czeka na swoją rundę."""
+    """Ciąg dalszy historii z eventu w parku (silnik/swiat/zdarzenia.py) – scena czeka na swoją rundę."""
     historia: str
     scena: str
     runda: int
@@ -290,7 +290,7 @@ class OtwartaHistoria(Model):
 
 class Efekt(Model):
     """Skutek eventu trwający kilka rund: mnożnik popytu, godziny właściciela mniej albo dodatek do szansy kontroli
-    sanepidu (silnik/zdarzenia.py, silnik/urzad.py)."""
+    sanepidu (silnik/swiat/zdarzenia.py, silnik/ksiegowosc/urzad.py)."""
     typ: str                      # "popyt" | "czas" | "kontrola"
     wartosc: float                # mnożnik, godziny albo szansa
     od_rundy: int
@@ -299,7 +299,7 @@ class Efekt(Model):
 
 
 class Kampania(Model):
-    """Kampania agencji reklamowej (silnik/reklama.py): trwa rundy od_rundy–do_rundy, potem wygasa."""
+    """Kampania agencji reklamowej (silnik/rynek/reklama.py): trwa rundy od_rundy–do_rundy, potem wygasa."""
     agencja: str
     kanal: str
     strefa: str | None            # None – zasięg „miasto”
@@ -310,7 +310,7 @@ class Kampania(Model):
 
 
 class Promocja(Model):
-    """Promocja z listy (silnik/promocje.py): trwa od rundy od_rundy, dopóki drużyna jej nie wyłączy."""
+    """Promocja z listy (silnik/rynek/promocje.py): trwa od rundy od_rundy, dopóki drużyna jej nie wyłączy."""
     typ: str
     nazwa: str                    # ozdobna nazwa drużyny – bez wpływu na wynik
     danie: str | None = None      # zakres „danie”
@@ -346,18 +346,18 @@ class Firma(Model):
     harpagon: PozyczkaHarpagona | None = None
     historie: list[OtwartaHistoria] = Field(default_factory=list)   # eventy w parkach: ciągi dalsze
     efekty: list[Efekt] = Field(default_factory=list)
-    wypadki: dict[str, int] = Field(default_factory=dict)   # wypadki w lokalu (silnik/awarie.py): id → runda początku
+    wypadki: dict[str, int] = Field(default_factory=dict)   # wypadki w lokalu (silnik/swiat/awarie.py): id → runda początku
     polisy: dict[str, int] = Field(default_factory=dict)    # polisy ubezpieczyciela: rodzaj → runda początku ochrony
-    higiena: str | None = None    # poziom higieny lokali (silnik/urzad.py); None – domyślny z danych
+    higiena: str | None = None    # poziom higieny lokali (silnik/ksiegowosc/urzad.py); None – domyślny z danych
     odbiory: dict[str, int] = Field(default_factory=dict)   # lokal → runda odbioru przez sanepid
-    portfel_gr: int | None = None   # prywatny portfel właściciela (silnik/wlasciciel.py); None – oszczędności z danych
-    zaproszenia: list[int] = Field(default_factory=list)    # rundy z otwartym klubem (silnik/kasyno.py)
-    oferty_handlu: list[OfertaHandlu] = Field(default_factory=list)   # wystawione innym drużynom (silnik/handel.py)
+    portfel_gr: int | None = None   # prywatny portfel właściciela (silnik/pieniadze/wlasciciel.py); None – oszczędności z danych
+    zaproszenia: list[int] = Field(default_factory=list)    # rundy z otwartym klubem (silnik/pieniadze/kasyno.py)
+    oferty_handlu: list[OfertaHandlu] = Field(default_factory=list)   # wystawione innym drużynom (silnik/rynek/handel.py)
     wlasciciel_na: WlascicielNaStanowisku | None = None   # tylko w trakcie rundy (silnik/decyzje.py)
     kampanie: list[Kampania] = Field(default_factory=list)          # agencje reklamowe (gra z lokalami)
     promocje: list[Promocja] = Field(default_factory=list)          # promocje z listy (gra z lokalami)
     rozliczenie: RozliczenieJDG = Field(default_factory=RozliczenieJDG)   # JDG – gra z lokalami
-    deklaracja: dict | None = None    # samodzielna księgowość: dokumenty i poprawne kwoty rundy (silnik/biuro.py)
+    deklaracja: dict | None = None    # samodzielna księgowość: dokumenty i poprawne kwoty rundy (silnik/ksiegowosc/biuro.py)
     kredyt_odnawialny_gr: int = 0
     majatek_gr: int = 0               # suma inwestycji (sprzęt, stanowiska, udogodnienia, wyposażenie) – rozwój firmy
     rozwoj_poprzedni: float | None = None

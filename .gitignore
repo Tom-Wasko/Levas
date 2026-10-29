@@ -8,3 +8,4 @@ gra/lokalne.json
 *.sqlite3
 **/.obsidian/workspace*.json
 gra/narzedzia/
+.hypothesis/

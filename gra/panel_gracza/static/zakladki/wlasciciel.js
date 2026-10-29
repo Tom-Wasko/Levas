@@ -1,4 +1,4 @@
-// Portfel właściciela (gra z lokalami, silnik/wlasciciel.py): wypłata własna z firmy i wpłata własna do firmy – poza KPiR.
+// Portfel właściciela (gra z lokalami, silnik/pieniadze/wlasciciel.py): wypłata własna z firmy i wpłata własna do firmy – poza KPiR.
 // Decyzje `wyplata_wlasna` i `wplata_wlasna` (kwoty); kolejność: wypłata → wydatki prywatne → wpłata.
 import { esc, okno, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
 

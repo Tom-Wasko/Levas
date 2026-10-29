@@ -3,26 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from silnik import awarie as aw
-from silnik import banki as bk
-from silnik import biuro as bo
-from silnik import czas_wlasciciela as cw
-from silnik import handel as hd
 from silnik import harmonogram as hm
-from silnik import kalendarz as kl
-from silnik import kasyno as kas
-from silnik import konkurencja as kn
-from silnik import lichwiarz as lw
-from silnik import magazyn as mag
-from silnik import promocje as pm
-from silnik import przejecia as pr
-from silnik import reklama as rk
-from silnik import rozliczenie as rz
-from silnik import rynek_pracy as rp
-from silnik import swiezosc
-from silnik import urzad as urz
-from silnik import wlasciciel as wl
-from silnik import zdarzenia as zd
 from silnik.dane import Dane
 from silnik.decyzje import (
     cena_sprzedazy_sprzetu,
@@ -31,11 +12,21 @@ from silnik.decyzje import (
     lista_bledow,
     zastosuj,
 )
-from silnik.dostawcy import ceny_rundy, oferta_rundy
-from silnik.dostawcy import info as info_dostawcy
-from silnik.finanse import Ksiega, Rachunek
 from silnik.gra import Gra
-from silnik.lokale import (
+from silnik.ksiegowosc import biuro as bo
+from silnik.ksiegowosc import rozliczenie as rz
+from silnik.ksiegowosc import urzad as urz
+from silnik.ksiegowosc.finanse import Ksiega, Rachunek
+from silnik.ksiegowosc.srodki_trwale import ewidencja
+from silnik.kuchnia import magazyn as mag
+from silnik.kuchnia import swiezosc
+from silnik.kuchnia.dostawcy import ceny_rundy, oferta_rundy
+from silnik.kuchnia.dostawcy import info as info_dostawcy
+from silnik.ludzie import czas_wlasciciela as cw
+from silnik.ludzie import rynek_pracy as rp
+from silnik.model import Firma, do_slownika
+from silnik.nieruchomosci import przejecia as pr
+from silnik.nieruchomosci.lokale import (
     dostepne,
     komunikat_odpoczynku,
     koszt_wejscia,
@@ -44,10 +35,19 @@ from silnik.lokale import (
     wybierz,
     zajete,
 )
-from silnik.model import Firma, do_slownika
-from silnik.popyt import widok_popytu
-from silnik.srodki_trwale import ewidencja
-from silnik.wnioski import wnioski
+from silnik.pieniadze import banki as bk
+from silnik.pieniadze import kasyno as kas
+from silnik.pieniadze import lichwiarz as lw
+from silnik.pieniadze import wlasciciel as wl
+from silnik.rynek import handel as hd
+from silnik.rynek import kalendarz as kl
+from silnik.rynek import konkurencja as kn
+from silnik.rynek import promocje as pm
+from silnik.rynek import reklama as rk
+from silnik.rynek.popyt import widok_popytu
+from silnik.swiat import awarie as aw
+from silnik.swiat import zdarzenia as zd
+from silnik.wyniki.wnioski import wnioski
 
 
 def _firma_slownik(f: Firma) -> dict:

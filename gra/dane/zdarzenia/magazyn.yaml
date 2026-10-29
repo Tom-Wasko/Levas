@@ -1,4 +1,4 @@
-# Magazyn w grze z lokalami (zmiana 26.10, silnik/magazyn.py): teksty kontroli sanepidu i historia „bank żywności”
+# Magazyn w grze z lokalami (zmiana 26.10, silnik/kuchnia/magazyn.py): teksty kontroli sanepidu i historia „bank żywności”
 # Liczby kontroli (szansa, mandat, spadek popytu) i wynajmu chłodni – zalozenia.yaml, sekcja magazyn
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Kontrola sanepidu: tekst losowany z listy (kontrola bez zastrzeżeń albo z mandatem – {kwota} to kwota mandatu,

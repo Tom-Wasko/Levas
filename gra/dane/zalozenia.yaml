@@ -2,7 +2,7 @@
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Parametry mechanik gry, których nie widać wprost w grze REVAS. Każdy ma: wartosc, pewnosc (potwierdzone /
   skalibrowane / zalozenie) i zrodlo. Zmiana tu zmienia działanie silnika bez zmian w kodzie. Kalibracje: revas_gra/kalibracja/*.py,
-  opis: WIEDZA_O_GRZE.md.'
+  opis: dokumentacja/WIEDZA_O_GRZE.md.'
 popyt:
   elastycznosc_ceny:
     wartosc: 1.096
@@ -295,7 +295,7 @@ karta_wynikow:
         waga_harpagona: 1.5
     pewnosc: zalozenie
     zrodlo: 'F4.1, notatka „Ustalenia gry” (karta wyników): w grze z lokalami wskaźniki Revasa dostają składniki kebabowe
-      (silnik/karta.py → kebab). Zadowolenie klientów: cena względem ceny preferowanej strefy lokalu (zamiast średniej
+      (silnik/wyniki/karta.py → kebab). Zadowolenie klientów: cena względem ceny preferowanej strefy lokalu (zamiast średniej
       rynku), brakujące dania = udział dań-dni wyłączonych z braku składnika, kolejki = udział klientów utraconych w tym
       tygodniu z braku rąk lub sprzętu (czas obsługi), kontrola sanepidu z mandatem, każdy wypadek w lokalu. Zadowolenie
       pracowników: przepracowanie = średnia nadwyżka wykorzystania czasu ponad próg. Rozwój: każdy kolejny lokal i przyrost
@@ -366,7 +366,7 @@ lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
     pewnosc: zalozenie
     zrodlo: 'F4.2: ostrzeżenie o składniku, który przy prognozie popytu przeterminuje się przed użyciem, dopiero od tej
       wartości straty w tygodniu (drobne resztki nie zaśmiecają listy błędów; PRACA_NOCNA, pyt. 23)'
-wnioski:   # gra z lokalami (Q13): zakładka „Wnioski z rundy” – od jakich progów pojawia się rada (silnik/wnioski.py)
+wnioski:   # gra z lokalami (Q13): zakładka „Wnioski z rundy” – od jakich progów pojawia się rada (silnik/wyniki/wnioski.py)
   utracona:
     wartosc: 0.1
     pewnosc: zalozenie

@@ -1,5 +1,5 @@
 // Dostawcy: zakup składników i magazyn (bez zwrotów). Zamówienie ma dzień dostawy (świeżość – zakładka
-// „Magazyn i świeżość”, silnik/swiezosc.py), a dostawcy mają swoje zasady (silnik/dostawcy.py: zasady_dostaw):
+// „Magazyn i świeżość”, silnik/kuchnia/swiezosc.py), a dostawcy mają swoje zasady (silnik/kuchnia/dostawcy.py: zasady_dostaw):
 // dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
 import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
 

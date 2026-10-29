@@ -20,7 +20,7 @@
   </header>
   <nav class="menu" id="menu"></nav>
   <main class="scena"><div class="karta" id="karta"><div class="ladowanie">Wczytywanie…</div></div></main>
-  <div class="stopka">Levas – symulacja lokalu z kebabem na wzór REVAS · mechaniki i założenia: WIEDZA_O_GRZE.md, dane/*.yaml</div>
+  <div class="stopka">Levas – symulacja lokalu z kebabem na wzór REVAS · mechaniki i założenia: dokumentacja/WIEDZA_O_GRZE.md, dane/*.yaml</div>
   {{ id|json_script:"id-gry" }}{{ firma|json_script:"id-firmy" }}{{ mg|json_script:"mg" }}{{ konto.login|json_script:"login" }}
   <script>window.GRA = JSON.parse(document.getElementById("id-gry").textContent); window.FIRMA = JSON.parse(document.getElementById("id-firmy").textContent); window.MG = JSON.parse(document.getElementById("mg").textContent); window.KONTO = JSON.parse(document.getElementById("login").textContent);</script>
   <script type="module" src="/static/app.js"></script>

@@ -21,21 +21,32 @@ POSTEP.md            lista zadań z checkboxami (F/P/Q – zrobione; A, U, B –
 zadania/             instrukcje dla sesji: A_analiza_gracza.md, B_kalibracja.md
 raporty/             wyniki analiz i kalibracji (tworzysz tu pliki)
 notatki/             notatki projektowe autora (Obsidian) – NIE zmieniaj bez zgody (niżej)
-ROZNICE_LEVAS_STARY.md  co było w starej wersji Levasa – źródło pomysłów
-archiwum/            zakończone dzienniki prac
+dokumentacja/        tło: WIEDZA_O_GRZE.md (oryginalny REVAS: karta wyników, mechaniki),
+                     ROZNICE_LEVAS_STARY.md (stara wersja Levasa – źródło pomysłów)
+archiwum/            zakończone plany i dzienniki prac (Plan implementacji – tylko do odczytu)
 plan.txt             prywatny plik autora – nie commituj, nie zmieniaj
 gra/
   silnik/            silnik gry: czysty Python (pydantic, numpy), bez Django
+    *.py             rdzeń: gra, runda, decyzje, co_jesli, dane, schematy, model, losowosc,
+                     harmonogram, limity, boty
+    kuchnia/         menu, jakosc, operacje, planowanie, dostawcy, magazyn, swiezosc
+    rynek/           popyt, konkurencja, kalendarz, reklama, promocje, handel
+    ludzie/          rynek_pracy, kandydaci, czas_wlasciciela
+    nieruchomosci/   lokale, przejecia
+    ksiegowosc/      finanse (KPiR, rachunek), rozliczenie, uzgodnienie, biuro, urzad, srodki_trwale
+    pieniadze/       banki, lichwiarz (Harpagon), kasyno, wlasciciel, zaleglosci
+    swiat/           zdarzenia, awarie
+    wyniki/          karta, wnioski
   dane/              WSZYSTKIE liczby gry w YAML (mapa/, zdarzenia/, kalendarz/, zalozenia.yaml, boty.yaml…)
   api/               Django: widoki JSON; prezentacja.py buduje widok `v` dla zakładek
   panel_gracza/      strony gracza; static/zakladki/*.js – zakładki (moduły ES, rejestr w index.js)
   panel_mg/          panel mistrza gry (/mg/)
   gry/, konta/       modele Django (gry w SQLite), konta i logowanie
   balans/symuluj.py  symulacja gier botów (balans poziomów)
-  testy/             pytest (test_*.py)
+  testy/             pytest: podfoldery jak podpakiety silnika (rdzen/, kuchnia/, rynek/…) i aplikacja/
+                     (API, panele, konta); wspólne funkcje pomocnicze w pomocnicze.py
   README.md          uruchomienie, opis rozgrywki, słownik nazw kod → gra (usługa = danie itd.)
   INSTRUKCJA.md      instrukcja dla graczy (w grze: /jak-grac, szablon panel_gracza/templates/…/jak_grac.html)
-  WIEDZA_O_GRZE.md   wiedza o oryginalnym REVAS (karta wyników, mechaniki) – tło
 ```
 
 ## Uruchomienie na nowym komputerze
@@ -59,7 +70,7 @@ Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
 ## Jak działa silnik
 - `silnik/gra.py` – `Gra.nowa(nazwa, [(firma, strategia_bota|None)], liczba_rund, ziarno, **opcje)`. Opcje to między innymi `poziomy`, `kapital_startowy`, `ceny_dostawcow`, `kredyt_odnawialny` i `auto_zamowienia`. Gra ma metody `ustaw_decyzje(firma, decyzje)`, `wyslij`, `przelicz(wymus=True)`, `stan(r)` i `wyniki`. Boty dostają decyzje z `silnik/boty.py: decyzje_bota` w `Gra.przelicz`.
 - `silnik/decyzje.py` – **format decyzji** (docstring na górze) i ich zastosowanie. `silnik/runda.py` – przebieg tygodnia.
-- Wyniki rundy są w `stan.wyniki[runda][firma]`: `karta`, `kpir`, `sprzedaz` (popyt, sprzedaż, utracona sprzedaż, przyczyna), `magazyn`, `lista_bledow` i tak dalej. Karta wyników jest w `silnik/karta.py`.
+- Wyniki rundy są w `stan.wyniki[runda][firma]`: `karta`, `kpir`, `sprzedaz` (popyt, sprzedaż, utracona sprzedaż, przyczyna), `magazyn`, `lista_bledow` i tak dalej. Karta wyników jest w `silnik/wyniki/karta.py`.
 - Losowość pochodzi **tylko** z `silnik/losowosc.py: strumien(ziarno, runda, cel, *klucze)`. To samo ziarno daje ten sam wynik, a testy tego pilnują.
 - Kwoty w stanie są w groszach (`int`, pola `…_gr`), a silnik liczy w złotych przez właściwości.
 - Moduły mechanik: lokale, popyt, konkurencja, menu, dostawcy, magazyn, swiezosc, rynek_pracy, kandydaci, banki, lichwiarz (Harpagon), kasyno, biuro, urzad, awarie, reklama, promocje, handel, przejecia, zdarzenia, wlasciciel, czas_wlasciciela, wnioski, co_jesli i inne.

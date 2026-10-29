@@ -1,5 +1,5 @@
 opis: >-
-  Konkurencja i detektyw (gra z lokalami, silnik/konkurencja.py). Każda drużyna widzi ogólny obraz rywali z poprzedniej
+  Konkurencja i detektyw (gra z lokalami, silnik/rynek/konkurencja.py). Każda drużyna widzi ogólny obraz rywali z poprzedniej
   rundy: liczbę lokali, przedział cen, czy się reklamują i mają promocje, udział w popycie. Dokładne dane jednego
   rywala (gotówka, ceny i sprzedaż dań, załoga, kampanie, przychód i dochód) zbiera detektyw z mapy – za zlecenie
   płaci się w zł i w godzinach właściciela, a detektyw czasem wpada i rywal dowiaduje się, kto go śledził.

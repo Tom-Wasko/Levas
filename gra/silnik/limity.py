@@ -9,10 +9,10 @@ przycina nadmiar (`rynek_pracy.przed_decyzjami`, `lokale.powod_odrzucenia`) – 
 """
 from __future__ import annotations
 
-from . import lokale as lk
-from . import rynek_pracy as rp
 from .dane import Dane
+from .ludzie import rynek_pracy as rp
 from .model import Firma
+from .nieruchomosci import lokale as lk
 
 
 def nowi_pracownicy(decyzje: dict, firma: str) -> int:

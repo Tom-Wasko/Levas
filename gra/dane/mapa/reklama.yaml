@@ -1,6 +1,6 @@
 # Agencje reklamowe na mapie miasta (F3b.2) – kampanie z listy: agencja × kanał × strefa
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: 'Agencje reklamowe gry z lokalami (silnik/reklama.py). Kampania trwa `rundy` rund od rundy zamówienia; w tym
+opis: 'Agencje reklamowe gry z lokalami (silnik/rynek/reklama.py). Kampania trwa `rundy` rund od rundy zamówienia; w tym
   czasie poszerza pulę klientów strefy (pula – ułamek, korzystają wszystkie lokale, najwięcej reklamujący się) i podnosi
   atrakcyjność firmy u mieszkańców strefy (przyciaganie – ułamek, odbiera klientów konkurencji). Koszt netto (VAT 23%)
   płatny z góry: przy zasięgu „strefa” koszt × pula strefy z mapa/popyt.yaml (więcej ludzi – drożej), przy zasięgu

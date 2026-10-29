@@ -1,4 +1,4 @@
-// Magazyn i świeżość: partie składników z terminami, pojemność chłodni i zamrażarki (silnik/swiezosc.py,
+// Magazyn i świeżość: partie składników z terminami, pojemność chłodni i zamrażarki (silnik/kuchnia/swiezosc.py,
 // dane/zasoby.yaml, dane/sprzet.yaml) – w decyzjach plan dostaw, w wynikach dzień po dniu: dostawy, zużycie, straty.
 import { esc, gw, licz, nazwaUslugi, tabela, ulamek, wykres, zl2 } from "./wspolne.js";
 

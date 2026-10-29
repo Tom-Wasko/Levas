@@ -1,4 +1,4 @@
-// Bank w grze z lokalami (silnik/banki.py, dane/mapa/banki.yaml): sześć banków, konto firmowe z terminalem
+// Bank w grze z lokalami (silnik/pieniadze/banki.py, dane/mapa/banki.yaml): sześć banków, konto firmowe z terminalem
 // i limitem, lokaty, kredyty (na start, inwestycyjny pod zastaw, obrotowy) i leasing sprzętu w dowolnym banku.
 import { esc, OKRES, okno, proc, tabela, toast, zamknijOkno, zl, zl2 } from "./wspolne.js";
 

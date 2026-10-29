@@ -1,7 +1,7 @@
 opis: >-
-  Tajny klub z grami (gra z lokalami, silnik/kasyno.py). Nie ma go na mapie ani w menu – otwiera się tylko na jedną
+  Tajny klub z grami (gra z lokalami, silnik/pieniadze/kasyno.py). Nie ma go na mapie ani w menu – otwiera się tylko na jedną
   rundę, gdy drużyna dostanie zaproszenie. Zaproszenie niczego nie sugeruje. Gra się z prywatnego portfela właściciela
-  (silnik/wlasciciel.py); do firmy pieniądze trafiają tylko jako zwykła wpłata własna. Mistrz gry nie widzi klubu
+  (silnik/pieniadze/wlasciciel.py); do firmy pieniądze trafiają tylko jako zwykła wpłata własna. Mistrz gry nie widzi klubu
   w żadnym widoku, rankingu ani eksporcie.
 zrodlo: >-
   Notatka „Elementy mapy” – Kasyno (tajne). Ruletka europejska (37 pól, zero). Automat – tabela wyników gry

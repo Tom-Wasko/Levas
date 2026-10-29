@@ -16,7 +16,7 @@ from pathlib import Path
 
 from . import harmonogram as hm
 from .dane import Dane, dane_domyslne
-from .kandydaci import pula_startowa
+from .ludzie.kandydaci import pula_startowa
 from .model import Firma, StanGry, firma_z_slownika
 
 WERSJA_SILNIKA = "1.2"  # 1.1: kwoty w groszach; 1.2: lokale na mapie miasta

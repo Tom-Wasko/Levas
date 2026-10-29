@@ -1,5 +1,5 @@
-// Urząd i sanepid (gra z lokalami, silnik/urzad.py): rejestracja firmy, odbiór lokali przez sanepid i higiena.
-// Decyzja `higiena: poziom` trwa do zmiany; poziom zmienia szansę i wynik kontroli sanepidu (silnik/magazyn.py).
+// Urząd i sanepid (gra z lokalami, silnik/ksiegowosc/urzad.py): rejestracja firmy, odbiór lokali przez sanepid i higiena.
+// Decyzja `higiena: poziom` trwa do zmiany; poziom zmienia szansę i wynik kontroli sanepidu (silnik/kuchnia/magazyn.py).
 import { esc, naOkres, proc, tabela, zl2 } from "./wspolne.js";
 
 const rund = (n) => `${n} ${n === 1 ? "rundę" : n < 5 ? "rundy" : "rund"}`;

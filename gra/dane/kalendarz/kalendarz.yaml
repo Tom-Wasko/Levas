@@ -1,5 +1,5 @@
 opis: >-
-  Kalendarz miejski Lublina (gra z lokalami, silnik/kalendarz.py): święta, rok akademicki (sesja, przerwy), szkoły
+  Kalendarz miejski Lublina (gra z lokalami, silnik/rynek/kalendarz.py): święta, rok akademicki (sesja, przerwy), szkoły
   (ferie), okazje handlowe i wydarzenia w mieście. Każde wydarzenie mnoży dzienną pulę klientów w strefach
   (klucz `wszystkie` – każda strefa bez własnego mnożnika). Daty stałe jako 'MM-DD' (zakres może przechodzić przez
   Nowy Rok); daty ruchome – `wzgledem` (klucz z `ruchome`) i przesunięcie w dniach `od`/`do`.

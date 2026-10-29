@@ -1,5 +1,5 @@
 opis: >-
-  Prywatny portfel właściciela (gra z lokalami, silnik/wlasciciel.py). Właściciel jednoosobowej działalności może
+  Prywatny portfel właściciela (gra z lokalami, silnik/pieniadze/wlasciciel.py). Właściciel jednoosobowej działalności może
   wypłacić pieniądze z firmy na swoje potrzeby (wypłata własna) albo dołożyć do firmy własne pieniądze (wpłata
   własna). Obie operacje są poza KPiR – nie są ani przychodem, ani kosztem.
 zrodlo: >-

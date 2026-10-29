@@ -526,7 +526,7 @@ class ZasadyLokali(Schemat):
     nowy_lokal_co_rund: int = Field(ge=1)
     kaucja_miesiecy: float = Field(ge=0)
     urzadzanie_rund: int = Field(ge=0)
-    # licytacje i przejęcia (silnik/przejecia.py)
+    # licytacje i przejęcia (silnik/nieruchomosci/przejecia.py)
     licytacje_od_rundy: int = Field(ge=1)      # od tej rundy można przebić cenę wywoławczą (wcześniej remis)
     oferta_max: float = Field(ge=1)            # najwyżej tyle × cena wywoławcza (chroni przed literówką)
     przejecia_od_rundy: int = Field(ge=1)
@@ -940,8 +940,8 @@ SKUTKI_POLA = {"kwota": ("gotowka", "szkoda"), "mnoznik": ("popyt",), "godziny":
 
 
 class Skutek(Schemat):
-    # oddaj_zapas – tylko bank żywności; szkoda – tylko wypadki w lokalu (losowe.yaml, silnik/awarie.py);
-    # kontrola – skarga do sanepidu: większa szansa kontroli (silnik/urzad.py)
+    # oddaj_zapas – tylko bank żywności; szkoda – tylko wypadki w lokalu (losowe.yaml, silnik/swiat/awarie.py);
+    # kontrola – skarga do sanepidu: większa szansa kontroli (silnik/ksiegowosc/urzad.py)
     typ: Literal["gotowka", "popyt", "czas", "kandydat", "oddaj_zapas", "szkoda", "kontrola"]
     opis: str = Field(min_length=3)
     kwota: float | None = None                          # gotowka: + przychód, − koszt; szkoda: koszt (> 0)
@@ -1127,7 +1127,7 @@ class Ubezpieczyciel(Schemat):
 
 
 class PlikWypadkow(Plik):
-    """dane/zdarzenia/losowe.yaml: wypadki w lokalu jednej drużyny i polisy ubezpieczyciela (silnik/awarie.py)."""
+    """dane/zdarzenia/losowe.yaml: wypadki w lokalu jednej drużyny i polisy ubezpieczyciela (silnik/swiat/awarie.py)."""
     zasady: ZasadyWypadkow
     ubezpieczyciel: Ubezpieczyciel
     historie: list[Historia] = Field(min_length=1)
@@ -1169,7 +1169,7 @@ class BankZywnosci(Schemat):
 
 
 class PlikMagazynu(Plik):
-    """dane/zdarzenia/magazyn.yaml: teksty kontroli sanepidu i historia „bank żywności” (silnik/magazyn.py)."""
+    """dane/zdarzenia/magazyn.yaml: teksty kontroli sanepidu i historia „bank żywności” (silnik/kuchnia/magazyn.py)."""
     sanepid: TekstySanepidu
     bank_zywnosci: BankZywnosci
 
@@ -1216,7 +1216,7 @@ class Higiena(Schemat):
 
 
 class PlikUrzedu(Plik):
-    """dane/zdarzenia/urzad.yaml: rejestracja firmy, odbiór lokalu i higiena (silnik/urzad.py)."""
+    """dane/zdarzenia/urzad.yaml: rejestracja firmy, odbiór lokalu i higiena (silnik/ksiegowosc/urzad.py)."""
     urzad: Urzad
     odbior: Odbior
     higiena: Higiena
@@ -1227,7 +1227,7 @@ class Portfel(Schemat):
 
 
 class PlikWlasciciela(Plik):
-    """dane/zdarzenia/wlasciciel.yaml: prywatny portfel właściciela – wpłaty i wypłaty własne (silnik/wlasciciel.py)."""
+    """dane/zdarzenia/wlasciciel.yaml: prywatny portfel właściciela – wpłaty i wypłaty własne (silnik/pieniadze/wlasciciel.py)."""
     portfel: Portfel
 
 
@@ -1295,7 +1295,7 @@ class GraKasyna(Schemat):
 
 
 class PlikKasyna(Plik):
-    """dane/zdarzenia/kasyno.yaml: tajny klub, zaproszenia i gry (silnik/kasyno.py)."""
+    """dane/zdarzenia/kasyno.yaml: tajny klub, zaproszenia i gry (silnik/pieniadze/kasyno.py)."""
     kasyno: Klub
     zaproszenie: Zaproszenie
     zaklady: LimitZakladow
@@ -1311,7 +1311,7 @@ class ZasadyHandlu(Schemat):
 
 
 class PlikHandlu(Plik):
-    """dane/zdarzenia/handel.yaml: handel między drużynami – towar i sprzęt z fakturą (silnik/handel.py)."""
+    """dane/zdarzenia/handel.yaml: handel między drużynami – towar i sprzęt z fakturą (silnik/rynek/handel.py)."""
     handel: ZasadyHandlu
     teksty: list[str] = Field(min_length=1)   # przekazanie: {sprzedawca}, {kupujacy}, {co}
 
@@ -1334,7 +1334,7 @@ class ZasadyDetektywa(Schemat):
 
 
 class PlikDetektywa(Plik):
-    """dane/zdarzenia/detektyw.yaml: przegląd konkurencji i detektyw (silnik/konkurencja.py, P16)."""
+    """dane/zdarzenia/detektyw.yaml: przegląd konkurencji i detektyw (silnik/rynek/konkurencja.py, P16)."""
     detektyw: ZasadyDetektywa
     powitania: list[str] = Field(min_length=1)
     raporty: list[str] = Field(min_length=1)    # {rywal}

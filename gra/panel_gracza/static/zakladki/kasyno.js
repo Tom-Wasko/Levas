@@ -1,6 +1,6 @@
-// Adres z wizytówki (silnik/kasyno.py): zakładka widoczna tylko w rundzie z zaproszeniem albo z wynikami gier.
+// Adres z wizytówki (silnik/pieniadze/kasyno.py): zakładka widoczna tylko w rundzie z zaproszeniem albo z wynikami gier.
 // Decyzja `kasyno`: lista {gra, zaklad, stawka} – stawki z portfela właściciela, wynik dopiero po zamknięciu rundy.
-// P12: przelew z firmy do portfela wprost z klubu – to zwykła decyzja `wyplata_wlasna` (silnik/wlasciciel.py), więc
+// P12: przelew z firmy do portfela wprost z klubu – to zwykła decyzja `wyplata_wlasna` (silnik/pieniadze/wlasciciel.py), więc
 // na koncie firmy widać tylko „wypłatę własną właściciela”; wypłata idzie przed zakładami, można ją od razu postawić.
 import { esc, tabela, toast, zl2 } from "./wspolne.js";
 

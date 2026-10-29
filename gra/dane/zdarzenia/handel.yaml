@@ -1,5 +1,5 @@
 opis: >-
-  Handel między drużynami (gra z lokalami, silnik/handel.py). Drużyna wystawia innej drużynie ofertę sprzedaży
+  Handel między drużynami (gra z lokalami, silnik/rynek/handel.py). Drużyna wystawia innej drużynie ofertę sprzedaży
   towaru z magazynu albo sprzętu ze stanowiska; adresat przyjmuje ją w następnej rundzie. Obie strony dostają
   fakturę w KPiR (VAT należny u sprzedawcy, naliczony u kupującego). Widełki ceny chronią przed przelewaniem
   pieniędzy między drużynami „za grosz” albo „za milion”.

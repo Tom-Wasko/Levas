@@ -1,4 +1,4 @@
-// Podatki jednoosobowej działalności (silnik/rozliczenie.py) – dwie zakładki Finansów: VAT (rejestr, stawki,
+// Podatki jednoosobowej działalności (silnik/ksiegowosc/rozliczenie.py) – dwie zakładki Finansów: VAT (rejestr, stawki,
 // deklaracja) oraz Podatki (składki właściciela, zaliczka PIT liniowego). Rozliczenie co rundę, ceny w grze są brutto.
 import { UKRYTE } from "./finanse.js";
 import { LEKCJA_PIT_ZUS, LEKCJA_VAT } from "./lekcje.js";

@@ -8,7 +8,7 @@ const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekono
 
 let skumulowana = false;
 
-// składniki kebabowe karty (gra z lokalami, silnik/karta.py → kebab): wskaźnik, miernik, jak pokazać miarę
+// składniki kebabowe karty (gra z lokalami, silnik/wyniki/karta.py → kebab): wskaźnik, miernik, jak pokazać miarę
 const SKLADNIKI_KEBABU = [
   ["zadowolenie_klientow", "kolejki", "Klienci, którzy nie doczekali się obsługi", (m) => proc(m.kolejki)],
   ["zadowolenie_klientow", "brakujace_dania", "Dania wyłączone z braku składnika (dania × dni)", (m) => proc(m.brakujace_dania)],
@@ -147,7 +147,7 @@ export const dashboard = {
   },
 };
 
-// Wnioski z poprzedniej rundy (silnik/wnioski.py): co się udało i co poprawić – z zakładką, w której to zrobić
+// Wnioski z poprzedniej rundy (silnik/wyniki/wnioski.py): co się udało i co poprawić – z zakładką, w której to zrobić
 export const wnioski = {
   tytul: "Wnioski z rundy", ikona: "ok",
   info: "Co wyszło w poprzedniej rundzie i co zrobić, żeby kolejna poszła lepiej.",

@@ -1,4 +1,4 @@
-# Lichwiarz Harpagon (F3a.10, silnik/lichwiarz.py i silnik/zaleglosci.py) – pożyczka „na czarno” poza KPiR
+# Lichwiarz Harpagon (F3a.10, silnik/pieniadze/lichwiarz.py i silnik/pieniadze/zaleglosci.py) – pożyczka „na czarno” poza KPiR
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Pożyczka od ręki, bez sprawdzania zdolności kredytowej i poza księgami: gotówka nie jest przychodem, spłata
   i odsetki nie są kosztem. Jedna pożyczka naraz. Odsetki co rundę od całego długu (kapitał + naliczone odsetki).

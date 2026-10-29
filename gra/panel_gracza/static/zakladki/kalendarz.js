@@ -1,4 +1,4 @@
-// Kalendarz miejski (gra z lokalami, silnik/kalendarz.py, dane/kalendarz/kalendarz.yaml): święta, uczelnie, ferie,
+// Kalendarz miejski (gra z lokalami, silnik/rynek/kalendarz.py, dane/kalendarz/kalendarz.yaml): święta, uczelnie, ferie,
 // okazje handlowe, mecze Motoru na Arenie i wydarzenia w Lublinie – zmiana puli klientów stref w każdym tygodniu gry
 // i popytu na konkretne dania (P14).
 import { esc, licz, nazwaRundy, nazwaUslugi, tabela } from "./wspolne.js";

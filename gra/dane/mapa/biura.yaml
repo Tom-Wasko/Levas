@@ -1,4 +1,4 @@
-# Biura rachunkowe w Levasie (F3a.13, silnik/biuro.py) – gra z lokalami; w grze Revas zostają biura z katalog.yaml
+# Biura rachunkowe w Levasie (F3a.13, silnik/ksiegowosc/biuro.py) – gra z lokalami; w grze Revas zostają biura z katalog.yaml
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Oferty biur w Kamienicy biur rachunkowych. Kwoty miesięczne, brutto (z VAT 23%), w rundzie tygodniowej
   przeliczane jak czynsz (× 12/52); limit dokumentów w ryczałcie – też na rundę (zaokrąglony). Dokument = zapis

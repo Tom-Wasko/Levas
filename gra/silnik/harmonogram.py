@@ -3,7 +3,7 @@
 Element harmonogramu to zakładka (katalog.yaml: rundy.harmonogram_lokali.zakladki) albo element mapy z własnym
 terminem w danych: kanały rekrutacji, późniejsi dostawcy, licytacje i przejęcia lokali, promocje, kanały agencji
 reklamowych, eventy w parkach, wypadki, handel między drużynami, detektyw (bez klubu z kasynem – mistrz gry o nim nie wie,
-silnik/kasyno.py). Mistrz gry może zmienić
+silnik/pieniadze/kasyno.py). Mistrz gry może zmienić
 tydzień każdego elementu (konfiguracja gry: `odblokowanie` – {element: tydzień}, tylko zmiany względem danych) – poza
 tygodniem 1 (P15): to tydzień przygotowawczy, jego zakładek nie da się przesunąć ani przenieść niczego do niego.
 
@@ -15,9 +15,9 @@ from __future__ import annotations
 
 import copy
 
-from . import dostawcy as dw
 from .dane import Dane
-from .lokale import tryb_lokali
+from .kuchnia import dostawcy as dw
+from .nieruchomosci.lokale import tryb_lokali
 
 Sciezka = tuple[str, ...]   # (atrybut danych, klucze…) do pola z numerem pierwszej rundy
 PRZYGOTOWAWCZY = 1          # tydzień przygotowań – poza władzą mistrza gry

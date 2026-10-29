@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 [tool.pytest.ini_options]
 testpaths = ["testy"]
 DJANGO_SETTINGS_MODULE = "levas.settings"
-pythonpath = ["."]
+pythonpath = [".", "testy"]
 
 [tool.ruff]
 line-length = 100
@@ -18,7 +18,7 @@ select = ["E", "F", "W", "I", "B", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
 # Kod przeniesiony z Revasa (długie linie, krótkie nazwy). Plik wypada z listy, gdy zostanie przepisany.
-"silnik/*.py" = ["E501", "E741", "B023", "B905", "E731"]
+"silnik/**/*.py" = ["E501", "E741", "B023", "B905", "E731"]
 "api/prezentacja.py" = ["E501", "E741", "B023", "B905", "E731"]
-"testy/*.py" = ["E501", "E741", "B023", "B905", "E731"]
+"testy/**/*.py" = ["E501", "E741", "B023", "B905", "E731"]
 "*/migrations/*.py" = ["E501"]

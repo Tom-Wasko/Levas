@@ -32,26 +32,26 @@ agresywny marketing, naśladowca). Zakładki są jak w Revasie: Oferta (menu) �
 Sprzedaż → Finanse → Lista błędów → **Wyślij decyzje**. Przełącznik **Decyzje / Wyniki** pokazuje wyniki
 poprzedniej rundy, strzałki ‹ › przełączają podgląd poprzednich rund. Limity (`silnik/limity.py`): najwyżej
 3 nowych pracowników na rundę (zatrudnienia i oferty podkupienia razem) i kolejny lokal co 3 rundy – zapis
-decyzji z przekroczeniem jest odrzucony. **Zdarzenia** (`silnik/zdarzenia.py`, `dane/zdarzenia/parki.yaml`):
+decyzji z przekroczeniem jest odrzucony. **Zdarzenia** (`silnik/swiat/zdarzenia.py`, `dane/zdarzenia/parki.yaml`):
 od rundy 2 co tydzień w jednym z parków zaczyna się historia, ta sama dla wszystkich drużyn; reakcja kosztuje czas
-właściciela, gotówkę albo porcje, ciąg dalszy przychodzi w kolejnych rundach. **Magazyn** (`silnik/magazyn.py`,
+właściciela, gotówkę albo porcje, ciąg dalszy przychodzi w kolejnych rundach. **Magazyn** (`silnik/kuchnia/magazyn.py`,
 `dane/zdarzenia/magazyn.yaml`, `zalozenia.yaml` → `magazyn`): w grze z lokalami nie ma kosztu magazynowania ani zwrotów
 do dostawcy – co nie zmieści się w chłodni i zamrażarce lokalu, jedzie do wynajętej chłodni (za litr, krótszy termin);
 towar w wynajmie i przeterminowane jedzenie zwiększają szansę kontroli sanepidu (mandat poza KPiR, mniej klientów),
-a duży zapas z krótkim terminem może wywołać telefon z banku żywności. **Agencje reklamowe** (`silnik/reklama.py`,
+a duży zapas z krótkim terminem może wywołać telefon z banku żywności. **Agencje reklamowe** (`silnik/rynek/reklama.py`,
 `dane/mapa/reklama.yaml`): w grze z lokalami zamiast reklamy tradycyjnej i internetowej z Revasa – cztery agencje na
 mapie (druk, internet, radio i billboardy, wydarzenia), kampania = agencja × kanał × strefa; poszerza pulę klientów
 strefy i przyciąga jej mieszkańców do firmy, kampanie tego samego rodzaju w strefie się zagłuszają, powtórka zaraz
-po poprzedniej działa słabiej, po końcu efekt wygasa. **Promocje** (`silnik/promocje.py`, `dane/mapa/promocje.yaml`):
+po poprzedniej działa słabiej, po końcu efekt wygasa. **Promocje** (`silnik/rynek/promocje.py`, `dane/mapa/promocje.yaml`):
 2 za 1, zestaw z napojem, happy hours, karta stałego klienta i zniżka studencka z własną, ozdobną nazwą drużyny;
 przyciągają objętych klientów (dni tygodnia, strefy), ale obcinają cenę (rabat, porcje gratis), trwają do
-wyłączenia, a ich siła z czasem słabnie albo (karta) rośnie. **Licytacje i przejęcia** (`silnik/przejecia.py`): o lokal
+wyłączenia, a ich siła z czasem słabnie albo (karta) rośnie. **Licytacje i przejęcia** (`silnik/nieruchomosci/przejecia.py`): o lokal
 wybrany w jednej rundzie przez kilka drużyn decyduje najwyższa oferta (remis – losowanie), budynek wynajmowany przez
 inną drużynę można kupić (najemca płaci czynsz nowemu właścicielowi) albo wykupić własny, a właściciel może
 wypowiedzieć najem – po 4 rundach najemca się wyprowadza, nakłady rozlicza się wg KC art. 676. **Wypadki
-i ubezpieczenia** (`silnik/awarie.py`, `dane/zdarzenia/losowe.yaml`): od rundy 4 w lokalu drużyny może zacząć się
+i ubezpieczenia** (`silnik/swiat/awarie.py`, `dane/zdarzenia/losowe.yaml`): od rundy 4 w lokalu drużyny może zacząć się
 wypadek – zwykle komiczna historia w kilku scenach, która kończy się szkodą; polisy TUW „Pod Koziołkiem” (lokal,
-sprzęt, OC) po karencji zwracają część szkody. **Urząd i sanepid** (`silnik/urzad.py`, `dane/zdarzenia/urzad.yaml`):
+sprzęt, OC) po karencji zwracają część szkody. **Urząd i sanepid** (`silnik/ksiegowosc/urzad.py`, `dane/zdarzenia/urzad.yaml`):
 sanepid odbiera każdy lokal przed pierwszą rundą działania – bez sprzątania odmawia i lokal rusza później; poziom
 higieny kosztuje co rundę za lokal i zmienia szansę oraz wynik kontroli, a skargi z historii ściągają sanepid
 częściej. **Analiza** liczy przewidywany wynik rundy
@@ -135,7 +135,7 @@ przełącznik `panel_gracza/static/motyw.js`.
 
 | Folder | Co zawiera |
 |---|---|
-| `silnik/` | silnik gry (czysty Python, bez Django): rynek, operacje, finanse, karta wyników, boty |
+| `silnik/` | silnik gry (czysty Python, bez Django): rdzeń (`gra`, `runda`, `decyzje`, `dane`, `schematy`, `boty`…) i podpakiety mechanik: `kuchnia/` (menu, dostawcy, magazyn, świeżość), `rynek/` (popyt, konkurencja, reklama, promocje, handel), `ludzie/`, `nieruchomosci/`, `ksiegowosc/`, `pieniadze/` (banki, Harpagon, kasyno), `swiat/` (zdarzenia, awarie), `wyniki/` (karta, wnioski) |
 | `dane/*.yaml` | dane gry (kebab) i założenia (niepewne parametry), każdy z `zrodlo`; sprawdzenie: `python -m silnik.dane sprawdz` |
 | `levas/` | projekt Django (ustawienia, adresy) |
 | `gry/` | modele `Gra`, `Runda`, `Decyzja` (event sourcing: konfiguracja + decyzje, stan liczy silnik) i `serwisy.py` |
@@ -143,9 +143,9 @@ przełącznik `panel_gracza/static/motyw.js`.
 | `panel_gracza/` | strony gracza, zakładki w czystym JS (`static/zakladki/`), Chart.js, komenda `graj` |
 | `konta/` | logowanie (django-allauth: własny login, konto Microsoft), role uczeń / mistrz gry (`role.py`), komenda `konto` |
 | `panel_mg/` | panel mistrza gry (`/mg/`): nowa gra, prowadzenie rund, wyniki drużyn; dane z `GET /api/gry/<id>/mg` |
-| `testy/` | pytest (mechaniki silnika, zasady rund, API) |
+| `testy/` | pytest w podfolderach jak podpakiety silnika (`rdzen/`, `kuchnia/`…) i `aplikacja/` (API, panele, konta); wspólne funkcje pomocnicze w `pomocnicze.py` |
 
-`WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (dane oryginalnego Revasa usunięte 27.10 –
+`../dokumentacja/WIEDZA_O_GRZE.md` – opis mechanik Revasa, z których korzysta silnik (dane oryginalnego Revasa usunięte 27.10 –
 są w historii repozytorium i w `revas_26/`).
 
 ### Kalendarz rund

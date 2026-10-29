@@ -2,7 +2,7 @@
 import { esc, lekcja, zl } from "./wspolne.js";
 
 // Samodzielna księgowość (gra z lokalami): co po kolei zrobić z dokumentami i deklaracjami. Reguły kolumn –
-// silnik/biuro.py (WYJASNIENIA); otwarta, dopóki nic nie zaksięgowano.
+// silnik/ksiegowosc/biuro.py (WYJASNIENIA); otwarta, dopóki nic nie zaksięgowano.
 export function krokiKpir(K, otwarta) {
   const kolumny = Object.entries(K.wyjasnienia || {}).map(([k, w]) => `<li><b>${esc(K.kolumny[k] || k)}</b> – ${esc(w)}</li>`).join("");
   const html = lekcja("Jak samemu wypełnić KPiR i deklaracje – krok po kroku", [

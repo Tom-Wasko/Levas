@@ -1,4 +1,4 @@
-// Licytacje i przejęcia: kupno budynku z najemcą, wypowiedzenia najmu, wyniki licytacji (silnik/przejecia.py).
+// Licytacje i przejęcia: kupno budynku z najemcą, wypowiedzenia najmu, wyniki licytacji (silnik/nieruchomosci/przejecia.py).
 import { esc, nazwaFirmy, naOkres, naRunde, proc, tabela, zl } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 

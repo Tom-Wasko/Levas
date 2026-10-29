@@ -1,9 +1,9 @@
-# Urząd i sanepid w grze z lokalami (F3b.6, silnik/urzad.py): rejestracja firmy, odbiór lokalu przez sanepid,
-# higiena lokalu (decyzja) i jej wpływ na kontrole sanepidu z silnik/magazyn.py
+# Urząd i sanepid w grze z lokalami (F3b.6, silnik/ksiegowosc/urzad.py): rejestracja firmy, odbiór lokalu przez sanepid,
+# higiena lokalu (decyzja) i jej wpływ na kontrole sanepidu z silnik/kuchnia/magazyn.py
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Higiena – decyzja `higiena: poziom` (trwa, dopóki drużyna jej nie zmieni; bez decyzji – higiena.domyslna).
   Koszt poziomu (zł miesięcznie, brutto z VAT) za każdy działający lokal, co rundę. Kontrola sanepidu
-  (silnik/magazyn.py): część szansy z problemów (wynajęta chłodnia, przeterminowany towar) plus dodatek poziomu
+  (silnik/kuchnia/magazyn.py): część szansy z problemów (wynajęta chłodnia, przeterminowany towar) plus dodatek poziomu
   i skarg (skutek kontrola w historiach) mnożona przez mnoznik poziomu; do mandatu dolicza się mandat poziomu.
   Odbiór: w rundzie, w której lokal ma zacząć działać, sanepid go odbiera – przy poziomie z odbior: false
   odmawia i lokal zaczyna działać odbior.odroczenie_rund rund później (do skutku).'

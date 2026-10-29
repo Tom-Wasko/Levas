@@ -1,4 +1,4 @@
-// Czas właściciela (gra z lokalami, silnik/czas_wlasciciela.py): pula godzin na rundę na sprawy poza lokalem.
+// Czas właściciela (gra z lokalami, silnik/ludzie/czas_wlasciciela.py): pula godzin na rundę na sprawy poza lokalem.
 // Decyzja, na którą nie starcza godzin, jest odrzucona (lista błędów).
 import { esc, licz, tabela } from "./wspolne.js";
 

@@ -1,6 +1,6 @@
 # Popyt strefowy (gra z lokalami): pule klientów stref, dni tygodnia, wybór lokalu (kalendarz miejski – dane/kalendarz/)
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: 'Klienci stref Lublina (krok F3a.4, silnik/popyt.py). Pula strefy na danie i dzień = popyt roczny dania / 52
+opis: 'Klienci stref Lublina (krok F3a.4, silnik/rynek/popyt.py). Pula strefy na danie i dzień = popyt roczny dania / 52
   × sezonowość dania × pula strefy × miesiąc strefy × kalendarz × waga dnia tygodnia × szum. Klienci strefy wybierają
   lokal: atrakcyjność = jakość × exp(−elastyczność × wrażliwość strefy × (cena / (cena preferowana × cena strefy) − 1))
   × exp(−odległość / zasięg) × zadowolenie klientów firmy × wyposażenie × reklama; udział lokalu = A / (A_0 + Σ A),

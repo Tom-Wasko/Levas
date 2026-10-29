@@ -23,13 +23,13 @@ from gry.models import Gra
 from konta import druzyny
 from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
 from silnik import co_jesli
-from silnik import handel as hd
 from silnik import harmonogram as hm
-from silnik import kasyno as kas
-from silnik.biuro import ukryj
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
+from silnik.ksiegowosc.biuro import ukryj
 from silnik.limity import naruszenia
+from silnik.pieniadze import kasyno as kas
+from silnik.rynek import handel as hd
 
 from .prezentacja import katalogi, przeglad_mg, tabela_wynikow, widok
 
@@ -100,7 +100,7 @@ def sprawdz_firme(request, id_: str, g: GraSilnika, firma: str) -> None:
 
 
 def _bez_klubu(request) -> bool:
-    """Klub z silnik/kasyno.py jest tajny: mistrz gry go nie widzi,
+    """Klub z silnik/pieniadze/kasyno.py jest tajny: mistrz gry go nie widzi,
     a LEVAS_KASYNO=0 wyłącza go na serwerze."""
     return jest_mg(request.user) or not settings.LEVAS_KASYNO
 

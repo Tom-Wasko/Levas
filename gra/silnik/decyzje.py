@@ -4,13 +4,13 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     nazwa, misja
     oferta:            {usługa: prognoza popytu}           – pełna lista usług w ofercie
     sprzedaz:          {usługa: {"cena", "rabat"}}          – usługi włączone do sprzedaży
-    lokal:             {"id", "forma": "najem" | "kupno"}   – nowy lokal z mapy (silnik/lokale.py)
+    lokal:             {"id", "forma": "najem" | "kupno"}   – nowy lokal z mapy (silnik/nieruchomosci/lokale.py)
     stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet; najwyżej tyle, ile wolnych
                                                               miejsc w działających lokalach)
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
     zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
-                       opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/rynek_pracy.py)
+                       opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/ludzie/rynek_pracy.py)
     podkup:            [{"pracownik", "firma", "pensja", "umowa"}]   – oferta przez headhuntera
     kontroferty:       {id pracownika: pensja}              – odpowiedź na oferty innych firm (ta sama runda)
                        opcjonalnie "zastepca": true + "wzor": {"zawod", "gwiazdki"} – gdy kandydata zatrudni
@@ -20,12 +20,12 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc", "dzien"}]   ilość w opakowaniach; dzien – dzień
                                                               dostawy w rundzie (0 = poniedziałek)
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
-    kampanie:          [{"agencja", "kanal", "strefa"}]     – agencje reklamowe (silnik/reklama.py,
+    kampanie:          [{"agencja", "kanal", "strefa"}]     – agencje reklamowe (silnik/rynek/reklama.py,
                                                               dane/mapa/reklama.yaml)
     promocje:          [{"typ", "nazwa", "danie"}]          – pełna lista włączonych promocji, nazwa
-                                                              ozdobna (silnik/promocje.py, dane/mapa/promocje.yaml)
+                                                              ozdobna (silnik/rynek/promocje.py, dane/mapa/promocje.yaml)
     polisy:            [rodzaj]                             – gra z lokalami: pełna lista polis ubezpieczyciela
-                                                              (silnik/awarie.py, dane/zdarzenia/losowe.yaml)
+                                                              (silnik/swiat/awarie.py, dane/zdarzenia/losowe.yaml)
     szkolenia:         [{"firma", "szkolenie"}]
     bank, biuro:       nazwa (z lokalami biuro: id z dane/mapa/biura.yaml albo "samodzielnie")
     ksiegowosc:        {"zapisy": {id dokumentu: {"kolumna", "stawka"}}, "deklaracja": {"vat", "pit", "zdrowotna"}}
@@ -34,7 +34,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     kredyty_wez:       [{"kwota", "miesiecy"}];  kredyty_splac: [id]
     handel_oferty:     [{"do", "typ": "towar", "zasob", "jakosc", "ilosc", "cena"} | {"do", "typ": "sprzet",
                        "stanowisko", "nr", "nazwa", "cena"}]  – gra z lokalami: oferty dla innych drużyn (cena brutto
-                                                              za całość; silnik/handel.py)
+                                                              za całość; silnik/rynek/handel.py)
     handel_przyjmij:   [{"id", "nr"}]                       – przyjęcie ofert z poprzedniej rundy (nr – stanowisko
                                                               na kupiony sprzęt)
                        negocjacje na żywo (P13): oferta ma też "klucz", "ceny" (kolejne ceny sprzedawcy)
@@ -47,27 +47,27 @@ import math
 import re
 from datetime import date, timedelta
 
-from . import awarie as aw
-from . import biuro as bo
-from . import czas_wlasciciela as cw
 from . import limity as lm
-from . import lokale as lk
-from . import menu as mn
-from . import promocje as pm
-from . import reklama as rk
-from . import rozliczenie as rz
-from . import rynek_pracy as rp
-from . import srodki_trwale as st_trwale
-from . import swiezosc as sw
-from . import urzad as urz
-from . import zdarzenia as zd
 from .dane import KASA, KUCHNIA, Dane
-from .dostawcy import zasady_dostaw
-from .finanse import Ksiega, Rachunek, ksieguj
-from .lokale import bledy as bledy_lokali
-from .lokale import wolne_miejsca
+from .ksiegowosc import biuro as bo
+from .ksiegowosc import rozliczenie as rz
+from .ksiegowosc import srodki_trwale as st_trwale
+from .ksiegowosc import urzad as urz
+from .ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
+from .kuchnia import menu as mn
+from .kuchnia import swiezosc as sw
+from .kuchnia.dostawcy import zasady_dostaw
+from .kuchnia.operacje import kasjerzy, stanowiska_uslugi
+from .ludzie import czas_wlasciciela as cw
+from .ludzie import rynek_pracy as rp
 from .model import Cena, Firma, Odejscie, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
-from .operacje import kasjerzy, stanowiska_uslugi
+from .nieruchomosci import lokale as lk
+from .nieruchomosci.lokale import bledy as bledy_lokali
+from .nieruchomosci.lokale import wolne_miejsca
+from .rynek import promocje as pm
+from .rynek import reklama as rk
+from .swiat import awarie as aw
+from .swiat import zdarzenia as zd
 
 
 def limit_nowych_uslug(dane: Dane, runda: int, obecnie: int = 0) -> int:
@@ -131,7 +131,7 @@ def _kanal(dane: Dane, kandydat: dict, wybrany: str | None, runda: int, czas: cw
 def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ceny_dostawcow: dict,
              ksiega: Ksiega, rachunek: Rachunek) -> dict:
     """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów).
-    Nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany wcześniej, silnik/lokale.py)."""
+    Nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany wcześniej, silnik/nieruchomosci/lokale.py)."""
     info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "wypowiedzenia": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
@@ -298,7 +298,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         cena = cena_dostawcy(dane, ceny_dostawcow, z["dostawca"], z["zasob"], int(z["jakosc"]))
         if ilosc > 0 and cena is not None:
             zamowienia.append({**z, "ilosc": ilosc, "cena": cena})
-    # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/dostawcy.py)
+    # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/kuchnia/dostawcy.py)
     zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
                                                 (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
     # właściciel na wolnym stanowisku: pracownik 1★ bez pensji, godziny z puli czasu właściciela (P5)
@@ -418,7 +418,7 @@ def _wlasciciel_na_stanowisku(dane: Dane, firma: Firma, w: dict, czas: cw.Czas) 
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
                  tryb_kredytu: str = "na_biezaco", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
-    `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/lokale.py: wybierz; None – bez sprawdzania lokali),
+    `lokal` – w grze z lokalami wynik decyzji o lokalu (silnik/nieruchomosci/lokale.py: wybierz; None – bez sprawdzania lokali),
     `info` – wynik `zastosuj` (odrzucone stanowiska)."""
     wynik, konkretne = [], set()   # konkretne – dania z błędem sprzętu lub kucharza (bez ogólnego „brak stanowiska”)
 

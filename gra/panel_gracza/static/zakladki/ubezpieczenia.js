@@ -1,4 +1,4 @@
-// Ubezpieczenia (gra z lokalami, silnik/awarie.py): polisy TUW na wypadki w lokalu. Decyzja `polisy: [rodzaj]` – pełna
+// Ubezpieczenia (gra z lokalami, silnik/swiat/awarie.py): polisy TUW na wypadki w lokalu. Decyzja `polisy: [rodzaj]` – pełna
 // lista; polisa chroni po karencji i trwa, dopóki drużyna jej nie wypowie. Same wypadki – w zakładce Zdarzenia.
 import { esc, naOkres, proc, tabela, zl2 } from "./wspolne.js";
 

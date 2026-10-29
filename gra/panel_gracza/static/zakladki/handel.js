@@ -1,4 +1,4 @@
-// Handel między drużynami (gra z lokalami, silnik/handel.py): oferty sprzedaży towaru i sprzętu innej drużynie,
+// Handel między drużynami (gra z lokalami, silnik/rynek/handel.py): oferty sprzedaży towaru i sprzętu innej drużynie,
 // przyjęcie w następnej rundzie, faktury w KPiR obu stron. Decyzje `handel_oferty` i `handel_przyjmij`.
 // P13: negocjacje na żywo w rundzie wystawienia – adresat widzi szkic oferty od razu i odpowiada w `handel_odpowiedzi`
 // ({"<sprzedawca>/<klucz>": {kontry, przyjmij, nr, odrzuc}}), sprzedawca dopisuje `ceny` albo `przyjmij_kontre`.

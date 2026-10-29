@@ -21,24 +21,29 @@ from copy import deepcopy
 
 import numpy as np
 
-from . import awarie as aw
-from . import banki as bk
-from . import biuro as bo
-from . import lokale as lk
-from . import menu as mn
-from . import popyt as pp
-from . import promocje as pm
-from . import reklama as rk
-from . import rynek_pracy as rp
-from . import zdarzenia as zd
 from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
-from .dostawcy import ceny_rundy
-from .finanse import Ksiega, Rachunek
-from .jakosc import mnoznik_wyposazenia
+from .ksiegowosc import biuro as bo
+from .ksiegowosc.finanse import Ksiega, Rachunek
+from .kuchnia import menu as mn
+from .kuchnia.dostawcy import ceny_rundy
+from .kuchnia.jakosc import mnoznik_wyposazenia
+from .kuchnia.planowanie import (
+    godziny_uslugi,
+    kasjerzy_potrzebni,
+    stanowiska_potrzebne,
+    zamowienie_zasobow,
+)
 from .losowosc import strumien
+from .ludzie import rynek_pracy as rp
 from .model import Firma, StanGry
-from .planowanie import godziny_uslugi, kasjerzy_potrzebni, stanowiska_potrzebne, zamowienie_zasobow
+from .nieruchomosci import lokale as lk
+from .pieniadze import banki as bk
+from .rynek import popyt as pp
+from .rynek import promocje as pm
+from .rynek import reklama as rk
+from .swiat import awarie as aw
+from .swiat import zdarzenia as zd
 
 DOMYSLNY_POZIOM = "sredni"
 
@@ -315,7 +320,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     d: dict = {"zatrudnij": [], "sprzet_kup": [], "zamowienia": []}
     pz = poziom(dane, konf, nazwa)
     planuje = pz.get("planowanie", "przepustowosc") == "przepustowosc" and dane.mapa.get("popyt")
-    # wszystkie lokale z wypowiedzianym najmem (nowy właściciel budynku, silnik/przejecia.py) – szuka nowego
+    # wszystkie lokale z wypowiedzianym najmem (nowy właściciel budynku, silnik/nieruchomosci/przejecia.py) – szuka nowego
     wyprowadzka = f.lokale and all(x.najem_do is not None for x in f.lokale) \
         and runda >= lk.runda_nowego_lokalu(dane, f)
     if not f.lokale or wyprowadzka:

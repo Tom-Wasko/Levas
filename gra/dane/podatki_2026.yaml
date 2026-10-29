@@ -1,5 +1,5 @@
-# Podatki i ZUS jednoosobowej działalności (gra z lokalami, F3a.11: silnik/finanse.py – rejestr VAT,
-# silnik/rozliczenie.py – rozliczenie tygodnia). Gra Revas (bez mapy) nadal liczy CIT z zalozenia.yaml.
+# Podatki i ZUS jednoosobowej działalności (gra z lokalami, F3a.11: silnik/ksiegowosc/finanse.py – rejestr VAT,
+# silnik/ksiegowosc/rozliczenie.py – rozliczenie tygodnia). Gra Revas (bez mapy) nadal liczy CIT z zalozenia.yaml.
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'JDG na KPiR, czynny podatnik VAT, PIT liniowy. Wszystkie ceny w danych gry są brutto: VAT jest wydzielany
   z kwoty (netto = brutto / (1 + stawka)), KPiR dostaje netto, rejestr VAT – podatek. Rozliczenie co rundę

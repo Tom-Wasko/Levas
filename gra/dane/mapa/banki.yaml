@@ -1,4 +1,4 @@
-# Banki gry z lokalami (F3a.9, silnik/banki.py) – sześć prawdziwych banków, każdy z inną najlepszą ofertą
+# Banki gry z lokalami (F3a.9, silnik/pieniadze/banki.py) – sześć prawdziwych banków, każdy z inną najlepszą ofertą
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Konto firmowe (opłata miesięczna, terminal: abonament miesięczny + prowizja od płatności kartą), lokaty
   (okres w rundach → oprocentowanie roczne), limit w koncie (kredyt odnawialny uruchamiany sam przy braku gotówki),

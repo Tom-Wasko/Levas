@@ -13,7 +13,7 @@ Jesteś jednocześnie doświadczonym projektantem gier edukacyjnych, badaczem UX
 - **Cel rozgrywki:** gra ma wciągać, nie może zniechęcać i ma nagradzać myślenie, a nie zgadywanie.
 - **Wizja i zasady:** `notatki/Główny obraz.md`, `Zarys aplikacji.md`, `Ustalenia gry.md`, `Prawidła świata.md`, `Elementy mapy.md`, `Menu i składniki.md`, `Zdarzenia i historie.md`, `Artstyle.md`.
 - **Dla gracza:** `gra/INSTRUKCJA.md` i strona `/jak-grac`.
-- **Pomysły ze starej wersji:** `ROZNICE_LEVAS_STARY.md`.
+- **Pomysły ze starej wersji:** `dokumentacja/ROZNICE_LEVAS_STARY.md`.
 
 ## Jak pracować
 1. **A1 – przygotowanie.**

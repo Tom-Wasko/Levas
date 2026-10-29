@@ -1,6 +1,6 @@
-// Zdarzenia – eventy w parkach (gra z lokalami, silnik/zdarzenia.py). Co rundę w parkach zaczynają się 3–4 historie,
+// Zdarzenia – eventy w parkach (gra z lokalami, silnik/swiat/zdarzenia.py). Co rundę w parkach zaczynają się 3–4 historie,
 // te same dla wszystkich drużyn (P9: opcje po 2–5 h – czasu właściciela nie starczy na wszystko); każda drużyna wybiera reakcję (decyzja `zdarzenia: {historia: opcja}`). Do tego
-// historie jednej drużyny: bank żywności i wypadki w lokalu (silnik/awarie.py – szkody i polisy).
+// historie jednej drużyny: bank żywności i wypadki w lokalu (silnik/swiat/awarie.py – szkody i polisy).
 import { esc, licz, proc, tabela, zl2 } from "./wspolne.js";
 
 function kosztTekst(k) {

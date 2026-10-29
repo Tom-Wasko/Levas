@@ -1,4 +1,4 @@
-// Rynek pracy (gra z lokalami, silnik/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
+// Rynek pracy (gra z lokalami, silnik/ludzie/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
 // i okresy wypowiedzenia. Kandydatów z puli zatrudnia się w zakładce HR → Zatrudnienie.
 import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
 

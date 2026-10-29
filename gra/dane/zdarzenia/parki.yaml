@@ -1,4 +1,4 @@
-# Eventy w parkach (F3b.1, P9; silnik/zdarzenia.py) – co rundę 3–4 historie, te same dla wszystkich drużyn
+# Eventy w parkach (F3b.1, P9; silnik/swiat/zdarzenia.py) – co rundę 3–4 historie, te same dla wszystkich drużyn
 # Sprawdzenie: python -m silnik.dane sprawdz
 opis: 'Co rundę w parkach Lublina dzieją się 3–4 rzeczy, w których każda drużyna może wziąć udział (niezależnie od
   innych). Historia ma kilka scen w kolejnych rundach; wybór w scenie zmienia dalszy ciąg. Opcje kosztują czas

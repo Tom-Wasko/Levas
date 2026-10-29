@@ -3,7 +3,7 @@ import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wykres, zl, zl
 
 const grosze = (x) => Math.round(x * 100) / 100;
 
-// widełki ceny dania (silnik/menu.py: widelki_ceny) – cena rynkowa = preferowana × średni mnożnik cen stref
+// widełki ceny dania (silnik/kuchnia/menu.py: widelki_ceny) – cena rynkowa = preferowana × średni mnożnik cen stref
 function widelki(kat, u) {
   const g = kat.mapa?.menu?.ceny;
   if (!g) return null;

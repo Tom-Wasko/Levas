@@ -19,7 +19,7 @@ const GRUPY = [
   ["Biuro rachunkowe", (p) => /biura rachunkowego|kadrowo/.test(p.opis) ? p.pozostale : 0],
 ];
 
-// Samodzielna księgowość (silnik/biuro.py): wynik podatkowy rundy – dopiero po deklaracjach drużyny.
+// Samodzielna księgowość (silnik/ksiegowosc/biuro.py): wynik podatkowy rundy – dopiero po deklaracjach drużyny.
 export const UKRYTE = `<div class="komunikat">Księgujesz sam: KPiR, VAT i podatki za tę rundę zobaczysz po złożeniu deklaracji
   (Finanse → Biuro rachunkowe) i przeliczeniu rundy.</div>`;
 
@@ -30,7 +30,7 @@ function koszty(k) {
   return wynik.filter(([, x]) => Math.abs(x) > 0.004);
 }
 
-// Uzgodnienie kasy z KPiR (silnik/uzgodnienie.py): skąd wzięła się zmiana salda – metodą pośrednią.
+// Uzgodnienie kasy z KPiR (silnik/ksiegowosc/uzgodnienie.py): skąd wzięła się zmiana salda – metodą pośrednią.
 function uzgodnienieHtml(U) {
   if (!U) return "";
   const wiersze = [["Saldo konta na początku rundy", zl2(U.poczatek)],
@@ -100,7 +100,7 @@ let zakladkaBanku = "historia", wyborBanku = false;
 export const bank = {
   tytul: "Bank", tytulPelny: "Finanse - bank", ikona: "🏦", odblokowanie: "finanse_bank",
   info: "Wybierz bank, w którym Twoja firma będzie prowadzić konto firmowe. Zarządzaj lokatami i kredytami.",
-  wynikiGdy: (v) => !!v.gra.lokale,   // w grze z lokalami: opłaty, raty, przejęcia (silnik/banki.py)
+  wynikiGdy: (v) => !!v.gra.lokale,   // w grze z lokalami: opłaty, raty, przejęcia (silnik/pieniadze/banki.py)
   wyniki: (c) => wynikiBanku(c),
   decyzje({ v, kat, edycja }) {
     if (v.gra.lokale) return decyzjeBanku({ v, kat, edycja }) + LEKCJA_BANK;
@@ -181,7 +181,7 @@ export const bank = {
   },
 };
 
-// Gra z lokalami (silnik/biuro.py): biura z mapy albo samodzielna księgowość – dokumenty z poprzedniej rundy
+// Gra z lokalami (silnik/ksiegowosc/biuro.py): biura z mapy albo samodzielna księgowość – dokumenty z poprzedniej rundy
 // do zaksięgowania (kolumna KPiR, stawka VAT) i trzy deklaracje; podsumowanie liczone na bieżąco z zapisów.
 const STAWKI = [0, 0.05, 0.08, 0.23];
 const PRZYCHODY = ["przychod", "przychod_pozostaly"];
@@ -192,7 +192,7 @@ function czesci(x, z) {   // [{stawka, brutto}] dokumentu wg zapisu drużyny (fa
   return z.stawka == null || z.stawka === "" ? [] : [{ stawka: Number(z.stawka), brutto: x.brutto }];
 }
 
-// Kwoty deklaracji z zapisów drużyny – ten sam wzór co silnik/rozliczenie.py (od stanu przed rundą).
+// Kwoty deklaracji z zapisów drużyny – ten sam wzór co silnik/ksiegowosc/rozliczenie.py (od stanu przed rundą).
 export function podsumowanieDeklaracji(D, zapisy, P) {
   const s = { przychody: 0, koszty: 0, nalezny: 0, naliczony: 0, zaksiegowane: 0 };
   for (const x of D.dokumenty) {

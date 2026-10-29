@@ -1,4 +1,4 @@
-// Lichwiarz Harpagon (gra z lokalami, silnik/lichwiarz.py): pożyczka „na czarno” od ręki, poza KPiR.
+// Lichwiarz Harpagon (gra z lokalami, silnik/pieniadze/lichwiarz.py): pożyczka „na czarno” od ręki, poza KPiR.
 // Po terminie rośnie presja: przypomnienia, odsetki karne, wizyty (szkody, odpływ klientów, odejście pracownika).
 import { esc, okno, proc, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
 

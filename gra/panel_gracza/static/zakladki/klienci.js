@@ -1,4 +1,4 @@
-// Klienci i strefy: popyt strefowy w grze z lokalami (silnik/popyt.py, dane/mapa/popyt.yaml) – pule klientów stref,
+// Klienci i strefy: popyt strefowy w grze z lokalami (silnik/rynek/popyt.py, dane/mapa/popyt.yaml) – pule klientów stref,
 // dni tygodnia, kalendarz miejski i wyniki dzień po dniu. Bez gotowej prognozy – popyt drużyna liczy sama (test gry 28.10).
 import { esc, licz, nazwaFirmy, proc, tabela, wykres } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";

@@ -6,7 +6,7 @@ Runda r = tydzień r gry z lokalami (dane/mapa). Kolejność jak w KPiR i banku 
  3. decyzje: lokal, stanowiska, sprzęt, kadry, dostawy, udogodnienia, wyposażenie, kampanie, promocje, szkolenia,
     polisy, higiena, eventy w parkach,
  4. od rundy 2: popyt strefowy → obsługa klientów w lokalach → przychody,
- 5. koszty rundy: pensje + ZUS, utrzymanie, lokale, amortyzacja, wynajęta chłodnia i sanepid (silnik/magazyn.py),
+ 5. koszty rundy: pensje + ZUS, utrzymanie, lokale, amortyzacja, wynajęta chłodnia i sanepid (silnik/kuchnia/magazyn.py),
     bank, biuro rachunkowe,
  6. rozliczenie JDG (składki, zaliczka PIT, VAT), kredyt odnawialny przy braku gotówki,
  7. karta wyników (od rundy 2; w grze widoczna od rundy 3).
@@ -17,39 +17,46 @@ from copy import deepcopy
 
 import numpy as np
 
-from . import awarie as aw
-from . import banki as bk
-from . import biuro as bo
 from . import boty as bt
-from . import czas_wlasciciela as cw
-from . import handel as hd
-from . import karta as kw
-from . import kasyno as kas
-from . import konkurencja as kn
-from . import lichwiarz as lw
-from . import lokale as lk
-from . import magazyn as mag
-from . import menu
-from . import popyt as pp
-from . import promocje as pm
-from . import przejecia as pr
-from . import reklama as rk
-from . import rozliczenie as rz
-from . import rynek_pracy as rp
-from . import urzad as urz
-from . import wlasciciel as wl
-from . import zdarzenia as zd
 from .dane import KUCHNIA, Dane
 from .decyzje import lista_bledow, zastosuj
-from .dostawcy import ceny_rundy
-from .finanse import Ksiega, Rachunek, ksieguj, uruchom_odnawialny, wyrownaj_gotowke, zadluzenie
-from .jakosc import mnoznik_wyposazenia
-from .kandydaci import dodaj_nowych
+from .ksiegowosc import biuro as bo
+from .ksiegowosc import rozliczenie as rz
+from .ksiegowosc import urzad as urz
+from .ksiegowosc.finanse import (
+    Ksiega,
+    Rachunek,
+    ksieguj,
+    uruchom_odnawialny,
+    wyrownaj_gotowke,
+    zadluzenie,
+)
+from .ksiegowosc.srodki_trwale import amortyzuj, ewidencja
+from .ksiegowosc.uzgodnienie import uzgodnij
+from .kuchnia import magazyn as mag
+from .kuchnia import menu
+from .kuchnia.dostawcy import ceny_rundy
+from .kuchnia.jakosc import mnoznik_wyposazenia
+from .kuchnia.operacje import kasjerzy
 from .losowosc import strumien
+from .ludzie import czas_wlasciciela as cw
+from .ludzie import rynek_pracy as rp
+from .ludzie.kandydaci import dodaj_nowych
 from .model import Firma, StanGry, do_slownika
-from .operacje import kasjerzy
-from .srodki_trwale import amortyzuj, ewidencja
-from .uzgodnienie import uzgodnij
+from .nieruchomosci import lokale as lk
+from .nieruchomosci import przejecia as pr
+from .pieniadze import banki as bk
+from .pieniadze import kasyno as kas
+from .pieniadze import lichwiarz as lw
+from .pieniadze import wlasciciel as wl
+from .rynek import handel as hd
+from .rynek import konkurencja as kn
+from .rynek import popyt as pp
+from .rynek import promocje as pm
+from .rynek import reklama as rk
+from .swiat import awarie as aw
+from .swiat import zdarzenia as zd
+from .wyniki import karta as kw
 
 EPS = 1e-9
 
@@ -57,7 +64,7 @@ EPS = 1e-9
 def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfiguracja: dict,
                    podglad: bool = False) -> StanGry:
     """Zwraca nowy stan po rundzie stan.runda + 1 (stan wejściowy nie jest zmieniany).
-    `podglad` – „Analiza – co jeśli”: deklaracje samodzielnej księgowości nie są sprawdzane (silnik/biuro.py)."""
+    `podglad` – „Analiza – co jeśli”: deklaracje samodzielnej księgowości nie są sprawdzane (silnik/ksiegowosc/biuro.py)."""
     s = deepcopy(stan)
     r = stan.runda + 1
     if not lk.tryb_lokali(dane, konfiguracja):
@@ -77,14 +84,14 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
              for n, f in s.firmy.items()}
     for nazwa in nazwy:
         ksiegi[nazwa], rachunki[nazwa] = Ksiega(vat=rz.reguly_vat(dane)), Rachunek()
-    # wyprowadzki po wypowiedzeniu najmu, potem licytacje lokali i budynków (silnik/przejecia.py)
+    # wyprowadzki po wypowiedzeniu najmu, potem licytacje lokali i budynków (silnik/nieruchomosci/przejecia.py)
     wyprowadzki = pr.koniec_najmu(dane, s, r, ksiegi, rachunki)
     lic = pr.licytacje(dane, s.firmy, decyzje, r, ziarno, lk.zajete(s.firmy))
     przetargi, przegrane = lic["przetargi"], lic["przegrane"]
-    # handel między drużynami: oferty z poprzedniej rundy przyjęte teraz – przed zakupami (silnik/handel.py)
+    # handel między drużynami: oferty z poprzedniej rundy przyjęte teraz – przed zakupami (silnik/rynek/handel.py)
     handel = hd.przyjmij(dane, s.firmy, decyzje, r, ksiegi, rachunki, ziarno)
     zajete = lk.zajete(s.firmy)
-    # agencja pracy: limit nowych, licytacje kandydatów, podkupienia i kontroferty (silnik/rynek_pracy.py)
+    # agencja pracy: limit nowych, licytacje kandydatów, podkupienia i kontroferty (silnik/ludzie/rynek_pracy.py)
     decyzje, rezerwacje, rynek_pracy = rp.przed_decyzjami(dane, s, decyzje, r, ziarno)
     for nazwa in kolejnosc:
         f = s.firmy[nazwa]
@@ -101,7 +108,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         lokal = lk.wybierz(dane, f, d.get("lokal"), r, zajete, ksiegi[nazwa], rachunki[nazwa],
                            przegrane.get((nazwa, "lokal")), bk.finansowanie_lokalu(dane, f, d, r))
         bk.kredyty_na_lokal(dane, f, bank_info, r, ksiegi[nazwa], rachunki[nazwa])   # pod zastaw kupionego lokalu
-        # kupno budynku z najemcą, wypowiedzenia najmu (silnik/przejecia.py)
+        # kupno budynku z najemcą, wypowiedzenia najmu (silnik/nieruchomosci/przejecia.py)
         info_przejecia = {"przejecie": pr.przejmij(dane, s.firmy, nazwa, d.get("przejecie"), r,
                                                    przegrane.get((nazwa, "przejecie")), ksiegi[nazwa], rachunki[nazwa]),
                           "wypowiedzenia": pr.wypowiedz(dane, s.firmy, nazwa, d.get("wypowiedz"), r)}
@@ -113,7 +120,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         info[nazwa]["harpagon"] = harpagon_info
         info[nazwa]["wlasciciel"], info[nazwa]["kasyno"] = portfel_info
         info[nazwa]["przejecia"] = info_przejecia
-        # higiena i odbiór lokali przez sanepid – po lokalach i inwestycjach (silnik/urzad.py)
+        # higiena i odbiór lokali przez sanepid – po lokalach i inwestycjach (silnik/ksiegowosc/urzad.py)
         info[nazwa]["urzad"] = urz.ustaw(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa])
         # wspólna pula: zatrudnieni z niej znikają, zwolnieni wracają
         zatrudnieni = set(info[nazwa]["zatrudnieni"])
@@ -121,7 +128,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
         bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
         bledy[nazwa] += wl.bledy(info[nazwa]["wlasciciel"], info[nazwa]["kasyno"])
-        if dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/zdarzenia.py)
+        if dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/swiat/zdarzenia.py)
             czas = cw.z_podsumowania(info[nazwa]["czas_wlasciciela"])
             info[nazwa]["zdarzenia"] = zd.rozegraj(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa], czas)
             # detektyw: zlecenie obserwacji rywala – godziny i koszt teraz, raport po wynikach wszystkich firm
@@ -214,16 +221,16 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                               + sum(wy[n]["utrzymanie"] for n in f.wyposazenie)))
         lk.koszty_rundy(dane, f, r, ks, rach, s.firmy)
         amortyzuj(dane, f, r, ks)
-        # wynajęta chłodnia i kontrola sanepidu (silnik/magazyn.py)
+        # wynajęta chłodnia i kontrola sanepidu (silnik/kuchnia/magazyn.py)
         info[nazwa]["magazyn"] = mag.koniec_rundy(dane, f, r, ziarno, (strefowy or {}).get("swiezosc", {}).get(nazwa) or {},
                                                   ks, rach, urz.modyfikatory(dane, f, r))
         bank_koniec = bk.koniec_rundy(dane, f, r, ks, rach)
         info[nazwa]["harpagon_odsetki"] = lw.koniec_rundy(dane, f, r)   # doliczone do długu, poza KPiR
         if not podglad:   # zaproszenie do klubu na następną rundę
             info[nazwa]["zaproszenie"] = kas.zaproszenie(dane, f, r, ziarno, konfiguracja["liczba_rund"])
-        if f.biuro in bo.biura(dane):   # biura z mapy albo samodzielna księgowość (silnik/biuro.py)
+        if f.biuro in bo.biura(dane):   # biura z mapy albo samodzielna księgowość (silnik/ksiegowosc/biuro.py)
             info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, len(etat), len(f.pracownicy) - len(etat))
-        # JDG: składki właściciela, zaliczka PIT i VAT (silnik/rozliczenie.py)
+        # JDG: składki właściciela, zaliczka PIT i VAT (silnik/ksiegowosc/rozliczenie.py)
         samodzielnie = bo.zamknij_samodzielnie(f, r >= konfiguracja["liczba_rund"])
         stan_przed = bo.stan_rozliczen(f)
         info[nazwa]["rozliczenie"] = rz.rozlicz(dane, f, r, ks, rach, zaplac=not samodzielnie)
