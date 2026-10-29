@@ -3,11 +3,17 @@ import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, tabe
 
 const kategorie = (kat) => [...new Set(Object.values(kat.uslugi).map((u) => u.kategoria))];  // kolejność jak w uslugi.yaml
 const JAK = { 1: "Niska", 2: "Średnia", 3: "Wysoka" };
+const MIESIACE = Array.from({ length: 12 }, (_, i) => {
+  const m = new Date(2025, i, 1).toLocaleString("pl-PL", { month: "long" });
+  return m[0].toUpperCase() + m.slice(1);
+});
 
+// słupek na miesiąc; po najechaniu: mnożnik popytu dania w tym miesiącu
 function sezon(u, miesiac) {
   const max = Math.max(...u.sezonowosc);
   return `<div class="sezon" title="Sezonowość (styczeń–grudzień)">${u.sezonowosc.map((s, i) =>
-    `<i class="${i === miesiac ? "ten" : ""}" style="height:${Math.round((s / max) * 22)}px"></i>`).join("")}</div>`;
+    `<i class="${i === miesiac ? "ten" : ""}" style="height:${Math.round((s / max) * 22)}px"
+      title="${MIESIACE[i]}: popyt × ${licz(s, 2)}${i === miesiac ? " (miesiąc sprzedaży)" : ""}"></i>`).join("")}</div>`;
 }
 
 export const prognozaBazowa = (u, miesiac) => Math.round((u.popyt_roczny / OKRES.rund_w_roku) * u.sezonowosc[miesiac]);

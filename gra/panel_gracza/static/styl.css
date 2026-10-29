@@ -153,6 +153,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
 .sezon { display: flex; gap: 2px; align-items: flex-end; height: 22px; }
 .sezon i { width: 5px; background: var(--pom); display: block; border-radius: 1px; opacity: .7; }
 .sezon i.ten { background: var(--czarny); opacity: 1; }
+.sezon i:hover { opacity: 1; cursor: help; outline: 1px solid var(--czarny); }
 .gwiazdki { color: var(--pom); letter-spacing: 1px; white-space: nowrap; }
 .gwiazdki .p { color: #d4d4d8; }
 
