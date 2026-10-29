@@ -107,6 +107,9 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant("lokale:drugi", "drugi lokal jak bot trudny",
                   poziom=(("kolejny_lokal", drugi),)),
           Wariant("lokale:jeden", "bez drugiego lokalu", poziom=(("kolejny_lokal", None),))]
+    # B3: umiejętności poziomu trudnego pojedynczo wyłączone (na innych poziomach – bez zmian)
+    w += [Wariant(f"poziom:bez_{u}", f"poziom bez ustawienia {u}", poziom=((u, None),))
+          for u in ("korekta_prognozy", "mnozniki_ceny", "obsluga_kampanii")]
     return {x.nazwa: x for x in w}
 
 

@@ -291,12 +291,15 @@ def _prognoza_lokali(dane: Dane, f: Firma, nazwa: str, oferta: list[str], ceny: 
 
 
 def _korekta_prognozy(stan: StanGry, nazwa: str, runda: int, granice: list[float]) -> float:
-    """Popyt / prognoza poprzedniej rundy (bot trudny poprawia nią prognozę), w granicach z danych."""
+    """Błąd modelu popytu, którym bot trudny poprawia prognozę, w granicach z danych. W raporcie rundy
+    „prognoza” to oferta bota, a ta zawiera już korektę z tamtej rundy – stąd korekta narastająco (B3: sam
+    stosunek popyt / oferta przy stałym błędzie modelu skakał co rundę między błędem a 1)."""
     sp = (stan.wyniki.get(runda - 1, {}).get(nazwa) or {}).get("sprzedaz", {}).values()
     prog = sum(v["prognoza"] for v in sp if v["prognoza"])
     if not prog:
         return 1.0
-    return min(max(granice), max(min(granice), sum(v["popyt"] for v in sp if v["prognoza"]) / prog))
+    k = _korekta_prognozy(stan, nazwa, runda - 1, granice) * sum(v["popyt"] for v in sp if v["prognoza"]) / prog
+    return min(max(granice), max(min(granice), k))
 
 
 def _prognoza_czlowieka(dane: Dane, stan: StanGry, f: Firma, nazwa: str, oferta: list[str], runda: int,

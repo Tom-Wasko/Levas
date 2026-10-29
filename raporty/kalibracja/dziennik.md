@@ -214,3 +214,32 @@ wpis na dole.
   rundzie N, a ta pokazuje skutki rundy N−1 (jak w REVAS: wyniki rundy r widać w rundzie r+1). Drużyna nie widzi
   więc wyników ani miejsca po ostatniej rundzie, a mistrz gry widzi. Czy po końcu gry pokazać drużynie widok
   „po rundzie N” (wyniki ostatniej rundy i końcowe miejsce)? Warto to sprawdzić w części A.
+
+## B3 – boty, część do pomiaru: poziomy łatwy < średni < trudny (29.10.2026, Claude Code, Opus 5.5)
+- Do pomiaru B4 boty nie muszą same wybierać opcji: warianty z B2 (banki, dostawcy, kupno, lokale…) wymuszają
+  decyzje badanej firmy. Reszta B3 (każda strategia sięga po każdą opcję) to krok 0 każdego obszaru B6–B12.
+- Pomiar poziomów: 18 rund, 6 firm, badana wśród średnich rywali, 5 strategii × ziarna 1–8
+  (`pomiary/b3_poziomy` – przed, `b3_poziomy_blad` – krok pośredni, `b3_poziomy_po` – po).
+- Przed: karta skumulowana łatwy 0,207, średni 0,540, trudny 0,797; średni < trudny tylko w 19/40 par
+  (agresywny 8/8 dzięki drugiemu lokalowi, premium 1/8, zrównoważony 2/8, tani i naśladowca 4/8).
+- Ablacja trudnego (warianty `poziom:bez_…`, 32 pary): bez korekty prognozy +0,15 ± 0,07 (84%, „lepszy”),
+  bez mnożników ceny i bez progu kampanii – szum.
+- Zmiany:
+  1. `silnik/boty.py: _korekta_prognozy` – błąd: „prognoza” w raporcie to oferta bota, która ma już korektę,
+     więc stosunek popyt / prognoza przy stałym błędzie modelu skakał co rundę między błędem a 1. Teraz
+     korekta narastająco (poprzednia × popyt / oferta) i zbiega do błędu modelu. Po poprawce wariant „bez
+     korekty” to szum (+0,02 ± 0,04).
+  2. `dane/boty.yaml`, średni: `blad_prognozy: 0.1` (było brak) – średni planował z dokładnego modelu popytu
+     prawie jak trudny. Wpływ mały (średni 0,540 → 0,524).
+  3. `dane/boty.yaml`, trudny i niemożliwy: `kolejny_lokal.obsluga` 0,85 → 1,0 – drugi lokal, gdy stać
+     (gotówka > 60 / 45 tys. zł), a nie tylko przy brakach obsługi. Wariant w parach: +0,33 ± 0,09 karty,
+     89% wygranych, +32 tys. zł majątku, bez alarmów. Bot „jak człowiek dobry” bez zmian (to B5).
+- Po: łatwy 0,207, średni 0,524, trudny 1,132 (majątek 80 / 126 / 186 tys. zł). Łatwy < średni w 39/40 par,
+  średni < trudny w 37/40 – przy każdej strategii (agresywny 8/8, naśladowca 8/8, tani 8/8, zrównoważony 7/8,
+  premium 6/8).
+- Dla B4 (hipotezy): drugi lokal opłaca się prawie zawsze, gdy jest gotówka (do sprawdzenia, czy to nie
+  dominacja); agresywny na poziomie łatwym i średnim ma alarmy debetu w 4–5/8 gier, a na łatwym ujemną kartę
+  (H17).
+- Testy: nowy `test_korekta_prognozy_trudnego_zbiega_do_bledu_modelu` (`testy/rdzen/test_boty.py`); w
+  `balans/warianty.py` nowe warianty `poziom:bez_korekta_prognozy|mnozniki_ceny|obsluga_kampanii`. Inne testy
+  bez zmian.

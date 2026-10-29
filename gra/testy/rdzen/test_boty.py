@@ -117,3 +117,16 @@ def test_poziomy_jak_czlowiek_tylko_do_pomiarow():
     assert len(wersje) == 3 and all(poziomy[k].get("tylko_pomiar") for k in wersje)
     with pytest.raises(ValueError, match="prognoza_czlowieka"):
         PoziomBota(nazwa="x", opis="x", prognoza_czlowieka={"rund": 1}, mnozniki_ceny=[1.1])
+
+
+def test_korekta_prognozy_trudnego_zbiega_do_bledu_modelu():
+    """B3: raport pokazuje ofertę bota (prognoza z korektą), więc korekta liczy się narastająco – przy stałym
+    błędzie modelu (+10%) zbiega do niego, zamiast skakać co rundę między 1,1 a 1,0."""
+    from types import SimpleNamespace
+
+    stan, ks = SimpleNamespace(wyniki={1: {"A": {"sprzedaz": {}}}}), []
+    for r in range(2, 8):
+        k = boty._korekta_prognozy(stan, "A", r, [0.8, 1.25])
+        ks.append(k)
+        stan.wyniki[r] = {"A": {"sprzedaz": {"kebab": {"popyt": 110, "prognoza": round(100 * k)}}}}
+    assert ks[0] == 1.0 and all(abs(k - 1.1) < 0.01 for k in ks[1:])

@@ -290,7 +290,7 @@ Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4
 
 ### Pomiar i kalibracja
 
-- [ ] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru; przed B4 – część do pomiaru i poziomy łatwy < średni < trudny
+- [x] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru; przed B4 – część do pomiaru i poziomy łatwy < średni < trudny — zrobione 29.10.2026 (część przed B4): poprawiona korekta prognozy trudnego, średni z prognozą ±10%, trudny otwiera drugi lokal, gdy stać – średni < trudny w 37/40 par (było 19/40), przy każdej strategii; reszta B3 to krok 0 obszarów B6–B12
 - [ ] B4 Pomiar startowy: dominacje, hipotezy z B1, krzywa trudności, strategie, 4/6/8 firm, realia (`raporty/kalibracja/stan_poczatkowy.md`); tag `kalibracja-start`
 - [ ] B5 Gospodarka i trudność (popyt, koszty poza prawem, kapitał; pierwszy plus bota „jak człowiek” średniego w rundzie 4–6) – **do zatwierdzenia przez autora; część A czeka na zatwierdzenie**
 
