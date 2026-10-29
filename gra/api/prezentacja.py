@@ -14,7 +14,7 @@ from silnik.gra import Gra
 from silnik.ksiegowosc import biuro as bo
 from silnik.ksiegowosc import rozliczenie as rz
 from silnik.ksiegowosc import urzad as urz
-from silnik.ksiegowosc.finanse import Ksiega, Rachunek
+from silnik.ksiegowosc.finanse import Ksiega, Rachunek, zadluzenie
 from silnik.ksiegowosc.srodki_trwale import ewidencja
 from silnik.kuchnia import magazyn as mag
 from silnik.kuchnia import swiezosc
@@ -34,6 +34,7 @@ from silnik.nieruchomosci.lokale import (
     zajete,
 )
 from silnik.pieniadze import banki as bk
+from silnik.pieniadze import inwestor as inw
 from silnik.pieniadze import kasyno as kas
 from silnik.pieniadze import lichwiarz as lw
 from silnik.pieniadze import wlasciciel as wl
@@ -390,9 +391,13 @@ def przeglad_mg(gra: Gra) -> dict:
             "poziom": f.get("poziom") if f["bot"] else None,
             "wyslane": None if f["bot"] else n in wyslane,
             "gotowka": fs.gotowka,
-            "zadluzenie": sum(k.pozostalo for k in fs.kredyty) + fs.kredyt_odnawialny,
+            "zadluzenie": zadluzenie(fs),
             "lokaty": sum(lk.kwota for lk in fs.lokaty),
             "majatek_netto": _majatek_netto(stan.wyniki.get(ostatnia, {}).get(n)),
+            # Z3: debet ponad limit (blokada w bieżącej rundzie), inwestor ratunkowy i wpłata przysłana na tę rundę
+            "alarm": bk.debet_ponad_limit(dane, fs) if ostatnia >= gra.runda_startowa else 0.0,
+            "inwestor": inw.raport(fs, None, 0.0),
+            "inwestor_przyslany": inw.przyznany(konf, n, r),
             "pracownicy": len(fs.pracownicy), "stanowiska": len(fs.stanowiska),
             "dochod_ostatni": wyn[-1] if wyn else None, "dochod_suma": round(sum(wyn), 2),
             "wynik_ostatni": karta_ost.get(n, {}).get("wynik_dzialalnosci"),
@@ -408,6 +413,7 @@ def przeglad_mg(gra: Gra) -> dict:
                 "auto_zamowienia": bool(konf.get("auto_zamowienia")),
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
                 "lokale": True,
+                "inwestor": inw.warunki(dane),   # warunki inwestora ratunkowego (Z3)
                 "brakujace": [] if gra.zakonczona else gra.brakujace(),
                 "kalendarz": kalendarz(dane, konf["liczba_rund"])},
         "firmy": firmy,

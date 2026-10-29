@@ -104,6 +104,7 @@ RODZAJE_OPERACJI = {"kpir": "Zapisy w KPiR", "korekta": "Korekty zapisów w KPiR
                     "podatki": "Podatki i składki", "inwestycje": "Inwestycje (lokale, budowa, środki trwałe)",
                     "kredyty": "Kredyty", "lokaty": "Lokaty", "kaucje": "Kaucje za lokale",
                     "harpagon": "Harpagon (poza księgami)",
+                    "inwestor": "Inwestor ratunkowy (poza KPiR)",
                     "wlasciciel": "Wpłaty i wypłaty własne właściciela (poza KPiR)",
                     "kary": "Mandaty i kary (poza KPiR – nie są kosztem podatkowym)"}
 
@@ -163,4 +164,6 @@ def wyrownaj_gotowke(firma: Firma, rachunek: Rachunek, pobrany_w_miesiacu: float
 
 
 def zadluzenie(firma: Firma) -> float:
-    return round(sum(k.pozostalo for k in firma.kredyty) + firma.kredyt_odnawialny, 2)
+    """Kredyty i debet; niezwrócona wpłata inwestora ratunkowego liczy się jak dług (Z3)."""
+    inwestor = firma.inwestor.dlug if firma.inwestor else 0.0
+    return round(sum(k.pozostalo for k in firma.kredyty) + firma.kredyt_odnawialny + inwestor, 2)

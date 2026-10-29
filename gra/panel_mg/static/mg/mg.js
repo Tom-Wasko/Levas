@@ -1,5 +1,5 @@
 // Panel mistrza gry: zakładki Decyzje (kto wysłał, zamknięcie i cofnięcie rundy, pauza, harmonogram zamykania rund,
-// harmonogram odblokowań gry z lokalami, poziomy botów), Wyniki (ranking, wykresy, eksport CSV) i Drużyny (skład 1–4 uczniów, konta uczniów).
+// harmonogram odblokowań gry z lokalami, poziomy botów, alarm debetu i inwestor ratunkowy), Wyniki (ranking, wykresy, eksport CSV) i Drużyny (skład 1–4 uczniów, konta uczniów).
 // Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg), GET /api/gry/<id>/druzyny.
 import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, termin, toast, ustawKalendarz, wsk, wyczyscWykresy,
   wykres, zamknijOkno, zl }
@@ -59,6 +59,29 @@ function statusDecyzji(f, gra) {
   return `<span class="chip pom" title="${a.zapisal ? `Ostatni zapis: ${esc(a.zapisal.nazwa)}, ${godzina(a.zapisal.kiedy)}` : "Brak zapisanych decyzji"}">czeka</span>`;
 }
 
+// Z3: debet ponad limit – w tej rundzie blokada inwestycji i kredytów; mistrz gry może przysłać inwestora ratunkowego
+function alarm(f, gra) {
+  if (gra.zakonczona) return "";
+  if (f.inwestor_przyslany) return ` <span class="chip ok" title="Wpłata na początku rundy ${gra.runda}">inwestor: ${zl(f.inwestor_przyslany)}</span>
+    <a data-akcja="inwestor-odwolaj" data-f="${esc(f.nazwa)}">odwołaj</a>`;
+  if (!(f.alarm > 0)) return "";
+  const ratunek = f.inwestor ? "" : ` <a data-akcja="inwestor" data-f="${esc(f.nazwa)}">przyślij inwestora</a>`;
+  return ` <span class="chip pom" title="W tej rundzie zablokowane inwestycje, kredyty, leasing i lokaty">debet ponad limit ${zl(f.alarm)}</span>${ratunek}`;
+}
+
+function przyslijInwestora(nazwa) {
+  const { gra, firmy } = S.p;
+  const w = gra.inwestor;
+  const f = firmy.find((x) => x.nazwa === nazwa);
+  okno(`Inwestor dla „${esc(nazwa)}”`, `<p>Inwestor wpłaci pieniądze na początku rundy ${gra.runda}: najpierw spłaci debet, reszta zostanie w kasie.
+      Przez ${w.rund} rund weźmie ${Math.round(w.udzial * 100)}% dodatniego dochodu netto. Dopóki wpłata nie wróci, liczy się jak dług
+      (wskaźnik zadłużenia w karcie, majątek netto) – ratunek pozwala grać dalej, ale nie poprawia miejsca w rankingu. Jeden inwestor na grę.</p>
+    <p><label>Wpłata (najwyżej ${zl(w.max_kwota)}): <input type="number" id="kwota-inwestora" min="1" max="${w.max_kwota}"
+      value="${Math.min(w.max_kwota, Math.ceil(f.alarm))}"> zł</label></p>`,
+  { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
+    <button class="btn pom" data-akcja="inwestor-tak" data-f="${esc(nazwa)}">Przyślij inwestora</button>` });
+}
+
 function decyzje() {
   const { gra, firmy, prowadzenie: P } = S.p;
   const druzyny = firmy.filter((f) => !f.bot);
@@ -69,14 +92,17 @@ function decyzje() {
     : `Decyzje wysłało ${wyslaly} z ${druzyny.length} ${druzyny.length === 1 ? "drużyny" : "drużyn"}. Runda zamyka się sama, gdy wyślą wszystkie.${kiedy}
        Możesz zamknąć ją wcześniej – drużyny bez wysłanych decyzji zagrają wtedy decyzjami zapisanymi do tej pory.`;
   const harm = P.harmonogram.length ? esc(P.harmonogram_opis) : "brak – rundę zamykasz sam(a) albo zamyka się, gdy wyślą wszyscy";
-  const wiersze = firmy.map((f) => [`<b>${esc(f.nazwa)}</b>`, prowadzi(f), statusDecyzji(f, gra), zl(f.gotowka),
+  const wiersze = firmy.map((f) => [`<b>${esc(f.nazwa)}</b>`, prowadzi(f), statusDecyzji(f, gra), zl(f.gotowka) + alarm(f, gra),
     `<a class="btn jasny maly" href="${strona(f)}" target="_blank" rel="noopener">Strona firmy</a>`]);
   const ustawienia = [["Kapitał startowy", zl(gra.kapital)], ["Ziarno losowości", esc(gra.ziarno)],
     ["Kredyt odnawialny", gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "na niedobór na koniec rundy"],
     ["Ceny dostawców", gra.ceny_dostawcow === "losowe" ? "wszystkie generowane" : "z danych, dalej generowane"],
     ["Przycisk „Zamów brakujące” w Dostawcach", `${gra.auto_zamowienia ? "włączony" : "wyłączony"}${gra.zakonczona ? ""
       : ` <a data-akcja="auto-zamowienia">${gra.auto_zamowienia ? "wyłącz" : "włącz"}</a>`}`]];
-  return `${info(opis)}
+  const alarmy = gra.zakonczona ? [] : firmy.filter((f) => f.alarm > 0 && !f.inwestor_przyslany);
+  const opisAlarmu = alarmy.length ? info(`<b>Alarm – debet ponad limit konta:</b> ${alarmy.map((f) => esc(f.nazwa)).join(", ")}.
+    W tej rundzie nie mogą inwestować ani brać kredytów, leasingu i lokat. Drużynę bez inwestora możesz uratować – link „przyślij inwestora” przy gotówce.`) : "";
+  return `${info(opis)}${opisAlarmu}
     ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", ""], wiersze, { klasy: ["l", "l"] })}
     <div class="przyciski-mg">
       ${gra.zakonczona ? "" : `<button class="btn pom" data-akcja="zamknij" ${P.pauza ? "disabled" : ""}>Zamknij rundę ${gra.runda}</button>
@@ -268,6 +294,14 @@ async function wykonaj(akcja, el) {
     const auto = !S.p.gra.auto_zamowienia;
     await api(`${URL_GRY}/prowadzenie`, "POST", { auto_zamowienia: auto });
     toast(auto ? "Drużyny mogą zamawiać brakujące składniki jednym przyciskiem." : "Przycisk „Zamów brakujące” wyłączony.");
+    return wczytaj();
+  }
+  if (akcja === "inwestor") return przyslijInwestora(el.dataset.f);
+  if (akcja === "inwestor-tak" || akcja === "inwestor-odwolaj") {
+    const kwota = akcja === "inwestor-tak" ? +document.getElementById("kwota-inwestora").value : 0;
+    await api(`${URL_GRY}/prowadzenie`, "POST", { inwestor: { firma: el.dataset.f, kwota } });
+    zamknijOkno();
+    toast(kwota ? `Inwestor wpłaci ${zl(kwota)} na początku rundy ${S.p.gra.runda}.` : "Inwestor odwołany.");
     return wczytaj();
   }
   if (akcja === "odswiez") return wczytaj();

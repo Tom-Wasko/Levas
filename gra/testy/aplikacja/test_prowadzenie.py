@@ -1,5 +1,5 @@
 """Prowadzenie gry przez mistrza gry (F3a.14): harmonogram zamykania rund, pauza, wgląd w drużyny tylko do
-odczytu, poziom botów, eksport wyników do arkusza."""
+odczytu, poziom botów, eksport wyników do arkusza, alarm debetu i inwestor ratunkowy (Z3)."""
 
 from datetime import datetime, timedelta
 from io import StringIO
@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from gry import harmonogram as hg
+from gry import serwisy
 from gry.models import Gra
 
 pytestmark = pytest.mark.django_db
@@ -136,3 +137,19 @@ def test_eksport_csv(client, gra, uczen):
     assert ranking[0].startswith("﻿miejsce;firma") and len(ranking) == 4 and ranking[1].startswith("1;")
     assert client.get(f"/api/gry/{gra}/inne.csv").status_code == 404
     assert uczen("ala").get(f"/api/gry/{gra}/wyniki.csv").status_code == 403
+
+
+def test_alarm_debetu_i_inwestor_ratunkowy(client, gra):
+    """Z3: alarm przy firmie z debetem ponad limit; mistrz gry przysyła inwestora albo go odwołuje."""
+    assert client.post(f"/api/gry/{gra}/przelicz", content_type=JSON).status_code == 200
+    r = _ustaw(client, gra, inwestor={"firma": "Kebab Ali", "kwota": 10000})
+    assert r.status_code == 400 and "debetem ponad limit" in r.json()["blad"]
+    f = serwisy.wczytaj(gra).stan(1).firmy["Kebab Ali"]   # gra w pamięci: debet ponad limit po rundzie 1
+    f.kredyt_odnawialny, f.gotowka = 50000, 0
+    ali = next(x for x in _mg(client, gra)["firmy"] if x["nazwa"] == "Kebab Ali")
+    assert ali["alarm"] > 0 and ali["inwestor"] is None and ali["inwestor_przyslany"] is None
+    p = _ustaw(client, gra, inwestor={"firma": "Kebab Ali", "kwota": 30000}).json()
+    assert next(x for x in p["firmy"] if x["nazwa"] == "Kebab Ali")["inwestor_przyslany"] == 30000
+    assert p["gra"]["inwestor"]["max_kwota"] >= 30000
+    p = _ustaw(client, gra, inwestor={"firma": "Kebab Ali", "kwota": 0}).json()
+    assert next(x for x in p["firmy"] if x["nazwa"] == "Kebab Ali")["inwestor_przyslany"] is None

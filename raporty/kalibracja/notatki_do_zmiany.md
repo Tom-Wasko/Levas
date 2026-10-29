@@ -27,3 +27,12 @@ portfel osobno. Proponowany dopisek do definicji majątku netto:
 > Mistrz gry widzi majątek netto firmy bez portfela właściciela (portfel zdradzałby klub); w pomiarach
 > balansu portfel jest doliczany. Zaległości to dziś zaległe raty kredytów (w długu kredytu) i leasingu –
 > podatki, ZUS, czynsz i dostawcy są płacone od razu z konta (debet).
+
+## Z3 – debet ponad limit i inwestor ratunkowy (29.10.2026) → `notatki/Ustalenia gry.md`, finanse
+
+Proponowany dopisek:
+> **Debet ponad limit konta** – alarm u mistrza gry; w następnej rundzie blokada inwestycji (lokal, stanowiska,
+> sprzęt, udogodnienia, wyposażenie), nowych kredytów, leasingu i lokat. Odsetki karne banku zostają, innych kar
+> nie ma. **Inwestor ratunkowy** (przysyła mistrz gry, jeden na grę): wpłata do 40 000 zł na początku rundy,
+> najpierw spłaca debet; przez 8 rund bierze 30% dodatniego dochodu netto; niezwrócona część wpłaty liczy się
+> jak dług (wskaźnik zadłużenia, majątek netto). Wartości: założenie, do kalibracji.

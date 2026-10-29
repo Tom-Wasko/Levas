@@ -223,6 +223,15 @@ finanse:
     wartosc: true
     pewnosc: potwierdzone
     zrodlo: instrukcja
+  inwestor_ratunkowy:
+    wartosc:
+      max_kwota: 40000
+      udzial: 0.3
+      rund: 8
+    pewnosc: zalozenie
+    zrodlo: 'Z3 (Plan optymalizacji, odpowiedź autora: „Inwestor za udział w wyniku”, „Wpłata jako dług”): mistrz gry
+      ratuje drużynę z debetem ponad limit wpłatą do max_kwota (kapitał startowy); inwestor przez `rund` rund bierze
+      `udzial` dodatniego dochodu netto rundy, a niezwrócona wpłata liczy się jak dług – wartości do kalibracji'
 karta_wynikow:
   wynik_ekonomiczny_dzielnik:
     wartosc: 4615

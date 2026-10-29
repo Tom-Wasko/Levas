@@ -165,6 +165,10 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
 - **Podatki**: PIT liniowy, składka zdrowotna i ZUS rozliczają się same na koniec tygodnia – ale płacisz je z konta.
 - **Bank**: konto, lokaty i kredyty. Kredyt odnawialny ratuje, gdy na koncie zabraknie pieniędzy – kosztuje odsetki
   i psuje wskaźnik zadłużenia. Kredyt inwestycyjny spłacasz w ratach.
+- **Debet ponad limit konta** to alarm: odsetki karne, a w następnym tygodniu bank blokuje inwestycje (lokal,
+  stanowiska, sprzęt, wyposażenie), nowe kredyty, leasing i lokaty. Spłać debet albo poproś mistrza gry
+  o **inwestora ratunkowego**: wpłaci pieniądze (najpierw spłaci debet), a przez kilka tygodni weźmie część
+  dochodu. Dopóki wpłata nie wróci, liczy się jak dług – firma gra dalej, ale miejsca w rankingu to nie poprawia.
 - **Środki trwałe**: kupiony lokal i drogi sprzęt płacisz od razu, ale w księdze koszt rozkłada się na lata
   (amortyzacja).
 - **Portfel właściciela**: z jednoosobowej działalności można wypłacić pieniądze dla siebie albo dołożyć własne

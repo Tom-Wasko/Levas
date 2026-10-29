@@ -150,7 +150,7 @@ export function wynikiBanku({ v }) {
     ...(w.leasing?.nowe || []).map((id) => `leasing nr ${id}`)];
   if (nowe.length) html += `<p>Nowe produkty: ${nowe.join(", ")}.</p>`;
   if (odrzucone.length) html += tabela("Odrzucone przez bank", ["Decyzja", "Powód"], odrzucone.map((x) => [esc(x.co), esc(x.powod)]), { klasy: ["l", "l"] });
-  const uwagi = [...(k.zaleglosci || []), ...(w.debet_ponad_limit > 0 ? [`Debet ponad limit w koncie: ${zl2(w.debet_ponad_limit)} – odsetki karne.`] : [])];
+  const uwagi = [...(k.zaleglosci || []), ...(w.debet_ponad_limit > 0 ? [`Debet ponad limit w koncie: ${zl2(w.debet_ponad_limit)} – odsetki karne, a w następnej rundzie zablokowane inwestycje, kredyty, leasing i lokaty (spłać debet albo poproś mistrza gry o inwestora).`] : [])];
   if (uwagi.length) html += `<div class="komunikat">${uwagi.map(esc).join("<br>")}</div>`;
   return html + `<p class="podpowiedz">Historia firmy na koniec ${OKRES.dopelniacz}: ${rundy(w.historia)}.</p>`;
 }

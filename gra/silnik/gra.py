@@ -189,5 +189,25 @@ class Gra:
         self.dane = hm.dla_gry(self.dane, self.konfiguracja)
         self._stany = {k: v for k, v in self._stany.items() if k < self.runda}   # przeliczone rundy bez zmian
 
+    def ustaw_inwestora(self, firma: str, kwota: float) -> None:
+        """Mistrz gry przysyła firmie z debetem ponad limit inwestora ratunkowego – wpłata na początku bieżącej rundy
+        (kwota 0 odwołuje); warunki w dane/zalozenia.yaml (silnik/pieniadze/inwestor.py)."""
+        from .pieniadze import inwestor as inw
+        if self.zakonczona:
+            raise ValueError("Gra jest zakończona.")
+        stan = self.stan(self.runda - 1)
+        if firma not in stan.firmy:
+            raise ValueError("Nie ma takiej firmy w grze.")
+        inwestorzy = dict(self.konfiguracja.get("inwestorzy") or {})
+        if kwota > 0:
+            inw.sprawdz(self.dane, stan.firmy[firma], kwota)
+            inwestorzy[firma] = {"runda": self.runda, "kwota": round(float(kwota), 2)}
+        elif (inwestorzy.get(firma) or {}).get("runda", 0) >= self.runda:   # wpłata jeszcze nieprzeliczona
+            inwestorzy.pop(firma)
+        self.konfiguracja.pop("inwestorzy", None)
+        if inwestorzy:
+            self.konfiguracja["inwestorzy"] = inwestorzy
+        self._stany = {k: v for k, v in self._stany.items() if k < self.runda}   # przeliczone rundy bez zmian
+
     def kopia(self) -> Gra:
         return Gra(deepcopy(self.konfiguracja), deepcopy(self.decyzje), self.dane)

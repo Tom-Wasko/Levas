@@ -44,6 +44,7 @@ from .model import Firma, StanGry, do_slownika
 from .nieruchomosci import lokale as lk
 from .nieruchomosci import przejecia as pr
 from .pieniadze import banki as bk
+from .pieniadze import inwestor as inw
 from .pieniadze import kasyno as kas
 from .pieniadze import lichwiarz as lw
 from .pieniadze import wlasciciel as wl
@@ -83,6 +84,15 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
              for n, f in s.firmy.items()}
     for nazwa in nazwy:
         ksiegi[nazwa], rachunki[nazwa] = Ksiega(vat=rz.reguly_vat(dane)), Rachunek()
+    # inwestor ratunkowy od mistrza gry, potem blokada inwestycji i kredytów przy debecie ponad limit (Z3) – przed
+    # licytacjami lokali i budynków (silnik/pieniadze/inwestor.py)
+    decyzje, inwestor, blokady = dict(decyzje), {}, {}
+    for nazwa in nazwy:
+        f = s.firmy[nazwa]
+        inwestor[nazwa] = inw.poczatek_rundy(dane, f, inw.przyznany(konfiguracja, nazwa, r), r, rachunki[nazwa])
+        d, blokady[nazwa] = inw.blokada(dane, f, decyzje.get(nazwa, {}))
+        if blokady[nazwa]:
+            decyzje[nazwa] = d
     # wyprowadzki po wypowiedzeniu najmu, potem licytacje lokali i budynków (silnik/nieruchomosci/przejecia.py)
     wyprowadzki = pr.koniec_najmu(dane, s, r, ksiegi, rachunki)
     lic = pr.licytacje(dane, s.firmy, decyzje, r, ziarno, lk.zajete(s.firmy))
@@ -127,6 +137,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
         bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
         bledy[nazwa] += wl.bledy(info[nazwa]["wlasciciel"], info[nazwa]["kasyno"])
+        bledy[nazwa] += blokady[nazwa] + inw.bledy(f, inwestor[nazwa])
         if dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/swiat/zdarzenia.py)
             czas = cw.z_podsumowania(info[nazwa]["czas_wlasciciela"])
             info[nazwa]["zdarzenia"] = zd.rozegraj(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa], czas)
@@ -237,6 +248,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         podatek = info[nazwa]["rozliczenie"]["zaliczka"] + info[nazwa]["rozliczenie"]["zdrowotna"]
         if not samodzielnie and "biuro" in info[nazwa]:
             info[nazwa]["biuro"]["blad"] = bo.blad_biura(dane, f, nazwa, r, ziarno, rach)
+        # udział inwestora ratunkowego w dochodzie netto – przed wyrównaniem gotówki (silnik/pieniadze/inwestor.py)
+        udzial_inwestora = inw.koniec_rundy(f, r, round(ks.dochod - podatek, 2), rach)
         wyrownaj_gotowke(f, rach, odnawialny[nazwa])
         if samodzielnie:   # dokumenty rundy – po ostatniej operacji (także kredycie odnawialnym)
             bo.otworz(f, r, ks, rach, info[nazwa]["rozliczenie"], stan_przed)
@@ -283,6 +296,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         w["harpagon"] = {"poczatek": info[nazwa].get("harpagon"), "presja": info[nazwa].get("harpagon_presja"),
                          "odsetki": info[nazwa].get("harpagon_odsetki"), "stan": lw.stan(dane, f, r + 1)}
         w["majatek_netto"] = majatek_netto(f)   # Z2: składniki i razem
+        w["alarm"] = bk.debet_ponad_limit(dane, f)   # Z3: alarm u mistrza gry, w następnej rundzie blokada
+        w["inwestor"] = inw.raport(f, inwestor[nazwa], udzial_inwestora)
         if pm.zasady(dane):
             promo = (strefowy or {}).get("promocje", {}).get(nazwa)
             w["promocje"] = pm.raport(dane, f, nazwa, r, promo, info[nazwa].get("promocje") or {}, ziarno)

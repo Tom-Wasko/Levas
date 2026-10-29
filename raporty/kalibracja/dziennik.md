@@ -104,3 +104,38 @@ wpis na dole.
 - Wpłata inwestora (Z3) dojdzie do długów w Z3.
 - Panel mistrza gry: kolumna i wykres majątku netto. CSV: kolumna „majątek netto” w rankingu i w wynikach rund.
 - Testy: nowy `testy/wyniki/test_majatek.py`; w `test_eksport_csv` dodane sprawdzenie kolumny.
+
+## Z3 – debet ponad limit i inwestor ratunkowy (29.10.2026, Claude Code, Opus 5.5)
+- Alarm: `w["alarm"]` = debet ponad limit konta na koniec rundy (`bk.debet_ponad_limit`). Panel mistrza gry
+  pokazuje go przy gotówce, a nad tabelą jest ramka z listą firm w alarmie.
+- Blokada (`silnik/pieniadze/inwestor.py: BLOKOWANE`) działa w następnej rundzie, gdy debet ponad limit trwa na
+  początku rundy. Zablokowane są: nowy lokal, kupno budynku, stanowiska, sprzęt, udogodnienia, wyposażenie,
+  kredyty, leasing i lokaty. Każda odrzucona decyzja daje czerwony błąd w zakładce Bank.
+  - Zostają Harpagon, sprzedaż majątku i spłaty, żeby drużyna mogła sama wyjść z debetu.
+  - Lista kluczy jest w kodzie, bo to teksty, a nie liczby gry.
+- **Interpretacja odpowiedzi autora** („bez odsetek karnych i zajęcia majątku”): nie ma nowych kar, ale
+  istniejące odsetki karne banku od debetu ponad limit zostają.
+- Inwestor (`Gra.ustaw_inwestora(firma, kwota)`, API `POST /prowadzenie {"inwestor": {"firma", "kwota"}}`,
+  w panelu link „przyślij inwestora”):
+  - tylko firma z debetem ponad limit po ostatniej rundzie, jeden inwestor na grę, kwota do `max_kwota`;
+  - kwota 0 odwołuje przysłanie przed zamknięciem rundy;
+  - zapis jest w `konfiguracja["inwestorzy"]`, więc przetrwa cofnięcie i ponowne przeliczenie rundy;
+  - wpłata trafia na początek rundy, przed aukcjami i decyzjami. Najpierw spłaca debet, więc blokada znika w tej
+    samej rundzie;
+  - przez `rund` rund inwestor bierze `udzial` dodatniego dochodu netto rundy (poza KPiR, nie jest kosztem w
+    karcie);
+  - niezwrócona część wpłaty (kwota − wypłacone) liczy się jak dług do końca gry, także po końcu umowy:
+    w `zadluzenie` (wskaźnik zadłużenia w karcie) i w majątku netto (`dlugi["inwestor"]`);
+  - wypłaty ponad wpłatę to zysk inwestora, a dług wynosi wtedy 0.
+- Warunki są w YAML: `finanse.inwestor_ratunkowy` = {max_kwota 40000, udzial 0.3, rund 8}, pewność `zalozenie`
+  (do kalibracji w B).
+- Boty nie dostają inwestora automatycznie. W grze 12 rund (ziarno 7) alarm łapie agresywny na poziomie łatwym
+  (rundy 6–12, 6 blokad) i średnim (runda 3), a premium na łatwym (runda 5); na trudnym nikt. Boty grają bez
+  błędów.
+- Testy:
+  - nowe: `testy/pieniadze/test_inwestor.py` (4) i `test_alarm_debetu_i_inwestor_ratunkowy` w
+    `testy/aplikacja/test_prowadzenie.py`;
+  - zmieniony: `test_dzialka_budowa_w_ratach_potem_lokal_bez_sprzetu` dostał kapitał 200 000 zł, bo budowa za
+    100 000 zł wpychała firmę w debet ponad limit i blokada zatrzymywała stanowiska. Test sprawdza budowę, a nie
+    debet.
+- Tekst dla gracza: `INSTRUKCJA.md` §11 i komunikat o debecie w zakładce Bank.

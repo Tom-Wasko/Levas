@@ -218,9 +218,16 @@ def _przeglad(id_: str) -> dict:
 def api_prowadzenie(request, id_):
     """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]},
     {"poziom": {"firma", "poziom"}} (poziom bota), {"odblokowanie": {element: tydzień}}
-    (harmonogram odblokowań gry z lokalami) albo {"auto_zamowienia": bool}
-    (przycisk „Zamów brakujące” w Dostawcach)."""
+    (harmonogram odblokowań gry z lokalami), {"auto_zamowienia": bool} (przycisk „Zamów brakujące”
+    w Dostawcach) albo {"inwestor": {"firma", "kwota"}} (inwestor ratunkowy, kwota 0 odwołuje)."""
     d = cialo(request)
+    if "inwestor" in d:
+        firma, kwota = (d["inwestor"] or {}).get("firma"), (d["inwestor"] or {}).get("kwota")
+        try:
+            with serwisy.zmiana(id_) as g:
+                g.ustaw_inwestora(firma, float(kwota or 0))
+        except (TypeError, ValueError) as e:
+            raise BladZapytania(str(e)) from e
     if "auto_zamowienia" in d:
         with serwisy.zmiana(id_) as g:
             g.konfiguracja["auto_zamowienia"] = bool(d["auto_zamowienia"])

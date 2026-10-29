@@ -243,6 +243,23 @@ class PozyczkaHarpagona(Model):
     odsetki = _kwota("odsetki")
 
 
+class Inwestor(Model):
+    """Inwestor ratunkowy od mistrza gry (Z3, silnik/pieniadze/inwestor.py) – wpłata poza KPiR za udział w dochodach."""
+    kwota_gr: int
+    od_rundy: int
+    do_rundy: int                     # ostatnia runda udziału w dochodzie netto
+    udzial: float
+    wyplacone_gr: int = 0             # suma wypłaconych udziałów
+
+    kwota = _kwota("kwota")
+    wyplacone = _kwota("wyplacone")
+
+    @property
+    def dlug(self) -> float:
+        """Niezwrócona część wpłaty – w karcie i majątku netto liczy się jak dług."""
+        return max(0.0, round(self.kwota - self.wyplacone, 2))
+
+
 class RozliczenieJDG(Model):
     """Stan rozliczeń jednoosobowej działalności (gra z lokalami, silnik/ksiegowosc/rozliczenie.py) – narastająco od startu gry."""
     vat_nadwyzka_gr: int = 0          # nadwyżka VAT naliczonego do przeniesienia na następną rundę
@@ -345,6 +362,7 @@ class Firma(Model):
     kredyty: list[Kredyt] = Field(default_factory=list)
     leasingi: list[Leasing] = Field(default_factory=list)
     harpagon: PozyczkaHarpagona | None = None
+    inwestor: Inwestor | None = None   # inwestor ratunkowy (silnik/pieniadze/inwestor.py)
     historie: list[OtwartaHistoria] = Field(default_factory=list)   # eventy w parkach: ciągi dalsze
     efekty: list[Efekt] = Field(default_factory=list)
     wypadki: dict[str, int] = Field(default_factory=dict)   # wypadki w lokalu (silnik/swiat/awarie.py): id → runda początku

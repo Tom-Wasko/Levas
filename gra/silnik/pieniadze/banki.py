@@ -409,5 +409,6 @@ def bledy(dane: Dane, firma: Firma, info_poczatek: dict | None, info_koniec: dic
         wynik += [f"Bank {p['bank']} przejął zastaw: {p['zastaw']}." for p in info_koniec["przejecia"]]
     debet = debet_ponad_limit(dane, firma)
     if debet > 0:
-        wynik.append(f"Debet ponad limit w koncie: {debet:,.2f} PLN – odsetki karne.".replace(",", " "))
+        wynik.append(f"Debet ponad limit w koncie: {debet:,.2f} PLN – odsetki karne, a w następnej rundzie "
+                     "zablokowane inwestycje, kredyty, leasing i lokaty.".replace(",", " "))
     return [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": t} for t in wynik]

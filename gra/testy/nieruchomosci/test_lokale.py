@@ -85,7 +85,7 @@ def test_stanowiska_tylko_na_wolnych_miejscach_w_lokalu_do_wyposazenia():
 
 
 def test_dzialka_budowa_w_ratach_potem_lokal_bez_sprzetu():
-    g = _gra()
+    g = _gra(kapital_startowy=200000)   # działka i budowa bez debetu ponad limit (Z3: blokada inwestycji)
     lok = g.dane.lokale["czechow_3"]
     n = lok["budowa_rund"]
     assert n >= 2   # wyposażanie dopiero w ostatniej rundzie budowy
