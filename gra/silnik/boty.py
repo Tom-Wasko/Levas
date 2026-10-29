@@ -286,7 +286,8 @@ def _zatrudnieni(f: Firma, plan: dict) -> None:
 def _prognoza_lokali(dane: Dane, f: Firma, nazwa: str, oferta: list[str], ceny: dict[str, float], q: int,
                      wyp: float, konkurencja: dict, r_sprz: int) -> dict:
     moje = {lok.id: {u: {"strefa": dane.lokale[lok.id]["strefa"], "cena": ceny[u], "jakosc": (q, q, q),
-                         "wyposazenie": wyp} for u in oferta} for lok in f.lokale if lok.dziala_od <= r_sprz}
+                         "wyposazenie": wyp, "rozruch": pp.rozruch(dane, lok, r_sprz)} for u in oferta}
+            for lok in f.lokale if lok.dziala_od <= r_sprz}
     return pp.prognoza(dane, r_sprz, {**konkurencja, nazwa: moje}, nazwa)
 
 
@@ -517,14 +518,18 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni,
                                              dane.data_rundy(runda))
 
-    # inwestycje dodatkowe wg strategii (gdy jest gotówka)
+    # inwestycje dodatkowe wg strategii (gdy jest gotówka): po zakupach zostaje bufor gotówki (B5: wcześniej bot
+    # kupował od razu cały komplet i wpadał w debet)
     bufor = f.gotowka > ust["bufor_gotowki"]
+    budzet = [f.gotowka - ust["bufor_gotowki"]]
     if "inwestycje_wyposazenie" in odbl and bufor:
-        d["wyposazenie_kup"] = [p["nazwa"] for p in sorted(dane.pozycje("wyposazenie").values(), key=lambda p: -p["procent"])
-                                if p["od_rundy"] <= runda and p["nazwa"] not in f.wyposazenie][:max(0, st["wyposazenie"] - len(f.wyposazenie))]
+        d["wyposazenie_kup"] = _w_budzecie(sorted(dane.pozycje("wyposazenie").values(), key=lambda p: -p["procent"]),
+                                           runda, f.wyposazenie, st["wyposazenie"], budzet)
     if "hr_udogodnienia" in odbl and bufor:
-        d["udogodnienia_kup"] = [p["nazwa"] for p in sorted(dane.pozycje("udogodnienia").values(), key=lambda p: p["cena"] / p["procent"])
-                                 if p["od_rundy"] <= runda and p["nazwa"] not in f.udogodnienia][:max(0, st["udogodnienia"] - len(f.udogodnienia))]
+        d["udogodnienia_kup"] = _w_budzecie(sorted(dane.pozycje("udogodnienia").values(),
+                                                   key=lambda p: p["cena"] / p["procent"]),
+                                            runda, f.udogodnienia, st["udogodnienia"], budzet)
+    bufor = budzet[0] > 0
     agencje = rk.zasady(dane) is not None   # kampanie agencji reklamowych
     reklamuje = pz.get("kampanie", True)
     if plan is not None and pz.get("obsluga_kampanii") is not None:   # trudny: reklama tylko z wolną kuchnią
@@ -545,6 +550,19 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
         d["higiena"] = st["higiena"]
     return d
+
+
+def _w_budzecie(pozycje: list[dict], runda: int, ma: list[str], ile: int, budzet: list[float]) -> list[str]:
+    """Pozycje do kupienia w podanej kolejności, dostępne, jeszcze niekupione, najwyżej do `ile` sztuk łącznie,
+    póki starcza budżetu (budzet[0] maleje o ich ceny)."""
+    wynik = []
+    for p in pozycje:
+        if len(ma) + len(wynik) >= ile:
+            break
+        if p["od_rundy"] <= runda and p["nazwa"] not in ma and p["cena"] <= budzet[0]:
+            wynik.append(p["nazwa"])
+            budzet[0] -= p["cena"]
+    return wynik
 
 
 def _stanowiska_proste(dane: Dane, f: Firma, d: dict, oferta: list[str], klienci: dict[str, float], szczyt: float,

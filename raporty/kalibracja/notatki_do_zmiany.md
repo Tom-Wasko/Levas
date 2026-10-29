@@ -56,3 +56,12 @@ Proponowany dopisek:
 Proponowany dopisek:
 > Kalendarz sięga do kwietnia 2026: mecze Motoru wiosną 2026 (prawdziwy terminarz), Finał WOŚP, Popielec i
 > Wielki Piątek (więcej falafla, mniej mięsa), początek semestru letniego, Jarmark Wielkanocny na Starym Mieście.
+
+## B5 – rozruch nowego lokalu i pule stref (29.10.2026) → `notatki/Ustalenia gry.md`, „Limity i czasy”
+
+**Nowa mechanika – czeka na zgodę autora.** Proponowany wiersz tabeli:
+> | Rozruch nowego lokalu | w pierwszym tygodniu sprzedaży lokal ma 40% klientów, co tydzień +10 p.p., pełny popyt od 7. tygodnia sprzedaży (każdy kolejny lokal tak samo) |
+
+Proponowany dopisek do opisu popytu (jeśli autor trzyma go w „Prawidłach świata”):
+> Pule klientów stref zmniejszone o 10% (B5): jeden lokal średniej drużyny sprzedawał ok. 97 tys. zł
+> miesięcznie, po zmianie ok. 85 tys. zł – bliżej typowego kebaba na dobrej ulicy w Lublinie.

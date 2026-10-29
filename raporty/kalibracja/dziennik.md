@@ -264,3 +264,62 @@ wpis na dole.
   Czy popyt (pule stref) ma zależeć od liczby firm, czy tak ma zostać (mniejsza klasa = łatwiej)? Plan każe
   tego nie stroić bez zgody – w B5 kalibruję na 6 firmach.
 - Dalej: B5 od razu (gospodarka i trudność), potem stop do zatwierdzenia.
+
+## B5 – gospodarka i trudność (29.10.2026, Claude Code, Opus 5.5) – **czeka na zatwierdzenie autora**
+- Pomiary: `pomiary/b5_trudnosc` (6 poziomów × 5 strategii × 20 ziaren, 6 firm, 18 rund, rywale średni),
+  `b5_firmy` (4 i 8 firm), `b5_dlugosc` (12 i 26 rund), `b5_szybki` (regresja wariantów). Porównanie z B4:
+  `b4_trudnosc`, `b4_firmy_trudnosc`, `b4_dlugosc`. Szukanie liczb: skrypt par na kopii `dane/`
+  (bot „jak człowiek” słaby / średni / dobry × 5 strategii × 10–20 ziaren, ok. 3 min na 10 ziaren).
+- Diagnoza B4: pierwszy plus w rundzie 2, bo pierwszy tydzień sprzedaży ma pełny popyt przy najniższych
+  kosztach (2 osoby, mały zapas). Same pule nie pomagają: pule ×0,75 → mediana pierwszego plusu 3, ale marża
+  spada do 11% i wersja słaba częściej wygrywa ze średnią (37/50 par); ×0,6 – marża 7%. Kapitał 50–60 tys. zł
+  nie zmienia alarmów (agresywny 5–6/50).
+- Zmiany:
+  1. **Nowa mechanika – rozruch nowego lokalu** (`silnik/rynek/popyt.py: rozruch`, schemat `Rozruch`,
+     `dane/mapa/popyt.yaml: model.rozruch: {start: 0.4, przyrost: 0.1}`): mnożnik atrakcyjności lokalu
+     0,4 w pierwszym tygodniu sprzedaży (najwcześniej runda 2), co tydzień +0,1, od 7. tygodnia 1. Działa tak
+     samo dla kolejnego lokalu; widzą go prognozy (zakładka Klienci, boty). Bez klucza w danych – 1 (zamrożona
+     kopia danych testów go nie ma, więc testy wzorów bez zmian). Warianty: 0,5/0,1 – wynik podobny, ale pierwszy
+     plus bywa już w rundzie 2 (2/50); 0,4/0,1 – nigdy w 2.
+  2. **Pule stref ×0,9** (`dane/mapa/popyt.yaml`, wszystkie strefy; było 1,0 / 1,2 / 1,1 / 0,7 / 0,8 / 0,6 /
+     0,9 / 0,7 / 0,5 / 0,4): przychód lokalu bliżej realiów i mniej pierwszych plusów w rundzie 3
+     (×0,85 – słaba częściej wygrywa ze średnią: 83/100 par wobec 89/100).
+  3. **Boty: zakupy dodatkowe w budżecie** (`silnik/boty.py: _w_budzecie`): wyposażenie i udogodnienia bot kupuje
+     po kolei, póki po zakupie zostaje `bufor_gotowki` (30 tys. zł); szkolenia i nowe promocje – tylko gdy coś
+     z budżetu zostało. Wcześniej przy gotówce > 30 tys. zł agresywny kupował od razu cały komplet (12 pozycji,
+     ok. 17 tys. zł) + kampanie i szkolenie i wpadał w debet ponad limit. Bez rozruchu alarmy wersji słabej
+     7/50 → 4/50.
+- Wynik (bot „jak człowiek”, 6 firm, 18 rund, 100 gier na wersję; przed = B4):
+
+  | miara | przed (B4) | po (B5) | cel |
+  |---|---|---|---|
+  | pierwszy plus średniej w rundach 4–6 | 19/100 (w 2: 62) | 65/100 (w 3: 35, w 2: 0) | 4–6 |
+  | alarmy wersji słabej | 17/100 (bez agresywnego 2) | 8/100 (bez agresywnego **0**) | 0 |
+  | dobra > średnia (pary) | 95/100 | 92/100 | ≥ 80% |
+  | słaba < średnia (pary) | – | 89/100 | – |
+  | karta słaba / średnia / dobra | 0,11 / 0,42 / 0,62 | −0,01 / 0,23 / 0,34 | słaba może być na minusie |
+  | majątek netto średniej (tys. zł) | 115 | 93 | – |
+
+  Realia (średnia wersja, wszystkie strategie): marża netto 16% → 13%, praca 22% → 23% przychodu, czynsz
+  4,2% → 4,8%, składniki 35%, przychód lokalu ok. 103 → 87 tys. zł na miesiąc (20 tys. zł na tydzień).
+- Inne konteksty (człowiek średni, 50 gier): 4 firmy – pierwszy plus 4–6 w 28/50 (było 3/50), karta 0,50
+  (było 0,68); 8 firm – 36/50 (było 10/50), karta 0,15; 12 i 26 rund – 33/50 (było 7/50), alarmy tylko
+  u agresywnego. Pytanie z B4 o 4 firmy nadal otwarte (gra łatwiejsza: karta 0,50 wobec 0,23 przy 6).
+- Poziomy botów (B3) po zmianach: łatwy < średni w 83/100 par, średni < trudny w 88/100 (każda strategia
+  ≥ 13/20; naśladowca najsłabiej). Karta łatwy / średni / trudny 0,10 / 0,33 / 0,67.
+- Regresja `balans.warianty szybki` (549 gier w limicie 10 min): ten sam obraz co w B4 – „lepsze” umowa zlecenie
+  (100% par), drugi lokal (74%), polisy, brak promocji u zrównoważonego; banki inne niż mBank i inne biura
+  „gorsze”; brak higieny – bankructwo. Nowych dominacji brak.
+- Czego B5 nie rozwiązuje (do B6–B12): **strategia agresywna** (cena 0,8 przy jakości 3★, cała reklama)
+  traci na każdym poziomie – wersja słaba ma alarm w 8/20 gier, bo proste planowanie kupuje towar za tyle,
+  ile wynosi przychód, a potem dokupuje sprzęt kuchni bez patrzenia na gotówkę (H17). To balans strategii,
+  nie liczb gospodarki. Praca 23% przychodu – trochę poniżej celu 25–35% (płace przy minimalnej; prawo
+  zamrożone, więc zostaje).
+- **Pytania do autora (zatwierdzenie B5):**
+  1. Czy zgoda na nową mechanikę „rozruch nowego lokalu” (40% klientów w pierwszym tygodniu sprzedaży,
+     +10 p.p. co tydzień)? Jest widoczna dla gracza – opis w `gra/INSTRUKCJA.md` (rozdział 6), propozycja do
+     „Ustaleń gry” w `notatki_do_zmiany.md`.
+  2. Czy zatwierdzić pule stref ×0,9 i regułę zakupów bota?
+  3. Strategia agresywna zostaje „pułapką” do B6–B12 – czy tak może być?
+- Testy: nowe `test_rozruch_nowego_lokalu` (`testy/rynek/test_popyt.py`) i
+  `test_zakupy_dodatkowe_bota_zostawiaja_bufor_gotowki` (`testy/rdzen/test_boty.py`). Inne testy bez zmian.

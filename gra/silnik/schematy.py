@@ -620,6 +620,11 @@ class PlikBudynkow(Plik):
     budynki: list[Budynek]
 
 
+class Rozruch(Schemat):
+    start: float = Field(gt=0, le=1)   # mnożnik popytu w pierwszym tygodniu sprzedaży lokalu
+    przyrost: float = Field(gt=0)      # o tyle więcej co tydzień, do 1
+
+
 class ModelPopytu(Schemat):
     opcja_zewnetrzna: float = Field(gt=0)
     elastycznosc_ceny: float = Field(ge=0)
@@ -627,6 +632,7 @@ class ModelPopytu(Schemat):
     szum_proc: float = Field(ge=0)
     zadowolenie_odniesienie: float = Field(gt=0)
     zadowolenie_wykladnik: float = Field(ge=0)
+    rozruch: Rozruch | None = None
 
 
 class DniTygodnia(Schemat):

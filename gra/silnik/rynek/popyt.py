@@ -11,7 +11,7 @@ nimi – liniowo (koniec września to już trochę październik).
 Klienci strefy wybierają lokal (model logitowy z opcją zewnętrzną A_0 – bary spoza gry, obiad w domu):
 
     A = jakość × exp(−E · wrażliwość strefy · (cena / (cena preferowana × cena strefy) − 1)) × exp(−odległość / zasięg)
-        × zadowolenie klientów firmy × wyposażenie × (1 + reklama) × mnożnik firmy
+        × zadowolenie klientów firmy × wyposażenie × (1 + reklama) × mnożnik firmy × rozruch lokalu
     udział lokalu w puli strefy = A / (A_0 + Σ A lokali oferujących danie)
 
 Dwa lokale w jednej strefie dzielą tę samą pulę; lokal łapie też klientów sąsiednich stref, słabiej z odległością
@@ -33,7 +33,7 @@ from ..kuchnia import menu
 from ..kuchnia import swiezosc as sw
 from ..kuchnia.operacje import jakosc_uslugi, kasjerzy, obsluz
 from ..losowosc import strumien
-from ..model import Firma
+from ..model import Firma, Lokal
 from . import kalendarz as kal
 from . import promocje as pm
 from . import reklama as rk
@@ -122,9 +122,17 @@ def mnoznik_zadowolenia(dane: Dane, zadowolenie: float | None) -> float:
     return (zadowolenie / m["zadowolenie_odniesienie"]) ** m["zadowolenie_wykladnik"]
 
 
+def rozruch(dane: Dane, lokal: Lokal, runda: int) -> float:
+    """Nowy lokal dopiero zdobywa klientów (B5): mnożnik popytu `start` w pierwszym tygodniu sprzedaży, co tydzień
+    o `przyrost` więcej, do 1 (dane/mapa/popyt.yaml: model.rozruch; bez niego – 1). Runda 1 to przygotowanie –
+    sprzedaż najwcześniej od rundy 2."""
+    r = dane.mapa["popyt"]["model"].get("rozruch")
+    return min(1.0, r["start"] + r["przyrost"] * max(0, runda - max(lokal.dziala_od, 2))) if r else 1.0
+
+
 def atrakcyjnosc(dane: Dane, strefa_klienta: str, usluga: str, o: dict, jakosc: float | None = None) -> float:
     """o: {"strefa", "cena" (po rabacie), "jakosc": (p, s, z), "wyposazenie", "reklama", "mnoznik_firmy", "zadowolenie",
-    "reklama_strefy": {strefa klienta: ułamek} – kampanie agencji reklamowych firmy}; jakosc – gotowy mnożnik
+    "rozruch", "reklama_strefy": {strefa klienta: ułamek} – kampanie agencji reklamowych firmy}; jakosc – gotowy mnożnik
     jakości dania (menu.jakosc_dania), gdy liczony raz dla wielu stref."""
     p = dane.mapa["popyt"]
     ps = p["strefy"][strefa_klienta]
@@ -132,7 +140,7 @@ def atrakcyjnosc(dane: Dane, strefa_klienta: str, usluga: str, o: dict, jakosc: 
     q = menu.jakosc_dania(dane, o["jakosc"]) if jakosc is None else jakosc
     return (q * math.exp(-p["model"]["elastycznosc_ceny"] * ps["wrazliwosc_ceny"] * (r - 1))
             * math.exp(-odleglosc(dane, strefa_klienta, o["strefa"]) / p["model"]["zasieg"])
-            * o.get("zadowolenie", 1.0) * o.get("wyposazenie", 1.0) * o.get("mnoznik_firmy", 1.0)
+            * o.get("zadowolenie", 1.0) * o.get("wyposazenie", 1.0) * o.get("mnoznik_firmy", 1.0) * o.get("rozruch", 1.0)
             * (1 + o.get("reklama", 0.0) + (o.get("reklama_strefy") or {}).get(strefa_klienta, 0.0)))
 
 
@@ -189,7 +197,8 @@ def oferty_lokali(dane: Dane, firma: Firma, runda: int, ceny: dict[str, float], 
         for u, cena in ceny.items():
             q = jakosc_uslugi(dane, v, u)
             if q is not None:
-                wynik.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q, **wspolne}
+                wynik.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q, **wspolne,
+                                                   "rozruch": rozruch(dane, lok, runda)}
     return wynik
 
 
@@ -413,7 +422,8 @@ def oferty_konkurencji(dane: Dane, stan, runda: int, firma: str) -> dict[str, di
             strefa = dane.lokale[lok.id]["strefa"]
             for u in dania:
                 c = ceny.get(u, {}).get(n) or dane.uslugi[u]["cena_preferowana"] * dane.mapa["popyt"]["strefy"][strefa]["cena"]
-                wynik.setdefault(n, {}).setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": c, "jakosc": (2, 2, 2)}
+                wynik.setdefault(n, {}).setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": c, "jakosc": (2, 2, 2),
+                                                                     "rozruch": rozruch(dane, lok, runda)}
         if n in wynik:
             pm.efekty_ofert(dane, g, wynik[n], runda, dni_rundy(dane, runda))   # promocje są widoczne na mieście
     return wynik
@@ -446,7 +456,8 @@ def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float 
             c = firma.ceny.get(u)
             cena = max(0.01, c.cena - c.rabat) if c else dane.uslugi[u]["cena_preferowana"] * dane.mapa["popyt"]["strefy"][strefa]["cena"]
             q = jakosc_uslugi(dane, v, u) if kasjerzy(dane, v) else None
-            moje.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q or (2, 2, 2), **wspolne}
+            moje.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q or (2, 2, 2), **wspolne,
+                                              "rozruch": rozruch(dane, lok, r)}
     pm.efekty_ofert(dane, firma, moje, r, dni)
     pot = potencjal_stref(dane, r, {**konkurencja, firma.nazwa: moje}, dania, pula_rekl)
     pr = pule(dane, r, reklama=pula_rekl)

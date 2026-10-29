@@ -130,3 +130,13 @@ def test_korekta_prognozy_trudnego_zbiega_do_bledu_modelu():
         ks.append(k)
         stan.wyniki[r] = {"A": {"sprzedaz": {"kebab": {"popyt": 110, "prognoza": round(100 * k)}}}}
     assert ks[0] == 1.0 and all(abs(k - 1.1) < 0.01 for k in ks[1:])
+
+
+def test_zakupy_dodatkowe_bota_zostawiaja_bufor_gotowki():
+    """B5: wyposażenie i udogodnienia bot kupuje po kolei, póki po zakupie zostaje bufor gotówki – wcześniej brał
+    od razu cały komplet strategii (agresywny ~17 tys. zł naraz) i wpadał w debet ponad limit."""
+    poz = [{"nazwa": n, "cena": c, "od_rundy": o} for n, c, o in
+           (("A", 3000, 1), ("B", 2500, 9), ("C", 2000, 1), ("D", 200, 1), ("E", 100, 1))]
+    budzet = [2300.0]
+    assert boty._w_budzecie(poz, 5, [], 6, budzet) == ["C", "D", "E"] and budzet[0] == 0   # B – dopiero od 9
+    assert boty._w_budzecie(poz, 5, ["C"], 2, [1e6]) == ["A"]                              # najwyżej 2 sztuki

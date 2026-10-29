@@ -7,7 +7,9 @@ import pytest
 from pomocnicze import KEBAB, _gra, _kopia, _lokal, _oferta, _runda, _zmien
 
 from silnik import boty
-from silnik.dane import dane_domyslne, sprawdz
+from silnik.dane import Dane, dane_domyslne, sprawdz
+from silnik.gra import Gra
+from silnik.model import Lokal
 from silnik.rynek import popyt as pp
 
 
@@ -25,6 +27,34 @@ def test_dwa_lokale_w_jednej_strefie_dziela_klientow():
     # tańszy lokal zabiera klientów droższemu
     tani = _podzial(dane, 5, ("centrum", _oferta("centrum", 0.85)), ("centrum", _oferta("centrum", 1.15)))
     assert tani[("F0", "centrum")][KEBAB]["dni"].sum() > 1.5 * tani[("F1", "centrum")][KEBAB]["dni"].sum()
+
+
+
+def test_rozruch_nowego_lokalu(tmp_path):
+    """B5: nowy lokal dopiero zdobywa klientów – mnożnik popytu od `start` w pierwszym tygodniu sprzedaży
+    (najwcześniej runda 2) rośnie o `przyrost` co tydzień do 1; bez klucza w danych – 1."""
+    stary, nowy = Lokal(id="centrum_1", forma="najem", od_rundy=1, dziala_od=1),         Lokal(id="centrum_1", forma="najem", od_rundy=5, dziala_od=6)
+    assert pp.rozruch(_bez_rozruchu(tmp_path), stary, 2) == 1.0
+    kat = _kopia(tmp_path / "z")
+    _zmien(kat, "mapa/popyt.yaml", lambda d: d["model"].update(rozruch={"start": 0.5, "przyrost": 0.2}))
+    dane = Dane(kat)
+    assert [pp.rozruch(dane, stary, r) for r in (1, 2, 3, 4, 5, 9)] == pytest.approx([0.5, 0.5, 0.7, 0.9, 1, 1])
+    assert [pp.rozruch(dane, nowy, r) for r in (6, 7)] == pytest.approx([0.5, 0.7])   # drugi lokal też od zera
+    o = _oferta("centrum")
+    assert pp.atrakcyjnosc(dane, "centrum", KEBAB, {**o, "rozruch": 0.5}) == pytest.approx(
+        0.5 * pp.atrakcyjnosc(dane, "centrum", KEBAB, o))
+    # w grze: popyt pierwszego tygodnia sprzedaży mniejszy niż bez rozruchu (ta sama gra botów)
+    def popyt_r2(d):
+        g = Gra.nowa("rozruch", [("A", "zrownowazony"), ("B", "premium")], 2, 3, dane=d)
+        g.przelicz(wymus=True)
+        return sum(v["popyt"] for v in g.przelicz(wymus=True).wyniki[2]["A"]["sprzedaz"].values())
+    assert popyt_r2(dane) < 0.7 * popyt_r2(_bez_rozruchu(tmp_path / "g"))
+
+
+def _bez_rozruchu(tmp_path):
+    kat = _kopia(tmp_path / "bez")
+    _zmien(kat, "mapa/popyt.yaml", lambda d: d["model"].pop("rozruch", None))
+    return Dane(kat)
 
 
 def test_pula_strefy_i_odleglosc():
