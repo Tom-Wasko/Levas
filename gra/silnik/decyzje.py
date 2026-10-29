@@ -4,7 +4,10 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     nazwa, misja
     oferta:            {usługa: prognoza popytu}           – pełna lista usług w ofercie
     sprzedaz:          {usługa: {"cena", "rabat"}}          – usługi włączone do sprzedaży
-    lokal:             {"id", "forma": "najem" | "kupno"}   – nowy lokal z mapy (silnik/nieruchomosci/lokale.py)
+    lokal:             {"id", "forma": "najem" | "kupno", "oferta"}   – nowy lokal z mapy, oferta w licytacji
+                                                              (silnik/nieruchomosci/lokale.py)
+    przejecie:         {"id", "oferta"}                     – kupno budynku z najemcą; wypowiedz: [{"id", "ulepszenia":
+                       "zatrzymaj" | "przywroc"}] – wypowiedzenie najmu (silnik/nieruchomosci/przejecia.py)
     stanowiska:        {"kuchnia": 0–5, "kasa": 0–5}        – nowe stanowiska (pakiet; najwyżej tyle, ile wolnych
                                                               miejsc w działających lokalach)
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
@@ -17,6 +20,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
                        wcześniej inna firma, zatrudniany jest najbardziej podobny
     zmiany:            {id pracownika: {"pensja", "umowa", "premia"}}
     zwolnij:           [id pracownika]
+    wlasciciel_stanowisko: {"typ", "nr", "godziny"}         – właściciel na pustym stanowisku (czas właściciela)
     zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc", "dzien"}]   ilość w opakowaniach; dzien – dzień
                                                               dostawy w rundzie (0 = poniedziałek)
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
@@ -32,6 +36,13 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
                                                               – samodzielna księgowość za poprzednią rundę (biuro.py)
     lokaty_zaloz:      [{"kwota", "miesiecy"}];  lokaty_zerwij: [id]
     kredyty_wez:       [{"kwota", "miesiecy"}];  kredyty_splac: [id]
+                       z lokalami także "bank", "produkt", "zastaw" (id lokalu albo sprzętu); lokaty – "bank"
+    leasing_wez:       [{"bank", "typ", "nr", "nazwa", "jakosc", "rund"}]   (silnik/pieniadze/banki.py)
+    harpagon_wez, harpagon_splac: kwota                     – pożyczka poza KPiR (silnik/pieniadze/lichwiarz.py)
+    wyplata_wlasna, wplata_wlasna: kwota                    – portfel właściciela (silnik/pieniadze/wlasciciel.py)
+    kasyno:            [{"gra", "zaklad", "stawka"}]        – po zaproszeniu (silnik/pieniadze/kasyno.py)
+    detektyw:          nazwa firmy rywala                   – raport o rywalu (silnik/rynek/konkurencja.py)
+    higiena:           poziom z dane/zdarzenia/urzad.yaml   – trwa do zmiany (silnik/ksiegowosc/urzad.py)
     handel_oferty:     [{"do", "typ": "towar", "zasob", "jakosc", "ilosc", "cena"} | {"do", "typ": "sprzet",
                        "stanowisko", "nr", "nazwa", "cena"}]  – gra z lokalami: oferty dla innych drużyn (cena brutto
                                                               za całość; silnik/rynek/handel.py)

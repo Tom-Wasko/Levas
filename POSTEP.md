@@ -275,7 +275,7 @@ Po każdym: testy, ruff, `sprawdz`, wpis w `raporty/kalibracja/dziennik.md`, POS
 Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4, B5 (**zatwierdza autor**), potem część A,
 **STOP** (autor wybiera pozycje U), U, K, B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
 
-- [ ] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz
+- [x] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz — zrobione 29.10.2026: inwentarz wszystkich decyzji z kompromisami (obszary B6–B12), 17 hipotez (H1–H17) z 9 gier botów i kodu, docstring uzupełniony, dziennik z pytaniem P1 (ZUS przy zleceniu).
 - [ ] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md, wznawianie pełnego pomiaru) z testami; szybki pomiar „punkt zero” na dzisiejszych zasadach
 
 ### Zmiany zasad (ustalone z autorem 29.10.2026, przed pomiarem startowym)
