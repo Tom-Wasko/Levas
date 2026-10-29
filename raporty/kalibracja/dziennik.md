@@ -243,3 +243,24 @@ wpis na dole.
 - Testy: nowy `test_korekta_prognozy_trudnego_zbiega_do_bledu_modelu` (`testy/rdzen/test_boty.py`); w
   `balans/warianty.py` nowe warianty `poziom:bez_korekta_prognozy|mnozniki_ceny|obsluga_kampanii`. Inne testy
   bez zmian.
+
+## B4 – pomiar startowy (29.10.2026, Claude Code, Opus 5.5)
+- Raport: `raporty/kalibracja/stan_poczatkowy.md`; pomiary `pomiary/b4_*` (7090 gier, 2 h 13 min na
+  5 procesach – limit autora „do ok. 3 h”); tag `kalibracja-start` na tym commicie.
+- Kod bez zmian. Skrypt pomiaru: krzywa trudności (6 poziomów × 5 strategii × 20 ziaren), 4/8 firm i
+  12/26 rund (człowiek średni, poziom średni, 10 ziaren), warianty 28 opcji × 5 strategii × 30 ziaren
+  (6 firm) i × 3 strategie × 10 ziaren (4 i 8 firm).
+- Najważniejsze:
+  - trudność: pierwszy plus „jak człowiek” średniego w rundzie 2 w 62/100 gier (cel 4–6 – 19%); wersja słaba
+    ma alarm w 17/100 gier (agresywny 15/20); dobra > średnia w 95/100 par;
+  - dominacje: umowa zlecenie (99% par), drugi lokal (85%), mBank, e-Księgi24, higiena podstawowa; polisy
+    lekko na plus; jakość 2★ zdominowana u zrównoważonego i naśladowcy;
+  - strategie: tani (karta 0,30) i agresywny (0,05, alarm w 9/30) nigdy nie wygrywają; agresywnego poprawia
+    prawie każda zmiana parametru, taniego – wyższa cena i brak promocji;
+  - realia: marża netto 19%, praca 21% przychodu, czynsz 4% – czynsz w złotych realny (ogłoszenia z Lublina),
+    za wysoki jest przychód na lokal (ok. 97 tys. zł / mies.).
+- **Pytanie do autora:** przy 4 firmach gra jest wyraźnie łatwiejsza (karta człowieka średniego 0,68 wobec
+  0,44 przy 6 i 0,30 przy 8 firmach; alarmów 0/50). Z4 zmniejsza liczbę lokali, ale popyt miasta zostaje.
+  Czy popyt (pule stref) ma zależeć od liczby firm, czy tak ma zostać (mniejsza klasa = łatwiej)? Plan każe
+  tego nie stroić bez zgody – w B5 kalibruję na 6 firmach.
+- Dalej: B5 od razu (gospodarka i trudność), potem stop do zatwierdzenia.
