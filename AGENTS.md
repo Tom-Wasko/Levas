@@ -21,8 +21,8 @@ POSTEP.md            lista zadań z checkboxami (F/P/Q – zrobione; A, U, B –
 zadania/             instrukcje dla sesji: README.md (polecenia), A_analiza_gracza.md, B_kalibracja.md
 raporty/             wyniki analiz i kalibracji (tworzysz tu pliki)
 notatki/             notatki projektowe autora (Obsidian) – NIE zmieniaj bez zgody (niżej)
-dokumentacja/        tło: WIEDZA_O_GRZE.md (oryginalny REVAS: karta wyników, mechaniki),
-                     ROZNICE_LEVAS_STARY.md (stara wersja Levasa – źródło pomysłów)
+dokumentacja/        STACK.md (technologie, architektura, polecenia), WIEDZA_O_GRZE.md (oryginalny
+                     REVAS: karta wyników, mechaniki), ROZNICE_LEVAS_STARY.md (stara wersja Levasa)
 archiwum/            zakończone plany i dzienniki prac (Plan implementacji – tylko do odczytu)
 plan.txt             prywatny plik autora – nie commituj, nie zmieniaj
 gra/
