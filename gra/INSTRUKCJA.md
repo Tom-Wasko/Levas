@@ -5,11 +5,14 @@ decydujecie o wszystkim: gdzie stanie lokal, co jest w menu, ile kosztuje kebab,
 mięso i czy wydać ostatnie złotówki na plakat przy dworcu. Rywalizujecie z innymi drużynami i z botami – o tych
 samych klientów, tych samych pracowników i te same lokale.
 
-> **W pięciu zdaniach.** Jedna runda to jeden tydzień, gra ma 18 rund (1.09.2025 – 4.01.2026). W każdej rundzie
-> oglądasz wyniki poprzedniego tygodnia, podejmujesz decyzje na następny i klikasz **Wyślij decyzje**. Mistrz gry
-> zamyka rundę, a gra liczy tydzień dzień po dniu: klientów, sprzedaż, koszty i podatki. Wygrywa drużyna z
-> najwyższym skumulowanym **wynikiem działalności** na karcie wyników. Kapitał na start: **40 000 zł** – i nic
-> więcej, więc licz, zanim wydasz.
+> **W pięciu zdaniach.** Jedna runda to jeden tydzień, gra ma zwykle 18 rund (1.09.2025 – 4.01.2026). W każdej
+> rundzie oglądasz wyniki poprzedniego tygodnia, podejmujesz decyzje na następny i klikasz **Wyślij decyzje**.
+> Mistrz gry zamyka rundę, a gra liczy tydzień dzień po dniu: klientów, sprzedaż, koszty i podatki. Wygrywa
+> drużyna z najwyższym średnim **wynikiem działalności** na skumulowanej karcie wyników. Kapitał na start:
+> **40 000 zł** – i nic więcej, więc licz, zanim wydasz.
+
+Mistrz gry może skrócić albo wydłużyć grę – kalendarz miejski sięga do kwietnia 2026 (WOŚP, Wielkanoc, wiosenne
+mecze Motoru).
 
 ## 1. Pierwsze kroki
 
@@ -46,7 +49,9 @@ dania, dostawy przyjeżdżają w swoje dni, a bułki z poniedziałku we wtorek w
 
 ## 3. Cel gry – karta wyników
 
-Na końcu liczy się **wynik działalności** z karty wyników, sumowany przez wszystkie tygodnie. To iloczyn:
+Na końcu liczy się **wynik działalności** z karty wyników – średnia ze wszystkich tygodni sprzedaży (od tygodnia 2;
+tydzień przygotowawczy się nie liczy). Tę średnią pokazuje **skumulowana karta wyników**, a według niej mistrz gry
+układa ranking i Dashboard pokazuje Twoje miejsce. Wynik działalności jednego tygodnia to iloczyn:
 
 | Składnik | Co mierzy | Jak go poprawić |
 |---|---|---|

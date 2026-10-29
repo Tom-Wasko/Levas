@@ -95,6 +95,10 @@ Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
   2. odhacz zadanie w `POSTEP.md` i dopisz jedno zdanie o tym, co zrobiłeś;
   3. zrób commit `B3: krótki opis` z opisem w treści;
   4. `git pull --rebase origin main`, potem `git push origin main`.
+- **Na końcu każdego dużego bloku zadań** (np. B1–B5, Z1–Z7, cała część A, U, K, B6–B15) przejrzyj instrukcję
+  dla graczy `gra/INSTRUKCJA.md`: sprawdź w `git log` od jej ostatniej zmiany wszystko, co widzi gracz (zasady,
+  liczby w tekście, zakładki, terminy odblokowania), popraw tekst, odśwież PDF (`python manage.py instrukcja_pdf`)
+  i zrób osobny commit `Instrukcja: …`. Pojedyncze zadania dalej dopisują do instrukcji swoje zmiany na bieżąco.
 - Na końcu każdego commita dopisz linię współautora z nazwą modelu, np. `Co-Authored-By: <model> <noreply@…>`.
 - Nie commituj `plan.txt`, `gra/db.sqlite3`, `gra/lokalne.json` ani `gra/zapisy/`. Nie używaj `push --force`.
 
