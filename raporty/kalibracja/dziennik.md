@@ -157,3 +157,37 @@ wpis na dole.
 - Boty grają bez nowych błędów w grach z 4, 6 i 8 firmami (8 rund, ziarno 7).
 - Wybór lokali do usunięcia jest założeniem (proporcje typów, premium w Starym Mieście i Centrum zostaje). Autor
   może go zmienić w YAML.
+
+## Z5 – bot „jak człowiek” (29.10.2026, Claude Code, Opus 5.5)
+- Trzy nowe poziomy w `dane/boty.yaml`: `czlowiek_slaby`, `czlowiek_sredni`, `czlowiek_dobry`. Strategia
+  (cena, jakość, menu…) zostaje osobno, więc „jak człowiek” może grać każdą strategię. Plan mówi „nowa
+  strategia”, ale wersje różnią się sposobem decydowania, a to w kodzie jest poziom.
+- Prognoza (`boty._prognoza_czlowieka`, opcja poziomu `prognoza_czlowieka`) korzysta tylko z tego, co drużyna
+  widzi w zakładkach:
+  - popyt dań w każdym lokalu z raportu ostatniej rundy (`wyniki[r].klienci.lokale[].dania`);
+  - wersja dobra: średnia z 2 rund, każda razy pula strefy w rundzie sprzedaży / pula w tamtej rundzie
+    (zakładka Klienci pokazuje pule stref, więc widać sezon i kalendarz);
+  - lokal albo danie bez historii (rundy 1–2, nowe danie, nowy lokal): potencjał lokalu jak w zakładce Klienci
+    (2★, ceny preferowane strefy, obecna konkurencja);
+  - rozkład na dni z wag dni strefy (też widoczne w zakładce Klienci).
+  Bot nie woła prognozy modelu dla własnych cen i jakości (`_prognoza_lokali`), co pilnuje test.
+- Wersje (różnią się staraniem):
+  - słaba – planowanie proste (jak łatwy), błąd ±25%, kandydat jakikolwiek, bez kampanii i promocji;
+  - średnia – planowanie obsady dzień po dniu (jak średni), błąd ±10%;
+  - dobra – średnia z dwóch tygodni poprawiona o pulę strefy, bez błędu, reklama tylko z wolną kuchnią, drugi
+    lokal na tych samych warunkach co trudny.
+  - Żadna nie ma korekty o prognozę modelu, wyboru ceny po modelu ani oszustwa (schemat tego zabrania).
+- Poziomy mają `tylko_pomiar: true` – nie ma ich na liście poziomów w panelu mistrza gry (API i strona listy
+  gier); gra z konfiguracją je przyjmuje. **Pytanie do autora:** czy pokazać je nauczycielom jako rywali?
+- `balans/warianty.py`: nowe pole kontekstu `rywale` (`--rywale sredni`) – badana firma na poziomie „jak
+  człowiek”, rywale na swoim. Klucz kontekstu bez `rywale` się nie zmienia (stare `gry.csv` pasują).
+- Pomiar orientacyjny (nie B4): 18 rund, 6 firm, badana zrównoważona, rywale średni, ziarna 1–8:
+  - karta skumulowana: słaba 0,11–0,30, średnia 0,38–0,96, dobra 0,55–1,00; dobra > średnia w 8/8 par;
+  - pierwszy plus: słaba w rundzie 2–4, średnia i dobra w rundzie 2–3 (cel dla średniej: 4–6 – gra za łatwa,
+    zgodnie z H1);
+  - majątek netto na koniec: słaba 61–87 tys., średnia 105–174 tys., dobra 123–180 tys. zł (start 40 tys.);
+    alarmów brak.
+  - W grze samych botów (`balans.symuluj 12`, ziarno 7) średnia gotówka: słaba 35 tys., średnia 61 tys., dobra
+    70 tys. zł (poziom średni: 63 tys.).
+- Testy: 3 nowe w `testy/rdzen/test_boty.py`, 1 w `testy/rdzen/test_warianty.py` (dane gry). Pozostałe bez
+  zmian; `test_poziom_botow` (panel MG) dalej widzi tylko 4 poziomy.

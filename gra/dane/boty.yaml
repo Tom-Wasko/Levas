@@ -33,6 +33,12 @@ ustawienia:
 # - kolejny_lokal – kolejny gotowy lokal, gdy żaden lokal nie obsługuje części popytu `obsluga`, gotówki jest
 #   ponad `gotowka`, a firma ma mniej niż `maks_lokali` (co mapa.zasady.nowy_lokal_co_rund rund).
 # - przewaga_popytu – oszustwo poziomu niemożliwego: mnożnik atrakcyjności wszystkich lokali bota (1 – brak).
+# - prognoza_czlowieka – bot „jak człowiek” (Z5, pomiar trudności w B): zamiast modelu popytu bez szumu prognozuje
+#   z tego, co drużyna widzi w zakładkach – popyt dań w lokalach z raportów `rund` ostatnich rund (średnia),
+#   przy `pule` razy pula strefy w rundzie sprzedaży / pula w tamtych rundach (zakładka Klienci); danie albo
+#   lokal bez historii – potencjał lokalu (2★, ceny preferowane strefy); wyklucza korekta_prognozy, mnozniki_ceny
+#   i przewaga_popytu (to wymaga znajomości modelu);
+# - tylko_pomiar – poziom do pomiarów (balans/), mistrz gry go nie wybiera.
 poziomy:
   latwy:
     nazwa: Łatwy
@@ -69,6 +75,36 @@ poziomy:
     obsluga_kampanii: 0.9
     kolejny_lokal: {obsluga: 0.85, gotowka: 45000, maks_lokali: 3}
     przewaga_popytu: 1.3         # klienci wolą jego lokale o 30% (jak stała kampania, której nikt nie widzi)
+  # Z5: bot „jak człowiek” – wersje różnią się staraniem, nie wiedzą (cele trudności: notatki/Plan optymalizacji)
+  czlowiek_slaby:
+    nazwa: Jak człowiek – słaby
+    opis: patrzy tylko na zeszły tydzień, na oko; proste reguły jak łatwy
+    tylko_pomiar: true
+    planowanie: proste
+    blad_prognozy: 0.25
+    losowy_kandydat: true
+    kampanie: false
+    promocje: false
+    prognoza_czlowieka: {rund: 1}
+  czlowiek_sredni:
+    nazwa: Jak człowiek – średni
+    opis: zeszły tydzień z małym błędem, planuje obsadę na popyt dzień po dniu
+    tylko_pomiar: true
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    narzut_pracy: 1.25
+    blad_prognozy: 0.1
+    prognoza_czlowieka: {rund: 1}
+  czlowiek_dobry:
+    nazwa: Jak człowiek – dobry
+    opis: średnia z dwóch tygodni poprawiona o pulę strefy z kalendarza, reklama z wolną kuchnią, drugi lokal
+    tylko_pomiar: true
+    planowanie: przepustowosc
+    cel_obslugi: 0.97
+    narzut_pracy: 1.25
+    obsluga_kampanii: 0.9
+    kolejny_lokal: {obsluga: 0.85, gotowka: 60000, maks_lokali: 2}
+    prognoza_czlowieka: {rund: 2, pule: true}
 strategie:
   zrownowazony:
     nazwa: Kebab u Zrównoważonego

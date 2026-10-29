@@ -207,7 +207,8 @@ def _przeglad(id_: str) -> dict:
     p["prowadzenie"] = hg.prowadzenie(id_)
     p["prowadzenie"]["dni"] = hg.DNI
     poziomy = g.dane.boty.get("poziomy") or {}
-    p["prowadzenie"]["poziomy"] = {k: v["nazwa"] for k, v in poziomy.items()}
+    p["prowadzenie"]["poziomy"] = {k: v["nazwa"] for k, v in poziomy.items()
+                                   if not v.get("tylko_pomiar")}   # Z5: bez poziomów do pomiarów
     p["prowadzenie"]["odblokowanie"] = hm.widok(g.dane, g.runda)
     return p
 

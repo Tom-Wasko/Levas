@@ -42,3 +42,11 @@ Proponowany dopisek:
 Proponowany dopisek:
 > Liczba lokali na mapie zależy od liczby drużyn (klucz `od_firm` w `dane/mapa/lokale.yaml`): 8 firm – 38 lokali,
 > 6–7 – 29, 4–5 – 20 (około 5 na firmę, wszystkie strefy, podobne proporcje typów). Popyt miasta się nie zmienia.
+
+## Z5 – bot „jak człowiek” (29.10.2026) → `notatki/Ustalenia gry.md`, boty
+
+Proponowany dopisek:
+> **Bot „jak człowiek”** (do pomiaru trudności, poziomy `czlowiek_slaby/sredni/dobry`, niewidoczne dla mistrza
+> gry): prognozuje z popytu w raportach poprzednich rund i z potencjału lokalu w zakładce Klienci, a nie z modelu
+> popytu. Słaby: zeszły tydzień ±25%, proste reguły; średni: zeszły tydzień ±10%, planuje obsadę; dobry: średnia
+> z dwóch tygodni razy zmiana puli strefy, reklama z wolną kuchnią, drugi lokal.

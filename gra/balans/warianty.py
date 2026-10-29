@@ -13,8 +13,9 @@ i `raport.md`.
 Wariant to dane, nie kod: nadpisanie parametrów strategii albo poziomu bota (dane/boty.yaml),
 decyzji, którą bot podejmuje (klucz z silnik/decyzje.py), albo pól każdego zatrudnienia.
 Kontekst: strategia badanej firmy, długość gry, liczba firm, poziom botów, strefa lokalu
-(parametr strategii `strefy`) i kapitał startowy. Rywale – boty kolejnych strategii, przesunięte
-o ziarno.
+(parametr strategii `strefy`), kapitał startowy i poziom rywali (bez niego – jak badanej; trudność
+mierzy badana firma „jak człowiek” wśród rywali na poziomie średnim, Z5:
+`--poziom czlowiek_dobry --rywale sredni`). Rywale – boty kolejnych strategii, przesunięte o ziarno.
 """
 from __future__ import annotations
 
@@ -54,11 +55,13 @@ class Kontekst:
     poziom: str = "sredni"
     strefa: str = ""
     kapital: int = 0          # 0 – kapitał domyślny gry
+    rywale: str = ""          # poziom rywali; "" – jak badanej (poziom)
 
     def klucz(self) -> str:
         k = f"{self.strategia}/{self.rund}r/{self.firm}f/{self.poziom}"
         k += f"/{self.strefa}" if self.strefa else ""
-        return k + (f"/{self.kapital}zl" if self.kapital else "")
+        k += f"/{self.kapital}zl" if self.kapital else ""
+        return k + (f"/rywale_{self.rywale}" if self.rywale else "")
 
 
 @dataclass(frozen=True)
@@ -108,10 +111,13 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
 
 
 def wybierz_warianty(dane: Dane, wzorce: list[str] | None) -> list[Wariant]:
-    """Warianty po nazwie albo przedrostku (`bank` = wszystkie banki); bez wzorców – wszystkie."""
+    """Warianty po nazwie albo przedrostku (`bank` = wszystkie banki); bez wzorców – wszystkie;
+    `baza` – żadnych (same gry bazowe, np. pomiar trudności)."""
     kat = katalog_wariantow(dane)
     if not wzorce:
         return list(kat.values())
+    if wzorce == [BAZA]:
+        return []
     pasuje = lambda n, x: n == x or n.startswith(x + ":")   # noqa: E731
     nieznane = [x for x in wzorce if not any(pasuje(n, x) for n in kat)]
     if nieznane:
@@ -154,7 +160,8 @@ def rozegraj(z: Zadanie) -> dict:
     k, w = z.kontekst, z.wariant
     fs = firmy(k, z.ziarno, list(dane_domyslne().boty["strategie"]))
     opcje = {"kapital_startowy": k.kapital} if k.kapital else {}
-    g = Gra.nowa("warianty", fs, k.rund, z.ziarno, poziomy={n: k.poziom for n, _ in fs}, **opcje)
+    poziomy = {n: k.poziom if n == BADANA else k.rywale or k.poziom for n, _ in fs}
+    g = Gra.nowa("warianty", fs, k.rund, z.ziarno, poziomy=poziomy, **opcje)
     nad = dict(w.strategia) | ({"strefy": [k.strefa]} if k.strefa else {})
     db = _dane_badanej(g.dane, k.strategia, k.poziom, nad, dict(w.poziom))
     for r in range(1, k.rund + 1):
@@ -346,6 +353,7 @@ def main(argv: list[str]) -> int:
     pa.add_argument("--firm", default="6")
     pa.add_argument("--rund", default="18")
     pa.add_argument("--poziom", default="sredni")
+    pa.add_argument("--rywale", default="", help="poziom rywali (bez – jak --poziom)")
     pa.add_argument("--strefy", help="strefy lokalu badanej firmy, po przecinku (bez – strategia)")
     pa.add_argument("--kapital", type=int, default=0)
     pa.add_argument("--warianty", help="nazwy albo przedrostki po przecinku (bez – wszystkie)")
@@ -364,7 +372,7 @@ def main(argv: list[str]) -> int:
     szybki = a.polecenie == "szybki"
     strategie = lista(a.strategie) or (SZYBKI["strategie"] if szybki
                                         else list(dane.boty["strategie"]))
-    konteksty = [Kontekst(s, r, f, a.poziom, st, a.kapital) for s in strategie
+    konteksty = [Kontekst(s, r, f, a.poziom, st, a.kapital, a.rywale) for s in strategie
                  for r in lista(a.rund, int) for f in lista(a.firm, int)
                  for st in lista(a.strefy) or [""]]
     ile = a.ziarna or (SZYBKI["ziarna"] if szybki else 30)

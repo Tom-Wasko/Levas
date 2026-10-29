@@ -14,6 +14,8 @@ Poziomy (dane/boty.yaml: poziomy, gra z lokalami; bez lokali – zawsze dawne re
   oczekiwanej marży (po koszcie składników i pracy), reklamuje się tylko z wolną kuchnią i bierze kolejny
   gotowy lokal, gdy obecne nie nadążają;
 - niemożliwy – jak trudny, ale oszukuje: klienci bez powodu wolą jego lokale (przewaga_popytu, silnik/runda.py).
+- jak człowiek – słaby, średni, dobry (Z5, tylko do pomiarów trudności): bez modelu popytu – prognoza z raportów
+  poprzednich rund i potencjału lokalu z zakładki Klienci (_prognoza_czlowieka); wersje różnią się staraniem.
 """
 from __future__ import annotations
 
@@ -297,6 +299,55 @@ def _korekta_prognozy(stan: StanGry, nazwa: str, runda: int, granice: list[float
     return min(max(granice), max(min(granice), sum(v["popyt"] for v in sp if v["prognoza"]) / prog))
 
 
+def _prognoza_czlowieka(dane: Dane, stan: StanGry, f: Firma, nazwa: str, oferta: list[str], runda: int,
+                        r_sprz: int, konkurencja: dict, pc: dict) -> dict:
+    """Prognoza bota „jak człowiek” (Z5) tylko z tego, co drużyna widzi w zakładkach: popyt dań w lokalach
+    z raportów `pc["rund"]` ostatnich rund (średnia), przy `pc["pule"]` razy pula strefy w rundzie sprzedaży
+    / pula w tamtej rundzie (zakładka Klienci). Lokal albo danie bez historii – potencjał lokalu jak w zakładce
+    Klienci (2★, ceny preferowane strefy, obecna konkurencja). Format jak pp.prognoza."""
+    lokale = [lok.id for lok in f.lokale if lok.dziala_od <= r_sprz]
+    pule: dict[int, dict] = {}
+
+    def pula(r: int, z: str) -> float:
+        if r not in pule:
+            pule[r] = pp.pule(dane, r)
+        return sum(float(pule[r][z][u].sum()) for u in oferta)
+
+    historia: dict[tuple[str, str], list[float]] = {}
+    for r in range(runda - 1, max(0, runda - 1 - pc["rund"]), -1):
+        for x in ((stan.wyniki.get(r, {}).get(nazwa) or {}).get("klienci") or {}).get("lokale", []):
+            if x["id"] not in lokale:
+                continue
+            z = dane.lokale[x["id"]]["strefa"]
+            skala = pula(r_sprz, z) / pula(r, z) if pc.get("pule") and pula(r, z) else 1.0
+            for u, n in x["dania"].items():
+                if u in oferta:
+                    historia.setdefault((x["id"], u), []).append(n * skala)
+    potencjal = None
+    wynik: dict[str, dict[str, float]] = {}
+    for lok in lokale:
+        for u in oferta:
+            if h := historia.get((lok, u)):
+                n = sum(h) / len(h)
+            else:
+                if potencjal is None:
+                    moje = {x: {v: {"strefa": dane.lokale[x]["strefa"], "jakosc": (2, 2, 2), "cena":
+                                    dane.uslugi[v]["cena_preferowana"]
+                                    * dane.mapa["popyt"]["strefy"][dane.lokale[x]["strefa"]]["cena"]}
+                                for v in oferta} for x in lokale}
+                    potencjal = pp.prognoza(dane, r_sprz, {**konkurencja, nazwa: moje}, nazwa)["lokale"]
+                n = potencjal.get(lok, {}).get(u, 0.0)
+            wynik.setdefault(lok, {})[u] = round(n, 1)
+    dni = None
+    for lok, dania in wynik.items():   # rozkład na dni – wagi dni strefy z zakładki Klienci
+        w = pp.wagi_dni(dane, dane.lokale[lok]["strefa"], pp.dni_rundy(dane, r_sprz))
+        porcje = sum(dania.values()) * w / w.sum() if w.sum() > 0 else w
+        dni = porcje if dni is None else dni + porcje
+    dania_firmy = {u: round(sum(x.get(u, 0.0) for x in wynik.values()), 1) for u in oferta}
+    return {"dania": dania_firmy, "lokale": wynik,
+            "dni": [round(float(x), 1) for x in dni] if dni is not None else []}
+
+
 def _koszt_pracy(dane: Dane, stan: StanGry, zawod: str, narzut: float) -> float:
     """Szacunkowy koszt rundy jednej osoby zawodu: średnia pensja preferowana kandydatów × narzut."""
     p = [k["pensja_preferowana"] for k in stan.kandydaci if k["zawod"] == zawod]
@@ -363,8 +414,13 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if blad:   # łatwy: prognoza „na oko”
         korekta *= 1 + float(strumien(konf["ziarno"], runda, "bot", nazwa, "prognoza").uniform(-blad, blad))
 
+    czlowiek = pz.get("prognoza_czlowieka")
+
     def prognoza_cen(c: dict[str, float]) -> tuple[dict, dict]:
-        prog = _prognoza_lokali(dane, f, nazwa, oferta, c, q, wyp, konkurencja, r_sprz)
+        if czlowiek:   # „jak człowiek”: z raportów poprzednich rund, nie z modelu popytu
+            prog = _prognoza_czlowieka(dane, stan, f, nazwa, oferta, runda, r_sprz, konkurencja, czlowiek)
+        else:
+            prog = _prognoza_lokali(dane, f, nazwa, oferta, c, q, wyp, konkurencja, r_sprz)
         lok = {x: {u: n * korekta * st["pokrycie"] for u, n in dania.items()} for x, dania in prog["lokale"].items()}
         return prog, lok
 

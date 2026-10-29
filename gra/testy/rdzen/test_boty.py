@@ -1,4 +1,5 @@
-"""Poziomy botów (F4.4, P19): łatwy, średni, trudny i niemożliwy różnią się sposobem planowania (niemożliwy – oszukuje)."""
+"""Poziomy botów (F4.4, P19, Z5): łatwy, średni, trudny i niemożliwy różnią się sposobem planowania (niemożliwy –
+oszukuje); wersje „jak człowiek” prognozują z raportów poprzednich rund."""
 import pytest
 
 from balans.symuluj import rozegraj
@@ -67,3 +68,52 @@ def test_niemozliwy_bot_oszukuje_popytem():
         s = g.przelicz(wymus=True)
     sprzedaz = {n: sum(v["sprzedaz"] for r in range(2, 7) for v in s.wyniki[r][n]["sprzedaz"].values()) for n in "AB"}
     assert sprzedaz["A"] > sprzedaz["B"]
+
+
+def test_bot_jak_czlowiek_prognozuje_z_raportow_a_nie_z_modelu(monkeypatch):
+    """Z5: wersje „jak człowiek” nie używają prognozy modelu popytu (pp.prognoza dla własnych cen i jakości),
+    tylko popytu z raportów poprzednich rund; wersja dobra – średnia z dwóch rund razy zmiana puli strefy."""
+    def model(*a, **k):
+        raise AssertionError("bot „jak człowiek” użył prognozy modelu")
+
+    monkeypatch.setattr(boty, "_prognoza_lokali", model)
+    wersje = {"A": "czlowiek_slaby", "B": "czlowiek_sredni", "C": "czlowiek_dobry"}
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani"), ("C", "premium")], 5, 3, poziomy=wersje)
+    for _ in range(4):
+        s = g.przelicz(wymus=True)
+    assert all(sum(v["sprzedaz"] for v in s.wyniki[4][n]["sprzedaz"].values()) > 0 for n in wersje)
+    dane, f = g.dane, s.firmy["C"]
+    oferta, lok = list(f.oferta), f.lokale[0].id
+    konk = boty.pp.oferty_konkurencji(dane, s, 5, "C")
+    popyt = {r: next(x for x in s.wyniki[r]["C"]["klienci"]["lokale"] if x["id"] == lok)["dania"] for r in (3, 4)}
+    zeszly = boty._prognoza_czlowieka(dane, s, f, "C", oferta, 5, 5, konk, {"rund": 1})
+    assert zeszly["lokale"][lok] == {u: popyt[4][u] for u in oferta}
+    assert sum(zeszly["dni"]) == pytest.approx(sum(zeszly["dania"].values()), abs=0.5)
+    strefa = dane.lokale[lok]["strefa"]
+
+    def pula(r):
+        return sum(float(x.sum()) for u, x in boty.pp.pule(dane, r)[strefa].items() if u in oferta)
+
+    dobry = boty._prognoza_czlowieka(dane, s, f, "C", oferta, 5, 5, konk, {"rund": 2, "pule": True})
+    for u in oferta:
+        oczekiwana = (popyt[4][u] * pula(5) / pula(4) + popyt[3][u] * pula(5) / pula(3)) / 2
+        assert dobry["lokale"][lok][u] == pytest.approx(oczekiwana, abs=0.06)
+
+
+def test_bot_jak_czlowiek_bez_historii_bierze_potencjal_lokalu():
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 4, 3, poziomy={"A": "czlowiek_sredni"})
+    s = g.przelicz(wymus=True)
+    dane, f = g.dane, s.firmy["A"]
+    oferta, lok = list(f.oferta), f.lokale[0].id
+    prog = boty._prognoza_czlowieka(dane, s, f, "A", oferta, 2, 2, boty.pp.oferty_konkurencji(dane, s, 2, "A"),
+                                    {"rund": 1})
+    assert not s.wyniki[1]["A"]["sprzedaz"] and all(prog["lokale"][lok][u] > 0 for u in oferta)
+
+
+def test_poziomy_jak_czlowiek_tylko_do_pomiarow():
+    from silnik.schematy import PoziomBota
+    poziomy = dane_domyslne().boty["poziomy"]
+    wersje = [k for k, p in poziomy.items() if p.get("prognoza_czlowieka")]
+    assert len(wersje) == 3 and all(poziomy[k].get("tylko_pomiar") for k in wersje)
+    with pytest.raises(ValueError, match="prognoza_czlowieka"):
+        PoziomBota(nazwa="x", opis="x", prognoza_czlowieka={"rund": 1}, mnozniki_ceny=[1.1])

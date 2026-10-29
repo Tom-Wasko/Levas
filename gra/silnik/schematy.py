@@ -430,6 +430,12 @@ class KolejnyLokalBota(Schemat):
     maks_lokali: int = Field(ge=1)
 
 
+class PrognozaCzlowieka(Schemat):
+    """Bot „jak człowiek” (Z5): prognoza z raportów poprzednich rund – opis pól w dane/boty.yaml."""
+    rund: int = Field(1, ge=1)
+    pule: bool = False
+
+
 class PoziomBota(Schemat):
     """Zachowanie bota na poziomie (gra z lokalami) – opis pól w dane/boty.yaml."""
     nazwa: str
@@ -446,6 +452,15 @@ class PoziomBota(Schemat):
     obsluga_kampanii: float | None = Field(None, ge=0, le=1)
     kolejny_lokal: KolejnyLokalBota | None = None
     przewaga_popytu: float = Field(1.0, ge=1)   # niemożliwy: mnożnik atrakcyjności lokali bota (oszustwo)
+    prognoza_czlowieka: PrognozaCzlowieka | None = None
+    tylko_pomiar: bool = False   # poziom do pomiarów (balans/), bez wyboru w panelu mistrza gry
+
+    @model_validator(mode="after")
+    def _czlowiek_bez_modelu(self) -> PoziomBota:
+        # bot „jak człowiek” nie zna modelu popytu: bez korekty o prognozę modelu, wyboru ceny i oszustwa
+        if self.prognoza_czlowieka and (self.korekta_prognozy or self.mnozniki_ceny or self.przewaga_popytu != 1):
+            raise ValueError("prognoza_czlowieka wyklucza korekta_prognozy, mnozniki_ceny i przewaga_popytu")
+        return self
 
 
 class PlikBotow(Plik):
