@@ -141,6 +141,12 @@ def karta_skumulowana(gra: Gra, do_rundy: int) -> dict:
     return wynik
 
 
+def miejsca(skum: dict) -> dict[str, int]:
+    """Miejsca firm w rankingu: średni wynik działalności z karty skumulowanej (pulpit drużyny i mistrz gry)."""
+    ranking = sorted(skum, key=lambda n: -skum[n]["wynik_dzialalnosci"])
+    return {n: i + 1 for i, n in enumerate(ranking)}
+
+
 def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     """Widok firmy w rundzie `runda` (domyślnie bieżąca). Decyzje: bieżąca runda – edytowalne, wcześniejsze – podgląd.
     Wyniki w rundzie r: skutki decyzji z rundy r−1 (jak w REVAS)."""
@@ -204,7 +210,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                           "dochod_netto": poprzedni.wyniki[r][firma]["kpir"]["dochod_netto"],
                           "gotowka": poprzedni.wyniki[r][firma]["gotowka"]}
                          for r in range(1, runda) if r in poprzedni.wyniki]
-    v["dashboard"] = _dashboard(gra, firma, runda, poprzedni)
+    v["dashboard"] = _dashboard(gra, firma, runda, poprzedni, v.get("karta_skumulowana") or {})
     v["lokale"] = _lokale(gra, firma, runda, f, poprzedni, stan, info if edycja else None)
     zk = ((poprzedni.wyniki.get(runda - 1) or {}).get(firma, {}).get("karta") or {}).get("zadowolenie_klientow")
     v["popyt"] = widok_popytu(dane, poprzedni, f, runda, zk)
@@ -321,17 +327,14 @@ def _lokale(gra: Gra, firma: str, runda: int, f: Firma, poprzedni, stan, info: d
             "decyzja": decyzja}
 
 
-def _dashboard(gra: Gra, firma: str, runda: int, poprzedni) -> dict:
+def _dashboard(gra: Gra, firma: str, runda: int, poprzedni, skum: dict) -> dict:
     f = poprzedni.firmy[firma]
     d = {"nazwa": f.nazwa_wyswietlana or firma, "saldo": f.gotowka, "dochod_netto": 0.0, "miejsce": None,
          "liczba_firm": len(poprzedni.firmy), "lokaty": sum(l.kwota for l in f.lokaty),
          "zadluzenie": sum(k.pozostalo for k in f.kredyty) + f.kredyt_odnawialny}
     if runda - 1 in poprzedni.wyniki:
         d["dochod_netto"] = poprzedni.wyniki[runda - 1][firma]["kpir"]["dochod_netto"]
-    if runda >= 3 and runda - 1 in poprzedni.rynek:
-        karty = poprzedni.rynek[runda - 1]["karta"]
-        ranking = sorted(karty, key=lambda n: -karty[n]["wynik_dzialalnosci"])
-        d["miejsce"] = ranking.index(firma) + 1 if firma in ranking else None
+    d["miejsce"] = miejsca(skum).get(firma)   # Z7: jak ranking mistrza gry (średnia z rund 2…)
     return d
 
 
@@ -405,9 +408,10 @@ def przeglad_mg(gra: Gra) -> dict:
             "wynik_ostatni": karta_ost.get(n, {}).get("wynik_dzialalnosci"),
             "wynik_skumulowany": skum.get(n, {}).get("wynik_dzialalnosci"),
         })
-    ranking = sorted((f for f in firmy if f["wynik_skumulowany"] is not None), key=lambda f: -f["wynik_skumulowany"])
-    for i, f in enumerate(ranking):
-        f["miejsce"] = i + 1
+    miejsce = miejsca(skum)
+    for f in firmy:
+        if f["nazwa"] in miejsce:
+            f["miejsce"] = miejsce[f["nazwa"]]
     return {
         "gra": {"nazwa": konf["nazwa"], "runda": r, "liczba_rund": konf["liczba_rund"], "zakonczona": gra.zakonczona,
                 "ziarno": konf["ziarno"], "kapital": gra.kapital_startowy,

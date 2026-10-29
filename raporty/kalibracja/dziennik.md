@@ -202,3 +202,15 @@ wpis na dole.
 - Gęstość: 09–12.2025 – 23 wydarzenia, 01–04.2026 – 23 (było 11 bez meczów). Runda 26 zaczyna się 23.02.2026,
   runda 35 – 27.04.2026.
 - Gra botów 34 rundy (ziarno 7) bez błędów. Testy bez zmian (testy kalendarza czytają zamrożoną kopię).
+
+## Z7 – miejsce na pulpicie jak ranking mistrza gry (29.10.2026, Claude Code, Opus 5.5)
+- `api/prezentacja.py`: nowa funkcja `miejsca(skum)`, z której korzystają pulpit drużyny (`_dashboard`) i ranking
+  mistrza gry (`przeglad_mg`, eksport CSV). Miejsce = kolejność średniego wyniku działalności z rund 2…N (karta
+  skumulowana, ta sama, którą pokazuje zakładka Karta wyników). Wcześniej pulpit brał kartę tylko z ostatniej
+  rundy. Ranking jest dostępny od rundy 3, jak dotąd.
+- Test: nowy `test_miejsce_na_pulpicie_jak_ranking_mistrza_gry` (`testy/aplikacja/test_panel_mg.py`) – w każdej
+  rundzie gry botów miejsce na pulpicie = miejsce u mistrza gry, a ranking z ostatniej rundy choć raz się różni.
+- **Pytanie do autora (zmiana widoczna dla gracza, nie ruszałem):** po zakończeniu gry widok drużyny staje na
+  rundzie N, a ta pokazuje skutki rundy N−1 (jak w REVAS: wyniki rundy r widać w rundzie r+1). Drużyna nie widzi
+  więc wyników ani miejsca po ostatniej rundzie, a mistrz gry widzi. Czy po końcu gry pokazać drużynie widok
+  „po rundzie N” (wyniki ostatniej rundy i końcowe miejsce)? Warto to sprawdzić w części A.

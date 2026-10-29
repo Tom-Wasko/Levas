@@ -89,3 +89,21 @@ def test_domyslny_kredyt_i_przycisk_zamow_brakujace(client):
     r = client.post(f"/api/gry/{id_}/prowadzenie", {"auto_zamowienia": True}, content_type="application/json")
     assert r.json()["gra"]["auto_zamowienia"] is True and gracz() is True
     assert _przeglad(client, _nowa(client, auto_zamowienia=True).json()["id"])["gra"]["auto_zamowienia"] is True
+
+
+def test_miejsce_na_pulpicie_jak_ranking_mistrza_gry():
+    """Z7: pulpit drużyny liczy miejsce ze średniej kart z rund 2…, a nie z karty ostatniej rundy."""
+    from api import prezentacja as pr
+    from silnik import Gra
+
+    g = Gra.nowa("Z7", [(f"Bot {k}", k) for k in ("tani", "premium", "zrownowazony", "agresywny")], 8, 7)
+    inna = False
+    for r in range(1, 8):   # po ostatniej rundzie pulpit pokazuje rundę N (skutki N−1), mistrz gry – N
+        g.przelicz(wymus=True)
+        if r < 2:
+            continue
+        mg = {f["nazwa"]: f.get("miejsce") for f in pr.przeglad_mg(g)["firmy"]}
+        assert {n: pr.widok(g, n)["dashboard"]["miejsce"] for n in mg} == mg
+        karty = g.stan(r).rynek[r]["karta"]
+        inna |= mg != pr.miejsca({n: karty[n] for n in mg})
+    assert inna   # w tej grze ranking ostatniej rundy choć raz różni się od skumulowanego
