@@ -8,7 +8,8 @@ zrodlo: >-
   popyt w strefach) i „Menu i składniki” (popyt zależny od kalendarza miejskiego). Mnożniki, daty ferii i wydarzeń
   miejskich – założenia gry (do potwierdzenia); wcześniej kalendarz był w mapa/popyt.yaml (F3a.4). Mecze Motoru
   Lublin – prawdziwe domowe mecze Ekstraklasy jesienią 2025 (Wikipedia: „Motor Lublin (piłka nożna) w sezonie
-  2025/2026”); `dania` – mnożnik popytu na danie w strefach wydarzenia (P14, „na oko”).
+  2025/2026”), domowe mecze wiosną 2026 – ta sama strona; daty finałów WOŚP – prawdziwe (Z6); `dania` – mnożnik
+  popytu na danie w strefach wydarzenia (P14, „na oko”).
 rodzaje:
   swieto: Święto
   uczelnie: Uczelnie
@@ -32,6 +33,9 @@ ruchome:
     2026: '02-02'
     2027: '01-18'
     2028: '02-14'
+  final_wosp:              # niedziela Finału Wielkiej Orkiestry Świątecznej Pomocy (prawdziwe daty)
+    2025: '01-26'
+    2026: '01-25'
 wydarzenia:
 - nazwa: Wakacje studenckie
   rodzaj: uczelnie
@@ -365,6 +369,109 @@ wydarzenia:
     frytki: 1.3
     napoj: 1.35
     talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Pogoń Szczecin'
+  rodzaj: sport
+  rok: 2026
+  opis: >-
+    Pierwszy mecz po zimowej przerwie. Murawa podgrzewana, kibice nie – stoją w trzech kurtkach i liczą, że
+    kebab w bułce rozgrzeje lepiej niż doping. Przyjezdni ze Szczecina mówią, że u nich wieje bardziej. Nikt
+    w Lublinie w to nie wierzy.
+  od: '02-01'
+  do: '02-01'
+  strefy:
+    zygmuntowskie: 1.7
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Lechia Gdańsk'
+  rodzaj: sport
+  rok: 2026
+  opis: >-
+    Niedziela po Walentynkach – pół trybuny przyszło z drugą połówką, która „pierwszy raz na meczu”. W przerwie
+    druga połówka pyta, czemu wszyscy krzyczą na sędziego, i dostaje frytki na uspokojenie.
+  od: '02-15'
+  do: '02-15'
+  strefy:
+    zygmuntowskie: 1.7
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Korona Kielce'
+  rodzaj: sport
+  rok: 2026
+  opis: >-
+    Sobotni mecz sąsiadów zza Wisły. Kibice z Kielc przyjeżdżają z kanapkami w folii, ale po dwóch godzinach
+    w lutowym wietrze kanapki są lodem, a kolejka przy Stadionowej rośnie od strony sektora gości.
+  od: '02-28'
+  do: '02-28'
+  strefy:
+    zygmuntowskie: 1.7
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Górnik Zabrze'
+  rodzaj: sport
+  rok: 2026
+  opis: >-
+    Niedziela i Dzień Kobiet w jednym. Kibice kupują tulipany w drodze na Arenę, a potem tłumaczą, że to „dla
+    mamy”. Śląsk znów pyta o roladę, Lublin znów odpowiada kebabem – rozmowa idzie lepiej niż w październiku.
+  od: '03-08'
+  do: '03-08'
+  strefy:
+    zygmuntowskie: 1.8
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Zagłębie Lubin'
+  rodzaj: sport
+  rok: 2026
+  opis: >-
+    Piątkowy wieczór, Lublin kontra Lubin. Spiker dwa razy myli nazwy, kibice gości przez pomyłkę klaszczą
+    gospodarzom, a kasjer przy budce z kebabem pyta każdego, „z którego Lub(l)ina” jest, i daje sos gratis.
+  od: '03-20'
+  do: '03-20'
+  strefy:
+    zygmuntowskie: 1.6
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
+- nazwa: 'Mecz Motoru: Motor Lublin – Raków Częstochowa'
+  rodzaj: sport
+  rok: 2026
+  opis: >-
+    Tydzień po Wielkanocy, pierwsza ciepła niedziela. Raków przyjeżdża jako faworyt, Lublin – z bębnami i
+    resztkami mazurka w kieszeni. Na trybunach krótkie rękawy, w kolejce po napoje – długa kolejka.
+  od: '04-12'
+  do: '04-12'
+  strefy:
+    zygmuntowskie: 1.9
+    dworzec: 1.15
+    centrum: 1.05
+  dania:
+    kebab_w_bulce: 1.25
+    frytki: 1.3
+    napoj: 1.35
+    talerz_kebab: 0.75
 - nazwa: Nowy Rok
   rodzaj: swieto
   opis: >-
@@ -396,6 +503,21 @@ wydarzenia:
     centrum: 1.1
     lsm_czuby: 0.9
     czechow: 0.9
+- nazwa: Finał WOŚP
+  rodzaj: miasto
+  opis: >-
+    Wolontariusze z puszkami stoją na każdym rogu Krakowskiego Przedmieścia, a wieczorem nad Placem Litewskim
+    leci „światełko do nieba”. Kto wrzucił do puszki, dostaje serduszko i nagle ma ochotę na coś ciepłego – na
+    mrozie nawet frytki smakują jak nagroda za dobry uczynek.
+  wzgledem: final_wosp
+  od: 0
+  do: 0
+  strefy:
+    centrum: 1.25
+    stare_miasto: 1.2
+  dania:
+    frytki: 1.2
+    napoj: 1.2
 - nazwa: Sesja zimowa
   rodzaj: uczelnie
   opis: >-
@@ -426,6 +548,19 @@ wydarzenia:
   strefy:
     akademickie: 0.5
     politechnika: 0.5
+- nazwa: Popielec
+  rodzaj: swieto
+  opis: >-
+    Dzień po pączkach i ostatkach: posypane głowy, post i postanowienia. Część klientów odwraca wzrok od rożna,
+    część pyta, czy falafel „się liczy”. Liczy się – i dziś schodzi jak nigdy.
+  wzgledem: wielkanoc
+  od: -46
+  do: -46
+  strefy:
+    wszystkie: 0.9
+  dania:
+    falafel: 1.5
+    talerz_kebab: 0.8
 - nazwa: Walentynki
   rodzaj: handel
   opis: >-
@@ -435,6 +570,19 @@ wydarzenia:
   do: '02-14'
   strefy:
     stare_miasto: 1.4
+- nazwa: Początek semestru letniego
+  rodzaj: uczelnie
+  opis: >-
+    Studenci wracają z gór i od rodziców, z nowym planem zajęć i starym brakiem pomysłu na obiad. Pierwszy tydzień
+    to zapisy na wybieralne, kolejki w dziekanacie i kolejki przy Twojej ladzie – te drugie idą szybciej.
+  od: '02-23'
+  do: '02-27'
+  strefy:
+    akademickie: 1.3
+    politechnika: 1.25
+    dworzec: 1.1
+  dania:
+    kebab_box: 1.15
 - nazwa: Dzień Kobiet
   rodzaj: handel
   opis: >-
@@ -456,6 +604,17 @@ wydarzenia:
     zemborzyce: 1.5
     stare_miasto: 1.2
     akademickie: 1.15
+- nazwa: Jarmark Wielkanocny
+  rodzaj: miasto
+  opis: >-
+    Na Starym Mieście stragany z palmami, pisankami i baranki z cukru, których nikt nie je, ale każdy kupuje. Między
+    budkami chodzi zapach wędzonej kiełbasy, a turyści szukają czegoś, co da się zjeść, zanim wrócą do koszyczka.
+  wzgledem: wielkanoc
+  od: -10
+  do: -4
+  strefy:
+    stare_miasto: 1.2
+    centrum: 1.05
 - nazwa: Przerwa wielkanocna na uczelniach
   rodzaj: uczelnie
   opis: >-
@@ -467,6 +626,20 @@ wydarzenia:
   strefy:
     akademickie: 0.5
     politechnika: 0.5
+- nazwa: Wielki Piątek
+  rodzaj: swieto
+  opis: >-
+    Najcichszy dzień roku przy rożnie. Babcie pilnują postu, kolejka stoi tylko po falafel i frytki, a kucharz
+    przez cały dzień kroi więcej cebuli niż mięsa.
+  wzgledem: wielkanoc
+  od: -2
+  do: -2
+  strefy:
+    wszystkie: 0.75
+  dania:
+    falafel: 1.6
+    frytki: 1.2
+    talerz_kebab: 0.6
 - nazwa: Wielkanoc
   rodzaj: swieto
   opis: >-

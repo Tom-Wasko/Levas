@@ -285,7 +285,7 @@ Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4
 - [x] Z3 Debet ponad limit: blokada inwestycji i kredytów, alarm u mistrza gry, inwestor ratunkowy (gotówka za udział w przyszłych dochodach, wpłata liczona jak dług); bez odsetek karnych i zajęcia majątku — zrobione 29.10.2026: `silnik/pieniadze/inwestor.py` (alarm `w["alarm"]`, blokada w następnej rundzie, inwestor od mistrza gry przez `Gra.ustaw_inwestora` i panel, udział 30% dochodu przez 8 rund, niezwrócona wpłata jako dług); warunki w `finanse.inwestor_ratunkowy`, odsetki karne banku zostają.
 - [x] Z4 Liczba lokali na mapie zależna od liczby firm (4–8), popyt bez zmian — zrobione 29.10.2026: klucz `od_firm` w `dane/mapa/lokale.yaml` (8 firm – 38 lokali, 6–7 – 29, 4–5 – 20, wszystkie strefy), filtr `lokale.na_mapie` w ofercie, decyzjach, botach i mapie.
 - [x] Z5 Bot „jak człowiek” (prognoza z zeszłotygodniowej sprzedaży zamiast `pp.prognoza`), wersje słaba / średnia / dobra — zrobione 29.10.2026: poziomy `czlowiek_slaby/sredni/dobry` (tylko do pomiarów) prognozują z popytu w raportach i potencjału z zakładki Klienci (`boty._prognoza_czlowieka`), `warianty.py --rywale`; dobra > średnia w 8/8 par.
-- [ ] Z6 Kalendarz miejski i święta do kwietnia 2026 (`dane/kalendarz/kalendarz.yaml`)
+- [x] Z6 Kalendarz miejski i święta do kwietnia 2026 (`dane/kalendarz/kalendarz.yaml`) — zrobione 29.10.2026: 6 domowych meczów Motoru wiosną 2026 (prawdziwy terminarz), Finał WOŚP, Popielec, semestr letni, Jarmark Wielkanocny, Wielki Piątek – 01–04.2026 ma 23 wydarzenia, tyle co jesień.
 - [ ] Z7 Miejsce na pulpicie drużyny liczone jak ranking mistrza gry (karta skumulowana, `api/prezentacja.py`)
 
 ### Pomiar i kalibracja

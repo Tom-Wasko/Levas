@@ -191,3 +191,14 @@ wpis na dole.
     70 tys. zł (poziom średni: 63 tys.).
 - Testy: 3 nowe w `testy/rdzen/test_boty.py`, 1 w `testy/rdzen/test_warianty.py` (dane gry). Pozostałe bez
   zmian; `test_poziom_botow` (panel MG) dalej widzi tylko 4 poziomy.
+
+## Z6 – kalendarz do kwietnia 2026 (29.10.2026, Claude Code, Opus 5.5)
+- Domowe mecze Motoru wiosną 2026 (`rok: 2026`, prawdziwe daty z Wikipedii, ta sama strona co jesień; dni
+  tygodnia sprawdzone): Pogoń 01.02, Lechia 15.02, Korona 28.02, Górnik 08.03, Zagłębie 20.03, Raków 12.04.
+  Mnożniki jak jesienią (Arena 1,6–1,9).
+- Nowe wydarzenia co roku: Finał WOŚP (data ruchoma `final_wosp`, prawdziwe daty 2025–2026), Popielec
+  (Wielkanoc −46, falafel ×1,5), Początek semestru letniego (23–27.02), Jarmark Wielkanocny (Wielkanoc −10…−4,
+  Stare Miasto), Wielki Piątek (falafel ×1,6, talerz ×0,6). Mnożniki to założenia, jak reszta kalendarza.
+- Gęstość: 09–12.2025 – 23 wydarzenia, 01–04.2026 – 23 (było 11 bez meczów). Runda 26 zaczyna się 23.02.2026,
+  runda 35 – 27.04.2026.
+- Gra botów 34 rundy (ziarno 7) bez błędów. Testy bez zmian (testy kalendarza czytają zamrożoną kopię).

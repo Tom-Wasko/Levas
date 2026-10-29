@@ -50,3 +50,9 @@ Proponowany dopisek:
 > gry): prognozuje z popytu w raportach poprzednich rund i z potencjału lokalu w zakładce Klienci, a nie z modelu
 > popytu. Słaby: zeszły tydzień ±25%, proste reguły; średni: zeszły tydzień ±10%, planuje obsadę; dobry: średnia
 > z dwóch tygodni razy zmiana puli strefy, reklama z wolną kuchnią, drugi lokal.
+
+## Z6 – kalendarz do kwietnia 2026 (29.10.2026) → `notatki/Prawidła świata.md`, kalendarz miejski
+
+Proponowany dopisek:
+> Kalendarz sięga do kwietnia 2026: mecze Motoru wiosną 2026 (prawdziwy terminarz), Finał WOŚP, Popielec i
+> Wielki Piątek (więcej falafla, mniej mięsa), początek semestru letniego, Jarmark Wielkanocny na Starym Mieście.
