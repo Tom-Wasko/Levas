@@ -1,4 +1,4 @@
-[[Plan implementacji]] · [[Różnice Revas – Levas]]
+`archiwum/Plan implementacji.md` · [[Różnice Revas – Levas]]
 
 # Technologia
 
@@ -67,5 +67,5 @@ przeglądarka ──HTTP/JSON──▶ Django (api, panel_gracza, panel_mg, kont
 ## Konwencje
 - Kod po polsku: identyfikatory bez polskich znaków, `snake_case` dla funkcji i zmiennych, `PascalCase` dla klas; komentarze i interfejs po polsku.
 - Końce linii LF (`.gitattributes`), wyjątek: `*.bat` w CRLF.
-- Historia liniowa na `main`, 1 commit = 1 zadanie z [[Plan implementacji]] (np. `F3a.9: banki ze specjalizacjami`), postęp w `POSTEP.md`.
+- Historia liniowa na `main`, 1 commit = 1 zadanie z `archiwum/Plan implementacji.md` (np. `F3a.9: banki ze specjalizacjami`), postęp w `POSTEP.md`.
 - Serwer produkcyjny – do decyzji później.

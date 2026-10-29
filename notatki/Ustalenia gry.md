@@ -1,4 +1,4 @@
-[[Główny obraz]] · [[Prawidła świata]] · [[Elementy mapy]] · [[Plan implementacji]]
+[[Główny obraz]] · [[Prawidła świata]] · [[Elementy mapy]] · `archiwum/Plan implementacji.md`
 
 # Ustalenia gry
 

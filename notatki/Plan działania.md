@@ -1,4 +1,4 @@
-[[Główny obraz]] · [[Plan optymalizacji]] · [[Plan implementacji]] (archiwum)
+[[Główny obraz]] · [[Plan optymalizacji]] · `archiwum/Plan implementacji.md` (archiwum)
 
 # Plan działania
 
@@ -10,7 +10,7 @@
    - **3b – reszta:** parki, agencje reklamowe, promocje, licytacje, wypadki i ubezpieczenia, urząd, handel między drużynami, kalendarz miejski.
 4. Dopasowanie starych funkcji (z Revasa) do nowych – karta wyników, lista błędów, odblokowywanie zakładek, boty, analiza „co jeśli”.
 
-Kroki 1–4 są zrobione (28.10.2026, `POSTEP.md`). Ich plan – [[Plan implementacji]] – jest już archiwum.
+Kroki 1–4 są zrobione (28.10.2026, `POSTEP.md`). Ich plan – `archiwum/Plan implementacji.md` – jest już archiwum.
 
 ## Optymalizacyjne
 5. Kalibracja algorytmów i testy – [[Plan optymalizacji]], część B.

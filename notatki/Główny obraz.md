@@ -19,4 +19,4 @@ W folderze `revas_26/` znajdują się wszystkie materiały, których używamy do
 - Firma to JDG: KPiR, VAT, ZUS i PIT, wszystko rozliczane co tydzień.
 - Ocena: karta wyników Revasa dostosowana do kebabu.
 
-Pełna lista: [[Ustalenia gry]]. Plan prac: [[Plan implementacji]].
+Pełna lista: [[Ustalenia gry]]. Plan prac: `archiwum/Plan implementacji.md`.

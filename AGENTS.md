@@ -12,13 +12,13 @@ Levas to edukacyjna symulacja biznesowa dla uczniów i studentów. Gra się tak:
 
 W grze biorą udział boty o 5 strategiach i 4 poziomach. Levas powstał z kopii gry REVAS (klub fitness), przebudowanej na kebab i rozbudowanej o nowe mechaniki.
 
-**Stan (28.10.2026):** kroki 1–4 są zrobione (cała gra grywalna). Teraz kolej na kroki 5–6: kalibrację i analizę według `notatki/Plan optymalizacji.md`. Zadania i postęp są w `POSTEP.md`, instrukcje dla sesji w `zadania/`.
+**Stan (29.10.2026):** kroki 1–4 są zrobione (cała gra grywalna). Teraz kolej na kroki 5–6: analizę (A) i kalibrację (B) według `notatki/Plan optymalizacji.md` – sesje po kolei, najpierw A. Zadania i postęp są w `POSTEP.md`, instrukcje dla sesji w `zadania/` (polecenia do wklejenia: `zadania/README.md`).
 
 ## Mapa repozytorium
 ```
 AGENTS.md            ten plik
 POSTEP.md            lista zadań z checkboxami (F/P/Q – zrobione; A, U, B – bieżące)
-zadania/             instrukcje dla sesji: A_analiza_gracza.md, B_kalibracja.md
+zadania/             instrukcje dla sesji: README.md (polecenia), A_analiza_gracza.md, B_kalibracja.md
 raporty/             wyniki analiz i kalibracji (tworzysz tu pliki)
 notatki/             notatki projektowe autora (Obsidian) – NIE zmieniaj bez zgody (niżej)
 dokumentacja/        tło: WIEDZA_O_GRZE.md (oryginalny REVAS: karta wyników, mechaniki),
@@ -81,6 +81,8 @@ Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
 - Pisz w stylu otaczającego kodu: zwięzłe komentarze po polsku, gęstość komentarzy jak obok.
 - Do nowej mechaniki dodaj test w `testy/`. Nie usuwaj i nie osłabiaj testów tylko po to, żeby przeszły.
 - Gdy celowo zmieniasz liczbę, a test sprawdza wynik co do grosza, zaktualizuj oczekiwaną wartość i **napisz w commicie, które testy zmieniłeś i dlaczego**.
+- Od B2: testy mechanik (wzory, scenariusze co do grosza) czytają zamrożoną kopię danych `testy/dane_zamrozone/`, a testy zasad (determinizm, brak liczb w kodzie, schematy, uzgodnienie kasy, boty bez błędów) – `dane/`. Zmiana liczby w `dane/` nie powinna więc łamać testów wzorów; liczb w zamrożonej kopii nie zmieniaj przy kalibracji (gdy zmienia się schemat danych, dopisz w niej tylko nowe klucze).
+- Funkcje pomocnicze wspólne dla kilku plików testów trzymaj w `testy/pomocnicze.py`, a nie w importach między `test_*.py`.
 
 ## Git i postęp
 - Pracujesz na gałęzi `main` w `origin` = github.com/Tom-Wasko/Levas. Autor pracuje na kilku komputerach, więc **wypychaj zmiany regularnie**.
@@ -88,7 +90,7 @@ Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
   1. `pytest`, `ruff`, `sprawdz` – wszystko musi przejść;
   2. odhacz zadanie w `POSTEP.md` i dopisz jedno zdanie o tym, co zrobiłeś;
   3. zrób commit `B3: krótki opis` z opisem w treści;
-  4. `git push origin main`.
+  4. `git pull --rebase origin main`, potem `git push origin main`.
 - Na końcu każdego commita dopisz linię współautora z nazwą modelu, np. `Co-Authored-By: <model> <noreply@…>`.
 - Nie commituj `plan.txt`, `gra/db.sqlite3`, `gra/lokalne.json` ani `gra/zapisy/`. Nie używaj `push --force`.
 
@@ -100,7 +102,7 @@ Najważniejsze notatki:
 - `Ustalenia gry` – wszystkie parametry;
 - `Prawidła świata`, `Elementy mapy`, `Menu i składniki` – zasady świata;
 - `Główny obraz` i `Zarys aplikacji` – wizja;
-- `Plan implementacji` – archiwum, wyłącznie do odczytu.
+- `archiwum/Plan implementacji.md` – plan kroków 1–4, archiwum, wyłącznie do odczytu.
 
 ## Kiedy pytać autora
 Pytaj o decyzje projektowe, których nie da się wyprowadzić z notatek ani z celów planu: nowa mechanika, zmiana zasad widocznych dla gracza, usunięcie funkcji. Liczb i wzorów nie musisz konsultować, o ile służą celom z `notatki/Plan optymalizacji.md`. Gdy pytanie czeka na odpowiedź, zapisz je w raporcie zadania i zajmij się czymś niezależnym.

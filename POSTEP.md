@@ -271,28 +271,49 @@ Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commi
 
 ## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
 
-- [ ] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry
-- [ ] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel) z dziennikami w `raporty/analiza/`
-- [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
+Pierwsza sesja; gra na dzisiejszych zasadach i botach. Kolejność całości i polecenia: `zadania/README.md`.
 
-## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
+- [ ] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry
+- [ ] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/`
+- [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
 
 ## Krok 5 – kalibracja (Plan optymalizacji, część B; instrukcja: `zadania/B_kalibracja.md`)
 
-Po każdym: testy, ruff, `sprawdz`, wpis w `raporty/kalibracja/dziennik.md`, POSTEP, commit i push.
+Po każdym: testy, ruff, `sprawdz`, wpis w `raporty/kalibracja/dziennik.md`, POSTEP, commit, `git pull --rebase` i push.
+Kolejność: B1, B2, Z1–Z7, B3 (część do pomiaru), B4, **STOP** (autor: raport z A → U), B5 (**zatwierdza autor**),
+B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
 
-- [ ] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów (`raporty/kalibracja/inwentarz.md`)
-- [ ] B2 Narzędzie porównań par gier `balans/warianty.py` (konteksty, wiele ziaren, równolegle, CSV + md) z testami
-- [ ] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru
-- [ ] B4 Pomiar startowy: dominacje, krzywa trudności, strategie, realia (`raporty/kalibracja/stan_poczatkowy.md`)
-- [ ] B5 Gospodarka i trudność (popyt, koszty, kapitał; pierwszy plus przeciętnej drużyny w rundzie 4–6)
+- [ ] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz
+- [ ] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md) z testami
+
+### Zmiany zasad (ustalone z autorem 29.10.2026, przed pomiarem startowym)
+
+- [ ] Z1 Karta wyników: strata daje ujemny wynik działalności (proporcjonalnie); budynek w majątku; majątek po amortyzacji; zakup sprzętu nie pompuje rozwoju; odsetki Harpagona obniżają kartę
+- [ ] Z2 Majątek netto w wynikach firmy, panelu mistrza gry i eksporcie CSV
+- [ ] Z3 Debet ponad limit: blokada inwestycji i kredytów, alarm u mistrza gry, inwestor ratunkowy (gotówka za udział w przyszłych dochodach); bez odsetek karnych i zajęcia majątku
+- [ ] Z4 Liczba lokali na mapie zależna od liczby firm (4–8), popyt bez zmian
+- [ ] Z5 Bot „jak człowiek” (prognoza z zeszłotygodniowej sprzedaży zamiast `pp.prognoza`), wersje słaba / średnia / dobra
+- [ ] Z6 Kalendarz miejski i święta do kwietnia 2026 (`dane/kalendarz/kalendarz.yaml`)
+- [ ] Z7 Miejsce na pulpicie drużyny liczone jak ranking mistrza gry (karta skumulowana, `api/prezentacja.py`)
+
+### Pomiar i kalibracja
+
+- [ ] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru; przed B4 – część do pomiaru i poziomy łatwy < średni < trudny
+- [ ] B4 Pomiar startowy: dominacje, hipotezy z B1, krzywa trudności, strategie, 4/6/8 firm, realia (`raporty/kalibracja/stan_poczatkowy.md`); tag `kalibracja-start`
+- [ ] **STOP:** autor czyta raport z A i pomiar startowy, wybiera pozycje U
+
+## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
+
+## Kalibracja obszarów
+
+- [ ] B5 Gospodarka i trudność (popyt, koszty poza prawem, kapitał; pierwszy plus bota „jak człowiek” średniego w rundzie 4–6) – **do zatwierdzenia przez autora**
 - [ ] B6 Lokale (typ × forma × strefa, licytacje, przejęcia)
 - [ ] B7 Menu i ceny (dania, marże, widełki, promocje)
 - [ ] B8 Zaopatrzenie (dostawcy, gwiazdki, świeżość, magazyn, auto-zamawianie, handel)
 - [ ] B9 Ludzie (rekrutacja, umowy, pensje, premie, szkolenia, headhunter, czas właściciela)
 - [ ] B10 Marketing (reklama, agencje, promocje, udogodnienia, wyposażenie)
-- [ ] B11 Finanse (banki, kredyty, lokaty, odnawialny; Harpagon i kasyno – ryzykowne, ale czasem opłacalne)
-- [ ] B12 Księgowość i urzędy (samodzielnie / biuro z OC i bez, kary, sanepid, higiena, ubezpieczenia)
-- [ ] B13 Karta wyników (wagi składowych, brak „nabijania”, zgodność z majątkiem netto)
-- [ ] B14 Boty po kalibracji (poziomy wyraźnie różne, każda strategia wygrywa w jakimś kontekście)
-- [ ] B15 Raport końcowy, `zrodlo`/`pewnosc` w YAML, propozycje zmian w notatkach, instrukcja gracza
+- [ ] B11 Finanse (banki, kredyty, lokaty, odnawialny bez limitu; Harpagon i kasyno – ryzykowne, ale czasem opłacalne)
+- [ ] B12 Księgowość i urzędy (samodzielnie / biuro z OC i bez, kary, sanepid, higiena, ubezpieczenia; łamanie zasad średnio się nie opłaca)
+- [ ] B13 Karta wyników – tylko wagi składowych (brak „nabijania”, zgodność z majątkiem netto), potem szybki pomiar wszystkich obszarów
+- [ ] B14 Boty po kalibracji (poziomy wyraźnie różne, każda strategia wygrywa w jakimś kontekście; cele B5 nadal spełnione)
+- [ ] B15 Raport końcowy (przed/po od tagu `kalibracja-start`), `zrodlo`/`pewnosc` w YAML, propozycje zmian w notatkach, instrukcja gracza

@@ -5,7 +5,7 @@ Wykonawca: **Fable 5.1** w OpenCode. Najpierw przeczytaj `AGENTS.md`, potem `not
 ## Twoja rola
 Jesteś jednocześnie doświadczonym projektantem gier edukacyjnych, badaczem UX i wymagającym graczem. Autor zbudował grę sam i zna ją od środka, więc nie widzi jej oczami kogoś, kto siada do niej pierwszy raz. Masz mu dać to spojrzenie z zewnątrz oraz pomysły, na które sam mógłby nie wpaść.
 
-**W tym zadaniu nie zmieniasz kodu gry.** Wynikiem jest raport, a wdrożenie zależy od decyzji autora (zadania U w `POSTEP.md`).
+**W tym zadaniu nie zmieniasz kodu gry.** Wynikiem jest raport, a wdrożenie zależy od decyzji autora (zadania U w `POSTEP.md`). Grasz na dzisiejszych zasadach i botach – część B zacznie je zmieniać dopiero po tobie (sesje idą po kolei).
 
 ## Kontekst
 - **Kto gra:** uczniowie szkół średnich i studenci, w drużynach 1–4 osób, 2–3 rundy na tydzień rzeczywisty, przez kilka tygodni. Prowadzi nauczyciel jako mistrz gry.
@@ -26,8 +26,8 @@ Jesteś jednocześnie doświadczonym projektantem gier edukacyjnych, badaczem UX
 
    Grasz trzema personami:
    - **Nowicjusz, 16 lat.** Nie wie, co to VAT ani marża, i czyta tylko to, co jest na ekranie. Gdzie się gubi? Co go zniechęca? Czy wie, co zrobić w rundzie 1, 2 i 5?
-   - **Optymalizator.** Szuka najlepszej strategii, luk i sposobów na oszukanie gry (np. wieczne nabijanie karty jednym zabiegiem, darmowe pieniądze, decyzje bez konsekwencji). Zapisuj każdą „za dobrą” strategię – to ważne dla kalibracji (część B).
-   - **Nauczyciel (mistrz gry), panel `/mg/`.** Czy łatwo założyć grę, prowadzić rundy, zobaczyć, kto ma problem, i omówić wyniki z klasą? Czego brakuje do przeprowadzenia lekcji?
+   - **Optymalizator.** Szuka najlepszej strategii, luk i sposobów na oszukanie gry (np. wieczne nabijanie karty jednym zabiegiem, darmowe pieniądze, decyzje bez konsekwencji). Strategie ocenia **kartą skumulowaną** (średni wynik działalności z rund 2..N, jak ranking mistrza gry) i **majątkiem netto** na koniec gry (definicja w planie), a nie samą gotówką. Zapisuj każdą „za dobrą” strategię z liczbami i sposobem odtworzenia – to tropy dla kalibracji (część B, hipotezy w B1).
+   - **Nauczyciel (mistrz gry), panel `/mg/`.** Załóż grę z 3–4 drużynami „uczniów”, które prowadzisz sam, każda z zaplanowanym błędem: drużyna, która nie zamawia składników; drużyna, która wpada w debet; drużyna bez deklaracji w samodzielnej księgowości; drużyna z cenami poza widełkami. Do tego 2 boty. Czy łatwo założyć grę i prowadzić rundy? Czy z panelu widać, **która drużyna ma problem i jaki**, zanim powiedzą to uczniowie? Czy da się omówić wyniki z klasą? Czego brakuje do przeprowadzenia lekcji?
 
    Po każdej rundzie zapisuj w dzienniku: co widzę, co rozumiem, czego nie rozumiem, co bym zrobił, co się stało i czy wynik był dla mnie zrozumiały. Dziennik trzymaj w `raporty/analiza/dziennik_<persona>.md`. Skrypty pomocnicze trzymaj poza repozytorium albo w `raporty/analiza/skrypty/`.
 3. **A3 – raport** `raporty/analiza_gracza.md` (po polsku, dla autora, który nie jest programistą-UX-owcem). Układ:
@@ -63,5 +63,5 @@ Jesteś jednocześnie doświadczonym projektantem gier edukacyjnych, badaczem UX
 
 ## Zakończenie
 1. Odhacz A1–A3 w `POSTEP.md`.
-2. Zrób commit `A3: raport z analizy oczami gracza` i wypchnij zmiany. Pliki: raport, dzienniki i POSTEP.
+2. Zrób commit `A3: raport z analizy oczami gracza` i wypchnij zmiany (`git pull --rebase origin main`, potem `git push origin main`). Pliki: raport, dzienniki i POSTEP.
 3. Napisz autorowi krótkie podsumowanie (5–10 zdań) i poproś, żeby zaznaczył w raporcie, które pozycje wdrożyć. Zatwierdzone pozycje dopiszesz potem do `POSTEP.md` jako U1, U2… z odwołaniem do raportu.
