@@ -74,7 +74,8 @@ co jeszcze zostało do zrobienia):
 1. **Lokal** – w zakładce **Lokale** albo na mapie. Wynajmujesz (kaucja = 2 czynsze, potem czynsz co tydzień)
    albo kupujesz. Lokal *gotowy* działa od razu, *do urządzenia* – od następnej rundy, a działkę trzeba
    zabudować. Liczy się **strefa**: Miasteczko Akademickie to studenci, Stare Miasto – turyści i wieczory,
-   Dworzec – podróżni o każdej porze.
+   Dworzec – podróżni o każdej porze. Im mniej drużyn w grze, tym mniej lokali na mapie (około pięciu na
+   drużynę), a klientów w mieście jest tyle samo.
 2. **Bank i biuro rachunkowe** – w zakładkach Finanse ▸ Bank i Finanse ▸ Biuro rachunkowe. Bez banku nie ma konta,
    bez biura – księgujesz sam.
 3. **Menu** – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,

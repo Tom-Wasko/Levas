@@ -90,7 +90,7 @@ function rysujMape(c) {
     napisy += `<text x="${a}" y="${b - 4}" class="strefa-napis">${esc(s.nazwa)}</text>`;
   }
   const obiekty = M.budynki.map((b) => budynek(g, b));
-  if (v.lokale) obiekty.push(...M.lokale.filter((l) => (l.od_rundy || 1) <= v.runda).map((l) => lokal(g, v, d, kat, l)));
+  if (v.lokale) obiekty.push(...M.lokale.filter((l) => (l.od_rundy || 1) <= v.runda && (!v.lokale.na_mapie || v.lokale.na_mapie.includes(l.id))).map((l) => lokal(g, v, d, kat, l)));
   obiekty.sort((a, b) => a.klucz - b.klucz);
   return `<svg class="mapa-svg" viewBox="0 0 ${g.szer} ${g.wys}" role="img" aria-label="Mapa miasta">
     ${teren}${obiekty.map((o) => o.html).join("")}${napisy}</svg>`;

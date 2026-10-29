@@ -10,6 +10,8 @@ zrodlo: 'założenie F3a.3: czynsz = metraż × stawka strefy (strefy.yaml: czyn
   budowa 900 zł/m², adaptacja 100 zł/m², media 300 zł + 25 zł/m²; niewyposażony: czynsz i cena kupna −25% (test gry
   28.10: lokal do urządzenia razem z adaptacją i zakupem sprzętu wychodził drożej niż gotowy z zestawem); rząd wielkości (oferty najmu w Lublinie 2025:
   40–130 zł/m²), do kalibracji w kroku 5'
+# od_firm (Z4): lokal jest na mapie tylko w grze z co najmniej tyloma firmami – 8 firm: 38 lokali, 6–7: 29,
+# 4–5: 20 (około 5 na firmę, proporcje typów podobne); popyt miasta się nie zmienia
 zasady:
   nowy_lokal_co_rund: 3
   kaucja_miesiecy: 2
@@ -79,6 +81,7 @@ zestawy:
         Tablica menu: 2
 lokale:
 - id: stare_miasto_1
+  od_firm: 6
   nazwa: Kamienica przy Grodzkiej
   strefa: stare_miasto
   typ: gotowy
@@ -111,6 +114,7 @@ lokale:
     x: 14
     y: 6
 - id: stare_miasto_3
+  od_firm: 6
   nazwa: Piwnica na Bramowej
   strefa: stare_miasto
   typ: niewyposazony
@@ -127,6 +131,7 @@ lokale:
     x: 11
     y: 7
 - id: stare_miasto_4
+  od_firm: 8
   nazwa: Okienko na Złotej
   strefa: stare_miasto
   typ: gotowy
@@ -160,6 +165,7 @@ lokale:
     x: 12
     y: 8
 - id: centrum_1
+  od_firm: 6
   nazwa: Deptak – Krakowskie Przedmieście
   strefa: centrum
   typ: gotowy
@@ -208,6 +214,7 @@ lokale:
     x: 10
     y: 6
 - id: centrum_4
+  od_firm: 8
   nazwa: Parter przy 3 Maja
   strefa: centrum
   typ: niewyposazony
@@ -257,6 +264,7 @@ lokale:
     x: 3
     y: 5
 - id: akademickie_2
+  od_firm: 8
   nazwa: Budka na Sowińskiego
   strefa: akademickie
   typ: gotowy
@@ -273,6 +281,7 @@ lokale:
     x: 2
     y: 6
 - id: akademickie_3
+  od_firm: 6
   nazwa: Lokal na Langiewicza
   strefa: akademickie
   typ: niewyposazony
@@ -340,6 +349,7 @@ lokale:
     x: 4
     y: 10
 - id: politechnika_3
+  od_firm: 8
   nazwa: Bar przy akademiku Politechniki
   strefa: politechnika
   typ: gotowy
@@ -357,6 +367,7 @@ lokale:
     x: 1
     y: 11
 - id: dworzec_1
+  od_firm: 6
   nazwa: Kiosk przy Placu Dworcowym
   strefa: dworzec
   typ: gotowy
@@ -389,6 +400,7 @@ lokale:
     x: 7
     y: 11
 - id: dworzec_3
+  od_firm: 6
   nazwa: Hala na Młyńskiej
   strefa: dworzec
   typ: niewyposazony
@@ -405,6 +417,7 @@ lokale:
     x: 9
     y: 11
 - id: dworzec_4
+  od_firm: 8
   nazwa: Lokal na Kunickiego
   strefa: dworzec
   typ: niewyposazony
@@ -438,6 +451,7 @@ lokale:
     x: 12
     y: 10
 - id: zygmuntowskie_2
+  od_firm: 6
   nazwa: Lokal w Alejach Zygmuntowskich
   strefa: zygmuntowskie
   typ: niewyposazony
@@ -489,6 +503,7 @@ lokale:
     x: 0
     y: 14
 - id: lsm_czuby_2
+  od_firm: 8
   nazwa: Lokal przy Jana Pawła II
   strefa: lsm_czuby
   typ: gotowy
@@ -506,6 +521,7 @@ lokale:
     x: 2
     y: 14
 - id: lsm_czuby_3
+  od_firm: 8
   nazwa: Lokal na Filaretów
   strefa: lsm_czuby
   typ: niewyposazony
@@ -540,6 +556,7 @@ lokale:
     x: 6
     y: 14
 - id: czechow_1
+  od_firm: 6
   nazwa: Lokal na Kompozytorów Polskich
   strefa: czechow
   typ: gotowy
@@ -643,6 +660,7 @@ lokale:
     x: 20
     y: 2
 - id: felin_3
+  od_firm: 8
   nazwa: Działka przy Mełgiewskiej
   strefa: felin
   typ: dzialka
@@ -679,6 +697,7 @@ lokale:
     x: 9
     y: 15
 - id: zemborzyce_2
+  od_firm: 8
   nazwa: Pawilon przy plaży
   strefa: zemborzyce
   typ: niewyposazony
@@ -696,6 +715,7 @@ lokale:
     x: 11
     y: 15
 - id: zemborzyce_3
+  od_firm: 6
   nazwa: Działka nad Zalewem
   strefa: zemborzyce
   typ: dzialka

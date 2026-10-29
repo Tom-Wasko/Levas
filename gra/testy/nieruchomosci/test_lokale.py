@@ -137,3 +137,20 @@ def test_sprawdz_wykrywa_bledy_mapy(tmp_path):
     bledy = sprawdz(kat)
     assert any("zajmuje już" in b for b in bledy), bledy
     assert any("atlantyda" in b for b in bledy), bledy
+
+
+@pytest.mark.dane_gry
+def test_liczba_lokali_na_mapie_zalezy_od_liczby_firm():
+    """Z4: w mniejszej grze część lokali (od_firm) nie trafia na mapę – ani do oferty, ani do decyzji."""
+    from silnik.nieruchomosci import lokale as lk
+    wszystkie = dane_domyslne().mapa["lokale"]
+    liczby = [sum(lk.na_mapie(lok, n) for lok in wszystkie) for n in range(4, 9)]
+    assert liczby == sorted(liczby) and liczby[0] < liczby[-1] == len(wszystkie)
+    g = _gra(*[(n, None) for n in "ABCD"])
+    s = g.stan_poczatkowy()
+    oferta = lk.dostepne(g.dane, 1, {}, len(s.firmy))
+    od_razu = [lok for lok in wszystkie if lk.na_mapie(lok, 4) and lok.get("od_rundy", 1) == 1]
+    assert oferta == od_razu and all(lok.get("od_firm", 1) <= 4 for lok in oferta)
+    poza = next(lok for lok in wszystkie if lok.get("od_firm", 1) > 4)
+    s = _runda(g, A=_lokal(poza["id"]))
+    assert not s.firmy["A"].lokale and s.wyniki[1]["A"]["lokal_decyzja"]["powod"] == "Nie ma takiego lokalu."

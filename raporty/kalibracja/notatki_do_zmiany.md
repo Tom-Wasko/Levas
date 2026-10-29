@@ -36,3 +36,9 @@ Proponowany dopisek:
 > nie ma. **Inwestor ratunkowy** (przysyła mistrz gry, jeden na grę): wpłata do 40 000 zł na początku rundy,
 > najpierw spłaca debet; przez 8 rund bierze 30% dodatniego dochodu netto; niezwrócona część wpłaty liczy się
 > jak dług (wskaźnik zadłużenia, majątek netto). Wartości: założenie, do kalibracji.
+
+## Z4 – liczba lokali zależna od liczby firm (29.10.2026) → `notatki/Elementy mapy.md`
+
+Proponowany dopisek:
+> Liczba lokali na mapie zależy od liczby drużyn (klucz `od_firm` w `dane/mapa/lokale.yaml`): 8 firm – 38 lokali,
+> 6–7 – 29, 4–5 – 20 (około 5 na firmę, wszystkie strefy, podobne proporcje typów). Popyt miasta się nie zmienia.

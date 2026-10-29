@@ -564,6 +564,7 @@ class Lokal(Schemat):
     tylko_kupno: bool = False
     wlasciciel: str | None = None
     od_rundy: int = Field(default=1, ge=1)
+    od_firm: int = Field(default=1, ge=1)   # Z4: na mapie w grze z co najmniej tyloma firmami
     mapa: Pole
 
     @model_validator(mode="after")

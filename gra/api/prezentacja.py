@@ -28,6 +28,7 @@ from silnik.nieruchomosci.lokale import (
     dostepne,
     komunikat_odpoczynku,
     koszt_wejscia,
+    na_mapie,
     runda_nowego_lokalu,
     stan_lokali,
     wybierz,
@@ -67,7 +68,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     handel = hd.przyjmij(gra.dane, stan.firmy, {firma: d}, r, {firma: ks}, {firma: rach},
                          gra.konfiguracja["ziarno"], tylko=firma)[firma]
     # lokal: pula po poprzedniej rundzie (o lokal wybrany w tej rundzie przez kilka drużyn rozstrzyga przeliczenie)
-    lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach)
+    lokal = wybierz(gra.dane, f, d.get("lokal"), r, zajete(stan.firmy), ks, rach, liczba_firm=len(stan.firmy))
     # kupno budynku i wypowiedzenia na kopii stanu (licytacja z innymi drużynami – dopiero w przeliczeniu)
     przejecia = {"przejecie": pr.przejmij(gra.dane, stan.firmy, firma, d.get("przejecie"), r, None, ks, rach),
                  "wypowiedzenia": pr.wypowiedz(gra.dane, stan.firmy, firma, d.get("wypowiedz"), r)}
@@ -310,7 +311,8 @@ def _lokale(gra: Gra, firma: str, runda: int, f: Firma, poprzedni, stan, info: d
     decyzja = info.get("lokal") if info is not None else stan.wyniki.get(runda, {}).get(firma, {}).get("lokal_decyzja")
     return {"oferta": [{**lok, "wejscie": {fm: koszt_wejscia(dane, lok, fm) for fm in ("najem", "kupno")
                                           if lok.get("czynsz" if fm == "najem" else "cena")}}
-                       for lok in dostepne(dane, runda, zaj)],
+                       for lok in dostepne(dane, runda, zaj, len(poprzedni.firmy))],
+            "na_mapie": [lok["id"] for lok in dane.mapa["lokale"] if na_mapie(lok, len(poprzedni.firmy))],
             "zajete": zajete(stan.firmy) if info is None else zaj,
             "moje": stan_lokali(dane, f, runda),
             "nowy_od": runda_nowego_lokalu(dane, poprzedni.firmy[firma]),

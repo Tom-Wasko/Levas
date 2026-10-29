@@ -139,7 +139,8 @@ def licytacje(dane: Dane, firmy: dict[str, Firma], decyzje: dict, runda: int, zi
         d = decyzje.get(nazwa, {})
         dl = d.get("lokal")
         if dl and dl.get("id") and not powod_odrzucenia(dane, firmy[nazwa], dl, runda, zajete_lokale,
-                                                         bk.finansowanie_lokalu(dane, firmy[nazwa], d, runda)):
+                                                         bk.finansowanie_lokalu(dane, firmy[nazwa], d, runda),
+                                                         len(firmy)):
             lok = dane.lokale[dl["id"]]
             wyw = lok["czynsz"] if dl["forma"] == "najem" else lok["cena"]
             zgloszenia.setdefault(("lokal", lok["id"]), []).append(

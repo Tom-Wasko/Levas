@@ -83,7 +83,7 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
     stawki. Losowanie spośród trzech najlepszych (ziarno gry), żeby boty nie biły się zawsze o ten sam lokal.
     min_kuchnia – najmniej miejsc w kuchni (planujący bot; bez takich lokali – każdy); strefy – tylko lokale w tych
     strefach (strategia: strefy, np. pomiar w balans/warianty.py; bez wolnych – każda strefa)."""
-    wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy)) if lok["typ"] == "gotowy" and lok.get("czynsz")]
+    wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy), len(stan.firmy)) if lok["typ"] == "gotowy" and lok.get("czynsz")]
     wolne = [lok for lok in wolne if lok["miejsca"][KUCHNIA] >= min_kuchnia] or wolne
     if strefy:
         wolne = [lok for lok in wolne if lok["strefa"] in strefy] or wolne

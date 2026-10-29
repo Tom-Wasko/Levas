@@ -139,3 +139,21 @@ wpis na dole.
     100 000 zł wpychała firmę w debet ponad limit i blokada zatrzymywała stanowiska. Test sprawdza budowę, a nie
     debet.
 - Tekst dla gracza: `INSTRUKCJA.md` §11 i komunikat o debecie w zakładce Bank.
+
+## Z4 – liczba lokali zależna od liczby firm (29.10.2026, Claude Code, Opus 5.5)
+- Lokal w `dane/mapa/lokale.yaml` może mieć `od_firm: N` – jest na mapie tylko w grze z co najmniej N firmami
+  (`lokale.na_mapie`). Bez klucza lokal jest zawsze.
+  - Wynik: 8+ firm – 38 lokali (19 gotowych, 14 do urządzenia, 5 działek), 6–7 firm – 29 (15/10/4), 4–5 firm
+    i mniej – 20 (11/6/3). To około 5 lokali na firmę, a wszystkie 10 stref zostaje na mapie.
+  - Gotowych do najmu od rundy 1: 16, 12 i 8.
+  - Zostają lokale wystawiane później (`od_rundy`) i lokal Tymka.
+- Liczba firm to `len(stan.firmy)`. Przechodzi przez `dostepne(…, liczba_firm)` (oferta, boty, zakładka Lokale) i
+  przez `powod_odrzucenia`/`wybierz` (decyzja i licytacje). Lokal spoza mapy daje „Nie ma takiego lokalu.”
+  Mapa gracza dostaje listę `v.lokale.na_mapie`.
+- Popyt miasta bez zmian.
+- Zamrożona kopia danych **nie** dostała `od_firm`. W testach mechanik (2–3 firmy) jest więc cała pula, jak dotąd,
+  a liczby tej kopii się nie zmieniły.
+- Testy: nowy `test_liczba_lokali_na_mapie_zalezy_od_liczby_firm` (dane gry). Pozostałe bez zmian.
+- Boty grają bez nowych błędów w grach z 4, 6 i 8 firmami (8 rund, ziarno 7).
+- Wybór lokali do usunięcia jest założeniem (proporcje typów, premium w Starym Mieście i Centrum zostaje). Autor
+  może go zmienić w YAML.

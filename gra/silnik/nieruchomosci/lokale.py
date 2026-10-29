@@ -14,7 +14,8 @@ bez niej – cena wywoławcza.
 Najem: kaucja (`kaucja_miesiecy` × czynsz) i co rundę czynsz (KPiR). Każdy działający lokal: co rundę media
 (utrzymanie, KPiR). Kupno, kaucja i budowa to ruchy na rachunku (bez KPiR). Nowy lokal można wziąć, gdy
 od wzięcia każdego poprzedniego minęło `nowy_lokal_co_rund` rund. Stanowiska stoją w działających lokalach
-i jest ich najwyżej tyle, ile lokal ma miejsc (`miejsca`). Kilka drużyn chcących ten sam lokal w jednej
+i jest ich najwyżej tyle, ile lokal ma miejsc (`miejsca`). Na mapie są tylko lokale z `od_firm` nie większym niż
+liczba firm w grze (Z4: mniej drużyn – mniej lokali, popyt bez zmian). Kilka drużyn chcących ten sam lokal w jednej
 rundzie: licytacja – wygrywa najwyższa oferta, remis rozstrzyga losowanie (silnik/nieruchomosci/przejecia.py).
 """
 from __future__ import annotations
@@ -37,9 +38,15 @@ def zajete(firmy: dict[str, Firma]) -> dict[str, str]:
     return {lok.id: n for n, f in firmy.items() for lok in f.lokale}
 
 
-def dostepne(dane: Dane, runda: int, zajete_lokale: dict[str, str]) -> list[dict]:
-    """Lokale z oferty w rundzie (już wystawione i wolne)."""
-    return [lok for lok in dane.mapa["lokale"] if lok.get("od_rundy", 1) <= runda and lok["id"] not in zajete_lokale]
+def na_mapie(lok: dict, liczba_firm: int | None) -> bool:
+    """Lokal jest w grze z tyloma firmami (None – każdy lokal)."""
+    return liczba_firm is None or lok.get("od_firm", 1) <= liczba_firm
+
+
+def dostepne(dane: Dane, runda: int, zajete_lokale: dict[str, str], liczba_firm: int | None) -> list[dict]:
+    """Lokale z oferty w rundzie (na mapie tej gry, już wystawione i wolne)."""
+    return [lok for lok in dane.mapa["lokale"] if na_mapie(lok, liczba_firm) and lok.get("od_rundy", 1) <= runda
+            and lok["id"] not in zajete_lokale]
 
 
 def runda_nowego_lokalu(dane: Dane, firma: Firma) -> int:
@@ -102,12 +109,12 @@ def oferta(dane: Dane, decyzja: dict, lok: dict, forma: str, runda: int) -> tupl
 
 
 def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete_lokale: dict[str, str],
-                     finansowanie: float = 0.0) -> str | None:
+                     finansowanie: float = 0.0, liczba_firm: int | None = None) -> str | None:
     """Dlaczego lokalu nie można wziąć (None – można). finansowanie – kredyt tej rundy pod zastaw tego lokalu
-    (silnik/pieniadze/banki.py: finansowanie_lokalu)."""
+    (silnik/pieniadze/banki.py: finansowanie_lokalu); liczba_firm – gra (lokale na mapie, None – wszystkie)."""
     lok = dane.lokale.get(decyzja.get("id"))
     forma = decyzja.get("forma")
-    if lok is None:
+    if lok is None or not na_mapie(lok, liczba_firm):
         return "Nie ma takiego lokalu."
     if forma not in FORMY:
         return "Wybierz najem albo kupno lokalu."
@@ -130,13 +137,15 @@ def powod_odrzucenia(dane: Dane, firma: Firma, decyzja: dict, runda: int, zajete
 
 
 def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_lokale: dict[str, str],
-            ksiega: Ksiega, rachunek: Rachunek, przegrana: str | None = None, finansowanie: float = 0.0) -> dict:
+            ksiega: Ksiega, rachunek: Rachunek, przegrana: str | None = None, finansowanie: float = 0.0,
+            liczba_firm: int | None = None) -> dict:
     """Decyzja o nowym lokalu. Zwraca {"id", "forma", "oferta", "przyjety", "powod", "dziala_od"} (pusty – brak
     decyzji). `przegrana` – powód przegranej licytacji (silnik/nieruchomosci/przejecia.py)."""
     if not decyzja or not decyzja.get("id"):
         return {}
     info = {"id": decyzja["id"], "forma": decyzja.get("forma")}
-    powod = przegrana or powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale, finansowanie)   # przegrana – z wyjaśnieniem
+    powod = przegrana or powod_odrzucenia(dane, firma, decyzja, runda, zajete_lokale, finansowanie,
+                                          liczba_firm)   # przegrana – z wyjaśnieniem
     if powod:
         return {**info, "przyjety": False, "powod": powod}
     lok, forma = dane.lokale[decyzja["id"]], decyzja["forma"]
