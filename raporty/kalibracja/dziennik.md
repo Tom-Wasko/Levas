@@ -324,5 +324,8 @@ wpis na dole.
 - **Odpowiedzi autora (29.10.2026): 4 × tak** – rozruch nowego lokalu zostaje, pule ×0,9 i zakupy bota
   w budżecie zatwierdzone, strategia agresywna zostaje do B6–B12, przy 4 firmach gra może być łatwiejsza
   (popyt nie zależy od liczby firm; pytanie z B4 zamknięte).
+- Inne odpowiedzi autora (29.10.2026): **P1** – zlecenie dostaje składki ZUS pracodawcy (w B9); **Z7** – po
+  końcu gry drużyna widzi wyniki ostatniej rundy i końcowe miejsce; **Z5** – boty „jak człowiek” do wyboru
+  przez mistrza gry. Propozycje Z1–Z6 i B5 wpisane do notatek.
 - Testy: nowe `test_rozruch_nowego_lokalu` (`testy/rynek/test_popyt.py`) i
   `test_zakupy_dodatkowe_bota_zostawiaja_bufor_gotowki` (`testy/rdzen/test_boty.py`). Inne testy bez zmian.

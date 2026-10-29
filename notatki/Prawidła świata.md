@@ -26,4 +26,5 @@
 - **Promocje** wybiera się z listy (np. 2 za 1, zestaw z napojem, happy hours, karta stałego klienta, zniżka studencka). Drużyna może nadać promocji własną, ozdobną nazwę – nazwa nie wpływa na wynik.
 - **Losowe wypadki** są rzadkie i nie mogą zniechęcać (awaria sprzętu, zalanie, drobna kradzież, choroba pracownika). Ubezpieczenie zmniejsza ich skutki. Wypadki i zdarzenia to historie w kilku scenach, w większości komiczne – [[Zdarzenia i historie]].
 - **Handel między drużynami:** drużyny mogą sprzedawać sobie towar, sprzęt i lokale po uzgodnionej cenie (z fakturą, w KPiR).
-- **Kalendarz miejski:** święta, sesja i wakacje studentów, wydarzenia w mieście – zmieniają popyt w strefach.
+- **Kalendarz miejski:** święta, sesja i wakacje studentów, wydarzenia w mieście – zmieniają popyt w strefach. Sięga do kwietnia 2026: mecze Motoru wiosną 2026 (prawdziwy terminarz), Finał WOŚP, Popielec i Wielki Piątek (więcej falafla, mniej mięsa), początek semestru letniego, Jarmark Wielkanocny na Starym Mieście.
+- **Popyt:** pule klientów stref zmniejszone o 10% w kalibracji B5 – jeden lokal średniej drużyny sprzedaje ok. 85 tys. zł miesięcznie (było ok. 97 tys. zł), bliżej typowego kebaba na dobrej ulicy w Lublinie.

@@ -19,6 +19,8 @@ Każdy element ma plusy i minusy – nie ma jednego najlepszego wyboru.
 
 - Jeden z lokali należy do **Tymka** i jest wystawiony na sprzedaż.
 - Limit: nowy lokal najwyżej co 3 rundy ([[Prawidła świata]]).
+- Liczba lokali na mapie zależy od liczby drużyn (klucz `od_firm` w `dane/mapa/lokale.yaml`): 8 firm – 38 lokali, 6–7 – 29, 4–5 – 20 (około 5 na firmę, wszystkie strefy, podobne proporcje typów). Popyt miasta się nie zmienia.
+- **Rozruch:** nowy lokal dopiero zdobywa klientów – w pierwszym tygodniu sprzedaży ma 40% popytu, co tydzień więcej ([[Ustalenia gry]]).
 
 ## Sklepy budowlane
 Leroy Merlin, IKEA, OBI, Jula, Castorama – meble, wyposażenie sali, materiały do urządzenia lokalu. Pojedynczy element jest od razu, pełne wyposażenie lokalu mieści się w 1 rundzie urządzania.

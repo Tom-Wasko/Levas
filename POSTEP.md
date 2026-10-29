@@ -313,7 +313,7 @@ Fable 5.1 w OpenCode, po zatwierdzeniu B5; gra na wersji po zmianach zasad Z i g
 - [ ] B6 Lokale (typ × forma × strefa, licytacje, przejęcia)
 - [ ] B7 Menu i ceny (dania, marże, widełki, promocje)
 - [ ] B8 Zaopatrzenie (dostawcy, gwiazdki, świeżość, magazyn, auto-zamawianie, handel)
-- [ ] B9 Ludzie (rekrutacja, umowy, pensje, premie, szkolenia, headhunter, czas właściciela)
+- [ ] B9 Ludzie (rekrutacja, umowy, pensje, premie, szkolenia, headhunter, czas właściciela); decyzja autora z 29.10.2026 (P1): umowa zlecenie dostaje składki ZUS pracodawcy jak w prawie 2026 (bez składek tylko student do 26 lat) – to część zamrożonego prawa, nie kalibracja
 - [ ] B10 Marketing (reklama, agencje, promocje, udogodnienia, wyposażenie)
 - [ ] B11 Finanse (banki, kredyty, lokaty, odnawialny bez limitu; Harpagon i kasyno – ryzykowne, ale czasem opłacalne)
 - [ ] B12 Księgowość i urzędy (samodzielnie / biuro z OC i bez, kary, sanepid, higiena, ubezpieczenia; łamanie zasad średnio się nie opłaca)

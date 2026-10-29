@@ -2,6 +2,9 @@
 
 Notatki (`notatki/`) zmienia się tylko za zgodą autora. Tu są proponowane teksty – do akceptacji albo poprawki.
 
+**29.10.2026: autor zatwierdził Z1–Z6 i B5 – wpisane do notatek** (Z5 z poprawką: boty „jak człowiek”
+widoczne dla mistrza gry).
+
 ## Z1 – karta wyników (29.10.2026) → `notatki/Ustalenia gry.md`, sekcja „Karta wyników”
 
 Dziś:
