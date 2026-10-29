@@ -5,7 +5,7 @@ z A (U), kontrola K i B6–B15 (zmiana z 29.10.2026 – A ocenia grę już po zm
 Na nowym komputerze najpierw `git clone https://github.com/Tom-Wasko/Levas.git` i uruchomienie według `AGENTS.md`.
 Na początku każdej sesji agent robi `git pull --rebase origin main`.
 
-## Sesja 1 – B1, B2, zmiany zasad Z, B3, B4 i B5 (Claude Code albo OpenCode, Opus 5.5)
+## Sesja 1 – B1, B2, zmiany zasad Z, B3, B4 i B5 (Claude Code albo OpenCode, Opus 5.5) – zrobiona 29.10.2026
 ```
 Przeczytaj AGENTS.md, notatki/Plan optymalizacji.md i zadania/B_kalibracja.md. Wykonaj po kolei
 B1, B2, Z1–Z7, B3 (część potrzebna do pomiaru), B4 i B5 według planu. Po każdym zadaniu testy, ruff,

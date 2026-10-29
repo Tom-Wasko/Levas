@@ -300,6 +300,8 @@ Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4
 
 Fable 5.1 w OpenCode, po zatwierdzeniu B5; gra na wersji po zmianach zasad Z i gospodarce z B5. Polecenia: `zadania/README.md`.
 
+Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełniona o rozruch lokalu, pule, boty „jak człowiek” do wyboru, podsumowanie po końcu gry i P1 (zlecenie – w B9); próbne gry 18 rund (4 i 6 firm, drużyna z decyzjami i bez, API i widoki wszystkich rund) bez błędów.
+
 - [ ] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry
 - [ ] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/`
 - [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
