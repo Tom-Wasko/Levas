@@ -150,12 +150,12 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
 .kafel .kd { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
 .wiersz { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; font-weight: 600; padding: 3px 0; color: var(--szary); }
 .wiersz span:last-child { font-weight: 700; text-align: right; color: var(--tekst); }
-.sezon { display: flex; gap: 2px; align-items: flex-end; height: 22px; }
-.sezon i { position: relative; width: 5px; height: 100%; display: flex; align-items: flex-end; cursor: help; }
-.sezon i b { width: 100%; background: var(--pom); border-radius: 1px; opacity: .7; }
-.sezon i.ten b { background: var(--czarny); opacity: 1; }
-.sezon i:hover b { opacity: 1; outline: 1px solid var(--czarny); }
-.sezon i:hover::after { content: attr(data-dymek); position: absolute; bottom: calc(100% + 6px); right: -4px; z-index: 20;
+.slupki { display: flex; gap: 3px; align-items: flex-end; height: 22px; }
+.slupki i { position: relative; width: 9px; height: 100%; display: flex; align-items: flex-end; cursor: help; }
+.slupki i b { width: 100%; background: var(--pom); border-radius: 1px; opacity: .7; }
+.slupki i.ten b { background: var(--czarny); opacity: 1; }
+.slupki i:hover b { opacity: 1; outline: 1px solid var(--czarny); }
+.slupki i:hover::after { content: attr(data-dymek); position: absolute; bottom: calc(100% + 6px); right: -4px; z-index: 20;
   white-space: nowrap; background: var(--czarny); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px;
   font-weight: 600; font-style: normal; text-transform: none; pointer-events: none; box-shadow: var(--cien); }
 .gwiazdki { color: var(--pom); letter-spacing: 1px; white-space: nowrap; }

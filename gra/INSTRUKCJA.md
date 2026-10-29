@@ -96,6 +96,9 @@ co jeszcze zostało do zrobienia):
 > Kalendarz) pokazuje, co i kiedy dzieje się w mieście – także mecze Motoru na Arenie (tłum kibiców pod stadionem,
 > więcej kebabów w bułce, frytek i napojów) i to, jak wydarzenia zmieniają popyt na konkretne dania (w Wigilię
 > wygrywa falafel). Im zimniej, tym więcej kebabów, a mniej zimnych napojów.
+> W tabeli **Strefy miasta** (Klienci i strefy ▸ Klienci) słupki pokazują, jak rozkładają się klienci strefy
+> na dni najbliższej rundy sprzedaży – najedź na słupek, a zobaczysz mnożnik popytu dnia i liczbę klientów.
+> Najciemniejszy słupek to najmocniejszy dzień: pod niego planuj obsadę.
 
 ## 5. Tydzień 2 – otwarcie
 

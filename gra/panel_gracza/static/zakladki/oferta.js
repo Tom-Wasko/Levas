@@ -3,18 +3,6 @@ import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, tabe
 
 const kategorie = (kat) => [...new Set(Object.values(kat.uslugi).map((u) => u.kategoria))];  // kolejność jak w uslugi.yaml
 const JAK = { 1: "Niska", 2: "Średnia", 3: "Wysoka" };
-const MIESIACE = Array.from({ length: 12 }, (_, i) => {
-  const m = new Date(2025, i, 1).toLocaleString("pl-PL", { month: "long" });
-  return m[0].toUpperCase() + m.slice(1);
-});
-
-// słupek na miesiąc (kolumna na całą wysokość); po najechaniu dymek: mnożnik popytu dania w tym miesiącu
-function sezon(u, miesiac) {
-  const max = Math.max(...u.sezonowosc);
-  return `<div class="sezon">${u.sezonowosc.map((s, i) =>
-    `<i class="${i === miesiac ? "ten" : ""}" data-dymek="${MIESIACE[i]}: popyt × ${licz(s, 2)}${i === miesiac ? " (miesiąc sprzedaży)" : ""}"
-      ><b style="height:${Math.round((s / max) * 22)}px"></b></i>`).join("")}</div>`;
-}
 
 export const prognozaBazowa = (u, miesiac) => Math.round((u.popyt_roczny / OKRES.rund_w_roku) * u.sezonowosc[miesiac]);
 // gra z lokalami: bez podpowiedzi – popyt drużyna liczy sama z pul klientów stref (zakładka Klienci i strefy)
@@ -48,7 +36,7 @@ export const oferta = {
         const dozwolona = (r > 1 || kat.oferty.rundy.uslugi_startowe.includes(klucz)) && (klucz in przed || nowe < limit || jest);
         const baza = prognozaDania(v, kat, klucz, m);
         html += `<div class="kafel ${jest ? "wybrany" : ""}">
-          <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span>${sezon(u, m)}</div>
+          <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span></div>
           <div class="kt">
             <div class="wiersz"><span>Popyt roczny</span><span>${licz(u.popyt_roczny)}</span></div>
             <div class="wiersz"><span>Preferowana cena</span><span>${zl(u.cena_preferowana)}</span></div>

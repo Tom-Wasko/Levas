@@ -1,6 +1,6 @@
 // Klienci i strefy: popyt strefowy w grze z lokalami (silnik/rynek/popyt.py, dane/mapa/popyt.yaml) – pule klientów stref,
 // dni tygodnia, kalendarz miejski i wyniki dzień po dniu. Bez gotowej prognozy – popyt drużyna liczy sama (test gry 28.10).
-import { esc, licz, nazwaFirmy, proc, tabela, wykres } from "./wspolne.js";
+import { esc, licz, proc, tabela, wykres } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
@@ -22,15 +22,23 @@ function jakLiczyc(P) {
     i sprzętu rozkładają się równo na ${P.dni.length} dni, więc w najmocniejszym dniu strefy zbyt mała obsada to utracona sprzedaż.</div>`;
 }
 
+// dni rundy sprzedaży w strefie: s.dni – mnożnik dnia względem średniego dnia strefy (dni tygodnia × kalendarz,
+// silnik/rynek/popyt.py: wagi_dni); słupek na dzień (najmocniejszy ciemny), dymek z mnożnikiem i klientami dnia
+function dniStrefy(P, s) {
+  const max = Math.max(...s.dni), suma = s.dni.reduce((a, x) => a + x, 0);
+  if (!s.dni.length || max <= 0) return "–";
+  return `<div class="slupki">${s.dni.map((x, i) =>
+    `<i class="${x === max ? "ten" : ""}" data-dymek="${esc(P.dni[i].dzien)} ${dataKrotka(P.dni[i].data)}: popyt × ${licz(x, 2)} (ok. ${licz(s.pula * x / suma)} klientów)"
+      ><b style="height:${Math.max(1, Math.round((x / max) * 22))}px"></b></i>`).join("")}</div>`;
+}
+
 function strefyDecyzje(v, kat) {
   const P = v.popyt;
-  const najmocniejszy = (s) => s.dni.length ? P.dni[s.dni.indexOf(Math.max(...s.dni))].dzien : "–";
   const wiersze = Object.entries(P.strefy).sort(([, a], [, b]) => b.pula - a.pula).map(([k, s]) => [
     `<span class="kropka" style="background:${esc(kat.mapa.strefy[k].kolor)}"></span>${esc(nazwaStrefy(kat, k))}`,
-    licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), najmocniejszy(s),
-    s.firmy.length ? s.firmy.map((f) => f === v.firma ? "<b>Ty</b>" : esc(nazwaFirmy(v, f))).join(", ") : "–"]);
-  return tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Ceny", "Wrażliwość na cenę", "Najwięcej klientów", "Lokale firm"],
-    wiersze, { klasy: ["l", "", "l", "l", "l", "l"] })
+    licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), dniStrefy(P, s)]);
+  return tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Ceny", "Wrażliwość na cenę", "Klienci w dni tygodnia"],
+    wiersze, { klasy: ["l", "", "l", "l", "l"] })
     + `<p class="podpowiedz">Klienci strefy – wszyscy chętni na dania z Twojego menu w rundzie sprzedaży, zanim podzielą się między lokale
       (Twoje i konkurencji) i bary spoza gry.</p>`;
 }
