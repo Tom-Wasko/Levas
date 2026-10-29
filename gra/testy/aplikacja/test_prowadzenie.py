@@ -128,7 +128,7 @@ def test_eksport_csv(client, gra, uczen):
     r = client.get(f"/api/gry/{gra}/wyniki.csv")
     assert r.status_code == 200 and r["Content-Type"].startswith("text/csv")
     tekst = r.content.decode("utf-8")
-    assert tekst.startswith("﻿runda;tydzień;firma;bot;przychody")
+    assert tekst.startswith("﻿runda;tydzień;firma;bot;przychody") and ";majątek netto;" in tekst
     wiersze = tekst.strip().split("\r\n")
     assert len(wiersze) == 1 + 3 * 3   # nagłówek + 3 rundy × 3 firmy
     assert any(w.startswith("2;T2;Kebab Ali;;") for w in wiersze) and "," in wiersze[1]  # przecinek dziesiętny

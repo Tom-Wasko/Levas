@@ -55,6 +55,7 @@ from .rynek import reklama as rk
 from .swiat import awarie as aw
 from .swiat import zdarzenia as zd
 from .wyniki import karta as kw
+from .wyniki.majatek import majatek_netto
 
 EPS = 1e-9
 
@@ -281,6 +282,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                      "historia": bk.historia(f, r), "debet_ponad_limit": bk.debet_ponad_limit(dane, f)}
         w["harpagon"] = {"poczatek": info[nazwa].get("harpagon"), "presja": info[nazwa].get("harpagon_presja"),
                          "odsetki": info[nazwa].get("harpagon_odsetki"), "stan": lw.stan(dane, f, r + 1)}
+        w["majatek_netto"] = majatek_netto(f)   # Z2: składniki i razem
         if pm.zasady(dane):
             promo = (strefowy or {}).get("promocje", {}).get(nazwa)
             w["promocje"] = pm.raport(dane, f, nazwa, r, promo, info[nazwa].get("promocje") or {}, ziarno)

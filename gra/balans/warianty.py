@@ -35,6 +35,7 @@ from silnik.dane import KATALOG_GRY, Dane, dane_domyslne
 from silnik.gra import Gra
 from silnik.ksiegowosc import biuro as bo
 from silnik.pieniadze import banki as bk
+from silnik.wyniki.majatek import z_portfelem
 
 BADANA = "Badana"
 BAZA = "baza"
@@ -163,14 +164,6 @@ def rozegraj(z: Zadanie) -> dict:
     return {**miary(s, k.rund), "czas_s": round(time.perf_counter() - t, 2)}
 
 
-def _majatek(w: dict) -> float:
-    """Majątek netto (Z2), a do Z2 przybliżenie: gotówka + lokaty − kredyty − dług u Harpagona."""
-    if "majatek_netto" in w:
-        return w["majatek_netto"]
-    harp = ((w.get("harpagon") or {}).get("stan") or {}).get("dlug", 0)
-    return w["gotowka"] + w["lokaty"] - w["zadluzenie"] - harp
-
-
 def miary(s, rund: int) -> dict:
     # karta skumulowana (plan): średni wynik działalności z rund 2..N, jak ranking mistrza gry
     karty = {n: sum(s.wyniki[r][n]["karta"]["wynik_dzialalnosci"] for r in range(2, rund + 1))
@@ -182,7 +175,7 @@ def miary(s, rund: int) -> dict:
                  for w in ws)
     return {"karta": round(karty[BADANA], 4),
             "dochod": round(sum(w["kpir"]["dochod_netto"] for w in ws), 2),
-            "gotowka": round(ws[-1]["gotowka"], 2), "majatek": round(_majatek(ws[-1]), 2),
+            "gotowka": round(ws[-1]["gotowka"], 2), "majatek": z_portfelem(ws[-1]),
             "pierwszy_plus": plus, "alarmy": alarmy,
             "miejsce": 1 + sum(v > karty[BADANA] for v in karty.values()),
             "lokale": len(s.firmy[BADANA].lokale)}

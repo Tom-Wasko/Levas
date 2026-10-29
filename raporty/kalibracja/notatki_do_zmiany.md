@@ -18,3 +18,12 @@ W tabeli wskaźników:
   lokale, budynki i działki); inwestycje liczą się tylko ponad najwyższy dawny majątek (odkup nie jest
   inwestycją)”;
 - „Wskaźnik zadłużenia” → „kredyty bankowe i dług u Harpagona względem majątku po amortyzacji (1 bez długu)”.
+
+## Z2 – majątek netto (29.10.2026) → `notatki/Plan optymalizacji.md`, „Definicje”
+
+Doprecyzowanie: portfel właściciela jest poza majątkiem netto pokazywanym mistrzowi gry (wynik rundy, panel,
+CSV), bo zmiany portfela zdradzałyby klub (kasyno jest ukryte przed mistrzem gry). Pomiary balansu doliczają
+portfel osobno. Proponowany dopisek do definicji majątku netto:
+> Mistrz gry widzi majątek netto firmy bez portfela właściciela (portfel zdradzałby klub); w pomiarach
+> balansu portfel jest doliczany. Zaległości to dziś zaległe raty kredytów (w długu kredytu) i leasingu –
+> podatki, ZUS, czynsz i dostawcy są płacone od razu z konta (debet).

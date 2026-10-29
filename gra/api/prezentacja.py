@@ -332,16 +332,26 @@ def _dashboard(gra: Gra, firma: str, runda: int, poprzedni) -> dict:
     return d
 
 
+def _majatek_netto(w: dict | None) -> float | None:
+    """Majątek netto firmy na koniec rundy (Z2); gry zapisane przed Z2 go nie mają."""
+    return ((w or {}).get("majatek_netto") or {}).get("razem")
+
+
+def _pusty(x):
+    return "" if x is None else x
+
+
 def tabela_wynikow(gra: Gra, co: str = "wyniki") -> tuple[list[str], list[list]]:
     """Wyniki do arkusza (eksport CSV mistrza gry). `wyniki` – wiersz na firmę w każdej przeliczonej rundzie,
     `ranking` – ranking po ostatniej przeliczonej rundzie (jak w panelu mistrza gry)."""
     if co == "ranking":
         p = przeglad_mg(gra)
         firmy = sorted(p["firmy"], key=lambda f: (f.get("miejsce") is None, f.get("miejsce") or 0, f["nazwa"]))
-        return (["miejsce", "firma", "bot", "wynik działalności (średnia)", "dochód netto razem", "gotówka",
-                 "zadłużenie", "lokaty", "pracownicy"],
+        return (["miejsce", "firma", "bot", "wynik działalności (średnia)", "dochód netto razem", "majątek netto",
+                 "gotówka", "zadłużenie", "lokaty", "pracownicy"],
                 [[f.get("miejsce", ""), f["nazwa"], f["strategia"] or "", f["wynik_skumulowany"] if f["wynik_skumulowany"] is not None else "",
-                  f["dochod_suma"], f["gotowka"], f["zadluzenie"], f["lokaty"], f["pracownicy"]] for f in firmy])
+                  f["dochod_suma"], _pusty(f["majatek_netto"]), f["gotowka"], f["zadluzenie"], f["lokaty"],
+                  f["pracownicy"]] for f in firmy])
     ostatnia = gra.runda - 1
     stan = gra.stan(ostatnia)
     strategie = gra.dane.boty["strategie"]
@@ -353,9 +363,10 @@ def tabela_wynikow(gra: Gra, co: str = "wyniki") -> tuple[list[str], list[list]]
             k = w["kpir"]
             wynik = karta.get(n, {}).get("wynik_dzialalnosci")
             wiersze.append([r, gra.dane.skrot_rundy(r), n, boty.get(n, ""), k["przychody"], k["koszty"], k["dochod_netto"],
-                            w["gotowka"], w["zadluzenie"], float(wynik) if wynik is not None else ""])
+                            w["gotowka"], w["zadluzenie"], _pusty(_majatek_netto(w)),
+                            float(wynik) if wynik is not None else ""])
     return (["runda", "tydzień", "firma", "bot", "przychody", "koszty", "dochód netto", "gotówka", "zadłużenie",
-             "wynik działalności"], wiersze)
+             "majątek netto", "wynik działalności"], wiersze)
 
 
 def przeglad_mg(gra: Gra) -> dict:
@@ -381,6 +392,7 @@ def przeglad_mg(gra: Gra) -> dict:
             "gotowka": fs.gotowka,
             "zadluzenie": sum(k.pozostalo for k in fs.kredyty) + fs.kredyt_odnawialny,
             "lokaty": sum(lk.kwota for lk in fs.lokaty),
+            "majatek_netto": _majatek_netto(stan.wyniki.get(ostatnia, {}).get(n)),
             "pracownicy": len(fs.pracownicy), "stanowiska": len(fs.stanowiska),
             "dochod_ostatni": wyn[-1] if wyn else None, "dochod_suma": round(sum(wyn), 2),
             "wynik_ostatni": karta_ost.get(n, {}).get("wynik_dzialalnosci"),
@@ -401,5 +413,6 @@ def przeglad_mg(gra: Gra) -> dict:
         "firmy": firmy,
         "historia": [{"runda": x, "skrot": dane.skrot_rundy(x),
                       "dochod": {n: w["kpir"]["dochod_netto"] for n, w in stan.wyniki[x].items()},
-                      "gotowka": {n: w["gotowka"] for n, w in stan.wyniki[x].items()}} for x in rundy],
+                      "gotowka": {n: w["gotowka"] for n, w in stan.wyniki[x].items()},
+                      "majatek": {n: _majatek_netto(w) for n, w in stan.wyniki[x].items()}} for x in rundy],
     }

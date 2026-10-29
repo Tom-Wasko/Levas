@@ -187,17 +187,20 @@ function wyniki() {
   const ostatnia = historia[historia.length - 1];
   const kolejnosc = [...firmy].sort((a, b) => (a.miejsce ?? 1e9) - (b.miejsce ?? 1e9) || (b.dochod_suma - a.dochod_suma));
   const wiersze = kolejnosc.map((f) => [f.miejsce ?? "–", `<b>${esc(f.nazwa)}</b>${f.bot ? ` <span class="podpowiedz">(bot)</span>` : ""}`,
-    wsk(f.wynik_skumulowany), wsk(f.wynik_ostatni), zl(f.dochod_ostatni), zl(f.dochod_suma), zl(f.gotowka), zl(f.zadluzenie),
+    wsk(f.wynik_skumulowany), wsk(f.wynik_ostatni), zl(f.dochod_ostatni), zl(f.dochod_suma), zl(f.majatek_netto), zl(f.gotowka), zl(f.zadluzenie),
     zl(f.lokaty), licz(f.pracownicy), licz(f.stanowiska)]);
   return `${info(`Ranking według wyniku działalności (karta wyników) – średnia z rund od 2, jak w Revasie.
       Ostatnia przeliczona runda: ${esc(nazwaRundy(ostatnia.runda))}.`)}
     <p class="przyciski-mg"><a class="btn jasny" href="${URL_GRY}/ranking.csv">Ranking do arkusza (CSV)</a>
       <a class="btn jasny" href="${URL_GRY}/wyniki.csv">Wyniki firm w rundach (CSV)</a></p>
     ${tabela("Ranking", ["Miejsce", "Firma", "Wynik działalności (średnia)", `Wynik działalności (${esc(skrotRundy(ostatnia.runda))})`,
-      `Dochód netto (${esc(skrotRundy(ostatnia.runda))})`, "Dochód netto (suma)", "Gotówka", "Zadłużenie", "Lokaty", "Pracownicy", "Stanowiska"],
+      `Dochód netto (${esc(skrotRundy(ostatnia.runda))})`, "Dochód netto (suma)", "Majątek netto", "Gotówka", "Zadłużenie", "Lokaty", "Pracownicy", "Stanowiska"],
     wiersze, { klasy: ["", "l"] })}
     <div class="wykresy-mg"><div class="wykres"><div class="tabela-tytul">Dochód netto w rundach</div><canvas id="w-dochod"></canvas></div>
-      <div class="wykres"><div class="tabela-tytul">Gotówka na koniec rundy</div><canvas id="w-gotowka"></canvas></div></div>`;
+      <div class="wykres"><div class="tabela-tytul">Majątek netto na koniec rundy</div><canvas id="w-majatek"></canvas></div>
+      <div class="wykres"><div class="tabela-tytul">Gotówka na koniec rundy</div><canvas id="w-gotowka"></canvas></div></div>
+    <p class="podpowiedz">Majątek netto = gotówka, lokaty, kaucje, nadwyżka VAT, zapasy, lokale i sprzęt po amortyzacji
+      i portfel właściciela minus kredyty, debet, zaległe raty leasingu i dług u Harpagona.</p>`;
 }
 
 function wykresy() {
@@ -205,6 +208,7 @@ function wykresy() {
   const etykiety = historia.map((h) => h.skrot);
   const serie = (pole) => firmy.map((f) => ({ label: f.nazwa, data: historia.map((h) => h[pole][f.nazwa] ?? null), type: "line" }));
   wykres("w-dochod", "line", etykiety, serie("dochod"));
+  wykres("w-majatek", "line", etykiety, serie("majatek"));
   wykres("w-gotowka", "line", etykiety, serie("gotowka"));
 }
 

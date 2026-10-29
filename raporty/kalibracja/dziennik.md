@@ -89,3 +89,18 @@ wpis na dole.
 - Zmienia wyniki gier (odcisk inny, celowo).
 - `balans/warianty.py`: karta to teraz średnia z rund 2..N, jak w definicji z planu (w punkcie zero była suma
   rund, czyli Δ karta ×17; kolejność firm i oceny wariantów bez zmian).
+
+## Z2 – majątek netto (29.10.2026, Claude Code, Opus 5.5)
+- `silnik/wyniki/majatek.py: majatek_netto(f)` – składniki i `razem`; w wynikach rundy jako
+  `w["majatek_netto"]`.
+  - Aktywa: gotówka, lokaty, kaucje, nadwyżka VAT, zapasy, nieruchomości i sprzęt po amortyzacji.
+  - Długi: kredyty z zaległymi ratami, debet, zaległe raty leasingu i Harpagon z odsetkami.
+- **Odejście od definicji z planu:** bez portfela właściciela. Mistrz gry widzi majątek netto, a test
+  `test_mistrz_gry_nie_widzi_klubu` pilnuje, żeby nie widział portfela.
+  - `z_portfelem(w)` dolicza portfel w pomiarach (`balans/warianty.py`).
+  - Propozycja dopisku do planu: `notatki_do_zmiany.md`.
+- Zaległości ZUS, US, czynszu i dostawców w grze nie istnieją: płatności idą z konta, a brak środków daje debet.
+  Rata kredytu bez pokrycia trafia do długu kredytu, a rata leasingu – do zaległych rat leasingu.
+- Wpłata inwestora (Z3) dojdzie do długów w Z3.
+- Panel mistrza gry: kolumna i wykres majątku netto. CSV: kolumna „majątek netto” w rankingu i w wynikach rund.
+- Testy: nowy `testy/wyniki/test_majatek.py`; w `test_eksport_csv` dodane sprawdzenie kolumny.
