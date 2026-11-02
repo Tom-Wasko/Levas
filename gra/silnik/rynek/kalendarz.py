@@ -101,16 +101,33 @@ def tydzien(dane: Dane, runda: int) -> dict:
         if abs(z) > EPS:
             zmiany[s] = round(float(z), 4)
     return {"runda": runda, "od": dni[0].isoformat(), "do": dni[-1].isoformat(), "wydarzenia": wydarzenia(dane, dni),
-            "strefy": zmiany}
+            "strefy": zmiany, "dni": [_dzien(dane, d) for d in dni]}
+
+
+def _dzien(dane: Dane, dzien: date) -> dict:
+    """Jeden dzień tygodnia w kalendarzu: wydarzenia, zmiana puli klientów stref (0,3 = +30%) i mnożniki popytu na
+    dania (największy z wydarzeń tego dnia; w strefach wydarzenia)."""
+    trwajace = aktywne(dane, dzien)
+    strefy = {}
+    for s in dane.mapa["strefy"]:
+        z = mnoznik(dane, s, dzien) - 1
+        if abs(z) > EPS:
+            strefy[s] = round(z, 4)
+    dania: dict[str, float] = {}
+    for w in trwajace:
+        for u, m in (w.get("dania") or {}).items():
+            dania[u] = max(dania.get(u, m), m) if m > 1 else min(dania.get(u, m), m)
+    return {"data": dzien.isoformat(), "wydarzenia": [w["nazwa"] for w in trwajace], "strefy": strefy, "dania": dania}
 
 
 def widok(dane: Dane, runda: int, liczba_rund: int) -> dict | None:
-    """Zakładka Kalendarz miejski: bieżący tydzień, poprzedni (wyniki) i przegląd wszystkich tygodni gry."""
+    """Zakładka Kalendarz miejski: bieżący tydzień i poprzedni (wyniki) dzień po dniu oraz wszystkie tygodnie gry
+    (siatka miesiąca)."""
     k = dane_kalendarza(dane)
     if not k:
         return None
     tygodnie = [tydzien(dane, r) for r in range(1, liczba_rund + 1)]
-    for t in tygodnie:   # przegląd: bez opisów (są w bieżącym tygodniu i w szczegółach)
-        t["wydarzenia"] = [{x: w[x] for x in ("nazwa", "rodzaj", "dni")} for w in t["wydarzenia"]]
+    for t in tygodnie:   # siatka miesiąca: wydarzenia z opisem (dymek), bez rozkładu na dni
+        t.pop("dni")
     return {"rodzaje": k["rodzaje"], "biezacy": tydzien(dane, runda),
             "poprzedni": tydzien(dane, runda - 1) if runda > 1 else None, "tygodnie": tygodnie}

@@ -185,7 +185,7 @@ def test_mistrz_gry_nie_widzi_klubu(client, uczen, zawsze_zaproszenie, settings)
     assert r.status_code == 200
     # mistrz gry: ani śladu klubu ani portfela (wpłaty i wypłaty widać tylko jako operacje na koncie)
     odpowiedzi = [client.get(f"/api/gry/{gra}/mg"), client.get(f"/api/gry/{gra}/widok/{DRUZYNA}"),
-                  client.get(f"/api/gry/{gra}/widok/{DRUZYNA}?runda=2"), client.post(f"/api/gry/{gra}/podglad/{DRUZYNA}", {}, content_type=JSON),
+                  client.get(f"/api/gry/{gra}/widok/{DRUZYNA}?runda=2"),
                   client.get(f"/api/gry/{gra}/eksport"), client.get(f"/api/gry/{gra}/wyniki.csv"),
                   client.get(f"/api/gry/{gra}/ranking.csv")]
     for r in odpowiedzi:

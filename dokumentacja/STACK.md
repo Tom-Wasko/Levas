@@ -44,7 +44,6 @@ przeglądarka ── HTML (szablony) ──▶ panel_gracza / panel_mg / konta
   - `dane.py` i `schematy.py` – wczytanie i walidacja YAML (`python -m silnik.dane sprawdz`);
   - `harmonogram.py` – odblokowanie zakładek i elementów w kolejnych tygodniach;
   - `boty.py` – decyzje botów (5 strategii × 4 poziomy);
-  - `co_jesli.py` – warianty „co jeśli” w zakładce Analiza;
   - `limity.py`, `losowosc.py`.
 - **Podpakiety mechanik:** `kuchnia/` (menu, jakość, operacje, dostawcy, magazyn, świeżość), `rynek/` (popyt,
   konkurencja, kalendarz miejski, reklama, promocje, handel), `ludzie/`, `nieruchomosci/`, `ksiegowosc/` (KPiR,
@@ -82,7 +81,8 @@ przeglądarka ── HTML (szablony) ──▶ panel_gracza / panel_mg / konta
 ### Frontend
 - Strony to szablony Django (`*/templates/`). Dane zakładek przychodzą z API jako JSON.
 - `panel_gracza/static/app.js` uruchamia panel. Zakładki to moduły ES w `static/zakladki/*.js` z rejestrem
-  w `index.js`. Motywy kolorów (`motywy/*.css`, `motyw.js`): domyślny szmaragdowy, noc, grafik i talerze.
+  w `index.js`. Motywy (`motywy/*.css`, `motyw.js`): klasyczny (menu poziome), „bok” (klasyczny z menu z boku) i grafik.
+  Opisy i objaśnienia są w kółkach „i” z dymkiem (`zakladki/dymki.js`).
   Wykresy rysuje Chart.js (`static/vendor/chart.umd.min.js`).
 - Składnię zakładki sprawdza `node --check plik.mjs` (skopiuj `.js` jako `.mjs`).
 

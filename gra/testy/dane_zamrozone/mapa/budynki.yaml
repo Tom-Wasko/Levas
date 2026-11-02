@@ -298,8 +298,8 @@ budynki:
   nazwa: Pracownia Analiz UMCS
   rodzaj: uczelnia
   strefa: akademickie
-  opis: Studenci ekonomii policzą, co się opłaca (Analiza).
-  zakladka: analiza
+  opis: Studenci ekonomii badają rynek – kto ile sprzedaje i po ile (Konkurencja).
+  zakladka: konkurencja
   mapa:
     x: 0
     y: 5

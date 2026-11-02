@@ -219,14 +219,13 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
   reklama i promocje, udział w klientach. Dokładne dane jednego rywala (od tygodnia 2) zbierze detektyw „Sokole Oko”
   z biura przy dworcu: 300–800 zł i 2 godziny właściciela. Raport przychodzi po tygodniu, ale w 15% przypadków
   detektyw wpada – i rywal dowiaduje się, kto go śledził.
-- **Analiza „co jeśli”** (od tygodnia 2) – przewidywany wynik tygodnia dla Twoich decyzji, zanim je wyślesz.
 
 ## 14. Kiedy co się odblokowuje
 
 | Tydzień | Nowe zakładki |
 |---|---|
 | 1 | Mapa, Lokale, Menu, Stanowiska, Bank, Biuro rachunkowe, Kalendarz miejski |
-| 2 | Sprzęt, Zatrudnienie, Rynek pracy, Dostawcy, Świeżość, Sprzedaż, Promocje, Parki, Ubezpieczenia, raporty finansowe, Analiza, detektyw |
+| 2 | Sprzęt, Zatrudnienie, Rynek pracy, Dostawcy, Świeżość, Sprzedaż, Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
 | 3 | Karta wyników, Udogodnienia, Agencje reklamowe, nowe dania w menu |
 | 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali |
 | 5 | Handel z drużynami, kolejne kampanie reklamowe |
@@ -244,7 +243,7 @@ Mistrz gry może przesunąć te terminy (poza tygodniem 1 – tydzień przygotow
 6. **Czytaj kalendarz miejski.** Sesja, mecz Motoru, jarmark – zaplanuj obsadę i zamówienia, zanim tydzień się zacznie.
 7. **Dbaj o ludzi.** Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć.
 8. **Sprawdzaj listę błędów przed wysłaniem.** Zawsze.
-9. **Korzystaj z Analizy.** Lepiej zobaczyć stratę w „co jeśli” niż na karcie wyników.
+9. **Najedź na kółko „i”.** Każda zakładka i pole ma tam wyjaśnienie – przeczytaj je, zanim zgadniesz.
 10. **Nie bierz od Harpagona.** Serio.
 
 ---

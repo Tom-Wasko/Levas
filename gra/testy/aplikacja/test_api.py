@@ -100,24 +100,6 @@ def test_wyslane_decyzje_czekaja_na_drugiego_gracza(client):
     assert client.post(f"/api/gry/{id_}/przelicz").json()["runda"] == 2  # mistrz gry wymusza
 
 
-def test_warianty_i_podglad(client):
-    id_ = _nowa(client)
-    client.post(f"/api/gry/{id_}/przelicz")
-    r = client.put(_url(id_, "warianty"), {"nazwa": "Tanio"}, content_type="application/json")
-    assert r.status_code == 200 and r.json()["warianty"] == ["Tanio"]
-    assert client.get(_url(id_, "warianty-dane") + "?nazwa=Tanio").status_code == 200
-    assert client.get(_url(id_, "warianty-dane") + "?nazwa=Brak").status_code == 404
-
-    r = client.post(
-        _url(id_, "podglad"), {"warianty": ["biezace", "Tanio"]}, content_type="application/json"
-    )
-    assert r.status_code == 200
-    assert [w["nazwa"] for w in r.json()["warianty"]] == ["Bieżące decyzje", "Tanio"]
-
-    r = client.delete(_url(id_, "warianty") + "?nazwa=Tanio")
-    assert r.json()["warianty"] == []
-
-
 def test_eksport_import_i_usuwanie(client):
     id_ = _nowa(client)
     client.post(f"/api/gry/{id_}/przelicz")

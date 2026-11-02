@@ -1,7 +1,7 @@
 """Gry w bazie: wczytanie do silnika, zapis decyzji, lista gier.
 
 Silnik trzyma decyzje jako {runda: {firma: decyzje, "_przeliczona": bool, "_wyslane": [...],
-"_warianty": {...}, "_autorzy": {...}}}. W bazie klucze z podkreśleniem są polami `Runda`,
+"_autorzy": {...}}}. W bazie klucze z podkreśleniem są polami `Runda`,
 a decyzje firm – wierszami `Decyzja`. Wczytane gry zostają w pamięci (z policzonymi stanami
 rund), dopóki nie zmieni się `Gra.zmieniono`.
 """
@@ -25,7 +25,7 @@ from .models import Decyzja, Gra, Runda
 _blokada = threading.RLock()
 _pamiec: dict[str, tuple[object, GraSilnika]] = {}
 
-KLUCZE_RUNDY = {"_przeliczona", "_wyslane", "_warianty", "_autorzy"}
+KLUCZE_RUNDY = {"_przeliczona", "_wyslane", "_autorzy"}
 
 
 def nowy_id(nazwa: str) -> str:
@@ -48,8 +48,6 @@ def wczytaj(id_: str) -> GraSilnika:
             d["_przeliczona"] = True
         if r.wyslane:
             d["_wyslane"] = list(r.wyslane)
-        if r.warianty:
-            d["_warianty"] = r.warianty
         if r.autorzy:
             d["_autorzy"] = r.autorzy
         decyzje[r.numer] = d
@@ -77,7 +75,6 @@ def zapisz(id_: str, g: GraSilnika) -> None:
                 numer=numer,
                 przeliczona=bool(d.get("_przeliczona")),
                 wyslane=list(d.get("_wyslane", [])),
-                warianty=d.get("_warianty", {}),
                 autorzy=d.get("_autorzy", {}),
             )
             Decyzja.objects.bulk_create(

@@ -1,4 +1,5 @@
 // Wspólne funkcje interfejsu: formatowanie, okna dialogowe, wykresy.
+import { zwinPodpowiedzi } from "./dymki.js";
 
 // Kalendarz rund (katalog.yaml: rundy.kalendarz) – ustawiany z widoku gry (v.gra.kalendarz) przy każdym wczytaniu.
 // Kwoty miesięczne z danych (utrzymanie, czynsz) silnik księguje na rundę: naRunde.
@@ -41,9 +42,11 @@ export const termin = (iso) => iso ? new Date(iso).toLocaleString("pl-PL",
   { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";
 export const inicjaly = (imie) => esc(String(imie || "?").split(" ").map((x) => x[0]).join("").slice(0, 2));
 
+// pasek z opisem (panel mistrza gry; panel gracza ma kółka „i” – dymki.js)
 export function info(tekst) {
   return `<div class="info"><span class="i">i</span><span>${tekst}</span></div>`;
 }
+
 
 // --- sortowanie tabel: klik w nagłówek – rosnąco, malejąco, kolejność pierwotna. Stan per tabela (tytuł + nagłówki)
 // zostaje po przerysowaniu widoku; w oknach (np. baza składników) wiersze układa się od razu w DOM.
@@ -105,6 +108,7 @@ export function okno(tytul, html, { male = false, srednie = false, przyciski = "
     <div class="ot">${html}</div>${przyciski ? `<div class="ost">${przyciski}</div>` : ""}</div>`;
   z.addEventListener("click", (e) => { if (e.target === z) zamknijOkno(); });
   document.body.appendChild(z);
+  zwinPodpowiedzi(z);
   _okno = z;
   return z;
 }

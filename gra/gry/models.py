@@ -27,7 +27,6 @@ class Runda(models.Model):
     numer = models.PositiveIntegerField()
     przeliczona = models.BooleanField(default=False)
     wyslane = models.JSONField(default=list)  # firmy, które wysłały decyzje
-    warianty = models.JSONField(default=dict)  # {firma: {nazwa wariantu: decyzje}} do Analizy
     autorzy = models.JSONField(default=dict)  # {firma: {zapisal, wyslal, wersja}} – kto z drużyny
 
     class Meta:

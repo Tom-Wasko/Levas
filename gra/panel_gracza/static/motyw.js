@@ -1,16 +1,15 @@
 // Wybór wyglądu gry. Ładowany w <head> (bez defer), żeby motyw był ustawiony przed pierwszym rysowaniem strony.
 (function () {
   var MOTYWY = [
-    ["klasyczny", "Klasyczny REVAS"],
-    ["talerze", "Talerze z kebabem"],
+    ["klasyczny", "Klasyczny"],
+    ["bok", "Klasyczny – menu z boku"],
     ["grafik", "Grafik zmian"],
-    ["noc", "Kebab nocą"],
   ];
   var KLUCZ = "revas-motyw";
   var znane = function (m) { return MOTYWY.some(function (x) { return x[0] === m; }); };
   var motyw = "klasyczny";
   try { motyw = localStorage.getItem(KLUCZ) || motyw; } catch (e) { /* prywatne okno – zostaje domyślny */ }
-  var zAdresu = new URLSearchParams(location.search).get("motyw");   // np. /gra/x/Firma?motyw=noc
+  var zAdresu = new URLSearchParams(location.search).get("motyw");   // np. /gra/x/Firma?motyw=bok
   if (znane(zAdresu)) {
     motyw = zAdresu;
     try { localStorage.setItem(KLUCZ, motyw); } catch (e) { /* bez zapisu */ }

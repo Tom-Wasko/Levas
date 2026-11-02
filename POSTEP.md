@@ -296,6 +296,15 @@ Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4
   - Zrobione i zatwierdzone przez autora 29.10.2026: nowa mechanika rozruchu nowego lokalu (40% popytu w 1. tygodniu, +10 p.p. co tydzień), pule stref ×0,9 i zakupy botów w budżecie – pierwszy plus średniego w rundach 4–6 w 65/100 gier (było 19/100), słaby bez alarmu poza strategią agresywną (dziennik B5).
   - Dopisek H17 (29.10.2026, wybór autora „poprawić bota agresywnego”): słaby „jak człowiek” zamawia najwyżej zeszłotygodniową sprzedaż × 1,1 dania, które traciło klientów w kolejce – alarmy słabego agresywnego 8/100 → 0/100, psucie towaru 27% → 7% przychodu, słaba < średnia w 85/100 par (dziennik H17).
 
+## Przebudowa zakładek i decyzje per lokal (polecenia autora 2.11.2026; ustalenia: `raporty/przebudowa_zakladek.md`)
+
+- [x] Z1 Interfejs bez zmian silnika: usunięty pasek podsumowania (saldo/koszty/braki/status; „Zapisał(a)” przeniesione do paska stanu); zakładka Analiza usunięta całkiem (zakładka, API `warianty`/`podglad`, `silnik/co_jesli.py`, testy, pole bazy `Runda.warianty` – migracja 0006); motywy: Klasyczny, Klasyczny – menu z boku (`motywy/bok.css`), Grafik zmian (talerze i noc usunięte); kółka „i” z dymkiem (`zakladki/dymki.js`: opis zakładki przy tytule, długie podpowiedzi zwijane do kółka przy nagłówku); kalendarz: tabela tygodnia dzień po dniu (`kalendarz.tydzien` → `dni`) i siatka miesiąca z rundami, wydarzeniami w dymkach i strzałkami; menu w nowym układzie (sekcje Twoje lokale / Miasto / Firma – na razie z dotychczasowymi zakładkami)
+- [ ] Z2 Silnik per lokal: menu i ceny, zamówienia i partie, ludzie i sprzęt; przewóz towaru; boty; testy; format decyzji
+- [ ] Z3 Zakładka Lokale z podzakładkami (Przegląd, Menu i ceny, Dostawy i magazyn, Ludzie, Sprzęt); kupno i najem lokali w Inwestycjach
+- [ ] Z4 Auto-dostawca i Auchan
+- [ ] Z5 Reklama z emisjami i progami zniżek
+- [ ] Z6 Infografiki w dymkach, instrukcja gracza (`gra/INSTRUKCJA.md`, PDF), opisy w `notebooklm\`
+
 ## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
 
 Fable 5.1 w OpenCode, po zatwierdzeniu B5; gra na wersji po zmianach zasad Z i gospodarce z B5. Polecenia: `zadania/README.md`.

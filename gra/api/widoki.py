@@ -5,7 +5,6 @@ from __future__ import annotations
 import csv
 import io
 import json
-from copy import deepcopy
 from datetime import datetime
 from functools import wraps
 from urllib.parse import quote
@@ -22,11 +21,9 @@ from gry import serwisy
 from gry.models import Gra
 from konta import druzyny
 from konta.role import firmy_ucznia, gry_ucznia, jest_mg, moze_firme
-from silnik import co_jesli
 from silnik import harmonogram as hm
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
-from silnik.ksiegowosc.biuro import ukryj
 from silnik.limity import naruszenia
 from silnik.pieniadze import kasyno as kas
 from silnik.rynek import handel as hd
@@ -112,21 +109,8 @@ def _dla(request, v: dict) -> dict:
 
 
 def _bez_klubu_w_decyzjach(decyzje: dict) -> dict:
-    """Plik gry (eksport) bez zakładów w klubie – także w zapisanych wariantach."""
-    wynik = {}
-    for r, rd in decyzje.items():
-        rd = {k: kas.ukryj_decyzje(d) for k, d in rd.items()}
-        if isinstance(rd.get("_warianty"), dict):
-            rd["_warianty"] = {
-                f: {n: kas.ukryj_decyzje(d) for n, d in w.items()}
-                for f, w in rd["_warianty"].items()
-            }
-        wynik[r] = rd
-    return wynik
-
-
-def _warianty(g: GraSilnika, firma: str) -> dict:
-    return g.decyzje.setdefault(g.runda, {}).setdefault("_warianty", {}).setdefault(firma, {})
+    """Plik gry (eksport) bez zakładów w klubie."""
+    return {r: {k: kas.ukryj_decyzje(d) for k, d in rd.items()} for r, rd in decyzje.items()}
 
 
 @require_GET
@@ -514,72 +498,6 @@ def api_cofnij(request, id_):
     with serwisy.zmiana(id_) as g:
         g.cofnij()
     return odpowiedz({"ok": True, "runda": g.runda})
-
-
-@require_http_methods(["PUT", "DELETE"])
-@api
-def api_warianty(request, id_, firma):
-    """PUT: zapisuje robocze decyzje (albo podane) jako nazwany wariant do porównania w Analizie.
-    DELETE ?nazwa=…: usuwa wariant."""
-    if request.method == "PUT":
-        d = cialo(request)
-        nazwa = str(d.get("nazwa") or "").strip()[:40]
-        if not nazwa:
-            return blad("Podaj nazwę wariantu.")
-    with serwisy.zmiana(id_) as g:
-        sprawdz_firme(request, id_, g, firma)
-        if request.method == "PUT":
-            nowe = d.get("decyzje") or deepcopy(g.szkic(firma))
-            _warianty(g, firma)[nazwa] = kas.ukryj_decyzje(nowe) if _bez_klubu(request) else nowe
-        else:
-            _warianty(g, firma).pop(request.GET.get("nazwa", ""), None)
-    return odpowiedz(_dla(request, widok(g, firma)))
-
-
-@require_GET
-@api
-def api_dane_wariantu(request, id_, firma):
-    g = serwisy.wczytaj(id_)
-    sprawdz_firme(request, id_, g, firma)
-    zapisane = g.decyzje.get(g.runda, {}).get("_warianty", {}).get(firma, {})
-    w = zapisane.get(request.GET.get("nazwa", ""))
-    if w is None:
-        return blad("Nie ma takiego wariantu.", 404)
-    return odpowiedz(kas.ukryj_decyzje(w) if _bez_klubu(request) else w)
-
-
-@require_POST
-@api
-def api_podglad(request, id_, firma):
-    """Przewidywany wynik bieżącej rundy dla decyzji (bez zapisu, silnik/co_jesli.py). Boty decydują
-    jak zwykle, inne drużyny powtarzają decyzje z poprzedniej rundy (ich robocze decyzje są tajne).
-    Body: {"warianty": [nazwa wariantu albo "biezace"]} – domyślnie bieżące."""
-    g = serwisy.wczytaj(id_)
-    sprawdz_firme(request, id_, g, firma)
-    if g.zakonczona:
-        return blad("Gra jest zakończona.")
-    kopia = g.kopia()
-    nazwy = cialo(request, wymagane=False).get("warianty") or ["biezace"]
-    zapisane = _warianty(kopia, firma)
-    nazwy = [n for n in nazwy if n == "biezace" or n in zapisane]
-    r = kopia.runda
-    warianty = [g.szkic(firma) if n == "biezace" else zapisane[n] for n in nazwy]
-    stany = co_jesli.przewiduj(kopia, firma, warianty)
-    wyniki = []
-    for nazwa, s in zip(nazwy, stany, strict=True):
-        w = s.wyniki[r][firma]
-        if s.firmy[firma].deklaracja:  # samodzielna księgowość: bez podatków rundy
-            w = ukryj(w, podglad=True)
-        if _bez_klubu(request):
-            w = kas.ukryj_wyniki(w, portfel=jest_mg(request.user))
-        wyniki.append(
-            {
-                "nazwa": "Bieżące decyzje" if nazwa == "biezace" else nazwa,
-                "wyniki": w,
-                "rynek": s.rynek[r],
-            }
-        )
-    return odpowiedz({"runda": r, "warianty": wyniki})
 
 
 @require_GET

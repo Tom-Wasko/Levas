@@ -1,0 +1,34 @@
+/* Motyw „Klasyczny – menu z boku”: wygląd klasyczny (kolory i karty z styl.css), ale główne menu stoi pionowo
+   po lewej – sekcje (Twoje lokale, Miasto, Firma) z grupami; podzakładki klikniętej grupy są w pasku nad treścią. */
+
+:root[data-motyw="bok"] {
+  & body:has(> .menu) { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: auto 1fr auto; }
+  & body:has(> .menu) > .naglowek { grid-column: 1 / -1; }
+  & body:has(> .menu) > .menu { grid-column: 1; grid-row: 2 / 4; }
+  & body:has(> .menu) > .scena, & body:has(> .menu) > .stopka { grid-column: 2; }
+  & .menu { flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; gap: 1px; padding: 12px 10px; background: #fff;
+    border-right: 1px solid var(--linia); border-bottom: 0; box-shadow: none; position: sticky; top: 0; height: 100vh;
+    overflow-y: auto; align-self: start; }
+  & .menu .poz > a { flex-direction: row; gap: 10px; padding: 8px 10px; border-radius: 6px; border-bottom: 0;
+    border-left: 3px solid transparent; font-size: 11px; }
+  & .menu .poz > a .ikona { width: 18px; height: 18px; }
+  & .menu .poz > a:hover { background: var(--pom-jasny); }
+  & .menu .poz > a.aktywna { background: var(--pom-jasny); border-left-color: var(--pom); }
+  & .menu .wyslij { margin-top: 8px; }
+  & .menu .wyslij > a, & .menu .wyslij > a.aktywna { background: var(--pom); color: #fff; border-left-color: var(--pom-ciemny); }
+  & .menu .znaczek { position: static; margin-left: auto; }
+  /* podzakładki tylko w pasku nad treścią – bez rozwijanego okienka */
+  & .menu .pod, & .menu .poz:hover .pod { display: none; }
+  & .menu .sekcja { width: auto; height: auto; margin: 12px 10px 4px; background: none; font-size: 9.5px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .08em; color: var(--szary); }
+  & .menu .sekcja::after { content: attr(data-nazwa); }
+  & .menu .sekcja.linia { margin: 10px 10px 2px; height: 1px; background: var(--linia); }
+  & .menu .sekcja.linia::after { content: none; }
+
+  @media (max-width: 900px) {
+    & body:has(> .menu) { display: block; }
+    & .menu { flex-direction: row; overflow-x: auto; height: auto; padding: 6px; border-right: 0; border-bottom: 1px solid var(--linia); }
+    & .menu .poz > a { white-space: nowrap; }
+    & .menu .sekcja { display: none; }
+  }
+}

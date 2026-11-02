@@ -1,8 +1,9 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
-import { esc, godzina, info, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
+import { esc, godzina, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
   from "./zakladki/wspolne.js";
 import ZAKLADKI, { ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
+import { kolko, zwinPodpowiedzi } from "./zakladki/dymki.js";
 
 const S = { v: null, kat: null, zakladka: "dashboard", tryb: "decyzje", runda: null, d: {}, zapis: Promise.resolve(),
   nrZapytania: 0, oczekujace: 0, poleZmiany: null, odliczanie: null };
@@ -106,8 +107,9 @@ const widocznePod = (pod) => pod.filter((k) => !ZAKLADKI[k]?.ukryta?.(S.v));
 
 function rysujMenu() {
   const czerwone = S.v.lista_bledow.filter((b) => b.poziom === "czerwony").length;
-  document.getElementById("menu").innerHTML = MENU.filter((poz) => !ZAKLADKI[poz.klucz]?.ukryta?.(S.v))
-    .map((poz) => poz.pod ? { ...poz, pod: widocznePod(poz.pod) } : poz).map((poz) => {
+  document.getElementById("menu").innerHTML = MENU.filter((poz) => poz.sekcja !== undefined || !ZAKLADKI[poz.klucz]?.ukryta?.(S.v))
+    .map((poz) => poz.pod ? { ...poz, pod: widocznePod(poz.pod) } : poz).filter((poz) => !poz.pod || poz.pod.length).map((poz) => {
+    if (poz.sekcja !== undefined) return `<div class="sekcja ${poz.sekcja ? "" : "linia"}" data-nazwa="${esc(poz.sekcja)}"></div>`;
     const z = ZAKLADKI[poz.klucz] || {};
     const pod = poz.pod ? `<div class="pod">${poz.pod.map((k) => `<a data-zakladka="${k}" class="${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"} ${k === S.zakladka ? "aktywna" : ""}">
       ${ikona(IKONY[k], 18)}${ZAKLADKI[k].tytul}${!dostepna(ZAKLADKI[k]) && odRundy(k) ? `<span class="od">od rundy ${odRundy(k)}</span>` : ""}</a>`).join("")}</div>` : "";
@@ -128,24 +130,11 @@ function podzakladki() {
     ${ikona(IKONY[k], 16)}${ZAKLADKI[k].tytul}</a>`).join("")}</div>`;
 }
 
-function podsumowanie(v) {
-  if (!v.edycja || S.zakladka === "dashboard") return "";
-  const koszty = v.koszty_decyzji.reduce((s, p) => s + p.towary + p.wynagrodzenia + p.pozostale - p.przychod_pozostaly, 0);
-  const czerwone = v.lista_bledow.filter((b) => b.poziom === "czerwony").length;
-  const status = v.wyslane ? `<span class="chip ok">${ikona("ok", 14)}Wysłane</span>` : `<span class="chip pom">W trakcie</span>`;
-  return `<div class="podsumowanie">
-    <div>${ikona("portfel")}<div><div class="et">Saldo po decyzjach</div><div class="wa ${v.stan.gotowka < 0 ? "minus" : ""}">${zl(v.stan.gotowka)}</div></div></div>
-    <div>${ikona("wykres")}<div><div class="et">Koszty decyzji tej rundy</div><div class="wa">${zl(koszty)}</div></div></div>
-    <div><a data-zakladka-k="lista_bledow">${ikona("uwaga")}</a><div><div class="et">Poważne braki</div>
-      <div class="wa ${czerwone ? "minus" : ""}"><a data-zakladka-k="lista_bledow">${czerwone ? `${czerwone} – zobacz listę` : "brak"}</a></div></div></div>
-    <div>${ikona("zegar")}<div><div class="et">Decyzje rundy ${v.runda}</div><div class="wa">${status}</div>${ostatniZapis(v)}</div></div></div>`;
-}
-
 // drużyna kilku osób: kto ostatnio zapisał decyzje
 function ostatniZapis(v) {
   const z = v.druzyna?.autorzy?.zapisal;
   if (!z || (v.druzyna.sklad || []).length < 2) return "";
-  return `<div class="et kto" title="Ostatni zapis decyzji drużyny">${esc(z.nazwa)}, ${godzina(z.kiedy)}</div>`;
+  return `<span class="chip" title="Ostatni zapis decyzji drużyny">Zapisał(a): ${esc(z.nazwa.split(" ")[0])}, ${godzina(z.kiedy)}</span>`;
 }
 
 function chipDruzyny(v) {
@@ -181,10 +170,10 @@ function osRund(v, runda) {
   return `<div class="os-rund" aria-label="Rundy gry">${html}</div>`;
 }
 
-function glowa(v, z, tryb, decyzje, wyniki, runda) {
+function glowa(v, z, tryb, decyzje, wyniki, runda, opis = "") {
   const lmin = v.gra.runda_startowa || 1, lmax = v.gra.runda;
   return `<div class="karta-glowa">
-      <div class="tytul">${ikona(IKONY[S.zakladka])}${z.tytulPelny || z.tytul}</div>
+      <div class="tytul">${ikona(IKONY[S.zakladka])}${z.tytulPelny || z.tytul}${kolko(opis)}</div>
       <div class="nawigator">
         <span class="strzalka ${runda <= lmin ? "wylaczona" : ""}" data-akcja="runda" data-d="-1" title="Poprzednia runda">${ikona("lewo", 18)}</span>
         <span class="miesiac" id="nawigator-miesiac">${napisRundy(v, runda)}</span>
@@ -214,11 +203,11 @@ function rysuj() {
   wyczyscWykresy();
   rysujMenu();
   const v = S.v, z = ZAKLADKI[S.zakladka];
-  const grupa = MENU.find((p) => p.klucz === S.zakladka || (p.pod || []).includes(S.zakladka));
+  const grupa = MENU.find((p) => p.pod ? p.pod.includes(S.zakladka) : p.klucz === S.zakladka);
   document.body.dataset.dzial = grupa ? grupa.klucz : "dashboard";
   document.getElementById("nazwa-firmy").textContent = v.dashboard.nazwa;
   const st = document.getElementById("status-gry");
-  st.innerHTML = `<span class="chip">${esc(v.gra.nazwa)}</span>${chipDruzyny(v)}<span class="chip pom">${ikona("portfel", 14)}${zl(v.dashboard.saldo)}</span>`
+  st.innerHTML = `<span class="chip">${esc(v.gra.nazwa)}</span>${chipDruzyny(v)}${ostatniZapis(v)}<span class="chip pom">${ikona("portfel", 14)}${zl(v.dashboard.saldo)}</span>`
     + (v.gra.zakonczona ? `<span class="chip">Gra zakończona</span>` : v.wyslane && v.edycja
       ? `<span class="chip ok">Czekamy na: ${esc(v.gra.brakujace.join(", ") || "–")}</span>` : "")
     + (!v.gra.zakonczona && v.prowadzenie?.pauza ? `<span class="chip pom">Gra wstrzymana</span>`
@@ -234,9 +223,11 @@ function rysuj() {
   const zablokowane = v.edycja && blokada(v) && tryb === "decyzje" ? `<div class="komunikat">${esc(blokada(v))}</div>` : "";
   const wyslane = !zablokowane && v.edycja && v.wyslane && tryb === "decyzje" && S.zakladka !== "wyslij"
     ? `<div class="komunikat ok">Decyzje tej rundy są wysłane. Aby je zmienić, wróć do podejmowania decyzji w zakładce „Wyślij decyzje”.</div>` : "";
-  document.getElementById("karta").innerHTML = glowa(v, z, tryb, decyzje, wyniki, v.runda) + podzakladki()
-    + (tryb === "decyzje" ? podsumowanie(v) : "")
-    + `${z.info ? info(typeof z.info === "function" ? z.info(c, tryb) : z.info) : ""}<div class="tresc">${podglad}${zablokowane}${wyslane}${tresc}</div>`;
+  const opis = typeof z.info === "function" ? z.info(c, tryb) : z.info;
+  const karta = document.getElementById("karta");
+  karta.innerHTML = glowa(v, z, tryb, decyzje, wyniki, v.runda, opis) + podzakladki()
+    + `<div class="tresc">${podglad}${zablokowane}${wyslane}${tresc}</div>`;
+  zwinPodpowiedzi(karta);
   history.replaceState(null, "", `#${S.zakladka}${tryb === "wyniki" ? "/wyniki" : ""}`);
   if (z.po) z.po(c, tryb);
   const pole = znajdzPole(fokus);

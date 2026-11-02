@@ -27,7 +27,7 @@ archiwum/            zakończone plany, dzienniki prac, stary STACK (Plan implem
 plan.txt             prywatny plik autora – nie commituj, nie zmieniaj
 gra/
   silnik/            silnik gry: czysty Python (pydantic, numpy), bez Django
-    *.py             rdzeń: gra, runda, decyzje, co_jesli, dane, schematy, model, losowosc,
+    *.py             rdzeń: gra, runda, decyzje, dane, schematy, model, losowosc,
                      harmonogram, limity, boty
     kuchnia/         menu, jakosc, operacje, planowanie, dostawcy, magazyn, swiezosc
     rynek/           popyt, konkurencja, kalendarz, reklama, promocje, handel
@@ -77,7 +77,7 @@ Na Windows używaj `python -X utf8` przy wypisywaniu polskich znaków.
 - Losowość pochodzi **tylko** z `silnik/losowosc.py: strumien(ziarno, runda, cel, *klucze)`. To samo ziarno daje ten sam wynik, a testy tego pilnują.
 - Kwoty w stanie są w groszach (`int`, pola `…_gr`), a silnik liczy w złotych przez właściwości.
 - `StanGry.kopia()` (`silnik/model.py`) nie kopiuje raportów minionych rund – `stan.wyniki` i `stan.rynek` dawnych rund są wspólne dla kopii i oryginału, więc są **tylko do odczytu**. Zapisuj wyniki tylko bieżącej rundy.
-- Moduły mechanik: lokale, popyt, konkurencja, menu, dostawcy, magazyn, swiezosc, rynek_pracy, kandydaci, banki, lichwiarz (Harpagon), kasyno, biuro, urzad, awarie, reklama, promocje, handel, przejecia, zdarzenia, wlasciciel, czas_wlasciciela, wnioski, co_jesli i inne.
+- Moduły mechanik: lokale, popyt, konkurencja, menu, dostawcy, magazyn, swiezosc, rynek_pracy, kandydaci, banki, lichwiarz (Harpagon), kasyno, biuro, urzad, awarie, reklama, promocje, handel, przejecia, zdarzenia, wlasciciel, czas_wlasciciela, wnioski i inne.
 
 ## Zasady kodu
 - **Żadnych liczb gry w kodzie silnika.** Wszystkie liczby trzymaj w `dane/*.yaml`; pilnuje tego test `test_w_kodzie_silnika_nie_ma_liczb_gry`. Każdy parametr w `zalozenia.yaml` ma postać `{wartosc, pewnosc: potwierdzone|skalibrowane|zalozenie, zrodlo}`. Gdy zmieniasz liczbę, zaktualizuj `zrodlo` (np. `'kalibracja B6: …, było X'`) i `pewnosc`.

@@ -173,7 +173,6 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         stan, f, ks, info, bledy = stan_po_szkicu(gra, firma)
         v["decyzje"] = gra.szkic(firma)
         v["wyslane"] = firma in gra.wyslane()
-        v["warianty"] = sorted(gra.decyzje.get(biezaca, {}).get("_warianty", {}).get(firma, {}))
     elif koniec:
         stan = gra.stan(runda - 1)
         f = stan.firmy[firma]

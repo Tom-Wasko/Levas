@@ -1,4 +1,4 @@
-// Pulpit, karta wyników, lista błędów, wysyłanie decyzji, analiza (podgląd wyniku rundy).
+// Pulpit, karta wyników, lista błędów, wysyłanie decyzji.
 import { esc, godzina, inicjaly, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
@@ -266,73 +266,6 @@ export const wyslij = {
     "cofnij-runde": async (el, c) => {
       if (!confirm("Cofnąć ostatnią przeliczoną rundę?")) return;
       await c.api(`/api/gry/${GRA}/cofnij`, { method: "POST" }); toast("Cofnięto rundę."); await c.wczytaj(null);
-    },
-  },
-};
-
-let podglad = null;
-const METRYKI = [
-  ["Klienci (popyt)", (w) => licz(Object.values(w.sprzedaz).reduce((a, s) => a + s.popyt, 0))],
-  ["Obsłużeni klienci", (w) => licz(Object.values(w.sprzedaz).reduce((a, s) => a + s.sprzedaz, 0))],
-  ["Utracona sprzedaż", (w) => licz(Object.values(w.sprzedaz).reduce((a, s) => a + s.utracona, 0))],
-  ["Przychody", (w) => zl(w.kpir.przychody)], ["Koszty", (w) => zl(w.kpir.koszty)],
-  ["Dochód do opodatkowania", (w) => zl(w.kpir.dochod)], ["Podatek", (w) => zl(w.kpir.podatek)],
-  ["<b>Dochód netto</b>", (w) => `<b>${zl(w.kpir.dochod_netto)}</b>`], ["Saldo po rundzie", (w) => zl(w.gotowka)],
-  ["Towar przeterminowany", (w) => (w.magazyn?.sanepid ? zl(w.magazyn.sanepid.przeterminowane || 0) : "–")],
-  ...WSKAZNIKI.map(([k, n]) => [n, (w) => wsk(w.karta?.[k])]),
-];
-
-export const analiza = {
-  tytul: "Analiza", tytulPelny: "Analiza – co jeśli", ikona: "◎", odblokowanie: (v) => v.edycja && v.runda >= 2,
-  info: "Dodatek spoza REVAS: przewidywany wynik bieżącej rundy dla Twoich decyzji. Boty decydują jak zwykle, a inne drużyny – których decyzji nie znasz – powtarzają swoje decyzje z poprzedniej rundy (ceny, zamówienia, reklamę, promocje). Zapisz kilka wariantów decyzji i porównaj je. To przewidywanie modelu, nie wynik gry.",
-  decyzje({ v, kat }) {
-    const warianty = v.warianty || [];
-    let html = `<div class="kafel"><div class="kg">Warianty decyzji tej rundy</div><div class="kt">
-      ${warianty.length ? warianty.map((n) => `<div class="wiersz" style="align-items:center"><span>${esc(n)}</span><span>
-        <button class="btn jasny maly" data-akcja="wczytaj-wariant" data-n="${esc(n)}">Wczytaj do decyzji</button>
-        <button class="btn jasny maly" data-akcja="usun-wariant" data-n="${esc(n)}">Usuń</button></span></div>`).join("")
-        : `<p class="podpowiedz">Brak zapisanych wariantów. Ustaw decyzje w zakładkach i zapisz je tutaj jako wariant, potem zmień decyzje i zapisz kolejny.</p>`}
-      </div><div class="kd" style="flex-direction:row;flex-wrap:wrap">
-        <button class="btn czarny" data-akcja="zapisz-wariant" ${v.wyslane ? "disabled" : ""}>Zapisz bieżące decyzje jako wariant</button>
-        <button class="btn pom" data-akcja="porownaj">Policz i porównaj (bieżące + warianty)</button></div></div>`;
-    const p = podglad && podglad.runda === v.runda ? podglad.warianty : null;
-    if (!p) return html;
-    html += tabela("Porównanie wariantów (przewidywanie)", ["", ...p.map((x) => esc(x.nazwa))],
-      METRYKI.map(([n, f]) => [n, ...p.map((x) => f(x.wyniki))]), { klasy: ["l"] });
-    const uslugi = [...new Set(p.flatMap((x) => Object.keys(x.wyniki.sprzedaz)))];
-    html += tabela("Sprzedaż dań: popyt / obsłużeni (przewidywanie)", ["Danie", ...p.map((x) => esc(x.nazwa))],
-      uslugi.map((u) => [esc(nazwaUslugi(kat, u)), ...p.map((x) => { const s = x.wyniki.sprzedaz[u];
-        return s ? `${licz(s.popyt)} / ${licz(s.sprzedaz)}${s.utracona ? ` <span class="minus">(−${licz(s.utracona)}: ${esc(s.przyczyna)})</span>` : ""}` : "–"; })]), { klasy: ["l"] });
-    return html + `<div class="wykres"><canvas id="w-warianty"></canvas></div>`;
-  },
-  po({ v }) {
-    const p = podglad && podglad.runda === v.runda ? podglad.warianty : null;
-    if (!p) return;
-    wykres("w-warianty", "bar", p.map((x) => x.nazwa), [{ label: "Dochód netto", data: p.map((x) => x.wyniki.kpir.dochod_netto) },
-      { label: "Przychody", data: p.map((x) => x.wyniki.kpir.przychody) }]);
-  },
-  akcje: {
-    "zapisz-wariant": async (el, c) => {
-      const nazwa = prompt("Nazwa wariantu (np. „Niższe ceny”):", `Wariant ${(c.v.warianty || []).length + 1}`);
-      if (!nazwa) return;
-      c.ustaw(await c.api(`/api/gry/${GRA}/warianty/${encodeURIComponent(FIRMA)}`, { method: "PUT", body: JSON.stringify({ nazwa }) }));
-      c.idz("analiza", "decyzje");
-    },
-    "usun-wariant": async (el, c) => {
-      c.ustaw(await c.api(`/api/gry/${GRA}/warianty/${encodeURIComponent(FIRMA)}?nazwa=${encodeURIComponent(el.dataset.n)}`, { method: "DELETE" }));
-      c.idz("analiza", "decyzje");
-    },
-    "wczytaj-wariant": async (el, c) => {
-      if (!confirm(`Zastąpić bieżące decyzje wariantem „${el.dataset.n}”?`)) return;
-      const d = await c.api(`/api/gry/${GRA}/warianty-dane/${encodeURIComponent(FIRMA)}?nazwa=${encodeURIComponent(el.dataset.n)}`);
-      await c.zmien((dd) => { Object.keys(dd).forEach((k) => delete dd[k]); Object.assign(dd, d); });
-      toast("Wczytano wariant do decyzji."); c.idz("analiza", "decyzje");
-    },
-    porownaj: async (el, c) => {
-      el.disabled = true; el.textContent = "Liczę…";
-      podglad = await c.api(`/api/gry/${GRA}/podglad/${encodeURIComponent(FIRMA)}`, { method: "POST",
-        body: JSON.stringify({ warianty: ["biezace", ...(c.v.warianty || [])] }) });
-      c.idz("analiza", "decyzje");
     },
   },
 };

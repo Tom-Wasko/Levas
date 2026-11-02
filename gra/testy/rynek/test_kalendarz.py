@@ -89,7 +89,8 @@ def test_widok_kalendarza():
     g = _gra()
     v = widok(g, "A")["kalendarz_miasta"]
     assert len(v["tygodnie"]) == g.konfiguracja["liczba_rund"] and v["biezacy"]["runda"] == 1 and v["poprzedni"] is None
-    assert v["biezacy"]["wydarzenia"][0]["opis"] and "opis" not in v["tygodnie"][0]["wydarzenia"][0]
+    assert v["biezacy"]["wydarzenia"][0]["opis"] and v["tygodnie"][0]["wydarzenia"][0]["opis"]
+    assert len(v["biezacy"]["dni"]) == 7 and "dni" not in v["tygodnie"][0]
     assert v["rodzaje"]["uczelnie"]
     _runda(g)
     v = widok(g, "A")["kalendarz_miasta"]

@@ -103,8 +103,6 @@ def test_uczen_nie_odczyta_cudzej_druzyny(gra, uczen):
         ("get", "widok"),
         ("put", "decyzje"),
         ("post", "wyslij"),
-        ("post", "podglad"),
-        ("get", "warianty-dane"),
     ]:
         r = getattr(ala, metoda)(
             f"/api/gry/{gra}/{co}/{B}",

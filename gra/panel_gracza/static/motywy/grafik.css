@@ -26,10 +26,10 @@
 
 [data-motyw="grafik"] {
   & body, & [data-dzial] { --dzial: var(--fiolet); --dzial-ciemny: #4a3db0; --dzial-tlo: #ebe8fb; }
-  & [data-dzial="oferta"], & [data-dzial="sprzedaz"], & [data-dzial="marketing"] { --dzial: var(--roz); --dzial-ciemny: #a8264f; --dzial-tlo: #fde6ed; }
-  & [data-dzial="inwestycje"], & [data-dzial="dostawcy"] { --dzial: var(--blekit); --dzial-ciemny: #1d5a9c; --dzial-tlo: #e2eefa; }
-  & [data-dzial="hr"] { --dzial: var(--cytryna); --dzial-ciemny: #7a5900; --dzial-tlo: #fdf3d7; }
-  & [data-dzial="finanse"] { --dzial: var(--morski); --dzial-ciemny: #0f6b62; --dzial-tlo: #ddf3f0; }
+  & [data-dzial="lokal"], & [data-dzial="marketing"] { --dzial: var(--roz); --dzial-ciemny: #a8264f; --dzial-tlo: #fde6ed; }
+  & [data-dzial="inwestycje"], & [data-dzial="rynek"] { --dzial: var(--blekit); --dzial-ciemny: #1d5a9c; --dzial-tlo: #e2eefa; }
+  & [data-dzial="firma"], & [data-dzial="handel"] { --dzial: var(--cytryna); --dzial-ciemny: #7a5900; --dzial-tlo: #fdf3d7; }
+  & [data-dzial="finanse"], & [data-dzial="ksiegowosc"] { --dzial: var(--morski); --dzial-ciemny: #0f6b62; --dzial-tlo: #ddf3f0; }
   & body, & [data-dzial] {
     --pom: var(--dzial-ciemny); --pom-ciemny: var(--dzial-ciemny); --pom-jasny: var(--dzial-tlo); --pom-mgla: var(--dzial-tlo);
     --czarny: var(--atrament); --tekst: var(--atrament); --szary: var(--olowek); --linia: var(--ramka);
@@ -74,6 +74,11 @@
   & .menu .wyslij > a, & .menu .wyslij > a.aktywna { background: var(--atrament); color: #fff; border-left-color: var(--atrament); }
   & .menu .wyslij > a .ikona { color: #fff; }
   & .menu .znaczek { position: static; margin-left: auto; background: #d23c64; }
+  & .menu .sekcja { width: auto; margin: 14px 10px 4px; background: none; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; color: var(--olowek); }
+  & .menu .sekcja::after { content: attr(data-nazwa); }
+  & .menu .sekcja.linia { margin: 10px 10px 2px; height: 1px; background: var(--ramka); }
+  & .menu .sekcja.linia::after { content: none; }
   & .menu .pod, & .menu .poz:hover .pod { display: block; position: static; transform: none; box-shadow: none; border: 0; padding: 2px 0 6px 18px; min-width: 0; }
   & .menu .pod a { padding: 6px 10px; text-transform: none; font-size: 14px; font-weight: 400; color: var(--olowek); border-radius: 6px; }
   & .menu .pod a .ikona { display: none; }
@@ -118,10 +123,6 @@
   /* podzakładki są w menu bocznym */
   & body:has(> .menu) .podzakladki { display: none; }
 
-  & .podsumowanie > div { padding: 14px 24px; border-right-color: var(--kratka); }
-  & .podsumowanie .ikona { color: var(--olowek); }
-  & .podsumowanie .et { text-transform: none; font-size: 13px; font-weight: 400; color: var(--olowek); }
-  & .podsumowanie .wa { font-size: 19px; font-weight: 700; }
   & .info { justify-content: flex-start; text-align: left; text-transform: none; font-size: 14px; font-weight: 400; letter-spacing: 0;
     color: var(--olowek); padding: 12px 24px; }
   & .info .i { border-color: var(--dzial-ciemny); color: var(--dzial-ciemny); }
@@ -208,6 +209,7 @@
     & body:has(> .menu) { display: block; }
     & .menu { flex-direction: row; overflow-x: auto; height: auto; position: sticky; padding: 8px; border-right: 0; border-bottom: 1px solid var(--ramka); }
     & .menu .poz > a { white-space: nowrap; }
+    & .menu .sekcja { display: none; }
     & .menu .pod, & .menu .poz:hover .pod { display: none; }
     & body:has(> .menu) .podzakladki { display: flex; }
     & .naglowek { height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 16px; }
