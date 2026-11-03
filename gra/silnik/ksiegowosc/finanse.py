@@ -125,19 +125,22 @@ class Rachunek:
 
 
 def ksieguj(firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, kwota: float, kolumna: str = "pozostale",
-            stawka: float | None = None, stawki: dict[float, float] | None = None) -> None:
+            stawka: float | None = None, stawki: dict[float, float] | None = None) -> float:
     """Pozycja KPiR + ruch na rachunku (koszt zmniejsza gotówkę, przychód zwiększa). Z regułami VAT kwota jest
-    brutto: `stawki` – części brutto wg stawek (zakup różnych składników), `stawka` – jedna stawka, bez nich – reguły."""
+    brutto: `stawki` – części brutto wg stawek (zakup różnych składników), `stawka` – jedna stawka, bez nich – reguły.
+    Zwraca kwotę wpisaną do KPiR (bez VAT)."""
     znak = 1 if kolumna.startswith("przychod") else -1
     kwota = do_grosza(kwota)     # raz, handlowo – ta sama kwota w KPiR (netto + VAT) i na rachunku
     if ksiega.vat is not None and abs(kwota) >= 0.005:
         if stawki is None:
             stawki = {ksiega.stawka_vat(opis) if stawka is None else stawka: kwota}
         vat = ksiega.zarejestruj(opis, stawki, znak > 0)
-        ksiega.dodaj(opis, round(kwota - vat, 2), kolumna)
+        netto = round(kwota - vat, 2)
     else:
-        ksiega.dodaj(opis, kwota, kolumna)
+        netto = kwota
+    ksiega.dodaj(opis, netto, kolumna)
     rachunek.zapisz(firma, opis, znak * kwota, "kpir")
+    return netto
 
 
 def uruchom_odnawialny(firma: Firma, rachunek: Rachunek) -> float:

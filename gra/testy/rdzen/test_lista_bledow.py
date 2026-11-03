@@ -1,5 +1,6 @@
 """Lista błędów w grze z lokalami (F4.2): sprzęt i kucharz dania, cena wobec kosztu składników, przeterminowanie
-przy prognozie popytu, zamówienia ponad saldo konta."""
+przy prognozie popytu, zamówienia ponad saldo konta,
+zakupy poniżej progu amortyzacji (U1)."""
 
 import copy
 
@@ -144,3 +145,13 @@ def test_puste_menu(gra_botow):
                          (od, "wybierz dania w zakładce Menu")):
         b = [b for b in lista_bledow(dane, f, {}, runda, []) if b["tekst"].startswith("Menu jest puste")]
         assert len(b) == 1 and b[0]["poziom"] == "czerwony" and b[0]["zakladka"] == "oferta" and tekst in b[0]["tekst"]
+
+
+def test_zakup_ponizej_progu_amortyzacji_ostrzega_o_karcie(gra_botow):
+    dane, f, r = _firma(gra_botow)
+    dz = dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]
+    assert not [t for t in _teksty(lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info={})) if "w koszty" in t]
+    lb = lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info={"inwestycje_w_koszty": 2.5 * dz})
+    [b] = [b for b in lb if "w koszty" in b["tekst"]]
+    assert b["poziom"] == "pomaranczowy" and b["zakladka"] == "sprzet"
+    assert "kartę wyników tej rundy – o ok. 2,50" in b["tekst"]

@@ -25,14 +25,15 @@ def przyjmij(dane: Dane, firma: Firma, nazwa: str, rodzaj: str, wartosc: float, 
 
 
 def zakup(dane: Dane, firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: str, nazwa: str, rodzaj: str,
-          cena: float, runda: int) -> None:
-    """Zakup inwestycji: od progu – środek trwały (amortyzacja), poniżej progu – koszt od razu."""
+          cena: float, runda: int) -> float:
+    """Zakup inwestycji: od progu – środek trwały (amortyzacja), poniżej progu – koszt od razu.
+    Zwraca koszt wpisany do KPiR w tej rundzie (bez VAT; 0 – środek trwały)."""
     if cena >= dane.z["finanse"]["amortyzacja_prog"]:
         rachunek.zapisz(firma, opis, -cena, "inwestycje")
         vat = ksiega.zarejestruj(opis, {dane.podatki["vat"]["srodki_trwale"]: cena}, False, inwestycja=True) if ksiega.vat is not None else 0.0
         przyjmij(dane, firma, nazwa, rodzaj, round(cena - vat, 2), runda)
-    else:
-        ksieguj(firma, ksiega, rachunek, opis, cena)
+        return 0.0
+    return ksieguj(firma, ksiega, rachunek, opis, cena)
 
 
 def sprzedaj(firma: Firma, nazwa: str, ksiega: Ksiega) -> bool:

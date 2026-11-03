@@ -171,3 +171,6 @@ def test_decyzje_w_lokalu(gra_bota):
     nazwa = dane.lokale[DRUGI]["nazwa"]
     assert all(isinstance(x["tekst"], str) for x in lb)
     assert not any(x["tekst"].startswith(nazwa) and dane.uslugi[v]["nazwa"] in x["tekst"] for x in lb)   # v nie ma w menu
+    # U1: udogodnienie poniżej progu amortyzacji – koszt tej rundy (bez VAT) i ostrzeżenie o karcie
+    cena = dane.pozycje("udogodnienia")[ud]["cena"]
+    assert 0 < info["inwestycje_w_koszty"] < cena and any("idą w koszty" in x["tekst"] for x in lb)

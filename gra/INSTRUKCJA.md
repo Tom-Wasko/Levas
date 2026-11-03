@@ -94,6 +94,9 @@ Kilka zasad, które warto znać:
 - **Odsetki Harpagona** nie trafiają do KPiR, ale karta je widzi: obniżają wynik ekonomiczny tak jak koszty.
 - **Majątek traci na wartości.** Sprzęt i wyposażenie liczą się w rozwoju firmy po amortyzacji, a kupiony lokal,
   budynek i działka – według ewidencji środków trwałych.
+- **Tani sprzęt to koszt tego tygodnia.** Sprzęt, wyposażenie i stanowiska tańsze niż 10 000 zł od razu idą
+  w koszty, więc w tygodniu zakupu obniżają dochód i kartę wyników (wyposażenie całego lokalu potrafi zabrać
+  więcej niż kilka dobrych tygodni). Lista błędów pokaże przed wysłaniem, o ile mniej więcej spadnie karta.
 - **Sprzedaż i odkup to nie inwestycja.** Rozwój podnoszą tylko zakupy ponad najwyższą wartość majątku, jaką
   firma już miała. Sprzedaż sprzętu obniża rozwój, a odkupienie go potem nie daje nic ekstra.
 

@@ -191,7 +191,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     same klucze}} – osobno dla lokalu; "zamowienia"[].lokal – dokąd dostawa (domyślnie lokal główny); "przewozy":
     [{"z", "do", "zasob", "jakosc", "ilosc", "dzien"}] – towar między lokalami; Z4: "auto_dostawy": {"pozycje":
     [{"zasob", "jakosc", "ilosc"}]} (decyzja główna albo w_lokalu) – lokal na auto-dostawach."""
-    info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "wypowiedzenia": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
+    info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "wypowiedzenia": [], "inwestycje": 0.0, "inwestycje_w_koszty": 0.0,
+            "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
     if d.get("nazwa"):
@@ -267,7 +268,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         start = firma.nowy_nr(typ)
         for i in range(n):
             firma.stanowiska.append(Stanowisko(nr=start + i, typ=typ, od_rundy=runda, lokal=wybrane[i]))
-        st_trwale.zakup(dane, firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}",
+        info["inwestycje_w_koszty"] += st_trwale.zakup(
+                        dane, firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}",
                         f"Stanowiska: {dane.typy_stanowisk[typ]['kto']} (runda {runda})", "sprzet", pakiety[str(n)],
                         runda)
         firma.majatek += pakiety[str(n)]
@@ -302,8 +304,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         q = int(s.get("jakosc", 3))
         cena = info_s["ceny"][str(q)]
         st.sprzet[s["nazwa"]] = q
-        st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {s['nazwa']}", f"{s['nazwa']} ({s['typ']} {s['nr']})",
-                        "sprzet", cena, runda)
+        info["inwestycje_w_koszty"] += st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {s['nazwa']}",
+                                                       f"{s['nazwa']} ({s['typ']} {s['nr']})", "sprzet", cena, runda)
         firma.majatek += cena
         info["inwestycje"] += cena
 
@@ -451,7 +453,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             for n in kup:
                 if n in pozycje and n not in posiadane and pozycje[n]["od_rundy"] <= runda:
                     posiadane.append(n)
-                    st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {n}",   # opis jak w KPiR gry
+                    info["inwestycje_w_koszty"] += st_trwale.zakup(
+                                    dane, firma, ksiega, rachunek, f"Koszt zakupu: {n}",   # opis jak w KPiR gry
                                     pl.nazwa_srodka(firma, lok, n) if lok is not None else n,
                                     "sprzet" if rodzaj == "udogodnienia" else "wyposazenie", pozycje[n]["cena"], runda)
                     firma.majatek += pozycje[n]["cena"]
@@ -587,6 +590,12 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj(b["poziom"], b["zakladka"], b["tekst"])
         for b in bo.bledy(dane, firma, d):
             dodaj(b["poziom"], b["zakladka"], b["tekst"])
+        if (koszt := (info or {}).get("inwestycje_w_koszty", 0.0)) > 0:   # U1: tylko ostrzeżenie
+            prog, zl = (f"{x:,.0f}".replace(",", " ") for x in (dane.z["finanse"]["amortyzacja_prog"], koszt))
+            karta = f"{koszt / dane.z['karta_wynikow']['wynik_ekonomiczny_dzielnik']:.2f}".replace(".", ",")
+            dodaj("pomaranczowy", "sprzet", f"Sprzęt, wyposażenie i stanowiska tańsze niż {prog} zł od razu idą "
+                  f"w koszty: ten zakup obniży dochód tej rundy o ok. {zl} zł (bez VAT), a kartę wyników tej rundy – "
+                  f"o ok. {karta}. Wartość zakupu zostaje w majątku firmy i liczy się do jej rozwoju.")
         # przekroczenia odrzuca zapis decyzji (API), a przeliczenie przycina – tu czerwone są w uwagach rynku pracy i lokali
         lim = lm.stan_limitow(dane, firma, d, runda)
         if lim["pracownicy"]["nowi"] == lim["pracownicy"]["limit"]:

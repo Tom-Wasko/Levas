@@ -41,8 +41,8 @@ def test_dzialka_grunt_bez_amortyzacji_budynek_po_budowie():
 def test_zakup_od_progu_i_sprzedaz():
     dane = dane_domyslne()
     f, ks, rach = Firma(nazwa="A", gotowka=50000), Ksiega(), Rachunek()
-    st.zakup(dane, f, ks, rach, "Koszt zakupu: Piec", "Piec", "sprzet", 12000, 3)
-    st.zakup(dane, f, ks, rach, "Koszt zakupu: Krzesło", "Krzesło", "wyposazenie", 300, 3)   # poniżej progu
+    assert st.zakup(dane, f, ks, rach, "Koszt zakupu: Piec", "Piec", "sprzet", 12000, 3) == 0   # nie w koszty tej rundy
+    assert st.zakup(dane, f, ks, rach, "Koszt zakupu: Krzesło", "Krzesło", "wyposazenie", 300, 3) == 300   # poniżej progu
     assert [p["opis"] for p in ks.pozycje] == ["Koszt zakupu: Krzesło"]
     assert f.gotowka == pytest.approx(50000 - 12300) and [s.nazwa for s in f.srodki_trwale] == ["Piec"]
     st.amortyzuj(dane, f, 3, ks)
