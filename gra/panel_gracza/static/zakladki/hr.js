@@ -2,6 +2,7 @@
 import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast,
   wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
+import { idWybranego, nazwaLokalu, stanowiskaLokalu } from "./lokal_wybor.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const UMOWY = { prace: "Umowa o pracę", zlecenie: "Umowa zlecenie" };
@@ -12,14 +13,14 @@ function kosztWynagrodzen(v, kat) {
 
 export const zatrudnienie = {
   tytul: "Zatrudnienie", tytulPelny: "HR - zatrudnienie", ikona: "☺", odblokowanie: "hr_zatrudnienie",
-  info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Inwestycje → Stanowiska).",
+  info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Lokale → Sprzęt).",
   decyzje({ v, kat, edycja }) {
     let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(naRunde(kosztWynagrodzen(v, kat)), true)}</span>${naOkres()} brutto (z ZUS pracodawcy; pensje w umowach – miesięczne)</span></div>`;
     if (v.nieudane_zatrudnienia?.length) html += `<div class="komunikat zly">Część kandydatów zatrudniła już inna firma – wybierz innych.</div>`;
     for (const typ of TYPY) {
-      const st = v.stan.stanowiska.filter((s) => s.typ === typ);
-      html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}</div>`;
-      if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Inwestycje → Stanowiska.</p>`; continue; }
+      const st = stanowiskaLokalu(v, v.stan.stanowiska).filter((s) => s.typ === typ);
+      html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}${idWybranego(v) ? ` – ${esc(nazwaLokalu(v, idWybranego(v)))}` : ""}</div>`;
+      if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Lokale → Sprzęt.</p>`; continue; }
       html += `<div class="siatka waska">${st.map((s) => {
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
         const wl = v.decyzje.wlasciciel_stanowisko;

@@ -287,6 +287,26 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .stopka { text-align: center; color: var(--szary); font-size: 11px; padding: 20px; }
 .ladowanie { text-align: center; padding: 60px; color: var(--szary); }
 
+/* Z3: zakładka Lokale – kafelki lokali, części podzakładek, liczby lokalu */
+.kafelki-lokali { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+.kafel-lokalu { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 190px; padding: 12px 16px;
+  background: #fff; border: 1px solid var(--linia); border-radius: var(--r); font: inherit; text-align: left; cursor: pointer; }
+.kafel-lokalu:hover { box-shadow: var(--cien); border-color: var(--pom); }
+.kafel-lokalu.aktywny { border-color: var(--pom); box-shadow: 0 0 0 2px var(--pom) inset; background: var(--pom-jasny); }
+.kafel-lokalu b { font-size: 14px; }
+.czesc { margin-top: 28px; scroll-margin-top: 80px; }
+.czesc-tytul { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; padding-bottom: 8px;
+  margin-bottom: 14px; border-bottom: 2px solid var(--pom); }
+.czesc-tytul .ikona { color: var(--pom); }
+.liczby-lokalu { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.liczby-lokalu .liczba { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; background: #fff;
+  border: 1px solid var(--linia); border-radius: var(--r); }
+.liczby-lokalu .etykieta { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--szary); }
+.liczby-lokalu .liczba b { font-size: 20px; }
+.liczby-lokalu .liczba.plus b { color: var(--zielony); }
+.liczby-lokalu .liczba.minus b { color: var(--czerwony); }
+.formularz-przewozu { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px; }
+
 @media (max-width: 900px) {
   .dash, .dwie, .trzy { grid-template-columns: 1fr; }
   .siatka.trojka { grid-template-columns: repeat(2, minmax(0, 1fr)); }

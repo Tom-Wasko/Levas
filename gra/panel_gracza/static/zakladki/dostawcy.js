@@ -2,9 +2,18 @@
 // „Magazyn i świeżość”, silnik/kuchnia/swiezosc.py), a dostawcy mają swoje zasady (silnik/kuchnia/dostawcy.py: zasady_dostaw):
 // dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
 import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
+import { glownyLokal, idWybranego, lokalPartii, lokalWybrany, menuLokalu, nazwaLokalu } from "./lokal_wybor.js";
 
-const stan = (v, z, q) => v.stan_przed.magazyn[`${z}|${q}`] || 0;
-const zamowienia = (v, d, z, q) => (v.decyzje.zamowienia || []).filter((x) => x.dostawca === d && x.zasob === z && +x.jakosc === q);
+// Z3: przy kilku lokalach magazyn i zamówienia wybranego lokalu (zamówienie bez pola "lokal" – lokal główny)
+function stan(v, z, q) {
+  const id = idWybranego(v);
+  if (!id) return v.stan_przed.magazyn[`${z}|${q}`] || 0;
+  return (v.stan_przed.partie || []).filter((p) => p.zasob === z && +p.jakosc === q && lokalPartii(v, p) === id).reduce((s, p) => s + p.ilosc, 0);
+}
+const lokalZam = (v, x) => x.lokal || glownyLokal(v);
+const mojeZam = (v) => { const id = idWybranego(v); return (v.decyzje.zamowienia || []).filter((x) => !id || lokalZam(v, x) === id); };
+const tenLokal = (v, x) => { const id = idWybranego(v); return !id || lokalZam(v, x) === id; };
+const zamowienia = (v, d, z, q) => mojeZam(v).filter((x) => x.dostawca === d && x.zasob === z && +x.jakosc === q);
 const zamowione = (v, d, z, q, dz) => zamowienia(v, d, z, q).filter((x) => dz === undefined || (+x.dzien || 0) === dz).reduce((s, x) => s + x.ilosc, 0);
 const dniDostaw = (v) => (v.lokale && v.swiezosc?.dni) || null;
 const DNI = ["pn", "wt", "śr", "czw", "pt", "sob", "nd"];
@@ -45,7 +54,8 @@ function dostawy(kat, z, potrzeba, stan, udzialy, dozwolone) {
 function udzialyDni(v) {
   const dni = dniDostaw(v);
   if (!dni) return null;
-  const wagi = (v.lokale?.moje || []).map((l) => v.popyt?.strefy?.[l.strefa]?.dni).filter((w) => w?.length === dni.length);
+  const id = idWybranego(v);
+  const wagi = (v.lokale?.moje || []).filter((l) => !id || l.id === id).map((l) => v.popyt?.strefy?.[l.strefa]?.dni).filter((w) => w?.length === dni.length);
   return wagi.length ? dni.map((_, i) => wagi.reduce((s, w) => s + w[i], 0)) : dni.map(() => 1);
 }
 
@@ -105,12 +115,12 @@ function planDostaw(P, tytul) {
 
 // Zamówienia rundy – każda pozycja z przyciskiem usunięcia (pozycja = dostawca, składnik, jakość i dzień dostawy).
 function listaZamowien(v, edycja) {
-  const ceny = v.ceny_dostawcow, dni = dniDostaw(v), zam = v.decyzje.zamowienia || [];
+  const ceny = v.ceny_dostawcow, dni = dniDostaw(v), zam = mojeZam(v), id = idWybranego(v);
   if (!zam.length) return "";
   const dzien = (x) => { const d = dni && dni[+x.dzien || 0]; return d ? `${DNI[dzienTyg(d.data)]} <span class="podpowiedz">${+d.data.slice(8)}.${d.data.slice(5, 7)}</span>` : "–"; };
   const wartosc = (x) => (ceny[x.dostawca]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc;
   const usun = (i) => `<button class="btn jasny maly" data-akcja="zam-usun" data-i="${i}" title="Usuń pozycję" ${edycja ? "" : "disabled"}>✕ Usuń</button>`;
-  return tabela(`Twoje zamówienia w tej rundzie (${zam.length})`, ["Dostawca", "Składnik", "Jakość", ...(dni ? ["Dostawa"] : []), "Ilość (opak.)", "Wartość", ""],
+  return tabela(`Twoje zamówienia w tej rundzie${id ? ` – dostawa do lokalu ${esc(nazwaLokalu(v, id))}` : ""} (${zam.length})`, ["Dostawca", "Składnik", "Jakość", ...(dni ? ["Dostawa"] : []), "Ilość (opak.)", "Wartość", ""],
     zam.map((x, i) => [esc(x.dostawca), esc(x.zasob), gw(+x.jakosc), ...(dni ? [dzien(x)] : []), licz(x.ilosc), zl2(wartosc(x)), usun(i)]),
     { klasy: ["l", "l"], stopka: ["Razem", "", "", ...(dni ? [""] : []), "", zl2(zam.reduce((s, x) => s + wartosc(x), 0)),
       edycja ? `<button class="btn jasny maly" data-akcja="zam-wyczysc">Usuń wszystkie</button>` : ""] });
@@ -118,7 +128,7 @@ function listaZamowien(v, edycja) {
 
 function zapotrzebowanie(v, kat) {
   const wynik = {};
-  for (const [u, p] of Object.entries(v.stan.oferta)) {
+  for (const [u, p] of Object.entries(menuLokalu(v, lokalWybrany(v)))) {
     for (const [z, ile] of Object.entries(kat.uslugi[u].zasoby)) wynik[z] = (wynik[z] || 0) + (p || 0) * ile / kat.zasoby[z].opakowanie;
   }
   return wynik;
@@ -140,14 +150,14 @@ export const dostawcy = {
     a w dyskoncie kupujesz sam – taniej przy małych ilościach i z gazetką, ale tracisz czas i nie wyniesiesz więcej niż limit.`,
   decyzje({ v, kat, edycja }) {
     const ceny = v.ceny_dostawcow;
-    const koszt = (v.decyzje.zamowienia || []).reduce((s, z) => s + (ceny[z.dostawca]?.[z.zasob]?.[z.jakosc] || 0) * z.ilosc, 0);
+    const koszt = mojeZam(v).reduce((s, z) => s + (ceny[z.dostawca]?.[z.zasob]?.[z.jakosc] || 0) * z.ilosc, 0);
     const pot = zapotrzebowanie(v, kat), tanie = najtansze(ceny);
     const C = v.czas_wlasciciela;
     const plan = planDostaw(v.dostawy_plan, "Dostawy w tej rundzie") + (C && C.wykorzystane
       ? `<p class="podpowiedz">Czas właściciela: wolne ${licz(C.wolne, 1)} h z ${licz(C.pula, 1)} h w tej rundzie (<a data-zakladka-k="czas_wlasciciela">szczegóły</a>).</p>` : "");
     const wiersze = Object.keys(kat.zasoby).filter((z) => pot[z] || [1, 2, 3].some((q) => stan(v, z, q))).map((z) => {
       const magazyn = [1, 2, 3].reduce((s, q) => s + stan(v, z, q), 0);
-      const zam = (v.decyzje.zamowienia || []).filter((x) => x.zasob === z).reduce((s, x) => s + x.ilosc, 0);
+      const zam = mojeZam(v).filter((x) => x.zasob === z).reduce((s, x) => s + x.ilosc, 0);
       const brak = Math.max(0, (pot[z] || 0) - magazyn - zam);
       return [esc(z), `${kat.zasoby[z].typ_opakowania} (${licz(kat.zasoby[z].opakowanie)} ${kat.zasoby[z].jednostka})`, ulamek(pot[z] || 0),
         ulamek(magazyn), licz(zam), brak > 0 ? `<span class="minus">${ulamek(brak)}</span>` : '<span class="plus">0</span>',
@@ -158,7 +168,7 @@ export const dostawcy = {
       <select id="auto-jakosc" style="width:auto"><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select>
       <select id="auto-zapas" style="width:auto"><option value="1">bez zapasu</option><option value="1.05" selected>+5% zapasu</option><option value="1.1">+10% zapasu</option></select>
       <button class="btn pom maly" data-akcja="auto-zamow" ${edycja ? "" : "disabled"}>Zamów</button></span>` : "";
-    let html = `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl2(koszt)}</span></span>${auto}</div>`;
+    let html = `<div class="pasek ciemny"><span>Koszt zakupu${idWybranego(v) ? " (ten lokal)" : ""}: <span class="kwota">${zl2(koszt)}</span></span>${auto}</div>`;
     html += tabela("Zapotrzebowanie na prognozowanych klientów (opakowania)", ["Zasób", "Opakowanie", "Potrzeba wg prognoz", "W magazynie",
       "Zamówione teraz", "Brakuje", "Najtańsze oferty"], wiersze, { klasy: ["l", "l"] });
     html += listaZamowien(v, edycja);
@@ -170,7 +180,7 @@ export const dostawcy = {
       <a data-zakladka-k="swiezosc">Świeżość</a>.</p>`;
     html += `<div class="pasek">Dostawcy</div><div class="siatka trojka">`;
     for (const d of Object.keys(ceny)) {
-      const wartosc = (v.decyzje.zamowienia || []).filter((x) => x.dostawca === d).reduce((s, x) => s + (ceny[d]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc, 0);
+      const wartosc = mojeZam(v).filter((x) => x.dostawca === d).reduce((s, x) => s + (ceny[d]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc, 0);
       html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}</div>
         <div class="kd"><button class="btn czarny" data-akcja="baza" data-d="${esc(d)}">Baza składników</button>
         <div class="wiersz"><span>Zamówienie</span><span>${zl2(wartosc)}</span></div></div></div>`;
@@ -197,18 +207,20 @@ export const dostawcy = {
   akcje: {
     baza: (el, c) => oknoBazy(c, el.dataset.d),
     "zam-usun": (el, c) => {
-      const x = (c.v.decyzje.zamowienia || [])[+el.dataset.i];
+      const x = mojeZam(c.v)[+el.dataset.i];
       if (!x) return;
-      const ta = (y) => y.dostawca === x.dostawca && y.zasob === x.zasob && +y.jakosc === +x.jakosc && (+y.dzien || 0) === (+x.dzien || 0);
+      const ta = (y) => y.dostawca === x.dostawca && y.zasob === x.zasob && +y.jakosc === +x.jakosc && (+y.dzien || 0) === (+x.dzien || 0)
+        && lokalZam(c.v, y) === lokalZam(c.v, x);
       return c.zmien((d) => { d.zamowienia = (d.zamowienia || []).filter((y) => !ta(y)); });
     },
-    "zam-wyczysc": (el, c) => c.zmien((d) => { d.zamowienia = []; }),
+    "zam-wyczysc": (el, c) => c.zmien((d) => { d.zamowienia = (d.zamowienia || []).filter((x) => !tenLokal(c.v, x)); }),
     "auto-zamow": async (el, c) => {
       const q = +document.getElementById("auto-jakosc").value, zapas = +document.getElementById("auto-zapas").value;
-      if (!Object.values(c.v.stan.oferta).some((p) => p > 0)) return toast("Najpierw wpisz prognozę popytu dań w zakładce Menu – zamówienia liczone są na prognozowanych klientów.");
+      if (!Object.values(menuLokalu(c.v, lokalWybrany(c.v))).some((p) => p > 0)) return toast("Najpierw wpisz prognozę popytu dań w zakładce Menu – zamówienia liczone są na prognozowanych klientów.");
       const nowe = planZamowien(c, q, zapas);
       if (!nowe.length) return toast("Zapas w magazynie wystarcza na prognozowanych klientów.");
-      await c.zmien((d) => { d.zamowienia = nowe; });
+      const id = idWybranego(c.v);   // kilka lokali – zastępuje tylko zamówienia wybranego lokalu
+      await c.zmien((d) => { d.zamowienia = [...(d.zamowienia || []).filter((x) => !tenLokal(c.v, x)), ...nowe.map((x) => (id ? { ...x, lokal: id } : x))]; });
       toast(dniDostaw(c.v) ? "Zamówienia ustawione – dostawy rozłożone na dni wg terminów przydatności (poprzednie zastąpione)."
         : "Zamówienia ustawione (poprzednie zamówienia zastąpione).");
     },
@@ -216,10 +228,10 @@ export const dostawcy = {
   zmiany: {
     ilosc: async (el, c) => {
       const { d: dost, z, q, dz } = el.dataset, ilosc = Math.max(0, +el.value || 0);
-      const tenDzien = (x) => dz === undefined || (+x.dzien || 0) === +dz;
+      const tenDzien = (x) => dz === undefined || (+x.dzien || 0) === +dz, id = idWybranego(c.v);
       await c.zmien((d) => {
-        d.zamowienia = (d.zamowienia || []).filter((x) => !(x.dostawca === dost && x.zasob === z && +x.jakosc === +q && tenDzien(x)));
-        if (ilosc > 0) d.zamowienia.push({ dostawca: dost, zasob: z, jakosc: +q, ilosc, ...(dz === undefined ? {} : { dzien: +dz }) });
+        d.zamowienia = (d.zamowienia || []).filter((x) => !(x.dostawca === dost && x.zasob === z && +x.jakosc === +q && tenDzien(x) && tenLokal(c.v, x)));
+        if (ilosc > 0) d.zamowienia.push({ dostawca: dost, zasob: z, jakosc: +q, ilosc, ...(dz === undefined ? {} : { dzien: +dz }), ...(id ? { lokal: id } : {}) });
       });
       oknoBazy(c, dost);
     },
@@ -243,7 +255,8 @@ function oknoBazy({ v, kat, edycja }, dost) {
   }
   const kolumny = dni ? moje.map((i) => `${dni[i].dzien}<div class="podpowiedz">${+dni[i].data.slice(8)}.${dni[i].data.slice(5, 7)}</div>`) : ["Zamówienie (opakowania)"];
   const x = info(v, dost);
-  okno(`Dostawca „${esc(dost)}”`, tabela(null, ["Składnik", "Jakość", "Na magazynie", "Cena", ...kolumny, "Wartość"], w, { klasy: ["l"] })
+  const id = idWybranego(v);
+  okno(`Dostawca „${esc(dost)}”${id ? ` – dostawa do lokalu ${esc(nazwaLokalu(v, id))}` : ""}`, tabela(null, ["Składnik", "Jakość", "Na magazynie", "Cena", ...kolumny, "Wartość"], w, { klasy: ["l"] })
     + `<p class="podpowiedz">Ceny w tym ${OKRES.miejscownik}. Ilości wpisujesz w opakowaniach (np. napój: opakowanie 24 szt.).
       ${dni ? "Kolumny dni – dostawa rano tego dnia (tylko dni dostaw tego dostawcy); termin przydatności liczy się od dnia dostawy (zakładka Magazyn i świeżość)." : ""}
       ${dni && x.limit_opakowan ? ` Najwyżej ${licz(x.limit_opakowan)} opakowań składnika dziennie, każdy dzień zakupów to ${licz(x.godziny_odbioru)} h właściciela.` : ""}

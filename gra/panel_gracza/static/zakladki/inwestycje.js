@@ -1,6 +1,13 @@
 // Inwestycje: stanowiska, sprzęt, wyposażenie dla klientów.
 import { kosztLokali, miejscaLokali } from "./lokale.js";
 import { esc, naOkres, naRunde, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
+import { decyzjaLokalu, idWybranego, listaLokalu, nazwaLokalu, opisLokalu, stanowiskaLokalu } from "./lokal_wybor.js";
+
+// Z3: miejsca na stanowiska – przy kilku lokalach tylko w wybranym lokalu
+function miejscaWybranego(v, typ) {
+  const id = idWybranego(v), l = id && opisLokalu(v, id);
+  return l ? { wszystkie: l.miejsca[typ], zajete: l.zajete[typ] } : miejscaLokali(v, typ);
+}
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const suma = (pozycje, start) => pozycje.filter((p) => p.opis.startsWith(start)).reduce((s, p) => s + p.pozostale, 0);
@@ -10,13 +17,13 @@ export const stanowiska = {
   info: "Uruchom potrzebną liczbę stanowisk w Twojej firmie. Stanowisko działa już w rundzie zakupu. Każdy pracownik potrzebuje swojego stanowiska.",
   decyzje({ v, kat, edycja }) {
     const pakiety = kat.oferty.stanowiska.pakiety;
-    const nowe = v.decyzje.stanowiska || {};
+    const id = idWybranego(v), nowe = decyzjaLokalu(v.decyzje, v, "stanowiska") || {};
     const koszt = suma(v.koszty_decyzji, "Uruchomienie stanowiska");
     let html = `<div class="pasek ciemny"><span>Koszt lokali (czynsz i media): <span class="kwota">${zl(kosztLokali(v))}</span></span>
       <span>Nowe stanowiska: <span class="kwota">${zl(koszt)}</span></span></div><div class="dwie" style="margin-top:20px">`;
     for (const typ of TYPY) {
-      const maja = v.stan_przed.stanowiska.filter((s) => s.typ === typ).length;
-      const m = miejscaLokali(v, typ);
+      const maja = stanowiskaLokalu(v, v.stan_przed.stanowiska).filter((s) => s.typ === typ).length;
+      const m = miejscaWybranego(v, typ);
       const miejsca = m ? `<div class="podpowiedz" style="padding:8px 0">Miejsca w lokalach: zajęte ${m.zajete} z ${m.wszystkie}${m.wszystkie ? "" : " – najpierw wybierz lokal (zakładka Lokale)"}</div>` : "";
       html += `<div class="kafel"><div class="kg kg-pelny">
         ${esc(kat.oferty.stanowiska.typy[typ].nazwa)} – liczba posiadanych: <span style="font-size:22px">${maja}</span></div><div class="kt">${miejsca}
@@ -26,12 +33,12 @@ export const stanowiska = {
                              : `<button class="btn jasny maly" data-akcja="pakiet" data-t="${typ}" data-n="${n}" ${edycja ? "" : "disabled"}>Wybierz</button>`}</div>`).join("")}
         </div></div>`;
     }
-    return html + `</div><p class="podpowiedz">W jednej rundzie można uruchomić jeden pakiet każdego rodzaju (do 5 stanowisk). Puste stanowiska nie generują kosztów.</p>`;
+    return html + `</div><p class="podpowiedz">${id ? `Stanowiska powstaną w lokalu <b>${esc(nazwaLokalu(v, id))}</b>. ` : ""}W jednej rundzie można uruchomić jeden pakiet każdego rodzaju (do 5 stanowisk). Puste stanowiska nie generują kosztów.</p>`;
   },
   wyniki({ v, kat }) {
     const typy = kat.oferty.stanowiska.typy, sprzet = v.wyniki?.sprzet || [];
     const own = TYPY.map((typ) => {
-      const st = v.stan.stanowiska.filter((s) => s.typ === typ), m = miejscaLokali(v, typ);
+      const st = stanowiskaLokalu(v, v.stan.stanowiska).filter((s) => s.typ === typ), m = miejscaWybranego(v, typ);
       const ob = sprzet.filter((s) => s.typ === typ).map((s) => s.oblozenie);
       return [esc(typy[typ].nazwa), licz(st.length), m ? `${licz(m.zajete)} z ${licz(m.wszystkie)}` : "–",
         ob.length ? proc(ob.reduce((a, x) => a + x, 0) / ob.length) : "–", ob.length ? proc(Math.max(...ob)) : "–"];
@@ -42,7 +49,14 @@ export const stanowiska = {
       + (firmy.length ? tabela("Stanowiska konkurencji", ["Firma", ...TYPY.map((t) => esc(typy[t].nazwa))], firmy, { klasy: ["l"] }) : "")
       + `<p class="podpowiedz">Obłożenie blisko 100% oznacza, że sprzęt był wąskim gardłem – kolejne stanowisko (i pracownik) przyjmie więcej klientów.</p>`;
   },
-  akcje: { pakiet: (el, c) => c.zmien((d) => { d.stanowiska = { ...(d.stanowiska || {}), [el.dataset.t]: +el.dataset.n }; }) },
+  akcje: {
+    pakiet: (el, c) => c.zmien((d) => {
+      const id = idWybranego(c.v), wpis = { [el.dataset.t]: +el.dataset.n };
+      if (!id) { d.stanowiska = { ...(d.stanowiska || {}), ...wpis }; return; }
+      d.w_lokalu = d.w_lokalu || {};
+      d.w_lokalu[id] = { ...(d.w_lokalu[id] || {}), stanowiska: { ...(d.w_lokalu[id]?.stanowiska || {}), ...wpis } };
+    }),
+  },
 };
 
 function sprzetStanowiska(v, typ, nr) {
@@ -56,13 +70,13 @@ export const sprzet = {
   info: "Kup sprzęt potrzebny do przygotowania wybranych przez Ciebie dań. Sprzęt kupuje się na konkretne stanowisko.",
   decyzje({ v, kat, edycja }) {
     const koszt = suma(v.koszty_decyzji, "Koszt zakupu: ");
-    const utrz = v.stan.stanowiska.reduce((s, st) => s + Object.entries(st.sprzet).reduce((a, [n, q]) => a + kat.sprzet[n].utrzymanie[q], 0), 0);
+    const utrz = stanowiskaLokalu(v, v.stan.stanowiska).reduce((s, st) => s + Object.entries(st.sprzet).reduce((a, [n, q]) => a + kat.sprzet[n].utrzymanie[q], 0), 0);
     let html = `<div class="pasek ciemny"><span>Koszty całkowite zakupu: <span class="kwota">${zl(koszt)}</span></span>
       <span>Koszt utrzymania sprzętu: <span class="kwota">${zl(naRunde(utrz))}</span>${naOkres()}</span></div>`;
     for (const typ of TYPY) {
-      const st = v.stan.stanowiska.filter((s) => s.typ === typ);
+      const st = stanowiskaLokalu(v, v.stan.stanowiska).filter((s) => s.typ === typ);
       html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}</div>`;
-      if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Inwestycje → Stanowiska.</p>`; continue; }
+      if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk${idWybranego(v) ? " w tym lokalu" : ""} – uruchom je w części Stanowiska.</p>`; continue; }
       html += `<div class="siatka">${st.map((s) => {
         const { przed } = sprzetStanowiska(v, typ, s.nr);
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
@@ -196,11 +210,13 @@ export const srodki_trwale = {
 
 export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
   const pozycje = kat.oferty[rodzaj].pozycje.filter((p) => p.od_rundy <= v.runda);
-  const przed = v.stan_przed[rodzaj], teraz = v.stan[rodzaj];
+  // Z3: przy kilku lokalach – wyposażenie / udogodnienia wybranego lokalu
+  const id = idWybranego(v), przed = listaLokalu(v.stan_przed, rodzaj, id), teraz = listaLokalu(v.stan, rodzaj, id);
   const kupno = pozycje.filter((p) => teraz.includes(p.nazwa) && !przed.includes(p.nazwa)).reduce((s, p) => s + p.cena, 0);
   const utrz = pozycje.filter((p) => teraz.includes(p.nazwa)).reduce((s, p) => s + p.utrzymanie, 0);
   const sprzedaz = pozycje.filter((p) => przed.includes(p.nazwa) && !teraz.includes(p.nazwa)).reduce((s, p) => s + p.cena / 2, 0);
-  return `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl(kupno)}</span></span>
+  return `${id ? `<div class="komunikat ok">${rodzaj === "wyposazenie" ? "Wyposażenie" : "Udogodnienia"} lokalu <b>${esc(nazwaLokalu(v, id))}</b>.</div>` : ""}
+    <div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl(kupno)}</span></span>
     <span>Koszt utrzymania: <span class="kwota">${zl(naRunde(utrz))}</span>${naOkres()}</span><span>Przychody ze sprzedaży: <span class="kwota">${zl(sprzedaz)}</span></span></div>
     <div class="siatka trojka" style="margin-top:20px">${pozycje.map((p) => {
       const mial = przed.includes(p.nazwa), ma = teraz.includes(p.nazwa);
@@ -216,11 +232,12 @@ export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
 
 export async function przelaczUdog(el, c) {
   const r = el.dataset.r, n = el.dataset.nazwa;
-  const mial = c.v.stan_przed[r].includes(n);
+  const id = idWybranego(c.v), mial = listaLokalu(c.v.stan_przed, r, id).includes(n);
   await c.zmien((d) => {
     const k = mial ? `${r}_sprzedaj` : `${r}_kup`;
-    const l = d[k] || [];
-    d[k] = l.includes(n) ? l.filter((x) => x !== n) : [...l, n];
+    const cel = id ? ((d.w_lokalu = d.w_lokalu || {})[id] = d.w_lokalu[id] || {}) : d;
+    const l = cel[k] || [];
+    cel[k] = l.includes(n) ? l.filter((x) => x !== n) : [...l, n];
   });
 }
 

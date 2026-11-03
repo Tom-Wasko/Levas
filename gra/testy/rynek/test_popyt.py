@@ -102,6 +102,10 @@ def test_gra_obsluga_dzien_po_dniu_i_wyniki_klientow(monkeypatch):
         assert sum(d["popyt"] for d in k["dni"]) == sum(v["popyt"] for v in w["sprzedaz"].values())
         assert sum(d["sprzedaz"] for d in k["dni"]) == sum(v["sprzedaz"] for v in w["sprzedaz"].values())
         assert sum(d["sprzedaz"] for d in k["dni"]) > 0
+        # Z3: przychód i składniki lokalu (zakładka Lokale → Przegląd); jeden lokal – cały przychód firmy
+        lok = k["lokale"][0]
+        assert lok["przychod"] == pytest.approx(sum(v["przychod"] for v in w["sprzedaz"].values()), abs=0.05)
+        assert lok["skladniki"] > 0
         pt, pn = k["dni"][4], k["dni"][0]
         assert pt["dzien"] == "pt" and pt["popyt"] > pn["popyt"]
     strefy = s.rynek[2]["strefy"]

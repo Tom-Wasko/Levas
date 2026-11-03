@@ -1,7 +1,7 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
 import { esc, godzina, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
   from "./zakladki/wspolne.js";
-import ZAKLADKI, { ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
+import ZAKLADKI, { ALIAS, ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
 import { kolko, zwinPodpowiedzi } from "./zakladki/dymki.js";
 
@@ -42,6 +42,7 @@ function ustaw(v, { poZapisie = false } = {}) {
   ustawKalendarz(v.gra.kalendarz);
   S.runda = v.runda;
   S.d = kopia(v.decyzje);
+  S.zakladka = docelowa(S.zakladka);
   const z = ZAKLADKI[S.zakladka];
   if (!z || !dostepna(z)) S.zakladka = "dashboard";
   if (S.tryb === "wyniki" && !maWyniki(ZAKLADKI[S.zakladka])) S.tryb = "decyzje";
@@ -94,13 +95,23 @@ const odbl = (k) => S.v.odblokowane.includes(k);
 const odRundy = (k) => S.v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];   // gra z lokalami: harmonogram gry (MG)
 function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "function" ? z.odblokowanie(S.v) : odbl(z.odblokowanie)); }
 const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd) && (!z.wynikiGdy || z.wynikiGdy(S.v)));
+// Z3: dawne zakładki (oferta, dostawcy, …) są częściami podzakładek Lokali – link prowadzi do podzakładki i jej części
+const docelowa = (k) => (ALIAS[k] && ZAKLADKI[ALIAS[k]] ? ALIAS[k] : k);
+function pokazCzesc(k) {
+  if (!ALIAS[k]) return;
+  const el = document.getElementById(`czesc-${k}`);
+  if (el) el.scrollIntoView({ block: "start" });
+}
 const kluczZakladki = (z) => Object.keys(ZAKLADKI).find((k) => ZAKLADKI[k] === z);
 
 // v, d i edycja zawsze bieżące – akcja po `await c.zmien(…)` (np. ponowne otwarcie okna) widzi zapisane decyzje
 const ctx = () => ({ get v() { return S.v; }, kat: S.kat, get d() { return S.d; },
   get edycja() { return S.v.edycja && !S.v.wyslane && !blokada(S.v); }, zmien, api, wczytaj, ustaw, rysuj,
   dostepna: (k) => !!ZAKLADKI[k] && dostepna(ZAKLADKI[k]), tytulZakladki: (k) => ZAKLADKI[k]?.tytul ?? k,
-  idz: (k, tryb) => { S.zakladka = k; S.tryb = tryb || (ZAKLADKI[k].decyzje ? "decyzje" : "wyniki"); rysuj(); } });
+  idz: (k, tryb) => {
+    const cel = docelowa(k);
+    S.zakladka = cel; S.tryb = tryb || (ZAKLADKI[cel].decyzje ? "decyzje" : "wyniki"); rysuj(); pokazCzesc(k);
+  } });
 
 // --- rysowanie ---------------------------------------------------------------------------------
 const widocznePod = (pod) => pod.filter((k) => !ZAKLADKI[k]?.ukryta?.(S.v));
@@ -260,12 +271,13 @@ function idzDoRundy(r) {
 document.addEventListener("click", async (e) => {
   const zak = e.target.closest("[data-zakladka], [data-zakladka-k]");
   if (zak && (zak.closest("#menu") || zak.dataset.pod || zak.dataset.zakladkaK)) {
-    const k = zak.dataset.zakladka || zak.dataset.zakladkaK;
-    if (!dostepna(ZAKLADKI[k])) return;
+    const stary = zak.dataset.zakladka || zak.dataset.zakladkaK, k = docelowa(stary);
+    if (!ZAKLADKI[k] || !dostepna(ZAKLADKI[k])) return;
     S.zakladka = k;
     S.tryb = ZAKLADKI[k].decyzje ? (S.v.edycja ? "decyzje" : maWyniki(ZAKLADKI[k]) ? "wyniki" : "decyzje") : "wyniki";
     rysuj();
     if (zak.closest("#menu")) window.scrollTo({ top: 0 });
+    pokazCzesc(stary);
     return;
   }
   if (e.target.closest(".logo")) { S.zakladka = "dashboard"; rysuj(); return; }
@@ -306,7 +318,7 @@ document.addEventListener("keydown", (e) => {
   try {
     S.kat = await api("/api/katalogi");
     const [h, tryb] = location.hash.slice(1).split("/");
-    if (ZAKLADKI[h]) S.zakladka = h;
+    if (ZAKLADKI[h]) S.zakladka = docelowa(h);
     if (tryb === "wyniki") S.tryb = "wyniki";
     await wczytaj();
   } catch (e) {
@@ -319,7 +331,7 @@ document.addEventListener("motyw", () => { if (S.v) rysuj(); });
 
 window.addEventListener("hashchange", () => {
   const [h, tryb] = location.hash.slice(1).split("/");
-  if (ZAKLADKI[h] && h !== S.zakladka) { S.zakladka = h; S.tryb = tryb === "wyniki" ? "wyniki" : "decyzje"; rysuj(); }
+  if (ZAKLADKI[h] && docelowa(h) !== S.zakladka) { S.zakladka = docelowa(h); S.tryb = tryb === "wyniki" ? "wyniki" : "decyzje"; rysuj(); pokazCzesc(h); }
 });
 export { S, okno, kluczZakladki };
 

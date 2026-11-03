@@ -1,6 +1,7 @@
 // Magazyn i świeżość: partie składników z terminami, pojemność chłodni i zamrażarki (silnik/kuchnia/swiezosc.py,
 // dane/zasoby.yaml, dane/sprzet.yaml) – w decyzjach plan dostaw, w wynikach dzień po dniu: dostawy, zużycie, straty.
-import { esc, gw, licz, nazwaUslugi, tabela, ulamek, wykres, zl2 } from "./wspolne.js";
+import { esc, gw, licz, nazwaUslugi, tabela, toast, ulamek, wykres, zl2 } from "./wspolne.js";
+import { idWybranego, mojeLokale, nazwaLokalu } from "./lokal_wybor.js";
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
 const MIEJSCE = { chlodnia: "Chłodnia", zamrazarka: "Zamrażarka", suche: "Suchy magazyn" };
@@ -89,6 +90,47 @@ function wynikiMenu(W, kat) {
     + `<p class="podpowiedz">Gdy dania nie ma w menu, część klientów zamawia coś innego, reszta idzie do konkurencji.</p>`;
 }
 
+
+// Z3: przewozy towaru z wybranego lokalu do innego własnego (silnik/nieruchomosci/per_lokal.py: przewozy) –
+// kurs (para lokali, jeden dzień) zajmuje czas właściciela i kosztuje; towar jedzie rano, termin krótszy.
+function przewozyHtml(v, S, edycja) {
+  const P = v.przewozy, id = idWybranego(v);
+  if (!P || !id) return "";
+  const zas = P.zasady;
+  if (!zas) return "";
+  const dzien = (i) => S.dni[i] ? `${S.dni[i].dzien} <span class="podpowiedz">${dataKrotka(S.dni[i].data)}</span>` : "–";
+  const lista = v.decyzje.przewozy || [];
+  const wiersze = lista.map((x, i) => [esc(nazwaLokalu(v, x.z)), esc(nazwaLokalu(v, x.do)), esc(x.zasob), x.jakosc ? gw(+x.jakosc) : "dowolna",
+    ulamek(+x.ilosc), dzien(+x.dzien || 0), `<button class="btn jasny maly" data-akcja="przewoz-usun" data-i="${i}" ${edycja ? "" : "disabled"}>✕ Usuń</button>`]);
+  const kursy = new Set(lista.map((x) => `${x.z}|${x.do}|${+x.dzien || 0}`)).size;
+  const inne = mojeLokale(v).filter((l) => l.id !== id);
+  const towar = {};
+  for (const p of S.partie) if (!p.wynajem) towar[`${p.zasob}|${p.jakosc}`] = (towar[`${p.zasob}|${p.jakosc}`] || 0) + p.ilosc;
+  const opcje = Object.entries(towar).sort().map(([k, n]) => { const [z, q] = k.split("|");
+    return `<option value="${esc(k)}">${esc(z)} ${"★".repeat(+q)} (${ulamek(n)} opak.)</option>`; }).join("");
+  const formularz = !edycja || !opcje ? "" : `<div class="formularz-przewozu">
+    <label class="pole">Do lokalu<select id="pz-do">${inne.map((l) => `<option value="${esc(l.id)}">${esc(nazwaLokalu(v, l.id))}</option>`).join("")}</select></label>
+    <label class="pole">Składnik<select id="pz-towar">${opcje}</select></label>
+    <label class="pole">Opakowania<input type="number" id="pz-ilosc" class="krotkie" min="0" step="1" value="1"></label>
+    <label class="pole">Dzień<select id="pz-dzien">${S.dni.map((d, i) => `<option value="${i}">${d.dzien} ${dataKrotka(d.data)}</option>`).join("")}</select></label>
+    <button class="btn czarny" data-akcja="przewoz-dodaj">Dodaj przewóz</button></div>`;
+  return `<div class="pasek">Przewóz towaru do innego lokalu</div>
+    <p class="podpowiedz">Właściciel wozi towar sam: jeden kurs (para lokali, jeden dzień) to ${licz(zas.czas_wlasciciela, 1)} h jego czasu
+    i ${zl2(zas.koszt_kursu)}. Towar jedzie rano, zanim przyjadą dostawy, i traci ${zas.skrocenie_terminu_dni} dzień terminu; wziąć można
+    tylko to, co dotarło do lokalu dzień wcześniej. ${v.runda < zas.od_rundy ? `<b>Przewozy – od rundy ${zas.od_rundy}.</b>` : ""}</p>`
+    + (wiersze.length ? tabela(`Zaplanowane przewozy (${kursy} ${kursy === 1 ? "kurs" : "kursy"} · ${zl2(kursy * zas.koszt_kursu)} · ${licz(kursy * zas.czas_wlasciciela, 1)} h)`,
+      ["Z lokalu", "Do lokalu", "Składnik", "Jakość", "Opakowania", "Dzień", ""], wiersze, { klasy: ["l", "l", "l"] }) : "")
+    + (P.uwagi || []).map((u) => `<div class="komunikat">${esc(u)}</div>`).join("") + formularz;
+}
+
+function wynikiPrzewozow(v, W) {
+  const P = W.przewozy || [];
+  if (!P.length) return "";
+  return tabela("Przewozy towaru między lokalami", ["Dzień", "Z lokalu", "Do lokalu", "Składnik", "Zaplanowano", "Przewieziono"],
+    P.map((x) => [W.dni[x.dzien] ? dataKrotka(W.dni[x.dzien]) : "–", esc(nazwaLokalu(v, x.z)), esc(nazwaLokalu(v, x.do)), esc(x.zasob), ulamek(x.ilosc),
+      x.przewiezione + 1e-9 < x.ilosc ? `<span class="minus">${ulamek(x.przewiezione)}</span>` : ulamek(x.przewiezione)]), { klasy: ["l", "l", "l", "l"] });
+}
+
 export const swiezosc = {
   tytul: "Świeżość", tytulPelny: "Magazyn i świeżość", ikona: "swiezosc", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
   info: `Składniki mają termin przydatności: bułka z poniedziałku ląduje w koszu we wtorek wieczorem, mięso wytrzyma cztery dni, mrożonki – miesiące.
@@ -96,8 +138,9 @@ export const swiezosc = {
     w szafie chłodniczej i zamrażarce – nadmiar jedzie do wynajętej chłodni (płacisz za litr, a termin się skraca).
     Dużo towaru w wynajmie i przeterminowane jedzenie w koszu przyciągają sanepid. Mrożona pita i mrożone mięso zastępują świeże, gdy tych zabraknie,
     ale klienci to czują (−1★ jakości składnika).`,
-  decyzje({ v }) {
-    const S = v.swiezosc;
+  decyzje({ v, edycja }) {
+    const id = idWybranego(v);   // Z3: kilka lokali – magazyn wybranego lokalu
+    const S = (id && v.swiezosc?.lokale?.[id]) || v.swiezosc;
     if (!S) return `<p class="podpowiedz">Brak danych o magazynie.</p>`;
     const koniec = S.dni[S.dni.length - 1].data;
     const wygasa = S.partie.filter((p) => p.termin && p.termin <= koniec);
@@ -106,7 +149,8 @@ export const swiezosc = {
       <span>Partie kończące termin w tej rundzie: <span class="kwota">${wygasa.length}</span></span></div>`
       + (S.pojemnosc.chlodnia || S.pojemnosc.zamrazarka ? "" : `<div class="komunikat">Nie masz szafy chłodniczej ani zamrażarki – kup je w zakładce Sprzęt, inaczej mięso będzie trzymane na parapecie.</div>`)
       + zajetoscHtml(S) + planWynajmuHtml(S) + ryzykoHtml(v.magazyn)
-      + (S.partie.length ? partieHtml(S, S.dni) : `<p class="podpowiedz">Magazyn jest pusty.</p>`);
+      + (S.partie.length ? partieHtml(S, S.dni) : `<p class="podpowiedz">Magazyn${id ? " tego lokalu" : ""} jest pusty.</p>`)
+      + przewozyHtml(v, S, edycja);
   },
   wyniki({ v, kat }) {
     const W = v.wyniki?.swiezosc;
@@ -114,7 +158,7 @@ export const swiezosc = {
     return `<div class="pasek ciemny"><span>Wartość strat: <span class="kwota">${zl2(W.wartosc_strat)}</span></span>
       <span>Wyrzucone partie: <span class="kwota">${W.straty.length}</span></span></div>`
       + wynikiZasoby(W) + `<div class="wykres"><canvas id="w-swiezosc"></canvas></div>` + wynikiStraty(W)
-      + wynikiMagazynu(W, v.wyniki?.magazyn) + wynikiMenu(W, kat);
+      + wynikiPrzewozow(v, W) + wynikiMagazynu(W, v.wyniki?.magazyn) + wynikiMenu(W, kat);
   },
   po({ v }, tryb) {
     const W = v.wyniki?.swiezosc;
@@ -122,5 +166,16 @@ export const swiezosc = {
     wykres("w-swiezosc", "bar", W.dni.map((d) => dataKrotka(d)), [
       { label: "Chłodnia – zajęte litry (wieczorem)", data: W.zajetosc.map((z) => z.chlodnia) },
       { label: "Zamrażarka – zajęte litry (wieczorem)", data: W.zajetosc.map((z) => z.zamrazarka) }]);
+  },
+  akcje: {
+    "przewoz-dodaj": (el, c) => {
+      const [zasob, q] = document.getElementById("pz-towar").value.split("|");
+      const ilosc = Math.max(0, +document.getElementById("pz-ilosc").value || 0);
+      if (!(ilosc > 0)) return toast("Podaj liczbę opakowań większą od zera.");
+      const x = { z: idWybranego(c.v), do: document.getElementById("pz-do").value, zasob, jakosc: +q, ilosc,
+        dzien: +document.getElementById("pz-dzien").value };
+      return c.zmien((d) => { d.przewozy = [...(d.przewozy || []), x]; });
+    },
+    "przewoz-usun": (el, c) => c.zmien((d) => { d.przewozy = (d.przewozy || []).filter((_, i) => i !== +el.dataset.i); }),
   },
 };

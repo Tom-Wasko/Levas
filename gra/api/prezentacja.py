@@ -23,6 +23,7 @@ from silnik.kuchnia.dostawcy import info as info_dostawcy
 from silnik.ludzie import czas_wlasciciela as cw
 from silnik.ludzie import rynek_pracy as rp
 from silnik.model import Firma, do_slownika
+from silnik.nieruchomosci import per_lokal as pl
 from silnik.nieruchomosci import przejecia as pr
 from silnik.nieruchomosci.lokale import (
     dostepne,
@@ -234,6 +235,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                              else wr.get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
     v["wlasciciel_stanowisko"] = ((info or {}).get("wlasciciel_stanowisko") if edycja
                                   else wr.get("wlasciciel_stanowisko"))
+    if len(f.lokale) > 1:   # Z3: przewozy towaru między lokalami (zakładka Lokale → Dostawy i magazyn)
+        v["przewozy"] = {"zasady": pl.zasady_przewozu(dane), "przyjete": (info or {}).get("przewozy", []) if edycja else [],
+                         "uwagi": (info or {}).get("uwagi_przewozow", []) if edycja else []}
     v["agencja"] = _agencja(gra, firma, runda, f, stan, edycja)
     zam = ((info.get("kampanie") or {}) if edycja else (wr.get("reklama_agencje") or {}))
     v["reklama"] = rk.widok(dane, f, runda, poprzedni.rynek.get(runda - 1), zam.get("zamowione"))

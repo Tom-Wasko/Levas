@@ -1,5 +1,6 @@
 // Sprzedaż: cennik i rabaty, wyniki sprzedaży na tle konkurencji.
 import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wykres, zl, zl2 } from "./wspolne.js";
+import { cenyLokalu, lokalWybrany, menuLokalu, nazwaLokalu, wieleLokali, zapiszWLokalu } from "./lokal_wybor.js";
 
 const grosze = (x) => Math.round(x * 100) / 100;
 
@@ -15,10 +16,11 @@ export const sprzedaz = {
   tytul: "Sprzedaż", ikona: "🛒", odblokowanie: "sprzedaz",
   info: "Ustal ceny dań gotowych do sprzedaży. Danie jest gotowe, gdy masz sprzęt, pracowników, obsadzoną kasę i składniki. Klient płaci cenę pomniejszoną o rabat.",
   decyzje({ v, kat, edycja }) {
-    const gotowe = v.stan.gotowe_uslugi, ceny = v.stan.ceny;
-    if (!Object.keys(v.stan.oferta).length) return `<div class="komunikat">Najpierw wybierz dania w zakładce Oferta.</div>`;
+    // Z3: przy kilku lokalach – ceny wybranego lokalu (dania z jego menu)
+    const lok = lokalWybrany(v), gotowe = v.stan.gotowe_uslugi, ceny = cenyLokalu(v, lok), menu = menuLokalu(v, lok);
+    if (!Object.keys(menu).length) return `<div class="komunikat">Najpierw wybierz dania do menu${wieleLokali(v) ? " tego lokalu" : ""}.</div>`;
     const rynek = v.rynek?.ceny || {};
-    const w = Object.keys(v.stan.oferta).map((u) => {
+    const w = Object.keys(menu).map((u) => {
       const k = kat.uslugi[u], c = ceny[u], braki = gotowe[u] || [];
       const inni = Object.entries(rynek[u] || {}).filter(([f]) => f !== v.firma).map(([, x]) => x);
       const sr = inni.length ? inni.reduce((a, b) => a + b, 0) / inni.length : null;
@@ -31,7 +33,8 @@ export const sprzedaz = {
         wl ? `${zl2(c.cena - c.rabat)} <span class="podpowiedz">(${proc((c.cena - c.rabat) / k.cena_preferowana, 0)} pref.)</span>` : ""];
     });
     const g = kat.mapa?.menu?.ceny;
-    return tabela(null, ["Danie", "Preferowana cena", "Średnia cena konkurencji (poprz. runda)", "Sprzedaż", "Cena", "Rabat", "Cena dla klienta"], w, { klasy: ["l"] })
+    return (wieleLokali(v) ? `<div class="komunikat ok">Ceny w lokalu <b>${esc(nazwaLokalu(v, lok.id))}</b>.</div>` : "")
+      + tabela(null, ["Danie", "Preferowana cena", "Średnia cena konkurencji (poprz. runda)", "Sprzedaż", "Cena", "Rabat", "Cena dla klienta"], w, { klasy: ["l"] })
       + `<p class="podpowiedz">Cena wpływa na popyt i na zadowolenie klientów. Niższa cena od konkurencji przyciąga klientów, a im więcej lokali ma danie w menu, tym mniej klientów przypada na każdą.${g ? ` Cena musi mieścić się w widełkach: od ${proc(g.min, 0)} do ${proc(g.max, 0)} ceny rynkowej (cena dla klienta po rabacie – nie niżej niż dolna granica).` : ""}</p>`;
   },
   wyniki({ v, kat }) {
@@ -62,10 +65,10 @@ export const sprzedaz = {
   },
   akcje: {
     "wlacz-sprzedaz": (el, c) => c.zmien((d) => {
-      const u = el.dataset.u, ceny = { ...c.v.stan.ceny };
+      const u = el.dataset.u, ceny = { ...cenyLokalu(c.v, lokalWybrany(c.v)) };
       if (ceny[u]) delete ceny[u];
       else ceny[u] = { cena: c.kat.uslugi[u].cena_preferowana, rabat: 0 };
-      d.sprzedaz = ceny;
+      zapiszWLokalu(d, c.v, "sprzedaz", ceny);
     }),
   },
   zmiany: {
@@ -76,8 +79,12 @@ export const sprzedaz = {
         cena = Math.min(wd.max, Math.max(wd.min, cena));
         toast(`${nazwaUslugi(c.kat, u)}: cena musi być między ${zl2(wd.min)} a ${zl2(wd.max)} – ustawiono ${zl2(cena)}.`);
       }
-      return c.zmien((d) => { d.sprzedaz = { ...c.v.stan.ceny, [u]: { ...c.v.stan.ceny[u], cena } }; });
+      const ceny = cenyLokalu(c.v, lokalWybrany(c.v));
+      return c.zmien((d) => { zapiszWLokalu(d, c.v, "sprzedaz", { ...ceny, [u]: { ...ceny[u], cena } }); });
     },
-    rabat: (el, c) => c.zmien((d) => { d.sprzedaz = { ...c.v.stan.ceny, [el.dataset.u]: { ...c.v.stan.ceny[el.dataset.u], rabat: Math.max(0, +el.value || 0) } }; }),
+    rabat: (el, c) => {
+      const u = el.dataset.u, ceny = cenyLokalu(c.v, lokalWybrany(c.v));
+      return c.zmien((d) => { zapiszWLokalu(d, c.v, "sprzedaz", { ...ceny, [u]: { ...ceny[u], rabat: Math.max(0, +el.value || 0) } }); });
+    },
   },
 };

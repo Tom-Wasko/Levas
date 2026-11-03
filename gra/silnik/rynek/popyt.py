@@ -253,6 +253,9 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
             widoki.setdefault(lok, widok_lokalu(firma, lok))
         przew = (przewozy or {}).get(f, [])
         sprzedaz_lokalu = {lok: 0 for lok in lokale}
+        # Z3: przychód (ceny lokalu, bez promocji) i wartość zużytych składników każdego lokalu – zakładka Lokale
+        przychod_lokalu = {lok: 0.0 for lok in lokale}
+        skladniki_lokalu = {lok: 0.0 for lok in lokale}
         przych = przychod[f] = {}
         raport = _raport_swiezosci(dane, firma, dni)
         raport["przewozy"] = []
@@ -290,6 +293,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     dzienne[u]["popyt"][i] += d[u]
                     dzienne[u]["sprzedaz"][i] += k
                     sprzedaz_lokalu[lok] += k
+                    przychod_lokalu[lok] += k * lokale[lok][u]["cena"]
                     if promo is not None:
                         _rozlicz_promocje(promo, u, k, lokale[lok][u], pod[(f, lok)][u], i)
                     else:
@@ -301,6 +305,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     x = laczna["zuzyte_zasoby"].setdefault(n, {"ilosc": 0.0, "wartosc": 0.0})
                     x["ilosc"] += z["ilosc"]
                     x["wartosc"] += z["wartosc"]
+                    skladniki_lokalu[lok] += z["wartosc"]
                 for klucz in ("godziny_stanowisk", "godziny_sprzetu"):
                     for k, h in o[klucz].items():
                         laczna[klucz][k] = laczna[klucz].get(k, 0.0) + h
@@ -335,6 +340,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     zrodla.setdefault(z, {})[f] = zrodla.get(z, {}).get(f, 0.0) + x
             lokale_wynik.append({"id": lok, "nazwa": dane.lokale[lok]["nazwa"], "strefa": dane.lokale[lok]["strefa"],
                                  "popyt": sum(sum(dd.values()) for dd in dzien_popyt[lok]), "sprzedaz": sprzedaz_lokalu[lok],
+                                 "przychod": round(przychod_lokalu[lok], 2), "skladniki": round(skladniki_lokalu[lok], 2),
                                  "dania": {u: sum(dd[u] for dd in dzien_popyt[lok]) for u in dania},
                                  "strefy": {z: int(round(x)) for z, x in sorted(strefy_lok.items(), key=lambda t: -t[1]) if round(x)}})
         klienci[f] = {"dni": [{"data": dni[i].isoformat(), "dzien": dane.mapa["popyt"]["dni_tygodnia"]["nazwy"][dni[i].weekday()],

@@ -1,5 +1,6 @@
 // Oferta: wybór dań (menu) i prognoza popytu.
 import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, tabela, toast, wykres, zl } from "./wspolne.js";
+import { lokalWybrany, menuLokalu, nazwaLokalu, wieleLokali, zapiszWLokalu } from "./lokal_wybor.js";
 
 const kategorie = (kat) => [...new Set(Object.values(kat.uslugi).map((u) => u.kategoria))];  // kolejność jak w uslugi.yaml
 const JAK = { 1: "Niska", 2: "Średnia", 3: "Wysoka" };
@@ -20,12 +21,14 @@ export const oferta = {
     : v.runda < kat.oferty.rundy.nowe_uslugi_od_rundy ? "W rundzie 2 sprzedajesz dania wybrane w rundzie 1. Nowe dania można dodawać od rundy 3."
     : `Wybierz dania do menu i określ ich ${popytOkresu()}. W każdej rundzie będzie można uruchamiać maksymalnie ${kat.oferty.rundy.nowe_uslugi_na_runde} nowe dania.`,
   decyzje({ v, kat, edycja }) {
-    const wybrane = v.stan.oferta, przed = v.stan_przed.oferta, r = v.runda;
+    // Z3: przy kilku lokalach – menu wybranego lokalu; limit nowych dań liczony dla całej firmy (suma menu lokali)
+    const wybrane = menuLokalu(v, lokalWybrany(v)), przed = v.stan_przed.oferta, r = v.runda;
     const m = miesiacSprzedazy(r);
     const limit = limitNowych(kat, r);
-    const nowe = Object.keys(wybrane).filter((u) => !(u in przed)).length;
+    const nowe = Object.keys(v.stan.oferta).filter((u) => !(u in przed)).length;
     const okres = r === 1 ? `prognoza na ${esc(nazwaRundy(2))} – sprzedaż zaczyna się w rundzie 2` : esc(v.miesiac);
-    let html = `<div class="komunikat">Nowe dania w tej rundzie: <b>${nowe} / ${limit}</b>. ${v.popyt
+    let html = `${wieleLokali(v) ? `<div class="komunikat ok">Menu lokalu <b>${esc(nazwaLokalu(v, lokalWybrany(v).id))}</b> – prognoza popytu tylko dla tego lokalu.</div>` : ""}
+      <div class="komunikat">Nowe dania w tej rundzie (cała firma): <b>${nowe} / ${limit}</b>. ${v.popyt
       ? `Prognozę popytu (${okres}) policz sam: ilu klientów stref może przyjść do Twoich lokali przy Twoich cenach, cenach konkurencji i dniach tygodnia – dane w zakładce <a data-zakladka-k="klienci">Klienci i strefy</a>.`
       : `Prognozowany popyt = popyt roczny / ${OKRES.rund_w_roku} × sezonowość (${okres}).`}</div>`;
     for (const k of kategorie(kat)) {
@@ -33,7 +36,7 @@ export const oferta = {
       html += `<div class="pasek">${k}</div><div class="siatka trojka">`;
       for (const [klucz, u] of uslugi) {
         const jest = klucz in wybrane;
-        const dozwolona = (r > 1 || kat.oferty.rundy.uslugi_startowe.includes(klucz)) && (klucz in przed || nowe < limit || jest);
+        const dozwolona = (r > 1 || kat.oferty.rundy.uslugi_startowe.includes(klucz)) && (klucz in przed || klucz in v.stan.oferta || nowe < limit || jest);
         const baza = prognozaDania(v, kat, klucz, m);
         html += `<div class="kafel ${jest ? "wybrany" : ""}">
           <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span></div>
@@ -91,20 +94,22 @@ export const oferta = {
     },
     usluga: async (el, c) => {
       const u = el.dataset.u, r = c.v.runda;
-      const of = { ...c.v.stan.oferta };
+      const of = { ...menuLokalu(c.v, lokalWybrany(c.v)) };
       if (u in of) delete of[u];
       else {
         const limit = limitNowych(c.kat, r);
-        // limit dotyczy przyrostu liczby dań (usunięte danie zwalnia miejsce na nowe)
-        const przyrost = Object.keys(of).length - Object.keys(c.v.stan_przed.oferta).length;
-        if (!(u in c.v.stan_przed.oferta) && przyrost >= limit) return toast(`W tej rundzie liczba dań może wzrosnąć najwyżej o ${limit}.`);
+        // limit dotyczy przyrostu liczby dań firmy (usunięte danie zwalnia miejsce na nowe; danie z innego lokalu – bez limitu)
+        const przyrost = Object.keys(c.v.stan.oferta).length - Object.keys(c.v.stan_przed.oferta).length;
+        if (!(u in c.v.stan_przed.oferta) && !(u in c.v.stan.oferta) && przyrost >= limit) return toast(`W tej rundzie liczba dań może wzrosnąć najwyżej o ${limit}.`);
         of[u] = prognozaDania(c.v, c.kat, u, miesiacSprzedazy(r));
       }
-      await c.zmien((d) => { d.oferta = of; });
+      await c.zmien((d) => { zapiszWLokalu(d, c.v, "oferta", of); });
     },
   },
   zmiany: {
-    prognoza: async (el, c) => c.zmien((d) => { d.oferta = { ...c.v.stan.oferta, [el.dataset.u]: Math.max(0, Math.round(+el.value || 0)) }; }),
+    prognoza: async (el, c) => c.zmien((d) => {
+      zapiszWLokalu(d, c.v, "oferta", { ...menuLokalu(c.v, lokalWybrany(c.v)), [el.dataset.u]: Math.max(0, Math.round(+el.value || 0)) });
+    }),
   },
 };
 
