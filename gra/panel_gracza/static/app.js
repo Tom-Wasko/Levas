@@ -336,7 +336,7 @@ window.addEventListener("hashchange", () => {
 export { S, okno, kluczZakladki };
 
 // --- drużyna: zmiany innych osób i przeliczenie rundy pojawiają się same -------------------------
-const ODSWIEZANIE_MS = 20000, ODSWIEZANIE_HANDLU_MS = 5000;   // w zakładce Handel – negocjacje na żywo (P13)
+const ODSWIEZANIE_MS = 20000, ODSWIEZANIE_HANDLU_MS = 5000;   // w zakładce Handel z drużynami – negocjacje na żywo (P13)
 async function sprawdzZmiany() {
   const v = S.v;
   if (!v || document.hidden || document.querySelector(".zaslona") || v.gra.zakonczona) return;

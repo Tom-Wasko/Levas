@@ -114,7 +114,10 @@ export const dashboard = {
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}
         <div class="maly-tekst">${v.gra.zakonczona ? "Gra zakończona" : `Bieżąca runda: ${v.gra.runda}`} · ${v.gra.firmy.length + stali.length} firm na rynku</div>
         ${rynek ? `<div class="podpowiedz">${rynek}</div>` : ""}</div>`)}
-      ${kafel("Dochód netto", "wykres", `<span class="${d.dochod_netto < 0 ? "minus" : ""}">${zl(d.dochod_netto)}</span>`)}
+      ${kafel("Dochód netto", "wykres", d.dochod_netto == null && v.ksiegowosc?.ukryte   // U7: ukryty do złożenia deklaracji
+        ? `<div class="maly-tekst">Księgujesz sam – dochód tej rundy poznasz po złożeniu deklaracji albo wybierz biuro.</div>
+           <button class="btn jasny maly" data-akcja="popraw" data-z="biuro">Księgowość ▸ Biuro rachunkowe</button>`
+        : `<span class="${d.dochod_netto < 0 ? "minus" : ""}">${zl(d.dochod_netto)}</span>`)}
       ${kafel("Saldo konta", "portfel", zl(d.saldo))}
       ${kafel("Minimalne wynagrodzenie brutto", "zatrudnienie", `${licz(kat.placa_minimalna)} PLN / miesiąc`
         + (OKRES.rund_w_roku === 12 ? "" : `<div class="maly-tekst">≈ ${licz(naRunde(kat.placa_minimalna))} PLN${naOkres()}</div>`))}

@@ -50,6 +50,12 @@ def _wszystkie_teksty():
         for plik in sorted((GRA / katalog).rglob("*.py")):
             for nr, t in _teksty_py(plik):
                 yield f"{plik.relative_to(GRA)}:{nr}", " ".join(t.split())
+    menu = "|".join(sorted(map(re.escape, _tytuly()[0]), key=len, reverse=True))
+    for plik in sorted((GRA / "panel_gracza" / "static").rglob("*.js")):   # panel: też „Menu → zakładka” (bez strzałek w schematach)
+        if "vendor" not in plik.parts:
+            for nr, linia in enumerate(plik.read_text(encoding="utf-8").splitlines(), 1):
+                if not linia.lstrip().startswith("//"):
+                    yield f"{plik.relative_to(GRA)}:{nr}", re.sub(rf"\b({menu}) → ", r"\1 ▸ ", re.sub(r"<[^>]+>", "", linia))
     for plik in sorted((GRA / "dane").rglob("*.yaml")):
         for t in _teksty_yaml(yaml.safe_load(plik.read_text(encoding="utf-8"))):
             yield str(plik.relative_to(GRA)), " ".join(t.split())

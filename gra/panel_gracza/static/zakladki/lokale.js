@@ -46,7 +46,7 @@ function jakUruchomic(kat, lok) {
   const rund = lok.typ === "dzialka" ? lok.budowa_rund : kat.mapa.zasady.urzadzanie_rund;
   const kiedy = rund > 1 ? `w ostatniej rundzie ${lok.typ === "dzialka" ? "budowy" : "urządzania"} (${rund}. po wzięciu)` : "już w rundzie wzięcia";
   return `<p class="podpowiedz"><b>Jak uruchomić:</b> ${lok.typ === "dzialka" ? `budowa trwa ${rund} ${rund === 1 ? "rundę" : "rundy"} – lokal nie sprzedaje i nie płaci mediów, płacisz raty budowy. ` : `urządzanie trwa ${rund === 1 ? "1 rundę" : `${rund} rundy`}. `}`
-    + `Lokal jest pusty: ${kiedy} kup stanowiska kuchni i kasy (Inwestycje), sprzęt na stanowiska i zatrudnij pracowników (Kadry) – w pierwszej rundzie działania lokal od razu sprzedaje.</p>`;
+    + `Lokal jest pusty: ${kiedy} kup stanowiska kuchni i kasy oraz sprzęt na stanowiska (Lokale ▸ Sprzęt) i zatrudnij pracowników (Lokale ▸ Ludzie) – w pierwszej rundzie działania lokal od razu sprzedaje.</p>`;
 }
 
 // przyciski Wynajmij / Kup (okno mapy i kafel oferty)

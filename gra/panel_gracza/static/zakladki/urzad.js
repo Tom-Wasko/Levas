@@ -31,7 +31,7 @@ export const urzad = {
   info: `Firma jest zarejestrowana, ale każdy lokal przed pierwszą sprzedażą musi odebrać sanepid – bez porządnego sprzątania
     odbioru nie będzie. Higiena kosztuje co rundę za każdy działający lokal i zmienia kontrole: lepsza zmniejsza szansę, że
     kontrola przyczepi się do wynajętej chłodni albo przeterminowanego towaru. Skargi z historii ściągają sanepid częściej.
-    Ryzyko kontroli widać też w zakładce <a data-zakladka-k="swiezosc">Magazyn i świeżość</a>, a braki w decyzjach –
+    Ryzyko kontroli widać też w zakładce <a data-zakladka-k="swiezosc">Dostawy i magazyn</a>, a braki w decyzjach –
     na <a data-zakladka-k="lista_bledow">liście błędów</a>.`,
   decyzje({ v, edycja }) {
     const U = v.urzad;

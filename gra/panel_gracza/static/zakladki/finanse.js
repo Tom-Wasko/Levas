@@ -20,8 +20,8 @@ const GRUPY = [
 ];
 
 // Samodzielna księgowość (silnik/ksiegowosc/biuro.py): wynik podatkowy rundy – dopiero po deklaracjach drużyny.
-export const UKRYTE = `<div class="komunikat">Księgujesz sam: KPiR, VAT i podatki za tę rundę zobaczysz po złożeniu deklaracji
-  (Finanse → Biuro rachunkowe) i przeliczeniu rundy.</div>`;
+export const UKRYTE = `<div class="komunikat">Księgujesz sam: dochód, KPiR, VAT i podatki za tę rundę zobaczysz po złożeniu deklaracji
+  (<a data-zakladka-k="biuro">Księgowość ▸ Biuro rachunkowe</a>) i przeliczeniu rundy – albo wybierz tam biuro, które rozliczy rundę od razu.</div>`;
 
 function koszty(k) {
   const wynik = GRUPY.map(([n, f]) => [n, k.pozycje.reduce((s, p) => s + f(p), 0)]);
@@ -92,7 +92,7 @@ export const kpir = {
       + tabela(null, ["", "Kwota"], [["Dochód do opodatkowania", zl2(k.dochod)], ...(R
         ? [["Zaliczka na PIT", zl2(R.zaliczka)], ["Składka zdrowotna", zl2(R.zdrowotna)]]   // JDG – zakładka Podatki
         : [["Podatek", zl2(k.podatek)]]), ["Dochód netto", zl2(k.dochod_netto)]], { klasy: ["l", "r"] })
-      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Finanse → VAT.</p>` : "") + LEKCJA_KPIR;
+      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Księgowość ▸ VAT.</p>` : "") + LEKCJA_KPIR;
   },
 };
 
@@ -311,7 +311,7 @@ function wynikiKsiegowosci({ v }) {
         zle.map((x) => [`${esc(x.typ)}: ${esc(x.opis)}`, zl2(x.brutto), x.bledy.map(esc).join("<br>")]), { klasy: ["l", "r", "l"] });
     }
   }
-  if (W.samodzielnie) html += `<p class="podpowiedz">Dokumenty tej rundy czekają na zaksięgowanie – zakładka Decyzje.</p>`;
+  if (W.samodzielnie) html += `<p class="podpowiedz">Dokumenty tej rundy czekają na zaksięgowanie – przełącz tę zakładkę na „Decyzje”.</p>`;
   return html || `<p class="podpowiedz">Brak rozliczeń w tej rundzie.</p>`;
 }
 
