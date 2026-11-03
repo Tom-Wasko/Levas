@@ -30,9 +30,13 @@ const naglowek = (s) => `<h3>${esc(s.tytul)}</h3>`;
 function scenaHtml(s, wybor, edycja) {
   const opcje = s.opcje.map((o) => {
     const wybrana = (wybor ?? s.domyslna) === o.id;
-    const etykieta = `${esc(o.tekst)}${o.id === s.domyslna ? " <small>(domyślnie)</small>" : ""}<br><small>${kosztTekst(o.koszt)}</small>`;
-    return edycja ? `<button class="btn ${wybrana ? "zielony" : "jasny"}" data-akcja="zd-wybierz" data-h="${esc(s.historia)}" data-o="${esc(o.id)}"
-        style="text-align:left;margin:4px 0;width:100%">${etykieta}</button>`
+    // U8: opcja, na którą nie starcza wolnych godzin właściciela (po scenach powyżej) – wyszarzona z wyjaśnieniem
+    const brak = edycja && o.koszt?.czas && s.wolne != null && o.koszt.czas > s.wolne + 1e-9;
+    const etykieta = `${esc(o.tekst)}${o.id === s.domyslna ? " <small>(domyślnie)</small>" : ""}<br><small>${kosztTekst(o.koszt)}</small>`
+      + (brak ? `<br><small class="minus">Wymaga ${licz(o.koszt.czas, 1)} h, masz wolne ${licz(s.wolne, 1)} h${wybrana
+        ? ` – bez zmiany gra wykona reakcję domyślną` : ""}.</small>` : "");
+    return edycja ? `<button class="btn ${wybrana ? (brak ? "jasny" : "zielony") : "jasny"}" data-akcja="zd-wybierz" data-h="${esc(s.historia)}" data-o="${esc(o.id)}"
+        ${brak && !wybrana ? "disabled " : ""}style="text-align:left;margin:4px 0;width:100%${wybrana && brak ? ";border:2px solid var(--czerwony)" : ""}">${etykieta}</button>`
       : `<div class="wiersz"><span>${wybrana ? "▶ " : ""}${etykieta}</span></div>`;
   }).join("");
   return `<div class="karta">${naglowek(s)}<p class="podpowiedz">${s.nowa ? (s.park ? "Nowe wydarzenie w parku" : s.wypadek ? "Wypadek w lokalu" : "Nowe wydarzenie w lokalu") : "Ciąg dalszy"}</p>

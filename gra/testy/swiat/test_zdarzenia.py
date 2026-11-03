@@ -86,6 +86,25 @@ def test_brak_czasu_wlasciciela(zbyszek, monkeypatch):
     assert any(b["poziom"] == "czerwony" and b["zakladka"] == "zdarzenia" for b in s.wyniki[2]["A"]["lista_bledow"])
 
 
+def test_podglad_pokazuje_wolne_godziny_i_ostrzega_przed_wyslaniem(client, zbyszek, monkeypatch):
+    d = {"nazwa": "Parki", "ziarno": "5", "liczba_rund": 6, "firmy": [{"nazwa": "A", "bot": None}]}
+    gra = client.post("/api/gry", d, content_type=JSON).json()["id"]
+    v = client.get(f"/api/gry/{gra}/widok/A").json()
+    client.put(f"/api/gry/{gra}/decyzje/A", {**v["decyzje"], **_lokal("centrum_3")}, content_type=JSON)
+    client.post(f"/api/gry/{gra}/przelicz")
+    v = client.get(f"/api/gry/{gra}/widok/A").json()
+    pula = v["czas_wlasciciela"]["pula"]   # skutek zdarzenia zabiera cały tydzień poza 1 h
+    monkeypatch.setattr(zd, "efekty_czasu", lambda f, r: [Efekt(typ="czas", wartosc=pula - 1, od_rundy=r, do_rundy=r,
+                                                                 opis="Test")])
+    client.put(f"/api/gry/{gra}/decyzje/A", {**v["decyzje"], "zdarzenia": {"pan_zbyszek": "kebab"}}, content_type=JSON)
+    v = client.get(f"/api/gry/{gra}/widok/A").json()
+    s = v["zdarzenia"]["aktywne"][0]
+    kebab = next(o for o in s["opcje"] if o["id"] == "kebab")
+    assert s["wolne"] == 1 < kebab["koszt"]["czas"]
+    b = next(b for b in v["lista_bledow"] if b["zakladka"] == "zdarzenia")
+    assert b["poziom"] == "czerwony" and "wymaga" in b["tekst"] and "wybierz inną reakcję" in b["tekst"]
+
+
 def test_skutki_popytu_i_czasu():
     f = Firma(nazwa="X", gotowka=0)
     zd._skutek(f, {"typ": "popyt", "mnoznik": 1.1, "rund": 2, "opis": "Sława"}, "h", 5, None, None, [])

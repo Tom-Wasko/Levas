@@ -258,6 +258,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                               (v.get("wyniki") or {}).get("przejecia"))
     if dane.zdarzenia:
         v["zdarzenia"] = zd.widok(dane, poprzedni.firmy[firma], runda, gra.konfiguracja["ziarno"], poprzedni.wyniki, firma)
+        wolne = {w["historia"]: w.get("wolne_przed") for w in ((info or {}).get("zdarzenia") or {}).get("sceny", [])}
+        for s in v["zdarzenia"]["aktywne"] if edycja else []:   # U8: godziny wolne na tę scenę (po wcześniejszych)
+            s["wolne"] = wolne.get(s["historia"])
     if aw.dane_wypadkow(dane):
         v["ubezpieczenia"] = aw.widok(dane, f, runda, info.get("ubezpieczenia") if edycja
                                       else wr.get("ubezpieczenia"), poprzedni.wyniki, firma)

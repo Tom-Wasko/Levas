@@ -126,10 +126,16 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
         if sc["opcje"]:
             opcje = {o["id"]: o for o in sc["opcje"]}
             o = opcje.get(wybory.get(h["id"])) or opcje[sc["domyslna"]]
+            wolne = czas.wolne
+            if podglad:   # U8: zakładka wyszarza opcje, na które nie starcza godzin (po scenach wcześniejszych)
+                wpis["wolne_przed"] = wolne
             if o["koszt"]["czas"] and not czas.wez(o["koszt"]["czas"], f"{h['tytul']}: {o['tekst']}", ZAKLADKA):
+                domyslna = opcje[sc["domyslna"]]["tekst"]
                 wynik["bledy"].append({"poziom": "czerwony", "zakladka": ZAKLADKA, "tekst":
                                        f"„{h['tytul']}”: nie starcza czasu właściciela na „{o['tekst']}” "
-                                       f"({cw.godziny(o['koszt']['czas'])} h) – gra wybrała „{opcje[sc['domyslna']]['tekst']}”."})
+                                       f"(wymaga {cw.godziny(o['koszt']['czas'])} h, wolne {cw.godziny(wolne)} h) – "
+                                       + (f"wybierz inną reakcję albo zwolnij czas, inaczej gra wykona „{domyslna}”."
+                                          if podglad else f"gra wybrała „{domyslna}”.")})
                 o = opcje[sc["domyslna"]]
             elif podglad and h["id"] not in wybory:   # tylko przy decyzjach (w wynikach rundy to bez sensu)
                 wynik["bledy"].append({"poziom": "niebieski", "zakladka": ZAKLADKA, "tekst":
