@@ -3,14 +3,15 @@
 opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku), jakość, docelowa liczba dań, pokrycie popytu,
   wyposażenie i udogodnienia (sztuki), reklama (medium → emisje), internet, szkolenia; gra z lokalami: kampanie
   (agencja/kanał z mapa/reklama.yaml) zamiast reklamy i internetu, bufor_kampanii – gotówka po kampaniach,
-  min_sila_kampanii – słabszej kampanii (po powtórkach) bot nie zamawia; promocje (typ z mapa/promocje.yaml
+  emisje_kampanii – tyle emisji w kampanii, przerwa_kampanii – rund przerwy po kampanii w tym kanale i strefie; promocje (typ z mapa/promocje.yaml
   i ozdobna nazwa) – na najdroższe danie w sprzedaży, nowe tylko z buforem gotówki, wszystkie wyłączone, gdy bot
   obsłużył mniej niż min_obsluga_promocji popytu poprzedniej rundy.'
 zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C), liczba dań dopasowana do menu kebaba
 ustawienia:
   bufor_gotowki: 30000
   bufor_kampanii: 12000
-  min_sila_kampanii: 0.5
+  emisje_kampanii: 6
+  przerwa_kampanii: 1
   min_obsluga_promocji: 0.9
   cena_nasladowcy_bez_danych: 0.95
   krok_ceny: 0.5

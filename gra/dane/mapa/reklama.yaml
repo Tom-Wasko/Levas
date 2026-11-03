@@ -1,24 +1,28 @@
 # Agencje reklamowe na mapie miasta (F3b.2) – kampanie z listy: agencja × kanał × strefa
 # Sprawdzenie: python -m silnik.dane sprawdz
-opis: 'Agencje reklamowe gry z lokalami (silnik/rynek/reklama.py). Kampania trwa `rundy` rund od rundy zamówienia; w tym
-  czasie poszerza pulę klientów strefy (pula – ułamek, korzystają wszystkie lokale, najwięcej reklamujący się) i podnosi
-  atrakcyjność firmy u mieszkańców strefy (przyciaganie – ułamek, odbiera klientów konkurencji). Koszt netto (VAT 23%)
-  płatny z góry: przy zasięgu „strefa” koszt × pula strefy z mapa/popyt.yaml (więcej ludzi – drożej), przy zasięgu
-  „miasto” – koszt bez mnożnika, efekt w każdej strefie. Agencja należy do rodzaju kanału: kilka drużyn w tym samym
-  rodzaju i strefie w tej samej rundzie się zagłusza. model: zagluszanie – efekt × 1 / (1 + zagluszanie × (n − 1)),
-  n – liczba firm z trwającą kampanią tego rodzaju w strefie; nasycenie – każda wcześniejsza kampania firmy w tym
-  samym kanale i strefie w ostatnich okno_nasycenia rundach osłabia nową o ten ułamek (× (1 − nasycenie)^k);
-  wygasanie – po końcu kampanii efekt spada co rundę × wygasanie, aż będzie mniejszy niż prog_wygasania.
+opis: 'Agencje reklamowe gry z lokalami (silnik/rynek/reklama.py). Kampania to agencja × kanał × strefa z liczbą
+  emisji w tej rundzie (emisja – jednostka kanału: paczka ulotek, post, spot w radiu…). Cena emisji netto (VAT 23%)
+  płatna z góry: przy zasięgu „strefa” cena_emisji × pula strefy z mapa/popyt.yaml (więcej ludzi – drożej, zaokrąglona
+  do złotówki), przy zasięgu „miasto” – bez mnożnika, efekt w każdej strefie. znizki – progi rabatu kanału [od ilu
+  emisji, rabat] na wszystkie emisje zamówienia; maks_emisji – najwięcej w jednej rundzie. Efekt w rundzie emisji:
+  pula i przyciaganie (ułamki przy pełnym nasyceniu) × (1 − e^(−tempo_emisji × emisje)) – ok. 10 emisji to ponad
+  90% efektu; pula poszerza pulę klientów strefy (korzystają wszystkie lokale, najwięcej reklamujący się),
+  przyciaganie podnosi atrakcyjność firmy u mieszkańców strefy (odbiera klientów konkurencji). Agencja należy do
+  rodzaju kanału: kilka drużyn w tym samym rodzaju i strefie w tej samej rundzie się zagłusza. model: zagluszanie –
+  efekt × 1 / (1 + zagluszanie × (n − 1)), n – liczba firm z kampanią tego rodzaju w strefie w tej rundzie;
+  wygasanie – po rundzie emisji efekt spada co rundę × wygasanie, aż będzie mniejszy niż prog_wygasania.
   teksty – komiczne raporty agencji po rundzie ({strefa} – nazwa strefy).'
 zrodlo: 'notatka „Elementy mapy” (kilka agencji, każda z własnymi kanałami: ulotki i plakaty, internet i social media,
   radio i billboardy, lokalne wydarzenia; kampanie z listy; reklama poszerza pulę i odbiera klientów konkurencji; ten
   sam kanał w tej samej strefie osłabia kampanie) i „Ustalenia gry” (runda 3 – część kanałów, runda 5 – wszystkie);
   liczby – założenie F3b.2 (kampania ok. 2–15% tygodniowego utargu lokalu); P10 (odpowiedź 14): jedna
-  kampania ok. +4–10% popytu lokalu, kilka razem ok. +10–30% – sufit maks_przyciagania i maks_puli'
+  kampania ok. +4–10% popytu lokalu, kilka razem ok. +10–30% – sufit maks_przyciagania i maks_puli; Z5 (przebudowa
+  2.11.2026): emisje, progi rabatów i nasycenie 1 − e^(−0,265 · emisje) – mechanizm reklamy tradycyjnej z gry ATH
+  (dokumentacja/WIEDZA_O_GRZE.md §10, za zgodą autora), ceny emisji tak, by ok. 8 emisji kosztowało tyle co dawna
+  kampania na rundę'
 model:
   zagluszanie: 0.5
-  nasycenie: 0.3
-  okno_nasycenia: 4
+  tempo_emisji: 0.265      # nasycenie kampanii: efekt × (1 − e^(−tempo × emisje))
   wygasanie: 0.5
   prog_wygasania: 0.1
   maks_przyciagania: 0.7   # P10: suma kampanii firmy w strefie nasyca się do +70% atrakcyjności (≈ +30% popytu)
@@ -34,8 +38,10 @@ agencje:
         nazwa: Ulotki za wycieraczki
         od_rundy: 3
         zasieg: strefa
-        rundy: 1
-        koszt: 300
+        emisja: paczka 250 ulotek
+        cena_emisji: 45
+        znizki: [[4, 0.15], [11, 0.3]]
+        maks_emisji: 20
         pula: 0.04
         przyciaganie: 0.12
         teksty:
@@ -48,8 +54,10 @@ agencje:
         nazwa: Plakaty na słupach ogłoszeniowych
         od_rundy: 3
         zasieg: strefa
-        rundy: 2
-        koszt: 600
+        emisja: 10 plakatów na słupach
+        cena_emisji: 55
+        znizki: [[5, 0.2], [11, 0.3]]
+        maks_emisji: 20
         pula: 0.04
         przyciaganie: 0.16
         teksty:
@@ -68,8 +76,10 @@ agencje:
         nazwa: Posty na grupach osiedlowych
         od_rundy: 3
         zasieg: strefa
-        rundy: 1
-        koszt: 250
+        emisja: post na grupie
+        cena_emisji: 35
+        znizki: [[4, 0.1], [11, 0.25]]
+        maks_emisji: 20
         pula: 0.02
         przyciaganie: 0.1
         teksty:
@@ -81,8 +91,10 @@ agencje:
         nazwa: Influencerka „Kebabowa Królowa” (TikTok)
         od_rundy: 5
         zasieg: strefa
-        rundy: 2
-        koszt: 1500
+        emisja: relacja influencerki
+        cena_emisji: 120
+        znizki: [[3, 0.15], [6, 0.25]]
+        maks_emisji: 10
         pula: 0.08
         przyciaganie: 0.3
         teksty:
@@ -101,8 +113,10 @@ agencje:
         nazwa: Billboard przy rondzie
         od_rundy: 5
         zasieg: strefa
-        rundy: 3
-        koszt: 1200
+        emisja: dzień na billboardzie
+        cena_emisji: 70
+        znizki: [[4, 0.15], [7, 0.3]]
+        maks_emisji: 7
         pula: 0.06
         przyciaganie: 0.2
         teksty:
@@ -114,8 +128,10 @@ agencje:
         nazwa: Spot w radiu „Fala Koziołka”
         od_rundy: 5
         zasieg: miasto
-        rundy: 2
-        koszt: 2500
+        emisja: spot w radiu
+        cena_emisji: 180
+        znizki: [[10, 0.2], [21, 0.3]]
+        maks_emisji: 30
         pula: 0.03
         przyciaganie: 0.1
         teksty:
@@ -134,8 +150,10 @@ agencje:
         nazwa: Degustacja na festynie osiedlowym
         od_rundy: 3
         zasieg: strefa
-        rundy: 1
-        koszt: 700
+        emisja: godzina degustacji
+        cena_emisji: 110
+        znizki: [[4, 0.15], [8, 0.25]]
+        maks_emisji: 12
         pula: 0.06
         przyciaganie: 0.2
         teksty:
@@ -150,8 +168,10 @@ agencje:
         strefy:
         - akademickie
         - politechnika
-        rundy: 1
-        koszt: 2500
+        emisja: godzina stoiska na imprezie
+        cena_emisji: 400
+        znizki: [[3, 0.15], [6, 0.3]]
+        maks_emisji: 8
         pula: 0.16
         przyciaganie: 0.4
         teksty:

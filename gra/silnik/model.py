@@ -331,14 +331,16 @@ class Efekt(Model):
 
 
 class Kampania(Model):
-    """Kampania agencji reklamowej (silnik/rynek/reklama.py): trwa rundy od_rundy–do_rundy, potem wygasa."""
+    """Kampania agencji reklamowej (silnik/rynek/reklama.py): emisje w rundzie od_rundy (= do_rundy), potem wygasa.
+    Zapisy sprzed Z5: kampania na kilka rund (do_rundy > od_rundy), bez emisji – pełny efekt."""
     agencja: str
     kanal: str
     strefa: str | None            # None – zasięg „miasto”
     od_rundy: int
     do_rundy: int
     koszt: float                  # netto
-    sila: float = 1.0             # po nasyceniu (wcześniejsze kampanie w tym kanale i strefie)
+    sila: float = 1.0             # zapisy sprzed Z5: osłabienie powtórki; od Z5 – nasycenie emisjami
+    emisje: int | None = None     # Z5: liczba emisji w rundzie (None – zapis sprzed Z5)
 
 
 class Promocja(Model):

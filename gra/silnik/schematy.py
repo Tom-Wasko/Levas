@@ -420,7 +420,8 @@ class Strategia(Schemat):
 class UstawieniaBotow(Schemat):
     bufor_gotowki: float
     bufor_kampanii: float = Field(0, ge=0)   # gra z lokalami: gotówka, która musi zostać po kampaniach reklamowych
-    min_sila_kampanii: float = Field(0, ge=0, le=1)   # słabszej (po powtórkach – nasycenie) bot nie zamawia
+    emisje_kampanii: int = Field(6, ge=1)     # tyle emisji bot zamawia w kampanii (najwyżej maks_emisji kanału)
+    przerwa_kampanii: int = Field(1, ge=0)    # rund przerwy po kampanii w tym samym kanale i strefie
     min_obsluga_promocji: float = Field(1, ge=0, le=1)   # promocje tylko, gdy w poprzedniej rundzie obsłużył taką
                                                           # część popytu (kuchnia nie nadąża – promocja tylko ucina cenę)
     cena_nasladowcy_bez_danych: float = Field(gt=0)
@@ -827,11 +828,22 @@ class KanalReklamy(Schemat):
     od_rundy: int = Field(ge=1)
     zasieg: Literal["strefa", "miasto"]
     strefy: list[str] | None = None      # tylko te strefy (brak – każda)
-    rundy: int = Field(ge=1)
-    koszt: float = Field(gt=0)           # netto; zasięg „strefa” – × pula strefy
-    pula: float = Field(ge=0, lt=1)
+    emisja: str = Field(min_length=3)    # jednostka kanału (paczka ulotek, post, spot…)
+    cena_emisji: float = Field(gt=0)     # netto; zasięg „strefa” – × pula strefy
+    znizki: list[tuple[int, float]] = Field(default_factory=list)   # [od ilu emisji, rabat] – rosnąco
+    maks_emisji: int = Field(ge=1)       # najwięcej emisji w jednej rundzie
+    pula: float = Field(ge=0, lt=1)      # przy pełnym nasyceniu (dużo emisji)
     przyciaganie: float = Field(ge=0, lt=2)
     teksty: list[str] = Field(min_length=1)
+
+    @field_validator("znizki")
+    @classmethod
+    def _progi(cls, v: list[tuple[int, float]]) -> list[tuple[int, float]]:
+        if any(od < 2 or not 0 < r < 1 for od, r in v):
+            raise ValueError("próg zniżki: od co najmniej 2 emisji, rabat w (0, 1)")
+        if any(a[0] >= b[0] or a[1] >= b[1] for a, b in zip(v, v[1:])):
+            raise ValueError("progi zniżek rosnąco: więcej emisji – większy rabat")
+        return v
 
 
 class AgencjaReklamowa(Schemat):
@@ -844,8 +856,7 @@ class AgencjaReklamowa(Schemat):
 
 class ModelReklamy(Schemat):
     zagluszanie: float = Field(ge=0)
-    nasycenie: float = Field(ge=0, lt=1)
-    okno_nasycenia: int = Field(ge=1)
+    tempo_emisji: float = Field(gt=0)    # efekt kampanii × (1 − e^(−tempo × emisje))
     wygasanie: float = Field(ge=0, lt=1)
     prog_wygasania: float = Field(gt=0, le=1)
     maks_przyciagania: float = Field(default=10.0, gt=0)   # P10: sufit sumy kampanii firmy w strefie (nasycenie)

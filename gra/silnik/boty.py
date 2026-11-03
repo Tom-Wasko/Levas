@@ -106,8 +106,8 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
 
 
 def _kampanie(dane: Dane, f: Firma, st: dict, runda: int, ust: dict) -> list[dict]:
-    """Kampanie ze strategii w strefach własnych lokali: dostępne, nietrwające, nie za słabe po powtórkach, a po
-    zapłacie zostaje bufor gotówki."""
+    """Kampanie ze strategii w strefach własnych lokali: dostępne, po przerwie od poprzedniej w tym kanale i strefie,
+    emisje_kampanii emisji (najwyżej maks_emisji kanału), a po zapłacie zostaje bufor gotówki."""
     strefy = sorted({dane.lokale[lok.id]["strefa"] for lok in f.lokale})
     wynik, wydatki = [], 0.0
     for x in st.get("kampanie", []) if strefy else []:
@@ -116,11 +116,13 @@ def _kampanie(dane: Dane, f: Firma, st: dict, runda: int, ust: dict) -> list[dic
         if kan is None or kan["od_rundy"] > runda:
             continue
         for s in [None] if kan["zasieg"] == "miasto" else [z for z in strefy if z in rk.strefy_kanalu(dane, kan)]:
-            koszt = rk.brutto(dane, rk.koszt(dane, kan, s))
-            if rk.trwa(f, a, k, s, runda) or rk.sila_nowej(dane, f, a, k, s, runda) < ust["min_sila_kampanii"] \
+            emisje = min(ust["emisje_kampanii"], kan["maks_emisji"])
+            koszt = rk.brutto(dane, rk.koszt(dane, kan, s, emisje))
+            ostatnia = max((x.do_rundy for x in f.kampanie if (x.agencja, x.kanal, x.strefa) == (a, k, s)), default=None)
+            if (ostatnia is not None and runda - ostatnia <= ust["przerwa_kampanii"]) \
                     or f.gotowka - wydatki - koszt < ust["bufor_kampanii"]:
                 continue
-            wynik.append({"agencja": a, "kanal": k, "strefa": s})
+            wynik.append({"agencja": a, "kanal": k, "strefa": s, "emisje": emisje})
             wydatki += koszt
     return wynik
 

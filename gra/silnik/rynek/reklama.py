@@ -1,13 +1,16 @@
-"""Agencje reklamowe w grze z lokalami (F3b.2; notatki „Elementy mapy” i „Ustalenia gry”): kampanie z listy
-agencja × kanał × strefa (`dane/mapa/reklama.yaml`), zamiast reklamy tradycyjnej i internetowej z Revasa.
+"""Agencje reklamowe w grze z lokalami (F3b.2, Z5; notatki „Elementy mapy” i „Ustalenia gry”): kampanie z listy
+agencja × kanał × strefa (`dane/mapa/reklama.yaml`) z liczbą emisji w rundzie, zamiast reklamy z Revasa.
 
-- Zamówienie (`zamow`, w decyzje.zastosuj): koszt netto + VAT płatny z góry, kampania w `Firma.kampanie` trwa
-  `rundy` rund od rundy zamówienia. Nasycenie: każda wcześniejsza kampania firmy w tym samym kanale i strefie w ostatnich
-  `okno_nasycenia` rundach osłabia nową (`Kampania.sila`). Kampania w tym samym kanale i strefie nie może się nakładać.
+- Zamówienie (`zamow`, w decyzje.zastosuj): emisje × cena emisji (przy zasięgu „strefa” × pula strefy) z rabatem
+  z progów kanału (`znizki`, na wszystkie emisje), + VAT, płatne z góry. Kampania w `Firma.kampanie` działa w rundzie
+  zamówienia (od_rundy = do_rundy); jedna na kanał i strefę w rundzie, najwyżej `maks_emisji` emisji.
+- Nasycenie (Z5, mechanizm reklamy tradycyjnej z gry ATH): efekt kampanii × (1 − e^(−tempo_emisji · emisje)) –
+  pierwsze emisje działają najmocniej, ok. 10 to ponad 90% efektu kanału.
 - Efekt w rundzie (`efekty_rundy`, w runda.py przed popytem): pula strefy rośnie (mnożnik w popyt.pule – korzystają
   wszystkie lokale, najwięcej reklamujący się) i firma przyciąga mieszkańców strefy (popyt.atrakcyjnosc –
-  `reklama_strefy`, odbiera klientów konkurencji). Zagłuszanie: inne firmy z trwającą kampanią tego samego rodzaju
-  w tej strefie (kampanie na całe miasto – w każdej strefie). Wygasanie: po końcu efekt × wygasanie co rundę.
+  `reklama_strefy`, odbiera klientów konkurencji). Zagłuszanie: inne firmy z kampanią tego samego rodzaju w tej
+  strefie w tej rundzie (kampanie na całe miasto – w każdej strefie). Wygasanie: po rundzie emisji efekt × wygasanie
+  co rundę.
 - Sufit (P10): suma kampanii firmy w strefie nasyca się do `maks_przyciagania` (x → maks · (1 − e^(−x/maks))),
   poszerzenie puli strefy – do `maks_puli`; kilka kampanii razem daje kebabowi ok. +10% … +30% popytu, nie więcej.
 """
@@ -38,10 +41,19 @@ def strefy_kanalu(dane: Dane, kan: dict) -> list[str]:
     return [] if kan["zasieg"] == "miasto" else list(kan["strefy"] or dane.mapa["strefy"])
 
 
-def koszt(dane: Dane, kan: dict, strefa: str | None) -> float:
-    """Koszt netto: przy zasięgu „strefa” × pula strefy (więcej ludzi – drożej), zaokrąglony do 10 zł."""
-    k = kan["koszt"] * (dane.mapa["popyt"]["strefy"][strefa]["pula"] if strefa else 1.0)
-    return float(round(k / 10) * 10)
+def cena_emisji(dane: Dane, kan: dict, strefa: str | None) -> float:
+    """Cena jednej emisji netto: przy zasięgu „strefa” × pula strefy (więcej ludzi – drożej), do złotówki."""
+    return float(round(kan["cena_emisji"] * (dane.mapa["popyt"]["strefy"][strefa]["pula"] if strefa else 1.0)))
+
+
+def rabat(kan: dict, emisje: int) -> float:
+    """Rabat z najwyższego osiągniętego progu kanału (na wszystkie emisje zamówienia)."""
+    return max([r for od, r in kan.get("znizki") or [] if emisje >= od], default=0.0)
+
+
+def koszt(dane: Dane, kan: dict, strefa: str | None, emisje: int) -> float:
+    """Koszt netto zamówienia: emisje × cena emisji × (1 − rabat)."""
+    return round(emisje * cena_emisji(dane, kan, strefa) * (1 - rabat(kan, emisje)), 2)
 
 
 def brutto(dane: Dane, netto: float) -> float:
@@ -50,14 +62,15 @@ def brutto(dane: Dane, netto: float) -> float:
     return round(netto * (1 + (Ksiega(vat=vat).stawka_vat(OPIS) if vat else 0.0)), 2)
 
 
-def sila_nowej(dane: Dane, f: Firma, agencja: str, kanal_id: str, strefa: str | None, runda: int) -> float:
-    m = zasady(dane)["model"]
-    k = sum(1 for x in f.kampanie if (x.agencja, x.kanal, x.strefa) == (agencja, kanal_id, strefa)
-            and x.od_rundy > runda - m["okno_nasycenia"] and x.od_rundy < runda)
-    return round((1 - m["nasycenie"]) ** k, 4)
+def efekt_emisji(dane: Dane, emisje: int | None) -> float:
+    """Część pełnego efektu kanału po tylu emisjach: 1 − e^(−tempo · emisje); None (zapis sprzed Z5) – 1."""
+    if emisje is None:
+        return 1.0
+    return 1 - math.exp(-zasady(dane)["model"]["tempo_emisji"] * emisje) if emisje > 0 else 0.0
 
 
-def trwa(f: Firma, agencja: str, kanal_id: str, strefa: str | None, runda: int) -> bool:
+def zamowiona(f: Firma, agencja: str, kanal_id: str, strefa: str | None, runda: int) -> bool:
+    """Kampania w tym kanale i strefie już zamówiona w tej rundzie (albo – w zapisie sprzed Z5 – jeszcze trwa)."""
     return any((x.agencja, x.kanal, x.strefa) == (agencja, kanal_id, strefa) and x.od_rundy <= runda <= x.do_rundy
                for x in f.kampanie)
 
@@ -67,7 +80,8 @@ def nazwa_strefy(dane: Dane, strefa: str | None) -> str:
 
 
 def zamow(dane: Dane, f: Firma, d: dict, runda: int, ks: Ksiega, rach: Rachunek) -> dict:
-    """Kampanie z decyzji `kampanie: [{"agencja", "kanal", "strefa"}]`. Zwraca {"zamowione": [...], "uwagi": [...]}."""
+    """Kampanie z decyzji `kampanie: [{"agencja", "kanal", "strefa", "emisje"}]`.
+    Zwraca {"zamowione": [...], "uwagi": [...]}."""
     info = {"zamowione": [], "uwagi": []}
     R = zasady(dane)
     if not R:
@@ -80,6 +94,10 @@ def zamow(dane: Dane, f: Firma, d: dict, runda: int, ks: Ksiega, rach: Rachunek)
             continue
         nazwa = f"{kan['nazwa']} ({R['agencje'][a]['nazwa']})"
         strefa = None if kan["zasieg"] == "miasto" else z.get("strefa")
+        try:
+            emisje = int(z.get("emisje") or 0)
+        except (TypeError, ValueError):
+            emisje = 0
         if not f.lokale:
             info["uwagi"].append(f"{nazwa}: agencja przyjmuje zlecenia dopiero od firm z lokalem.")
         elif kan["od_rundy"] > runda:
@@ -88,17 +106,21 @@ def zamow(dane: Dane, f: Firma, d: dict, runda: int, ks: Ksiega, rach: Rachunek)
             info["uwagi"].append(f"{nazwa}: " + ("wybierz strefę." if not strefa else
                                                  f"agencja nie robi tej kampanii w strefie {nazwa_strefy(dane, strefa)}."
                                                  if strefa in dane.mapa["strefy"] else f"nieznana strefa {strefa}."))
-        elif trwa(f, a, k, strefa, runda):
-            info["uwagi"].append(f"{nazwa} – {nazwa_strefy(dane, strefa)}: kampania jeszcze trwa, nową zamówisz po jej końcu.")
+        elif emisje < 1:
+            info["uwagi"].append(f"{nazwa} – {nazwa_strefy(dane, strefa)}: podaj liczbę emisji ({kan['emisja']}).")
+        elif emisje > kan["maks_emisji"]:
+            info["uwagi"].append(f"{nazwa} – {nazwa_strefy(dane, strefa)}: najwyżej {kan['maks_emisji']} emisji w rundzie.")
+        elif zamowiona(f, a, k, strefa, runda):
+            info["uwagi"].append(f"{nazwa} – {nazwa_strefy(dane, strefa)}: już zamówiona w tej rundzie – zmień liczbę emisji.")
         else:
-            netto = koszt(dane, kan, strefa)
-            kamp = Kampania(agencja=a, kanal=k, strefa=strefa, od_rundy=runda, do_rundy=runda + kan["rundy"] - 1,
-                            koszt=netto, sila=sila_nowej(dane, f, a, k, strefa, runda))
+            netto = koszt(dane, kan, strefa, emisje)
+            kamp = Kampania(agencja=a, kanal=k, strefa=strefa, od_rundy=runda, do_rundy=runda, koszt=netto, emisje=emisje)
             f.kampanie.append(kamp)
-            opis = f"{OPIS}: {kan['nazwa']} – {nazwa_strefy(dane, strefa)}"
+            opis = f"{OPIS}: {kan['nazwa']} – {nazwa_strefy(dane, strefa)} ({emisje} × {kan['emisja']})"
             stawka = ks.stawka_vat(opis) if ks.vat is not None else 0.0
             ksieguj(f, ks, rach, opis, round(netto * (1 + stawka), 2), "pozostale")
             info["zamowione"].append({**kamp.model_dump(), "nazwa": kan["nazwa"], "agencja_nazwa": R["agencje"][a]["nazwa"],
+                                      "cena_emisji": cena_emisji(dane, kan, strefa), "rabat": rabat(kan, emisje),
                                       "brutto": round(netto * (1 + stawka), 2)})
     return info
 
@@ -141,7 +163,7 @@ def efekty_rundy(dane: Dane, firmy: dict[str, Firma], runda: int, ziarno=None) -
             for z in ([k.strefa] if k.strefa else strefy):
                 inni = len((aktywne.get((rodzaj, z), set()) | aktywne.get((rodzaj, None), set())) - {n})
                 mn = 1 / (1 + m["zagluszanie"] * inni)
-                e = waga * k.sila * mn
+                e = waga * k.sila * efekt_emisji(dane, k.emisje) * mn
                 wynik["pula"][z] += e * kan["pula"]
                 przyc[z] = przyc.get(z, 0.0) + e * kan["przyciaganie"]
                 zag.append(mn)
@@ -151,7 +173,8 @@ def efekty_rundy(dane: Dane, firmy: dict[str, Firma], runda: int, ziarno=None) -
             wpis = {"agencja": k.agencja, "kanal": k.kanal, "strefa": k.strefa, "nazwa": kan["nazwa"],
                     "agencja_nazwa": R["agencje"][k.agencja]["nazwa"], "strefa_nazwa": nazwa_strefy(dane, k.strefa),
                     "od_rundy": k.od_rundy, "do_rundy": k.do_rundy, "faza": faza, "waga": round(waga, 4),
-                    "sila": k.sila, "zagluszanie": round(sum(zag) / nz, 4), "konkurenci": inni_max,
+                    "sila": k.sila, "emisje": k.emisje, "nasycenie": round(efekt_emisji(dane, k.emisje), 4),
+                    "zagluszanie": round(sum(zag) / nz, 4), "konkurenci": inni_max,
                     "pula": round(pula_k / nz, 4), "przyciaganie": round(przyc_k / nz, 4),
                     "koszt": k.koszt if k.od_rundy == runda else 0.0, "tekst": None}
             if ziarno is not None and k.od_rundy == runda:
@@ -169,13 +192,13 @@ def efekty_rundy(dane: Dane, firmy: dict[str, Firma], runda: int, ziarno=None) -
 def publiczne(dane: Dane, efekty: dict) -> dict:
     """Do danych rynku (widoczne dla wszystkich – reklamy widać na mieście): {firma: {"wydatki", "kampanie"}}."""
     return {n: {"wydatki": round(sum(x["koszt"] for x in lista), 2),
-                "kampanie": [{k: x[k] for k in ("agencja", "kanal", "strefa", "faza")} for x in lista]}
+                "kampanie": [{k: x[k] for k in ("agencja", "kanal", "strefa", "faza", "emisje")} for x in lista]}
             for n, lista in efekty["kampanie"].items()}
 
 
 def widok(dane: Dane, f: Firma, runda: int, rynek_poprzedni: dict | None, zamowione: list | None = None) -> dict | None:
-    """Zakładka „Agencje reklamowe” (decyzje): agencje z kanałami (koszt i siła w każdej strefie), kampanie firmy
-    trwające w tej rundzie (f – stan po decyzjach), kto reklamował się w poprzedniej rundzie."""
+    """Zakładka „Agencje reklamowe” (decyzje): agencje z kanałami (cena emisji w każdej strefie, progi rabatów),
+    kampanie firmy działające w tej rundzie (f – stan po decyzjach), kto reklamował się w poprzedniej rundzie."""
     R = zasady(dane)
     if not R:
         return None
@@ -184,13 +207,11 @@ def widok(dane: Dane, f: Firma, runda: int, rynek_poprzedni: dict | None, zamowi
         kanaly = []
         for k, kan in ag["kanaly"].items():
             st = strefy_kanalu(dane, kan) or [None]
-            kanaly.append({"id": k, **{x: kan[x] for x in ("nazwa", "od_rundy", "zasieg", "rundy", "pula", "przyciaganie")},
+            kanaly.append({"id": k, **{x: kan[x] for x in ("nazwa", "od_rundy", "zasieg", "emisja", "maks_emisji", "pula",
+                                                            "przyciaganie")},
+                           "znizki": [list(x) for x in kan.get("znizki") or []],
                            "dostepny": kan["od_rundy"] <= runda, "strefy": [s for s in st if s],
-                           "koszty": {s or "miasto": koszt(dane, kan, s) for s in st},
-                           "sila": {s or "miasto": sila_nowej(dane, f, a, k, s, runda) for s in st},
-                           "trwa": [s or "miasto" for s in st if trwa(f, a, k, s, runda)
-                                    and not any(z["agencja"] == a and z["kanal"] == k and z["strefa"] == s
-                                                for z in zamowione or [])]})
+                           "ceny": {s or "miasto": cena_emisji(dane, kan, s) for s in st}})
         agencje.append({"id": a, "nazwa": ag["nazwa"], "opis": ag["opis"], "rodzaj": ag["rodzaj"], "budynek": ag["budynek"],
                         "kanaly": kanaly})
     ef = efekty_rundy(dane, {f.nazwa: f}, runda)
@@ -200,7 +221,7 @@ def widok(dane: Dane, f: Firma, runda: int, rynek_poprzedni: dict | None, zamowi
             continue
         for k in x["kampanie"]:
             rodzaj = R["agencje"].get(k["agencja"], {}).get("rodzaj")
-            if rodzaj:
+            if rodzaj and k.get("faza", "trwa") == "trwa":
                 konkurencja.setdefault(rodzaj, {}).setdefault(k["strefa"] or "miasto", []).append(n)
     return {"model": R["model"], "agencje": agencje,
             "strefy": {z: s["nazwa"] for z, s in dane.mapa["strefy"].items()},
@@ -208,5 +229,5 @@ def widok(dane: Dane, f: Firma, runda: int, rynek_poprzedni: dict | None, zamowi
             "trwajace": ef["kampanie"].get(f.nazwa, []), "zamowione": zamowione or [], "konkurencja": konkurencja}
 
 
-__all__ = ["OPIS", "ZAKLADKA", "brutto", "efekty_rundy", "kanal", "koszt", "nazwa_strefy", "publiczne", "sila_nowej",
-           "strefy_kanalu", "trwa", "widok", "zamow", "zasady"]
+__all__ = ["OPIS", "ZAKLADKA", "brutto", "cena_emisji", "efekt_emisji", "efekty_rundy", "kanal", "koszt", "nazwa_strefy",
+           "publiczne", "rabat", "strefy_kanalu", "widok", "zamow", "zamowiona", "zasady"]

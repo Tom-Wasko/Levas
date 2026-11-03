@@ -24,7 +24,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     zamowienia:        [{"dostawca", "zasob", "jakosc", "ilosc", "dzien"}]   ilość w opakowaniach; dzien – dzień
                                                               dostawy w rundzie (0 = poniedziałek)
     udogodnienia_kup / udogodnienia_sprzedaj / wyposazenie_kup / wyposazenie_sprzedaj: [nazwa]
-    kampanie:          [{"agencja", "kanal", "strefa"}]     – agencje reklamowe (silnik/rynek/reklama.py,
+    kampanie:          [{"agencja", "kanal", "strefa", "emisje"}] – agencje reklamowe (silnik/rynek/reklama.py,
                                                               dane/mapa/reklama.yaml)
     promocje:          [{"typ", "nazwa", "danie"}]          – pełna lista włączonych promocji, nazwa
                                                               ozdobna (silnik/rynek/promocje.py, dane/mapa/promocje.yaml)

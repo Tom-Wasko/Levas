@@ -1,7 +1,8 @@
-"""Agencje reklamowe w grze z lokalami (F3b.2): koszt, zamówienie z walidacją, zagłuszanie, nasycenie, wygasanie,
-poszerzenie puli i przyciąganie klientów, gra z botami, widok API i brak reklamy z Revasa."""
+"""Agencje reklamowe w grze z lokalami (F3b.2, Z5): emisje, progi rabatów, zamówienie z walidacją, zagłuszanie,
+nasycenie emisjami, wygasanie, poszerzenie puli i przyciąganie klientów, gra z botami, widok API i brak reklamy z Revasa."""
 
 import copy
+import math
 
 import pytest
 from pomocnicze import KEBAB, _gra, _lokal, _oferta, _runda
@@ -13,7 +14,7 @@ from silnik.model import Firma, Kampania
 from silnik.rynek import popyt as pp
 from silnik.rynek import reklama as rk
 
-ULOTKI = {"agencja": "papier_przyjmie", "kanal": "ulotki", "strefa": "centrum"}
+ULOTKI = {"agencja": "papier_przyjmie", "kanal": "ulotki", "strefa": "centrum", "emisje": 5}
 
 
 def _firma_z_lokalem(runda=3):
@@ -27,16 +28,22 @@ def _zamow(dane, f, kampanie, runda=3):
     return rk.zamow(dane, f, {"kampanie": kampanie}, runda, ks, rach), ks, rach
 
 
-def _kampania(agencja="papier_przyjmie", kanal="ulotki", strefa="centrum", od=3, do=3, sila=1.0):
-    return Kampania(agencja=agencja, kanal=kanal, strefa=strefa, od_rundy=od, do_rundy=do, koszt=100, sila=sila)
+def _kampania(agencja="papier_przyjmie", kanal="ulotki", strefa="centrum", od=3, do=None, emisje=None):
+    return Kampania(agencja=agencja, kanal=kanal, strefa=strefa, od_rundy=od, do_rundy=od if do is None else do, koszt=100,
+                    emisje=emisje)
 
 
-def test_koszt_strefy_i_miasta():
+def test_koszt_emisji_i_progi_rabatow():
     dane = dane_domyslne()
     ulotki, radio = rk.kanal(dane, "papier_przyjmie", "ulotki"), rk.kanal(dane, "fala_koziolka", "radio")
     pule = dane.mapa["popyt"]["strefy"]
-    assert rk.koszt(dane, ulotki, "centrum") == pytest.approx(round(ulotki["koszt"] * pule["centrum"]["pula"] / 10) * 10)
-    assert rk.koszt(dane, radio, None) == radio["koszt"] and rk.strefy_kanalu(dane, radio) == []
+    c = rk.cena_emisji(dane, ulotki, "centrum")
+    assert c == round(ulotki["cena_emisji"] * pule["centrum"]["pula"])
+    assert rk.cena_emisji(dane, radio, None) == radio["cena_emisji"] and rk.strefy_kanalu(dane, radio) == []
+    (od1, r1), (od2, r2) = ulotki["znizki"][:2]
+    assert [rk.rabat(ulotki, n) for n in (1, od1 - 1, od1, od2 - 1, od2, ulotki["maks_emisji"])] == [0, 0, r1, r1, r2, r2]
+    assert rk.koszt(dane, ulotki, "centrum", od1 - 1) == pytest.approx((od1 - 1) * c)
+    assert rk.koszt(dane, ulotki, "centrum", od1) == pytest.approx(od1 * c * (1 - r1))     # rabat na wszystkie emisje
     assert rk.brutto(dane, 100) == pytest.approx(123)
     assert rk.strefy_kanalu(dane, rk.kanal(dane, "kozi_grod", "noc_kebaba")) == ["akademickie", "politechnika"]
 
@@ -46,38 +53,47 @@ def test_zamowienie_walidacja_vat_i_kpir():
     info, ks, rach = _zamow(dane, f, [
         ULOTKI,
         {"agencja": "papier_przyjmie", "kanal": "nie_ma"},
-        {"agencja": "papier_przyjmie", "kanal": "plakaty"},                       # bez strefy
-        {"agencja": "kozi_grod", "kanal": "noc_kebaba", "strefa": "centrum"},     # tylko strefy akademickie
-        {"agencja": "lajk", "kanal": "influencer", "strefa": "centrum"},          # od rundy 5
-        {"agencja": "papier_przyjmie", "kanal": "ulotki", "strefa": "centrum"},   # ta sama kampania jeszcze trwa
-        {"agencja": "fala_koziolka", "kanal": "radio", "strefa": "centrum"},      # od rundy 5
+        {"agencja": "papier_przyjmie", "kanal": "plakaty", "emisje": 3},                       # bez strefy
+        {"agencja": "kozi_grod", "kanal": "noc_kebaba", "strefa": "centrum", "emisje": 3},     # tylko strefy akademickie
+        {"agencja": "lajk", "kanal": "influencer", "strefa": "centrum", "emisje": 3},          # od rundy 5
+        {"agencja": "papier_przyjmie", "kanal": "ulotki", "strefa": "centrum", "emisje": 2},   # już zamówiona w tej rundzie
+        {"agencja": "fala_koziolka", "kanal": "radio", "strefa": "centrum", "emisje": 3},      # od rundy 5
+        {"agencja": "papier_przyjmie", "kanal": "plakaty", "strefa": "centrum"},               # bez emisji
+        {"agencja": "papier_przyjmie", "kanal": "plakaty", "strefa": "centrum", "emisje": 999},  # ponad maks_emisji
     ])
-    assert [(z["kanal"], z["strefa"]) for z in info["zamowione"]] == [("ulotki", "centrum")]
-    assert len(info["uwagi"]) == 6 and any("wybierz strefę" in u for u in info["uwagi"])
-    assert any("od rundy 5" in u for u in info["uwagi"]) and any("jeszcze trwa" in u for u in info["uwagi"])
-    netto = rk.koszt(dane, rk.kanal(dane, "papier_przyjmie", "ulotki"), "centrum")
+    assert [(z["kanal"], z["strefa"], z["emisje"]) for z in info["zamowione"]] == [("ulotki", "centrum", 5)]
+    assert len(info["uwagi"]) == 8 and any("wybierz strefę" in u for u in info["uwagi"])
+    assert any("od rundy 5" in u for u in info["uwagi"]) and any("już zamówiona" in u for u in info["uwagi"])
+    assert any("podaj liczbę emisji" in u for u in info["uwagi"]) and any("najwyżej" in u for u in info["uwagi"])
+    netto = rk.koszt(dane, rk.kanal(dane, "papier_przyjmie", "ulotki"), "centrum", 5)
     poz = [p for p in ks.pozycje if p["opis"].startswith(rk.OPIS)]
     assert [p["pozostale"] for p in poz] == [pytest.approx(netto)]
     assert sum(o["kwota"] for o in rach.operacje) == pytest.approx(-rk.brutto(dane, netto))
-    assert [(k.kanal, k.od_rundy, k.do_rundy, k.sila) for k in f.kampanie] == [("ulotki", 3, 3, 1.0)]
-    # radio na całe miasto: strefa z decyzji pomijana
-    info, _, _ = _zamow(dane, f, [{"agencja": "fala_koziolka", "kanal": "radio", "strefa": "centrum"}], runda=5)
-    assert info["zamowione"][0]["strefa"] is None and info["zamowione"][0]["do_rundy"] == 6
+    assert [(k.kanal, k.od_rundy, k.do_rundy, k.emisje) for k in f.kampanie] == [("ulotki", 3, 3, 5)]
+    assert "5 × paczka" in poz[0]["opis"]
+    # radio na całe miasto: strefa z decyzji pomijana, działa tylko w rundzie emisji
+    info, _, _ = _zamow(dane, f, [{"agencja": "fala_koziolka", "kanal": "radio", "strefa": "centrum", "emisje": 10}], runda=5)
+    assert info["zamowione"][0]["strefa"] is None and info["zamowione"][0]["do_rundy"] == 5
+    # w następnej rundzie tę samą kampanię można zamówić znowu (bez osłabienia – nasyca się tylko liczba emisji)
+    info, _, _ = _zamow(dane, f, [ULOTKI], runda=4)
+    assert [z["emisje"] for z in info["zamowione"]] == [5] and not info["uwagi"]
     # bez lokalu agencja nie przyjmuje zlecenia
     info, _, _ = _zamow(dane, Firma(nazwa="X"), [ULOTKI])
     assert not info["zamowione"] and "z lokalem" in info["uwagi"][0]
 
 
-def test_nasycenie_i_wygasanie():
+def test_nasycenie_emisjami_i_wygasanie():
     dane, f = _firma_z_lokalem()
     m = rk.zasady(dane)["model"]
-    f.kampanie = [_kampania(od=3, do=3)]
-    assert rk.sila_nowej(dane, f, "papier_przyjmie", "ulotki", "centrum", 4) == pytest.approx(1 - m["nasycenie"])
-    assert rk.sila_nowej(dane, f, "papier_przyjmie", "ulotki", "dworzec", 4) == 1.0          # inna strefa
-    assert rk.sila_nowej(dane, f, "papier_przyjmie", "ulotki", "centrum", 3 + m["okno_nasycenia"]) == 1.0
-    f.kampanie.append(_kampania(od=4, do=4, sila=0.7))
-    assert rk.sila_nowej(dane, f, "papier_przyjmie", "ulotki", "centrum", 5) == pytest.approx((1 - m["nasycenie"]) ** 2)
-    f.kampanie = [_kampania(od=3, do=3)]
+    e = [rk.efekt_emisji(dane, n) for n in range(0, 21)]
+    assert e[0] == 0 and e[1] == pytest.approx(1 - math.exp(-m["tempo_emisji"])) and rk.efekt_emisji(dane, None) == 1
+    assert all(b > a for a, b in zip(e, e[1:])) and e[10] > 0.9                           # ok. 10 emisji – ponad 90%
+    assert all(e[n + 1] - e[n] < e[n] - e[n - 1] for n in range(1, 20))                    # każda kolejna daje mniej
+    f.kampanie = [_kampania(emisje=5)]
+    pula5 = rk.kanal(dane, "papier_przyjmie", "ulotki")["pula"] * e[5]
+    assert rk.efekty_rundy(dane, {"A": f}, 3)["pula"]["centrum"] == pytest.approx(rk.nasycenie(pula5, m["maks_puli"]), abs=1e-4)
+    assert rk.efekty_rundy(dane, {"A": f}, 3)["kampanie"]["A"][0]["nasycenie"] == pytest.approx(e[5], abs=1e-4)
+    f.kampanie = [_kampania()]                                  # zapis sprzed Z5 (bez emisji) – pełny efekt
     pula = rk.kanal(dane, "papier_przyjmie", "ulotki")["pula"]
     fazy = [rk.efekty_rundy(dane, {"A": f}, r) for r in (2, 3, 4, 5, 6, 7)]
     P = lambda x: pytest.approx(rk.nasycenie(x, m["maks_puli"]), abs=1e-4)   # P10: sufit sumy kampanii
@@ -95,7 +111,7 @@ def test_sufit_sumy_kampanii():
     dane, f = _firma_z_lokalem()
     m = rk.zasady(dane)["model"]
     R = rk.zasady(dane)["agencje"]
-    f.kampanie = [_kampania(agencja=a, kanal=k, strefa=None if kan["zasieg"] == "miasto" else "centrum", od=5, do=5)
+    f.kampanie = [_kampania(agencja=a, kanal=k, strefa=None if kan["zasieg"] == "miasto" else "centrum", od=5, emisje=kan["maks_emisji"])
                   for a, ag in R.items() for k, kan in ag["kanaly"].items() if kan["zasieg"] == "miasto" or "centrum" in (kan.get("strefy") or ["centrum"])]
     ef = rk.efekty_rundy(dane, {"A": f}, 5)
     suma, dziala = ef["suma"]["A"]["centrum"], ef["firmy"]["A"]["centrum"]
@@ -117,8 +133,8 @@ def test_zagluszanie_ten_sam_rodzaj_i_radio_w_kazdej_strefie():
                    "C": 1.0}
     assert ef["kampanie"]["A"][0]["konkurenci"] == 1
     # radio (całe miasto) zagłusza billboard tego samego rodzaju w każdej strefie i działa wszędzie
-    a.kampanie = [_kampania(agencja="fala_koziolka", kanal="radio", strefa=None, od=5, do=6)]
-    b.kampanie = [_kampania(agencja="fala_koziolka", kanal="billboard", strefa="dworzec", od=5, do=7)]
+    a.kampanie = [_kampania(agencja="fala_koziolka", kanal="radio", strefa=None, od=5, emisje=10)]
+    b.kampanie = [_kampania(agencja="fala_koziolka", kanal="billboard", strefa="dworzec", od=5, emisje=4)]
     ef = rk.efekty_rundy(dane, {"A": a, "B": b}, 5)
     assert set(ef["firmy"]["A"]) == set(dane.mapa["strefy"]) and ef["kampanie"]["B"][0]["konkurenci"] == 1
     assert ef["firmy"]["A"]["dworzec"] < ef["firmy"]["A"]["centrum"]
@@ -147,8 +163,8 @@ def test_gra_kampania_popyt_wyniki_i_bledy(monkeypatch):
     g.przelicz(wymus=True)
     g.przelicz(wymus=True)
     s0 = copy.deepcopy(g).przelicz(wymus=True)
-    dodatki[("A", 3)] = {"kampanie": [{"agencja": "kozi_grod", "kanal": "degustacja", "strefa": "centrum"},
-                                      {"agencja": "papier_przyjmie", "kanal": "ulotki"}],
+    dodatki[("A", 3)] = {"kampanie": [{"agencja": "kozi_grod", "kanal": "degustacja", "strefa": "centrum", "emisje": 8},
+                                      {"agencja": "papier_przyjmie", "kanal": "ulotki", "emisje": 5}],
                          "reklama_tradycyjna": {"Ulotki": 10}}
     s = g.przelicz(wymus=True)
     popyt = {n: (sum(v["popyt"] for v in s0.wyniki[3][n]["sprzedaz"].values()),
@@ -178,6 +194,13 @@ def test_boty_zamawiaja_kampanie_w_swojej_strefie():
         assert f.kampanie and all(k.strefa in strefy or k.strefa is None for k in f.kampanie), n
         assert not f.internet
     assert {k.kanal for k in s.firmy["Agr"].kampanie} > {"plakaty"}
+    ust = g.dane.boty["ustawienia"]
+    for n in ("Agr", "Zrown"):   # emisje ze strategii, przerwa między kampaniami w tym samym kanale i strefie
+        k = s.firmy[n].kampanie
+        assert all(x.emisje == min(ust["emisje_kampanii"], rk.kanal(g.dane, x.agencja, x.kanal)["maks_emisji"]) for x in k)
+        for x in k:
+            assert not any((y.agencja, y.kanal, y.strefa) == (x.agencja, x.kanal, x.strefa)
+                           and 0 < y.od_rundy - x.od_rundy <= ust["przerwa_kampanii"] for y in k)
 
 
 def test_widok_api_i_gra_bez_lokali():
@@ -190,5 +213,5 @@ def test_widok_api_i_gra_bez_lokali():
     assert r["moje_strefy"] == ["centrum"] and [z["kanal"] for z in r["zamowione"]] == ["ulotki"]
     kanaly = {k["id"]: k for a in r["agencje"] for k in a["kanaly"]}
     assert kanaly["ulotki"]["dostepny"] and not kanaly["influencer"]["dostepny"]
-    assert kanaly["ulotki"]["trwa"] == [] and kanaly["radio"]["koszty"] == {"miasto": kanaly["radio"]["koszty"]["miasto"]}
-    assert [x["faza"] for x in r["trwajace"]] == ["trwa"]
+    assert list(kanaly["radio"]["ceny"]) == ["miasto"] and kanaly["ulotki"]["znizki"] and kanaly["ulotki"]["emisja"]
+    assert [(x["faza"], x["emisje"]) for x in r["trwajace"]] == [("trwa", 5)]
