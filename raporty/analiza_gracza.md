@@ -415,3 +415,19 @@ polisy, jakość 2★, strategia agresywna jako pułapka.
 
 Proszę o zaznaczenie, które pozycje 1–22 wdrożyć (staną się U1, U2… w `POSTEP.md`), i odpowiedzi na
 pytania 1–6. Pozycje z sekcji 6 trafią do inwentarza B1 jako hipotezy niezależnie od wyboru.
+
+---
+
+## 8. Odpowiedzi autora (3.11.2026)
+
+1. **Wypłaty właściciela:** zostaje jak jest – wypłata nie obniża karty.
+2. **Firma bez sprzedaży:** zostaje jak jest (≈ 0), a tygodnie ze stratą liczą się na minus – tak już działa.
+3. **Kredyt:** gotówka wchodzi do mianownika wskaźnika zadłużenia → **U22**.
+4. **Drużyna w spirali:** nie ratować – jeden inwestor na grę. Pozycja [18] pominięta.
+5. **Zakup sprzętu na karcie:** tylko ostrzeżenie przed zakupem (wariant c), liczby karty bez zmian → **U1**.
+   Wyjaśnienie dla porządku: −2,48 w R15 nowicjusza to sam wynik ekonomiczny (−11 448 zł ÷ 4615 zł),
+   bo przy stracie karta = wynik ekonomiczny × 1,0; majątek netto w tej rundzie wzrósł (57 049 → 58 424 zł).
+6. **Zatrudnianie:** od tygodnia 1 → **U23**.
+
+Do wdrożenia: wszystkie pozycje 1–22 poza [18] oraz U22 i U23 – lista U1–U23 w `POSTEP.md`.
+Pozycje U robione na gałęzi `analiza-a`.

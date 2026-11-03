@@ -315,9 +315,33 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry — zrobione 3.11.2026 (Claude Code zamiast Fable, gałąź `analiza-a`): `raporty/analiza/A1_przygotowanie.md`; osobny serwer analizy (port 8766, baza `raporty/analiza/analiza.sqlite3`), gracz przez API i zrzuty Chrome bez okna – `raporty/analiza/skrypty/gracz.py`.
 - [x] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/` — zrobione 3.11.2026: `dziennik_nowicjusz.md` (18 rund przez API, 4. miejsce, −0,297), `dziennik_optymalizator.md` (18 wariantów × 3 ziarna, `skrypty/eksperymenty.py`), `dziennik_nauczyciel.md` (4 drużyny + 2 boty: konta, pauza, przelicz mimo braków, alarm i inwestor, zmiana poziomu bota, cofnięcie, CSV); logi JSON i zrzuty w `raporty/analiza/`.
 - [x] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania — zrobione 3.11.2026: 22 pozycje (8 problemów, 7 zmian, 7 nowych funkcji), 8 hipotez „za dobrych” strategii dla B, 6 pytań do autora
-- [ ] **STOP:** autor czyta raport z A i wybiera pozycje U
+- [x] **STOP:** autor czyta raport z A i wybiera pozycje U — 3.11.2026: wybrane wszystkie pozycje poza [18]; odpowiedzi na pytania 1–6 w `raporty/analiza_gracza.md` (sekcja 8); U robione na gałęzi `analiza-a`
 
 ## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
+
+- [ ] U1 [1] Ostrzeżenie przed zakupem sprzętu/wyposażenia: „ten zakup obniży kartę tej rundy o ok. X” (decyzja autora: tylko ostrzeżenie, liczby karty bez zmian)
+- [ ] U2 [2] Alarm debetu ponad limit widoczny dla ucznia: pasek na Dashboardzie + pierwsza pozycja na Liście błędów
+- [ ] U3 [3] Błąd: komunikat „kanapa” po pierwszym lokalu (`silnik/decyzje.py:595`) – tylko przy próbie wzięcia kolejnego lokalu
+- [ ] U4 [4] Stare nazwy zakładek w tekstach silnika („Kadry”, „Inwestycje” w `lokale.py:233`) + test nazw zakładek
+- [ ] U5 [5] Lista błędów: grupy Do zrobienia / Uwaga / Dla informacji, łączenie pozycji jednej sprawy, licznik tylko czerwonych
+- [ ] U6 [6] Mandat za brak deklaracji: co zrobić zamiast (KPiR albo biuro od ok. 160 zł/tydz.), porównanie w zakładce Biuro
+- [ ] U7 [7] Ukryty dochód przy samodzielnej księgowości: napis „dochód poznasz po złożeniu deklaracji” zamiast pustego pola
+- [ ] U8 [8] Zdarzenie: opcja bez wystarczającego czasu właściciela oznaczona i ostrzeżona przed wysłaniem
+- [ ] U9 [9] Dashboard: wyjaśnienie rozruchu i straty w pierwszym tygodniu sprzedaży lokalu
+- [ ] U10 [10] Skala (kolor + słowo) przy wskaźnikach karty wyników
+- [ ] U11 [11] Inwestor widoczny dla ucznia po wpłacie (30% zysku, ile rund zostało, ile wziął)
+- [ ] U12 [12] Panel mistrza gry, Decyzje: kolumny wynik skumulowany i miejsce, informacja „inwestor wykorzystany”
+- [ ] U13 [13] Wyniki: majątek netto obok wyniku i zdanie, jak liczy się ranking
+- [ ] U14 [14] Menu w rundzie 1: podpis „od tygodnia 3”, jeden komunikat zamiast dwóch, objaśnienie „popytu rocznego”
+- [ ] U15 [15] Harpagon: kwota do oddania w złotych przy pożyczce
+- [ ] U16 [16] „Dlaczego mój wynik się zmienił?” – 1–3 zdania po rundzie z największych zmian karty
+- [ ] U17 [17] Refleksja drużyny przy wysyłaniu decyzji (pole tekstowe, widoczne u mistrza gry i w CSV; opcja gry)
+- [ ] U18 [19] Dziennik zapisów decyzji dla mistrza gry + ostrzeżenie o jednej sesji w dwóch drużynach (eksperyment)
+- [ ] U19 [20] Tryb podpowiedzi na pierwsze 3 rundy, włączany przez mistrza gry (eksperyment)
+- [ ] U20 [21] Kandydaci z `ROZNICE_LEVAS_STARY.md`: (4) dynamika pracowników, (7) opinie na mapie, (2) grupy klientów – koszt L, najpierw (4)
+- [ ] U21 [22] Pomiar „zamknięcia firmy” z wypowiedzeniem najmu (wariant w `balans/warianty.py`)
+- [ ] U22 (pyt. 3) Wskaźnik zadłużenia: gotówka w mianowniku – kredyt leżący na koncie nie karze karty
+- [ ] U23 (pyt. 6) Zatrudnianie od tygodnia 1 (`dane/katalog.yaml:52`, hr_zatrudnienie)
 
 - [ ] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu
 
