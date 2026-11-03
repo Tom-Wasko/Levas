@@ -320,7 +320,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 ## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
 
 - [x] U1 [1] Ostrzeżenie przed zakupem sprzętu/wyposażenia: „ten zakup obniży kartę tej rundy o ok. X” (decyzja autora: tylko ostrzeżenie, liczby karty bez zmian) – zrobione: `zastosuj` liczy zakupy poniżej progu amortyzacji wpisane w koszty (`inwestycje_w_koszty`), a Lista błędów (Lokale ▸ Sprzęt) pokazuje pomarańczowe ostrzeżenie z kwotą bez VAT i spadkiem karty (koszt ÷ dzielnik wyniku ekonomicznego); wzmianka w INSTRUKCJA rozdz. 3.
-- [ ] U2 [2] Alarm debetu ponad limit widoczny dla ucznia: pasek na Dashboardzie + pierwsza pozycja na Liście błędów
+- [x] U2 [2] Alarm debetu ponad limit widoczny dla ucznia: pasek na Dashboardzie + pierwsza pozycja na Liście błędów – zrobione: `inw.alarm` daje czerwoną pozycję „ALARM: debet ponad limit…” na początku listy błędów (podgląd szkicu i wyniki rundy; podgląd stosuje też wpłatę inwestora i blokadę jak przeliczenie), a Dashboard pokazuje ją jako czerwony pasek z przyciskiem do Banku.
 - [ ] U3 [3] Błąd: komunikat „kanapa” po pierwszym lokalu (`silnik/decyzje.py:595`) – tylko przy próbie wzięcia kolejnego lokalu
 - [ ] U4 [4] Stare nazwy zakładek w tekstach silnika („Kadry”, „Inwestycje” w `lokale.py:233`) + test nazw zakładek
 - [ ] U5 [5] Lista błędów: grupy Do zrobienia / Uwaga / Dla informacji, łączenie pozycji jednej sprawy, licznik tylko czerwonych

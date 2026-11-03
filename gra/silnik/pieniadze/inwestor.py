@@ -57,6 +57,17 @@ def poczatek_rundy(dane: Dane, f: Firma, kwota: float | None, runda: int, rachun
     return {"wplata": round(kwota, 2), "splata_debetu": splata}
 
 
+def alarm(dane: Dane, f: Firma) -> list[dict]:
+    """U2: alarm dla drużyny na początku rundy z blokadą – pierwsza pozycja listy błędów i pasek na Dashboardzie."""
+    debet = bk.debet_ponad_limit(dane, f)
+    if debet <= 0:
+        return []
+    return [{"poziom": "czerwony", "zakladka": "finanse_bank", "alarm": True,
+             "tekst": f"ALARM: debet ponad limit konta {zg.zl(debet)}. W tej rundzie nie możesz inwestować (lokal, "
+                      "stanowiska, sprzęt, wyposażenie) ani brać kredytów, leasingu i lokat – takie decyzje bank "
+                      "odrzuci. Spłać debet albo poproś mistrza gry o inwestora ratunkowego."}]
+
+
 def blokada(dane: Dane, f: Firma, decyzje: dict) -> tuple[dict, list[dict]]:
     """Debet ponad limit na początku rundy: decyzje bez inwestycji i kredytów oraz czerwone błędy za każdą odrzuconą."""
     debet = bk.debet_ponad_limit(dane, f)

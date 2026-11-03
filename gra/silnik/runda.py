@@ -91,6 +91,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         f = s.firmy[nazwa]
         inwestor[nazwa] = inw.poczatek_rundy(dane, f, inw.przyznany(konfiguracja, nazwa, r), r, rachunki[nazwa])
         d, blokady[nazwa] = inw.blokada(dane, f, decyzje.get(nazwa, {}))
+        blokady[nazwa] = inw.alarm(dane, f) + blokady[nazwa]   # U2: alarm na górze listy błędów
         if blokady[nazwa]:
             decyzje[nazwa] = d
     # wyprowadzki po wypowiedzeniu najmu, potem licytacje lokali i budynków (silnik/nieruchomosci/przejecia.py)
@@ -135,9 +136,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         zatrudnieni = set(info[nazwa]["zatrudnieni"])
         s.kandydaci = [k for k in s.kandydaci if k["id"] not in zatrudnieni] \
             + [rp.jako_kandydat(przed[pid]) for pid in info[nazwa]["zwolnieni"]]
-        bledy[nazwa] = lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
+        bledy[nazwa] = blokady[nazwa] + inw.bledy(f, inwestor[nazwa])
+        bledy[nazwa] += lista_bledow(dane, f, d, r, poprzednia_oferta, tryb_kredytu, lokal, info[nazwa])
         bledy[nazwa] += wl.bledy(info[nazwa]["wlasciciel"], info[nazwa]["kasyno"])
-        bledy[nazwa] += blokady[nazwa] + inw.bledy(f, inwestor[nazwa])
         if dane.zdarzenia:   # eventy w parkach: czas, gotówka, porcje, skutki (silnik/swiat/zdarzenia.py)
             czas = cw.z_podsumowania(info[nazwa]["czas_wlasciciela"])
             info[nazwa]["zdarzenia"] = zd.rozegraj(dane, f, d, r, ziarno, ksiegi[nazwa], rachunki[nazwa], czas)

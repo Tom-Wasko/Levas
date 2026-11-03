@@ -66,6 +66,10 @@ def stan_po_szkicu(gra: Gra, firma: str):
     d = gra.szkic(firma)
     ks, rach = Ksiega(vat=rz.reguly_vat(gra.dane)), Rachunek()
     poprzednia_oferta = list(f.oferta)
+    # inwestor ratunkowy i blokada przy debecie ponad limit – jak w przeliczeniu (silnik/runda.py), U2: alarm na górze
+    inwestor = inw.poczatek_rundy(gra.dane, f, inw.przyznany(gra.konfiguracja, firma, r), r, rach)
+    alarm = inw.alarm(gra.dane, f)
+    d, blokady = inw.blokada(gra.dane, f, d)
     # handel: przyjęte oferty od razu na kopii stanu (druga strona – w pustej księdze; jej decyzje – w przeliczeniu)
     handel = hd.przyjmij(gra.dane, stan.firmy, {firma: d}, r, {firma: ks}, {firma: rach},
                          gra.konfiguracja["ziarno"], tylko=firma)[firma]
@@ -97,8 +101,9 @@ def stan_po_szkicu(gra: Gra, firma: str):
         info["konkurencja"] = kn.zlec(gra.dane, f, d, r, gra.konfiguracja["ziarno"], sorted(stan.firmy), ks, rach, czas,
                                       podglad=True)   # wpadka – dopiero w przeliczeniu
         info["czas_wlasciciela"] = czas.podsumowanie()
-    bledy = lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
-                         lokal, info)
+    bledy = alarm + blokady + inw.bledy(f, inwestor)
+    bledy += lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
+                          lokal, info)
     bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
     # odrzucone kredyty, lokaty i leasing (zaległości i debet – dopiero w przeliczeniu)
     odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]

@@ -105,7 +105,10 @@ export const dashboard = {
     const rynek = [boty.length ? `boty: ${boty.join(", ")}` : "", stali.length ? `stałe ceny: ${stali.join(", ")}` : ""].filter(Boolean).join(" · ");
     const klub = v.kasyno?.otwarte ? `<div class="komunikat">${esc(v.kasyno.zaproszenie)}
       · <a data-zakladka-k="kasyno">${esc(v.kasyno.adres)}</a></div>` : "";
-    return `${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
+    const alarm = (v.lista_bledow || []).find((b) => b.alarm);   // U2: debet ponad limit – blokada w tej rundzie
+    const pasek = alarm ? `<div class="komunikat zly">${esc(alarm.tekst)}
+      <button class="btn jasny maly" data-akcja="popraw" data-z="bank">Przejdź do banku</button></div>` : "";
+    return `${pasek}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
       ${kafel("Nazwa i logo firmy", "osoba", `<div class="srodek">${znakFirmy(m)}<b>${esc(m.nazwa)}</b>${m.slogan ? `<div class="maly-tekst">„${esc(m.slogan)}”</div>` : ""}</div>`)}
       ${kafel("Miejsce", "karta", d.miejsce ? `${d.miejsce} / ${d.liczba_firm}` : `<span class="maly-tekst">Ranking dostępny od rundy 3</span>`)}
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}
@@ -139,6 +142,7 @@ export const dashboard = {
   akcje: {
     "marka-kolor": (el, c) => c.zmien((d) => { d.kolor = el.dataset.kolor; }),
     "marka-bez-logo": (el, c) => wyslijLogo(c, ""),
+    popraw: (el, c) => c.idz(el.dataset.z, "decyzje"),
   },
   po({ v }) {
     const h = v.historia || [];
