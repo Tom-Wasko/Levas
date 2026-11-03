@@ -314,7 +314,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 
 - [x] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry — zrobione 3.11.2026 (Claude Code zamiast Fable, gałąź `analiza-a`): `raporty/analiza/A1_przygotowanie.md`; osobny serwer analizy (port 8766, baza `raporty/analiza/analiza.sqlite3`), gracz przez API i zrzuty Chrome bez okna – `raporty/analiza/skrypty/gracz.py`.
 - [x] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/` — zrobione 3.11.2026: `dziennik_nowicjusz.md` (18 rund przez API, 4. miejsce, −0,297), `dziennik_optymalizator.md` (18 wariantów × 3 ziarna, `skrypty/eksperymenty.py`), `dziennik_nauczyciel.md` (4 drużyny + 2 boty: konta, pauza, przelicz mimo braków, alarm i inwestor, zmiana poziomu bota, cofnięcie, CSV); logi JSON i zrzuty w `raporty/analiza/`.
-- [ ] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania
+- [x] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania — zrobione 3.11.2026: 22 pozycje (8 problemów, 7 zmian, 7 nowych funkcji), 8 hipotez „za dobrych” strategii dla B, 6 pytań do autora
 - [ ] **STOP:** autor czyta raport z A i wybiera pozycje U
 
 ## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
