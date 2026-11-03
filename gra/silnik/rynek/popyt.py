@@ -31,9 +31,11 @@ import numpy as np
 from ..dane import Dane
 from ..kuchnia import menu
 from ..kuchnia import swiezosc as sw
+from ..kuchnia.jakosc import mnoznik_wyposazenia
 from ..kuchnia.operacje import jakosc_uslugi, kasjerzy, obsluz
 from ..losowosc import strumien
 from ..model import Firma, Lokal
+from ..nieruchomosci import per_lokal as pl
 from . import kalendarz as kal
 from . import promocje as pm
 from . import reklama as rk
@@ -179,13 +181,21 @@ def podzial(dane: Dane, pule_rundy: dict, oferty: dict[str, dict[tuple[str, str]
 
 
 def widok_lokalu(firma: Firma, lokal: str) -> Firma:
-    """Firma ograniczona do stanowisk jednego lokalu (magazyn i pracownicy wspólni – zużycie idzie do firmy)."""
-    return firma.model_copy(update={"stanowiska": [s for s in firma.stanowiska if s.lokal == lokal]})
+    """Firma widziana z jednego lokalu (silnik/nieruchomosci/per_lokal.py: stanowiska, partie, magazyn, menu, ceny,
+    wyposażenie lokalu; pracownicy wspólni)."""
+    return pl.widok(firma, lokal)
 
 
-def oferty_lokali(dane: Dane, firma: Firma, runda: int, ceny: dict[str, float], wspolne: dict) -> dict[str, dict]:
-    """Oferty działających lokali firmy: {lokal: {danie: oferta}} – danie jest w lokalu, gdy lokal ma kasjera
-    i stanowisko z pracownikiem i sprzętem dla dania. wspolne: wyposażenie, reklama, mnoznik_firmy, zadowolenie."""
+def ceny_lokalu(firma: Firma, lok: Lokal) -> dict[str, float]:
+    """Ceny po rabacie dań z menu lokalu, które są w sprzedaży."""
+    c = pl.ceny(firma, lok)
+    return {u: max(0.01, c[u].cena - c[u].rabat) for u in pl.menu(firma, lok) if u in c}
+
+
+def oferty_lokali(dane: Dane, firma: Firma, runda: int, wspolne: dict) -> dict[str, dict]:
+    """Oferty działających lokali firmy: {lokal: {danie: oferta}} – danie jest w lokalu, gdy jest w menu i sprzedaży
+    lokalu, a lokal ma kasjera i stanowisko z pracownikiem i sprzętem dla dania. Cena i wyposażenie – lokalu (Z2);
+    wspolne: reklama, mnoznik_firmy, zadowolenie, reklama_strefy."""
     wynik = {}
     for lok in firma.lokale:
         if lok.dziala_od > runda:
@@ -194,21 +204,24 @@ def oferty_lokali(dane: Dane, firma: Firma, runda: int, ceny: dict[str, float], 
         if not kasjerzy(dane, v):
             continue
         strefa = dane.lokale[lok.id]["strefa"]
-        for u, cena in ceny.items():
+        wyp = mnoznik_wyposazenia(dane, pl.lista(firma, lok, "wyposazenie"))
+        for u, cena in ceny_lokalu(firma, lok).items():
             q = jakosc_uslugi(dane, v, u)
             if q is not None:
-                wynik.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q, **wspolne,
-                                                   "rozruch": rozruch(dane, lok, runda)}
+                wynik.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q, "wyposazenie": wyp,
+                                                   **wspolne, "rozruch": rozruch(dane, lok, runda)}
     return wynik
 
 
 def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str, dict]], runda: int, ziarno,
-                 reklama: dict[str, float] | None = None) -> dict:
+                 reklama: dict[str, float] | None = None, przewozy: dict[str, list[dict]] | None = None) -> dict:
     """Popyt i obsługa w grze z lokalami. oferty: {firma: {lokal: {danie: oferta}}} (z `oferty_lokali`).
     Zwraca {"popyt": {firma: {danie: n}}, "obsluga": {firma: wynik jak operacje.obsluz}, "klienci": {firma: …},
     "rynek": {danie: {firma: {"popyt", "skladniki"}}}, "strefy": {…}, "swiezosc": {firma: …},
     "promocje": {firma z promocjami: {"przychod": {danie: zł brutto}, "doplaty", "koszt_dodatkow", "typy"}}} – dane do
     wyników i zakładek „Klienci” oraz „Magazyn i świeżość”. reklama – poszerzenie pul stref (jak w `pule`).
+    Z2: każdy lokal ma swój magazyn (widok lokalu), przewozy {firma: [...]} (per_lokal.przewozy) jadą rano przed
+    dostawami; "przychod": {firma: {danie: zł brutto}} – suma sprzedaży lokali po ich cenach (z promocjami).
     Popyt i sprzedaż – w porcjach (2 za 1: dwie porcje na klienta)."""
     dni = dni_rundy(dane, runda)
     pr = pule(dane, runda, ziarno, reklama)
@@ -219,7 +232,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                 po_daniach.setdefault(u, {})[(f, lok)] = o
     pod = podzial(dane, pr, po_daniach)
 
-    popyt, obsluga, klienci, rynek, swiezosc, promocje = {}, {}, {}, {}, {}, {}
+    popyt, obsluga, klienci, rynek, swiezosc, promocje, przychod = {}, {}, {}, {}, {}, {}, {}
     zrodla: dict[str, dict[str, float]] = {}
     for f, lokale in oferty.items():
         firma = firmy[f]
@@ -233,22 +246,31 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         promo = None
         if any(o.get("promocje") for dania in lokale.values() for o in dania.values()):
             promo = promocje[f] = {"przychod": {}, "doplaty": 0.0, "koszt_dodatkow": 0.0, "typy": {}}
-        widoki = {lok: widok_lokalu(firma, lok) for lok in lokale}
+        partie = bool(firma.partie)
+        # widoki wszystkich działających lokali (magazyn lokalu żyje także bez sprzedaży – dostawy, kosz, przewozy)
+        widoki = pl.widoki(firma, runda) if firma.lokale else {}
+        for lok in lokale:
+            widoki.setdefault(lok, widok_lokalu(firma, lok))
+        przew = (przewozy or {}).get(f, [])
         sprzedaz_lokalu = {lok: 0 for lok in lokale}
+        przych = przychod[f] = {}
         raport = _raport_swiezosci(dane, firma, dni)
+        raport["przewozy"] = []
         for i in range(len(dni)):
             dzien = dni[i].isoformat()
-            if firma.partie:
-                przyjete, straty, wynajete = sw.przyjmij(dane, firma, dzien)
-                raport["wynajem"].extend(wynajete)
-                for z, ile in przyjete.items():
-                    raport["zasoby"].setdefault(z, _wiersz(len(dni)))["dostawy"][i] += ile
-                _dodaj_straty(raport, straty, i, len(dni))
+            if partie:
+                raport["przewozy"] += pl.wykonaj_przewozy(dane, firma, widoki, przew, i, dzien)
+                for v in widoki.values():
+                    przyjete, straty, wynajete = sw.przyjmij(dane, v, dzien)
+                    raport["wynajem"].extend(wynajete)
+                    for z, ile in przyjete.items():
+                        raport["zasoby"].setdefault(z, _wiersz(len(dni)))["dostawy"][i] += ile
+                    _dodaj_straty(raport, straty, i, len(dni))
             for lok in lokale:
                 d = dzien_popyt[lok][i]
                 if not any(d.values()):
                     continue
-                wyl = menu.wylaczone(dane, firma.magazyn, [u for u in d if d[u]])
+                wyl = menu.wylaczone(dane, widoki[lok].magazyn, [u for u in d if d[u]])
                 if wyl:
                     d, przeszli = menu.przenies(dane, d, wyl)
                     dzien_popyt[lok][i] = d
@@ -258,7 +280,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                         z["odeszli"] += d[u]
                         raport["wylaczone"].append({"data": dzien, "lokal": lok, "danie": u, "skladnik": wyl[u]})
                 o = obsluz(dane, widoki[lok], d, ziarno, runda, skala_godzin=1 / len(dni), klucze=(lok, i),
-                           dzien=dzien if firma.partie else None)
+                           dzien=dzien if partie else None)
                 for n, z in o["zuzyte_zasoby"].items():
                     raport["zasoby"].setdefault(n, _wiersz(len(dni)))["zuzycie"][i] += z["ilosc"]
                 for u, k in o["obsluzeni"].items():
@@ -270,6 +292,8 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     sprzedaz_lokalu[lok] += k
                     if promo is not None:
                         _rozlicz_promocje(promo, u, k, lokale[lok][u], pod[(f, lok)][u], i)
+                    else:
+                        przych[u] = przych.get(u, 0.0) + k * lokale[lok][u]["cena"]
                     if o["utracona"][u]:
                         p = przyczyny.setdefault(u, {})
                         p[o["przyczyna"][u]] = p.get(o["przyczyna"][u], 0) + o["utracona"][u]
@@ -281,10 +305,19 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                     for k, h in o[klucz].items():
                         laczna[klucz][k] = laczna[klucz].get(k, 0.0) + h
                 laczna["godziny_kasy"] += o["godziny_kasy"]
-            if firma.partie:
-                _dodaj_straty(raport, sw.wyrzuc(firma, dzien), i, len(dni))
-                raport["zajetosc"].append(sw.zajete(dane, firma, dzien))
-        sw.uzgodnij(firma)
+            if partie:
+                zaj = {t: 0.0 for t in sw.CHLODZONE}
+                for v in widoki.values():
+                    _dodaj_straty(raport, sw.wyrzuc(v, dzien), i, len(dni))
+                    for t, x in sw.zajete(dane, v, dzien).items():
+                        zaj[t] += x
+                raport["zajetosc"].append(zaj)
+        if partie:
+            pl.scal(firma, widoki)
+        else:
+            sw.uzgodnij(firma)
+        if promo is not None:
+            przych.update(promo["przychod"])
         swiezosc[f] = _zakoncz_raport(raport)
         laczna["liczba_kasjerow"] = sum(len(kasjerzy(dane, v)) for v in widoki.values())
         laczna["przyczyna"] = {u: max(p, key=p.get) for u, p in przyczyny.items()}
@@ -321,7 +354,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                      "klienci": {f: int(round(x)) for f, x in sorted(zrodla.get(z, {}).items())}}
     return {"popyt": popyt, "obsluga": obsluga, "klienci": klienci, "rynek": rynek, "swiezosc": swiezosc,
             "strefy": {"strefy": strefy, "dni": [d.isoformat() for d in dni], "wydarzenia": wydarzenia(dane, dni)},
-            "promocje": promocje}
+            "promocje": promocje, "przychod": przychod}
 
 
 def _rozlicz_promocje(promo: dict, u: str, k: int, o: dict, w: dict, i: int) -> None:
@@ -453,7 +486,7 @@ def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float 
             continue
         strefa, v = dane.lokale[lok.id]["strefa"], widok_lokalu(firma, lok.id)
         for u in dania:   # własne lokale konkurują z nowym lokalem o klientów strefy
-            c = firma.ceny.get(u)
+            c = pl.ceny(firma, lok).get(u)
             cena = max(0.01, c.cena - c.rabat) if c else dane.uslugi[u]["cena_preferowana"] * dane.mapa["popyt"]["strefy"][strefa]["cena"]
             q = jakosc_uslugi(dane, v, u) if kasjerzy(dane, v) else None
             moje.setdefault(lok.id, {})[u] = {"strefa": strefa, "cena": cena, "jakosc": q or (2, 2, 2), **wspolne,

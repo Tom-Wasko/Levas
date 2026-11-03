@@ -133,6 +133,15 @@ class OfertaHandlu(Model):
     cena = _kwota("cena")
 
 
+class Cena(Model):
+    """Cena usługi i rabat (włączona sprzedaż)."""
+    cena_gr: int
+    rabat_gr: int = 0
+
+    cena = _kwota("cena")
+    rabat = _kwota("rabat")
+
+
 class Lokal(Model):
     """Lokal drużyny (dane: dane/mapa/lokale.yaml)."""
     id: str
@@ -147,6 +156,12 @@ class Lokal(Model):
     najem_do: int | None = None   # po wypowiedzeniu: ostatnia runda najmu
     ulepszenia: str | None = None # rozliczenie nakładów po wypowiedzeniu: "zatrzymaj" | "przywroc" (KC art. 676)
     naklady_gr: int = 0           # nakłady najemcy na lokal (adaptacja, stanowiska) – do rozliczenia ulepszeń
+    # Z2 (przebudowa 2.11.2026): menu, ceny, wyposażenie i udogodnienia osobno w każdym lokalu
+    # (silnik/nieruchomosci/per_lokal.py); None – jeszcze nie ustalone (stary zapis), wtedy jak w całej firmie
+    menu: dict[str, int] | None = None          # usługa → prognoza popytu w lokalu
+    ceny: dict[str, Cena] | None = None         # usługa → cena i rabat w lokalu
+    wyposazenie: list[str] | None = None
+    udogodnienia: list[str] | None = None
 
     czynsz = _kwota("czynsz")
     kaucja = _kwota("kaucja")
@@ -175,6 +190,7 @@ class Partia(Model):
     dostawca: str = ""
     runda: int = 0                # runda zakupu
     wynajem: bool = False         # w wynajętej chłodni (nie zmieściło się we własnej) – nie zajmuje własnego miejsca
+    lokal: str | None = None      # Z2: lokal, w którym leży partia (None – stary zapis: pierwszy lokal firmy)
 
     wartosc = _kwota("wartosc")
 
@@ -273,15 +289,6 @@ class RozliczenieJDG(Model):
     zdrowotna_odliczona = _kwota("zdrowotna_odliczona")
     zaliczki = _kwota("zaliczki")
     zaplacone = _kwota("zaplacone")
-
-
-class Cena(Model):
-    """Cena usługi i rabat (włączona sprzedaż)."""
-    cena_gr: int
-    rabat_gr: int = 0
-
-    cena = _kwota("cena")
-    rabat = _kwota("rabat")
 
 
 class SrodekTrwaly(Model):

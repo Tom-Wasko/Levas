@@ -40,6 +40,7 @@ from .losowosc import strumien
 from .ludzie import rynek_pracy as rp
 from .model import Firma, StanGry
 from .nieruchomosci import lokale as lk
+from .nieruchomosci import per_lokal as pl
 from .pieniadze import banki as bk
 from .rynek import popyt as pp
 from .rynek import promocje as pm
@@ -409,7 +410,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
 
     # popyt strefowy w rundzie sprzedaży (runda 1 planuje rundę 2): prognoza dla własnych lokali przy cenach
     # konkurencji z poprzedniej rundy
-    wyp = mnoznik_wyposazenia(dane, f.wyposazenie)
+    glowny = pl.glowny(f, runda)   # wyposażenie bot kupuje do lokalu głównego (Z2)
+    wyp = mnoznik_wyposazenia(dane, pl.lista(f, glowny, "wyposazenie") if glowny else f.wyposazenie)
     ceny = {u: _cena(dane, st, stan, u, runda) for u in oferta}
     szczyt, udzialy_dni, plan = 1.0, None, None
     r_sprz = max(runda, 2)
@@ -444,10 +446,10 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 c = {u: _cena(dane, st, stan, u, runda, m) for u in oferta}
                 if c == ceny:
                     continue
-                pr, pl = prognoza_cen(c)
-                pn = _plan_firmy(dane, f, pl, r_sprz, runda, ekonomia(c))
+                pr, plk = prognoza_cen(c)
+                pn = _plan_firmy(dane, f, plk, r_sprz, runda, ekonomia(c))
                 if (mz := _marza(dane, pn, ekonomia(c))) > najlepsza[0]:
-                    najlepsza = (mz, c, pr, pl, pn)
+                    najlepsza = (mz, c, pr, plk, pn)
             _, ceny, prog, prog_lok, plan = najlepsza
         drugi = pz.get("kolejny_lokal")
         if drugi and "lokal" not in d and plan["lokale"] \
@@ -522,6 +524,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         ceny_d = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
         d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni,
                                              dane.data_rundy(runda))
+        if len(f.lokale) > 1:   # magazyn każdego lokalu osobno (Z2): dostawy wg prognozy lokali
+            d["zamowienia"] = pl.podziel_zamowienia(d["zamowienia"], {x: sum(v.values()) for x, v in prog_lok.items()})
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka): po zakupach zostaje bufor gotówki (B5: wcześniej bot
     # kupował od razu cały komplet i wpadał w debet)

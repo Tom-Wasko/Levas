@@ -32,7 +32,7 @@ gra/
     kuchnia/         menu, jakosc, operacje, planowanie, dostawcy, magazyn, swiezosc
     rynek/           popyt, konkurencja, kalendarz, reklama, promocje, handel
     ludzie/          rynek_pracy, kandydaci, czas_wlasciciela
-    nieruchomosci/   lokale, przejecia
+    nieruchomosci/   lokale, przejecia, per_lokal (menu, ceny, magazyn, wyposażenie osobno w lokalu; przewozy)
     ksiegowosc/      finanse (KPiR, rachunek), rozliczenie, uzgodnienie, biuro, urzad, srodki_trwale
     pieniadze/       banki, lichwiarz (Harpagon), kasyno, wlasciciel, zaleglosci
     swiat/           zdarzenia, awarie

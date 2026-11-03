@@ -118,7 +118,7 @@ def miary_kebabu(dane: Dane, f, w: dict) -> dict:
     sprzedaz = w["sprzedaz"]
     popyt = sum(v["popyt"] for v in sprzedaz.values())
     dni = len((w.get("klienci") or {}).get("dni") or [])
-    dania_dni = len(f.oferta) * len(f.lokale) * dni
+    dania_dni = sum(len(lok.menu if lok.menu is not None else f.oferta) for lok in f.lokale) * dni   # menu lokali (Z2)
     wyl = (w.get("swiezosc") or {}).get("wylaczone") or []
     prac = w.get("pracownicy") or []
     prog = dane.z["karta_wynikow"]["kebab"]["zadowolenie_pracownikow"]["prog_przepracowania"]

@@ -370,6 +370,17 @@ magazyn:   # gra z lokalami (zmiana 26.10): bez kosztu magazynowania i zwrotów 
       się mandatem z szansą (szansa − bazowa) / szansa; mandat = min + za litr + za zł strat (od min do max, co 50
       zł), poza KPiR; po mandacie popyt × popyt_po_mandacie przez rund_spadku rund. Liczby – założenie do kalibracji
       w kroku 5 (100 l w wynajmie i 300 zł przeterminowanych → ok. 20% na kontrolę)'
+  przewoz:
+    wartosc:
+      od_rundy: 2
+      czas_wlasciciela: 1
+      koszt_kursu: 30
+      skrocenie_terminu_dni: 1
+    pewnosc: zalozenie
+    zrodlo: 'przebudowa 2.11.2026 (Z2, raporty/przebudowa_zakladek.md): towar między własnymi lokalami przewozi
+      właściciel – kurs (para lokali, jeden dzień) zajmuje 1 h jego czasu i kosztuje 30 zł brutto (paliwo,
+      parkowanie); przewieziona partia traci 1 dzień terminu (nie krótszy niż dzień przewozu). Pracowników nie
+      przenosi się. Liczby – założenie do kalibracji'
 lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
   udzial_skladnikow:
     wartosc: 0.5

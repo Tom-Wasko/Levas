@@ -35,6 +35,7 @@ from ..ksiegowosc.finanse import Ksiega, Rachunek, ksieguj, vat_z_brutto
 from ..kuchnia import swiezosc as sw
 from ..losowosc import strumien
 from ..model import Firma, OfertaHandlu, Partia, grosze
+from ..nieruchomosci import per_lokal as pl
 from ..pieniadze.zaleglosci import zl
 
 ZAKLADKA = "handel"
@@ -292,12 +293,13 @@ def _przenies_towar(dane: Dane, s: Firma, k: Firma, o: OfertaHandlu, runda: int)
         if zostalo <= EPS:
             break
     reszta = o.cena_gr   # u kupującego wartość partii = cena z faktury, rozdzielona wg ilości
+    lok = pl.glowny(k, runda)   # towar trafia do lokalu głównego kupującego (Z2)
     for j, (p, ile) in enumerate(wziete):
         w = reszta if j == len(wziete) - 1 else round(o.cena_gr * ile / o.ilosc)
         reszta -= w
         k.partie.append(Partia(zasob=p.zasob, jakosc=p.jakosc, ilosc=ile, wartosc_gr=w,
                                dostawa=dane.data_rundy(runda).isoformat(), termin=p.termin,
-                               dostawca=f"Drużyna {nazwa(s)}", runda=runda))
+                               dostawca=f"Drużyna {nazwa(s)}", runda=runda, lokal=lok.id if lok else None))
     sw.uzgodnij(s)
     sw.uzgodnij(k)
 

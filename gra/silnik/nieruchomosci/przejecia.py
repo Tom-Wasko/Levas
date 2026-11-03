@@ -35,6 +35,7 @@ from ..ludzie.rynek_pracy import jako_kandydat
 from ..model import Firma, KupionyBudynek, Lokal, StanGry, Stanowisko
 from ..pieniadze import banki as bk
 from ..pieniadze.zaleglosci import zl as _zl
+from . import per_lokal as pl
 from .lokale import oferta, powod_odrzucenia
 
 ZAKLADKA = "przejecia"
@@ -235,9 +236,28 @@ def _wyprowadzka(dane: Dane, s: StanGry, nazwa: str, umowa: Lokal, runda: int, z
         wlasciciel.stanowiska.append(Stanowisko(nr=wlasciciel.nowy_nr(st.typ), typ=st.typ, od_rundy=runda,
                                                 lokal=umowa.id, sprzet=sprzet))
         info["stanowiska_wlasciciela"] += 1
+    # wyposażenie i udogodnienia lokalu – sprzedane; towar z magazynu lokalu – do innego lokalu najemcy (Z2)
+    info["sprzedane_wyposazenie"] = []
+    pl.utrwal(najemca)   # stary zapis: listy firmy przypisane do lokali, zanim ten lokal zniknie
+    for rodzaj in pl.LISTY:
+        poz = dane.pozycje(rodzaj)
+        for n in list(pl.lista(najemca, umowa, rodzaj)):
+            if not st_trwale.sprzedaj(najemca, pl.nazwa_srodka(najemca, umowa, n), ks_n):
+                st_trwale.sprzedaj(najemca, n, ks_n)
+            kwota = poz[n]["cena"] * dane.z["finanse"]["sprzedaz_udogodnien"]
+            ksieguj(najemca, ks_n, rach_n, f"Sprzedaż {'udogodnień' if rodzaj == 'udogodnienia' else 'wyposażenia'}: {n}",
+                    kwota, "przychod_pozostaly")
+            st_trwale.zmniejsz_majatek(najemca, poz[n]["cena"])
+            info["sprzedane_wyposazenie"].append(n)
+        setattr(umowa, rodzaj, [])
     # pracownicy najemcy: na wolne stanowiska w jego innych działających lokalach, reszta zwolniona z odprawą
     najemca.stanowiska = [st for st in najemca.stanowiska if st.lokal != umowa.id]
     najemca.lokale.remove(umowa)
+    cel = pl.glowny(najemca, runda)
+    for p in najemca.partie:
+        if p.lokal == umowa.id:
+            p.lokal = cel.id if cel else None
+    pl.synchronizuj(najemca)
     dzialajace = {x.id for x in najemca.lokale if x.dziala_od <= runda}
     for st in stanowiska:
         p = najemca.pracownicy.get(st.pracownik) if st.pracownik else None

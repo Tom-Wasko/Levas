@@ -73,6 +73,7 @@ from .ludzie import czas_wlasciciela as cw
 from .ludzie import rynek_pracy as rp
 from .model import Cena, Firma, Odejscie, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
 from .nieruchomosci import lokale as lk
+from .nieruchomosci import per_lokal as pl
 from .nieruchomosci.lokale import bledy as bledy_lokali
 from .nieruchomosci.lokale import wolne_miejsca
 from .rynek import promocje as pm
@@ -139,10 +140,55 @@ def _kanal(dane: Dane, kandydat: dict, wybrany: str | None, runda: int, czas: cw
     return None
 
 
+def _zadane_lokali(firma: Firma, d: dict, w_lokalu: dict, klucz: str) -> dict | None:
+    """{lokal: zadane (oferta / sprzedaz)} – decyzja główna dla każdego lokalu, w_lokalu ją zastępuje; gra bez lokali –
+    {None: decyzja główna}. None – nic nie zmieniono."""
+    if not firma.lokale:
+        return {None: d[klucz]} if klucz in d else None
+    wynik = {}
+    for lok in firma.lokale:
+        x = w_lokalu.get(lok.id, {}).get(klucz, d.get(klucz))
+        if x is not None:
+            wynik[lok.id] = x
+    return wynik or None
+
+
+def _odrzucone_uslugi(dane: Dane, runda: int, stara: dict, nowa: list[str]) -> list[str]:
+    """Nowe dania ponad limit rundy albo spoza dań startowych (limit liczony dla menu całej firmy)."""
+    rundy = dane.katalog_ofert["rundy"]
+    limit = limit_nowych_uslug(dane, runda, len(stara))
+    dozwolone = rundy["uslugi_startowe"] if runda < rundy["nowe_uslugi_od_rundy"] else list(dane.uslugi)
+    nowe = [u for u in nowa if u not in stara]
+    wolne = max(0, len(stara) + limit - sum(u in stara for u in nowa))
+    return [u for u in nowe if u not in dozwolone] + [u for u in nowe if u in dozwolone][wolne:]
+
+
+def _nowe_ceny(dane: Dane, stare: dict[str, Cena], zadane: dict, info: dict) -> dict[str, Cena]:
+    """Ceny ze zgłoszenia; cena spoza widełek (menu.yaml: ceny) – zostaje poprzednia."""
+    ceny = {}
+    for u, c in zadane.items():
+        if not (c and c.get("cena")):
+            continue
+        nowa = Cena(cena=float(c["cena"]), rabat=float(c.get("rabat", 0) or 0))
+        powod = mn.powod_ceny(dane, u, nowa.cena, nowa.rabat)
+        if powod:
+            info.setdefault("odrzucone_ceny", []).append(
+                f"{powod} Zostaje poprzednia cena." if u in stare else f"{powod} Danie nie weszło do sprzedaży.")
+            if u in stare:
+                ceny[u] = stare[u]
+        else:
+            ceny[u] = nowa
+    return ceny
+
+
 def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ceny_dostawcow: dict,
              ksiega: Ksiega, rachunek: Rachunek) -> dict:
     """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów).
-    Nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany wcześniej, silnik/nieruchomosci/lokale.py)."""
+    Nowe stanowiska tylko na wolnych miejscach działających lokali (lokal wybrany wcześniej, silnik/nieruchomosci/lokale.py).
+    Z2 (silnik/nieruchomosci/per_lokal.py): "oferta", "sprzedaz", "stanowiska", "{udogodnienia,wyposazenie}_{kup,sprzedaj}"
+    dotyczą wszystkich lokali (oferta i ceny) albo lokalu głównego / dowolnego wolnego miejsca; "w_lokalu": {lokal: {te
+    same klucze}} – osobno dla lokalu; "zamowienia"[].lokal – dokąd dostawa (domyślnie lokal główny); "przewozy":
+    [{"z", "do", "zasob", "jakosc", "ilosc", "dzien"}] – towar między lokalami."""
     info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "wypowiedzenia": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
@@ -152,35 +198,43 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         firma.misja = d["misja"]
     if re.fullmatch(r"#[0-9a-fA-F]{6}", str(d.get("kolor") or "")):
         firma.kolor = d["kolor"].lower()
-    if "oferta" in d:
-        nowa = {u: int(p or 0) for u, p in d["oferta"].items() if u in dane.uslugi}
-        rundy = dane.katalog_ofert["rundy"]
-        limit = limit_nowych_uslug(dane, runda, len(firma.oferta))
-        dozwolone = rundy["uslugi_startowe"] if runda < rundy["nowe_uslugi_od_rundy"] else list(dane.uslugi)
-        nowe = [u for u in nowa if u not in firma.oferta]
-        wolne = max(0, len(firma.oferta) + limit - sum(u in firma.oferta for u in nowa))
-        odrzucone = [u for u in nowe if u not in dozwolone] + [u for u in nowe if u in dozwolone][wolne:]
-        firma.oferta = {u: p for u, p in nowa.items() if u not in odrzucone}
+    # Z2: menu i ceny osobno w każdym lokalu – decyzja główna dla wszystkich lokali, w_lokalu[lok] ją zastępuje
+    w_lokalu = {k: v or {} for k, v in (d.get("w_lokalu") or {}).items() if pl.lokal(firma, k)}
+    if firma.lokale:
+        pl.utrwal(firma)
+        pl.synchronizuj(firma)
+    zadane = _zadane_lokali(firma, d, w_lokalu, "oferta")
+    if zadane is not None:
+        n = len(firma.lokale) or 1
+        menu_lok = {k: {u: int(p or 0) if k is None or k in w_lokalu and "oferta" in w_lokalu[k]
+                        else math.ceil(int(p or 0) / n)   # prognoza firmy – po równo na lokale
+                        for u, p in x.items() if u in dane.uslugi} for k, x in zadane.items()}
+        wszystkie = list(dict.fromkeys([u for lok in firma.lokale for u in menu_lok.get(lok.id, lok.menu)]
+                                       + [u for u in menu_lok.get(None, {})]))
+        odrzucone = _odrzucone_uslugi(dane, runda, firma.oferta, wszystkie)
+        for k, x in menu_lok.items():
+            m = {u: p for u, p in x.items() if u not in odrzucone}
+            if k is None:
+                firma.oferta = m
+            else:
+                pl.lokal(firma, k).menu = m
+        pl.synchronizuj(firma)
         if odrzucone:
             info["odrzucone_uslugi"] = odrzucone
         for u in firma.oferta:
             if u not in firma.uslugi_kiedykolwiek:
                 firma.uslugi_kiedykolwiek.append(u)
-    if "sprzedaz" in d and "sprzedaz" in odbl:
-        ceny = {}
-        for u, c in d["sprzedaz"].items():
-            if not (c and c.get("cena")):
-                continue
-            nowa = Cena(cena=float(c["cena"]), rabat=float(c.get("rabat", 0) or 0))
-            powod = mn.powod_ceny(dane, u, nowa.cena, nowa.rabat)
-            if powod:      # cena spoza widełek (menu.yaml: ceny) – zostaje poprzednia
-                info.setdefault("odrzucone_ceny", []).append(
-                    f"{powod} Zostaje poprzednia cena." if u in firma.ceny else f"{powod} Danie nie weszło do sprzedaży.")
-                if u in firma.ceny:
-                    ceny[u] = firma.ceny[u]
+    zadane = _zadane_lokali(firma, d, w_lokalu, "sprzedaz") if "sprzedaz" in odbl else None
+    if zadane is not None:
+        for k, x in zadane.items():
+            if k is None:
+                firma.ceny = _nowe_ceny(dane, firma.ceny, x, info)
             else:
-                ceny[u] = nowa
-        firma.ceny = ceny
+                lok = pl.lokal(firma, k)
+                lok.ceny = _nowe_ceny(dane, lok.ceny, x, info)
+        if info.get("odrzucone_ceny"):
+            info["odrzucone_ceny"] = list(dict.fromkeys(info["odrzucone_ceny"]))
+        pl.synchronizuj(firma)
     if d.get("bank") and d["bank"] in dane.dostepne("banki", runda):
         firma.bank = d["bank"]
     if d.get("biuro") and bo.poprawny_wybor(dane, d["biuro"]):   # biura z mapy albo samodzielna księgowość
@@ -189,26 +243,34 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     # stanowiska (działają od razu)
     pakiety = dane.katalog_ofert["stanowiska"]["pakiety"]
     miejsca = wolne_miejsca(dane, firma, runda)
-    for typ, n in (d.get("stanowiska") or {}).items():
+    uzyte: dict[str, int] = {}   # limit nowych stanowisk typu – wspólny dla lokali
+    zlecenia = [(None, typ, n) for typ, n in (d.get("stanowiska") or {}).items()] + [
+        (k, typ, n) for k, v in w_lokalu.items() for typ, n in (v.get("stanowiska") or {}).items()]
+    for lok_wybrany, typ, n in zlecenia:
         n = int(n or 0)
         if n <= 0 or typ not in dane.typy_stanowisk:
             continue
-        n = min(n, dane.maks_nowych_stanowisk)
-        if n > len(miejsca[typ]):
-            info.setdefault("odrzucone_stanowiska", {})[typ] = n - len(miejsca[typ])
-            n = len(miejsca[typ])
-            if n == 0:
-                continue
+        n = min(n, dane.maks_nowych_stanowisk - uzyte.get(typ, 0))
+        wolne = [m for m in miejsca[typ] if lok_wybrany is None or m == lok_wybrany]
+        if n > len(wolne):
+            odrz = info.setdefault("odrzucone_stanowiska", {})
+            odrz[typ] = odrz.get(typ, 0) + n - len(wolne)
+            n = len(wolne)
+        if n <= 0:
+            continue
+        wybrane = wolne[:n]
+        for m in wybrane:
+            miejsca[typ].remove(m)
+        uzyte[typ] = uzyte.get(typ, 0) + n
         start = firma.nowy_nr(typ)
         for i in range(n):
-            firma.stanowiska.append(Stanowisko(nr=start + i, typ=typ, od_rundy=runda,
-                                               lokal=miejsca[typ][i]))
+            firma.stanowiska.append(Stanowisko(nr=start + i, typ=typ, od_rundy=runda, lokal=wybrane[i]))
         st_trwale.zakup(dane, firma, ksiega, rachunek, f"Uruchomienie stanowiska: {dane.typy_stanowisk[typ]['kto']}",
                         f"Stanowiska: {dane.typy_stanowisk[typ]['kto']} (runda {runda})", "sprzet", pakiety[str(n)],
                         runda)
         firma.majatek += pakiety[str(n)]
         info["inwestycje"] += pakiety[str(n)]
-        for lok_id in miejsca[typ][:n]:   # nakłady najemcy – rozliczenie ulepszeń
+        for lok_id in wybrane:   # nakłady najemcy – rozliczenie ulepszeń
             lok = next(x for x in firma.lokale if x.id == lok_id)
             if lok.forma == "najem":
                 lok.naklady += pakiety[str(n)] / n
@@ -312,6 +374,13 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/kuchnia/dostawcy.py)
     zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
                                                 (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
+    # przewozy towaru między własnymi lokalami (Z2): czas właściciela i koszt kursu teraz, towar jedzie w tygodniu
+    if len(firma.lokale) > 1 and d.get("przewozy"):
+        info["przewozy"] = pl.przewozy(dane, firma, d["przewozy"], runda, czas, info)
+        for x in info["przewozy"]:
+            if x.get("koszt"):
+                ksieguj(firma, ksiega, rachunek, f"Przewóz towaru: {pl.nazwa(dane, x['z'])} → {pl.nazwa(dane, x['do'])}",
+                        x["koszt"])
     # właściciel na wolnym stanowisku: pracownik 1★ bez pensji, godziny z puli czasu właściciela (P5)
     firma.wlasciciel_na = None
     if kadry_ok and d.get("wlasciciel_stanowisko"):
@@ -325,8 +394,12 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         # partia z dniem dostawy (świeżość); magazyn do końca decyzji = stan + zamówione
         dni = (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days
         dzien = min(max(0, int(z.get("dzien") or 0)), dni - 1)
+        lok = pl.lokal(firma, z.get("lokal")) or pl.glowny(firma, runda)   # dostawa do lokalu (Z2)
+        if lok is not None:
+            z["lokal"] = lok.id
         firma.partie.append(sw.nowa_partia(dane, z["zasob"], int(z["jakosc"]), ilosc, cena,
-                                           dane.data_rundy(runda) + timedelta(days=dzien), z["dostawca"], runda))
+                                           dane.data_rundy(runda) + timedelta(days=dzien), z["dostawca"], runda,
+                                           lokal=lok.id if lok else None))
         zakupy[z["dostawca"]] = zakupy.get(z["dostawca"], 0.0) + ilosc * cena
         s, sv = stawki.setdefault(z["dostawca"], {}), rz.stawka_zasobu(dane, z["zasob"]) or 0.0   # VAT wg składnika
         s[sv] = s.get(sv, 0.0) + ilosc * cena
@@ -341,22 +414,35 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         if f"hr_{rodzaj}" not in odbl and f"inwestycje_{rodzaj}" not in odbl:
             continue
         pozycje = dane.pozycje(rodzaj)
-        posiadane = getattr(firma, rodzaj)
-        for n in d.get(f"{rodzaj}_sprzedaj", []):
-            if n in posiadane:
+        glowny = pl.glowny(firma, runda)
+        # Z2: każdy lokal ma swoje; decyzja główna – lokal główny (sprzedaż: albo inny lokal z tą pozycją)
+        zlecenia = [(glowny, d.get(f"{rodzaj}_sprzedaj", []), d.get(f"{rodzaj}_kup", []), True)] + [
+            (pl.lokal(firma, k), v.get(f"{rodzaj}_sprzedaj", []), v.get(f"{rodzaj}_kup", []), False)
+            for k, v in w_lokalu.items()]
+        for lok, sprzedaj, kup, dowolny in zlecenia:
+            for n in sprzedaj:
+                gdzie = lok if lok is None or n in getattr(lok, rodzaj) else next(
+                    (x for x in firma.lokale if n in getattr(x, rodzaj)), None) if dowolny else None
+                posiadane = getattr(gdzie if gdzie is not None else firma, rodzaj)
+                if n not in posiadane:
+                    continue
                 posiadane.remove(n)
-                st_trwale.sprzedaj(firma, n, ksiega)
+                if gdzie is None or not st_trwale.sprzedaj(firma, pl.nazwa_srodka(firma, gdzie, n), ksiega):
+                    st_trwale.sprzedaj(firma, n, ksiega)
                 ksieguj(firma, ksiega, rachunek, f"Sprzedaż {nazwa_pozycji}: {n}",
                         pozycje[n]["cena"] * dane.z["finanse"]["sprzedaz_udogodnien"], "przychod_pozostaly")
                 st_trwale.zmniejsz_majatek(firma, pozycje[n]["cena"])
                 info["sprzedany_majatek"] += pozycje[n]["cena"]
-        for n in d.get(f"{rodzaj}_kup", []):
-            if n in pozycje and n not in posiadane and pozycje[n]["od_rundy"] <= runda:
-                posiadane.append(n)
-                st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {n}", n,   # opis jak w KPiR gry
-                                "sprzet" if rodzaj == "udogodnienia" else "wyposazenie", pozycje[n]["cena"], runda)
-                firma.majatek += pozycje[n]["cena"]
-                info["inwestycje"] += pozycje[n]["cena"]
+            posiadane = getattr(lok if lok is not None else firma, rodzaj)
+            for n in kup:
+                if n in pozycje and n not in posiadane and pozycje[n]["od_rundy"] <= runda:
+                    posiadane.append(n)
+                    st_trwale.zakup(dane, firma, ksiega, rachunek, f"Koszt zakupu: {n}",   # opis jak w KPiR gry
+                                    pl.nazwa_srodka(firma, lok, n) if lok is not None else n,
+                                    "sprzet" if rodzaj == "udogodnienia" else "wyposazenie", pozycje[n]["cena"], runda)
+                    firma.majatek += pozycje[n]["cena"]
+                    info["inwestycje"] += pozycje[n]["cena"]
+    pl.synchronizuj(firma)
 
     # marketing: kampanie agencji reklamowych i promocje
     if rk.zasady(dane) is not None:
@@ -426,6 +512,17 @@ def _wlasciciel_na_stanowisku(dane: Dane, firma: Firma, w: dict, czas: cw.Czas) 
     return wynik
 
 
+def _widoki_bledow(firma: Firma, runda: int) -> list[tuple[str | None, Firma]]:
+    """Lista błędów menu i gotowości dań: osobno dla każdego działającego lokalu (Z2), przy jednym lokalu – cała firma."""
+    if len(firma.lokale) < 2:
+        return [(None, firma)]
+    return list(pl.widoki(firma, runda).items()) or [(None, firma)]
+
+
+def _w_lokalu(dane: Dane, lok_id: str | None, tekst: str) -> str:
+    return f"{pl.nazwa(dane, lok_id)} – {tekst}" if lok_id else tekst
+
+
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
                  tryb_kredytu: str = "na_biezaco", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
@@ -438,19 +535,23 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
 
     if lokal is not None:
         bledy_lokali(dane, firma, runda, lokal, dodaj)
-        for b in mn.bledy(dane, firma, runda):
-            dodaj(b["poziom"], b["zakladka"], b["tekst"])
-            if b["zakladka"] != "oferta":
-                konkretne.add(b["danie"])
+        for lok_id, v in _widoki_bledow(firma, runda):
+            for b in mn.bledy(dane, v, runda):
+                dodaj(b["poziom"], b["zakladka"], _w_lokalu(dane, lok_id, b["tekst"]))
+                if b["zakladka"] != "oferta":
+                    konkretne.add((lok_id, b["danie"]))
         for poziom, tekst in sw.ostrzezenia(dane, firma, runda):
             dodaj(poziom, "swiezosc", tekst)
         for s in sw.przeterminowanie(dane, firma, runda):
             if s["wartosc"] >= dane.z["lista_bledow"]["przeterminowanie_min_zl"]:
                 ile = f"{s['ilosc']:.1f}".replace(".", ",")
-                dodaj("pomaranczowy", "swiezosc", f"{s['zasob']}: przy Twojej prognozie popytu ok. {ile} opak. "
+                gdzie = f" w lokalu {pl.nazwa(dane, s['lokal'])}" if s.get("lokal") else ""
+                dodaj("pomaranczowy", "swiezosc", f"{s['zasob']}{gdzie}: przy Twojej prognozie popytu ok. {ile} opak. "
                       f"(ok. {s['wartosc']:.0f} zł) przeterminuje się, zanim trafi do dań (termin "
                       f"{date.fromisoformat(s['termin']):%d.%m}) – zamów mniej albo bliżej dnia sprzedaży.")
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
+            dodaj("czerwony", "dostawcy", tekst)
+        for tekst in (info or {}).get("uwagi_przewozow", []):
             dodaj("czerwony", "dostawcy", tekst)
         for w in (info or {}).get("wypowiedzenia", []):
             dodaj("niebieski", "zatrudnienie", f"{w['imie_nazwisko']} dostaje wypowiedzenie – pracuje i dostaje pensję "
@@ -492,7 +593,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         if spoza:
             dodaj("czerwony", "oferta", "W rundzie 1 można wybrać tylko dania: "
                   + ", ".join(dane.uslugi[u]["nazwa"] for u in rundy["uslugi_startowe"]) + ".")
-    if przyrost > limit or (d.get("oferta") and set(d["oferta"]) - set(firma.oferta)):
+    if przyrost > limit or (d.get("oferta") and set(d["oferta"]) - set(firma.oferta)) \
+            or (info or {}).get("odrzucone_uslugi"):
         dodaj("czerwony", "oferta", f"W tej rundzie liczba dań może wzrosnąć najwyżej o {limit} – nadmiarowe nie zostały dodane.")
     if not firma.oferta:   # bez dań w rundzie 1 runda 2 mija bez sprzedaży (nowe dania dopiero od nowe_uslugi_od_rundy)
         od = rundy["nowe_uslugi_od_rundy"]
@@ -509,10 +611,11 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         if float(z.get("pensja") or placa_min) < placa_min:
             dodaj("czerwony", "hr_zatrudnienie", f"Pensja poniżej płacy minimalnej ({placa_min} PLN).")
     if runda >= 2:
-        for u, braki in gotowe_uslugi(dane, firma).items():
-            for b in braki:
-                if not (u in konkretne and b.startswith("brak stanowiska")):
-                    dodaj("czerwony", "oferta", f"{dane.uslugi[u]['nazwa']}: {b}.")
+        for lok_id, v in _widoki_bledow(firma, runda):
+            for u, braki in gotowe_uslugi(dane, v).items():
+                for b in braki:
+                    if not ((lok_id, u) in konkretne and b.startswith("brak stanowiska")):
+                        dodaj("czerwony", "oferta", _w_lokalu(dane, lok_id, f"{dane.uslugi[u]['nazwa']}: {b}."))
         for u in firma.oferta:
             if not firma.oferta.get(u):
                 dodaj("niebieski", "oferta", f"{dane.uslugi[u]['nazwa']}: nie podano prognozy popytu.")

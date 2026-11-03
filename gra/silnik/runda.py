@@ -34,7 +34,6 @@ from .ksiegowosc.uzgodnienie import uzgodnij
 from .kuchnia import magazyn as mag
 from .kuchnia import menu
 from .kuchnia.dostawcy import ceny_rundy
-from .kuchnia.jakosc import mnoznik_wyposazenia
 from .kuchnia.operacje import kasjerzy
 from .losowosc import strumien
 from .ludzie import czas_wlasciciela as cw
@@ -42,6 +41,7 @@ from .ludzie import rynek_pracy as rp
 from .ludzie.kandydaci import dodaj_nowych
 from .model import Firma, StanGry, do_slownika
 from .nieruchomosci import lokale as lk
+from .nieruchomosci import per_lokal as pl
 from .nieruchomosci import przejecia as pr
 from .pieniadze import banki as bk
 from .pieniadze import inwestor as inw
@@ -183,13 +183,13 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             mn_firmy = f.baza_klientow * (1 - info[nazwa]["harpagon_presja"]["odplyw"])   # Harpagon odstrasza gości
             mn_firmy *= zd.mnoznik_popytu(f, r)   # skutki eventów w parkach
             mn_firmy *= bt.przewaga_popytu(dane, konfiguracja, nazwa)   # bot niemożliwy oszukuje
-            ceny = {u: max(0.01, f.ceny[u].cena - f.ceny[u].rabat) for u in f.oferta if u in f.ceny}
-            oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, ceny, {
-                "wyposazenie": mnoznik_wyposazenia(dane, f.wyposazenie), "reklama": 0.0, "mnoznik_firmy": mn_firmy,
+            oferty_lok[nazwa] = pp.oferty_lokali(dane, f, r, {   # ceny, menu i wyposażenie – każdego lokalu (Z2)
+                "reklama": 0.0, "mnoznik_firmy": mn_firmy,
                 "zadowolenie": pp.mnoznik_zadowolenia(dane, zk),
                 "reklama_strefy": (kampanie or {}).get("firmy", {}).get(nazwa, {})})
             pm.efekty_ofert(dane, f, oferty_lok[nazwa], r, pp.dni_rundy(dane, r))
-        strefowy = pp.rynek_lokali(dane, s.firmy, oferty_lok, r, ziarno, (kampanie or {}).get("pula"))
+        strefowy = pp.rynek_lokali(dane, s.firmy, oferty_lok, r, ziarno, (kampanie or {}).get("pula"),
+                                   {n: info[n].get("przewozy") or [] for n in nazwy})
         popyt, obsluga, rynek = strefowy["popyt"], strefowy["obsluga"], strefowy["rynek"]
         for nazwa, lokale in oferty_lok.items():  # oferta firmy: jakość lokalu z największym popytem dania
             for u in popyt[nazwa]:
@@ -197,10 +197,10 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                 oferty.setdefault(u, {})[nazwa] = lokale[lok][u]
         for nazwa in nazwy:
             promo = (strefowy or {}).get("promocje", {}).get(nazwa)   # przychód z rabatami promocji
-            for u, k in obsluga[nazwa]["obsluzeni"].items():
+            przych = info[nazwa]["przychod_sprzedazy"] = strefowy["przychod"].get(nazwa, {})   # suma lokali (Z2)
+            for u in obsluga[nazwa]["obsluzeni"]:
                 ksieguj(s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], f"Sprzedaż: {dane.uslugi[u]['nazwa']}",
-                        promo["przychod"].get(u, 0.0) if promo else k * oferty[u][nazwa]["cena"], "przychod",
-                        stawka=rz.stawka_sprzedazy(dane, u))
+                        przych.get(u, 0.0), "przychod", stawka=rz.stawka_sprzedazy(dane, u))
             if promo:
                 pm.ksieguj_sprzedaz(dane, s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa], promo,
                                     rz.stawka_sprzedazy(dane, "napoj") if "napoj" in dane.uslugi else None)
@@ -361,7 +361,8 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
             sprzedaz[u] = {"popyt": d, "prognoza": f.oferta.get(u, 0), "sprzedaz": obsluga["obsluzeni"][u],
                            "utracona": obsluga["utracona"][u], "przyczyna": obsluga["przyczyna"].get(u, ""),
                            "cena": f.ceny[u].cena, "rabat": f.ceny[u].rabat, "cena_po_rabacie": o["cena"],
-                           "przychod": round(obsluga["obsluzeni"][u] * o["cena"], 2), "reklamacje": obsluga["reklamacje"][u],
+                           "przychod": round((info.get("przychod_sprzedazy") or {}).get(
+                               u, obsluga["obsluzeni"][u] * o["cena"]), 2), "reklamacje": obsluga["reklamacje"][u],
                            "jakosc": o["jakosc"], "skladniki_popytu": rynek[u][f.nazwa]["skladniki"]}
     w["sprzedaz"] = sprzedaz
 
@@ -443,6 +444,19 @@ def _netto_karty(netto: float, info: dict) -> float:
     return round(netto - ((info.get("harpagon_odsetki") or {}).get("odsetki") or 0.0), 2)
 
 
+def _procent_lokali(dane: Dane, f: Firma, rodzaj: str, wagi: bool = False) -> float:
+    """Premia z wyposażenia / udogodnień do karty: średnia lokali (Z2 – każdy lokal ma swoje), przy wagi=True ważona
+    liczbą stanowisk lokalu (tam pracują ludzie). Gra bez lokali – suma firmy jak dawniej."""
+    poz = dane.pozycje(rodzaj)
+    if not f.lokale:
+        return sum(poz[n]["procent"] / 100 for n in getattr(f, rodzaj))
+    w = {lok.id: (sum(st.lokal == lok.id for st in f.stanowiska) if wagi else 1) for lok in f.lokale}
+    if not sum(w.values()):
+        w = {k: 1 for k in w}
+    return sum(w[lok.id] * sum(poz[n]["procent"] / 100 for n in pl.lista(f, lok, rodzaj))
+               for lok in f.lokale) / sum(w.values())
+
+
 def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict, netto: float) -> dict:
     sprzedane = {u: v for u, v in sprzedaz.items() if v["sprzedaz"] > 0}
     klienci = sum(v["sprzedaz"] for v in sprzedane.values())
@@ -454,7 +468,7 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
         reklamacje = sum(v["reklamacje"] for v in sprzedane.values()) / klienci
     else:
         r_rynek, q_sr, reklamacje = 1.0, 0.0, 0.0
-    wyp = sum(dane.pozycje("wyposazenie")[n]["procent"] / 100 for n in f.wyposazenie)
+    wyp = _procent_lokali(dane, f, "wyposazenie")
     zk = kw.zadowolenie_klientow(dane, len(sprzedane), r_rynek, f.utracona_poprzednio, q_sr, wyp, reklamacje)
     f.utracona_poprzednio = utracona
     f.baza_klientow *= 1 - dane.z["popyt"]["utrata_klientow"] * utracona   # klienci nieobsłużeni częściowo nie wracają
@@ -467,7 +481,7 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
         placa, zlecenia = 1.0, 0.0
     jakosci = [q for st in f.stanowiska for q in st.sprzet.values()]
     sprzet_gw = float(np.mean(jakosci)) if jakosci else 2.0
-    udog = sum(dane.pozycje("udogodnienia")[n]["procent"] / 100 for n in f.udogodnienia)
+    udog = _procent_lokali(dane, f, "udogodnienia", wagi=True)
     zmiany = (len(info["zatrudnieni"]) + len(info["zwolnieni"]) + len(info.get("wypowiedzenia", []))) / max(1, len(prac))
     zp = kw.zadowolenie_pracownikow(dane, placa, sprzet_gw, udog, info["szkolenia_procent"], zlecenia,
                                     zmiany if r > 2 else 0.0) if prac else 0.0
