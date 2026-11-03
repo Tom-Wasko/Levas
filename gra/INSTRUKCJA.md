@@ -67,8 +67,10 @@ miejsce w rankingu. Wcześniejsze rundy dalej obejrzysz strzałkami.
 Gra liczy tydzień **dzień po dniu**: w każdym dniu klienci każdej strefy wybierają lokal, kucharze przygotowują
 dania, dostawy przyjeżdżają w swoje dni, a bułki z poniedziałku we wtorek wieczorem lądują w koszu.
 
-> **Uwaga.** Czerwone pozycje na liście błędów to poważne braki (np. brak lokalu albo banku). Pomarańczowe
-> i niebieskie – ostrzeżenia i podpowiedzi. Decyzje da się wysłać mimo czerwonych błędów, ale zwykle się tego żałuje.
+> **Uwaga.** Lista błędów ma trzy grupy: **Do zrobienia** (czerwone – poważne braki, np. brak lokalu albo banku;
+> tylko je liczy znaczek w menu), **Uwaga** (pomarańczowe ostrzeżenia) i **Dla informacji** (niebieskie podpowiedzi,
+> zwinięte – kliknij, żeby rozwinąć). Kilka dań bez sprzętu czy towar do wyrzucenia w jednym lokalu to jedna pozycja.
+> Decyzje da się wysłać mimo czerwonych błędów, ale zwykle się tego żałuje.
 
 ## 3. Cel gry – karta wyników
 

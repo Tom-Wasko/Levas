@@ -124,11 +124,11 @@ def bledy(dane: Dane, firma: Firma, runda: int) -> list[dict]:
         du = dane.uslugi[u]
         brak = [n for n in du["sprzet"] if not sztuki_sprzetu(firma, n)]
         if brak:
-            wynik.append({"poziom": "czerwony", "zakladka": "sprzet", "danie": u, "tekst":
+            wynik.append({"poziom": "czerwony", "zakladka": "sprzet", "danie": u, "brak": brak, "tekst":
                           f"{du['nazwa']}: brak sprzętu ({', '.join(brak)}) – bez niego danie można najwyżej pokazać "
                           "klientom na zdjęciu. Kup sprzęt albo zdejmij danie z menu."})
         if du["prowadzacy"] not in kucharze:
-            wynik.append({"poziom": "czerwony", "zakladka": "zatrudnienie", "danie": u, "tekst":
+            wynik.append({"poziom": "czerwony", "zakladka": "zatrudnienie", "danie": u, "brak": [du["prowadzacy"].lower()], "tekst":
                           f"{du['nazwa']}: w kuchni nie ma nikogo z zawodem „{du['prowadzacy'].lower()}” – klienci sami "
                           "sobie tego nie zrobią (próbowali, sanepid był przeciw). Zatrudnij kogoś na stanowisko kuchni."})
         c = firma.ceny[u]

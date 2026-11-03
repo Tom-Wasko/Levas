@@ -539,6 +539,28 @@ def _w_lokalu(dane: Dane, lok_id: str | None, tekst: str) -> str:
     return f"{pl.nazwa(dane, lok_id)} – {tekst}" if lok_id else tekst
 
 
+def _dan(n: int) -> str:
+    return f"{n} danie" if n == 1 else f"{n} dania" if n % 10 in (2, 3, 4) and n % 100 // 10 != 1 else f"{n} dań"
+
+
+def _scal_dania(dane: Dane, bledy: list[dict]) -> list[dict]:
+    """U5: kilka dań bez sprzętu (albo bez kucharza) w jednym lokalu – jedna pozycja zamiast linijki na każde danie."""
+    wynik = []
+    for zakl in ("sprzet", "zatrudnienie"):
+        grupa = [b for b in bledy if b["zakladka"] == zakl]
+        if len(grupa) < dane.z["lista_bledow"]["scal_dania_od"]:
+            wynik += grupa
+            continue
+        braki = ", ".join(dict.fromkeys(n for b in grupa for n in b["brak"]))
+        dania = ", ".join(dane.uslugi[b["danie"]]["nazwa"] for b in grupa)
+        wynik.append({"poziom": "czerwony", "zakladka": zakl, "tekst": (
+            f"{_dan(len(grupa))} bez sprzętu ({braki}): {dania} – kup sprzęt na stanowiska kuchni albo zdejmij te dania "
+            "z menu." if zakl == "sprzet" else
+            f"{_dan(len(grupa))} bez kucharza – w kuchni nie ma nikogo z zawodem: {braki} ({dania}). Zatrudnij kogoś "
+            "na stanowisko kuchni.")})
+    return wynik + [b for b in bledy if b["zakladka"] not in ("sprzet", "zatrudnienie")]
+
+
 def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_oferta: list[str],
                  tryb_kredytu: str = "na_biezaco", lokal: dict | None = None, info: dict | None = None) -> list[dict]:
     """Ostrzeżenia jak w zakładce „Lista błędów”: czerwone (poważne), pomarańczowe, niebieskie (informacyjne).
@@ -552,19 +574,28 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
     if lokal is not None:
         bledy_lokali(dane, firma, runda, lokal, dodaj)
         for lok_id, v in _widoki_bledow(firma, runda):
-            for b in mn.bledy(dane, v, runda):
+            bl = mn.bledy(dane, v, runda)
+            konkretne |= {(lok_id, b["danie"]) for b in bl if b["zakladka"] != "oferta"}
+            for b in _scal_dania(dane, bl):
                 dodaj(b["poziom"], b["zakladka"], _w_lokalu(dane, lok_id, b["tekst"]))
-                if b["zakladka"] != "oferta":
-                    konkretne.add((lok_id, b["danie"]))
         for poziom, tekst in sw.ostrzezenia(dane, firma, runda):
             dodaj(poziom, "swiezosc", tekst)
+        przet = {}   # U5: jedna pozycja na lokal z kwotą łącznie
         for s in sw.przeterminowanie(dane, firma, runda):
-            if s["wartosc"] >= dane.z["lista_bledow"]["przeterminowanie_min_zl"]:
+            przet.setdefault(s.get("lokal"), []).append(s)
+        for lok_id, grupa in przet.items():
+            if (razem := sum(s["wartosc"] for s in grupa)) < dane.z["lista_bledow"]["przeterminowanie_min_zl"]:
+                continue
+            if len(grupa) == 1:
+                s = grupa[0]
                 ile = f"{s['ilosc']:.1f}".replace(".", ",")
-                gdzie = f" w lokalu {pl.nazwa(dane, s['lokal'])}" if s.get("lokal") else ""
-                dodaj("pomaranczowy", "swiezosc", f"{s['zasob']}{gdzie}: przy Twojej prognozie popytu ok. {ile} opak. "
-                      f"(ok. {s['wartosc']:.0f} zł) przeterminuje się, zanim trafi do dań (termin "
-                      f"{date.fromisoformat(s['termin']):%d.%m}) – zamów mniej albo bliżej dnia sprzedaży.")
+                tekst = (f"{s['zasob']}: przy Twojej prognozie popytu ok. {ile} opak. (ok. {s['wartosc']:.0f} zł) "
+                         f"przeterminuje się, zanim trafi do dań (termin {date.fromisoformat(s['termin']):%d.%m})")
+            else:
+                grupa.sort(key=lambda s: -s["wartosc"])
+                tekst = (f"Przy Twojej prognozie popytu przeterminuje się towar za ok. {razem:.0f} zł, zanim trafi do dań: "
+                         + ", ".join(f"{s['zasob']} ok. {s['wartosc']:.0f} zł" for s in grupa))
+            dodaj("pomaranczowy", "swiezosc", _w_lokalu(dane, lok_id, tekst + " – zamów mniej albo bliżej dnia sprzedaży."))
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
         for tekst in (info or {}).get("uwagi_przewozow", []):
@@ -612,13 +643,14 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
     oferta = d.get("oferta") or firma.oferta
     przyrost = len(oferta) - len(poprzednia_oferta)
     limit = limit_nowych_uslug(dane, runda, len(poprzednia_oferta))
+    spoza = []
     if runda == 1:
         spoza = [u for u in (d.get("oferta") or {}) if u not in rundy["uslugi_startowe"]]
         if spoza:
             dodaj("czerwony", "oferta", "W rundzie 1 można wybrać tylko dania: "
-                  + ", ".join(dane.uslugi[u]["nazwa"] for u in rundy["uslugi_startowe"]) + ".")
-    if przyrost > limit or (d.get("oferta") and set(d["oferta"]) - set(firma.oferta)) \
-            or (info or {}).get("odrzucone_uslugi"):
+                  + ", ".join(dane.uslugi[u]["nazwa"] for u in rundy["uslugi_startowe"]) + " – pozostałe nie zostały dodane.")
+    if (przyrost > limit or (d.get("oferta") and set(d["oferta"]) - set(firma.oferta))
+            or (info or {}).get("odrzucone_uslugi")) and not (runda == 1 and spoza):   # U5: w rundzie 1 – jeden komunikat
         dodaj("czerwony", "oferta", f"W tej rundzie liczba dań może wzrosnąć najwyżej o {limit} – nadmiarowe nie zostały dodane.")
     if not firma.oferta:   # bez dań w rundzie 1 runda 2 mija bez sprzedaży (nowe dania dopiero od nowe_uslugi_od_rundy)
         od = rundy["nowe_uslugi_od_rundy"]

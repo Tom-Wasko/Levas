@@ -8,7 +8,7 @@ import pytest
 from pomocnicze import _gra
 
 from silnik.dane import KUCHNIA
-from silnik.decyzje import lista_bledow
+from silnik.decyzje import _dan, lista_bledow
 from silnik.kuchnia import menu as mn
 from silnik.kuchnia import swiezosc as sw
 from silnik.model import Cena
@@ -47,7 +47,7 @@ def test_sprzet_i_kucharz(gra_botow):
     # na liście błędów konkretne powody zamiast ogólnego „brak stanowiska z pracownikiem…”
     lb = lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info={})
     assert not any(t.startswith(du["nazwa"]) and "brak stanowiska" in t for t in _teksty(lb))
-    assert any(t.startswith(du["nazwa"]) and "brak sprzętu" in t for t in _teksty(lb, "sprzet"))
+    assert any(du["nazwa"] in t and du["sprzet"][0] in t for t in _teksty(lb, "sprzet"))
     # lokal jeszcze nie działa – bez uwag o daniach
     for lok in f.lokale:
         lok.dziala_od = r + 1
@@ -155,3 +155,58 @@ def test_zakup_ponizej_progu_amortyzacji_ostrzega_o_karcie(gra_botow):
     [b] = [b for b in lb if "w koszty" in b["tekst"]]
     assert b["poziom"] == "pomaranczowy" and b["zakladka"] == "sprzet"
     assert "kartę wyników tej rundy – o ok. 2,50" in b["tekst"]
+
+
+def test_dania_jednego_lokalu_scalone_w_jedna_pozycje(gra_botow):
+    """U5: lokal bez sprzętu i kucharzy – jedna pozycja „bez sprzętu” i jedna „bez kucharza”, nie linijka na danie."""
+    dane, f, r = _firma(gra_botow)
+    dania = [u for u in f.oferta if u in f.ceny]
+    assert len(dania) >= dane.z["lista_bledow"]["scal_dania_od"]
+    for s in f.stanowiska_typu(KUCHNIA):
+        s.sprzet.clear()
+        s.pracownik = None
+    lb = lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info={})
+    sprzet, ludzie = _teksty(lb, "sprzet"), [t for t in _teksty(lb, "zatrudnienie") if "kucharza" in t]
+    assert len(sprzet) == 1 and len(ludzie) == 1 and all(dane.uslugi[u]["nazwa"] in sprzet[0] for u in dania if dane.uslugi[u]["sprzet"])
+    assert f"{_dan(len(dania))} bez kucharza" in ludzie[0] and not any("brak sprzętu" in t for t in _teksty(lb))
+    # jedno danie bez sprzętu – zostaje dokładny komunikat o tym daniu
+    f2 = _firma(gra_botow)[1]
+    u = dania[0]
+    jedyne = {n for n in dane.uslugi[u]["sprzet"] if all(n not in dane.uslugi[x]["sprzet"] for x in dania if x != u)}
+    if jedyne:
+        for s in f2.stanowiska_typu(KUCHNIA):
+            for n in jedyne:
+                s.sprzet.pop(n, None)
+        t = _teksty(lista_bledow(dane, f2, {}, r, list(f2.oferta), lokal={}, info={}), "sprzet")
+        assert len(t) == 1 and t[0].startswith(dane.uslugi[u]["nazwa"]) and "brak sprzętu" in t[0]
+
+
+def test_przeterminowanie_kilku_skladnikow_jedna_pozycja(gra_botow):
+    """U5: kilka składników do wyrzucenia – jedna linijka z kwotą łącznie, także gdy każdy osobno jest pod progiem."""
+    dane, f, r = _firma(gra_botow)
+    prog = dane.z["lista_bledow"]["przeterminowanie_min_zl"]
+    partie = [{"zasob": z, "ilosc": 1.0, "wartosc": prog * 0.6, "termin": "2026-01-05", "lokal": None} for z in ("Bułka", "Mięso")]
+    import silnik.decyzje as dc
+    stare = dc.sw.przeterminowanie
+    try:
+        dc.sw.przeterminowanie = lambda *a: [dict(x) for x in partie]
+        t = _teksty(lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info={}), "swiezosc")
+        assert len(t) == 1 and t[0].startswith(f"Przy Twojej prognozie popytu przeterminuje się towar za ok. {prog * 1.2:.0f} zł")
+        assert "Bułka" in t[0] and "Mięso" in t[0]
+        dc.sw.przeterminowanie = lambda *a: [dict(partie[0])]
+        assert not _teksty(lista_bledow(dane, f, {}, r, list(f.oferta), lokal={}, info={}), "swiezosc")
+    finally:
+        dc.sw.przeterminowanie = stare
+
+
+def test_runda_1_jeden_komunikat_o_daniach_spoza_startowych(gra_botow):
+    dane, f, _ = _firma(gra_botow)
+    rundy = dane.katalog_ofert["rundy"]
+    obce = next(u for u in dane.uslugi if u not in rundy["uslugi_startowe"])
+    t = _teksty(lista_bledow(dane, f, {"oferta": {obce: 10}}, 1, []), "oferta")
+    assert sum("W rundzie 1 można wybrać tylko dania" in x for x in t) == 1
+    assert not any("może wzrosnąć najwyżej" in x for x in t)
+
+
+def test_odmiana_dan():
+    assert [_dan(n) for n in (1, 2, 4, 5, 12, 22, 25)] == ["1 danie", "2 dania", "4 dania", "5 dań", "12 dań", "22 dania", "25 dań"]

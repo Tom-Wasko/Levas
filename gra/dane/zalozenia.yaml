@@ -407,6 +407,11 @@ lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
     pewnosc: zalozenie
     zrodlo: 'F4.2: ostrzeżenie o składniku, który przy prognozie popytu przeterminuje się przed użyciem, dopiero od tej
       wartości straty w tygodniu (drobne resztki nie zaśmiecają listy błędów; PRACA_NOCNA, pyt. 23)'
+  scal_dania_od:
+    wartosc: 2
+    pewnosc: zalozenie
+    zrodlo: 'U5 (analiza gracza [5]): od tylu dań bez sprzętu (albo bez kucharza) w jednym lokalu lista błędów pokazuje
+      jedną pozycję „lokal do urządzenia” zamiast osobnej linijki na każde danie'
 wnioski:   # gra z lokalami (Q13): zakładka „Wnioski z rundy” – od jakich progów pojawia się rada (silnik/wyniki/wnioski.py)
   utracona:
     wartosc: 0.1

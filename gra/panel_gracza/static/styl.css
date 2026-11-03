@@ -251,6 +251,12 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .blad.pomaranczowy { border-left-color: var(--zolty); }
 .blad.niebieski { border-left-color: var(--niebieski); }
 .blad .tx { flex: 1; }
+/* U5: grupy na liście błędów */
+.grupa-bledow { margin: 16px 0 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--szary, #666); }
+.grupa-bledow.czerwony { color: var(--czerwony); }
+.grupa-bledow.pomaranczowy { color: var(--zolty); }
+details.grupa-bledow > summary { cursor: pointer; color: var(--niebieski); margin-bottom: 8px; }
+details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; font-weight: 400; font-size: inherit; color: inherit; }
 .komunikat { padding: 12px 16px; border-radius: 9px; background: var(--pom-jasny); margin: 0 0 14px; font-weight: 600; border: 1px solid var(--pom-mgla); }
 .komunikat.ok { background: var(--zielony-jasny); border-color: #c4ebd6; }
 .komunikat.zly { background: var(--czerwony-jasny); border-color: #f6c9cf; }
