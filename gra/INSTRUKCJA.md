@@ -38,7 +38,7 @@ mecze Motoru).
 | Rynek | Klienci i strefy, Kalendarz, Konkurencja, Rynek pracy |
 | Parki i zdarzenia | cotygodniowe wydarzenia w parkach |
 | Marketing | Agencje reklamowe, Promocje |
-| Inwestycje | Kupno i najem lokali, Licytacje i przejęcia, Środki trwałe |
+| Inwestycje | Lokale (najem i kupno), Licytacje i przejęcia, Środki trwałe |
 | Handel z drużynami | oferty dla innych drużyn |
 | Firma | Czas właściciela, Urząd i sanepid, Ubezpieczenia |
 | Finanse | Raport, Bank, Harpagon, Portfel właściciela |
@@ -105,7 +105,7 @@ Kilka zasad, które warto znać:
 W pierwszym tygodniu nic jeszcze nie sprzedajesz. To czas, żeby urządzić firmę (Dashboard pokazuje plan rundy –
 co jeszcze zostało do zrobienia):
 
-1. **Lokal** – w zakładce **Inwestycje ▸ Kupno i najem lokali** albo na mapie. Wynajmujesz (kaucja = 2 czynsze, potem czynsz co tydzień)
+1. **Lokal** – w zakładce **Inwestycje ▸ Lokale** albo na mapie. Wynajmujesz (kaucja = 2 czynsze, potem czynsz co tydzień)
    albo kupujesz. Lokal *gotowy* działa od razu, *do urządzenia* – od następnej rundy, a działkę trzeba
    zabudować. Liczy się **strefa**: Miasteczko Akademickie to studenci, Stare Miasto – turyści i wieczory,
    Dworzec – podróżni o każdej porze. Im mniej drużyn w grze, tym mniej lokali na mapie (około pięciu na
@@ -254,7 +254,7 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 ## 13. Rozwój
 
 - **Wyposażenie dla klientów** (od tygodnia 4) – stoliki i krzesła, darmowe WiFi, telewizor z meczami: podnosi zadowolenie klientów.
-- **Kolejny lokal** (Inwestycje ▸ Kupno i najem lokali) można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
+- **Kolejny lokal** (Inwestycje ▸ Lokale) można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
   bez litości). Nowy lokal ma własne menu, ceny, magazyn i załogę – urządzasz go od zera
   w zakładce Lokale. Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
 - **Handel z drużynami** (od tygodnia 5) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
@@ -269,7 +269,7 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 
 | Tydzień | Nowe zakładki |
 |---|---|
-| 1 | Mapa, Kupno i najem lokali, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska), Bank, Biuro rachunkowe, Kalendarz miejski |
+| 1 | Mapa, Inwestycje ▸ Lokale, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska), Bank, Biuro rachunkowe, Kalendarz miejski |
 | 2 | Sprzęt i Ludzie w lokalu, Rynek pracy, Dostawy i magazyn (z auto-dostawcą i przewozem towaru), Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
 | 3 | Karta wyników, Udogodnienia, Agencje reklamowe, nowe dania w menu |
 | 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali |

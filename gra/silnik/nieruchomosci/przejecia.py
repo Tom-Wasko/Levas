@@ -68,7 +68,7 @@ def powod_przejecia(dane: Dane, firmy: dict[str, Firma], nazwa: str, decyzja: di
         return f"{lok['nazwa']}: właściciel nie chce sprzedać budynku – lokal jest tylko do wynajęcia."
     wynajety = najem(firmy, lok["id"])
     if wynajety is None:
-        return f"{lok['nazwa']} nie ma najemcy – kup go w zakładce Lokale."
+        return f"{lok['nazwa']} nie ma najemcy – kup go w Inwestycje ▸ Lokale."
     if wynajety[1].wlasciciel:
         return f"{lok['nazwa']} kupiła już firma {nazwa_firmy(firmy, wynajety[1].wlasciciel)}."
     kwota, blad = oferta(dane, decyzja, lok, "kupno", runda)
@@ -172,7 +172,7 @@ def licytacje(dane: Dane, firmy: dict[str, Firma], decyzje: dict, runda: int, zi
                        "na kant)." if len(remis) > 1 and o in remis else
                        f"jej oferta była wyższa ({_zl(wygrana['kwota'])} wobec Twojej {_zl(o['kwota'])}).")
                     + f" Wybierz inny wolny lokal albo następnym razem zaproponuj wyższy {co} w polu „Twoja oferta”"
-                    + " w zakładce Lokale – pieniądze za ten lokal nie zostały pobrane.")
+                    + " w Inwestycje ▸ Lokale – pieniądze za ten lokal nie zostały pobrane.")
         przetargi.append({"id": lok_id, "rodzaj": rodzaj, "zwyciezca": zwyciezca, "remis": len(remis) > 1,
                           "oferty": sorted(oferty, key=lambda o: (-o["stosunek"], o["firma"]))})
     return {"przegrane": przegrane, "przetargi": przetargi}

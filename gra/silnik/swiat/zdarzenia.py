@@ -133,7 +133,7 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
                 o = opcje[sc["domyslna"]]
             elif podglad and h["id"] not in wybory:   # tylko przy decyzjach (w wynikach rundy to bez sensu)
                 wynik["bledy"].append({"poziom": "niebieski", "zakladka": ZAKLADKA, "tekst":
-                                       f"„{h['tytul']}”: wybierz reakcję w zakładce Zdarzenia (bez wyboru: „{o['tekst']}”)."})
+                                       f"„{h['tytul']}”: wybierz reakcję w zakładce Parki i zdarzenia (bez wyboru: „{o['tekst']}”)."})
             wpis.update(opcja=o["id"], opcja_tekst=o["tekst"], domyslna=o["id"] == sc["domyslna"], wynik=o["wynik"],
                         koszt=_koszt(o, kp))
             if o["koszt"]["gotowka"]:

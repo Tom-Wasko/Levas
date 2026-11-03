@@ -224,13 +224,13 @@ def bledy(dane: Dane, firma: Firma, runda: int, info: dict, dodaj) -> None:
     if info and not info["przyjety"]:
         dodaj("czerwony", "lokale", f"Lokal nie został przydzielony: {info['powod']}")
     if not firma.lokale:
-        dodaj("czerwony", "lokale", "Nie masz lokalu – wynajmij albo kup lokal w zakładce Lokale. "
+        dodaj("czerwony", "lokale", "Nie masz lokalu – wynajmij albo kup lokal na mapie miasta albo w Inwestycje ▸ Lokale. "
                                     "Bez lokalu nie ma stanowisk ani sprzedaży.")
     for lok in firma.lokale:
         d = dane.lokale[lok.id]
         if lok.dziala_od > runda:
             co = "Budowa" if d["typ"] == "dzialka" else "Urządzanie"
-            jak = ("kup stanowiska kuchni i kasy (Inwestycje), sprzęt na stanowiska i zatrudnij pracowników (Kadry), "
+            jak = ("kup stanowiska kuchni i kasy oraz sprzęt na stanowiska (Lokale ▸ Sprzęt) i zatrudnij pracowników (Lokale ▸ Ludzie), "
                    f"a od rundy {lok.dziala_od} lokal od razu sprzedaje.")
             kiedy = ("Już w tej rundzie możesz go wyposażyć: " + jak) if mozna_wyposazac(lok, runda) \
                 else f"W rundzie {lok.dziala_od - 1} będzie można go wyposażyć: " + jak

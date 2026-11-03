@@ -72,7 +72,7 @@ def wnioski(dane: Dane, w: dict | None) -> dict | None:
     if lokale is not None and not klienci:
         if not lokale:
             poprawa.append(_rada("Firma nie ma jeszcze lokalu", "Bez lokalu nie ma sprzedaży.",
-                                 "Wybierzcie lokal na mapie albo w zakładce Lokale – wynajem ruszy od razu, "
+                                 "Wybierzcie lokal na mapie albo w Inwestycje ▸ Lokale – wynajem ruszy od razu, "
                                  "a lokal do urządzenia albo działkę możecie wyposażać już w ostatniej rundzie prac.",
                                  "lokale"))
         elif not any(lok["dziala"] for lok in lokale):
@@ -113,8 +113,8 @@ def wnioski(dane: Dane, w: dict | None) -> dict | None:
             za_wysoko.append(opis)
     if za_nisko:
         poprawa.append(_rada("Chętnych było więcej, niż zakładała prognoza", _lista(za_nisko) + ".",
-                             "Podnieście prognozę w Menu – według niej zamawiacie składniki i planujecie kuchnię. "
-                             "Pomogą pule klientów stref i wydarzenia w zakładce Klienci i strefy.", "oferta"))
+                             "Podnieście prognozę w Lokale ▸ Menu i ceny – według niej zamawiacie składniki i planujecie kuchnię. "
+                             "Pomogą pule klientów stref i wydarzenia w Rynek ▸ Klienci i Rynek ▸ Kalendarz miejski.", "oferta"))
     if za_wysoko:
         poprawa.append(_rada("Prognoza była wyższa niż popyt", _lista(za_wysoko) + ".",
                              "Obniżcie prognozę w Menu albo przyciągnijcie klientów ceną, promocją lub reklamą – "
@@ -126,11 +126,11 @@ def wnioski(dane: Dane, w: dict | None) -> dict | None:
         poprawa.append(_rada("Część składników się przeterminowała",
                              f"Wyrzucony towar był wart {zl(sanepid['przeterminowane'])}.",
                              "Zamawiajcie mniejsze partie, częściej i bliżej prognozy – terminy przydatności widać "
-                             "w zakładce Świeżość.", "swiezosc"))
+                             "w Lokale ▸ Dostawy i magazyn.", "swiezosc"))
     if sanepid.get("mandat"):
         poprawa.append(_rada("Mandat z sanepidu", f"Kontrola zakończyła się mandatem {zl(sanepid['mandat'])}.",
                              "Ryzyko kontroli rośnie z przeterminowanym towarem i wynajętą chłodnią – trzymajcie "
-                             "mniejszy zapas i zadbajcie o higienę (zakładka Urząd i sanepid).", "urzad"))
+                             "mniejszy zapas i zadbajcie o higienę (Firma ▸ Urząd i sanepid).", "urzad"))
 
     # reklamacje
     reklamacje = round(sum(v["reklamacje"] for v in sprzedaz.values()))
@@ -142,7 +142,7 @@ def wnioski(dane: Dane, w: dict | None) -> dict | None:
     # księgowość
     if ks.get("kara"):
         poprawa.append(_rada("Mandat za deklaracje", f"Urząd naliczył {zl(ks['kara'])} mandatu.",
-                             "W zakładce Biuro rachunkowe (wyniki) widać, która deklaracja się nie zgadzała. Nad tabelą "
+                             "W Księgowość ▸ Biuro rachunkowe (wyniki) widać, która deklaracja się nie zgadzała. Nad tabelą "
                              "dokumentów jest instrukcja krok po kroku – albo powierzcie księgowość biuru.", "biuro"))
     blad_biura = (w.get("biuro") or {}).get("blad")
     if blad_biura and not blad_biura.get("oc"):
