@@ -191,6 +191,13 @@ class Partia(Model):
     runda: int = 0                # runda zakupu
     wynajem: bool = False         # w wynajętej chłodni (nie zmieściło się we własnej) – nie zajmuje własnego miejsca
     lokal: str | None = None      # Z2: lokal, w którym leży partia (None – stary zapis: pierwszy lokal firmy)
+    u_dostawcy: bool = False      # Z4: leży u auto-dostawcy (silnik/kuchnia/auto_dostawca.py) – dowożona w miarę zużycia,
+                                  # nie zajmuje miejsca w lokalu
+
+    @property
+    def poza_lokalem(self) -> bool:
+        """W wynajętej chłodni albo u auto-dostawcy – nie zajmuje własnej chłodni i nie przechodzi przez ranne dostawy."""
+        return self.wynajem or self.u_dostawcy
 
     wartosc = _kwota("wartosc")
 

@@ -2,7 +2,7 @@
 // „Magazyn i świeżość”, silnik/kuchnia/swiezosc.py), a dostawcy mają swoje zasady (silnik/kuchnia/dostawcy.py: zasady_dostaw):
 // dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
 import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
-import { glownyLokal, idWybranego, lokalPartii, lokalWybrany, menuLokalu, nazwaLokalu } from "./lokal_wybor.js";
+import { glownyLokal, idWybranego, lokalPartii, lokalWybrany, menuLokalu, nazwaLokalu, zapiszWLokalu } from "./lokal_wybor.js";
 
 // Z3: przy kilku lokalach magazyn i zamówienia wybranego lokalu (zamówienie bez pola "lokal" – lokal główny)
 function stan(v, z, q) {
@@ -17,7 +17,7 @@ const zamowienia = (v, d, z, q) => mojeZam(v).filter((x) => x.dostawca === d && 
 const zamowione = (v, d, z, q, dz) => zamowienia(v, d, z, q).filter((x) => dz === undefined || (+x.dzien || 0) === dz).reduce((s, x) => s + x.ilosc, 0);
 const dniDostaw = (v) => (v.lokale && v.swiezosc?.dni) || null;
 const DNI = ["pn", "wt", "śr", "czw", "pt", "sob", "nd"];
-const RODZAJ = { dyskont: "Dyskont", hurtownia: "Hurtownia", producent: "Producent", piekarnia: "Piekarnia" };
+const RODZAJ = { dyskont: "Dyskont", hurtownia: "Hurtownia", producent: "Producent", piekarnia: "Piekarnia", hipermarket: "Hipermarket" };
 const info = (v, d) => (v.dostawcy_info || {})[d] || { dni_dostaw: [0, 1, 2, 3, 4, 5, 6], koszt_dostawy: 0, minimalne_zamowienie: 0 };
 const dzienTyg = (iso) => (new Date(iso).getUTCDay() + 6) % 7;
 // indeksy dni rundy, w które dostawca dowozi (null – gra bez lokali)
@@ -143,6 +143,83 @@ function najtansze(ceny, pomin = new Set()) {
   return w;
 }
 
+// Z4: auto-dostawca (silnik/kuchnia/auto_dostawca.py) – lokal jest na auto-dostawach albo zaopatruje się sam, całość naraz.
+// Decyzja "auto_dostawy": {pozycje: [{zasob, jakosc, ilosc}]} wybranego lokalu (decyzja główna – lokal główny); null – wyłączone.
+function autoDecyzja(v) {
+  const d = v.decyzje, id = idWybranego(v);
+  if (!id) return d.auto_dostawy;
+  const w = d.w_lokalu?.[id];
+  if (w && "auto_dostawy" in w) return w.auto_dostawy;
+  return id === glownyLokal(v) ? d.auto_dostawy : undefined;
+}
+const naAuto = (v) => { const a = autoDecyzja(v); return !!a && typeof a === "object"; };
+const cenyAuto = (v) => (v.ceny_dostawcow || {})[v.auto_dostawca?.zasady?.dostawca] || {};
+const jakosciAuto = (v, z) => Object.keys(cenyAuto(v)[z] || {}).map(Number);
+const domyslnaJakosc = (v, z) => { const j = jakosciAuto(v, z); return j.includes(2) ? 2 : j[0]; };
+const zapasLokalu = (v, z) => [1, 2, 3].reduce((s, q) => s + stan(v, z, q), 0);
+
+function sekcjaAuto(v, kat, edycja) {
+  const A = v.auto_dostawca, Z = A?.zasady;
+  if (!Z) return "";
+  const lok = nazwaLokalu(v, idWybranego(v) || glownyLokal(v)), od = v.runda < Z.od_rundy, wl = naAuto(v);
+  const dis = edycja && !od ? "" : "disabled";
+  let html = `<div class="pasek">Auto-dostawca</div>
+    <label class="pole-wyboru"><input type="checkbox" data-zmiana="auto-wl" ${wl ? "checked" : ""} ${dis}> <b>Auto-dostawy w lokalu ${esc(lok)}</b></label>
+    <p class="podpowiedz">Auto-dostawca kupuje za Ciebie w ${esc(Z.dostawca)} (drożej niż w hurtowni) i co rano przywozi do lokalu tyle, ile tego dnia zużyjesz –
+    nic nie psuje się w lokalu i nie zajmuje chłodni. Płacisz z góry za całą wpisaną ilość + ${Math.round(Z.prowizja * 100)}% prowizji
+    i ${zl2(Z.abonament)} abonamentu za tydzień. Co zostanie, czeka u dostawcy na następny tydzień: ${zl2(Z.przechowanie_zl_za_litr_dzien)} za litr dziennie,
+    a termin przydatności biegnie. Za mało towaru – dania wypadają z menu. Lokal na auto-dostawach nie przyjmuje Twoich zamówień od innych dostawców.
+    ${od ? `<b>Auto-dostawca – od rundy ${Z.od_rundy}.</b>` : ""}</p>`;
+  if (!wl) return html;
+  const ceny = cenyAuto(v), poz = autoDecyzja(v).pozycje || [], pot = zapotrzebowanie(v, kat);
+  const zasoby = [...new Set([...Object.keys(pot), ...poz.map((x) => x.zasob)])].filter((z) => ceny[z]);
+  let towar = 0;
+  const wiersze = zasoby.map((z) => {
+    const p = poz.find((x) => x.zasob === z) || {}, q = +p.jakosc || domyslnaJakosc(v, z);
+    const c = ceny[z][q] || 0, ile = +p.ilosc || 0;
+    towar += c * ile;
+    const k = kat.zasoby[z];
+    return [esc(z), `${k.typ_opakowania} (${licz(k.opakowanie)} ${k.jednostka})`, ulamek(pot[z] || 0), ulamek(zapasLokalu(v, z)),
+      `<select data-zmiana="auto-jakosc" data-z="${esc(z)}" style="width:auto" ${dis}>${jakosciAuto(v, z).map((j) => `<option value="${j}" ${j === q ? "selected" : ""}>${"★".repeat(j)}</option>`).join("")}</select>`,
+      `<input type="number" class="krotkie" min="0" step="1" value="${ile}" data-zmiana="auto-ilosc" data-z="${esc(z)}" ${dis}>`,
+      zl2(c), zl2(c * ile * (1 + Z.prowizja))];
+  });
+  const prow = towar * Z.prowizja;
+  html += `<div class="pasek ciemny"><span>Towar: <span class="kwota">${zl2(towar)}</span></span><span>Prowizja: <span class="kwota">${zl2(prow)}</span></span>
+    <span>Abonament: <span class="kwota">${zl2(Z.abonament)}</span></span><span>Razem: <span class="kwota">${zl2(towar + prow + Z.abonament)}</span></span>
+    <span style="display:flex;gap:8px;align-items:center">Wpisz wg prognozy
+      <select id="auto-ad-zapas" style="width:auto"><option value="1">bez zapasu</option><option value="1.1" selected>+10% zapasu</option><option value="1.2">+20% zapasu</option></select>
+      <button class="btn pom maly" data-akcja="auto-prognoza" ${dis}>Wpisz</button></span></div>`;
+  html += tabela(`Zakupy auto-dostawcy na ten tydzień – ${esc(lok)} (opakowania)`, ["Składnik", "Opakowanie", "Potrzeba wg prognoz", "Zapas (lokal i u dostawcy)",
+    "Jakość", "Ilość na tydzień", `Cena ${esc(Z.dostawca)}`, "Z prowizją"], wiersze, { klasy: ["l", "l"] });
+  const uwagi = A.przyjete?.uwagi || [];
+  html += uwagi.map((u) => `<div class="komunikat">${esc(u)}</div>`).join("");
+  const zam = mojeZam(v);
+  if (zam.length) html += `<div class="komunikat">Masz ${zam.length} ${zam.length === 1 ? "zamówienie" : "zamówień"} do tego lokalu u innych dostawców –
+    na auto-dostawach zostaną odrzucone. <button class="btn jasny maly" data-akcja="zam-wyczysc" ${edycja ? "" : "disabled"}>Usuń je</button></div>`;
+  return html;
+}
+
+function zapiszPozycje(c, zmiana) {
+  const a = autoDecyzja(c.v) || {};
+  const poz = zmiana((a.pozycje || []).map((x) => ({ ...x })));
+  return c.zmien((d) => { zapiszWLokalu(d, c.v, "auto_dostawy", { ...a, pozycje: poz }); });
+}
+function ustawPozycje(lista, z, zmiany, v) {
+  let p = lista.find((x) => x.zasob === z);
+  if (!p) lista.push(p = { zasob: z, jakosc: domyslnaJakosc(v, z), ilosc: 0 });
+  Object.assign(p, zmiany);
+  return lista;
+}
+
+function wynikiAuto(v) {
+  const A = v.wyniki?.auto_dostawy;
+  if (!A?.lokale || !Object.keys(A.lokale).length) return "";
+  const w = Object.entries(A.lokale).map(([l, x]) => [esc(nazwaLokalu(v, l)), licz(x.pozycje.length), zl2(x.towar), zl2(x.prowizja), zl2(x.abonament),
+    zl2(x.towar + x.prowizja + x.abonament)]);
+  return tabela("Auto-dostawca – zakupy tygodnia", ["Lokal", "Pozycje", "Towar", "Prowizja", "Abonament", "Razem"], w, { klasy: ["l"] });
+}
+
 export const dostawcy = {
   tytul: "Dostawcy", ikona: "⛟", odblokowanie: "dostawcy",
   info: `Kup składniki potrzebne do wybranych dań. Składniki możesz kupować u jednego lub kilku dostawców. Niezużyte zostają w magazynie.
@@ -150,6 +227,8 @@ export const dostawcy = {
     a w dyskoncie kupujesz sam – taniej przy małych ilościach i z gazetką, ale tracisz czas i nie wyniesiesz więcej niż limit.`,
   decyzje({ v, kat, edycja }) {
     const ceny = v.ceny_dostawcow;
+    const auto = sekcjaAuto(v, kat, edycja);
+    if (naAuto(v)) return auto;
     const koszt = mojeZam(v).reduce((s, z) => s + (ceny[z.dostawca]?.[z.zasob]?.[z.jakosc] || 0) * z.ilosc, 0);
     const pot = zapotrzebowanie(v, kat), tanie = najtansze(ceny);
     const C = v.czas_wlasciciela;
@@ -164,11 +243,11 @@ export const dostawcy = {
         [1, 2, 3].map((q) => tanie[`${z}|${q}`] ? `${gw(q)} ${zl2(tanie[`${z}|${q}`].c)} <span class="podpowiedz">${esc(tanie[`${z}|${q}`].d)}</span>` : "").join("<br>")];
     });
     // „Zamów brakujące” – tylko gdy mistrz gry go włączył (domyślnie drużyny liczą zamówienia same)
-    const auto = v.gra.auto_zamowienia ? `<span style="display:flex;gap:8px;align-items:center">Zamów brakujące u najtańszych w jakości
+    const autoZam = v.gra.auto_zamowienia ? `<span style="display:flex;gap:8px;align-items:center">Zamów brakujące u najtańszych w jakości
       <select id="auto-jakosc" style="width:auto"><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select>
       <select id="auto-zapas" style="width:auto"><option value="1">bez zapasu</option><option value="1.05" selected>+5% zapasu</option><option value="1.1">+10% zapasu</option></select>
       <button class="btn pom maly" data-akcja="auto-zamow" ${edycja ? "" : "disabled"}>Zamów</button></span>` : "";
-    let html = `<div class="pasek ciemny"><span>Koszt zakupu${idWybranego(v) ? " (ten lokal)" : ""}: <span class="kwota">${zl2(koszt)}</span></span>${auto}</div>`;
+    let html = `<div class="pasek ciemny"><span>Koszt zakupu${idWybranego(v) ? " (ten lokal)" : ""}: <span class="kwota">${zl2(koszt)}</span></span>${autoZam}</div>`;
     html += tabela("Zapotrzebowanie na prognozowanych klientów (opakowania)", ["Zasób", "Opakowanie", "Potrzeba wg prognoz", "W magazynie",
       "Zamówione teraz", "Brakuje", "Najtańsze oferty"], wiersze, { klasy: ["l", "l"] });
     html += listaZamowien(v, edycja);
@@ -178,7 +257,7 @@ export const dostawcy = {
     if (wyn) html += `<p class="podpowiedz">Dostawcy nie przyjmują zwrotów. Co nie zmieści się w chłodni lub zamrażarce lokalu,
       jedzie do wynajętej chłodni (${zl2(wyn.zl_za_litr)} za litr, termin krótszy o ${wyn.skrocenie_dni} dni) – szczegóły w zakładce
       <a data-zakladka-k="swiezosc">Świeżość</a>.</p>`;
-    html += `<div class="pasek">Dostawcy</div><div class="siatka trojka">`;
+    html += auto + `<div class="pasek">Dostawcy</div><div class="siatka trojka">`;
     for (const d of Object.keys(ceny)) {
       const wartosc = mojeZam(v).filter((x) => x.dostawca === d).reduce((s, x) => s + (ceny[d]?.[x.zasob]?.[x.jakosc] || 0) * x.ilosc, 0);
       html += `<div class="kafel"><div class="kg">${esc(d)}</div><div class="kt">${kafelInfo(v, d)}</div>
@@ -194,7 +273,7 @@ export const dostawcy = {
     const suma = (v.wyniki?.zasoby || []).reduce((s, x) => s + x.wartosc, 0);
     const firmy = Object.keys(v.rynek?.jakosc_zasobow || {});
     const jak = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => ulamek(v.rynek.jakosc_zasobow[f][q]))]);
-    return planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []),
+    return wynikiAuto(v) + planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []),
       `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", ...(straty ? [""] : []), "", zl2(suma)] })
       + tabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
       + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`;
@@ -214,6 +293,14 @@ export const dostawcy = {
       return c.zmien((d) => { d.zamowienia = (d.zamowienia || []).filter((y) => !ta(y)); });
     },
     "zam-wyczysc": (el, c) => c.zmien((d) => { d.zamowienia = (d.zamowienia || []).filter((x) => !tenLokal(c.v, x)); }),
+    "auto-prognoza": (el, c) => {
+      const zapas = +document.getElementById("auto-ad-zapas").value, pot = zapotrzebowanie(c.v, c.kat), ceny = cenyAuto(c.v);
+      if (!Object.values(pot).some((p) => p > 0)) return toast("Najpierw wpisz prognozę popytu dań w zakładce Menu.");
+      return zapiszPozycje(c, (lista) => {
+        for (const [z, p] of Object.entries(pot)) if (ceny[z]) ustawPozycje(lista, z, { ilosc: Math.ceil(Math.max(0, p * zapas - zapasLokalu(c.v, z)) - 1e-9) }, c.v);
+        return lista;
+      });
+    },
     "auto-zamow": async (el, c) => {
       const q = +document.getElementById("auto-jakosc").value, zapas = +document.getElementById("auto-zapas").value;
       if (!Object.values(menuLokalu(c.v, lokalWybrany(c.v))).some((p) => p > 0)) return toast("Najpierw wpisz prognozę popytu dań w zakładce Menu – zamówienia liczone są na prognozowanych klientów.");
@@ -226,6 +313,9 @@ export const dostawcy = {
     },
   },
   zmiany: {
+    "auto-wl": (el, c) => c.zmien((d) => { zapiszWLokalu(d, c.v, "auto_dostawy", el.checked ? { pozycje: [] } : null); }),
+    "auto-ilosc": (el, c) => zapiszPozycje(c, (l) => ustawPozycje(l, el.dataset.z, { ilosc: Math.max(0, Math.round(+el.value || 0)) }, c.v)),
+    "auto-jakosc": (el, c) => zapiszPozycje(c, (l) => ustawPozycje(l, el.dataset.z, { jakosc: +el.value }, c.v)),
     ilosc: async (el, c) => {
       const { d: dost, z, q, dz } = el.dataset, ilosc = Math.max(0, +el.value || 0);
       const tenDzien = (x) => dz === undefined || (+x.dzien || 0) === +dz, id = idWybranego(c.v);

@@ -5,7 +5,8 @@ opis: 'Dostawcy jedzenia: rodzaj, dni dostaw (0 = poniedziałek), koszt dostawy 
   taniej). Ceny: miesiąc → dostawca → składnik → jakość → cena za opakowanie; w miesiącach bez danych cena waha się losowo
   wokół tej bazy.'
 zrodlo: notatka „Elementy mapy” (dyskonty, hurtownie, producent mięsa, piekarnia – marki z notatki); ceny, dni dostaw, progi
-  i limity – założenie F3a.6 (ceny względem dawnej hurtowni z F2.6), do kalibracji w kroku 5
+  i limity – założenie F3a.6 (ceny względem dawnej hurtowni z F2.6), do kalibracji w kroku 5; Auchan (Z4, przebudowa
+  2.11.2026) – bez własnych cen, czyli średnia cen pozostałych dostawców w rundzie + narzut (ceny_z_rynku)
 pierwsi:
 - Piekarnia Koziołek
 - Biedronka
@@ -117,6 +118,22 @@ dostawcy:
     - 4
     minimalne_zamowienie: 800
     od_rundy: 3
+  Auchan:
+    rodzaj: hipermarket
+    opis: 'Hipermarket: wszystko pod jednym dachem, ale drożej niż w hurtowni i bez gazetki. Odbiór osobisty
+      bez limitu sztuk. Tu robi zakupy auto-dostawca.'
+    dni_dostaw:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    odbior_osobisty: true
+    godziny_odbioru: 2.0
+    ceny_z_rynku:
+      narzut: 0.12
 ceny:
   pazdziernik:
     Piekarnia Koziołek:

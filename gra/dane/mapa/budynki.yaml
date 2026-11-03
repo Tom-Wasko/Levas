@@ -173,6 +173,17 @@ budynki:
     y: 7
     szer: 2
     gl: 2
+- id: auchan
+  nazwa: Auchan
+  rodzaj: dostawca
+  strefa: zygmuntowskie
+  opis: 'Hipermarket: pełny asortyment, drożej niż w hurtowni, odbiór osobisty. Tu kupuje auto-dostawca.'
+  zakladka: dostawcy
+  mapa:
+    x: 15
+    y: 11
+    szer: 2
+    gl: 2
 - id: biedronka
   nazwa: Biedronka
   rodzaj: dostawca

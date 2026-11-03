@@ -6,7 +6,7 @@ import { idWybranego, mojeLokale, nazwaLokalu } from "./lokal_wybor.js";
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
 const MIEJSCE = { chlodnia: "Chłodnia", zamrazarka: "Zamrażarka", suche: "Suchy magazyn" };
 const POWOD = { termin: "minął termin przydatności", miejsce: "nie zmieściło się – dostawca zostawił pod drzwiami",
-  bank: "oddane do banku żywności" };
+  bank: "oddane do banku żywności", u_dostawcy: "przeterminowane u auto-dostawcy (płacisz za towar, sanepid nie liczy)" };
 const procent = (x) => `${Math.round(x * 1000) / 10}%`;
 
 function planWynajmuHtml(S) {
@@ -29,8 +29,12 @@ function ryzykoHtml(M) {
     w koszu ląduje przeterminowane jedzenie – i przez kilka rund mniej klientów.</span></div></div>`;
 }
 
-function wynikiMagazynu(W, M) {
+function wynikiMagazynu(W, M, v) {
   let html = "";
+  const A = M?.auto_dostawca;   // Z4: towar u auto-dostawcy
+  if (A?.koszt) html += `<p class="podpowiedz">Przechowanie towaru u auto-dostawcy: ${licz(A.litrodni)} litrodni, <span class="minus">${zl2(A.koszt)}</span>.</p>`;
+  if (A?.zostaje?.length) html += tabela("Zostaje u auto-dostawcy na następny tydzień (płacisz za przechowanie)", ["Lokal", "Składnik", "Jakość", "Opakowania", "Ostatni dzień"],
+    A.zostaje.map((x) => [esc(nazwaLokalu(v, x.lokal)), esc(x.zasob), gw(x.jakosc), ulamek(x.ilosc), x.termin ? dataKrotka(x.termin) : "–"]), { klasy: ["l", "l"] });
   if (W.wynajem?.length) html += tabela("Wynajęta chłodnia – Mroźnia u Mietka", ["Dzień", "Składnik", "Jakość", "Opakowania", "Litry", "Ostatni dzień", "Koszt"],
     W.wynajem.map((x) => [dataKrotka(x.data), esc(x.zasob), gw(x.jakosc), ulamek(x.ilosc), licz(x.litry), dataKrotka(x.termin), zl2(x.koszt)]),
     { klasy: ["l", "l"], stopka: ["Razem", "", "", "", licz(M?.wynajem?.litry || 0), "", zl2(M?.wynajem?.koszt || 0)] });
@@ -58,7 +62,7 @@ function partieHtml(S, dni) {
   const koniec = dni[dni.length - 1].data;
   const wiersze = S.partie.map((p) => [esc(p.zasob) + (p.nowa ? ' <span class="podpowiedz">(zamówione teraz)</span>' : ""), gw(p.jakosc), ulamek(p.ilosc),
     dataKrotka(p.dostawa), p.termin ? (p.termin <= koniec ? `<span class="minus">${dataKrotka(p.termin)}</span>` : dataKrotka(p.termin)) : "–",
-    MIEJSCE[p.przechowywanie], p.miejsce_l ? licz(p.miejsce_l) : "–", zl2(p.wartosc)]);
+    p.u_dostawcy ? "u auto-dostawcy" : MIEJSCE[p.przechowywanie], p.miejsce_l ? licz(p.miejsce_l) : "–", zl2(p.wartosc)]);
   return tabela("Partie składników (najpierw zużywane te z najkrótszym terminem)", ["Składnik", "Jakość", "Opakowania", "Dostawa", "Ostatni dzień", "Przechowywanie", "Miejsce (l)", "Wartość"],
     wiersze, { klasy: ["l", "", "", "", "", "l"], stopka: ["Razem", "", "", "", "", "", "", zl2(S.partie.reduce((s, p) => s + p.wartosc, 0))] });
 }
@@ -105,7 +109,7 @@ function przewozyHtml(v, S, edycja) {
   const kursy = new Set(lista.map((x) => `${x.z}|${x.do}|${+x.dzien || 0}`)).size;
   const inne = mojeLokale(v).filter((l) => l.id !== id);
   const towar = {};
-  for (const p of S.partie) if (!p.wynajem) towar[`${p.zasob}|${p.jakosc}`] = (towar[`${p.zasob}|${p.jakosc}`] || 0) + p.ilosc;
+  for (const p of S.partie) if (!p.wynajem && !p.u_dostawcy) towar[`${p.zasob}|${p.jakosc}`] = (towar[`${p.zasob}|${p.jakosc}`] || 0) + p.ilosc;
   const opcje = Object.entries(towar).sort().map(([k, n]) => { const [z, q] = k.split("|");
     return `<option value="${esc(k)}">${esc(z)} ${"★".repeat(+q)} (${ulamek(n)} opak.)</option>`; }).join("");
   const formularz = !edycja || !opcje ? "" : `<div class="formularz-przewozu">
@@ -158,7 +162,7 @@ export const swiezosc = {
     return `<div class="pasek ciemny"><span>Wartość strat: <span class="kwota">${zl2(W.wartosc_strat)}</span></span>
       <span>Wyrzucone partie: <span class="kwota">${W.straty.length}</span></span></div>`
       + wynikiZasoby(W) + `<div class="wykres"><canvas id="w-swiezosc"></canvas></div>` + wynikiStraty(W)
-      + wynikiPrzewozow(v, W) + wynikiMagazynu(W, v.wyniki?.magazyn) + wynikiMenu(W, kat);
+      + wynikiPrzewozow(v, W) + wynikiMagazynu(W, v.wyniki?.magazyn, v) + wynikiMenu(W, kat);
   },
   po({ v }, tryb) {
     const W = v.wyniki?.swiezosc;

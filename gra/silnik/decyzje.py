@@ -65,6 +65,7 @@ from .ksiegowosc import rozliczenie as rz
 from .ksiegowosc import srodki_trwale as st_trwale
 from .ksiegowosc import urzad as urz
 from .ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
+from .kuchnia import auto_dostawca as ad
 from .kuchnia import menu as mn
 from .kuchnia import swiezosc as sw
 from .kuchnia.dostawcy import zasady_dostaw
@@ -188,7 +189,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     Z2 (silnik/nieruchomosci/per_lokal.py): "oferta", "sprzedaz", "stanowiska", "{udogodnienia,wyposazenie}_{kup,sprzedaj}"
     dotyczą wszystkich lokali (oferta i ceny) albo lokalu głównego / dowolnego wolnego miejsca; "w_lokalu": {lokal: {te
     same klucze}} – osobno dla lokalu; "zamowienia"[].lokal – dokąd dostawa (domyślnie lokal główny); "przewozy":
-    [{"z", "do", "zasob", "jakosc", "ilosc", "dzien"}] – towar między lokalami."""
+    [{"z", "do", "zasob", "jakosc", "ilosc", "dzien"}] – towar między lokalami; Z4: "auto_dostawy": {"pozycje":
+    [{"zasob", "jakosc", "ilosc"}]} (decyzja główna albo w_lokalu) – lokal na auto-dostawach."""
     info = {"zakupy_zasobow": {}, "zatrudnieni": [], "zwolnieni": [], "wypowiedzenia": [], "inwestycje": 0.0, "sprzedany_majatek": 0.0,
             "szkolenia_procent": 0.0, "majatek_przed": firma.majatek}
     odbl = dane.odblokowane(runda)
@@ -366,14 +368,24 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
 
     # zasoby od dostawców
     zakupy, zamowienia, stawki = {}, [], {}
+    # Z4: lokal na auto-dostawach nie przyjmuje własnych zamówień (silnik/kuchnia/auto_dostawca.py)
+    na_auto = ad.lokale_na_auto(dane, firma, d, w_lokalu, runda) if "dostawcy" in odbl else set()
+    odrzucone_auto = set()
     for z in d.get("zamowienia", []) if "dostawcy" in odbl else []:
         ilosc = float(z.get("ilosc") or 0)
         cena = cena_dostawcy(dane, ceny_dostawcow, z["dostawca"], z["zasob"], int(z["jakosc"]))
+        lok_z = pl.lokal(firma, z.get("lokal")) or pl.glowny(firma, runda)
+        if ilosc > 0 and lok_z is not None and lok_z.id in na_auto:
+            odrzucone_auto.add(lok_z.id)
+            continue
         if ilosc > 0 and cena is not None:
             zamowienia.append({**z, "ilosc": ilosc, "cena": cena})
     # dni dostaw, limity dyskontów, minimalne zamówienie, opłaty za dowóz, czas właściciela (silnik/kuchnia/dostawcy.py)
     zamowienia, info["dostawy"] = zasady_dostaw(dane, zamowienia, dane.data_rundy(runda),
                                                 (dane.data_rundy(runda + 1) - dane.data_rundy(runda)).days, czas)
+    for lok_id in sorted(odrzucone_auto):
+        info["dostawy"]["uwagi"].append(f"{pl.nazwa(dane, lok_id)} jest na auto-dostawach – własne zamówienia do tego"
+                                        " lokalu odrzucone (wyłącz auto-dostawy albo usuń zamówienia).")
     # przewozy towaru między własnymi lokalami (Z2): czas właściciela i koszt kursu teraz, towar jedzie w tygodniu
     if len(firma.lokale) > 1 and d.get("przewozy"):
         info["przewozy"] = pl.przewozy(dane, firma, d["przewozy"], runda, czas, info)
@@ -408,6 +420,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         ksieguj(firma, ksiega, rachunek, f"Zakup zasobu od dostawcy: {dostawca}", kwota, "towary", stawki=stawki[dostawca])
     for dostawca, kwota in info.get("dostawy", {}).get("oplaty", {}).items():
         ksieguj(firma, ksiega, rachunek, f"Koszt dostawy: {dostawca}", kwota)
+    if "dostawcy" in odbl:   # Z4: auto-dostawca – zakupy na tydzień, prowizja, abonament
+        info["auto_dostawy"] = ad.zamow(dane, firma, d, w_lokalu, runda, ceny_dostawcow, ksiega, rachunek)
 
     # udogodnienia i wyposażenie
     for rodzaj, nazwa_pozycji in (("udogodnienia", "udogodnień"), ("wyposazenie", "wyposażenia")):
@@ -552,6 +566,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         for tekst in (info or {}).get("dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
         for tekst in (info or {}).get("uwagi_przewozow", []):
+            dodaj("czerwony", "dostawcy", tekst)
+        for tekst in (info or {}).get("auto_dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
         for w in (info or {}).get("wypowiedzenia", []):
             dodaj("niebieski", "zatrudnienie", f"{w['imie_nazwisko']} dostaje wypowiedzenie – pracuje i dostaje pensję "

@@ -192,6 +192,7 @@ input:focus, select:focus { outline: none; border-color: var(--pom); box-shadow:
 input.krotkie { width: 92px; }
 input:disabled, select:disabled { background: var(--szary-jasny); color: var(--szary); }
 label.pole { display: flex; flex-direction: column; gap: 5px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--szary); }
+label.pole-wyboru { display: flex; gap: 8px; align-items: center; margin: 8px 0 4px; cursor: pointer; }
 
 /* tabele */
 .tab-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--linia); background: #fff; }

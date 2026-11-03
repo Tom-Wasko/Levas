@@ -29,6 +29,7 @@ from datetime import date, timedelta
 import numpy as np
 
 from ..dane import Dane
+from ..kuchnia import auto_dostawca as ad
 from ..kuchnia import menu
 from ..kuchnia import swiezosc as sw
 from ..kuchnia.jakosc import mnoznik_wyposazenia
@@ -314,6 +315,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
                 zaj = {t: 0.0 for t in sw.CHLODZONE}
                 for v in widoki.values():
                     _dodaj_straty(raport, sw.wyrzuc(v, dzien), i, len(dni))
+                    raport["przechowanie"] += ad.przechowanie(dane, v, dzien, runda)   # Z4: towar u auto-dostawcy
                     for t, x in sw.zajete(dane, v, dzien).items():
                         zaj[t] += x
                 raport["zajetosc"].append(zaj)
@@ -384,7 +386,7 @@ def _wiersz(n: int) -> dict:
 
 def _raport_swiezosci(dane: Dane, firma: Firma, dni: list[date]) -> dict:
     return {"dni": [d.isoformat() for d in dni], "zasoby": {}, "straty": [], "zamiany": {}, "wylaczone": [],
-            "pojemnosc": sw.pojemnosc(dane, firma), "zajetosc": [], "wynajem": []}
+            "pojemnosc": sw.pojemnosc(dane, firma), "zajetosc": [], "wynajem": [], "przechowanie": []}
 
 
 def _dodaj_straty(raport: dict, straty: list[dict], i: int, n: int) -> None:
@@ -398,6 +400,15 @@ def _zakoncz_raport(raport: dict) -> dict:
         for k in w:
             w[k] = [round(x, 3) for x in w[k]]
     raport["wartosc_strat"] = round(sum(s["wartosc"] for s in raport["straty"]), 2)
+    # Z4: przechowanie u auto-dostawcy – dni zsumowane na lokal i składnik
+    suma: dict[tuple, dict] = {}
+    for x in raport.get("przechowanie", []):
+        s = suma.setdefault((x["lokal"], x["zasob"], x["jakosc"]), {"lokal": x["lokal"], "zasob": x["zasob"],
+                                                                     "jakosc": x["jakosc"], "dni": 0, "litrodni": 0.0, "koszt": 0.0})
+        s["dni"] += 1
+        s["litrodni"] += x["litry"]
+        s["koszt"] += x["koszt"]
+    raport["przechowanie"] = [{**s, "litrodni": round(s["litrodni"], 1), "koszt": round(s["koszt"], 2)} for s in suma.values()]
     raport["zajetosc"] = [{k: round(v, 1) for k, v in z.items()} for z in raport["zajetosc"]]
     return raport
 

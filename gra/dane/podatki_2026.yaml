@@ -38,6 +38,8 @@ vat:
     stawka: 0.23
   - zawiera: Koszt dostawy
     stawka: 0.23
+  - zawiera: Auto-dostawca
+    stawka: 0.23
   - zawiera: Reklama tradycyjna
     stawka: 0.23
   - zawiera: reklamy internetowej

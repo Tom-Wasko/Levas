@@ -17,6 +17,7 @@ from ..dane import Dane
 from ..ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
 from ..losowosc import strumien
 from ..model import Efekt, Firma, Partia
+from . import auto_dostawca as ad
 from . import swiezosc as sw
 
 WYNAJEM = "Wynajem chłodni – Mroźnia u Mietka"
@@ -62,6 +63,15 @@ def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksi
     if koszt > 0:
         ksieguj(f, ks, rach, f"{WYNAJEM} ({litry:.0f} l)", koszt, "pozostale")
     wynik = {"wynajem": {"litry": litry, "koszt": koszt}, "sanepid": None}
+    # Z4: auto-dostawca – przechowanie towaru z poprzednich tygodni, reszta z tego tygodnia zostaje u niego
+    prz = raport.get("przechowanie") or []
+    litrodni = round(sum(x["litrodni"] for x in prz), 1)
+    koszt_p = round(sum(x["koszt"] for x in prz), 2)
+    if koszt_p > 0:
+        ksieguj(f, ks, rach, f"{ad.NAZWA}: przechowanie towaru ({litrodni:.0f} l × dzień)", koszt_p, "pozostale")
+    zostaje = ad.koniec_tygodnia(dane, f, runda, dane.data_rundy(runda + 1) - timedelta(days=1))
+    if prz or zostaje:
+        wynik["auto_dostawca"] = {"litrodni": litrodni, "koszt": koszt_p, "zostaje": zostaje}
     if zasady_sanepidu(dane) is None or not f.lokale:
         return wynik
     z = zasady_sanepidu(dane)
@@ -114,7 +124,7 @@ def zapas_do_oddania(dane: Dane, f: Firma, runda: int) -> list[Partia]:
     start = dane.data_rundy(runda)
     do = (start + timedelta(days=b["zasady"]["dni_do_terminu"])).isoformat()
     return [p for p in f.partie if p.runda < runda and p.termin and start.isoformat() <= p.termin <= do
-            and p.ilosc > sw.EPS]
+            and p.ilosc > sw.EPS and not p.u_dostawcy]
 
 
 def wartosc_zapasu(dane: Dane, f: Firma, runda: int) -> float:

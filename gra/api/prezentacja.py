@@ -16,6 +16,7 @@ from silnik.ksiegowosc import rozliczenie as rz
 from silnik.ksiegowosc import urzad as urz
 from silnik.ksiegowosc.finanse import Ksiega, Rachunek, zadluzenie
 from silnik.ksiegowosc.srodki_trwale import ewidencja
+from silnik.kuchnia import auto_dostawca as ad
 from silnik.kuchnia import magazyn as mag
 from silnik.kuchnia import swiezosc
 from silnik.kuchnia.dostawcy import ceny_rundy, oferta_rundy
@@ -235,6 +236,9 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                              else wr.get("czas_wlasciciela")) or cw.nowy(dane).podsumowanie()
     v["wlasciciel_stanowisko"] = ((info or {}).get("wlasciciel_stanowisko") if edycja
                                   else wr.get("wlasciciel_stanowisko"))
+    if ad.zasady(dane) and f.lokale:   # Z4: auto-dostawca (zakładka Lokale → Dostawy i magazyn)
+        v["auto_dostawca"] = {"zasady": ad.zasady(dane),
+                              "przyjete": ((info or {}).get("auto_dostawy") if edycja else wr.get("auto_dostawy")) or {}}
     if len(f.lokale) > 1:   # Z3: przewozy towaru między lokalami (zakładka Lokale → Dostawy i magazyn)
         v["przewozy"] = {"zasady": pl.zasady_przewozu(dane), "przyjete": (info or {}).get("przewozy", []) if edycja else [],
                          "uwagi": (info or {}).get("uwagi_przewozow", []) if edycja else []}

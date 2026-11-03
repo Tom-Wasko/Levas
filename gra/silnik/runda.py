@@ -267,6 +267,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         w["lokal_decyzja"] = info[nazwa]["lokal"]
         w["przejecia"] = pr.raport(dane, s.firmy, nazwa, r, info[nazwa]["przejecia"], przetargi, wyprowadzki.get(nazwa, []))
         w["dostawy"] = info[nazwa].get("dostawy")
+        if info[nazwa].get("auto_dostawy", {}).get("lokale"):   # Z4: zakupy auto-dostawcy
+            w["auto_dostawy"] = info[nazwa]["auto_dostawy"]
         w["czas_wlasciciela"] = info[nazwa].get("czas_wlasciciela")
         w["zdarzenia"] = info[nazwa].get("zdarzenia")
         if aw.dane_wypadkow(dane):

@@ -101,8 +101,12 @@ class Gazetka(Schemat):
     rabat_max: float = Field(gt=0, lt=1)
 
 
+class CenyZRynku(Schemat):
+    narzut: float = Field(ge=0, lt=1)          # hipermarket (Z4): średnia cen pozostałych × (1 + narzut)
+
+
 class Dostawca(Schemat):
-    rodzaj: Literal["dyskont", "hurtownia", "producent", "piekarnia"]
+    rodzaj: Literal["dyskont", "hurtownia", "producent", "piekarnia", "hipermarket"]
     opis: str
     dni_dostaw: list[int] = Field(min_length=1)   # 0 = poniedziałek … 6 = niedziela
     koszt_dostawy: float = Field(default=0, ge=0)  # za każdą dostawę (dzień) poniżej progu
@@ -113,6 +117,7 @@ class Dostawca(Schemat):
     limit_opakowan: int | None = Field(default=None, ge=1)  # na składnik na dzień
     od_rundy: int = Field(default=0, ge=0)
     gazetka: Gazetka | None = None
+    ceny_z_rynku: CenyZRynku | None = None   # bez własnych cen w `ceny`
 
     @field_validator("dni_dostaw")
     @classmethod

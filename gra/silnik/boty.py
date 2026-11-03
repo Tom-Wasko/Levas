@@ -28,7 +28,7 @@ from .decyzje import kandydaci_firmy
 from .ksiegowosc import biuro as bo
 from .ksiegowosc.finanse import Ksiega, Rachunek
 from .kuchnia import menu as mn
-from .kuchnia.dostawcy import ceny_rundy
+from .kuchnia.dostawcy import ceny_rundy, z_rynku
 from .kuchnia.jakosc import mnoznik_wyposazenia
 from .kuchnia.planowanie import (
     godziny_uslugi,
@@ -522,6 +522,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:
         ceny_d = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
+        ceny_d = {k: v for k, v in ceny_d.items() if not z_rynku(dane, k)}   # Z4: boty nie kupują w Auchan
         d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni,
                                              dane.data_rundy(runda))
         if len(f.lokale) > 1:   # magazyn każdego lokalu osobno (Z2): dostawy wg prognozy lokali

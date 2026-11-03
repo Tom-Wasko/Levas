@@ -9,6 +9,10 @@ Levas (F3a.6, dostawcy.yaml: dostawcy): dostawca może wejść później (od_run
 (kilka składników taniej – losowo z ziarnem gry). W grze z lokalami zamówienie ma dzień dostawy: dostawca dowozi tylko
 w swoje dni, dostawa poniżej progu kosztuje, producent ma minimalne zamówienie, a w dyskoncie właściciel kupuje sam
 (limit opakowań na składnik dziennie, godziny właściciela).
+
+Z4 (przebudowa 2.11.2026): hipermarket (dostawcy.yaml: ceny_z_rynku, Auchan) nie ma własnych cen – w każdej rundzie
+sprzedaje każdy składnik i jakość z oferty pozostałych dostawców po ich średniej cenie (przed gazetkami) z narzutem.
+Kupuje tam auto-dostawca (silnik/kuchnia/auto_dostawca.py).
 """
 from __future__ import annotations
 
@@ -36,7 +40,7 @@ def _serie(dane: Dane) -> dict[tuple[str, str, str], dict]:
 
 DOMYSLNE = {"rodzaj": "hurtownia", "opis": "", "dni_dostaw": list(range(7)), "koszt_dostawy": 0, "darmowa_od": None,
             "minimalne_zamowienie": 0, "odbior_osobisty": False, "godziny_odbioru": 0, "limit_opakowan": None,
-            "od_rundy": 0, "gazetka": None}
+            "od_rundy": 0, "gazetka": None, "ceny_z_rynku": None}
 DNI = ("poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota", "niedziela")
 W_DZIEN = ("w poniedziałek", "we wtorek", "w środę", "w czwartek", "w piątek", "w sobotę", "w niedzielę")
 
@@ -61,7 +65,33 @@ def oferta_rundy(dane: Dane, ziarno, runda: int, tryb: str = "dane") -> tuple[di
     rabaty = gazetki(dane, ziarno, runda, bazowe)
     ceny = {d: {z: ({q: round(c * (1 - rabaty[d][z]), 2) for q, c in jak.items()} if z in rabaty.get(d, {}) else jak)
                 for z, jak in zasoby.items()} for d, zasoby in bazowe.items()}
+    ceny.update(hipermarkety(dane, bazowe, runda))
     return ceny, rabaty
+
+
+def hipermarkety(dane: Dane, bazowe: dict, runda: int) -> dict:
+    """{hipermarket: {zasób: {jakość: cena}}} – średnia cen pozostałych dostawców (bez gazetek) × (1 + narzut)."""
+    wynik = {}
+    for d, x in sorted(dane.dostawcy_info.items()):
+        rynek = x.get("ceny_z_rynku")
+        if not rynek or x.get("od_rundy", 0) > runda:
+            continue
+        zbior: dict[tuple[str, str], list[float]] = {}
+        for inny, zasoby in bazowe.items():
+            if inny == d:
+                continue
+            for z, jak in zasoby.items():
+                for q, c in jak.items():
+                    zbior.setdefault((z, q), []).append(c)
+        oferta = wynik[d] = {}
+        for (z, q), c in sorted(zbior.items()):
+            oferta.setdefault(z, {})[q] = round(sum(c) / len(c) * (1 + rynek["narzut"]), 2)
+    return wynik
+
+
+def z_rynku(dane: Dane, dostawca: str) -> bool:
+    """Hipermarket z cenami z rynku (Auchan) – boty go pomijają."""
+    return bool(info(dane, dostawca)["ceny_z_rynku"])
 
 
 def gazetki(dane: Dane, ziarno, runda: int, ceny: dict) -> dict[str, dict[str, float]]:

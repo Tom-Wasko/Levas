@@ -104,7 +104,7 @@ def zajete(dane: Dane, firma: Firma, dzien: str | None = None) -> dict[str, floa
     """Litry zajęte we własnej chłodni i zamrażarce (bez partii w wynajętej chłodni)."""
     wynik = {t: 0.0 for t in CHLODZONE}
     for p in na_stanie(firma, dzien):
-        if p.wynajem:
+        if p.poza_lokalem:
             continue
         t = dane.zasoby[p.zasob].get("przechowywanie", "suche")
         if t in wynik:
@@ -156,7 +156,7 @@ def przyjmij(dane: Dane, firma: Firma, dzien: str) -> tuple[dict[str, float], li
     zaj = zajete(dane, firma, (date.fromisoformat(dzien) - timedelta(days=1)).isoformat())
     wyn = wynajem(dane)
     przyjete, straty, wynajete = {}, [], []
-    for p in [p for p in firma.partie if p.dostawa == dzien and not p.wynajem]:
+    for p in [p for p in firma.partie if p.dostawa == dzien and not p.poza_lokalem]:
         t = dane.zasoby[p.zasob].get("przechowywanie", "suche")
         dostarczone = p.ilosc
         if t in poj:
@@ -177,8 +177,9 @@ def przyjmij(dane: Dane, firma: Firma, dzien: str) -> tuple[dict[str, float], li
 
 
 def wyrzuc(firma: Firma, dzien: str) -> list[dict]:
-    """Wieczorem: partie, którym kończy się termin, idą do kosza."""
-    straty = [_strata(p, p.ilosc, p.wartosc_gr, "termin", dzien) for p in na_stanie(firma, dzien)
+    """Wieczorem: partie, którym kończy się termin, idą do kosza (u auto-dostawcy – powód „u_dostawcy”, poza
+    lokalem: sanepid liczy tylko powód „termin”)."""
+    straty = [_strata(p, p.ilosc, p.wartosc_gr, "u_dostawcy" if p.u_dostawcy else "termin", dzien) for p in na_stanie(firma, dzien)
               if p.termin and p.termin <= dzien and p.ilosc > EPS]
     for p in na_stanie(firma, dzien):
         if p.termin and p.termin <= dzien:
@@ -224,13 +225,13 @@ def plan_wynajmu(dane: Dane, firma: Firma, runda: int) -> list[dict]:
     poj = pojemnosc(dane, firma)
     wyn = wynajem(dane)
     start = dane.data_rundy(runda).isoformat()
-    nowe = [p for p in firma.partie if p.runda == runda and not p.wynajem]
+    nowe = [p for p in firma.partie if p.runda == runda and not p.poza_lokalem]
     for t in CHLODZONE:
         dzienne: dict[str, float] = {}
         for p in nowe:
             if dane.zasoby[p.zasob].get("przechowywanie") == t:
                 dzienne[p.dostawa] = dzienne.get(p.dostawa, 0.0) + miejsce(dane, p)
-        stare = sum(miejsce(dane, p) for p in firma.partie if p.dostawa < start and not p.wynajem
+        stare = sum(miejsce(dane, p) for p in firma.partie if p.dostawa < start and not p.poza_lokalem
                     and dane.zasoby[p.zasob].get("przechowywanie") == t)
         for dzien, litry in sorted(dzienne.items()):
             nadmiar = litry + (stare if dzien == start else 0.0) - poj[t]
@@ -288,7 +289,7 @@ def podsumowanie(dane: Dane, firma: Firma, runda: int) -> dict:
         z = {t: 0.0 for t in CHLODZONE}
         for p in firma.partie:
             t = dane.zasoby[p.zasob].get("przechowywanie", "suche")
-            if t in z and not p.wynajem and p.dostawa <= iso and not (p.termin and p.termin < iso):
+            if t in z and not p.poza_lokalem and p.dostawa <= iso and not (p.termin and p.termin < iso):
                 z[t] += miejsce(dane, p)
         zajetosc.append({k: round(v, 1) for k, v in z.items()})
     return {"dni": [{"data": d.isoformat(), "dzien": nazwy[d.weekday()]} for d in dni], "pojemnosc": pojemnosc(dane, firma),
@@ -296,7 +297,7 @@ def podsumowanie(dane: Dane, firma: Firma, runda: int) -> dict:
             "partie": [{"zasob": p.zasob, "jakosc": p.jakosc, "ilosc": round(p.ilosc, 3), "wartosc": p.wartosc,
                         "dostawa": p.dostawa, "termin": p.termin, "dostawca": p.dostawca, "nowa": p.runda == runda,
                         "przechowywanie": dane.zasoby[p.zasob].get("przechowywanie", "suche"), "wynajem": p.wynajem,
-                        "miejsce_l": round(miejsce(dane, p), 1)}
+                        "u_dostawcy": p.u_dostawcy, "miejsce_l": round(miejsce(dane, p), 1)}
                        for p in sorted(firma.partie, key=lambda p: (p.termin or "9999", p.dostawa, p.zasob))]}
 
 

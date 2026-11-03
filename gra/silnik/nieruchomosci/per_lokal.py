@@ -203,6 +203,7 @@ def wykonaj_przewozy(dane: Dane, firma: Firma, wid: dict[str, Firma], przew: lis
         zrodlo, cel = wid[x["z"]], wid[x["do"]]
         pozostalo, przewiezione = x["ilosc"], 0.0
         for p in sorted((p for p in zrodlo.partie if p.zasob == x["zasob"] and p.ilosc > EPS and p.dostawa < dzien
+                         and not p.u_dostawcy   # Z4: towar u auto-dostawcy nie jeździ między lokalami
                          and (x["jakosc"] is None or p.jakosc == x["jakosc"]) and not (p.termin and p.termin < dzien)),
                         key=lambda p: (p.termin or "9999-12-31", p.dostawa)):
             if pozostalo <= EPS:

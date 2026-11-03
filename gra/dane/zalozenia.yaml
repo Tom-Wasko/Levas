@@ -381,6 +381,20 @@ magazyn:   # gra z lokalami (zmiana 26.10): bez kosztu magazynowania i zwrotów 
       właściciel – kurs (para lokali, jeden dzień) zajmuje 1 h jego czasu i kosztuje 30 zł brutto (paliwo,
       parkowanie); przewieziona partia traci 1 dzień terminu (nie krótszy niż dzień przewozu). Pracowników nie
       przenosi się. Liczby – założenie do kalibracji'
+  auto_dostawca:
+    wartosc:
+      od_rundy: 2
+      dostawca: Auchan
+      abonament: 120
+      prowizja: 0.1
+      przechowanie_zl_za_litr_dzien: 0.15
+    pewnosc: zalozenie
+    zrodlo: 'przebudowa 2.11.2026 (Z4, raporty/przebudowa_zakladek.md): lokal na auto-dostawach – gracz wpisuje
+      tygodniową ilość składników i płaci za całość (cena Auchan + prowizja 10%, abonament 120 zł brutto na lokal
+      tygodniowo); dostawca co rano dowozi tyle, ile lokal zużyje (w lokalu nic się nie psuje, chłodnia nie jest
+      potrzebna), resztę po tygodniu trzyma u siebie za 0,15 zł brutto za litr dziennie, a termin liczy się od
+      ostatniego dnia tygodnia. Liczby – założenie do kalibracji (przechowanie tygodnia ≈ 1 zł/l, tyle co wynajęta
+      chłodnia, ale za każdy tydzień)'
 lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
   udzial_skladnikow:
     wartosc: 0.5
