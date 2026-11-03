@@ -237,10 +237,12 @@ function kartaBiura(b, wybrane, edycja, K) {
 
 function decyzjeKsiegowosci({ v, edycja }) {
   const K = v.ksiegowosc, d = v.decyzje || {}, wybrane = d.biuro || v.stan.biuro, S = K.samodzielna;
+  const tanie = K.oferty.reduce((a, b) => (!a || b.szacunek.razem < a.szacunek.razem ? b : a), null);   // U6: obok mandatu
   const sam = `<div class="kafel ${wybrane === "samodzielnie" ? "wybrany" : ""}"><div class="kg">Samodzielnie</div><div class="kt">
     <div class="wiersz"><span>Opłata</span><span>0 PLN</span></div>
     <div class="wiersz"><span>Mandat za błędną deklarację</span><span>${zl(S.kara_blad)}</span></div>
-    <div class="wiersz"><span>Mandat za niezłożone deklaracje</span><span>${zl(S.kara_brak)}</span></div>
+    <div class="wiersz"><span>Bez deklaracji – mandat co rundę</span><span><b>${zl(S.kara_brak)}</b></span></div>
+    ${tanie ? `<div class="wiersz"><span>Dla porównania: najtańsze biuro (${esc(tanie.nazwa)})</span><span>${zl2(tanie.szacunek.razem)} / rundę</span></div>` : ""}
     <details><summary>Jak to działa</summary><p>${esc(S.opis)}</p></details></div>
     <div class="kd">${wybierz("samodzielnie", wybrane, edycja, "Księguję sam")}</div></div>`;
   const html = `<div class="siatka trojka">${K.oferty.map((b) => kartaBiura(b, wybrane, edycja, K)).join("")}${sam}</div>`;

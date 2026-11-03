@@ -113,7 +113,9 @@ co jeszcze zostało do zrobienia):
    Dworzec – podróżni o każdej porze. Im mniej drużyn w grze, tym mniej lokali na mapie (około pięciu na
    drużynę), a klientów w mieście jest tyle samo.
 2. **Bank i biuro rachunkowe** – w zakładkach Finanse ▸ Bank i Księgowość ▸ Biuro rachunkowe. Bez banku nie ma konta,
-   bez biura – księgujesz sam.
+   bez biura – księgujesz sam: co rundę wpisujesz dokumenty do KPiR i składasz deklaracje w tej samej zakładce. Kto
+   deklaracji nie złoży, płaci mandat co rundę – zwykle ponad dwa razy więcej niż najtańsze biuro (karta „Samodzielnie”
+   pokazuje to porównanie).
 3. **Menu** (Lokale ▸ Menu i ceny) – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,
    dodatki) dodasz od tygodnia 3.
 4. **Stanowiska** (Lokale ▸ Sprzęt) – kuchnia i kasa. Każdy pracownik potrzebuje swojego stanowiska, a liczbę stanowisk ogranicza

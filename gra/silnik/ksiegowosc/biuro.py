@@ -92,6 +92,17 @@ def najtansze(dane: Dane, dokumenty: int, etat: int, zlecenie: int) -> str:
     return min(biura(dane).values(), key=lambda b: szacunek(dane, b, dokumenty, etat, zlecenie))["id"]
 
 
+def _umowy(firma: Firma) -> tuple[int, int]:
+    etat = sum(1 for p in firma.pracownicy.values() if p.umowa == "prace")
+    return etat, len(firma.pracownicy) - etat
+
+
+def najnizsza_oplata(dane: Dane, firma: Firma, dokumenty: int) -> tuple[str, float]:
+    """U6: biuro z najniższą opłatą za rundę przy tylu dokumentach i pracownikach firmy – (nazwa, kwota brutto)."""
+    oplaty = [(b["nazwa"], oplata(dane, b, dokumenty, *_umowy(firma))["razem"]) for b in biura(dane).values()]
+    return min(oplaty, key=lambda x: x[1])
+
+
 def nalicz(dane: Dane, firma: Firma, ksiega: Ksiega, rachunek: Rachunek, etat: int, zlecenie: int) -> dict:
     """Faktura biura za rundę – koszt w KPiR (dokumenty rundy + ta faktura)."""
     b = biura(dane)[firma.biuro]
@@ -312,9 +323,12 @@ def bledy(dane: Dane, firma: Firma, d: dict) -> list[dict]:
         return []
     u, k, wynik = ustawienia(dane)["samodzielna"], d.get("ksiegowosc") or {}, []
     if _deklaracja(k) is None:
+        nazwa, zl = najnizsza_oplata(dane, firma, len(dk["dokumenty"]))
         wynik.append({"poziom": "czerwony", "zakladka": "finanse_biuro",
                       "tekst": f"Nie złożono deklaracji za rundę {dk['runda']} – urząd rozliczy z urzędu i wystawi "
-                               f"mandat {u['kara_brak']:.0f} zł."})
+                               f"mandat {u['kara_brak']:.0f} zł. Zaksięguj dokumenty w tabeli w "
+                               f"Księgowość ▸ Biuro rachunkowe i złóż deklaracje albo wybierz biuro – najtańsze "
+                               f"({nazwa}) kosztuje ok. {zl:.0f} zł za rundę."})
     zapisy = k.get("zapisy") if isinstance(k.get("zapisy"), dict) else {}
     brak = sum(1 for x in dk["dokumenty"] if not (zapisy.get(x["id"]) or {}).get("kolumna"))
     if brak:
@@ -343,9 +357,9 @@ def widok(dane: Dane, firma_przed: Firma, firma: Firma, d: dict, wyniki: dict | 
     """Zakładka Biuro rachunkowe (gra z lokalami): oferty z szacunkiem opłaty, deklaracja do złożenia (dokumenty
     bez poprawnych zapisów) i podpowiedzi – zapisy, które drużyna już raz zrobiła dobrze (ten sam opis)."""
     u = ustawienia(dane)
-    etat = sum(1 for p in firma.pracownicy.values() if p.umowa == "prace")
+    etat, zlecenie = _umowy(firma)
     dok = len(dokumenty_ostatnie := (firma_przed.deklaracja or {}).get("dokumenty") or []) or u["szacunek_dokumentow"]
-    oferty = [{**b, "szacunek": oplata(dane, b, dok, etat, len(firma.pracownicy) - etat),
+    oferty = [{**b, "szacunek": oplata(dane, b, dok, etat, zlecenie),
                "limit_rundy": limit_rundy(b)} for b in u["biura"]]
     dk = firma_przed.deklaracja
     podpowiedzi = {}
@@ -353,7 +367,7 @@ def widok(dane: Dane, firma_przed: Firma, firma: Firma, d: dict, wyniki: dict | 
         if x["ok"]:
             podpowiedzi[x["opis"]] = {"kolumna": x["kolumna"], "stawka": x["stawka"]}
     return {"oferty": oferty, "samodzielna": u["samodzielna"], "kolumny": NAZWY_KOLUMN, "wyjasnienia": WYJASNIENIA,
-            "dokumenty_szacunek": dok, "pracownicy": {"etat": etat, "zlecenie": len(firma.pracownicy) - etat},
+            "dokumenty_szacunek": dok, "pracownicy": {"etat": etat, "zlecenie": zlecenie},
             "deklaracja": None if not dk else {"runda": dk["runda"], "dokumenty": publiczne(dk["dokumenty"]),
                                                "stan_przed": dk["stan_przed"], "ulga_na_start": dk["ulga_na_start"]},
             "podpowiedzi": podpowiedzi, "liczba_dokumentow": len(dokumenty_ostatnie)}
