@@ -73,7 +73,6 @@ from .kuchnia.operacje import kasjerzy, stanowiska_uslugi
 from .ludzie import czas_wlasciciela as cw
 from .ludzie import rynek_pracy as rp
 from .model import Cena, Firma, Odejscie, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
-from .nieruchomosci import lokale as lk
 from .nieruchomosci import per_lokal as pl
 from .nieruchomosci.lokale import bledy as bledy_lokali
 from .nieruchomosci.lokale import wolne_miejsca
@@ -601,8 +600,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         if lim["pracownicy"]["nowi"] == lim["pracownicy"]["limit"]:
             dodaj("niebieski", "zatrudnienie", f"Wykorzystany limit nowych pracowników w tej rundzie "
                   f"({lim['pracownicy']['limit']}) – kolejnych przyjmiesz w następnej rundzie.")
-        if firma.lokale and runda < lim["lokal"]["od_rundy"]:
-            dodaj("niebieski", "lokale", lk.komunikat_odpoczynku(dane, firma, runda))
+        # U3: „odpoczynek” po lokalu nie trafia na listę – jest w Inwestycje ▸ Lokale, a próba wzięcia kolejnego
+        # lokalu za wcześnie to błąd zapisu (limity.naruszenia)
         for tekst in (info or {}).get("odrzucone_ceny", []):
             dodaj("czerwony", "oferta", tekst)
         for typ, n in (info or {}).get("odrzucone_stanowiska", {}).items():

@@ -321,7 +321,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 
 - [x] U1 [1] Ostrzeżenie przed zakupem sprzętu/wyposażenia: „ten zakup obniży kartę tej rundy o ok. X” (decyzja autora: tylko ostrzeżenie, liczby karty bez zmian) – zrobione: `zastosuj` liczy zakupy poniżej progu amortyzacji wpisane w koszty (`inwestycje_w_koszty`), a Lista błędów (Lokale ▸ Sprzęt) pokazuje pomarańczowe ostrzeżenie z kwotą bez VAT i spadkiem karty (koszt ÷ dzielnik wyniku ekonomicznego); wzmianka w INSTRUKCJA rozdz. 3.
 - [x] U2 [2] Alarm debetu ponad limit widoczny dla ucznia: pasek na Dashboardzie + pierwsza pozycja na Liście błędów – zrobione: `inw.alarm` daje czerwoną pozycję „ALARM: debet ponad limit…” na początku listy błędów (podgląd szkicu i wyniki rundy; podgląd stosuje też wpłatę inwestora i blokadę jak przeliczenie), a Dashboard pokazuje ją jako czerwony pasek z przyciskiem do Banku.
-- [ ] U3 [3] Błąd: komunikat „kanapa” po pierwszym lokalu (`silnik/decyzje.py:595`) – tylko przy próbie wzięcia kolejnego lokalu
+- [x] U3 [3] Błąd: komunikat „kanapa” po pierwszym lokalu (`silnik/decyzje.py:595`) – tylko przy próbie wzięcia kolejnego lokalu – zrobione: komunikat o odpoczynku właściciela nie trafia już na Listę błędów po wzięciu lokalu; zostaje w Inwestycje ▸ Lokale i jako błąd zapisu przy próbie wzięcia kolejnego lokalu za wcześnie (test_limity).
 - [ ] U4 [4] Stare nazwy zakładek w tekstach silnika („Kadry”, „Inwestycje” w `lokale.py:233`) + test nazw zakładek
 - [ ] U5 [5] Lista błędów: grupy Do zrobienia / Uwaga / Dla informacji, łączenie pozycji jednej sprawy, licznik tylko czerwonych
 - [ ] U6 [6] Mandat za brak deklaracji: co zrobić zamiast (KPiR albo biuro od ok. 160 zł/tydz.), porównanie w zakładce Biuro

@@ -71,11 +71,12 @@ def test_zapis_ponad_limit_pracownikow_odrzucony(client, gra):
 
 def test_zapis_lokalu_przed_terminem_odrzucony(client, gra):
     v = _widok(client, gra)
-    assert _zapisz(client, gra, {**v["decyzje"], **_lokal("centrum_3")}).status_code == 200
+    r = _zapisz(client, gra, {**v["decyzje"], **_lokal("centrum_3")})
+    assert r.status_code == 200 and not any("najwcześniej w rundzie" in t for t in _bledy(r.json(), "niebieski"))
     client.post(f"/api/gry/{gra}/przelicz")
     v = _widok(client, gra)
     assert v["lokale"]["nowy_od"] == 4
-    assert any("najwcześniej w rundzie 4" in t for t in _bledy(v, "niebieski"))
+    assert not any("najwcześniej w rundzie 4" in t for t in _bledy(v, "niebieski"))   # U3: nie na liście błędów
     assert "najwcześniej w rundzie 4" in v["lokale"]["odpoczynek"]   # P8: komunikat z żartem
     r = _zapisz(client, gra, {**v["decyzje"], **_lokal("dworzec_1")})
     assert r.status_code == 400 and "najwcześniej w rundzie 4" in r.json()["blad"]
