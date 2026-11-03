@@ -129,6 +129,13 @@ pobiera się raz do `narzedzia/`. Logowanie wymagane także z tego komputera (pr
 przychodzi z 127.0.0.1, więc konta `lokalny` nie ma) – za pierwszym razem okno zakłada konto mistrza gry
 z hasłem. Kolegom zakłada się konta w zakładce *Drużyny*.
 
+**Stały link** (`staly_link.bat`, `manage.py staly_link`, `panel_gracza/staly_link.py`): gdy masz zwykły hosting
+WWW (np. subdomenę `levas.szkola.pl` na hostingu z samym PHP), uruchom raz `staly_link.bat` i podaj adres strony
+oraz dane konta FTP jej katalogu – trafiają do `lokalne.json` (poza gitem). Od tej pory `hostuj.bat` przy starcie
+wgrywa tam przez FTP z TLS `.htaccess` i `index.html` z przekierowaniem na bieżący adres tunelu, a po zakończeniu
+gry klawiszami Ctrl+C – stronę „gra wyłączona” (po zamknięciu okna krzyżykiem link prowadzi do martwego tunelu,
+do następnego startu). Na hostingu nie trzeba Pythona. Wyłączenie: `staly_link.bat --usun`.
+
 **Wygląd** (lista w nagłówku): klasyczny, *Talerze z kebabem*, *Grafik zmian*, *Kebab nocą* – pliki `panel_gracza/static/motywy/*.css`,
 przełącznik `panel_gracza/static/motyw.js`.
 

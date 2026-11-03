@@ -4,6 +4,7 @@ Serwer na tym komputerze z logowaniem (bez automatycznego konta mistrza gry z `g
 każde zapytanie przychodzi z 127.0.0.1) i darmowy tunel Cloudflare: adres
 https://<losowe-slowa>.trycloudflare.com, bez konta Cloudflare i bez ustawień routera. Adres zmienia
 się przy każdym uruchomieniu. Program `cloudflared.exe` pobiera się raz do `narzedzia/`.
+Stały link (staly_link.bat, panel_gracza/staly_link.py): zwykła strona WWW przekierowuje na tunel.
 """
 
 import re
@@ -22,6 +23,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 
 from konta.role import MISTRZ_GRY
+from panel_gracza import staly_link
 
 from .graj import port_zajety
 
@@ -78,6 +80,7 @@ class Command(BaseCommand):
             mistrzowie = [login]
 
         url, tunel = self.tunel(port)
+        staly = staly_link.ustaw(url)
         try:
             # przez tunel: adres z https, formularze z tego adresu, bez stron diagnostycznych Django
             settings.ALLOWED_HOSTS.append(urlparse(url).hostname)
@@ -88,9 +91,12 @@ class Command(BaseCommand):
             print(
                 "\n" + "=" * 70
                 + f"\n  Link dla kolegów:   {url}"
+                + (f"\n  Stały link:         {staly}  (prowadzi do gry, póki działa to okno)"
+                   if staly else "")
                 + f"\n  Ty (na tym komputerze): {lokalny}  – login: {', '.join(mistrzowie)}"
                 + "\n\n  Konta kolegów: panel mistrza gry -> gra -> zakładka Drużyny."
-                + "\n  Zamknięcie tego okna kończy grę i wyłącza link."
+                + "\n  Koniec gry: Ctrl+C w tym oknie (wyłącza link"
+                + (", stały pokaże „gra wyłączona”)." if staly else ").")
                 + "\n" + "=" * 70 + "\n",
                 flush=True,
             )
@@ -102,6 +108,8 @@ class Command(BaseCommand):
             )
         finally:
             tunel.terminate()
+            if staly:
+                staly_link.ustaw(None)
 
     def tunel(self, port: int) -> tuple[str, subprocess.Popen]:
         """Uruchamia tunel i czeka (do minuty), aż cloudflared poda adres."""
