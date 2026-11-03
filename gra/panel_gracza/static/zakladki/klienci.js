@@ -2,6 +2,7 @@
 // dni tygodnia, kalendarz miejski i wyniki dzień po dniu. Bez gotowej prognozy – popyt drużyna liczy sama (test gry 28.10).
 import { esc, licz, proc, tabela, wykres } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
+import { IG_KLIENCI } from "./infografiki.js";
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
 const POZIOM = (x) => x >= 1.08 ? "wysokie" : x <= 0.92 ? "niskie" : "średnie";
@@ -69,7 +70,7 @@ export const klienci = {
   tytul: "Klienci", tytulPelny: "Klienci i strefy", ikona: "klienci", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
   info: `Każda strefa miasta ma własnych klientów – ich liczba zależy od dania, pory roku, dnia tygodnia i wydarzeń w mieście.
     Klienci strefy wybierają lokal: liczy się cena względem cen w strefie, jakość, odległość lokalu (sąsiednie strefy też przychodzą, ale mniej)
-    i zadowolenie klientów firmy. Dwa lokale w jednej strefie dzielą tych samych klientów, a część klientów zawsze wybiera bary spoza gry albo obiad w domu.`,
+    i zadowolenie klientów firmy. Dwa lokale w jednej strefie dzielą tych samych klientów, a część klientów zawsze wybiera bary spoza gry albo obiad w domu.${IG_KLIENCI}`,
   decyzje({ v, kat }) {
     const P = v.popyt;
     if (!P) return `<p class="podpowiedz">Brak danych o klientach.</p>`;

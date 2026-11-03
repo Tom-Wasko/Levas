@@ -1,5 +1,6 @@
 // Marketing: kampanie agencji reklamowych w strefach miasta i promocje.
 import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
+import { igReklama } from "./infografiki.js";
 
 const RODZAJ = { druk: "druk", internet: "internet", radio_billboard: "radio i billboardy", wydarzenia: "wydarzenia" };
 const FAZA = { trwa: "trwa", wygasa: "wygasa" };
@@ -17,6 +18,11 @@ const rabatKanalu = (k, n) => k.znizki.reduce((r, [od, x]) => (n >= od ? Math.ma
 const efektEmisji = (R, n) => (n > 0 ? 1 - Math.exp(-R.model.tempo_emisji * n) : 0);
 const kosztKampanii = (k, s, n) => n * k.ceny[s] * (1 - rabatKanalu(k, n));
 const emisji = (n) => `${n} ${n === 1 ? "emisja" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? "emisje" : "emisji"}`;
+// infografika z danych pierwszego kanału (przykład w dymku); bez danych – wartości domyślne
+const igReklamaZ = (R) => {
+  const k = R?.agencje?.[0]?.kanaly?.[0];
+  return `<p><b>Przykład: ${esc(k?.nazwa || "ulotki")}</b></p>` + (k ? igReklama(R.model.tempo_emisji, k.znizki, k.maks_emisji) : igReklama());
+};
 const kanalReklamy = (R, a, k) => R.agencje.find((x) => x.id === a)?.kanaly.find((x) => x.id === k);
 const takaSama = (x, a, k, strefa) => x.agencja === a && x.kanal === k && (x.strefa ?? null) === strefa;
 const emisjeWDecyzji = (v, a, k, s) => (v.decyzje.kampanie || []).find((x) => takaSama(x, a, k, s === "miasto" ? null : s))?.emisje || 0;
@@ -56,12 +62,12 @@ function trwajaceHtml(v, lista, tytul) {
 export const agencje = {
   tytul: "Agencje reklamowe", tytulPelny: "Marketing – agencje reklamowe", ikona: "tradycyjny",
   odblokowanie: (v) => !!v.reklama && v.runda >= (v.harmonogram?.reklama ?? 1), ukryta: (v) => !v.reklama,
-  info: () => `Zamów kampanię w jednej z agencji na mieście: wybierz kanał, strefę i liczbę emisji w tej rundzie (emisja to paczka ulotek,
+  info: ({ v } = {}) => `Zamów kampanię w jednej z agencji na mieście: wybierz kanał, strefę i liczbę emisji w tej rundzie (emisja to paczka ulotek,
     post, spot w radiu…). Im więcej emisji, tym taniej za sztukę (progi rabatów każdego kanału), ale efekt się nasyca: pierwsze emisje działają
     najmocniej, ok. 10 to już ponad 90% tego, co kanał może dać. Kampania w strefie przyciąga do miasta więcej głodnych (korzystają też sąsiedzi)
     i podbiera klientów konkurencji. Kilka firm reklamujących się tak samo w tej samej strefie zagłusza się nawzajem. Kampania działa w rundzie
     emisji, potem jeszcze przez chwilę wygasa. Kampanie się sumują, ale z sufitem: jedna daje zwykle kilka procent popytu więcej, kilka naraz –
-    ok. +10% … +30%, a dalsze dokładanie już prawie nic nie zmienia.`,
+    ok. +10% … +30%, a dalsze dokładanie już prawie nic nie zmienia.${igReklamaZ(v?.reklama)}`,
   decyzje({ v, edycja }) {
     const R = v.reklama;
     if (!R) return `<p class="podpowiedz">Agencje reklamowe działają w grze z lokalami.</p>`;

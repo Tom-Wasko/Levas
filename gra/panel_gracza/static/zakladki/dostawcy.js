@@ -2,6 +2,7 @@
 // „Magazyn i świeżość”, silnik/kuchnia/swiezosc.py), a dostawcy mają swoje zasady (silnik/kuchnia/dostawcy.py: zasady_dostaw):
 // dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
 import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
+import { IG_AUTO } from "./infografiki.js";
 import { glownyLokal, idWybranego, lokalPartii, lokalWybrany, menuLokalu, nazwaLokalu, zapiszWLokalu } from "./lokal_wybor.js";
 
 // Z3: przy kilku lokalach magazyn i zamówienia wybranego lokalu (zamówienie bez pola "lokal" – lokal główny)
@@ -169,7 +170,7 @@ function sekcjaAuto(v, kat, edycja) {
     nic nie psuje się w lokalu i nie zajmuje chłodni. Płacisz z góry za całą wpisaną ilość + ${Math.round(Z.prowizja * 100)}% prowizji
     i ${zl2(Z.abonament)} abonamentu za tydzień. Co zostanie, czeka u dostawcy na następny tydzień: ${zl2(Z.przechowanie_zl_za_litr_dzien)} za litr dziennie,
     a termin przydatności biegnie. Za mało towaru – dania wypadają z menu. Lokal na auto-dostawach nie przyjmuje Twoich zamówień od innych dostawców.
-    ${od ? `<b>Auto-dostawca – od rundy ${Z.od_rundy}.</b>` : ""}</p>`;
+    ${od ? `<b>Auto-dostawca – od rundy ${Z.od_rundy}.</b>` : ""}${IG_AUTO}</p>`;
   if (!wl) return html;
   const ceny = cenyAuto(v), poz = autoDecyzja(v).pozycje || [], pot = zapotrzebowanie(v, kat);
   const zasoby = [...new Set([...Object.keys(pot), ...poz.map((x) => x.zasob)])].filter((z) => ceny[z]);

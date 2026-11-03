@@ -2,6 +2,7 @@
 // dane/zasoby.yaml, dane/sprzet.yaml) – w decyzjach plan dostaw, w wynikach dzień po dniu: dostawy, zużycie, straty.
 import { esc, gw, licz, nazwaUslugi, tabela, toast, ulamek, wykres, zl2 } from "./wspolne.js";
 import { idWybranego, mojeLokale, nazwaLokalu } from "./lokal_wybor.js";
+import { IG_SWIEZOSC } from "./infografiki.js";
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
 const MIEJSCE = { chlodnia: "Chłodnia", zamrazarka: "Zamrażarka", suche: "Suchy magazyn" };
@@ -141,7 +142,7 @@ export const swiezosc = {
     Dzień dostawy wybierasz w zakładce <a data-zakladka-k="dostawcy">Dostawcy</a> (baza składników dostawcy). Chłodzone i mrożone składniki muszą się zmieścić
     w szafie chłodniczej i zamrażarce – nadmiar jedzie do wynajętej chłodni (płacisz za litr, a termin się skraca).
     Dużo towaru w wynajmie i przeterminowane jedzenie w koszu przyciągają sanepid. Mrożona pita i mrożone mięso zastępują świeże, gdy tych zabraknie,
-    ale klienci to czują (−1★ jakości składnika).`,
+    ale klienci to czują (−1★ jakości składnika).${IG_SWIEZOSC}`,
   decyzje({ v, edycja }) {
     const id = idWybranego(v);   // Z3: kilka lokali – magazyn wybranego lokalu
     const S = (id && v.swiezosc?.lokale?.[id]) || v.swiezosc;

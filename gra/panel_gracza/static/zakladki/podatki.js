@@ -3,6 +3,7 @@
 import { UKRYTE } from "./finanse.js";
 import { LEKCJA_PIT_ZUS, LEKCJA_VAT } from "./lekcje.js";
 import { esc, nazwaUslugi, proc, tabela, zl2 } from "./wspolne.js";
+import { IG_PIT, IG_VAT } from "./infografiki.js";
 
 const RODZAJ = { nalezny: "należny (sprzedaż)", naliczony: "naliczony (zakupy)" };
 
@@ -43,7 +44,7 @@ export const vat = {
   tytul: "VAT", tytulPelny: "Finanse – VAT: rejestr, stawki i deklaracja", ikona: "procent", odblokowanie: (v) => !!v.podatki, ukryta: (v) => !v.podatki,
   info: `Jesteś czynnym podatnikiem VAT. Wszystkie ceny w grze są <b>brutto</b> – z każdej sprzedaży i z większości zakupów
     wydzielany jest VAT, a do KPiR trafia kwota netto. Na koniec rundy biuro rachunkowe składa deklarację: VAT należny
-    (ze sprzedaży) minus naliczony (z zakupów); nadwyżka naliczonego przechodzi na następną rundę.`,
+    (ze sprzedaży) minus naliczony (z zakupów); nadwyżka naliczonego przechodzi na następną rundę.${IG_VAT}`,
   decyzje({ v, kat }) {
     const T = v.podatki;
     if (!T) return `<p class="podpowiedz">Brak danych.</p>`;
@@ -67,7 +68,7 @@ export const podatki = {
   tytul: "Podatki", tytulPelny: "Finanse – PIT i ZUS (rozliczenie JDG)", ikona: "podatki", odblokowanie: (v) => !!v.podatki, ukryta: (v) => !v.podatki,
   info: `Prowadzisz jednoosobową działalność: KPiR i PIT liniowy (VAT – w zakładce obok). Na koniec każdej rundy biuro
     rachunkowe rozlicza składkę zdrowotną, zaliczkę na PIT (narastająco od początku gry) i – po uldze na start –
-    preferencyjny ZUS. Wszystko płaci się z konta, automatycznie.`,
+    preferencyjny ZUS. Wszystko płaci się z konta, automatycznie.${IG_PIT}`,
   decyzje({ v }) {
     const T = v.podatki;
     if (!T) return `<p class="podpowiedz">Brak danych.</p>`;
