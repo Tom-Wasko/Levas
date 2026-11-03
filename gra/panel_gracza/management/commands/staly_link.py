@@ -50,9 +50,17 @@ class Command(BaseCommand):
         try:
             staly_link.wgraj(konfig, None)
         except (OSError, ftplib.Error) as blad:
+            podpowiedz = (
+                "Serwer odrzucił login albo hasło. Sprawdź w panelu hostingu pełną nazwę\n"
+                "konta FTP (z przedrostkiem, np. serwer12345_levas), czy konto jest już zapisane\n"
+                "i aktywne,\n"
+                "i wpisz hasło jeszcze raz – najlepiej wklej je albo ustaw nowe bez znaków\n"
+                "podobnych do siebie (l / I / 1, O / 0)."
+                if str(blad).startswith("530") else
+                "Sprawdź adres serwera FTP i katalog.")
             raise CommandError(
-                f"Nie udało się połączyć z {konfig['host']}: {blad}\n"
-                "Sprawdź serwer, login, hasło i katalog (dane niezapisane).") from blad
+                f"Nie udało się połączyć z {konfig['host']}: {blad}\n{podpowiedz}\n"
+                "Dane niezapisane – uruchom staly_link.bat jeszcze raz.") from blad
         staly_link.zapisz_konfiguracje(konfig)
         print(f"Gotowe. {konfig['adres'] or konfig['host']} pokazuje teraz „gra wyłączona”;\n"
               "po uruchomieniu hostuj.bat będzie prowadzić do gry.")

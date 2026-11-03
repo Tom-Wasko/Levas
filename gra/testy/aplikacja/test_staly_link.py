@@ -129,7 +129,7 @@ def test_komenda_nie_zapisuje_przy_bledzie_polaczenia(ftp, lokalne, monkeypatch)
     monkeypatch.setattr("builtins.input", lambda _pytanie: next(odpowiedzi))
     monkeypatch.setattr(komenda, "getpass", lambda _pytanie: "zle")
     ftp.blad = OSError("530 Login incorrect")
-    with pytest.raises(CommandError, match="530"):
+    with pytest.raises(CommandError, match="odrzucił login"):
         call_command("staly_link")
     assert not lokalne.exists()
 
