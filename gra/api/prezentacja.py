@@ -46,7 +46,7 @@ from silnik.rynek import kalendarz as kl
 from silnik.rynek import konkurencja as kn
 from silnik.rynek import promocje as pm
 from silnik.rynek import reklama as rk
-from silnik.rynek.popyt import widok_popytu
+from silnik.rynek.popyt import rozruch, widok_popytu
 from silnik.swiat import awarie as aw
 from silnik.swiat import zdarzenia as zd
 from silnik.wyniki.wnioski import wnioski
@@ -358,6 +358,14 @@ def _dashboard(gra: Gra, firma: str, runda: int, poprzedni, skum: dict) -> dict:
     if runda - 1 in poprzedni.wyniki:
         d["dochod_netto"] = poprzedni.wyniki[runda - 1][firma]["kpir"]["dochod_netto"]
     d["miejsce"] = miejsca(skum).get(firma)   # Z7: jak ranking mistrza gry (średnia z rund 2…)
+    zr = gra.dane.mapa["popyt"]["model"].get("rozruch")
+    if zr:   # U9: lokale w rozruchu (poprzedni i bieżący tydzień sprzedaży) – wyjaśnienie straty na starcie
+        def mnoznik(lok, r):
+            return round(rozruch(gra.dane, lok, r), 2) if r >= max(lok.dziala_od, 2) else None
+        lokale = [{"nazwa": gra.dane.lokale[lok.id]["nazwa"], "poprzednia": mnoznik(lok, runda - 1),
+                   "teraz": mnoznik(lok, runda)} for lok in f.lokale]
+        d["rozruch"] = {"start": zr["start"], "przyrost": zr["przyrost"],
+                        "lokale": [x for x in lokale if any(m is not None and m < 1 for m in (x["poprzednia"], x["teraz"]))]}
     return d
 
 

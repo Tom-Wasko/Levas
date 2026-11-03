@@ -155,7 +155,8 @@ roku akademickiego i wydarzeń w mieście (sesja, Halloween, jarmark, mecze). Kl
 - **zadowolenia** – firmy, z której klienci wyszli zadowoleni, wracają chętniej.
 - **renomy lokalu** – nowy lokal dopiero zdobywa stałych bywalców: w pierwszym tygodniu sprzedaży
   przychodzi niecała połowa klientów, co tydzień więcej, aż po kilku tygodniach lokal jest „znany”.
-  Tak samo jest z każdym kolejnym lokalem – zaplanuj na start mniejszą obsadę i zamówienia.
+  Tak samo jest z każdym kolejnym lokalem – zaplanuj na start mniejszą obsadę i zamówienia. Dopóki lokal
+  się rozkręca, Dashboard pokazuje ramkę „Rozruch nowego lokalu” z odsetkiem klientów w tym tygodniu.
 
 Dwa lokale w jednej strefie dzielą tych samych klientów, a część ludzi i tak zje u konkurencji spoza gry albo
 w domu. Jeśli brakuje rąk, sprzętu albo miejsc przy kasie, klienci odchodzą z kolejki – to **utracona sprzedaż**,

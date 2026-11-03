@@ -90,6 +90,20 @@ function planRundy(v, kat) {
     <a data-zakladka-k="wyslij"><span class="st ${v.wyslane ? "ok" : "inf"}">${v.wyslane ? "✓" : "→"}</span><span>Wyślij decyzje<small>${v.wyslane ? "wysłane" : "gdy wszystko gotowe"}</small></span></a></div>`;
 }
 
+// U9: rozruch nowego lokalu (dane/mapa/popyt.yaml: model.rozruch) – strata w pierwszych tygodniach sprzedaży jest normalna
+function rozruchHtml(v) {
+  const R = v.dashboard?.rozruch;
+  if (!R || !(R.lokale.length || v.runda === v.gra.runda_startowa)) return "";
+  const pr = (m) => `ok. ${Math.round(m * 100)}%`;
+  const lokale = R.lokale.map((l) => `<li><b>${esc(l.nazwa)}</b>: ${l.poprzednia != null
+    ? `w poprzednim tygodniu przyszło ${pr(l.poprzednia)} klientów, w tym ${l.teraz < 1 ? pr(l.teraz) : "już pełny popyt"}`
+    : `pierwszy tydzień sprzedaży – przyjdzie ${pr(l.teraz)} klientów`}.</li>`).join("");
+  return `<div class="komunikat"><b>Rozruch nowego lokalu.</b> Nowy lokal dopiero zdobywa klientów: w pierwszym tygodniu
+    sprzedaży przychodzi ${pr(R.start)} klientów, potem co tydzień o ${Math.round(R.przyrost * 100)} punktów procentowych więcej,
+    aż do pełnego popytu. Czynsz i pensje są od razu pełne, więc strata na starcie jest normalna – pilnuj, żeby była mała:
+    zamówienia i grafik dopasuj do mniejszego ruchu.${lokale ? `<ul>${lokale}</ul>` : ""}</div>`;
+}
+
 export const dashboard = {
   tytul: "Dashboard", ikona: "▦",
   decyzje({ v, kat, d: szkic }) {
@@ -108,7 +122,7 @@ export const dashboard = {
     const alarm = (v.lista_bledow || []).find((b) => b.alarm);   // U2: debet ponad limit – blokada w tej rundzie
     const pasek = alarm ? `<div class="komunikat zly">${esc(alarm.tekst)}
       <button class="btn jasny maly" data-akcja="popraw" data-z="bank">Przejdź do banku</button></div>` : "";
-    return `${pasek}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
+    return `${pasek}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}${rozruchHtml(v)}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
       ${kafel("Nazwa i logo firmy", "osoba", `<div class="srodek">${znakFirmy(m)}<b>${esc(m.nazwa)}</b>${m.slogan ? `<div class="maly-tekst">„${esc(m.slogan)}”</div>` : ""}</div>`)}
       ${kafel("Miejsce", "karta", d.miejsce ? `${d.miejsce} / ${d.liczba_firm}` : `<span class="maly-tekst">Ranking dostępny od rundy 3</span>`)}
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}

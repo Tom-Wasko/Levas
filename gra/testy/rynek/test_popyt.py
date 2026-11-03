@@ -51,6 +51,25 @@ def test_rozruch_nowego_lokalu(tmp_path):
     assert popyt_r2(dane) < 0.7 * popyt_r2(_bez_rozruchu(tmp_path / "g"))
 
 
+@pytest.mark.django_db
+def test_dashboard_wyjasnia_rozruch(tmp_path):
+    """U9: Dashboard podaje mnożnik rozruchu lokalu w poprzednim i bieżącym tygodniu sprzedaży."""
+    from api.prezentacja import widok
+    kat = _kopia(tmp_path / "z")
+    _zmien(kat, "mapa/popyt.yaml", lambda d: d["model"].update(rozruch={"start": 0.4, "przyrost": 0.3}))
+    g = _gra(("A", None), dane=Dane(kat))
+    _runda(g, A=_lokal("centrum_3"))
+    R = widok(g, "A")["dashboard"]["rozruch"]
+    assert (R["start"], R["przyrost"]) == (0.4, 0.3)
+    assert [(x["poprzednia"], x["teraz"]) for x in R["lokale"]] == [(None, 0.4)]   # runda 2 – pierwszy tydzień
+    _runda(g, A={})
+    assert [(x["poprzednia"], x["teraz"]) for x in widok(g, "A")["dashboard"]["rozruch"]["lokale"]] == [(0.4, 0.7)]
+    for _ in range(2):
+        _runda(g, A={})
+    assert not widok(g, "A")["dashboard"]["rozruch"]["lokale"]   # runda 5: 1,0 i 1,0 – bez ramki
+    assert "rozruch" not in widok(_gra(("A", None), dane=_bez_rozruchu(tmp_path)), "A")["dashboard"]
+
+
 def _bez_rozruchu(tmp_path):
     kat = _kopia(tmp_path / "bez")
     _zmien(kat, "mapa/popyt.yaml", lambda d: d["model"].pop("rozruch", None))
