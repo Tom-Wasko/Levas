@@ -1,0 +1,3768 @@
+[
+ {
+  "krok": "konta",
+  "kod": 200,
+  "loginy": [
+   "ala.analizowa3",
+   "jan.testowy3"
+  ],
+  "sklad": [
+   [
+    200,
+    "ok"
+   ],
+   [
+    200,
+    "ok"
+   ]
+  ],
+  "druzyny": {
+   "druzyny": [
+    {
+     "firma": "1A",
+     "sklad": [
+      {
+       "login": "ala.analizowa3",
+       "nazwa": "Ala Analizowa"
+      },
+      {
+       "login": "jan.testowy3",
+       "nazwa": "Jan Testowy"
+      }
+     ]
+    },
+    {
+     "firma": "2B",
+     "sklad": []
+    },
+    {
+     "firma": "3C",
+     "sklad": []
+    },
+    {
+     "firma": "4D",
+     "sklad": []
+    }
+   ],
+   "uczniowie": [
+    {
+     "login": "ala.analizowa",
+     "nazwa": "Ala Analizowa"
+    },
+    {
+     "login": "ala.analizowa2",
+     "nazwa": "Ala Analizowa"
+    },
+    {
+     "login": "ala.analizowa3",
+     "nazwa": "Ala Analizowa"
+    },
+    {
+     "login": "jan.testowy",
+     "nazwa": "Jan Testowy"
+    },
+    {
+     "login": "jan.testowy2",
+     "nazwa": "Jan Testowy"
+    },
+    {
+     "login": "jan.testowy3",
+     "nazwa": "Jan Testowy"
+    }
+   ],
+   "maks": 4
+  }
+ },
+ {
+  "krok": "logowanie ucznia",
+  "zalogowany": true,
+  "mg_zapis_1a": [
+   403,
+   {
+    "blad": "Mistrz gry ogląda decyzje drużyny tylko do odczytu."
+   }
+  ],
+  "obca_druzyna": [
+   403,
+   {
+    "blad": "To nie jest firma Twojej drużyny."
+   }
+  ],
+  "uczen_mg": {
+   "blad": "Tylko mistrz gry może to zrobić."
+  }
+ },
+ {
+  "runda": 1,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Właściciel leży na kanapie z mrożonym kebabem na czole i mówi, że jeszcze jeden lokal w tym tygodniu i sam zacznie się obracać na rożnie. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "2B": [
+    "Właściciel leży na kanapie z mrożonym kebabem na czole i mówi, że jeszcze jeden lokal w tym tygodniu i sam zacznie się obracać na rożnie. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "3C": [
+    "Właściciel leży na kanapie z mrożonym kebabem na czole i mówi, że jeszcze jeden lokal w tym tygodniu i sam zacznie się obracać na rożnie. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "4D": [
+    "Właściciel leży na kanapie z mrożonym kebabem na czole i mówi, że jeszcze jeden lokal w tym tygodniu i sam zacznie się obracać na rożnie. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": null,
+    "gotowka": 39896.76,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 39902.07,
+    "alarm": 0.0,
+    "dochod_ostatni": -97.93,
+    "dochod_suma": -97.93,
+    "wynik_ostatni": null,
+    "wynik_skumulowany": null,
+    "pracownicy": 0,
+    "stanowiska": 0
+   },
+   "2B": {
+    "miejsce": null,
+    "gotowka": 28301.0,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 38590.03,
+    "alarm": 0.0,
+    "dochod_ostatni": -1409.97,
+    "dochod_suma": -1409.97,
+    "wynik_ostatni": null,
+    "wynik_skumulowany": null,
+    "pracownicy": 0,
+    "stanowiska": 2
+   },
+   "3C": {
+    "miejsce": null,
+    "gotowka": 27756.78,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 38472.77,
+    "alarm": 0.0,
+    "dochod_ostatni": -1527.23,
+    "dochod_suma": -1527.23,
+    "wynik_ostatni": null,
+    "wynik_skumulowany": null,
+    "pracownicy": 0,
+    "stanowiska": 2
+   },
+   "4D": {
+    "miejsce": null,
+    "gotowka": 39896.76,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 39902.07,
+    "alarm": 0.0,
+    "dochod_ostatni": -97.93,
+    "dochod_suma": -97.93,
+    "wynik_ostatni": null,
+    "wynik_skumulowany": null,
+    "pracownicy": 0,
+    "stanowiska": 0
+   },
+   "Bafra": {
+    "miejsce": null,
+    "gotowka": 30062.54,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 38721.36,
+    "alarm": 0.0,
+    "dochod_ostatni": -1278.64,
+    "dochod_suma": -1278.64,
+    "wynik_ostatni": null,
+    "wynik_skumulowany": null,
+    "pracownicy": 0,
+    "stanowiska": 2
+   },
+   "Sułtan Premium": {
+    "miejsce": null,
+    "gotowka": 12829.85,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 36855.25,
+    "alarm": 0.0,
+    "dochod_ostatni": -3144.75,
+    "dochod_suma": -3144.75,
+    "wynik_ostatni": null,
+    "wynik_skumulowany": null,
+    "pracownicy": 0,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 2,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 72 zł) przeterminuje się, zanim trafi do dań (termin 09.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,1 opak. (ok. 41 zł) przeterminuje się, zanim trafi do dań (termin 12.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Lekarz rodzinny zalecił właścicielowi „trzy tygodnie bez notariuszy”. Recepta wisi na lodówce, magnesem w kształcie falafela. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 5."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 58 zł) przeterminuje się, zanim trafi do dań (termin 09.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 200 zł) przeterminuje się, zanim trafi do dań (termin 12.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Lekarz rodzinny zalecił właścicielowi „trzy tygodnie bez notariuszy”. Recepta wisi na lodówce, magnesem w kształcie falafela. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,8 opak. (ok. 31 zł) przeterminuje się, zanim trafi do dań (termin 11.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Lekarz rodzinny zalecił właścicielowi „trzy tygodnie bez notariuszy”. Recepta wisi na lodówce, magnesem w kształcie falafela. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 3,3 opak. (ok. 126 zł) przeterminuje się, zanim trafi do dań (termin 09.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 211 zł) przeterminuje się, zanim trafi do dań (termin 12.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Lekarz rodzinny zalecił właścicielowi „trzy tygodnie bez notariuszy”. Recepta wisi na lodówce, magnesem w kształcie falafela. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 5."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 4,
+    "gotowka": 36420.88,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 39218.59,
+    "alarm": 0.0,
+    "dochod_ostatni": -3149.91,
+    "dochod_suma": -3247.84,
+    "wynik_ostatni": -0.683,
+    "wynik_skumulowany": -0.683,
+    "pracownicy": 0,
+    "stanowiska": 0
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 25998.96,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 37445.15,
+    "alarm": 0.0,
+    "dochod_ostatni": -1589.18,
+    "dochod_suma": -2999.15,
+    "wynik_ostatni": -0.344,
+    "wynik_skumulowany": -0.344,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "3C": {
+    "miejsce": 3,
+    "gotowka": 24970.87,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 37551.72,
+    "alarm": 0.0,
+    "dochod_ostatni": -2676.54,
+    "dochod_suma": -4203.77,
+    "wynik_ostatni": -0.58,
+    "wynik_skumulowany": -0.58,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 19888.96,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 31893.88,
+    "alarm": 0.0,
+    "dochod_ostatni": -10553.25,
+    "dochod_suma": -10651.18,
+    "wynik_ostatni": -2.287,
+    "wynik_skumulowany": -2.287,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 5,
+    "gotowka": 24110.04,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 33997.69,
+    "alarm": 0.0,
+    "dochod_ostatni": -4646.74,
+    "dochod_suma": -5925.38,
+    "wynik_ostatni": -1.007,
+    "wynik_skumulowany": -1.007,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Sułtan Premium": {
+    "miejsce": 2,
+    "gotowka": 10751.8,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 35735.72,
+    "alarm": 0.0,
+    "dochod_ostatni": -1899.38,
+    "dochod_suma": -5044.13,
+    "wynik_ostatni": -0.412,
+    "wynik_skumulowany": -0.412,
+    "pracownicy": 2,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 3,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 63 zł) przeterminuje się, zanim trafi do dań (termin 15.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Rodzina schowała właścicielowi długopis, pieczątkę i telefon do agenta nieruchomości. Najpierw ma się odstresować. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 6."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 85 zł) przeterminuje się, zanim trafi do dań (termin 16.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Rodzina schowała właścicielowi długopis, pieczątkę i telefon do agenta nieruchomości. Najpierw ma się odstresować. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 60 zł) przeterminuje się, zanim trafi do dań (termin 15.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,8 opak. (ok. 291 zł) przeterminuje się, zanim trafi do dań (termin 15.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Rodzina schowała właścicielowi długopis, pieczątkę i telefon do agenta nieruchomości. Najpierw ma się odstresować. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 4."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,4 opak. (ok. 353 zł) przeterminuje się, zanim trafi do dań (termin 15.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,7 opak. (ok. 248 zł) przeterminuje się, zanim trafi do dań (termin 15.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Rodzina schowała właścicielowi długopis, pieczątkę i telefon do agenta nieruchomości. Najpierw ma się odstresować. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 5.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 4,
+    "gotowka": 27732.78,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 36377.78,
+    "alarm": 0.0,
+    "dochod_ostatni": -2679.88,
+    "dochod_suma": -5927.72,
+    "wynik_ostatni": -0.581,
+    "wynik_skumulowany": -0.632,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 3,
+    "gotowka": 19512.52,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 37316.74,
+    "alarm": 0.0,
+    "dochod_ostatni": -1638.25,
+    "dochod_suma": -4637.4,
+    "wynik_ostatni": -0.355,
+    "wynik_skumulowany": -0.349,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 1,
+    "gotowka": 29992.65,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 41167.16,
+    "alarm": 0.0,
+    "dochod_ostatni": 4596.05,
+    "dochod_suma": 392.28,
+    "wynik_ostatni": 0.546,
+    "wynik_skumulowany": -0.017,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 9850.61,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 24978.55,
+    "alarm": 0.0,
+    "dochod_ostatni": -8257.75,
+    "dochod_suma": -18908.93,
+    "wynik_ostatni": -1.789,
+    "wynik_skumulowany": -2.038,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 5,
+    "gotowka": 21192.6,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 31495.15,
+    "alarm": 0.0,
+    "dochod_ostatni": -2334.43,
+    "dochod_suma": -8259.81,
+    "wynik_ostatni": -0.506,
+    "wynik_skumulowany": -0.756,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Sułtan Premium": {
+    "miejsce": 2,
+    "gotowka": 13980.37,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 38599.45,
+    "alarm": 0.0,
+    "dochod_ostatni": 2818.51,
+    "dochod_suma": -2225.62,
+    "wynik_ostatni": 0.335,
+    "wynik_skumulowany": -0.038,
+    "pracownicy": 2,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 4,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,2 opak. (ok. 52 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 638 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 1,0 opak. (ok. 34 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 1,0 opak. (ok. 47 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Właściciel zapisał się na jogę dla przedsiębiorców. Instruktor twierdzi, że pozycja „podpisuję kolejną umowę” to najczęstsza przyczyna kontuzji kręgosłupa. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 6."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,7 opak. (ok. 28 zł) przeterminuje się, zanim trafi do dań (termin 23.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,1 opak. (ok. 338 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 1,6 opak. (ok. 72 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,0 opak. (ok. 41 zł) przeterminuje się, zanim trafi do dań (termin 23.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 1,2 opak. (ok. 54 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,7 opak. (ok. 366 zł) przeterminuje się, zanim trafi do dań (termin 22.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 79 zł) przeterminuje się, zanim trafi do dań (termin 26.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Właściciel zapisał się na jogę dla przedsiębiorców. Instruktor twierdzi, że pozycja „podpisuję kolejną umowę” to najczęstsza przyczyna kontuzji kręgosłupa. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 5.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Talerz kebab: nie podano prognozy popytu."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 4,
+    "gotowka": 26719.52,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 33822.01,
+    "alarm": 0.0,
+    "dochod_ostatni": -1139.44,
+    "dochod_suma": -7067.16,
+    "wynik_ostatni": -0.247,
+    "wynik_skumulowany": -0.504,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 3,
+    "gotowka": 18106.71,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 34427.52,
+    "alarm": 0.0,
+    "dochod_ostatni": 2343.77,
+    "dochod_suma": -2293.63,
+    "wynik_ostatni": 0.295,
+    "wynik_skumulowany": -0.135,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 2,
+    "gotowka": 33276.73,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 44292.0,
+    "alarm": 0.0,
+    "dochod_ostatni": 3284.32,
+    "dochod_suma": 3676.6,
+    "wynik_ostatni": 0.379,
+    "wynik_skumulowany": 0.115,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 3855.37,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 16962.05,
+    "alarm": 0.0,
+    "dochod_ostatni": -4101.86,
+    "dochod_suma": -23010.79,
+    "wynik_ostatni": -0.889,
+    "wynik_skumulowany": -1.655,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 5,
+    "gotowka": 19887.5,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 29533.93,
+    "alarm": 0.0,
+    "dochod_ostatni": -1120.79,
+    "dochod_suma": -9380.6,
+    "wynik_ostatni": -0.243,
+    "wynik_skumulowany": -0.585,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Sułtan Premium": {
+    "miejsce": 1,
+    "gotowka": 20582.14,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 44294.61,
+    "alarm": 0.0,
+    "dochod_ostatni": 6207.85,
+    "dochod_suma": 3982.23,
+    "wynik_ostatni": 0.741,
+    "wynik_skumulowany": 0.221,
+    "pracownicy": 2,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 5,
+  "mg": [
+   "3C zapisali szkic, ale nie kliknęli Wyślij",
+   "Przelicz mimo braków: ['3C']"
+  ],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 64 zł) przeterminuje się, zanim trafi do dań (termin 29.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Właściciel musi odpocząć po ostatniej przeprowadzce – wciąż śni mu się umowa najmu w trzech egzemplarzach. Kolejny lokal można wziąć co 3 rundy – najwcześniej w rundzie 6."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 82 zł) przeterminuje się, zanim trafi do dań (termin 30.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 25 zł) przeterminuje się, zanim trafi do dań (termin 30.09) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,6 opak. (ok. 362 zł) przeterminuje się, zanim trafi do dań (termin 29.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,5 opak. (ok. 869 zł) przeterminuje się, zanim trafi do dań (termin 03.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,5 opak. (ok. 85 zł) przeterminuje się, zanim trafi do dań (termin 03.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Sos: przy Twojej prognozie popytu ok. 2,9 opak. (ok. 182 zł) przeterminuje się, zanim trafi do dań (termin 30.09) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,9 opak. (ok. 151 zł) przeterminuje się, zanim trafi do dań (termin 02.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny)."
+   ]
+  },
+  "czeka_na": [
+   "3C"
+  ],
+  "przelicz_w_pauzie": [
+   400,
+   {
+    "blad": "Gra jest wstrzymana – wznów ją, żeby zamknąć rundę."
+   }
+  ],
+  "przelicz_wymus": [
+   200,
+   {
+    "ok": true,
+    "runda": 6
+   }
+  ],
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 26260.95,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 33370.78,
+    "alarm": 0.0,
+    "dochod_ostatni": -567.35,
+    "dochod_suma": -7634.51,
+    "wynik_ostatni": -0.123,
+    "wynik_skumulowany": -0.408,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 3,
+    "gotowka": 18528.52,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 34539.08,
+    "alarm": 0.0,
+    "dochod_ostatni": 4139.37,
+    "dochod_suma": 1845.74,
+    "wynik_ostatni": 0.517,
+    "wynik_skumulowany": 0.028,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 2,
+    "gotowka": 34413.79,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 52212.86,
+    "alarm": 0.0,
+    "dochod_ostatni": 1309.19,
+    "dochod_suma": 4985.79,
+    "wynik_ostatni": 0.228,
+    "wynik_skumulowany": 0.143,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 3193.78,
+    "lokaty": 0,
+    "majatek_netto": 9380.21,
+    "alarm": 0.0,
+    "dochod_ostatni": -5274.55,
+    "dochod_suma": -28285.34,
+    "wynik_ostatni": -1.143,
+    "wynik_skumulowany": -1.527,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 4,
+    "gotowka": 21993.18,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 30920.55,
+    "alarm": 0.0,
+    "dochod_ostatni": 1809.32,
+    "dochod_suma": -7571.28,
+    "wynik_ostatni": 0.198,
+    "wynik_skumulowany": -0.389,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Sułtan Premium": {
+    "miejsce": 1,
+    "gotowka": 26177.91,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 50479.06,
+    "alarm": 0.0,
+    "dochod_ostatni": 5795.29,
+    "dochod_suma": 9777.52,
+    "wynik_ostatni": 0.696,
+    "wynik_skumulowany": 0.34,
+    "pracownicy": 3,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 6,
+  "mg": [
+   "3C nic nie zapisali ani nie wysłali",
+   "Przelicz mimo braków: ['3C']",
+   "4D w alarmie – inwestor ratunkowy 20 000 zł"
+  ],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,2 opak. (ok. 52 zł) przeterminuje się, zanim trafi do dań (termin 06.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,4 opak. (ok. 135 zł) przeterminuje się, zanim trafi do dań (termin 06.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 29 zł) przeterminuje się, zanim trafi do dań (termin 06.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,9 opak. (ok. 36 zł) przeterminuje się, zanim trafi do dań (termin 07.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie.",
+    "Na koncie brakuje ok. 585 zł  a same zamówienia u dostawców to 9 735 zł – jeśli sprzedaż tego nie pokryje  zapłaci za nie kredyt odnawialny (z odsetkami). Zamów mniej albo zadbaj o finansowanie."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,7 opak. (ok. 368 zł) przeterminuje się, zanim trafi do dań (termin 06.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,4 opak. (ok. 829 zł) przeterminuje się, zanim trafi do dań (termin 10.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,5 opak. (ok. 88 zł) przeterminuje się, zanim trafi do dań (termin 10.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 136 zł) przeterminuje się, zanim trafi do dań (termin 09.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 3 237 PLN)."
+   ]
+  },
+  "czeka_na": [
+   "3C"
+  ],
+  "przelicz_wymus": [
+   200,
+   {
+    "ok": true,
+    "runda": 7
+   }
+  ],
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 28926.84,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 35160.71,
+    "alarm": 0.0,
+    "dochod_ostatni": 2364.9,
+    "dochod_suma": -5269.61,
+    "wynik_ostatni": 0.271,
+    "wynik_skumulowany": -0.273,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 2,
+    "gotowka": 21507.08,
+    "zadluzenie": 185.42,
+    "lokaty": 0,
+    "majatek_netto": 37982.74,
+    "alarm": 0.0,
+    "dochod_ostatni": 6576.29,
+    "dochod_suma": 8422.03,
+    "wynik_ostatni": 0.787,
+    "wynik_skumulowany": 0.18,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 3,
+    "gotowka": 29181.92,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 47215.07,
+    "alarm": 0.0,
+    "dochod_ostatni": -4838.65,
+    "dochod_suma": 147.14,
+    "wynik_ostatni": -1.048,
+    "wynik_skumulowany": -0.095,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 10524.32,
+    "lokaty": 0,
+    "majatek_netto": 3211.55,
+    "alarm": 524.32,
+    "dochod_ostatni": -5919.19,
+    "dochod_suma": -34204.53,
+    "wynik_ostatni": -1.283,
+    "wynik_skumulowany": -1.478,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 4,
+    "gotowka": 26442.31,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 35559.82,
+    "alarm": 0.0,
+    "dochod_ostatni": 4363.83,
+    "dochod_suma": -3207.45,
+    "wynik_ostatni": 0.46,
+    "wynik_skumulowany": -0.22,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Sułtan Premium": {
+    "miejsce": 1,
+    "gotowka": 37377.47,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 61545.96,
+    "alarm": 0.0,
+    "dochod_ostatni": 11399.42,
+    "dochod_suma": 21176.94,
+    "wynik_ostatni": 1.394,
+    "wynik_skumulowany": 0.551,
+    "pracownicy": 3,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": [
+   "4D"
+  ],
+  "inwestor": [
+   200,
+   {
+    "gra": {
+     "nazwa": "A2 nauczyciel",
+     "runda": 7,
+     "liczba_rund": 18,
+     "zakonczona": false,
+     "ziarno": 303,
+     "kapital": 40000,
+     "kredyt_odnawialny": "na_biezaco",
+     "auto_zamowienia": false,
+     "ceny_dostawcow": "dane",
+     "lokale": true,
+     "inwestor": {
+      "max_kwota": 40000,
+      "udzial": 0.3,
+      "rund": 8
+     },
+     "brakujace": [
+      "1A",
+      "2B",
+      "3C",
+      "4D"
+     ],
+     "kalendarz": {
+      "okres": {
+       "mianownik": "tydzień",
+       "dopelniacz": "tygodnia",
+       "miejscownik": "tygodniu",
+       "skrot": "tydz.",
+       "przymiotnik": "Tygodniowy",
+       "mnoga": "tygodnie"
+      },
+      "tygodniowe": true,
+      "rund_w_roku": 52,
+      "nazwy": [
+       "Tydzień 1 (1–7.09)",
+       "Tydzień 2 (8–14.09)",
+       "Tydzień 3 (15–21.09)",
+       "Tydzień 4 (22–28.09)",
+       "Tydzień 5 (29.09–5.10)",
+       "Tydzień 6 (6–12.10)",
+       "Tydzień 7 (13–19.10)",
+       "Tydzień 8 (20–26.10)",
+       "Tydzień 9 (27.10–2.11)",
+       "Tydzień 10 (3–9.11)",
+       "Tydzień 11 (10–16.11)",
+       "Tydzień 12 (17–23.11)",
+       "Tydzień 13 (24–30.11)",
+       "Tydzień 14 (1–7.12)",
+       "Tydzień 15 (8–14.12)",
+       "Tydzień 16 (15–21.12)",
+       "Tydzień 17 (22–28.12)",
+       "Tydzień 18 (29.12–4.01)"
+      ],
+      "skroty": [
+       "T1",
+       "T2",
+       "T3",
+       "T4",
+       "T5",
+       "T6",
+       "T7",
+       "T8",
+       "T9",
+       "T10",
+       "T11",
+       "T12",
+       "T13",
+       "T14",
+       "T15",
+       "T16",
+       "T17",
+       "T18"
+      ],
+      "miesiace": [
+       8,
+       8,
+       8,
+       8,
+       9,
+       9,
+       9,
+       9,
+       9,
+       10,
+       10,
+       10,
+       10,
+       11,
+       11,
+       11,
+       11,
+       0
+      ]
+     }
+    },
+    "firmy": [
+     {
+      "nazwa": "1A",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 28926.84,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 35160.71,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 2,
+      "stanowiska": 2,
+      "dochod_ostatni": 2364.9,
+      "dochod_suma": -5269.61,
+      "wynik_ostatni": 0.271,
+      "wynik_skumulowany": -0.273,
+      "miejsce": 5,
+      "sklad": [
+       {
+        "login": "ala.analizowa3",
+        "nazwa": "Ala Analizowa"
+       },
+       {
+        "login": "jan.testowy3",
+        "nazwa": "Jan Testowy"
+       }
+      ],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "2B",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 21507.08,
+      "zadluzenie": 185.42,
+      "lokaty": 0,
+      "majatek_netto": 37982.74,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 3,
+      "stanowiska": 3,
+      "dochod_ostatni": 6576.29,
+      "dochod_suma": 8422.03,
+      "wynik_ostatni": 0.787,
+      "wynik_skumulowany": 0.18,
+      "miejsce": 2,
+      "sklad": [],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "3C",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 29181.92,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 47215.07,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 3,
+      "stanowiska": 3,
+      "dochod_ostatni": -4838.65,
+      "dochod_suma": 147.14,
+      "wynik_ostatni": -1.048,
+      "wynik_skumulowany": -0.095,
+      "miejsce": 3,
+      "sklad": [],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "4D",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 0.0,
+      "zadluzenie": 10524.32,
+      "lokaty": 0,
+      "majatek_netto": 3211.55,
+      "alarm": 524.32,
+      "inwestor": null,
+      "inwestor_przyslany": 20000.0,
+      "pracownicy": 2,
+      "stanowiska": 2,
+      "dochod_ostatni": -5919.19,
+      "dochod_suma": -34204.53,
+      "wynik_ostatni": -1.283,
+      "wynik_skumulowany": -1.478,
+      "miejsce": 6,
+      "sklad": [],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "Bafra",
+      "bot": "zrownowazony",
+      "strategia": "Kebab u Zrównoważonego",
+      "poziom": "czlowiek_sredni",
+      "wyslane": null,
+      "gotowka": 26442.31,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 35559.82,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 2,
+      "stanowiska": 2,
+      "dochod_ostatni": 4363.83,
+      "dochod_suma": -3207.45,
+      "wynik_ostatni": 0.46,
+      "wynik_skumulowany": -0.22,
+      "miejsce": 4
+     },
+     {
+      "nazwa": "Sułtan Premium",
+      "bot": "premium",
+      "strategia": "Kebab Premium",
+      "poziom": "trudny",
+      "wyslane": null,
+      "gotowka": 37377.47,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 61545.96,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 3,
+      "stanowiska": 3,
+      "dochod_ostatni": 11399.42,
+      "dochod_suma": 21176.94,
+      "wynik_ostatni": 1.394,
+      "wynik_skumulowany": 0.551,
+      "miejsce": 1
+     }
+    ],
+    "historia": [
+     {
+      "runda": 1,
+      "skrot": "T1",
+      "dochod": {
+       "1A": -97.93,
+       "2B": -1409.97,
+       "3C": -1527.23,
+       "4D": -97.93,
+       "Bafra": -1278.64,
+       "Sułtan Premium": -3144.75
+      },
+      "gotowka": {
+       "1A": 39896.76,
+       "2B": 28301.0,
+       "3C": 27756.78,
+       "4D": 39896.76,
+       "Bafra": 30062.54,
+       "Sułtan Premium": 12829.85
+      },
+      "majatek": {
+       "1A": 39902.07,
+       "2B": 38590.03,
+       "3C": 38472.77,
+       "4D": 39902.07,
+       "Bafra": 38721.36,
+       "Sułtan Premium": 36855.25
+      }
+     },
+     {
+      "runda": 2,
+      "skrot": "T2",
+      "dochod": {
+       "1A": -3149.91,
+       "2B": -1589.18,
+       "3C": -2676.54,
+       "4D": -10553.25,
+       "Bafra": -4646.74,
+       "Sułtan Premium": -1899.38
+      },
+      "gotowka": {
+       "1A": 36420.88,
+       "2B": 25998.96,
+       "3C": 24970.87,
+       "4D": 19888.96,
+       "Bafra": 24110.04,
+       "Sułtan Premium": 10751.8
+      },
+      "majatek": {
+       "1A": 39218.59,
+       "2B": 37445.15,
+       "3C": 37551.72,
+       "4D": 31893.88,
+       "Bafra": 33997.69,
+       "Sułtan Premium": 35735.72
+      }
+     },
+     {
+      "runda": 3,
+      "skrot": "T3",
+      "dochod": {
+       "1A": -2679.88,
+       "2B": -1638.25,
+       "3C": 4596.05,
+       "4D": -8257.75,
+       "Bafra": -2334.43,
+       "Sułtan Premium": 2818.51
+      },
+      "gotowka": {
+       "1A": 27732.78,
+       "2B": 19512.52,
+       "3C": 29992.65,
+       "4D": 9850.61,
+       "Bafra": 21192.6,
+       "Sułtan Premium": 13980.37
+      },
+      "majatek": {
+       "1A": 36377.78,
+       "2B": 37316.74,
+       "3C": 41167.16,
+       "4D": 24978.55,
+       "Bafra": 31495.15,
+       "Sułtan Premium": 38599.45
+      }
+     },
+     {
+      "runda": 4,
+      "skrot": "T4",
+      "dochod": {
+       "1A": -1139.44,
+       "2B": 2343.77,
+       "3C": 3284.32,
+       "4D": -4101.86,
+       "Bafra": -1120.79,
+       "Sułtan Premium": 6207.85
+      },
+      "gotowka": {
+       "1A": 26719.52,
+       "2B": 18106.71,
+       "3C": 33276.73,
+       "4D": 3855.37,
+       "Bafra": 19887.5,
+       "Sułtan Premium": 20582.14
+      },
+      "majatek": {
+       "1A": 33822.01,
+       "2B": 34427.52,
+       "3C": 44292.0,
+       "4D": 16962.05,
+       "Bafra": 29533.93,
+       "Sułtan Premium": 44294.61
+      }
+     },
+     {
+      "runda": 5,
+      "skrot": "T5",
+      "dochod": {
+       "1A": -567.35,
+       "2B": 4139.37,
+       "3C": 1309.19,
+       "4D": -5274.55,
+       "Bafra": 1809.32,
+       "Sułtan Premium": 5795.29
+      },
+      "gotowka": {
+       "1A": 26260.95,
+       "2B": 18528.52,
+       "3C": 34413.79,
+       "4D": 0.0,
+       "Bafra": 21993.18,
+       "Sułtan Premium": 26177.91
+      },
+      "majatek": {
+       "1A": 33370.78,
+       "2B": 34539.08,
+       "3C": 52212.86,
+       "4D": 9380.21,
+       "Bafra": 30920.55,
+       "Sułtan Premium": 50479.06
+      }
+     },
+     {
+      "runda": 6,
+      "skrot": "T6",
+      "dochod": {
+       "1A": 2364.9,
+       "2B": 6576.29,
+       "3C": -4838.65,
+       "4D": -5919.19,
+       "Bafra": 4363.83,
+       "Sułtan Premium": 11399.42
+      },
+      "gotowka": {
+       "1A": 28926.84,
+       "2B": 21507.08,
+       "3C": 29181.92,
+       "4D": 0.0,
+       "Bafra": 26442.31,
+       "Sułtan Premium": 37377.47
+      },
+      "majatek": {
+       "1A": 35160.71,
+       "2B": 37982.74,
+       "3C": 47215.07,
+       "4D": 3211.55,
+       "Bafra": 35559.82,
+       "Sułtan Premium": 61545.96
+      }
+     }
+    ],
+    "prowadzenie": {
+     "pauza": false,
+     "harmonogram": [],
+     "termin": null,
+     "harmonogram_opis": "",
+     "dni": [
+      "poniedziałek",
+      "wtorek",
+      "środa",
+      "czwartek",
+      "piątek",
+      "sobota",
+      "niedziela"
+     ],
+     "poziomy": {
+      "latwy": "Łatwy",
+      "sredni": "Średni",
+      "trudny": "Trudny",
+      "niemozliwy": "Niemożliwy",
+      "czlowiek_slaby": "Jak człowiek – słaby",
+      "czlowiek_sredni": "Jak człowiek – średni",
+      "czlowiek_dobry": "Jak człowiek – dobry"
+     },
+     "odblokowanie": [
+      {
+       "klucz": "nazwa_firmy",
+       "nazwa": "Nazwa firmy",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "misja",
+       "nazwa": "Misja",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "oferta",
+       "nazwa": "Menu",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "inwestycje_stanowiska",
+       "nazwa": "Stanowiska",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "inwestycje_sprzet",
+       "nazwa": "Sprzęt i leasing",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "sprzedaz",
+       "nazwa": "Ceny dań",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "dostawcy",
+       "nazwa": "Dostawcy",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "hr_zatrudnienie",
+       "nazwa": "Zatrudnienie",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "finanse_bank",
+       "nazwa": "Bank",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "finanse_biuro",
+       "nazwa": "Biuro rachunkowe",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "karta_wynikow",
+       "nazwa": "Karta wyników",
+       "grupa": "Zakładki",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "hr_udogodnienia",
+       "nazwa": "Udogodnienia",
+       "grupa": "Zakładki",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "inwestycje_wyposazenie",
+       "nazwa": "Wyposażenie",
+       "grupa": "Zakładki",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "karta_skumulowana",
+       "nazwa": "Karta skumulowana",
+       "grupa": "Zakładki",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "hr_szkolenia",
+       "nazwa": "Szkolenia",
+       "grupa": "Zakładki",
+       "tydzien": 7,
+       "domyslny": 7,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "licytacje",
+       "nazwa": "Licytacje lokali (przebijanie ceny wywoławczej)",
+       "grupa": "Lokale",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "przejecia",
+       "nazwa": "Kupno budynku z najemcą",
+       "grupa": "Lokale",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "rekrutacja_pracuj",
+       "nazwa": "pracuj.pl (ogłoszenie)",
+       "grupa": "HR",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "rekrutacja_agencja",
+       "nazwa": "Agencja pracy",
+       "grupa": "HR",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "rekrutacja_headhunter",
+       "nazwa": "Headhunter",
+       "grupa": "HR",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "dostawcy_producent",
+       "nazwa": "Zakłady Mięsne „Rożen” z Łęcznej",
+       "grupa": "Dostawcy",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "promocje",
+       "nazwa": "Promocje",
+       "grupa": "Marketing",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "reklama",
+       "nazwa": "Agencje reklamowe – pierwsze kanały",
+       "grupa": "Marketing",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "reklama_wszystkie",
+       "nazwa": "Agencje reklamowe – pozostałe kanały",
+       "grupa": "Marketing",
+       "tydzien": 5,
+       "domyslny": 5,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "parki",
+       "nazwa": "Eventy w parkach",
+       "grupa": "Zdarzenia",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "wypadki",
+       "nazwa": "Wypadki w lokalu",
+       "grupa": "Zdarzenia",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "handel",
+       "nazwa": "Handel między drużynami",
+       "grupa": "Handel",
+       "tydzien": 5,
+       "domyslny": 5,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "detektyw",
+       "nazwa": "Detektyw – dokładne dane konkurencji",
+       "grupa": "Zdarzenia",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "runda": 7,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 26 zł) przeterminuje się, zanim trafi do dań (termin 13.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 2,2 opak. (ok. 93 zł) przeterminuje się, zanim trafi do dań (termin 14.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,6 opak. (ok. 362 zł) przeterminuje się, zanim trafi do dań (termin 13.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,1 opak. (ok. 740 zł) przeterminuje się, zanim trafi do dań (termin 17.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,3 opak. (ok. 80 zł) przeterminuje się, zanim trafi do dań (termin 17.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Tortilla: przy Twojej prognozie popytu ok. 28,9 opak. (ok. 605 zł) przeterminuje się, zanim trafi do dań (termin 14.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 132 zł) przeterminuje się, zanim trafi do dań (termin 16.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 1 968 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 30904.91,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 37140.59,
+    "alarm": 0.0,
+    "dochod_ostatni": 1974.16,
+    "dochod_suma": -3295.45,
+    "wynik_ostatni": 0.232,
+    "wynik_skumulowany": -0.189,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 2,
+    "gotowka": 25689.16,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 41972.68,
+    "alarm": 0.0,
+    "dochod_ostatni": 8367.3,
+    "dochod_suma": 16789.33,
+    "wynik_ostatni": 0.995,
+    "wynik_skumulowany": 0.316,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 30462.14,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 50406.05,
+    "alarm": 0.0,
+    "dochod_ostatni": 947.37,
+    "dochod_suma": 1094.51,
+    "wynik_ostatni": 0.113,
+    "wynik_skumulowany": -0.06,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 3295.68,
+    "zadluzenie": 20000.0,
+    "lokaty": 0,
+    "majatek_netto": -3839.25,
+    "alarm": 0.0,
+    "dochod_ostatni": -4430.94,
+    "dochod_suma": -38635.47,
+    "wynik_ostatni": -0.96,
+    "wynik_skumulowany": -1.392,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 3,
+    "gotowka": 31645.24,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 45928.81,
+    "alarm": 0.0,
+    "dochod_ostatni": 5202.58,
+    "dochod_suma": 1995.13,
+    "wynik_ostatni": 0.832,
+    "wynik_skumulowany": -0.044,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 1,
+    "gotowka": 39507.77,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 71176.5,
+    "alarm": 0.0,
+    "dochod_ostatni": 2922.76,
+    "dochod_suma": 24099.7,
+    "wynik_ostatni": 0.582,
+    "wynik_skumulowany": 0.556,
+    "pracownicy": 3,
+    "stanowiska": 3
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 8,
+  "mg": [
+   "Bafra: poziom bota czlowiek_sredni → trudny"
+  ],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,3 opak. (ok. 55 zł) przeterminuje się, zanim trafi do dań (termin 20.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,1 opak. (ok. 46 zł) przeterminuje się, zanim trafi do dań (termin 24.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,9 opak. (ok. 38 zł) przeterminuje się, zanim trafi do dań (termin 21.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 805 zł) przeterminuje się, zanim trafi do dań (termin 20.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,5 opak. (ok. 87 zł) przeterminuje się, zanim trafi do dań (termin 21.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 1,3 opak. (ok. 65 zł) przeterminuje się, zanim trafi do dań (termin 20.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,1 opak. (ok. 344 zł) przeterminuje się, zanim trafi do dań (termin 20.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 683 zł) przeterminuje się, zanim trafi do dań (termin 24.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,1 opak. (ok. 72 zł) przeterminuje się, zanim trafi do dań (termin 24.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Sos: przy Twojej prognozie popytu ok. 1,8 opak. (ok. 123 zł) przeterminuje się, zanim trafi do dań (termin 26.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 133 zł) przeterminuje się, zanim trafi do dań (termin 23.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 33710.85,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 40128.18,
+    "alarm": 0.0,
+    "dochod_ostatni": 2805.7,
+    "dochod_suma": -489.75,
+    "wynik_ostatni": 0.341,
+    "wynik_skumulowany": -0.113,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 30264.62,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 46888.07,
+    "alarm": 0.0,
+    "dochod_ostatni": 8575.76,
+    "dochod_suma": 25365.09,
+    "wynik_ostatni": 0.999,
+    "wynik_skumulowany": 0.413,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 32021.8,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 49952.25,
+    "alarm": 0.0,
+    "dochod_ostatni": 1976.82,
+    "dochod_suma": 3071.33,
+    "wynik_ostatni": 0.233,
+    "wynik_skumulowany": -0.018,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 21376.24,
+    "lokaty": 0,
+    "majatek_netto": -8871.27,
+    "alarm": 0.0,
+    "dochod_ostatni": -4470.38,
+    "dochod_suma": -43105.85,
+    "wynik_ostatni": -0.969,
+    "wynik_skumulowany": -1.331,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 3,
+    "gotowka": 39721.27,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 55461.66,
+    "alarm": 0.0,
+    "dochod_ostatni": 8076.41,
+    "dochod_suma": 10071.54,
+    "wynik_ostatni": 1.029,
+    "wynik_skumulowany": 0.109,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 2,
+    "gotowka": 28075.46,
+    "zadluzenie": 3619.08,
+    "lokaty": 0,
+    "majatek_netto": 87575.68,
+    "alarm": 0.0,
+    "dochod_ostatni": -11626.19,
+    "dochod_suma": 12473.51,
+    "wynik_ostatni": -2.519,
+    "wynik_skumulowany": 0.117,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": [],
+  "zmiana_poziomu": [
+   200,
+   {
+    "gra": {
+     "nazwa": "A2 nauczyciel",
+     "runda": 9,
+     "liczba_rund": 18,
+     "zakonczona": false,
+     "ziarno": 303,
+     "kapital": 40000,
+     "kredyt_odnawialny": "na_biezaco",
+     "auto_zamowienia": false,
+     "ceny_dostawcow": "dane",
+     "lokale": true,
+     "inwestor": {
+      "max_kwota": 40000,
+      "udzial": 0.3,
+      "rund": 8
+     },
+     "brakujace": [
+      "1A",
+      "2B",
+      "3C",
+      "4D"
+     ],
+     "kalendarz": {
+      "okres": {
+       "mianownik": "tydzień",
+       "dopelniacz": "tygodnia",
+       "miejscownik": "tygodniu",
+       "skrot": "tydz.",
+       "przymiotnik": "Tygodniowy",
+       "mnoga": "tygodnie"
+      },
+      "tygodniowe": true,
+      "rund_w_roku": 52,
+      "nazwy": [
+       "Tydzień 1 (1–7.09)",
+       "Tydzień 2 (8–14.09)",
+       "Tydzień 3 (15–21.09)",
+       "Tydzień 4 (22–28.09)",
+       "Tydzień 5 (29.09–5.10)",
+       "Tydzień 6 (6–12.10)",
+       "Tydzień 7 (13–19.10)",
+       "Tydzień 8 (20–26.10)",
+       "Tydzień 9 (27.10–2.11)",
+       "Tydzień 10 (3–9.11)",
+       "Tydzień 11 (10–16.11)",
+       "Tydzień 12 (17–23.11)",
+       "Tydzień 13 (24–30.11)",
+       "Tydzień 14 (1–7.12)",
+       "Tydzień 15 (8–14.12)",
+       "Tydzień 16 (15–21.12)",
+       "Tydzień 17 (22–28.12)",
+       "Tydzień 18 (29.12–4.01)"
+      ],
+      "skroty": [
+       "T1",
+       "T2",
+       "T3",
+       "T4",
+       "T5",
+       "T6",
+       "T7",
+       "T8",
+       "T9",
+       "T10",
+       "T11",
+       "T12",
+       "T13",
+       "T14",
+       "T15",
+       "T16",
+       "T17",
+       "T18"
+      ],
+      "miesiace": [
+       8,
+       8,
+       8,
+       8,
+       9,
+       9,
+       9,
+       9,
+       9,
+       10,
+       10,
+       10,
+       10,
+       11,
+       11,
+       11,
+       11,
+       0
+      ]
+     }
+    },
+    "firmy": [
+     {
+      "nazwa": "1A",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 33710.85,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 40128.18,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 2,
+      "stanowiska": 2,
+      "dochod_ostatni": 2805.7,
+      "dochod_suma": -489.75,
+      "wynik_ostatni": 0.341,
+      "wynik_skumulowany": -0.113,
+      "miejsce": 5,
+      "sklad": [
+       {
+        "login": "ala.analizowa3",
+        "nazwa": "Ala Analizowa"
+       },
+       {
+        "login": "jan.testowy3",
+        "nazwa": "Jan Testowy"
+       }
+      ],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "2B",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 30264.62,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 46888.07,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 3,
+      "stanowiska": 3,
+      "dochod_ostatni": 8575.76,
+      "dochod_suma": 25365.09,
+      "wynik_ostatni": 0.999,
+      "wynik_skumulowany": 0.413,
+      "miejsce": 1,
+      "sklad": [],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "3C",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 32021.8,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 49952.25,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 3,
+      "stanowiska": 3,
+      "dochod_ostatni": 1976.82,
+      "dochod_suma": 3071.33,
+      "wynik_ostatni": 0.233,
+      "wynik_skumulowany": -0.018,
+      "miejsce": 4,
+      "sklad": [],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "4D",
+      "bot": null,
+      "strategia": null,
+      "poziom": null,
+      "wyslane": false,
+      "gotowka": 0.0,
+      "zadluzenie": 21376.24,
+      "lokaty": 0,
+      "majatek_netto": -8871.27,
+      "alarm": 0.0,
+      "inwestor": {
+       "kwota": 20000.0,
+       "od_rundy": 7,
+       "do_rundy": 14,
+       "udzial": 0.3,
+       "wyplacone": 0.0,
+       "dlug": 20000.0,
+       "wyplata": 0.0
+      },
+      "inwestor_przyslany": null,
+      "pracownicy": 2,
+      "stanowiska": 2,
+      "dochod_ostatni": -4470.38,
+      "dochod_suma": -43105.85,
+      "wynik_ostatni": -0.969,
+      "wynik_skumulowany": -1.331,
+      "miejsce": 6,
+      "sklad": [],
+      "autorzy": {
+       "wersja": 0
+      }
+     },
+     {
+      "nazwa": "Bafra",
+      "bot": "zrownowazony",
+      "strategia": "Kebab u Zrównoważonego",
+      "poziom": "trudny",
+      "wyslane": null,
+      "gotowka": 39721.27,
+      "zadluzenie": 0.0,
+      "lokaty": 0,
+      "majatek_netto": 55461.66,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 3,
+      "stanowiska": 3,
+      "dochod_ostatni": 8076.41,
+      "dochod_suma": 10071.54,
+      "wynik_ostatni": 1.029,
+      "wynik_skumulowany": 0.109,
+      "miejsce": 3
+     },
+     {
+      "nazwa": "Sułtan Premium",
+      "bot": "premium",
+      "strategia": "Kebab Premium",
+      "poziom": "trudny",
+      "wyslane": null,
+      "gotowka": 28075.46,
+      "zadluzenie": 3619.08,
+      "lokaty": 0,
+      "majatek_netto": 87575.68,
+      "alarm": 0.0,
+      "inwestor": null,
+      "inwestor_przyslany": null,
+      "pracownicy": 5,
+      "stanowiska": 5,
+      "dochod_ostatni": -11626.19,
+      "dochod_suma": 12473.51,
+      "wynik_ostatni": -2.519,
+      "wynik_skumulowany": 0.117,
+      "miejsce": 2
+     }
+    ],
+    "historia": [
+     {
+      "runda": 1,
+      "skrot": "T1",
+      "dochod": {
+       "1A": -97.93,
+       "2B": -1409.97,
+       "3C": -1527.23,
+       "4D": -97.93,
+       "Bafra": -1278.64,
+       "Sułtan Premium": -3144.75
+      },
+      "gotowka": {
+       "1A": 39896.76,
+       "2B": 28301.0,
+       "3C": 27756.78,
+       "4D": 39896.76,
+       "Bafra": 30062.54,
+       "Sułtan Premium": 12829.85
+      },
+      "majatek": {
+       "1A": 39902.07,
+       "2B": 38590.03,
+       "3C": 38472.77,
+       "4D": 39902.07,
+       "Bafra": 38721.36,
+       "Sułtan Premium": 36855.25
+      }
+     },
+     {
+      "runda": 2,
+      "skrot": "T2",
+      "dochod": {
+       "1A": -3149.91,
+       "2B": -1589.18,
+       "3C": -2676.54,
+       "4D": -10553.25,
+       "Bafra": -4646.74,
+       "Sułtan Premium": -1899.38
+      },
+      "gotowka": {
+       "1A": 36420.88,
+       "2B": 25998.96,
+       "3C": 24970.87,
+       "4D": 19888.96,
+       "Bafra": 24110.04,
+       "Sułtan Premium": 10751.8
+      },
+      "majatek": {
+       "1A": 39218.59,
+       "2B": 37445.15,
+       "3C": 37551.72,
+       "4D": 31893.88,
+       "Bafra": 33997.69,
+       "Sułtan Premium": 35735.72
+      }
+     },
+     {
+      "runda": 3,
+      "skrot": "T3",
+      "dochod": {
+       "1A": -2679.88,
+       "2B": -1638.25,
+       "3C": 4596.05,
+       "4D": -8257.75,
+       "Bafra": -2334.43,
+       "Sułtan Premium": 2818.51
+      },
+      "gotowka": {
+       "1A": 27732.78,
+       "2B": 19512.52,
+       "3C": 29992.65,
+       "4D": 9850.61,
+       "Bafra": 21192.6,
+       "Sułtan Premium": 13980.37
+      },
+      "majatek": {
+       "1A": 36377.78,
+       "2B": 37316.74,
+       "3C": 41167.16,
+       "4D": 24978.55,
+       "Bafra": 31495.15,
+       "Sułtan Premium": 38599.45
+      }
+     },
+     {
+      "runda": 4,
+      "skrot": "T4",
+      "dochod": {
+       "1A": -1139.44,
+       "2B": 2343.77,
+       "3C": 3284.32,
+       "4D": -4101.86,
+       "Bafra": -1120.79,
+       "Sułtan Premium": 6207.85
+      },
+      "gotowka": {
+       "1A": 26719.52,
+       "2B": 18106.71,
+       "3C": 33276.73,
+       "4D": 3855.37,
+       "Bafra": 19887.5,
+       "Sułtan Premium": 20582.14
+      },
+      "majatek": {
+       "1A": 33822.01,
+       "2B": 34427.52,
+       "3C": 44292.0,
+       "4D": 16962.05,
+       "Bafra": 29533.93,
+       "Sułtan Premium": 44294.61
+      }
+     },
+     {
+      "runda": 5,
+      "skrot": "T5",
+      "dochod": {
+       "1A": -567.35,
+       "2B": 4139.37,
+       "3C": 1309.19,
+       "4D": -5274.55,
+       "Bafra": 1809.32,
+       "Sułtan Premium": 5795.29
+      },
+      "gotowka": {
+       "1A": 26260.95,
+       "2B": 18528.52,
+       "3C": 34413.79,
+       "4D": 0.0,
+       "Bafra": 21993.18,
+       "Sułtan Premium": 26177.91
+      },
+      "majatek": {
+       "1A": 33370.78,
+       "2B": 34539.08,
+       "3C": 52212.86,
+       "4D": 9380.21,
+       "Bafra": 30920.55,
+       "Sułtan Premium": 50479.06
+      }
+     },
+     {
+      "runda": 6,
+      "skrot": "T6",
+      "dochod": {
+       "1A": 2364.9,
+       "2B": 6576.29,
+       "3C": -4838.65,
+       "4D": -5919.19,
+       "Bafra": 4363.83,
+       "Sułtan Premium": 11399.42
+      },
+      "gotowka": {
+       "1A": 28926.84,
+       "2B": 21507.08,
+       "3C": 29181.92,
+       "4D": 0.0,
+       "Bafra": 26442.31,
+       "Sułtan Premium": 37377.47
+      },
+      "majatek": {
+       "1A": 35160.71,
+       "2B": 37982.74,
+       "3C": 47215.07,
+       "4D": 3211.55,
+       "Bafra": 35559.82,
+       "Sułtan Premium": 61545.96
+      }
+     },
+     {
+      "runda": 7,
+      "skrot": "T7",
+      "dochod": {
+       "1A": 1974.16,
+       "2B": 8367.3,
+       "3C": 947.37,
+       "4D": -4430.94,
+       "Bafra": 5202.58,
+       "Sułtan Premium": 2922.76
+      },
+      "gotowka": {
+       "1A": 30904.91,
+       "2B": 25689.16,
+       "3C": 30462.14,
+       "4D": 3295.68,
+       "Bafra": 31645.24,
+       "Sułtan Premium": 39507.77
+      },
+      "majatek": {
+       "1A": 37140.59,
+       "2B": 41972.68,
+       "3C": 50406.05,
+       "4D": -3839.25,
+       "Bafra": 45928.81,
+       "Sułtan Premium": 71176.5
+      }
+     },
+     {
+      "runda": 8,
+      "skrot": "T8",
+      "dochod": {
+       "1A": 2805.7,
+       "2B": 8575.76,
+       "3C": 1976.82,
+       "4D": -4470.38,
+       "Bafra": 8076.41,
+       "Sułtan Premium": -11626.19
+      },
+      "gotowka": {
+       "1A": 33710.85,
+       "2B": 30264.62,
+       "3C": 32021.8,
+       "4D": 0.0,
+       "Bafra": 39721.27,
+       "Sułtan Premium": 28075.46
+      },
+      "majatek": {
+       "1A": 40128.18,
+       "2B": 46888.07,
+       "3C": 49952.25,
+       "4D": -8871.27,
+       "Bafra": 55461.66,
+       "Sułtan Premium": 87575.68
+      }
+     }
+    ],
+    "prowadzenie": {
+     "pauza": false,
+     "harmonogram": [],
+     "termin": null,
+     "harmonogram_opis": "",
+     "dni": [
+      "poniedziałek",
+      "wtorek",
+      "środa",
+      "czwartek",
+      "piątek",
+      "sobota",
+      "niedziela"
+     ],
+     "poziomy": {
+      "latwy": "Łatwy",
+      "sredni": "Średni",
+      "trudny": "Trudny",
+      "niemozliwy": "Niemożliwy",
+      "czlowiek_slaby": "Jak człowiek – słaby",
+      "czlowiek_sredni": "Jak człowiek – średni",
+      "czlowiek_dobry": "Jak człowiek – dobry"
+     },
+     "odblokowanie": [
+      {
+       "klucz": "nazwa_firmy",
+       "nazwa": "Nazwa firmy",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "misja",
+       "nazwa": "Misja",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "oferta",
+       "nazwa": "Menu",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "inwestycje_stanowiska",
+       "nazwa": "Stanowiska",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "inwestycje_sprzet",
+       "nazwa": "Sprzęt i leasing",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "sprzedaz",
+       "nazwa": "Ceny dań",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "dostawcy",
+       "nazwa": "Dostawcy",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "hr_zatrudnienie",
+       "nazwa": "Zatrudnienie",
+       "grupa": "Zakładki",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "finanse_bank",
+       "nazwa": "Bank",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "finanse_biuro",
+       "nazwa": "Biuro rachunkowe",
+       "grupa": "Zakładki",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "karta_wynikow",
+       "nazwa": "Karta wyników",
+       "grupa": "Zakładki",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "hr_udogodnienia",
+       "nazwa": "Udogodnienia",
+       "grupa": "Zakładki",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "inwestycje_wyposazenie",
+       "nazwa": "Wyposażenie",
+       "grupa": "Zakładki",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "karta_skumulowana",
+       "nazwa": "Karta skumulowana",
+       "grupa": "Zakładki",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "hr_szkolenia",
+       "nazwa": "Szkolenia",
+       "grupa": "Zakładki",
+       "tydzien": 7,
+       "domyslny": 7,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "licytacje",
+       "nazwa": "Licytacje lokali (przebijanie ceny wywoławczej)",
+       "grupa": "Lokale",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "przejecia",
+       "nazwa": "Kupno budynku z najemcą",
+       "grupa": "Lokale",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "rekrutacja_pracuj",
+       "nazwa": "pracuj.pl (ogłoszenie)",
+       "grupa": "HR",
+       "tydzien": 1,
+       "domyslny": 1,
+       "odblokowany": true,
+       "staly": true
+      },
+      {
+       "klucz": "rekrutacja_agencja",
+       "nazwa": "Agencja pracy",
+       "grupa": "HR",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "rekrutacja_headhunter",
+       "nazwa": "Headhunter",
+       "grupa": "HR",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "dostawcy_producent",
+       "nazwa": "Zakłady Mięsne „Rożen” z Łęcznej",
+       "grupa": "Dostawcy",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "promocje",
+       "nazwa": "Promocje",
+       "grupa": "Marketing",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "reklama",
+       "nazwa": "Agencje reklamowe – pierwsze kanały",
+       "grupa": "Marketing",
+       "tydzien": 3,
+       "domyslny": 3,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "reklama_wszystkie",
+       "nazwa": "Agencje reklamowe – pozostałe kanały",
+       "grupa": "Marketing",
+       "tydzien": 5,
+       "domyslny": 5,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "parki",
+       "nazwa": "Eventy w parkach",
+       "grupa": "Zdarzenia",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "wypadki",
+       "nazwa": "Wypadki w lokalu",
+       "grupa": "Zdarzenia",
+       "tydzien": 4,
+       "domyslny": 4,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "handel",
+       "nazwa": "Handel między drużynami",
+       "grupa": "Handel",
+       "tydzien": 5,
+       "domyslny": 5,
+       "odblokowany": true,
+       "staly": false
+      },
+      {
+       "klucz": "detektyw",
+       "nazwa": "Detektyw – dokładne dane konkurencji",
+       "grupa": "Zdarzenia",
+       "tydzien": 2,
+       "domyslny": 2,
+       "odblokowany": true,
+       "staly": false
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "runda": 9,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,0 opak. (ok. 42 zł) przeterminuje się, zanim trafi do dań (termin 28.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 194 zł) przeterminuje się, zanim trafi do dań (termin 31.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,9 opak. (ok. 39 zł) przeterminuje się, zanim trafi do dań (termin 28.10) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,3 opak. (ok. 352 zł) przeterminuje się, zanim trafi do dań (termin 27.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 682 zł) przeterminuje się, zanim trafi do dań (termin 31.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,1 opak. (ok. 72 zł) przeterminuje się, zanim trafi do dań (termin 31.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 132 zł) przeterminuje się, zanim trafi do dań (termin 30.10) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 3 403 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 36789.7,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 43429.58,
+    "alarm": 0.0,
+    "dochod_ostatni": 3078.71,
+    "dochod_suma": 2588.96,
+    "wynik_ostatni": 0.368,
+    "wynik_skumulowany": -0.053,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 33501.67,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 49948.09,
+    "alarm": 0.0,
+    "dochod_ostatni": 7236.69,
+    "dochod_suma": 32601.78,
+    "wynik_ostatni": 0.875,
+    "wynik_skumulowany": 0.471,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 36697.5,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 55409.51,
+    "alarm": 0.0,
+    "dochod_ostatni": 4875.26,
+    "dochod_suma": 7946.59,
+    "wynik_ostatni": 0.595,
+    "wynik_skumulowany": 0.058,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 26911.59,
+    "lokaty": 0,
+    "majatek_netto": -13363.68,
+    "alarm": 0.0,
+    "dochod_ostatni": -5296.94,
+    "dochod_suma": -48402.79,
+    "wynik_ostatni": -1.148,
+    "wynik_skumulowany": -1.308,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 3,
+    "gotowka": 48976.83,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 64221.68,
+    "alarm": 0.0,
+    "dochod_ostatni": 9255.53,
+    "dochod_suma": 19327.07,
+    "wynik_ostatni": 1.16,
+    "wynik_skumulowany": 0.24,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 2,
+    "gotowka": 37830.04,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 97056.15,
+    "alarm": 0.0,
+    "dochod_ostatni": 11854.26,
+    "dochod_suma": 24327.77,
+    "wynik_ostatni": 1.886,
+    "wynik_skumulowany": 0.338,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": []
+ },
+ {
+  "runda": 10,
+  "mg": [
+   "Cofnięcie rundy 10 i ponowne przeliczenie"
+  ],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 83 zł) przeterminuje się, zanim trafi do dań (termin 04.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,7 opak. (ok. 28 zł) przeterminuje się, zanim trafi do dań (termin 03.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,8 opak. (ok. 254 zł) przeterminuje się, zanim trafi do dań (termin 03.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 0,9 opak. (ok. 31 zł) przeterminuje się, zanim trafi do dań (termin 04.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,2 opak. (ok. 345 zł) przeterminuje się, zanim trafi do dań (termin 03.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,7 opak. (ok. 580 zł) przeterminuje się, zanim trafi do dań (termin 06.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 1,8 opak. (ok. 58 zł) przeterminuje się, zanim trafi do dań (termin 07.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 129 zł) przeterminuje się, zanim trafi do dań (termin 06.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 2 554 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 39650.48,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 46476.44,
+    "alarm": 0.0,
+    "dochod_ostatni": 2860.61,
+    "dochod_suma": 5449.57,
+    "wynik_ostatni": 0.343,
+    "wynik_skumulowany": -0.009,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 35694.87,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 52740.89,
+    "alarm": 0.0,
+    "dochod_ostatni": 6193.26,
+    "dochod_suma": 38795.04,
+    "wynik_ostatni": 0.746,
+    "wynik_skumulowany": 0.502,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 43279.49,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 60719.4,
+    "alarm": 0.0,
+    "dochod_ostatni": 6782.36,
+    "dochod_suma": 14728.95,
+    "wynik_ostatni": 0.907,
+    "wynik_skumulowany": 0.153,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 33826.21,
+    "lokaty": 0,
+    "majatek_netto": -20616.67,
+    "alarm": 3826.21,
+    "dochod_ostatni": -5364.41,
+    "dochod_suma": -53767.2,
+    "wynik_ostatni": -1.162,
+    "wynik_skumulowany": -1.292,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 3,
+    "gotowka": 58987.84,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 73950.26,
+    "alarm": 0.0,
+    "dochod_ostatni": 10011.27,
+    "dochod_suma": 29338.34,
+    "wynik_ostatni": 1.252,
+    "wynik_skumulowany": 0.353,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 2,
+    "gotowka": 39925.53,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 106815.89,
+    "alarm": 0.0,
+    "dochod_ostatni": 2732.53,
+    "dochod_suma": 27060.3,
+    "wynik_ostatni": 0.493,
+    "wynik_skumulowany": 0.355,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": [
+   "4D"
+  ],
+  "cofnij": [
+   200,
+   {
+    "ok": true,
+    "runda": 10
+   }
+  ],
+  "cofnij_porownanie": {
+   "przed": {
+    "1A": 46476.44,
+    "2B": 52740.89,
+    "3C": 60719.4,
+    "4D": -20616.67,
+    "Bafra": 73950.26,
+    "Sułtan Premium": 106815.89
+   },
+   "po": {
+    "1A": 46476.44,
+    "2B": 52740.89,
+    "3C": 60719.4,
+    "4D": -20616.67,
+    "Bafra": 73950.26,
+    "Sułtan Premium": 106815.89
+   }
+  }
+ },
+ {
+  "runda": 11,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,9 opak. (ok. 40 zł) przeterminuje się, zanim trafi do dań (termin 13.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,1 opak. (ok. 45 zł) przeterminuje się, zanim trafi do dań (termin 11.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 30 zł) przeterminuje się, zanim trafi do dań (termin 10.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,2 opak. (ok. 348 zł) przeterminuje się, zanim trafi do dań (termin 10.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,8 opak. (ok. 603 zł) przeterminuje się, zanim trafi do dań (termin 13.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 63 zł) przeterminuje się, zanim trafi do dań (termin 15.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Sos: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 105 zł) przeterminuje się, zanim trafi do dań (termin 16.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 135 zł) przeterminuje się, zanim trafi do dań (termin 13.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 2 776 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 43160.04,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 49663.51,
+    "alarm": 0.0,
+    "dochod_ostatni": 3509.52,
+    "dochod_suma": 8959.09,
+    "wynik_ostatni": 0.421,
+    "wynik_skumulowany": 0.034,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 38237.61,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 55208.47,
+    "alarm": 0.0,
+    "dochod_ostatni": 7093.14,
+    "dochod_suma": 45888.18,
+    "wynik_ostatni": 0.798,
+    "wynik_skumulowany": 0.531,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 51943.83,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 70018.49,
+    "alarm": 0.0,
+    "dochod_ostatni": 8664.16,
+    "dochod_suma": 23393.11,
+    "wynik_ostatni": 1.145,
+    "wynik_skumulowany": 0.252,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 39086.15,
+    "lokaty": 0,
+    "majatek_netto": -26285.17,
+    "alarm": 9086.15,
+    "dochod_ostatni": -5040.47,
+    "dochod_suma": -58807.67,
+    "wynik_ostatni": -1.092,
+    "wynik_skumulowany": -1.272,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 3,
+    "gotowka": 66834.77,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 82150.37,
+    "alarm": 0.0,
+    "dochod_ostatni": 7846.79,
+    "dochod_suma": 37185.13,
+    "wynik_ostatni": 0.996,
+    "wynik_skumulowany": 0.417,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 2,
+    "gotowka": 46250.4,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 111258.46,
+    "alarm": 0.0,
+    "dochod_ostatni": 6389.18,
+    "dochod_suma": 33449.48,
+    "wynik_ostatni": 1.061,
+    "wynik_skumulowany": 0.426,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 12,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,7 opak. (ok. 76 zł) przeterminuje się, zanim trafi do dań (termin 18.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 2,4 opak. (ok. 105 zł) przeterminuje się, zanim trafi do dań (termin 18.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,2 opak. (ok. 355 zł) przeterminuje się, zanim trafi do dań (termin 17.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,8 opak. (ok. 595 zł) przeterminuje się, zanim trafi do dań (termin 21.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 62 zł) przeterminuje się, zanim trafi do dań (termin 21.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 130 zł) przeterminuje się, zanim trafi do dań (termin 20.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 2 984 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 46186.8,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 52996.23,
+    "alarm": 0.0,
+    "dochod_ostatni": 3026.45,
+    "dochod_suma": 11985.54,
+    "wynik_ostatni": 0.361,
+    "wynik_skumulowany": 0.064,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 39667.13,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 57252.97,
+    "alarm": 0.0,
+    "dochod_ostatni": 5429.4,
+    "dochod_suma": 51317.58,
+    "wynik_ostatni": 0.643,
+    "wynik_skumulowany": 0.541,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 58786.56,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 76610.29,
+    "alarm": 0.0,
+    "dochod_ostatni": 6843.21,
+    "dochod_suma": 30236.32,
+    "wynik_ostatni": 0.874,
+    "wynik_skumulowany": 0.308,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 44243.66,
+    "lokaty": 0,
+    "majatek_netto": -30526.29,
+    "alarm": 14243.66,
+    "dochod_ostatni": -4923.16,
+    "dochod_suma": -63730.83,
+    "wynik_ostatni": -1.067,
+    "wynik_skumulowany": -1.254,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 2,
+    "gotowka": 74574.01,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 89637.1,
+    "alarm": 0.0,
+    "dochod_ostatni": 7739.35,
+    "dochod_suma": 44924.48,
+    "wynik_ostatni": 0.958,
+    "wynik_skumulowany": 0.466,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 3,
+    "gotowka": 51702.29,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 116786.7,
+    "alarm": 0.0,
+    "dochod_ostatni": 4863.37,
+    "dochod_suma": 38312.85,
+    "wynik_ostatni": 0.851,
+    "wynik_skumulowany": 0.464,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 13,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,4 opak. (ok. 51 zł) przeterminuje się, zanim trafi do dań (termin 25.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,0 opak. (ok. 36 zł) przeterminuje się, zanim trafi do dań (termin 25.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,0 opak. (ok. 317 zł) przeterminuje się, zanim trafi do dań (termin 24.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 0,9 opak. (ok. 31 zł) przeterminuje się, zanim trafi do dań (termin 24.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,8 opak. (ok. 30 zł) przeterminuje się, zanim trafi do dań (termin 25.11) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 7,9 opak. (ok. 297 zł) przeterminuje się, zanim trafi do dań (termin 25.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,6 opak. (ok. 533 zł) przeterminuje się, zanim trafi do dań (termin 27.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 1,8 opak. (ok. 63 zł) przeterminuje się, zanim trafi do dań (termin 29.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 129 zł) przeterminuje się, zanim trafi do dań (termin 28.11) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 2 040 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 50486.21,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 57029.83,
+    "alarm": 0.0,
+    "dochod_ostatni": 4299.04,
+    "dochod_suma": 16284.58,
+    "wynik_ostatni": 0.497,
+    "wynik_skumulowany": 0.1,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 42033.47,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 58668.45,
+    "alarm": 0.0,
+    "dochod_ostatni": 7016.08,
+    "dochod_suma": 58333.66,
+    "wynik_ostatni": 0.823,
+    "wynik_skumulowany": 0.565,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 67782.32,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 85809.25,
+    "alarm": 0.0,
+    "dochod_ostatni": 8995.28,
+    "dochod_suma": 39231.6,
+    "wynik_ostatni": 1.175,
+    "wynik_skumulowany": 0.381,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 48643.98,
+    "lokaty": 0,
+    "majatek_netto": -34757.13,
+    "alarm": 18643.98,
+    "dochod_ostatni": -4220.48,
+    "dochod_suma": -67951.31,
+    "wynik_ostatni": -0.915,
+    "wynik_skumulowany": -1.225,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 2,
+    "gotowka": 83825.76,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 98937.6,
+    "alarm": 0.0,
+    "dochod_ostatni": 9251.26,
+    "dochod_suma": 54175.74,
+    "wynik_ostatni": 1.157,
+    "wynik_skumulowany": 0.524,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "Sułtan Premium": {
+    "miejsce": 3,
+    "gotowka": 56587.65,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 119841.48,
+    "alarm": 0.0,
+    "dochod_ostatni": 4975.53,
+    "dochod_suma": 43288.38,
+    "wynik_ostatni": 0.829,
+    "wynik_skumulowany": 0.495,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 14,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,7 opak. (ok. 73 zł) przeterminuje się, zanim trafi do dań (termin 02.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,5 opak. (ok. 148 zł) przeterminuje się, zanim trafi do dań (termin 05.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 0,8 opak. (ok. 37 zł) przeterminuje się, zanim trafi do dań (termin 01.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,4 opak. (ok. 61 zł) przeterminuje się, zanim trafi do dań (termin 02.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 0,7 opak. (ok. 33 zł) przeterminuje się, zanim trafi do dań (termin 01.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,1 opak. (ok. 333 zł) przeterminuje się, zanim trafi do dań (termin 01.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,6 opak. (ok. 490 zł) przeterminuje się, zanim trafi do dań (termin 04.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 1,7 opak. (ok. 56 zł) przeterminuje się, zanim trafi do dań (termin 05.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Sos: przy Twojej prognozie popytu ok. 1,4 opak. (ok. 90 zł) przeterminuje się, zanim trafi do dań (termin 07.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 116 zł) przeterminuje się, zanim trafi do dań (termin 04.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 1 860 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 53003.81,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 59769.33,
+    "alarm": 0.0,
+    "dochod_ostatni": 2717.66,
+    "dochod_suma": 19002.24,
+    "wynik_ostatni": 0.324,
+    "wynik_skumulowany": 0.117,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 44479.52,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 61630.85,
+    "alarm": 0.0,
+    "dochod_ostatni": 6845.69,
+    "dochod_suma": 65179.35,
+    "wynik_ostatni": 0.819,
+    "wynik_skumulowany": 0.584,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 4,
+    "gotowka": 77059.36,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 95460.87,
+    "alarm": 0.0,
+    "dochod_ostatni": 9276.63,
+    "dochod_suma": 48508.23,
+    "wynik_ostatni": 1.225,
+    "wynik_skumulowany": 0.446,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 52982.35,
+    "lokaty": 0,
+    "majatek_netto": -39812.43,
+    "alarm": 22982.35,
+    "dochod_ostatni": -4142.04,
+    "dochod_suma": -72093.35,
+    "wynik_ostatni": -0.898,
+    "wynik_skumulowany": -1.2,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 2,
+    "gotowka": 74967.51,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 106570.9,
+    "alarm": 0.0,
+    "dochod_ostatni": 6791.79,
+    "dochod_suma": 60967.53,
+    "wynik_ostatni": 0.892,
+    "wynik_skumulowany": 0.552,
+    "pracownicy": 5,
+    "stanowiska": 5
+   },
+   "Sułtan Premium": {
+    "miejsce": 3,
+    "gotowka": 63431.69,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 128366.25,
+    "alarm": 0.0,
+    "dochod_ostatni": 6022.09,
+    "dochod_suma": 49310.47,
+    "wynik_ostatni": 1.042,
+    "wynik_skumulowany": 0.537,
+    "pracownicy": 5,
+    "stanowiska": 5
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 15,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 61 zł) przeterminuje się, zanim trafi do dań (termin 09.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,5 opak. (ok. 162 zł) przeterminuje się, zanim trafi do dań (termin 08.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,2 opak. (ok. 345 zł) przeterminuje się, zanim trafi do dań (termin 08.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 613 zł) przeterminuje się, zanim trafi do dań (termin 11.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 67 zł) przeterminuje się, zanim trafi do dań (termin 12.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 124 zł) przeterminuje się, zanim trafi do dań (termin 11.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 3 084 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 57537.18,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 64052.68,
+    "alarm": 0.0,
+    "dochod_ostatni": 4533.61,
+    "dochod_suma": 23535.85,
+    "wynik_ostatni": 0.519,
+    "wynik_skumulowany": 0.146,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 45167.7,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 61807.78,
+    "alarm": 0.0,
+    "dochod_ostatni": 5038.11,
+    "dochod_suma": 70217.46,
+    "wynik_ostatni": 0.623,
+    "wynik_skumulowany": 0.587,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 3,
+    "gotowka": 87453.36,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 104879.28,
+    "alarm": 0.0,
+    "dochod_ostatni": 10394.02,
+    "dochod_suma": 58902.25,
+    "wynik_ostatni": 1.357,
+    "wynik_skumulowany": 0.511,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 59709.42,
+    "lokaty": 0,
+    "majatek_netto": -45657.55,
+    "alarm": 29709.42,
+    "dochod_ostatni": -5433.72,
+    "dochod_suma": -77527.07,
+    "wynik_ostatni": -1.177,
+    "wynik_skumulowany": -1.198,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 2,
+    "gotowka": 81502.36,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 113066.47,
+    "alarm": 0.0,
+    "dochod_ostatni": 6534.76,
+    "dochod_suma": 67502.29,
+    "wynik_ostatni": 0.912,
+    "wynik_skumulowany": 0.578,
+    "pracownicy": 5,
+    "stanowiska": 5
+   },
+   "Sułtan Premium": {
+    "miejsce": 4,
+    "gotowka": 47792.36,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 123983.27,
+    "alarm": 0.0,
+    "dochod_ostatni": -2961.34,
+    "dochod_suma": 46349.13,
+    "wynik_ostatni": -0.642,
+    "wynik_skumulowany": 0.453,
+    "pracownicy": 7,
+    "stanowiska": 7
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 16,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,3 opak. (ok. 59 zł) przeterminuje się, zanim trafi do dań (termin 16.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 29 zł) przeterminuje się, zanim trafi do dań (termin 16.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 29 zł) przeterminuje się, zanim trafi do dań (termin 16.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,3 opak. (ok. 360 zł) przeterminuje się, zanim trafi do dań (termin 15.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 1,9 opak. (ok. 631 zł) przeterminuje się, zanim trafi do dań (termin 19.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 61 zł) przeterminuje się, zanim trafi do dań (termin 19.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 139 zł) przeterminuje się, zanim trafi do dań (termin 18.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 1 852 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 60001.51,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 66987.43,
+    "alarm": 0.0,
+    "dochod_ostatni": 2464.27,
+    "dochod_suma": 26000.12,
+    "wynik_ostatni": 0.297,
+    "wynik_skumulowany": 0.156,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 47580.11,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 64204.78,
+    "alarm": 0.0,
+    "dochod_ostatni": 6412.73,
+    "dochod_suma": 76630.19,
+    "wynik_ostatni": 0.797,
+    "wynik_skumulowany": 0.601,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 3,
+    "gotowka": 93658.04,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 112238.69,
+    "alarm": 0.0,
+    "dochod_ostatni": 6205.07,
+    "dochod_suma": 65107.32,
+    "wynik_ostatni": 0.819,
+    "wynik_skumulowany": 0.531,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 66151.43,
+    "lokaty": 0,
+    "majatek_netto": -51958.63,
+    "alarm": 36151.43,
+    "dochod_ostatni": -5117.5,
+    "dochod_suma": -82644.57,
+    "wynik_ostatni": -1.109,
+    "wynik_skumulowany": -1.193,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 2,
+    "gotowka": 85510.07,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 116208.31,
+    "alarm": 0.0,
+    "dochod_ostatni": 4008.03,
+    "dochod_suma": 71510.32,
+    "wynik_ostatni": 0.541,
+    "wynik_skumulowany": 0.575,
+    "pracownicy": 5,
+    "stanowiska": 5
+   },
+   "Sułtan Premium": {
+    "miejsce": 4,
+    "gotowka": 53574.97,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 130271.09,
+    "alarm": 0.0,
+    "dochod_ostatni": 5224.84,
+    "dochod_suma": 51573.97,
+    "wynik_ostatni": 0.957,
+    "wynik_skumulowany": 0.486,
+    "pracownicy": 7,
+    "stanowiska": 7
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 17,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,3 opak. (ok. 53 zł) przeterminuje się, zanim trafi do dań (termin 23.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,2 opak. (ok. 64 zł) przeterminuje się, zanim trafi do dań (termin 26.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 0,8 opak. (ok. 42 zł) przeterminuje się, zanim trafi do dań (termin 25.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,3 opak. (ok. 54 zł) przeterminuje się, zanim trafi do dań (termin 23.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,7 opak. (ok. 219 zł) przeterminuje się, zanim trafi do dań (termin 22.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,0 opak. (ok. 61 zł) przeterminuje się, zanim trafi do dań (termin 22.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,3 opak. (ok. 352 zł) przeterminuje się, zanim trafi do dań (termin 22.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,2 opak. (ok. 740 zł) przeterminuje się, zanim trafi do dań (termin 26.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,2 opak. (ok. 79 zł) przeterminuje się, zanim trafi do dań (termin 26.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 131 zł) przeterminuje się, zanim trafi do dań (termin 25.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 2 069 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 58741.42,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 65228.62,
+    "alarm": 0.0,
+    "dochod_ostatni": -1259.98,
+    "dochod_suma": 24740.14,
+    "wynik_ostatni": -0.273,
+    "wynik_skumulowany": 0.129,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 45867.68,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 62870.56,
+    "alarm": 0.0,
+    "dochod_ostatni": 2287.57,
+    "dochod_suma": 78917.76,
+    "wynik_ostatni": 0.296,
+    "wynik_skumulowany": 0.582,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 2,
+    "gotowka": 96839.66,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 115123.93,
+    "alarm": 0.0,
+    "dochod_ostatni": 3181.28,
+    "dochod_suma": 68288.6,
+    "wynik_ostatni": 0.422,
+    "wynik_skumulowany": 0.524,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 73604.53,
+    "lokaty": 0,
+    "majatek_netto": -59573.24,
+    "alarm": 43604.53,
+    "dochod_ostatni": -5718.77,
+    "dochod_suma": -88363.34,
+    "wynik_ostatni": -1.239,
+    "wynik_skumulowany": -1.195,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 3,
+    "gotowka": 76748.59,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 108007.09,
+    "alarm": 0.0,
+    "dochod_ostatni": -7349.06,
+    "dochod_suma": 64161.26,
+    "wynik_ostatni": -1.592,
+    "wynik_skumulowany": 0.44,
+    "pracownicy": 5,
+    "stanowiska": 5
+   },
+   "Sułtan Premium": {
+    "miejsce": 4,
+    "gotowka": 47455.58,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 122437.31,
+    "alarm": 0.0,
+    "dochod_ostatni": -4858.51,
+    "dochod_suma": 46715.46,
+    "wynik_ostatni": -1.053,
+    "wynik_skumulowany": 0.39,
+    "pracownicy": 7,
+    "stanowiska": 7
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "runda": 18,
+  "mg": [],
+  "bledy": {
+   "1A": [
+    "Bułka: przy Twojej prognozie popytu ok. 2,3 opak. (ok. 85 zł) przeterminuje się, zanim trafi do dań (termin 30.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,3 opak. (ok. 92 zł) przeterminuje się, zanim trafi do dań (termin 02.01) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "2B": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,5 opak. (ok. 56 zł) przeterminuje się, zanim trafi do dań (termin 30.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Billboard przy rondzie (Radio i billboardy „Fala Koziołka”) – Centrum: najwyżej 7 emisji w rundzie."
+   ],
+   "3C": [
+    "Bułka: przy Twojej prognozie popytu ok. 1,2 opak. (ok. 48 zł) przeterminuje się, zanim trafi do dań (termin 29.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 0,6 opak. (ok. 180 zł) przeterminuje się, zanim trafi do dań (termin 29.12) – zamów mniej albo bliżej dnia sprzedaży."
+   ],
+   "4D": [
+    "Bułka: przy Twojej prognozie popytu ok. 8,8 opak. (ok. 342 zł) przeterminuje się, zanim trafi do dań (termin 29.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Mięso kebab: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 908 zł) przeterminuje się, zanim trafi do dań (termin 02.01) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Warzywa: przy Twojej prognozie popytu ok. 2,7 opak. (ok. 89 zł) przeterminuje się, zanim trafi do dań (termin 02.01) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Sos: przy Twojej prognozie popytu ok. 2,6 opak. (ok. 190 zł) przeterminuje się, zanim trafi do dań (termin 29.12) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Surówki: przy Twojej prognozie popytu ok. 2,8 opak. (ok. 148 zł) przeterminuje się, zanim trafi do dań (termin 01.01) – zamów mniej albo bliżej dnia sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): cena 6,00 zł jest za wysoka – dozwolone ceny to od 50% do 200% ceny rynkowej (2,92 zł), czyli 1,46–5,84 zł. Danie nie weszło do sprzedaży.",
+    "Dodatek (sos, ser, jalapeño): nie jest włączone do sprzedaży (brak ceny).",
+    "Wydatki przekraczają saldo konta – zostanie uruchomiony kredyt odnawialny (ok. 2 359 PLN)."
+   ]
+  },
+  "po_rundzie": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 58987.1,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 66089.77,
+    "alarm": 0.0,
+    "dochod_ostatni": 245.82,
+    "dochod_suma": 24985.96,
+    "wynik_ostatni": 0.03,
+    "wynik_skumulowany": 0.123,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 46584.15,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 62485.22,
+    "alarm": 0.0,
+    "dochod_ostatni": 4716.31,
+    "dochod_suma": 83634.07,
+    "wynik_ostatni": 0.586,
+    "wynik_skumulowany": 0.582,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 2,
+    "gotowka": 101151.32,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 118385.47,
+    "alarm": 0.0,
+    "dochod_ostatni": 4511.6,
+    "dochod_suma": 72800.2,
+    "wynik_ostatni": 0.584,
+    "wynik_skumulowany": 0.528,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 84566.8,
+    "lokaty": 0,
+    "majatek_netto": -70103.35,
+    "alarm": 54566.8,
+    "dochod_ostatni": -9437.25,
+    "dochod_suma": -97800.59,
+    "wynik_ostatni": -2.045,
+    "wynik_skumulowany": -1.245,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 4,
+    "gotowka": 67798.15,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 100176.32,
+    "alarm": 0.0,
+    "dochod_ostatni": -7335.97,
+    "dochod_suma": 56825.29,
+    "wynik_ostatni": -1.59,
+    "wynik_skumulowany": 0.321,
+    "pracownicy": 5,
+    "stanowiska": 5
+   },
+   "Sułtan Premium": {
+    "miejsce": 3,
+    "gotowka": 47320.83,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 131807.06,
+    "alarm": 0.0,
+    "dochod_ostatni": 137.21,
+    "dochod_suma": 46852.67,
+    "wynik_ostatni": 0.028,
+    "wynik_skumulowany": 0.369,
+    "pracownicy": 8,
+    "stanowiska": 8
+   }
+  },
+  "alarmy": [
+   "4D"
+  ]
+ },
+ {
+  "koniec": true,
+  "gid": "a2-nauczyciel-fe3d1c",
+  "eksport_kb": 410,
+  "csv": [
+   8058,
+   477
+  ],
+  "po_grze": {
+   "1A": {
+    "miejsce": 5,
+    "gotowka": 58987.1,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 66089.77,
+    "alarm": 0.0,
+    "dochod_ostatni": 245.82,
+    "dochod_suma": 24985.96,
+    "wynik_ostatni": 0.03,
+    "wynik_skumulowany": 0.123,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "2B": {
+    "miejsce": 1,
+    "gotowka": 46584.15,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 62485.22,
+    "alarm": 0.0,
+    "dochod_ostatni": 4716.31,
+    "dochod_suma": 83634.07,
+    "wynik_ostatni": 0.586,
+    "wynik_skumulowany": 0.582,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "3C": {
+    "miejsce": 2,
+    "gotowka": 101151.32,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 118385.47,
+    "alarm": 0.0,
+    "dochod_ostatni": 4511.6,
+    "dochod_suma": 72800.2,
+    "wynik_ostatni": 0.584,
+    "wynik_skumulowany": 0.528,
+    "pracownicy": 3,
+    "stanowiska": 3
+   },
+   "4D": {
+    "miejsce": 6,
+    "gotowka": 0.0,
+    "zadluzenie": 84566.8,
+    "lokaty": 0,
+    "majatek_netto": -70103.35,
+    "alarm": 54566.8,
+    "dochod_ostatni": -9437.25,
+    "dochod_suma": -97800.59,
+    "wynik_ostatni": -2.045,
+    "wynik_skumulowany": -1.245,
+    "pracownicy": 2,
+    "stanowiska": 2
+   },
+   "Bafra": {
+    "miejsce": 4,
+    "gotowka": 67798.15,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 100176.32,
+    "alarm": 0.0,
+    "dochod_ostatni": -7335.97,
+    "dochod_suma": 56825.29,
+    "wynik_ostatni": -1.59,
+    "wynik_skumulowany": 0.321,
+    "pracownicy": 5,
+    "stanowiska": 5
+   },
+   "Sułtan Premium": {
+    "miejsce": 3,
+    "gotowka": 47320.83,
+    "zadluzenie": 0.0,
+    "lokaty": 0,
+    "majatek_netto": 131807.06,
+    "alarm": 0.0,
+    "dochod_ostatni": 137.21,
+    "dochod_suma": 46852.67,
+    "wynik_ostatni": 0.028,
+    "wynik_skumulowany": 0.369,
+    "pracownicy": 8,
+    "stanowiska": 8
+   }
+  }
+ }
+]

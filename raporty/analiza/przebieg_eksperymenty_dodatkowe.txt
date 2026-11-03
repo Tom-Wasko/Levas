@@ -1,0 +1,12 @@
+202 lokal_i_zamkniecie     wynik=-0.166 miejsce=3 majatek=45606.96 odrzucone=0  5s
+202 nic_z_biurem           wynik=-0.028 miejsce=3 majatek=37919.4 odrzucone=0  4s
+202 premium_ekspansja      wynik=0.897 miejsce=1 majatek=171654.51 odrzucone=0  5s
+202 premium_drogo          wynik=0.912 miejsce=1 majatek=174269.4 odrzucone=0  5s
+203 lokal_i_zamkniecie     wynik=-0.189 miejsce=3 majatek=42496.83 odrzucone=0  5s
+203 nic_z_biurem           wynik=-0.028 miejsce=3 majatek=37919.4 odrzucone=0  5s
+203 premium_ekspansja      wynik=0.648 miejsce=1 majatek=153284.02 odrzucone=0  5s
+203 premium_drogo          wynik=0.69 miejsce=1 majatek=144717.76 odrzucone=0  4s
+204 lokal_i_zamkniecie     wynik=-0.254 miejsce=4 majatek=36715.23 odrzucone=0  4s
+204 nic_z_biurem           wynik=-0.028 miejsce=3 majatek=37919.4 odrzucone=0  4s
+204 premium_ekspansja      wynik=0.977 miejsce=1 majatek=180748.97 odrzucone=0  5s
+204 premium_drogo          wynik=0.962 miejsce=1 majatek=181809.34 odrzucone=0  5s

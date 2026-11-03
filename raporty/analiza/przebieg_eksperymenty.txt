@@ -1,0 +1,45 @@
+202 baza                   wynik=0.452 miejsce=1 majatek=111911.78 odrzucone=0  5s
+202 planista_trudny        wynik=-0.396 miejsce=4 majatek=24832.33 odrzucone=0  5s
+202 drogo                  wynik=0.071 miejsce=2 majatek=66200.9 odrzucone=0  4s
+202 tanio                  wynik=0.326 miejsce=1 majatek=93565.96 odrzucone=0  4s
+202 premium                wynik=0.754 miejsce=1 majatek=154478.21 odrzucone=0  4s
+202 tani_kebab             wynik=-0.245 miejsce=3 majatek=35112.62 odrzucone=0  5s
+202 agresywny              wynik=0.039 miejsce=4 majatek=75521.67 odrzucone=0  5s
+202 ekspansja              wynik=0.555 miejsce=2 majatek=121088.39 odrzucone=0  5s
+202 ekspansja_na_kredyt    wynik=0.183 miejsce=2 majatek=115753.15 odrzucone=0  5s
+202 bez_lokalu_lokata      wynik=-0.019 miejsce=3 majatek=30176.42 odrzucone=0  3s
+202 lokal_i_zamkniecie     wynik=None miejsce=None majatek=None odrzucone=0 AttributeError("'str' object has no attribute 'id'") 2s
+202 wyplaty                wynik=0.447 miejsce=1 majatek=32047.41 odrzucone=0  4s
+202 harpagon_dzwignia      wynik=0.438 miejsce=1 majatek=111233.49 odrzucone=0  5s
+202 niskie_pensje          wynik=0.462 miejsce=1 majatek=114143.8 odrzucone=0  4s
+202 max_reklama            wynik=0.46 miejsce=1 majatek=112478.63 odrzucone=0  5s
+203 baza                   wynik=0.489 miejsce=2 majatek=114126.04 odrzucone=0  4s
+203 planista_trudny        wynik=0.26 miejsce=2 majatek=88881.09 odrzucone=0  5s
+203 drogo                  wynik=0.332 miejsce=2 majatek=95719.66 odrzucone=0  4s
+203 tanio                  wynik=0.439 miejsce=2 majatek=105587.15 odrzucone=0  4s
+203 premium                wynik=0.633 miejsce=1 majatek=151898.07 odrzucone=0  4s
+203 tani_kebab             wynik=0.241 miejsce=3 majatek=78027.17 odrzucone=0  4s
+203 agresywny              wynik=0.203 miejsce=3 majatek=93536.55 odrzucone=0  5s
+203 ekspansja              wynik=0.487 miejsce=2 majatek=111624.48 odrzucone=0  5s
+203 ekspansja_na_kredyt    wynik=0.199 miejsce=3 majatek=109018.49 odrzucone=0  7s
+203 bez_lokalu_lokata      wynik=-0.019 miejsce=3 majatek=30176.42 odrzucone=0  4s
+203 lokal_i_zamkniecie     wynik=None miejsce=None majatek=None odrzucone=0 AttributeError("'str' object has no attribute 'id'") 2s
+203 wyplaty                wynik=0.474 miejsce=2 majatek=42194.24 odrzucone=0  4s
+203 harpagon_dzwignia      wynik=0.453 miejsce=2 majatek=109829.66 odrzucone=0  4s
+203 niskie_pensje          wynik=0.497 miejsce=2 majatek=116243.64 odrzucone=0  4s
+203 max_reklama            wynik=0.596 miejsce=1 majatek=126664.23 odrzucone=0  4s
+204 baza                   wynik=0.337 miejsce=2 majatek=99064.97 odrzucone=0  4s
+204 planista_trudny        wynik=-0.325 miejsce=4 majatek=37025.09 odrzucone=0  5s
+204 drogo                  wynik=-0.019 miejsce=3 majatek=56628.58 odrzucone=0  4s
+204 tanio                  wynik=0.281 miejsce=2 majatek=92175.38 odrzucone=0  4s
+204 premium                wynik=0.71 miejsce=1 majatek=152856.09 odrzucone=0  5s
+204 tani_kebab             wynik=0.002 miejsce=3 majatek=55030.65 odrzucone=0  5s
+204 agresywny              wynik=0.069 miejsce=3 majatek=80904.1 odrzucone=0  4s
+204 ekspansja              wynik=0.521 miejsce=1 majatek=118666.02 odrzucone=0  5s
+204 ekspansja_na_kredyt    wynik=0.184 miejsce=2 majatek=118320.59 odrzucone=0  6s
+204 bez_lokalu_lokata      wynik=-0.019 miejsce=3 majatek=30176.42 odrzucone=0  4s
+204 lokal_i_zamkniecie     wynik=None miejsce=None majatek=None odrzucone=0 AttributeError("'str' object has no attribute 'id'") 2s
+204 wyplaty                wynik=0.331 miejsce=2 majatek=33063.43 odrzucone=0  4s
+204 harpagon_dzwignia      wynik=0.31 miejsce=2 majatek=98203.93 odrzucone=0  4s
+204 niskie_pensje          wynik=0.352 miejsce=2 majatek=101512.3 odrzucone=0  4s
+204 max_reklama            wynik=0.408 miejsce=2 majatek=109537.73 odrzucone=0  4s

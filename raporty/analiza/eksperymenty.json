@@ -1,0 +1,1823 @@
+[
+ {
+  "wariant": "baza",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.452,
+    "miejsce": 1,
+    "majatek_netto": 111911.78,
+    "dochod_suma": 66853.76,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.276,
+    "miejsce": 4,
+    "majatek_netto": 60136.75,
+    "dochod_suma": -9996.55,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.18,
+    "miejsce": 3,
+    "majatek_netto": 45067.23,
+    "dochod_suma": 4502.9,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.263,
+    "miejsce": 2,
+    "majatek_netto": 82345.78,
+    "dochod_suma": 35546.31,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.452,
+   "wynik_ekonomiczny": 0.868,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.069,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "planista_trudny",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.396,
+    "miejsce": 4,
+    "majatek_netto": 24832.33,
+    "dochod_suma": -15550.34,
+    "lokale": 2
+   },
+   "Gigant": {
+    "wynik": -0.262,
+    "miejsce": 2,
+    "majatek_netto": 61297.83,
+    "dochod_suma": -8617.19,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.262,
+    "miejsce": 3,
+    "majatek_netto": 38243.43,
+    "dochod_suma": -1940.27,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.22,
+    "miejsce": 1,
+    "majatek_netto": 77721.47,
+    "dochod_suma": 31422.09,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.396,
+   "wynik_ekonomiczny": -0.182,
+   "zadowolenie_pracownikow": 0.917,
+   "zadowolenie_klientow": 0.982,
+   "rozwoj_firmy": 0.661,
+   "wskaznik_zadluzenia": 0.97
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "drogo",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.071,
+    "miejsce": 2,
+    "majatek_netto": 66200.9,
+    "dochod_suma": 28590.87,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.113,
+    "miejsce": 3,
+    "majatek_netto": 71698.86,
+    "dochod_suma": 3823.41,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.139,
+    "miejsce": 4,
+    "majatek_netto": 48751.13,
+    "dochod_suma": 8458.57,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.266,
+    "miejsce": 1,
+    "majatek_netto": 82807.85,
+    "dochod_suma": 36109.35,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.071,
+   "wynik_ekonomiczny": 0.381,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 0.991,
+   "rozwoj_firmy": 0.539,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "tanio",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.326,
+    "miejsce": 1,
+    "majatek_netto": 93565.96,
+    "dochod_suma": 49501.73,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.312,
+    "miejsce": 4,
+    "majatek_netto": 70570.27,
+    "dochod_suma": -12290.52,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.196,
+    "miejsce": 3,
+    "majatek_netto": 84809.12,
+    "dochod_suma": 37866.01,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.25,
+    "miejsce": 2,
+    "majatek_netto": 78767.78,
+    "dochod_suma": 32069.38,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.326,
+   "wynik_ekonomiczny": 0.647,
+   "zadowolenie_pracownikow": 0.908,
+   "zadowolenie_klientow": 1.091,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "premium",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.754,
+    "miejsce": 1,
+    "majatek_netto": 154478.21,
+    "dochod_suma": 76988.16,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.081,
+    "miejsce": 4,
+    "majatek_netto": 89994.09,
+    "dochod_suma": 6449.56,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.256,
+    "miejsce": 3,
+    "majatek_netto": 94237.95,
+    "dochod_suma": 47129.7,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.327,
+    "miejsce": 2,
+    "majatek_netto": 90542.56,
+    "dochod_suma": 42988.85,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.754,
+   "wynik_ekonomiczny": 1.021,
+   "zadowolenie_pracownikow": 0.982,
+   "zadowolenie_klientow": 1.129,
+   "rozwoj_firmy": 0.702,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "tani_kebab",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.245,
+    "miejsce": 3,
+    "majatek_netto": 35112.62,
+    "dochod_suma": -3827.78,
+    "lokale": 2
+   },
+   "Gigant": {
+    "wynik": -0.281,
+    "miejsce": 4,
+    "majatek_netto": 58216.71,
+    "dochod_suma": -9780.39,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.31,
+    "miejsce": 2,
+    "majatek_netto": 102544.6,
+    "dochod_suma": 53956.84,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.411,
+    "miejsce": 1,
+    "majatek_netto": 99832.33,
+    "dochod_suma": 52307.97,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.245,
+   "wynik_ekonomiczny": -0.038,
+   "zadowolenie_pracownikow": 0.906,
+   "zadowolenie_klientow": 0.97,
+   "rozwoj_firmy": 0.568,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "agresywny",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.039,
+    "miejsce": 4,
+    "majatek_netto": 75521.67,
+    "dochod_suma": 13024.5,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": 0.056,
+    "miejsce": 3,
+    "majatek_netto": 99382.42,
+    "dochod_suma": 18012.96,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.41,
+    "miejsce": 1,
+    "majatek_netto": 110596.62,
+    "dochod_suma": 62095.19,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.228,
+    "miejsce": 2,
+    "majatek_netto": 76384.21,
+    "dochod_suma": 29505.1,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.039,
+   "wynik_ekonomiczny": 0.184,
+   "zadowolenie_pracownikow": 0.957,
+   "zadowolenie_klientow": 1.072,
+   "rozwoj_firmy": 0.679,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "ekspansja",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.555,
+    "miejsce": 2,
+    "majatek_netto": 121088.39,
+    "dochod_suma": 75977.44,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.379,
+    "miejsce": 4,
+    "majatek_netto": 47863.56,
+    "dochod_suma": -21603.18,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.597,
+    "miejsce": 1,
+    "majatek_netto": 125712.17,
+    "dochod_suma": 82666.61,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.197,
+    "miejsce": 3,
+    "majatek_netto": 75407.13,
+    "dochod_suma": 28921.64,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.555,
+   "wynik_ekonomiczny": 0.985,
+   "zadowolenie_pracownikow": 0.912,
+   "zadowolenie_klientow": 1.092,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "ekspansja_na_kredyt",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.183,
+    "miejsce": 2,
+    "majatek_netto": 115753.15,
+    "dochod_suma": 70861.23,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.512,
+    "miejsce": 4,
+    "majatek_netto": 37994.93,
+    "dochod_suma": -32051.18,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.605,
+    "miejsce": 1,
+    "majatek_netto": 128129.48,
+    "dochod_suma": 83942.93,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.176,
+    "miejsce": 3,
+    "majatek_netto": 72910.72,
+    "dochod_suma": 26623.85,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.183,
+   "wynik_ekonomiczny": 0.939,
+   "zadowolenie_pracownikow": 0.911,
+   "zadowolenie_klientow": 1.089,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 0.42
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "bez_lokalu_lokata",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.019,
+    "miejsce": 3,
+    "majatek_netto": 30176.42,
+    "dochod_suma": -1323.58,
+    "lokale": 0
+   },
+   "Gigant": {
+    "wynik": -0.408,
+    "miejsce": 4,
+    "majatek_netto": 47850.68,
+    "dochod_suma": -20656.92,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.628,
+    "miejsce": 1,
+    "majatek_netto": 129113.14,
+    "dochod_suma": 85816.68,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.485,
+    "miejsce": 2,
+    "majatek_netto": 108072.79,
+    "dochod_suma": 60544.88,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.019,
+   "wynik_ekonomiczny": -0.016,
+   "zadowolenie_pracownikow": 0.0,
+   "zadowolenie_klientow": 0.0,
+   "rozwoj_firmy": 0.535,
+   "wskaznik_zadluzenia": 0.294
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "lokal_i_zamkniecie",
+  "ziarno": 202,
+  "wyjatek": "AttributeError(\"'str' object has no attribute 'id'\")"
+ },
+ {
+  "wariant": "wyplaty",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.447,
+    "miejsce": 1,
+    "majatek_netto": 32047.41,
+    "dochod_suma": 67402.57,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.276,
+    "miejsce": 4,
+    "majatek_netto": 60136.75,
+    "dochod_suma": -9996.55,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.18,
+    "miejsce": 3,
+    "majatek_netto": 45067.23,
+    "dochod_suma": 4502.9,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.263,
+    "miejsce": 2,
+    "majatek_netto": 82345.78,
+    "dochod_suma": 35546.31,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.447,
+   "wynik_ekonomiczny": 0.875,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.069,
+   "rozwoj_firmy": 0.587,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "harpagon_dzwignia",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.438,
+    "miejsce": 1,
+    "majatek_netto": 111233.49,
+    "dochod_suma": 70456.08,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.28,
+    "miejsce": 4,
+    "majatek_netto": 60075.33,
+    "dochod_suma": -10101.24,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.188,
+    "miejsce": 3,
+    "majatek_netto": 44211.82,
+    "dochod_suma": 4052.59,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.221,
+    "miejsce": 2,
+    "majatek_netto": 77955.09,
+    "dochod_suma": 31711.34,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.438,
+   "wynik_ekonomiczny": 0.872,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.072,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 0.828
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "niskie_pensje",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.462,
+    "miejsce": 1,
+    "majatek_netto": 114143.8,
+    "dochod_suma": 69085.78,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.276,
+    "miejsce": 4,
+    "majatek_netto": 60136.75,
+    "dochod_suma": -9996.55,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.18,
+    "miejsce": 3,
+    "majatek_netto": 45067.23,
+    "dochod_suma": 4502.9,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.263,
+    "miejsce": 2,
+    "majatek_netto": 82345.78,
+    "dochod_suma": 35546.31,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.462,
+   "wynik_ekonomiczny": 0.897,
+   "zadowolenie_pracownikow": 0.901,
+   "zadowolenie_klientow": 1.069,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "max_reklama",
+  "ziarno": 202,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.46,
+    "miejsce": 1,
+    "majatek_netto": 112478.63,
+    "dochod_suma": 68584.35,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.307,
+    "miejsce": 4,
+    "majatek_netto": 57029.81,
+    "dochod_suma": -12324.69,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": -0.14,
+    "miejsce": 3,
+    "majatek_netto": 49146.13,
+    "dochod_suma": 7701.05,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.266,
+    "miejsce": 2,
+    "majatek_netto": 82656.05,
+    "dochod_suma": 35906.23,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.46,
+   "wynik_ekonomiczny": 0.89,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.066,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "baza",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.489,
+    "miejsce": 2,
+    "majatek_netto": 114126.04,
+    "dochod_suma": 67838.74,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.375,
+    "miejsce": 4,
+    "majatek_netto": 52810.26,
+    "dochod_suma": -21133.93,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 3,
+    "majatek_netto": 77636.09,
+    "dochod_suma": 38423.07,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.508,
+    "miejsce": 1,
+    "majatek_netto": 113148.66,
+    "dochod_suma": 64144.53,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.489,
+   "wynik_ekonomiczny": 0.866,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.081,
+   "rozwoj_firmy": 0.588,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "planista_trudny",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.26,
+    "miejsce": 2,
+    "majatek_netto": 88881.09,
+    "dochod_suma": 43485.14,
+    "lokale": 2
+   },
+   "Gigant": {
+    "wynik": -0.384,
+    "miejsce": 4,
+    "majatek_netto": 51777.5,
+    "dochod_suma": -21994.84,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 3,
+    "majatek_netto": 77668.97,
+    "dochod_suma": 38499.65,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.502,
+    "miejsce": 1,
+    "majatek_netto": 113661.83,
+    "dochod_suma": 64239.69,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.26,
+   "wynik_ekonomiczny": 0.556,
+   "zadowolenie_pracownikow": 0.917,
+   "zadowolenie_klientow": 1.043,
+   "rozwoj_firmy": 0.614,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "drogo",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.332,
+    "miejsce": 2,
+    "majatek_netto": 95719.66,
+    "dochod_suma": 54495.27,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.546,
+    "miejsce": 4,
+    "majatek_netto": 30662.69,
+    "dochod_suma": -34580.42,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 3,
+    "majatek_netto": 77724.26,
+    "dochod_suma": 38552.39,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.473,
+    "miejsce": 1,
+    "majatek_netto": 110131.96,
+    "dochod_suma": 61218.79,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.332,
+   "wynik_ekonomiczny": 0.696,
+   "zadowolenie_pracownikow": 0.917,
+   "zadowolenie_klientow": 1.022,
+   "rozwoj_firmy": 0.548,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "tanio",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.439,
+    "miejsce": 2,
+    "majatek_netto": 105587.15,
+    "dochod_suma": 58868.49,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.284,
+    "miejsce": 4,
+    "majatek_netto": 60855.3,
+    "dochod_suma": -13271.12,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 3,
+    "majatek_netto": 77536.06,
+    "dochod_suma": 38431.54,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.494,
+    "miejsce": 1,
+    "majatek_netto": 111381.49,
+    "dochod_suma": 62184.16,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.439,
+   "wynik_ekonomiczny": 0.752,
+   "zadowolenie_pracownikow": 0.912,
+   "zadowolenie_klientow": 1.121,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "premium",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.633,
+    "miejsce": 1,
+    "majatek_netto": 151898.07,
+    "dochod_suma": 66495.15,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.537,
+    "miejsce": 4,
+    "majatek_netto": 39661.99,
+    "dochod_suma": -34218.83,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.184,
+    "miejsce": 3,
+    "majatek_netto": 71121.66,
+    "dochod_suma": 31854.95,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.462,
+    "miejsce": 2,
+    "majatek_netto": 107538.37,
+    "dochod_suma": 59200.19,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.633,
+   "wynik_ekonomiczny": 0.849,
+   "zadowolenie_pracownikow": 0.981,
+   "zadowolenie_klientow": 1.108,
+   "rozwoj_firmy": 0.729,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "tani_kebab",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.241,
+    "miejsce": 3,
+    "majatek_netto": 78027.17,
+    "dochod_suma": 36636.28,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.459,
+    "miejsce": 4,
+    "majatek_netto": 37154.05,
+    "dochod_suma": -27831.51,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.515,
+    "miejsce": 2,
+    "majatek_netto": 116775.81,
+    "dochod_suma": 69839.09,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.541,
+    "miejsce": 1,
+    "majatek_netto": 116213.53,
+    "dochod_suma": 67381.01,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.241,
+   "wynik_ekonomiczny": 0.479,
+   "zadowolenie_pracownikow": 0.912,
+   "zadowolenie_klientow": 1.066,
+   "rozwoj_firmy": 0.562,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "agresywny",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.203,
+    "miejsce": 3,
+    "majatek_netto": 93536.55,
+    "dochod_suma": 29210.53,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.345,
+    "miejsce": 4,
+    "majatek_netto": 48867.11,
+    "dochod_suma": -17195.0,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 2,
+    "majatek_netto": 77474.04,
+    "dochod_suma": 38331.35,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.503,
+    "miejsce": 1,
+    "majatek_netto": 111902.6,
+    "dochod_suma": 63373.75,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.203,
+   "wynik_ekonomiczny": 0.374,
+   "zadowolenie_pracownikow": 0.949,
+   "zadowolenie_klientow": 1.112,
+   "rozwoj_firmy": 0.685,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "ekspansja",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.487,
+    "miejsce": 2,
+    "majatek_netto": 111624.48,
+    "dochod_suma": 65847.52,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -1.353,
+    "miejsce": 4,
+    "majatek_netto": -33420.51,
+    "dochod_suma": -99245.7,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.228,
+    "miejsce": 3,
+    "majatek_netto": 77691.66,
+    "dochod_suma": 38596.75,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.504,
+    "miejsce": 1,
+    "majatek_netto": 112308.63,
+    "dochod_suma": 63724.93,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.487,
+   "wynik_ekonomiczny": 0.841,
+   "zadowolenie_pracownikow": 0.918,
+   "zadowolenie_klientow": 1.09,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "ekspansja_na_kredyt",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.199,
+    "miejsce": 3,
+    "majatek_netto": 109018.49,
+    "dochod_suma": 63246.83,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -1.353,
+    "miejsce": 4,
+    "majatek_netto": -33420.51,
+    "dochod_suma": -99245.7,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.228,
+    "miejsce": 2,
+    "majatek_netto": 77691.66,
+    "dochod_suma": 38596.75,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.504,
+    "miejsce": 1,
+    "majatek_netto": 112308.63,
+    "dochod_suma": 63724.93,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.199,
+   "wynik_ekonomiczny": 0.827,
+   "zadowolenie_pracownikow": 0.918,
+   "zadowolenie_klientow": 1.09,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 0.39
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "bez_lokalu_lokata",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.019,
+    "miejsce": 3,
+    "majatek_netto": 30176.42,
+    "dochod_suma": -1323.58,
+    "lokale": 0
+   },
+   "Gigant": {
+    "wynik": -0.876,
+    "miejsce": 4,
+    "majatek_netto": 28432.93,
+    "dochod_suma": -59245.42,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.227,
+    "miejsce": 2,
+    "majatek_netto": 77721.6,
+    "dochod_suma": 38562.43,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.585,
+    "miejsce": 1,
+    "majatek_netto": 122654.2,
+    "dochod_suma": 73306.65,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.019,
+   "wynik_ekonomiczny": -0.016,
+   "zadowolenie_pracownikow": 0.0,
+   "zadowolenie_klientow": 0.0,
+   "rozwoj_firmy": 0.535,
+   "wskaznik_zadluzenia": 0.294
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "lokal_i_zamkniecie",
+  "ziarno": 203,
+  "wyjatek": "AttributeError(\"'str' object has no attribute 'id'\")"
+ },
+ {
+  "wariant": "wyplaty",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.474,
+    "miejsce": 2,
+    "majatek_netto": 42194.24,
+    "dochod_suma": 66247.14,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.378,
+    "miejsce": 4,
+    "majatek_netto": 52651.93,
+    "dochod_suma": -21326.96,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.225,
+    "miejsce": 3,
+    "majatek_netto": 77449.9,
+    "dochod_suma": 38266.48,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.508,
+    "miejsce": 1,
+    "majatek_netto": 113166.01,
+    "dochod_suma": 64162.09,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.474,
+   "wynik_ekonomiczny": 0.846,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.087,
+   "rozwoj_firmy": 0.578,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "harpagon_dzwignia",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.453,
+    "miejsce": 2,
+    "majatek_netto": 109829.66,
+    "dochod_suma": 67857.01,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.375,
+    "miejsce": 4,
+    "majatek_netto": 52810.26,
+    "dochod_suma": -21133.93,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 3,
+    "majatek_netto": 77636.09,
+    "dochod_suma": 38423.07,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.508,
+    "miejsce": 1,
+    "majatek_netto": 113148.66,
+    "dochod_suma": 64144.53,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.453,
+   "wynik_ekonomiczny": 0.824,
+   "zadowolenie_pracownikow": 0.915,
+   "zadowolenie_klientow": 1.081,
+   "rozwoj_firmy": 0.588,
+   "wskaznik_zadluzenia": 0.828
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "niskie_pensje",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.497,
+    "miejsce": 2,
+    "majatek_netto": 116243.64,
+    "dochod_suma": 69956.34,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.375,
+    "miejsce": 4,
+    "majatek_netto": 52810.26,
+    "dochod_suma": -21133.93,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.226,
+    "miejsce": 3,
+    "majatek_netto": 77636.09,
+    "dochod_suma": 38423.07,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.508,
+    "miejsce": 1,
+    "majatek_netto": 113148.66,
+    "dochod_suma": 64144.53,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.497,
+   "wynik_ekonomiczny": 0.893,
+   "zadowolenie_pracownikow": 0.901,
+   "zadowolenie_klientow": 1.081,
+   "rozwoj_firmy": 0.588,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "max_reklama",
+  "ziarno": 203,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.596,
+    "miejsce": 1,
+    "majatek_netto": 126664.23,
+    "dochod_suma": 80512.1,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.337,
+    "miejsce": 4,
+    "majatek_netto": 50775.2,
+    "dochod_suma": -18313.14,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.215,
+    "miejsce": 3,
+    "majatek_netto": 76015.07,
+    "dochod_suma": 36804.14,
+    "lokale": 1
+   },
+   "Kopiuj": {
+    "wynik": 0.498,
+    "miejsce": 2,
+    "majatek_netto": 112481.65,
+    "dochod_suma": 63336.97,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.596,
+   "wynik_ekonomiczny": 1.027,
+   "zadowolenie_pracownikow": 0.916,
+   "zadowolenie_klientow": 1.084,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "baza",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.337,
+    "miejsce": 2,
+    "majatek_netto": 99064.97,
+    "dochod_suma": 54081.86,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": 0.076,
+    "miejsce": 4,
+    "majatek_netto": 106231.9,
+    "dochod_suma": 21837.8,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.517,
+    "miejsce": 1,
+    "majatek_netto": 117457.83,
+    "dochod_suma": 75441.56,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.269,
+    "miejsce": 3,
+    "majatek_netto": 84309.56,
+    "dochod_suma": 35089.34,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.337,
+   "wynik_ekonomiczny": 0.706,
+   "zadowolenie_pracownikow": 0.917,
+   "zadowolenie_klientow": 1.057,
+   "rozwoj_firmy": 0.587,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "planista_trudny",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.325,
+    "miejsce": 4,
+    "majatek_netto": 37025.09,
+    "dochod_suma": -9340.26,
+    "lokale": 2
+   },
+   "Gigant": {
+    "wynik": -0.039,
+    "miejsce": 3,
+    "majatek_netto": 106844.14,
+    "dochod_suma": 10627.51,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.53,
+    "miejsce": 1,
+    "majatek_netto": 118943.67,
+    "dochod_suma": 76063.5,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.273,
+    "miejsce": 2,
+    "majatek_netto": 84805.81,
+    "dochod_suma": 35970.01,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.325,
+   "wynik_ekonomiczny": -0.103,
+   "zadowolenie_pracownikow": 0.919,
+   "zadowolenie_klientow": 1.008,
+   "rozwoj_firmy": 0.635,
+   "wskaznik_zadluzenia": 0.97
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "drogo",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.019,
+    "miejsce": 3,
+    "majatek_netto": 56628.58,
+    "dochod_suma": 18017.9,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.269,
+    "miejsce": 4,
+    "majatek_netto": 63216.48,
+    "dochod_suma": -8759.84,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.424,
+    "miejsce": 1,
+    "majatek_netto": 108753.82,
+    "dochod_suma": 66652.99,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.259,
+    "miejsce": 2,
+    "majatek_netto": 83984.22,
+    "dochod_suma": 35032.95,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.019,
+   "wynik_ekonomiczny": 0.246,
+   "zadowolenie_pracownikow": 0.917,
+   "zadowolenie_klientow": 0.97,
+   "rozwoj_firmy": 0.539,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "tanio",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.281,
+    "miejsce": 2,
+    "majatek_netto": 92175.38,
+    "dochod_suma": 46332.2,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": 0.137,
+    "miejsce": 4,
+    "majatek_netto": 107150.07,
+    "dochod_suma": 23758.65,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.508,
+    "miejsce": 1,
+    "majatek_netto": 114941.67,
+    "dochod_suma": 73134.33,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.276,
+    "miejsce": 3,
+    "majatek_netto": 85058.42,
+    "dochod_suma": 35950.73,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.281,
+   "wynik_ekonomiczny": 0.607,
+   "zadowolenie_pracownikow": 0.91,
+   "zadowolenie_klientow": 1.089,
+   "rozwoj_firmy": 0.587,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "premium",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.71,
+    "miejsce": 1,
+    "majatek_netto": 152856.09,
+    "dochod_suma": 72598.11,
+    "lokale": 2
+   },
+   "Gigant": {
+    "wynik": -0.281,
+    "miejsce": 4,
+    "majatek_netto": 81653.51,
+    "dochod_suma": -9880.43,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.235,
+    "miejsce": 3,
+    "majatek_netto": 85881.93,
+    "dochod_suma": 44495.72,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.386,
+    "miejsce": 2,
+    "majatek_netto": 98179.91,
+    "dochod_suma": 50562.39,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.71,
+   "wynik_ekonomiczny": 0.965,
+   "zadowolenie_pracownikow": 0.98,
+   "zadowolenie_klientow": 1.108,
+   "rozwoj_firmy": 0.725,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "tani_kebab",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.002,
+    "miejsce": 3,
+    "majatek_netto": 55030.65,
+    "dochod_suma": 15257.72,
+    "lokale": 2
+   },
+   "Gigant": {
+    "wynik": -0.299,
+    "miejsce": 4,
+    "majatek_netto": 55524.55,
+    "dochod_suma": -13250.85,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.46,
+    "miejsce": 2,
+    "majatek_netto": 109328.52,
+    "dochod_suma": 67518.45,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.462,
+    "miejsce": 1,
+    "majatek_netto": 107858.49,
+    "dochod_suma": 59097.77,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.002,
+   "wynik_ekonomiczny": 0.205,
+   "zadowolenie_pracownikow": 0.903,
+   "zadowolenie_klientow": 0.978,
+   "rozwoj_firmy": 0.549,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "agresywny",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.069,
+    "miejsce": 3,
+    "majatek_netto": 80904.1,
+    "dochod_suma": 16571.36,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.113,
+    "miejsce": 4,
+    "majatek_netto": 87030.86,
+    "dochod_suma": 3947.85,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.586,
+    "miejsce": 1,
+    "majatek_netto": 125050.12,
+    "dochod_suma": 82310.11,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.265,
+    "miejsce": 2,
+    "majatek_netto": 83773.53,
+    "dochod_suma": 34716.89,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.069,
+   "wynik_ekonomiczny": 0.229,
+   "zadowolenie_pracownikow": 0.952,
+   "zadowolenie_klientow": 1.084,
+   "rozwoj_firmy": 0.679,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "ekspansja",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.521,
+    "miejsce": 1,
+    "majatek_netto": 118666.02,
+    "dochod_suma": 72255.45,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -1.111,
+    "miejsce": 4,
+    "majatek_netto": -36478.02,
+    "dochod_suma": -83423.72,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.149,
+    "miejsce": 3,
+    "majatek_netto": 79440.65,
+    "dochod_suma": 32021.64,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.265,
+    "miejsce": 2,
+    "majatek_netto": 83996.43,
+    "dochod_suma": 35081.94,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.521,
+   "wynik_ekonomiczny": 0.937,
+   "zadowolenie_pracownikow": 0.913,
+   "zadowolenie_klientow": 1.087,
+   "rozwoj_firmy": 0.593,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "ekspansja_na_kredyt",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.184,
+    "miejsce": 2,
+    "majatek_netto": 118320.59,
+    "dochod_suma": 71779.65,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -1.114,
+    "miejsce": 4,
+    "majatek_netto": -37544.22,
+    "dochod_suma": -83751.23,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.128,
+    "miejsce": 3,
+    "majatek_netto": 79896.97,
+    "dochod_suma": 38142.53,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.317,
+    "miejsce": 1,
+    "majatek_netto": 90069.77,
+    "dochod_suma": 41180.06,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.184,
+   "wynik_ekonomiczny": 0.95,
+   "zadowolenie_pracownikow": 0.914,
+   "zadowolenie_klientow": 1.082,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 0.42
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "bez_lokalu_lokata",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": -0.019,
+    "miejsce": 3,
+    "majatek_netto": 30176.42,
+    "dochod_suma": -1323.58,
+    "lokale": 0
+   },
+   "Gigant": {
+    "wynik": -0.202,
+    "miejsce": 4,
+    "majatek_netto": 68942.23,
+    "dochod_suma": -3816.54,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.385,
+    "miejsce": 2,
+    "majatek_netto": 102766.96,
+    "dochod_suma": 60934.33,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.462,
+    "miejsce": 1,
+    "majatek_netto": 108084.12,
+    "dochod_suma": 59012.36,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": -0.019,
+   "wynik_ekonomiczny": -0.016,
+   "zadowolenie_pracownikow": 0.0,
+   "zadowolenie_klientow": 0.0,
+   "rozwoj_firmy": 0.535,
+   "wskaznik_zadluzenia": 0.294
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "lokal_i_zamkniecie",
+  "ziarno": 204,
+  "wyjatek": "AttributeError(\"'str' object has no attribute 'id'\")"
+ },
+ {
+  "wariant": "wyplaty",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.331,
+    "miejsce": 2,
+    "majatek_netto": 33063.43,
+    "dochod_suma": 53438.53,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": 0.072,
+    "miejsce": 4,
+    "majatek_netto": 105887.9,
+    "dochod_suma": 21564.26,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.52,
+    "miejsce": 1,
+    "majatek_netto": 117171.4,
+    "dochod_suma": 75446.34,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.269,
+    "miejsce": 3,
+    "majatek_netto": 84326.68,
+    "dochod_suma": 35099.02,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.331,
+   "wynik_ekonomiczny": 0.697,
+   "zadowolenie_pracownikow": 0.917,
+   "zadowolenie_klientow": 1.056,
+   "rozwoj_firmy": 0.587,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "harpagon_dzwignia",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.31,
+    "miejsce": 2,
+    "majatek_netto": 98203.93,
+    "dochod_suma": 56719.65,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": -0.002,
+    "miejsce": 4,
+    "majatek_netto": 96732.84,
+    "dochod_suma": 13972.6,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.519,
+    "miejsce": 1,
+    "majatek_netto": 116873.56,
+    "dochod_suma": 75215.44,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.266,
+    "miejsce": 3,
+    "majatek_netto": 83860.29,
+    "dochod_suma": 34993.29,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.31,
+   "wynik_ekonomiczny": 0.697,
+   "zadowolenie_pracownikow": 0.918,
+   "zadowolenie_klientow": 1.057,
+   "rozwoj_firmy": 0.595,
+   "wskaznik_zadluzenia": 0.828
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "niskie_pensje",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.352,
+    "miejsce": 2,
+    "majatek_netto": 101512.3,
+    "dochod_suma": 56529.19,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": 0.076,
+    "miejsce": 4,
+    "majatek_netto": 106231.9,
+    "dochod_suma": 21837.8,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.517,
+    "miejsce": 1,
+    "majatek_netto": 117457.83,
+    "dochod_suma": 75441.56,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.269,
+    "miejsce": 3,
+    "majatek_netto": 84309.56,
+    "dochod_suma": 35089.34,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.352,
+   "wynik_ekonomiczny": 0.737,
+   "zadowolenie_pracownikow": 0.903,
+   "zadowolenie_klientow": 1.057,
+   "rozwoj_firmy": 0.587,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ },
+ {
+  "wariant": "max_reklama",
+  "ziarno": 204,
+  "firmy": {
+   "Optima": {
+    "wynik": 0.408,
+    "miejsce": 2,
+    "majatek_netto": 109537.73,
+    "dochod_suma": 64326.77,
+    "lokale": 1
+   },
+   "Gigant": {
+    "wynik": 0.084,
+    "miejsce": 4,
+    "majatek_netto": 106573.67,
+    "dochod_suma": 22224.35,
+    "lokale": 2
+   },
+   "Bafra": {
+    "wynik": 0.511,
+    "miejsce": 1,
+    "majatek_netto": 116853.05,
+    "dochod_suma": 74861.29,
+    "lokale": 2
+   },
+   "Kopiuj": {
+    "wynik": 0.268,
+    "miejsce": 3,
+    "majatek_netto": 84263.86,
+    "dochod_suma": 35032.73,
+    "lokale": 1
+   }
+  },
+  "karta": {
+   "wynik_dzialalnosci": 0.408,
+   "wynik_ekonomiczny": 0.836,
+   "zadowolenie_pracownikow": 0.916,
+   "zadowolenie_klientow": 1.066,
+   "rozwoj_firmy": 0.587,
+   "wskaznik_zadluzenia": 1.0
+  },
+  "odrzucone": []
+ }
+]

@@ -106,7 +106,7 @@ def kalkulator(gid: str, firma: str, strategia: str, poziom: str) -> dict:
 
 
 def zrzut(gid: str, firma: str | None, zakladka: str, plik: str, wysokosc: int = 1100) -> Path:
-    """Zrzut strony drużyny (firma) albo panelu mistrza gry (firma=None) do raporty/analiza/zrzuty."""
+    """Zrzut strony drużyny albo panelu mistrza gry (firma=None) do raporty/analiza/zrzuty."""
     adres = (f"{ADRES}/gra/{gid}/{quote(firma)}#{zakladka}" if firma
              else f"{ADRES}/mg/gra/{gid}")
     cel = ZRZUTY / plik
