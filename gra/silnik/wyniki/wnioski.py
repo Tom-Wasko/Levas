@@ -175,3 +175,69 @@ def wnioski(dane: Dane, w: dict | None) -> dict | None:
     if not dobre:
         dobre.append("Każda firma zaczyna od zera – poniżej plan na kolejną rundę.")
     return {"dobre": dobre, "do_poprawy": poprawa}
+
+
+# U16: „Dlaczego mój wynik się zmienił?” – 1–3 zdania z porównania kart dwóch kolejnych rund
+WSKAZNIKI = {"wynik_ekonomiczny": "wynik ekonomiczny", "zadowolenie_pracownikow": "zadowolenie pracowników",
+             "zadowolenie_klientow": "zadowolenie klientów", "rozwoj_firmy": "rozwój firmy",
+             "wskaznik_zadluzenia": "wskaźnik zadłużenia"}
+
+
+def _liczba(x: float) -> str:
+    return f"{x:.2f}".replace(".", ",").replace("-", "−")
+
+
+def _wynik(dane: Dane, k: dict) -> float:
+    """Wynik działalności z wskaźników karty – jak silnik/wyniki/karta.py: karta (przy stracie bez mnożenia)."""
+    we = k["wynik_ekonomiczny"]
+    if we < 0:
+        return we * dane.z["karta_wynikow"]["strata"]["waga"]
+    return we * k["zadowolenie_pracownikow"] * k["zadowolenie_klientow"] * k["rozwoj_firmy"] * k["wskaznik_zadluzenia"]
+
+
+def _pozycje(kpir: dict) -> dict[str, float]:
+    """Saldo pozycji KPiR (przychód − koszt) pogrupowane po opisie przed dwukropkiem („Czynsz najmu: ul. …”)."""
+    wynik: dict[str, float] = {}
+    for p in kpir.get("pozycje") or []:
+        klucz = p["opis"].split(":")[0].strip()
+        wynik[klucz] = wynik.get(klucz, 0.0) + p.get("przychod", 0) + p.get("przychod_pozostaly", 0)             - p.get("towary", 0) - p.get("wynagrodzenia", 0) - p.get("pozostale", 0)
+    return wynik
+
+
+def dlaczego(dane: Dane, w: dict | None, wp: dict | None) -> list[str] | None:
+    """Zdania o zmianie wyniku działalności między rundą poprzednią (wp) a ostatnią (w); None – brak karty w.
+    Pierwsza karta (runda przygotowawcza bez karty) – porównanie z zerem: wynik ekonomiczny 0, KPiR bez pozycji.
+    Przyczyna: wskaźnik, którego sama zmiana (przy pozostałych z poprzedniej rundy) najbardziej przesuwa wynik;
+    przy wyniku ekonomicznym – pozycja KPiR o największej zmianie w tę samą stronę."""
+    k, kp = (w or {}).get("karta"), (wp or {}).get("karta")
+    if not k:
+        return None
+    pierwsza = not kp
+    if pierwsza:
+        kp, wp = {**k, "wynik_ekonomiczny": 0.0, "wynik_dzialalnosci": 0.0}, {"kpir": {"dochod_netto": 0.0, "pozycje": []}}
+    a, b = kp["wynik_dzialalnosci"], k["wynik_dzialalnosci"]
+    if abs(b - a) < dane.z["wnioski"]["dlaczego_min"] and not pierwsza:
+        return [f"Wynik działalności prawie się nie zmienił ({_liczba(a)} → {_liczba(b)})."]
+    zdania = [f"Pierwsza karta wyników: wynik działalności {_liczba(b)}." if pierwsza
+              else f"Wynik działalności {'wzrósł' if b > a else 'spadł'} z {_liczba(a)} do {_liczba(b)}."]
+    wplyw = {s: _wynik(dane, {**kp, s: k[s]}) - a for s in WSKAZNIKI}
+    zgodne = [s for s in WSKAZNIKI if wplyw[s] * (b - a) > 0] or list(WSKAZNIKI)
+    glowny = max(zgodne, key=lambda s: abs(wplyw[s]))
+    if glowny == "wynik_ekonomiczny":
+        dn, dnp = w["kpir"]["dochod_netto"], wp["kpir"]["dochod_netto"]
+        zmiana = "zysk zamienił się w stratę" if dnp > 0 > dn else "strata zamieniła się w zysk" if dn > 0 > dnp             else f"dochód netto {'wzrósł' if dn > dnp else 'spadł'}"
+        zdanie = f"Dochód netto: {zl(dn)}" if pierwsza             else f"Najwięcej zmienił wynik ekonomiczny: {zmiana} ({zl(dnp)} → {zl(dn)})"
+        teraz, przed = _pozycje(w["kpir"]), _pozycje(wp["kpir"])
+        roznice = {p: teraz.get(p, 0.0) - przed.get(p, 0.0) for p in set(teraz) | set(przed)}
+        kierunek = [p for p in roznice if roznice[p] * (dn - dnp) > 0]
+        if kierunek:
+            p = max(kierunek, key=lambda x: abs(roznice[x]))
+            rodzaj = "przychód" if teraz.get(p, 0.0) + przed.get(p, 0.0) > 0 else "koszt"
+            zdanie += f" – najbardziej zaważył {rodzaj} „{p}”: {zl(abs(teraz.get(p, 0.0)))}"                       + ("" if pierwsza else f", rundę wcześniej {zl(abs(przed.get(p, 0.0)))}")
+        zdania.append(zdanie + ".")
+    else:
+        zdania.append(f"Najwięcej zmienił wskaźnik „{WSKAZNIKI[glowny]}”: {_liczba(kp[glowny])} → {_liczba(k[glowny])}.")
+    if k["wynik_ekonomiczny"] < 0:
+        zdania.append("Przy stracie wynik działalności to sam (ujemny) wynik ekonomiczny – zadowolenie i rozwój "
+                      "zaczną się liczyć, gdy firma wyjdzie na plus.")
+    return zdania

@@ -334,7 +334,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] U13 [13] Wyniki: majątek netto obok wyniku i zdanie, jak liczy się ranking – zrobione: kolumna „Majątek netto” w rankingu Karty wyników (v.majatek_firm), zdanie RANKING_DLACZEGO pod rankiem ucznia i w Wynikach mistrza gry (tam majątek już był); INSTRUKCJA rozdz. 3.
 - [x] U14 [14] Menu w rundzie 1: podpis „od tygodnia 3”, jeden komunikat zamiast dwóch, objaśnienie „popytu rocznego” – zrobione: podpis przy wyszarzonym „Wybierz” („od tygodnia 3” / „limit nowych dań wyczerpany”), „Popyt roczny” → „Chętnych w strefie na tydzień ≈ N” z dymkiem; jeden komunikat w rundzie 1 był już z U5.
 - [x] U15 [15] Harpagon: kwota do oddania w złotych przy pożyczce – zrobione: w oknie pożyczki na żywo „Oddasz ok. X zł, jeśli spłacisz w terminie (na początku rundy T)” – kwota × (1 + oprocentowanie) ^ termin_rund, test zgodności z silnikiem.
-- [ ] U16 [16] „Dlaczego mój wynik się zmienił?” – 1–3 zdania po rundzie z największych zmian karty
+- [x] U16 [16] „Dlaczego mój wynik się zmienił?” – 1–3 zdania po rundzie z największych zmian karty – zrobione: wnioski.dlaczego – wskaźnik o największym wpływie (podstawienie przy pozostałych z poprzedniej rundy), przy wyniku ekonomicznym pozycja KPiR o największej zmianie; ramka na Dashboardzie i we Wnioskach; próg wnioski.dlaczego_min.
 - [ ] U17 [17] Refleksja drużyny przy wysyłaniu decyzji (pole tekstowe, widoczne u mistrza gry i w CSV; opcja gry)
 - [ ] U18 [19] Dziennik zapisów decyzji dla mistrza gry + ostrzeżenie o jednej sesji w dwóch drużynach (eksperyment)
 - [ ] U19 [20] Tryb podpowiedzi na pierwsze 3 rundy, włączany przez mistrza gry (eksperyment)

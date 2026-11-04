@@ -3,7 +3,7 @@
 from pomocnicze import _gra, _lokal, _runda
 
 from silnik.dane import dane_domyslne
-from silnik.wyniki.wnioski import wnioski
+from silnik.wyniki.wnioski import dlaczego, wnioski
 
 D = dane_domyslne()
 
@@ -65,3 +65,42 @@ def test_wnioski_po_rundzie_bez_lokalu_i_z_lokalem():
     s = _runda(g, A=_lokal("centrum_2"), B={})
     assert wnioski(D, s.wyniki[1]["B"])["do_poprawy"][0]["tytul"] == "Firma nie ma jeszcze lokalu"
     assert "Macie lokal" in " ".join(wnioski(D, s.wyniki[1]["A"])["dobre"])
+
+
+
+def _karta(we, zk=1.0, zp=0.9, roz=0.6, zad=1.0):
+    wd = we * zk * zp * roz * zad if we >= 0 else we
+    return {"wynik_dzialalnosci": round(wd, 3), "wynik_ekonomiczny": we, "zadowolenie_pracownikow": zp,
+            "zadowolenie_klientow": zk, "rozwoj_firmy": roz, "wskaznik_zadluzenia": zad}
+
+
+def _kpir(netto, **pozostale):
+    return {"dochod_netto": netto, "pozycje": [{"opis": f"{k}: x", "pozostale": v} for k, v in pozostale.items()]
+            + [{"opis": "Sprzedaż", "przychod": 3000.0}]}
+
+
+def test_dlaczego_wynik_sie_zmienil():
+    """U16: 1–3 zdania z największej zmiany karty – przy wyniku ekonomicznym z pozycją KPiR, która zaważyła."""
+    assert dlaczego(D, None, None) is None and dlaczego(D, {"kpir": {}}, None) is None
+    wp = {"karta": _karta(0.44), "kpir": _kpir(2000.0, Czynsz=900.0)}
+    w = {"karta": _karta(-2.48), "kpir": _kpir(-11000.0, Czynsz=900.0, **{"Zakup sprzętu": 11448.0})}
+    z = dlaczego(D, w, wp)
+    assert z[0] == "Wynik działalności spadł z 0,24 do −2,48."
+    assert "zysk zamienił się w stratę" in z[1] and "koszt „Zakup sprzętu”: 11 448" in z[1]
+    assert "Przy stracie" in z[2] and len(z) == 3
+    # zysk bez zmian, spadło zadowolenie klientów
+    z = dlaczego(D, {"karta": _karta(1.0, zk=0.7), "kpir": _kpir(4615.0)}, {"karta": _karta(1.0), "kpir": _kpir(4615.0)})
+    assert z == ["Wynik działalności spadł z 0,54 do 0,38.", "Najwięcej zmienił wskaźnik „zadowolenie klientów”: 1,00 → 0,70."]
+    assert dlaczego(D, {"karta": _karta(1.0), "kpir": _kpir(1.0)}, wp)[0].startswith("Wynik działalności wzrósł")
+    assert "prawie się nie zmienił" in dlaczego(D, wp, wp)[0]
+    assert dlaczego(D, w, {"kpir": _kpir(0.0)})[0] == "Pierwsza karta wyników: wynik działalności −2,48."
+
+
+def test_dlaczego_w_widoku_druzyny():
+    from api.prezentacja import widok
+    g = _gra()
+    _runda(g, A=_lokal("centrum_3"), B=_lokal("dworzec_1"))
+    assert widok(g, "A")["dlaczego"] is None or widok(g, "A")["dlaczego"][0].startswith("Pierwsza karta")
+    _runda(g)
+    _runda(g)
+    assert widok(g, "A")["dlaczego"][0].startswith("Wynik działalności")

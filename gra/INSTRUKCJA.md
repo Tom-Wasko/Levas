@@ -61,6 +61,9 @@ reklama, promocje, bank, podatki, czas właściciela, ubezpieczenia i handel.
 | 4 | Wysyłasz decyzje | **Wyślij decyzje** |
 | 5 | Czekasz, aż mistrz gry zamknie rundę | – |
 
+Po przeliczeniu rundy ramka **Dlaczego wynik się zmienił?** (Dashboard i Wnioski z rundy) w 1–3 zdaniach mówi,
+który wskaźnik karty zmienił się najbardziej i która pozycja – np. zakup sprzętu albo czynsz – zaważyła na wyniku.
+
 Po ostatniej rundzie gra otwiera się na **podsumowaniu** (🏁 na osi rund): wyniki ostatniego tygodnia i końcowe
 miejsce w rankingu. Wcześniejsze rundy dalej obejrzysz strzałkami.
 

@@ -31,6 +31,13 @@ function skalaKarty(v, karta) {
   }).join("")}</div>`;
 }
 
+// U16: „Dlaczego mój wynik się zmienił?” – zdania z silnik/wyniki/wnioski.py: dlaczego (karta ostatniej i poprzedniej rundy)
+function dlaczegoHtml(v) {
+  if (!v.dlaczego?.length) return "";
+  return `<div class="komunikat"><b>Dlaczego wynik się zmienił? (runda ${v.runda - 1})</b> ${v.dlaczego.map(esc).join(" ")}
+    <a href="#" data-zakladka-k="karta_wynikow">Karta wyników</a></div>`;
+}
+
 // składniki kebabowe karty (gra z lokalami, silnik/wyniki/karta.py → kebab): wskaźnik, miernik, jak pokazać miarę
 const SKLADNIKI_KEBABU = [
   ["zadowolenie_klientow", "kolejki", "Klienci, którzy nie doczekali się obsługi", (m) => proc(m.kolejki)],
@@ -146,7 +153,7 @@ export const dashboard = {
     const pasek = alarm ? `<div class="komunikat zly">${esc(alarm.tekst)}
       <button class="btn jasny maly" data-akcja="popraw" data-z="bank">Przejdź do banku</button></div>` : "";
     const inwestor = v.inwestor && v.runda <= v.inwestor.do_rundy + 1 ? inwestorHtml(v) : "";   // U11: potem tylko w Banku
-    return `${pasek}${inwestor}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}${rozruchHtml(v)}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
+    return `${pasek}${inwestor}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}${rozruchHtml(v)}${dlaczegoHtml(v)}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
       ${kafel("Nazwa i logo firmy", "osoba", `<div class="srodek">${znakFirmy(m)}<b>${esc(m.nazwa)}</b>${m.slogan ? `<div class="maly-tekst">„${esc(m.slogan)}”</div>` : ""}</div>`)}
       ${kafel("Miejsce", "karta", d.miejsce ? `${d.miejsce} / ${d.liczba_firm}` : `<span class="maly-tekst">Ranking dostępny od rundy 3</span>`)}
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}
@@ -204,7 +211,7 @@ export const wnioski = {
     const rady = W.do_poprawy.map((r) => `<div class="kafel"><div class="kg">${esc(r.tytul)}</div><div class="kt">
       <p>${esc(r.co)}</p><p><b>Co zrobić:</b> ${esc(r.rada)}</p></div>
       <div class="kd"><a class="btn jasny maly" data-zakladka-k="${esc(r.zakladka)}">Przejdź: ${esc(tytulZakladki(r.zakladka))}</a></div></div>`).join("");
-    return `<div class="sekcja-tytul">Runda ${v.runda - 1}: co się udało</div><ul class="wnioski-dobre">${dobre}</ul>
+    return `${dlaczegoHtml(v)}<div class="sekcja-tytul">Runda ${v.runda - 1}: co się udało</div><ul class="wnioski-dobre">${dobre}</ul>
       <div class="sekcja-tytul">Co poprawić w rundzie ${v.runda}</div>
       ${rady ? `<div class="siatka">${rady}</div><p class="podpowiedz">Nie wszystko naraz – zacznijcie od pierwszej rady.
         Każda poprawka od razu działa w tej rundzie.</p>` : `<div class="komunikat">Nic nie wymaga poprawy – tak trzymać!</div>`}`;

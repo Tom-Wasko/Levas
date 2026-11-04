@@ -420,6 +420,11 @@ wnioski:   # gra z lokalami (Q13): zakładka „Wnioski z rundy” – od jakich
     pewnosc: zalozenie
     zrodlo: 'test gry 28.10: rada o prognozie popytu (Menu), gdy różni się od prawdziwego popytu dania o co najmniej
       tyle w górę albo w dół'
+  dlaczego_min:
+    wartosc: 0.05
+    pewnosc: zalozenie
+    zrodlo: 'U16 (4.11.2026): „Dlaczego mój wynik się zmienił?” – od takiej zmiany wyniku działalności między rundami
+      gra szuka przyczyny (mniejsza zmiana: jedno zdanie „prawie bez zmian”)'
   bledy_max:
     wartosc: 3
     pewnosc: zalozenie
