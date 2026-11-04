@@ -288,6 +288,21 @@ function skladDruzyny(v) {
     <p class="sklad">${sklad.map((o) => `<span class="osoba-druzyny"><span class="inicjaly">${inicjaly(o.nazwa)}</span>${esc(o.nazwa)}</span>`).join("")}</p>`;
 }
 
+// U17: refleksja drużyny przy wysyłaniu decyzji – widzi ją mistrz gry (panel i eksport CSV).
+// Szkic trzymany w pamięci strony, żeby odświeżenie zakładki (zapis kolegi z drużyny) go nie skasowało.
+let szkicRefleksji = null;
+document.addEventListener("input", (e) => { if (e.target.id === "refleksja") szkicRefleksji = e.target.value; });
+function refleksjaHtml(v) {
+  const tryb = v.gra.refleksja || "opcjonalna";
+  if (tryb === "wylaczona") return "";
+  if (v.wyslane || v.tylko_odczyt || v.prowadzenie?.pauza) {
+    return v.refleksja ? `<p class="podpowiedz">Wasza refleksja do tej rundy: „${esc(v.refleksja)}”</p>` : "";
+  }
+  return `<label class="pole" style="margin:14px 0">Co zmieniamy w tej rundzie i dlaczego? (1–2 zdania${tryb === "wymagana" ? ", wymagane" : ", nieobowiązkowe"})
+      <textarea id="refleksja" rows="3" maxlength="500" placeholder="Np. Obniżamy ceny, bo w zeszłym tygodniu sprzedaliśmy tylko połowę porcji.">${esc(szkicRefleksji ?? v.refleksja ?? "")}</textarea></label>
+    <p class="podpowiedz">Przeczyta to mistrz gry – przyda się przy omawianiu rundy. Na wynik gry nie wpływa.</p>`;
+}
+
 export const wyslij = {
   tytul: "Wyślij decyzje", ikona: "✉", odblokowanie: (v) => !v.gra.zakonczona,
   decyzje({ v }) {
@@ -302,16 +317,18 @@ export const wyslij = {
       return `<div class="komunikat">${v.tylko_odczyt ? "Podgląd mistrza gry – decyzje tej drużyny wysyłają uczniowie."
         : "Gra jest wstrzymana przez mistrza gry – decyzji nie można teraz zmieniać ani wysyłać."}</div>
         ${v.wyslane ? `<div class="komunikat ok">Decyzje wysłane${kto(v.druzyna?.autorzy?.wyslal, " przez")}.</div>` : ""}
-        ${termin}${skladDruzyny(v)}
+        ${refleksjaHtml(v)}${termin}${skladDruzyny(v)}
         ${ludzie.length > 1 ? `<div class="tabela-tytul">Drużyny</div><div class="tab-wrap"><table class="t">${stan}</table></div>` : ""}`;
     }
     return `${termin}${czerwone ? `<div class="komunikat zly">Na liście błędów jest ${czerwone} poważnych uwag. Możesz mimo to wysłać decyzje.</div>` : ""}
       ${v.wyslane
         ? `<div class="komunikat ok">Decyzje wysłane${kto(v.druzyna?.autorzy?.wyslal, " przez")}. Runda przeliczy się, gdy wszystkie drużyny wyślą decyzje.</div>
+           ${refleksjaHtml(v)}
            <button class="btn czarny" data-akcja="cofnij-wyslanie">Wróć do podejmowania decyzji w bieżącej rundzie</button>`
         : `<p>Po wysłaniu decyzji gra czeka, aż wszystkie drużyny wyślą swoje. Wtedy runda przelicza się automatycznie
            (boty decydują same).${(v.druzyna?.sklad || []).length > 1 ? " Decyzje wysyła jedna osoba za całą drużynę." : ""}</p>
            ${v.druzyna?.autorzy?.zapisal ? `<p class="podpowiedz">Ostatni zapis decyzji${kto(v.druzyna.autorzy.zapisal, ":")}.</p>` : ""}
+           ${refleksjaHtml(v)}
            <button class="btn zielony" data-akcja="wyslij">Wyślij decyzje</button>`}
       ${skladDruzyny(v)}
       ${ludzie.length > 1 ? `<div class="tabela-tytul">Drużyny</div><div class="tab-wrap"><table class="t">${stan}</table></div>` : ""}
@@ -323,7 +340,11 @@ export const wyslij = {
   },
   akcje: {
     wyslij: async (el, c) => {
-      const v = await c.api(`/api/gry/${GRA}/wyslij/${encodeURIComponent(FIRMA)}`, { method: "POST", body: JSON.stringify({ wyslane: true }) });
+      const pole = document.getElementById("refleksja");
+      if (pole && c.v.gra.refleksja === "wymagana" && !pole.value.trim()) { pole.focus(); return toast("Napiszcie najpierw 1–2 zdania: co zmieniacie w tej rundzie i dlaczego."); }
+      const v = await c.api(`/api/gry/${GRA}/wyslij/${encodeURIComponent(FIRMA)}`, { method: "POST",
+        body: JSON.stringify({ wyslane: true, ...(pole ? { refleksja: pole.value } : {}) }) });
+      szkicRefleksji = null;
       if (v.przeliczono) { toast(`Runda przeliczona – teraz ${v.miesiac} (runda ${v.runda}).`); c.ustaw(v); c.idz("dashboard"); }
       else c.ustaw(v);
     },

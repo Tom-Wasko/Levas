@@ -61,6 +61,9 @@ reklama, promocje, bank, podatki, czas właściciela, ubezpieczenia i handel.
 | 4 | Wysyłasz decyzje | **Wyślij decyzje** |
 | 5 | Czekasz, aż mistrz gry zamknie rundę | – |
 
+Przy wysyłaniu decyzji wpisujecie w 1–2 zdaniach, **co zmieniacie w tej rundzie i dlaczego**. Czyta to mistrz gry
+przy omawianiu rundy, a na wynik gry nie ma to wpływu. Mistrz gry może ustawić to pole jako wymagane albo je wyłączyć.
+
 Po przeliczeniu rundy ramka **Dlaczego wynik się zmienił?** (Dashboard i Wnioski z rundy) w 1–3 zdaniach mówi,
 który wskaźnik karty zmienił się najbardziej i która pozycja – np. zakup sprzętu albo czynsz – zaważyła na wyniku.
 

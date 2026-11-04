@@ -170,8 +170,10 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "konkurenci_stali": gra.konfiguracja.get("konkurenci_stali", []),
                  "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
                  "auto_zamowienia": bool(gra.konfiguracja.get("auto_zamowienia")),
+                 "refleksja": gra.tryb_refleksji,
                  "lokale": True,
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
+         "refleksja": gra.refleksje(runda).get(firma),   # U17: co drużyna napisała przy wysłaniu decyzji
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja, "koniec": koniec,
          "odblokowane": sorted(dane.odblokowane(runda)),
          "harmonogram": {x["klucz"]: x["tydzien"] for x in hm.widok(dane, runda)}}   # z lokalami: tydzień elementu
@@ -405,9 +407,9 @@ def tabela_wynikow(gra: Gra, co: str = "wyniki") -> tuple[list[str], list[list]]
             wynik = karta.get(n, {}).get("wynik_dzialalnosci")
             wiersze.append([r, gra.dane.skrot_rundy(r), n, boty.get(n, ""), k["przychody"], k["koszty"], k["dochod_netto"],
                             w["gotowka"], w["zadluzenie"], _pusty(_majatek_netto(w)),
-                            float(wynik) if wynik is not None else ""])
+                            float(wynik) if wynik is not None else "", gra.refleksje(r).get(n, "")])
     return (["runda", "tydzień", "firma", "bot", "przychody", "koszty", "dochód netto", "gotówka", "zadłużenie",
-             "majątek netto", "wynik działalności"], wiersze)
+             "majątek netto", "wynik działalności", "refleksja drużyny"], wiersze)
 
 
 def przeglad_mg(gra: Gra) -> dict:
@@ -452,12 +454,16 @@ def przeglad_mg(gra: Gra) -> dict:
                 "ziarno": konf["ziarno"], "kapital": gra.kapital_startowy,
                 "kredyt_odnawialny": konf.get("kredyt_odnawialny", "na_biezaco"),
                 "auto_zamowienia": bool(konf.get("auto_zamowienia")),
+                "refleksja": gra.tryb_refleksji,
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
                 "lokale": True,
                 "inwestor": inw.warunki(dane),   # warunki inwestora ratunkowego (Z3)
                 "brakujace": [] if gra.zakonczona else gra.brakujace(),
                 "kalendarz": kalendarz(dane, konf["liczba_rund"])},
         "firmy": firmy,
+        # U17: refleksje drużyn – od najnowszej rundy (bieżąca: tylko wysłane decyzje)
+        "refleksje": [{"runda": x, "firma": n, "tekst": t} for x in range(r, gra.runda_startowa - 1, -1)
+                      for n, t in sorted(gra.refleksje(x).items())],
         "historia": [{"runda": x, "skrot": dane.skrot_rundy(x),
                       "dochod": {n: w["kpir"]["dochod_netto"] for n, w in stan.wyniki[x].items()},
                       "gotowka": {n: w["gotowka"] for n, w in stan.wyniki[x].items()},

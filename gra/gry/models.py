@@ -28,6 +28,7 @@ class Runda(models.Model):
     przeliczona = models.BooleanField(default=False)
     wyslane = models.JSONField(default=list)  # firmy, które wysłały decyzje
     autorzy = models.JSONField(default=dict)  # {firma: {zapisal, wyslal, wersja}} – kto z drużyny
+    refleksje = models.JSONField(default=dict)  # U17: {firma: tekst} – refleksja drużyny
 
     class Meta:
         verbose_name_plural = "rundy"

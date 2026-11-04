@@ -20,6 +20,8 @@ from .ludzie.kandydaci import pula_startowa
 from .model import Firma, StanGry, firma_z_slownika
 
 WERSJA_SILNIKA = "1.2"  # 1.1: kwoty w groszach; 1.2: lokale na mapie miasta
+# U17: refleksja drużyny przy wysyłaniu decyzji („Co zmieniamy w tej rundzie i dlaczego?”) – bez wpływu na wynik
+REFLEKSJA = ("wylaczona", "opcjonalna", "wymagana")
 
 
 class Gra:
@@ -43,6 +45,7 @@ class Gra:
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "na_biezaco"),
                 "auto_zamowienia": bool(opcje.get("auto_zamowienia", False)),   # przycisk „Zamów brakujące” (MG)
+                "refleksja": _refleksja(opcje.get("refleksja") or "opcjonalna"),
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,
                 "lokale": True}   # lokale z mapy miasta (dane/mapa); zapisy bez tego klucza – stary tryb REVAS
         if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych
@@ -124,15 +127,35 @@ class Gra:
         """Decyzje firmy w bieżącej rundzie (wysłane albo robocze)."""
         return self.decyzje.get(self.runda, {}).get(firma, {})
 
-    def wyslij(self, firma: str, wyslane: bool = True) -> None:
-        """„Wyślij decyzje” (albo „Wróć do podejmowania decyzji”, gdy wyslane=False)."""
+    def wyslij(self, firma: str, wyslane: bool = True, refleksja: str | None = None) -> None:
+        """„Wyślij decyzje” (albo „Wróć do podejmowania decyzji”, gdy wyslane=False). `refleksja` – 1–2 zdania drużyny
+        dla mistrza gry (U17); przy opcji gry „wymagana” bez niej nie można wysłać decyzji."""
+        tekst = " ".join(str(refleksja or "").split())
+        if wyslane and not tekst and self.tryb_refleksji == "wymagana":
+            raise ValueError("Przed wysłaniem napiszcie w 1–2 zdaniach, co zmieniacie w tej rundzie i dlaczego.")
         d = self.decyzje.setdefault(self.runda, {})
+        if wyslane and refleksja is not None and self.tryb_refleksji != "wylaczona":
+            if tekst:
+                d.setdefault("_refleksje", {})[firma] = tekst
+            else:
+                d.get("_refleksje", {}).pop(firma, None)
         d.setdefault(firma, {})
         lista = d.setdefault("_wyslane", [])
         if wyslane and firma not in lista:
             lista.append(firma)
         elif not wyslane and firma in lista:
             lista.remove(firma)
+
+    @property
+    def tryb_refleksji(self) -> str:
+        return self.konfiguracja.get("refleksja", "opcjonalna")   # zapisy sprzed U17 – opcjonalna
+
+    def ustaw_refleksje(self, tryb: str) -> None:
+        self.konfiguracja["refleksja"] = _refleksja(tryb)
+
+    def refleksje(self, runda: int) -> dict[str, str]:
+        """Refleksje drużyn zapisane przy wysłaniu decyzji danej rundy ({firma: tekst})."""
+        return dict(self.decyzje.get(runda, {}).get("_refleksje", {}))
 
     def wyslane(self) -> list[str]:
         return list(self.decyzje.get(self.runda, {}).get("_wyslane", []))
@@ -211,3 +234,9 @@ class Gra:
 
     def kopia(self) -> Gra:
         return Gra(deepcopy(self.konfiguracja), deepcopy(self.decyzje), self.dane)
+
+
+def _refleksja(tryb: str) -> str:
+    if tryb not in REFLEKSJA:
+        raise ValueError(f"Refleksja drużyn: {', '.join(REFLEKSJA)}.")
+    return tryb

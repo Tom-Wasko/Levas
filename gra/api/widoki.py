@@ -163,6 +163,7 @@ def api_gry(request):
             ceny_dostawcow=d.get("ceny_dostawcow", "dane"),
             kredyt_odnawialny=d.get("kredyt_odnawialny", "na_biezaco"),
             auto_zamowienia=bool(d.get("auto_zamowienia")),
+            refleksja=d.get("refleksja") or "opcjonalna",
             kapital_startowy=kapital,
             poziomy=poziomy,
             odblokowanie=d.get("odblokowanie") or None,   # {element: tydzień} – zmiany harmonogramu
@@ -204,8 +205,15 @@ def api_prowadzenie(request, id_):
     """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]},
     {"poziom": {"firma", "poziom"}} (poziom bota), {"odblokowanie": {element: tydzień}}
     (harmonogram odblokowań gry z lokalami), {"auto_zamowienia": bool} (przycisk „Zamów brakujące”
-    w Dostawcach) albo {"inwestor": {"firma", "kwota"}} (inwestor ratunkowy, kwota 0 odwołuje)."""
+    w Dostawcach), {"refleksja": "wylaczona" | "opcjonalna" | "wymagana"} (U17)
+    albo {"inwestor": {"firma", "kwota"}} (inwestor ratunkowy, kwota 0 odwołuje)."""
     d = cialo(request)
+    if "refleksja" in d:
+        try:
+            with serwisy.zmiana(id_) as g:
+                g.ustaw_refleksje(d["refleksja"])
+        except ValueError as e:
+            raise BladZapytania(str(e)) from e
     if "inwestor" in d:
         firma, kwota = (d["inwestor"] or {}).get("firma"), (d["inwestor"] or {}).get("kwota")
         try:
@@ -460,15 +468,23 @@ def api_logo(request, id_, firma):
     return odpowiedz(_z_druzyna(request, widok(g, firma), id_, g, firma))
 
 
+MAKS_REFLEKSJI = 500   # U17: znaków refleksji drużyny (pole w „Wyślij decyzje” ma ten sam limit)
+
+
 @require_POST
 @api
 def api_wyslij(request, id_, firma):
-    wyslane = bool(cialo(request, wymagane=False).get("wyslane", True))
+    d = cialo(request, wymagane=False)
+    wyslane = bool(d.get("wyslane", True))
     przeliczono = False
     with serwisy.zmiana(id_) as g:
         sprawdz_firme(request, id_, g, firma)
         _moze_zmieniac(request, id_, firma)
-        g.wyslij(firma, wyslane)
+        try:
+            refleksja = d.get("refleksja")
+            g.wyslij(firma, wyslane, None if refleksja is None else str(refleksja)[:MAKS_REFLEKSJI])
+        except ValueError as e:
+            raise BladZapytania(str(e)) from e
         druzyny.autor(g, firma, request.user, wyslal=wyslane)
         if wyslane and not g.brakujace() and not g.zakonczona:
             g.przelicz()

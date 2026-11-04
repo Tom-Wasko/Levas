@@ -153,3 +153,29 @@ def test_alarm_debetu_i_inwestor_ratunkowy(client, gra):
     assert p["gra"]["inwestor"]["max_kwota"] >= 30000
     p = _ustaw(client, gra, inwestor={"firma": "Kebab Ali", "kwota": 0}).json()
     assert next(x for x in p["firmy"] if x["nazwa"] == "Kebab Ali")["inwestor_przyslany"] is None
+
+
+def test_refleksja_druzyny_przy_wysylaniu_decyzji(client, gra):
+    """U17: refleksja przy „Wyślij decyzje” – widzi ją mistrz gry (panel, CSV); opcja gry wymagana / wyłączona."""
+    url = f"/api/gry/{gra}/wyslij/Kebab Ali"
+    assert _mg(client, gra)["gra"]["refleksja"] == "opcjonalna"
+    v = client.post(url, {"wyslane": True, "refleksja": "  Obniżamy ceny,\n bo  sprzedaliśmy połowę. "}, content_type=JSON).json()
+    assert v["refleksja"] == "Obniżamy ceny, bo sprzedaliśmy połowę." and v["gra"]["refleksja"] == "opcjonalna"
+    assert _mg(client, gra)["refleksje"] == [{"runda": 1, "firma": "Kebab Ali", "tekst": "Obniżamy ceny, bo sprzedaliśmy połowę."}]
+    assert client.post(f"/api/gry/{gra}/wyslij/Pita Pan", {"wyslane": True}, content_type=JSON).json()["przeliczono"]
+    wiersze = client.get(f"/api/gry/{gra}/wyniki.csv").content.decode("utf-8").strip().split("\r\n")
+    assert wiersze[0].endswith(";refleksja drużyny")
+    assert any(w.startswith("1;") and "Kebab Ali" in w and w.endswith(";Obniżamy ceny, bo sprzedaliśmy połowę.") for w in wiersze)
+
+    assert _ustaw(client, gra, refleksja="zawsze").status_code == 400
+    assert _ustaw(client, gra, refleksja="wymagana").json()["gra"]["refleksja"] == "wymagana"
+    r = client.post(url, {"wyslane": True, "refleksja": "  "}, content_type=JSON)
+    assert r.status_code == 400 and "co zmieniacie" in r.json()["blad"]
+    assert client.post(url, {"wyslane": True, "refleksja": "x" * 900}, content_type=JSON).json()["refleksja"] == "x" * 500
+    _ustaw(client, gra, refleksja="wylaczona")
+    client.post(url, {"wyslane": False}, content_type=JSON)
+    v = client.post(url, {"wyslane": True, "refleksja": "nowa"}, content_type=JSON).json()
+    assert v["refleksja"] == "x" * 500   # wyłączona: tekstu nie zapisujemy (stary zostaje w historii)
+    nowa = client.post("/api/gry", {"nazwa": "B", "firmy": FIRMY, "refleksja": "wymagana"}, content_type=JSON).json()["id"]
+    assert _mg(client, nowa)["gra"]["refleksja"] == "wymagana"
+    assert client.post("/api/gry", {"nazwa": "C", "firmy": FIRMY, "refleksja": "?"}, content_type=JSON).status_code == 400

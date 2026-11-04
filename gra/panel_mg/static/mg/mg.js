@@ -84,6 +84,17 @@ function przyslijInwestora(nazwa) {
     <button class="btn pom" data-akcja="inwestor-tak" data-f="${esc(nazwa)}">Przyślij inwestora</button>` });
 }
 
+// U17: refleksja drużyn przy wysyłaniu decyzji (opcja gry) – tabela od najnowszej rundy, obok dochodu tej rundy
+const TRYB_REFLEKSJI = { opcjonalna: "nieobowiązkowa", wymagana: "wymagana", wylaczona: "wyłączona" };
+function refleksje() {
+  const { refleksje: R = [], historia } = S.p;
+  if (!R.length) return "";
+  const dochod = (x, n) => historia.find((h) => h.runda === x)?.dochod?.[n];
+  return tabela("Refleksje drużyn – co zmieniają i dlaczego", ["Runda", "Firma", "Refleksja", "Dochód netto rundy"],
+    R.map((x) => [x.runda, `<b>${esc(x.firma)}</b>`, esc(x.tekst), dochod(x.runda, x.firma) != null ? zl(dochod(x.runda, x.firma)) : "– (jeszcze nie przeliczona)"]),
+    { klasy: ["", "l", "l", ""] });
+}
+
 function decyzje() {
   const { gra, firmy, prowadzenie: P } = S.p;
   const druzyny = firmy.filter((f) => !f.bot);
@@ -101,12 +112,15 @@ function decyzje() {
     ["Kredyt odnawialny", gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "na niedobór na koniec rundy"],
     ["Ceny dostawców", gra.ceny_dostawcow === "losowe" ? "wszystkie generowane" : "z danych, dalej generowane"],
     ["Przycisk „Zamów brakujące” w Dostawcach", `${gra.auto_zamowienia ? "włączony" : "wyłączony"}${gra.zakonczona ? ""
-      : ` <a data-akcja="auto-zamowienia">${gra.auto_zamowienia ? "wyłącz" : "włącz"}</a>`}`]];
+      : ` <a data-akcja="auto-zamowienia">${gra.auto_zamowienia ? "wyłącz" : "włącz"}</a>`}`],
+    ["Refleksja drużyn przy wysyłaniu decyzji", `${TRYB_REFLEKSJI[gra.refleksja] || gra.refleksja}${gra.zakonczona ? ""
+      : ` <a data-akcja="refleksja">zmień</a>`}`]];
   const alarmy = gra.zakonczona ? [] : firmy.filter((f) => f.alarm > 0 && !f.inwestor_przyslany);
   const opisAlarmu = alarmy.length ? info(`<b>Alarm – debet ponad limit konta:</b> ${alarmy.map((f) => esc(f.nazwa)).join(", ")}.
     W tej rundzie nie mogą inwestować ani brać kredytów, leasingu i lokat. Drużynę bez inwestora możesz uratować – link „przyślij inwestora” przy gotówce.`) : "";
   return `${info(opis)}${opisAlarmu}
     ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", "Wynik (skum.)", "Miejsce", ""], wiersze, { klasy: ["l", "l"] })}
+    ${refleksje()}
     <div class="przyciski-mg">
       ${gra.zakonczona ? "" : `<button class="btn pom" data-akcja="zamknij" ${P.pauza ? "disabled" : ""}>Zamknij rundę ${gra.runda}</button>
         <button class="btn jasny" data-akcja="pauza">${P.pauza ? "Wznów grę" : "Wstrzymaj grę"}</button>`}
@@ -297,6 +311,13 @@ async function wykonaj(akcja, el) {
     const auto = !S.p.gra.auto_zamowienia;
     await api(`${URL_GRY}/prowadzenie`, "POST", { auto_zamowienia: auto });
     toast(auto ? "Drużyny mogą zamawiać brakujące składniki jednym przyciskiem." : "Przycisk „Zamów brakujące” wyłączony.");
+    return wczytaj();
+  }
+  if (akcja === "refleksja") {
+    const kolejne = { opcjonalna: "wymagana", wymagana: "wylaczona", wylaczona: "opcjonalna" };
+    const tryb = kolejne[S.p.gra.refleksja] || "opcjonalna";
+    await api(`${URL_GRY}/prowadzenie`, "POST", { refleksja: tryb });
+    toast(`Refleksja drużyn: ${TRYB_REFLEKSJI[tryb]}.`);
     return wczytaj();
   }
   if (akcja === "inwestor") return przyslijInwestora(el.dataset.f);
