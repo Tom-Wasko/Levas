@@ -522,33 +522,40 @@ wpis na dole.
 - Teksty: INSTRUKCJA rozdz. 6 i rada 4 w rozdz. 15, „i” w zakładkach Mapa i Klienci, podpowiedź karty.
 
 ## K – kontrola po U (4.11.2026, Claude Code, Opus 5.5)
-- Pomiary (limit autora: 10 min): `pomiary/k_trudnosc` – bot „jak człowiek” słaby / średni / dobry × 5 strategii ×
-  ziarna 1000–1009, 6 firm, 18 rund, rywale średni (150 gier); `pomiary/k_szybki` – `balans.warianty szybki`,
-  3 strategie × 3 ziarna (254 gry, 247 par, przerwany limitem – 7 par na wariant, wynik orientacyjny).
-- Trudność – porównanie z B5 na tych samych ziarnach 1000–1009 (50 trójek gier):
+- Pomiary: `pomiary/k_trudnosc` – bot „jak człowiek” słaby / średni / dobry × 5 strategii × ziarna 1000–1019,
+  6 firm, 18 rund, rywale średni (300 gier); `pomiary/k_szybki` – `balans.warianty szybki`, 3 strategie × 6 ziaren
+  (666 gier, 648 par, 18 par na wariant). Pierwsza wersja wpisu (10 min, 10 ziaren, 7 par) – dokończona tego
+  samego dnia bez limitu czasu; wnioski bez zmian kierunku.
+- Trudność – porównanie z B5 na tych samych ziarnach 1000–1019 (100 trójek gier):
 
   | miara | B5 | K (po U1–U24) | cel |
   |---|---|---|---|
-  | pierwszy plus średniej w rundach 4–6 | 33/50 (w 3: 17) | 29/50 (w 3: 21, w 2: 0) | 4–6 |
-  | alarmy wersji słabej | 3/50 (agresywny) | **0/50** | 0 |
-  | dobra > średnia (pary) | 47/50 | **34/50** | ≥ 80% |
-  | słaba < średnia (pary) | 46/50 | 42/50 | – |
-  | karta słaba / średnia / dobra | 0,01 / 0,26 / 0,38 | 0,11 / 0,36 / 0,36 | słaba może być na minusie |
-  | majątek netto średniej (tys. zł) | 96 | 103 | – |
+  | pierwszy plus średniej w rundach 4–6 | 65/100 (w 3: 35) | 51/100 (w 3: 48, w 2: 1) | 4–6 |
+  | alarmy wersji słabej | 8/100 (agresywny) | **0/100** | 0 |
+  | dobra > średnia (pary) | 92/100 | **74/100** | ≥ 80% |
+  | słaba < średnia (pary) | 89/100 | 89/100 | – |
+  | karta słaba / średnia / dobra | −0,01 / 0,23 / 0,34 | 0,09 / 0,32 / 0,35 | słaba może być na minusie |
+  | majątek netto średniej (tys. zł) | 93 | 99 | – |
 
-  Dobra > średnia wg strategii: agresywny 4/10, naśladowca 7/10, tani 7/10, premium 8/10, zrównoważony 8/10.
+  Dobra > średnia wg strategii: agresywny 13/20, naśladowca 15/20, tani 14/20, premium 15/20, zrównoważony 17/20
+  (B5: 20, 20, 17, 18, 17). Remisów brak (jedna para z różnicą < 0,005). Na 10 pierwszych ziarnach – 34/50 jak
+  w pierwszej wersji wpisu.
 - Wnioski:
-  - **Cel „dobra wyraźnie wygrywa” rozjechał się** (68% par wobec ≥ 80%). Średnia i słaba zyskały po U (karta
-    +0,10), dobra – nie. Najbardziej przy agresywnym. To nie liczby B5 (rozruch, pule), tylko poziom
-    `czlowiek_dobry` w `dane/boty.yaml` albo mechaniki U20/U24, które dobra wykorzystuje gorzej (np. drugi lokal
-    bez opinii). Propozycja i decyzja – u autora (hipoteza H24 w inwentarzu).
-  - Pierwszy plus lekko wcześniej (w 3. rundzie 21/50 wobec 17/50) – w granicach szumu 10 ziaren; nie proponuję
-    zmiany rozruchu.
+  - **Cel „dobra wyraźnie wygrywa” rozjechał się** (74% par wobec ≥ 80%). Średnia i słaba zyskały po U (karta
+    +0,09…+0,10), dobra – prawie nie (+0,01). Najbardziej przy agresywnym i naśladowcy. To nie liczby B5 (rozruch,
+    pule), tylko poziom `czlowiek_dobry` w `dane/boty.yaml` albo mechaniki U20/U24, które dobra wykorzystuje gorzej
+    (np. drugi lokal bez opinii). Propozycja i decyzja – u autora (hipoteza H24 w inwentarzu).
+  - **Pierwszy plus przesunął się na rundę 3** (48/100 wobec 35/100) – cel 4–6 spełniony w 51% gier. Po U
+    średnia szybciej wychodzi na plus (zatrudnianie od tygodnia 1 – U23, grupy klientów – U24). Do rozważenia
+    razem z poziomem dobrym (rozruch nowego lokalu, B5); bez zmiany do decyzji autora.
   - Alarmy wersji słabej zniknęły – cel spełniony.
-- Obszary (`k_szybki`, 7 par): bank i biuro bez zmian (mBank, e-Księgi24 najtańsze – H4, H5); higiena brak
-  katastrofą, HACCP lekko gorsza (H15); **umowa zlecenie +0,09 w 7/7 par** (H3, czeka na składki w B9);
-  **polisy komplet +0,02 w 6/7 par** – nowe, odwrotnie niż H14; jakość 3★ +0,08 (szum, 5/7); drugi lokal −0,31
-  (szum, 1/7) – odwrotnie niż H6 z B4. Nowe hipotezy H18–H28 w inwentarzu (H18–H25 z raportu A, H26–H28 z K).
+- Obszary (`k_szybki`, 18 par): bank i biuro bez zmian (mBank, e-Księgi24 najtańsze – H4, H5); higiena brak
+  katastrofą, HACCP lekko gorsza (H15); **umowa zlecenie +0,07 w 18/18 par** (H3, H27 – czeka na składki w B9);
+  **polisy komplet +0,01 w 78% par** – „lepszy”, odwrotnie niż H14 (H26); jakość 3★ +0,05 (67%, szum; przy
+  premium jakość 1–2 to −0,17…−0,19 – H28); **drugi lokal −0,23 (19% par, „gorszy”)** – odwrotnie niż H6 z B4
+  (H21); kampanie – brak −0,05 (gorszy, H25); **promocje – brak +0,13 w 6/6 par przy premium** (nowa H29);
+  cena 1,15 przy premium +0,05 w 6/6 par (szum przedziału, H18). Nowe hipotezy H18–H29 w inwentarzu (H18–H25
+  z raportu A, H26–H29 z K).
 - Do pełnego K zostaje decyzja autora o poziomie „dobrym” (poprawka liczb tylko za zgodą).
 - Decyzje autora po K (4.11.2026): (1) bot dobry – zdiagnozować parami i zaproponować zmiany poziomu
   `czlowiek_dobry` (tabela przed zmianą, zmiana po zgodzie); (2) pomiary B6–B15 **bez limitu czasu**, wiele
