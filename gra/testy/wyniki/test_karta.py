@@ -162,3 +162,15 @@ def test_odsetki_harpagona_obnizaja_karte():
     assert odsetki > 0
     dz = g.dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]
     assert w["karta"]["wynik_ekonomiczny"] == pytest.approx((w["kpir"]["dochod_netto"] - odsetki) / dz, abs=1e-3)
+
+
+def test_skala_wskaznikow_karty():
+    """U10: progi „średni” i „dobry” dla każdego wskaźnika karty (rosnące) – panel pokazuje słowo i kolor."""
+    from silnik.dane import dane_domyslne
+    g = _gra()
+    _runda(g, A=_lokal("centrum_3"), B=_lokal("dworzec_1"))
+    karta = g.przelicz(wymus=True).wyniki[2]["A"]["karta"]
+    for dane in (g.dane, dane_domyslne()):
+        skala = dane.z["karta_wynikow"]["skala"]
+        assert set(skala) <= set(karta) and len(skala) == 6
+        assert all(len(p) == 2 and p[0] < p[1] for p in skala.values())

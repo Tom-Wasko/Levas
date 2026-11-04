@@ -8,6 +8,29 @@ const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekono
 
 let skumulowana = false;
 
+// U10: co podnosi wskaźnik (INSTRUKCJA rozdz. 3) i ocena według progów z dane/zalozenia.yaml: karta_wynikow.skala
+const PODNOSI = {
+  wynik_dzialalnosci: "Iloczyn pozostałych – najpierw popraw najsłabszy składnik.",
+  wynik_ekonomiczny: "Sprzedawać więcej i z sensowną marżą, pilnować kosztów.",
+  zadowolenie_pracownikow: "Uczciwe pensje, dobry sprzęt, udogodnienia, szkolenia, bez przepracowania.",
+  zadowolenie_klientow: "Rozsądne ceny, dobra jakość, szersze menu, bez braków dań i kolejek.",
+  rozwoj_firmy: "Nowy sprzęt i wyposażenie, kupione lokale, kolejne lokale.",
+  wskaznik_zadluzenia: "Nie żyć na kredycie (zwłaszcza u Harpagona) dłużej, niż trzeba.",
+};
+function ocena(skala, k, x) {
+  const p = skala?.[k];
+  if (!p || x == null) return null;
+  return x >= p[1] ? ["dobry", "dobry"] : x >= p[0] ? ["sredni", "średni"] : ["niski", "niski"];
+}
+function skalaKarty(v, karta) {
+  if (!karta || !v.skala_karty) return "";
+  return `<div class="skala-karty">${WSKAZNIKI.map(([k, n]) => {
+    const o = ocena(v.skala_karty, k, karta[k]);
+    return `<div class="wsk ${o?.[0] || ""}" title="${esc(PODNOSI[k])}"><span class="maly-tekst">${n}</span><b>${wsk(karta[k])}</b>
+      ${o ? `<span class="ocena ${o[0]}">${o[1]}</span>` : ""}<div class="maly-tekst">${PODNOSI[k]}</div></div>`;
+  }).join("")}</div>`;
+}
+
 // składniki kebabowe karty (gra z lokalami, silnik/wyniki/karta.py → kebab): wskaźnik, miernik, jak pokazać miarę
 const SKLADNIKI_KEBABU = [
   ["zadowolenie_klientow", "kolejki", "Klienci, którzy nie doczekali się obsługi", (m) => proc(m.kolejki)],
@@ -194,15 +217,18 @@ export const karta_wynikow = {
     const karty = skumulowana ? v.karta_skumulowana : v.rynek.karta;
     const firmy = Object.keys(karty || {}).sort((a, b) => karty[b].wynik_dzialalnosci - karty[a].wynik_dzialalnosci);
     const wiersze = firmy.map((f) => [`${f === v.firma ? "<b>" : ""}${esc(nazwaFirmy(v, f))}${f === v.firma ? "</b>" : ""}`,
-      ...WSKAZNIKI.map(([k]) => wsk(karty[f][k]))]);
+      ...WSKAZNIKI.map(([k]) => `<span class="ocena-tekst ${ocena(v.skala_karty, k, karty[f][k])?.[0] || ""}">${wsk(karty[f][k])}</span>`)]);
     return `<div style="display:flex;gap:10px;justify-content:center">
         <button class="btn ${skumulowana ? "jasny" : "pom"}" data-akcja="karta-skum" data-s="0">Karta wyników</button>
         <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.odblokowane.includes("karta_skumulowana") ? "" : "disabled"}>Skumulowana karta wyników</button></div>
+      ${karty?.[v.firma] ? `<div class="sekcja-tytul">${skumulowana ? "Twoja skumulowana karta" : "Twoja karta"} – niski, średni czy dobry?</div>
+        ${skalaKarty(v, karty[v.firma])}` : ""}
       ${tabela("Ranking zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n)], wiersze, { klasy: ["l"] })}
       ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>
       <div class="wykres"><canvas id="w-historia"></canvas></div>
-      <p class="podpowiedz">Wynik działalności = iloczyn pozostałych wskaźników; przy stracie ujemny, proporcjonalny do straty. Wynik ekonomiczny = (dochód netto rundy − odsetki Harpagona) / ${zl(v.dzielnik_karty)}.
+      <p class="podpowiedz">Ocena „niski / średni / dobry” porównuje wskaźnik z typowymi wynikami firm w grze
+      (dolna i górna ćwiartka). Wynik działalności = iloczyn pozostałych wskaźników; przy stracie ujemny, proporcjonalny do straty. Wynik ekonomiczny = (dochód netto rundy − odsetki Harpagona) / ${zl(v.dzielnik_karty)}.
       Zadowolenie i rozwój liczone są ze skalibrowanych wzorów (dane/zalozenia.yaml) – mogą odbiegać od prawdziwej gry.</p>`;
   },
   po({ v }) {

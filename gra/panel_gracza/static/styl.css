@@ -398,3 +398,16 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
   .kal-siatka .kal-etykieta { font-size: 0; padding: 0; height: 6px; border-left-width: 0; }
   .kal-siatka th:first-child { width: 44px; }
 }
+
+/* U10: skala przy wskaźnikach karty wyników */
+.skala-karty { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 8px 0 16px; }
+.skala-karty .wsk { background: var(--karta); border-radius: var(--r); box-shadow: var(--cien); padding: 10px 12px;
+  border-top: 4px solid var(--linia); }
+.skala-karty .wsk.niski { border-top-color: var(--czerwony); }
+.skala-karty .wsk.sredni { border-top-color: var(--zolty); }
+.skala-karty .wsk.dobry { border-top-color: var(--zielony); }
+.skala-karty .wsk b { display: block; font-size: 20px; margin: 2px 0; }
+.ocena { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.ocena.niski, .ocena-tekst.niski { color: var(--czerwony); }
+.ocena.sredni, .ocena-tekst.sredni { color: #a86a00; }
+.ocena.dobry, .ocena-tekst.dobry { color: var(--zielony); }

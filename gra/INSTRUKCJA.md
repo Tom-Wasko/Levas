@@ -88,6 +88,8 @@ układa ranking i Dashboard pokazuje Twoje miejsce. Wynik działalności jednego
 
 Iloczyn działa bezlitośnie: słaby jeden składnik ciągnie w dół wszystkie pozostałe. Lepiej być dobrym we
 wszystkim niż genialnym w jednym.
+Zakładka Karta wyników przy każdym Twoim wskaźniku pisze **niski / średni / dobry** (kolorem) – w porównaniu
+z typowymi wynikami firm w grze – i podpowiada, co go podnosi.
 
 **Tydzień ze stratą daje wynik ujemny** – tym niższy, im większa strata (proporcjonalnie do wyniku ekonomicznego,
 bez mnożenia przez pozostałe składniki). Mała strata na rozruchu kosztuje mało, duża – dużo.

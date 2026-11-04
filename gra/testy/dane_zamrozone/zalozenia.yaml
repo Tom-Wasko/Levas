@@ -237,6 +237,17 @@ karta_wynikow:
     wartosc: 4615
     pewnosc: zalozenie
     zrodlo: 'F2.7: 20 000 z Revasa (ATH r3–r9, dochód miesięczny) × 12/52 – ta sama skala dla dochodu tygodniowego'
+  skala:
+    wartosc:   # [od „średni”, od „dobry”] – słowo i kolor przy wskaźniku w zakładce Karta wyników
+      wynik_dzialalnosci: [0.1, 0.7]
+      wynik_ekonomiczny: [0.15, 1.1]
+      zadowolenie_pracownikow: [0.9, 0.98]
+      zadowolenie_klientow: [1.0, 1.1]
+      rozwoj_firmy: [0.56, 0.67]
+      wskaznik_zadluzenia: [0.6, 0.9]
+    pewnosc: zalozenie
+    zrodlo: 'U10 (4.11.2026): ok. 25. i 75. percentyl kart botów (9 strategii × poziomy łatwy/średni/trudny × ziarna 7, 11,
+      rundy 3–14); zadłużenie: boty go nie mają – progi z Revasa (Fruukulele z kredytem 0,2–0,6)'
   strata:
     wartosc:
       waga: 1.0
