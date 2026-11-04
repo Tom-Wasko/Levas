@@ -585,3 +585,77 @@ wpis na dole.
   `czlowiek_dobry` (tabela przed zmianą, zmiana po zgodzie); (2) pomiary B6–B15 **bez limitu czasu**, wiele
   pomiarów naraz; (3) przewaga premium – w B7 razem z ceną (H18, H28); (4) U20 i U24 – propozycje tekstów do
   `notatki_do_zmiany.md`, wpis do `notatki/` po zgodzie.
+
+## B6 – lokale (4.11.2026, Claude Code, Opus 5.5) – w toku, gałąź `kalibracja-b6`
+
+Cała praca B6–B15 na gałęzi `kalibracja-b6` (decyzja autora: bez merge do main bez zgody, bez FTP).
+Pomiary `balans.warianty pelny`, 3 strategie (zrównoważony, tani, premium) × 18 i 26 rund × 6 firm, poziom średni,
+badana firma w strefie z listy; Δ – wariant − baza na tych samych grach (para: kontekst + ziarno).
+
+**Krok 0 i poprawki botów (commity na gałęzi):**
+- c7f80e3, f283986 – boty mogą wziąć każdą opcję lokalu (kupno na kredyt pod zastaw, niewyposażony, działka,
+  przebicie w licytacji), sprzęt w leasingu, wykup własnego lokalu i kupno budynku rywala z wypowiedzeniem.
+- 36816c6 – bot z kilkoma lokalami zamawia towar z zapasów każdego lokalu (wcześniej z całej firmy: w jednym
+  lokalu brak towaru, w drugim się psuł).
+- a06b562 – bot kupuje szafę chłodniczą i zamrażarkę do lokalu bez nich (lokal bez zestawu nie miał gdzie trzymać
+  towaru); działka: koszt budowy w decyzji i w zastawie kredytu (decyzja autora: zastaw liczy budynek).
+- 6401d33 – dopłata do kupna lokalu kredytem bez historii (działka: kredyt pod zastaw nie pokrywał wejścia
+  z budową); rezerwa 30 tys. dla wariantów bez zestawu; wariant `lokale:niewyposazony_q3`.
+- 8655353 – bot planujący finansuje sprzęt ponad gotówkę kredytem bez historii (`rezerwa_po_sprzecie`
+  10 000 zł): wcześniej przy lokalu bez zestawu kupował cały sprzęt gotówką, wpadał w debet ponad limit i bank
+  blokował mu inwestycje na kilka rund. W grach z gotowym lokalem żadnego kredytu – baza bez zmian.
+
+**Wyniki dotąd** (Δ karty, wygrane pary):
+
+| wariant | pomiar (kod) | 18 rund | 26 rund | razem |
+|---|---|---|---|---|
+| niewyposażony w najmie | `b6_typy` (przed chłodnią) | – | – | −0,68 (1/600) |
+| niewyposażony w najmie | `b6_typy_po` (a06b562) | −0,08 | −0,03 | −0,05 (230/600) |
+| niewyposażony, sprzęt w leasingu | `b6_typy_po` | −0,05 | −0,05 | −0,05 (217/600) |
+| kupno gotowego (6 stref peryferyjnych) | `b6_typy_po`, niepełny (6401d33) | −0,06 | −0,09 | −0,07 (64/114) |
+| kupno niewyposażonego | `b6_typy_po`, niepełny (6401d33) | −0,27 | −0,22 | −0,24 (16/114) |
+
+`b6_drugi_po` (4/6/8 firm, 12/18/26 rund, 5 strategii; kod przed 6401d33) – drugi lokal (H21):
+
+| wariant | 12 rund | 18 rund | 26 rund | razem |
+|---|---|---|---|---|
+| drugi gotowy w najmie | +0,04 | +0,11 | **+0,23** | +0,13 (211/450) |
+| drugi gotowy na kupno | +0,03 | +0,09 | +0,20 | +0,11 (219/450) |
+| drugi niewyposażony | −0,07 | −0,15 | −0,13 | −0,12 (27/450) |
+
+- Drugi lokal **już się opłaca** i tym bardziej, im dłuższa gra (cel H21) – po zamówieniach z zapasów lokalu.
+- Niewyposażony: z −0,68 do −0,05 po chłodni i zamrażarce. Wariant 3★ (niewyposażony z własnym lepszym sprzętem
+  – kompromis z inwentarza) przegrywał z gotowym 3★ o 0,22 (niepełny pomiar, 141 par) przez debet przy zakupie
+  sprzętu – stąd 8655353; pomiar na nowym kodzie w toku.
+
+**`b6_niewyp2`** (kod 8655353, 10 stref × 3 strategie × 18/26 rund × 6 ziaren, 1800 gier, ok. 25 min):
+
+| wariant − baza | 18 rund | 26 rund | razem |
+|---|---|---|---|
+| niewyposażony w najmie | −0,16 | −0,09 | −0,12 (100/360) |
+| niewyposażony, sprzęt w leasingu | −0,06 | −0,07 | −0,06 (125/360) |
+| gotowy, jakość 3★ (`jakosc:3`) | +0,05 | +0,06 | +0,06 (172/360) |
+| niewyposażony 3★ | −0,21 | −0,08 | −0,15 (99/360) |
+| **niewyposażony 3★ − gotowy 3★** | −0,26 | −0,15 | **−0,20 (59/360)** |
+
+- Strefy (niewyposażony 3★ − gotowy 3★): wygrywa tylko lsm_czuby (+0,08, 19/36); zemborzyce −0,09, czechow
+  −0,14, centrum −0,18 … zygmuntowskie −0,50.
+- **Poprawka 8655353 nie pomaga w karcie:** na tych samych ziarnach (1000–1005) niewyposażony 1★ − baza
+  z −0,067 (`b6_typy_po`, przed nią) do −0,124. Debetu i blokady inwestycji już nie ma, ale kredyt bez historii
+  (11,9%, do 50 tys.) kosztuje odsetki i obniża wskaźnik zadłużenia, który mnoży kartę. Leasing (−0,06) wypada
+  lepiej niż kredyt.
+- Wniosek: przy obecnych liczbach niewyposażony nie ma szans – cały sprzęt naraz (1★ ok. 11 tys., 3★ ok. 31 tys.
+  zł, pozycje < 10 tys. od razu w koszty) wobec oszczędności czynszu i mediów ok. 90–220 zł na rundę.
+  Kompromis z inwentarza (niewyposażony wygrywa przy własnym lepszym sprzęcie) nie działa.
+
+**Następne kroki (sesja przerwana 4.11 ok. 22:20 – wyłączenie komputera):**
+1. Bot: zamiast kredytu bez historii na sprzęt – leasing albo zakup sprzętu w ratach rund (porównać na tych samych
+   ziarnach z 8655353 i z kodem sprzed niego); ewentualnie cofnąć 8655353, jeśli nic nie wypada lepiej.
+2. Propozycja liczb dla autora (`dane/mapa/lokale.yaml`, po sprawdzeniu realizmu): wyraźnie niższy czynsz
+   niewyposażonego (oszczędność rzędu kosztu sprzętu w 10–15 rundach) albo niższa adaptacja – zgoda autora,
+   bo to balans typów lokali.
+3. Pomiary jeszcze niezrobione na nowym kodzie: `b6_kupno2` (kupno, kupno niewyposażonego, działka – 6 stref
+   peryferyjnych), `b6_przejecia`, `b6_drugi_po2` (drugi niewyposażony, drugi na działce); polecenia jak
+   `b6_niewyp2` (6 ziaren, 3 procesy, jeden pomiar naraz – przy 8 procesach zabrakło pamięci).
+4. Potem: tabela strefa × wariant (każda strefa najlepsza dla jakiejś strategii), kupno od połowy gry 18 rund,
+   działka tylko w 26 rundach, licytacja, inwentarz (opis botów w sekcji `lokal`), odhaczenie B6 w POSTEP.
