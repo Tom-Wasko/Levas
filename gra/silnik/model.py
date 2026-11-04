@@ -62,6 +62,7 @@ class Odejscie(Model):
     pensja_gr: int
     umowa: str = "prace"
     od_rundy: int                 # runda przyjęcia oferty
+    powod: str = ""               # "niezadowolenie" – wypowiedzenie złożone przez osobę (U20)
 
     pensja = _kwota("pensja")
 
@@ -82,6 +83,12 @@ class Pracownik(Model):
     stanowisko: int = 0           # numer stanowiska (od 1) w grupie: instruktor/trener albo recepcja
     premia_gr: int = 0            # premia w bieżącej rundzie
     odchodzi: Odejscie | None = None   # gra z lokalami: okres wypowiedzenia po przyjęciu oferty innej firmy
+    cecha: str = ""               # U20: ukryta cecha (dane/kandydaci.yaml: cechy) – nie trafia do panelu gracza
+    opis: str = ""                # U20: żartobliwy opis, z którego gracz zgaduje cechę
+    wydajnosc: float = 1.0        # U20: mnożnik godzin pracy z cechy (ukryty)
+    zadowolenie: float | None = None   # U20: zadowolenie osoby po ostatniej rundzie
+    niezadowolony: int = 0        # U20: tygodnie z rzędu poniżej progu zadowolenia
+    wykorzystanie: float = 0.0    # U20: wykorzystanie godzin w ostatniej rundzie (do ostrzeżeń)
 
     pensja_preferowana = _kwota("pensja_preferowana")
     koszt_rekrutacji = _kwota("koszt_rekrutacji")
@@ -440,7 +447,8 @@ class Firma(Model):
     def godziny_stanowiska(self, s: Stanowisko, godziny_pracownika: float) -> float:
         """Godziny pracy na stanowisku w rundzie: etat pracownika albo godziny właściciela (0 – nieobsadzone)."""
         if s.pracownik:
-            return godziny_pracownika if s.pracownik in self.pracownicy else 0.0
+            p = self.pracownicy.get(s.pracownik)
+            return godziny_pracownika * p.wydajnosc if p else 0.0
         w = self.wlasciciel_na
         return min(godziny_pracownika, w.godziny) if w and (w.typ, w.nr) == (s.typ, s.nr) else 0.0
 

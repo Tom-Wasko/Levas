@@ -198,6 +198,81 @@ agencja:
   wypowiedzenie:
   - staz_od: 0       # jedna długość dla wszystkich (P6): 2 rundy, w obie strony (zwolnienie i odejście)
     rund: 2
+cechy:   # U20 (decyzja autora 4.11.2026): ukryta cecha każdej osoby – gracz zgaduje ją z żartobliwego opisu (kółko „i”)
+  zrodlo: 'U20: cechy i opisy – założenie (raporty/projekt_U20_dynamika_pracownikow.md). Mnożniki działają na składniki
+    zadowolenia osoby (silnik/ludzie/zadowolenie.py): placa – waga pensji, warunki – sprzęt i udogodnienia, przeciazenie
+    – kara za przepracowanie, odejscie – szansa wypowiedzenia; zadowolenie – stałe przesunięcie; wydajnosc – mnożnik
+    godzin pracy na stanowisku. Losowanie wg wag, opis – jeden z listy'
+  lista:
+    zwyczajny:
+      waga: 4
+      opisy:
+      - Przychodzi, pracuje, wychodzi. Bez niespodzianek.
+      - W CV w rubryce „zainteresowania” wpisane po prostu „tak”.
+      - Lubi kawę z mlekiem i spokojne poniedziałki.
+    lojalny:
+      waga: 1
+      odejscie: 0.3
+      opisy:
+      - Do dziś pije z kubka z logo pierwszej pracy. Kubek ma więcej lat stażu niż niejeden kierownik.
+      - Na święta wysyła kartki wszystkim byłym szefom. Lista jest krótka.
+      - Uważa, że zmiana pracy to jak zmiana klubu piłkarskiego – po prostu nie wypada.
+    niespokojny_duch:
+      waga: 1
+      odejscie: 2.0
+      opisy:
+      - W CV więcej pracodawców niż lat doświadczenia.
+      - Walizka zawsze spakowana. Tak na wszelki wypadek.
+      - Na rozmowie kwalifikacyjnej pyta, ile trwa okres wypowiedzenia.
+    materialista:
+      waga: 1
+      placa: 2.0
+      opisy:
+      - Każdą rozmowę zaczyna od stawki. Rozmowę o pogodzie też.
+      - Ma w telefonie arkusz ze stawkami wszystkich lokali w mieście. Aktualizowany codziennie.
+      - Liczy szybciej niż kalkulator, zwłaszcza nadgodziny.
+    wygodnicki:
+      waga: 1
+      warunki: 2.5
+      opisy:
+      - Pierwsze pytanie na rozmowie – jakie macie krzesła na zapleczu?
+      - Lokale ocenia po ekspresie do kawy. Jak dotąd żaden nie dostał pięciu gwiazdek.
+      - Tępym nożem kroić nie będzie. Na chwiejnym taborecie siedzieć też nie.
+    pracoholik:
+      waga: 1
+      przeciazenie: 0
+      opisy:
+      - Ostatni urlop – w 2019. Przez pomyłkę.
+      - Gdy nie ma ruchu, myje okap. Trzeci raz tego dnia.
+      - Słowo „fajrant” zna tylko ze słyszenia.
+    szybki:
+      waga: 1
+      wydajnosc: 1.1
+      opisy:
+      - Kroi cebulę szybciej, niż zdąży się rozpłakać.
+      - Robi dwie rzeczy naraz. W dobre dni trzy.
+      - Mówi szybko, chodzi szybko, je szybko. Pracuje zresztą też.
+    niespieszny:
+      waga: 1
+      wydajnosc: 0.9
+      opisy:
+      - Nigdzie się nie spieszy. Zwłaszcza w godzinach szczytu.
+      - Rano potrzebuje dwóch kaw, żeby się rozkręcić. Koło południa – trzeciej.
+      - Uważa, że dobra robota wymaga czasu. Dużo czasu.
+    pogodny:
+      waga: 1
+      zadowolenie: 0.04
+      opisy:
+      - Uśmiecha się nawet w poniedziałek o szóstej rano.
+      - Szklanka zawsze do połowy pełna. Najczęściej kompotu.
+      - Nuci przy pracy. Klienci podobno zaczęli nucić razem.
+    maruda:
+      waga: 1
+      zadowolenie: -0.04
+      opisy:
+      - Narzeka na pogodę. Każdą.
+      - Zawsze znajdzie coś, co mogłoby być lepiej. Zwykle dwie rzeczy.
+      - Na pytanie „jak leci?” odpowiada dłużej, niż trwa przerwa.
 imiona_kobiet:
 - Anna
 - Katarzyna

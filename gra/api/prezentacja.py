@@ -171,8 +171,8 @@ PODPOWIEDZI = (
       "Zamów tyle, ile sprzedasz do następnej dostawy.", "dostawcy")),
     (("Czytaj kalendarz miejski", "Sesja, mecz, jarmark – zaplanuj obsadę i zamówienia, zanim tydzień "
       "się zacznie.", "kalendarz"),
-     ("Dbaj o ludzi", "Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć. Sprawdź pensje "
-      "i warunki pracy załogi.", "zatrudnienie"),
+     ("Dbaj o ludzi", "Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć. Lista błędów ostrzega "
+      "tydzień wcześniej – sprawdź pensje, sprzęt i przepracowanie.", "zatrudnienie"),
      ("Nie bierz od Harpagona", "Szybka pożyczka kosztuje dużo więcej, niż pożyczasz. Gdy brakuje gotówki, "
       "sprawdź najpierw kredyt w banku.", "bank")),
 )

@@ -2,10 +2,17 @@
 import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast,
   wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
+import { kolko } from "./dymki.js";
 import { idWybranego, nazwaLokalu, stanowiskaLokalu } from "./lokal_wybor.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const UMOWY = { prace: "Umowa o pracę", zlecenie: "Umowa zlecenie" };
+const NIEZADOWOLENIE = "niezadowolenie";   // silnik/ludzie/zadowolenie.py: powód wypowiedzenia (U20)
+
+// U20: krótki żartobliwy opis osoby pod „i” – z niego gracz zgaduje ukrytą cechę
+const opisOsoby = (o) => kolko(esc(o.opis || ""));
+const zadowolenieOsoby = (p) => p.zadowolenie == null ? "–"
+  : `<span class="${p.niezadowolony ? "minus" : ""}">${licz(p.zadowolenie, 2)}</span>`;
 
 function kosztWynagrodzen(v, kat) {
   return v.stan.pracownicy.reduce((s, p) => s + (p.pensja + (p.premia || 0)) * (p.umowa === "prace" ? 1 + kat.parametry.zus : 1), 0);
@@ -29,8 +36,9 @@ export const zatrudnienie = {
           <button class="btn jasny" data-akcja="kandydaci" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Zatrudnij pracownika →</button>
           ${v.lokale ? `<button class="btn jasny maly" style="margin-top:6px" data-akcja="wlasciciel" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Stań sam (właściciel)</button>` : ""}</div></div>`;
         const nowy = p.od_rundy === v.runda;
-        const wyp = p.odchodzi ? `<span class="pigulka">wypowiedzenie do r. ${p.odchodzi.runda}</span>` : "";
-        return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}${wyp}</div>
+        const wyp = p.odchodzi ? `<span class="pigulka${p.odchodzi.powod === NIEZADOWOLENIE ? " nie" : ""}">wypowiedzenie do r. ${p.odchodzi.runda}</span>`
+          : p.niezadowolony ? '<span class="pigulka nie">niezadowolony</span>' : "";
+        return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}${wyp}${opisOsoby(p)}</div>
           <div class="kt srodek" data-akcja="profil" data-id="${esc(p.id)}" style="cursor:pointer"><div class="awatar">${inicjaly(p.imie_nazwisko)}</div>
           <b>${esc(p.imie_nazwisko)}</b><br><span class="podpowiedz">${esc(p.zawod)} · ${UMOWY[p.umowa]}</span><br>${gw(p.gwiazdki)}<br>
           <b class="akcent">${zl(p.pensja)}</b>${p.premia ? `<br><span class="podpowiedz">premia ${zl(p.premia)}</span>` : ""}</div></div>`;
@@ -49,14 +57,18 @@ export const zatrudnienie = {
     })]);
     const wyk = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...ZAWODY.map((z) => proc(r.wykorzystanie[f][z]))]);
     const pensje = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...ZAWODY.map((z) => r.wynagrodzenia[f][z] ? zl(r.wynagrodzenia[f][z]) : "–")]);
-    const moi = (v.wyniki?.pracownicy || []).map((p) => [esc(p.imie_nazwisko), esc(p.zawod), gw(p.gwiazdki), `nr ${p.stanowisko}`, proc(p.wykorzystanie), zl(p.pensja)]);
+    const moi = (v.wyniki?.pracownicy || []).map((p) => [esc(p.imie_nazwisko), esc(p.zawod), gw(p.gwiazdki), `nr ${p.stanowisko}`, proc(p.wykorzystanie),
+      zl(p.pensja), zadowolenieOsoby(p) + (p.powody?.length ? `<br><span class="podpowiedz">${p.powody.map(esc).join(", ")}</span>` : "")]);
     const wl = v.wyniki?.wlasciciel_stanowisko;
     if (wl?.przyjete) moi.push([`<b>Właściciel</b> <span class="podpowiedz">(${licz(wl.godziny, 1)} h)</span>`, esc(kat.oferty.stanowiska.typy[wl.typ]?.kto || wl.typ),
-      gw(1), `nr ${wl.nr}`, proc(wl.wykorzystanie || 0), "bez pensji"]);
+      gw(1), `nr ${wl.nr}`, proc(wl.wykorzystanie || 0), "bez pensji", "–"]);
+    const odejscia = (v.wyniki?.odejscia_pracownikow || []).map((o) => [esc(o.imie_nazwisko), licz(o.zadowolenie, 2), o.powody.map(esc).join(", "),
+      `runda ${o.runda_odejscia}`]);
     return tabela("Liczba pracowników", ["Zespół", ...ZAWODY], liczba, { klasy: ["l"] })
       + tabela("Wykorzystanie czasu pracowników", ["Zespół", ...ZAWODY], wyk, { klasy: ["l"] })
       + tabela("Średnie wynagrodzenie pracowników", ["Zespół", ...ZAWODY], pensje, { klasy: ["l"] })
-      + tabela("Twoi pracownicy", ["Pracownik", "Zawód", "Doświadczenie", "Stanowisko", "Wykorzystanie czasu", "Wynagrodzenie"], moi, { klasy: ["l"] })
+      + tabela("Twoi pracownicy", ["Pracownik", "Zawód", "Doświadczenie", "Stanowisko", "Wykorzystanie czasu", "Wynagrodzenie", "Zadowolenie"], moi, { klasy: ["l"] })
+      + (odejscia.length ? tabela("Wypowiedzenia z niezadowolenia", ["Pracownik", "Zadowolenie", "Powody", "Odchodzi"], odejscia, { klasy: ["l"] }) : "")
       + `<p class="podpowiedz">Wykorzystanie 100% oznacza, że pracownik nie miał czasu na kolejnych klientów (możliwa utracona sprzedaż).</p>`;
   },
   akcje: {
@@ -144,7 +156,7 @@ function oknoWlasciciela({ v }, typ, nr) {
 function oknoKandydatow({ v, kat }, typ, nr) {
   const typy = kat.oferty.stanowiska.typy, zawody = typy[typ].zawody;
   const lista = v.kandydaci.filter((k) => zawody.includes(k.zawod)).sort((a, b) => b.zadowolenie_klientow - a.zadowolenie_klientow);
-  const w = lista.map((k) => [esc(k.imie_nazwisko), gw(k.gwiazdki), esc(k.zawod), licz(k.pensja_preferowana), licz(k.koszt_rekrutacji),
+  const w = lista.map((k) => [esc(k.imie_nazwisko) + opisOsoby(k), gw(k.gwiazdki), esc(k.zawod), licz(k.pensja_preferowana), licz(k.koszt_rekrutacji),
     licz(k.koszt_odprawy), proc(k.zadowolenie_klientow, 0), proc(k.ryzyko_reklamacji, 0),
     `<button class="btn pom maly" data-akcja="zatrudnij" data-k="${esc(k.id)}" data-t="${typ}" data-n="${nr}">Zatrudnij +</button>`]);
   okno(`Zatrudnienie na „Stanowisko nr ${nr}”`, tabela(null, ["Imię i nazwisko", "Doświadczenie", "Zawód", "Preferowane wynagrodzenie",
@@ -183,13 +195,17 @@ function oknoProfilu({ v, kat, edycja }, id) {
   const pole = (etykieta, html) => `<label class="pole">${etykieta}${html}</label>`;
   okno("Profil pracownika", `<div class="dwie"><div class="srodek"><div class="awatar">${inicjaly(p.imie_nazwisko)}</div>${gw(p.gwiazdki)}
       <h3 style="margin:6px 0">${esc(p.imie_nazwisko)}</h3><div class="podpowiedz">${esc(p.zawod)}</div>
+      ${p.opis ? `<div class="podpowiedz" style="margin-top:6px"><i>„${esc(p.opis)}”</i></div>` : ""}
       <div style="margin-top:14px;text-align:left">
       <div class="wiersz"><span>Preferowane wynagrodzenie</span><span>${zl(p.pensja_preferowana)}</span></div>
       <div class="wiersz"><span>Koszty rekrutacji</span><span>${zl(p.koszt_rekrutacji)}</span></div>
       <div class="wiersz"><span>Koszt odprawy</span><span>${zl(p.koszt_odprawy)}</span></div>
       <div class="wiersz"><span>Zatrudniony od</span><span>runda ${p.od_rundy}</span></div>
       <div class="wiersz"><span>Ryzyko reklamacji</span><span>${proc(p.ryzyko_reklamacji, 0)}</span></div>
-      <div class="wiersz"><span>Zadowolenie klientów</span><span>${proc(p.zadowolenie_klientow, 0)}</span></div></div></div>
+      <div class="wiersz"><span>Zadowolenie klientów</span><span>${proc(p.zadowolenie_klientow, 0)}</span></div>
+      <div class="wiersz"><span>Zadowolenie z pracy (ostatni tydzień)</span><span>${zadowolenieOsoby(p)}</span></div></div>
+      ${p.niezadowolony && !p.odchodzi ? `<p class="minus" style="text-align:left">Niezadowolony od ${p.niezadowolony} tyg. – szczegóły na liście błędów.
+        Pomaga podwyżka, lepszy sprzęt albo odciążenie.</p>` : ""}</div>
     <div style="display:flex;flex-direction:column;gap:12px">
       ${pole("Aktualne wynagrodzenie brutto", `<input type="number" id="p-pensja" step="10" value="${p.pensja}" ${edycja ? "" : "disabled"}>`)}
       ${nowy ? "" : pole("Premia (jednorazowo w tej rundzie)", `<input type="number" id="p-premia" step="50" value="${p.premia || 0}" ${edycja ? "" : "disabled"}>`)}
@@ -197,7 +213,7 @@ function oknoProfilu({ v, kat, edycja }, id) {
       ${(v.decyzje.zwolnij || []).includes(id)
     ? `<button class="btn jasny" data-akcja="cofnij-zwolnienie" data-id="${esc(id)}" ${edycja ? "" : "disabled"}>Cofnij zwolnienie</button>
        <span class="podpowiedz">${p.umowa === "prace" ? "Umowa o pracę: przez 2 rundy wypowiedzenia jeszcze pracuje i dostaje pensję." : "Umowa zlecenie: odchodzi od razu."}</span>`
-    : p.odchodzi ? `<span class="minus">W okresie wypowiedzenia – odchodzi w rundzie ${p.odchodzi.runda}.</span>`
+    : p.odchodzi ? `<span class="minus">${p.odchodzi.powod === NIEZADOWOLENIE ? "Złożył(a) wypowiedzenie z niezadowolenia" : "W okresie wypowiedzenia"} – odchodzi w rundzie ${p.odchodzi.runda}.</span>`
       : `<button class="btn czarny" data-akcja="zwolnij" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>${nowy ? "Anuluj zatrudnienie" : "Zwolnij"}</button>`}
     </div></div>`, { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="zapisz-profil" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>Zapisz</button>` });

@@ -42,3 +42,18 @@ Progi i wagi trafiają do `dane/zalozenia.yaml` (`pewnosc: zalozenie`) i są do 
 
 Trzeba poprawić teksty, które dziś mówią nieprawdę: INSTRUKCJA rozdz. 8 („Niezadowoleni pracują gorzej
 i odchodzą”) i podpowiedź „Dbaj o ludzi” (`api/prezentacja.py: PODPOWIEDZI`).
+
+## Decyzja autora i wdrożenie (4.11.2026)
+
+- **Zakres:** etap 1 + ukryte cechy. Cech nie ujawnia gra. Gracz wnioskuje je z krótkiego, żartobliwego opisu
+  (1–2 zdania) pod kółkiem „i” przy pracowniku i kandydacie.
+- **Odejście:** nie jest pewne po 2 tygodniach. Szansa rośnie z niezadowoleniem. Pierwszy tydzień poniżej progu to
+  tylko ostrzeżenie, od drugiego z rzędu jest losowanie (5% za każde 0,01 poniżej progu 0,87, najwyżej 50%,
+  × mnożnik cechy).
+- **Cechy** (`dane/kandydaci.yaml: cechy`): zwyczajny, lojalny, niespokojny duch, materialista, wygodnicki,
+  pracoholik, szybki, niespieszny, pogodny, maruda. Każda zmienia wagi składników zadowolenia, szansę
+  odejścia albo wydajność (±10% godzin).
+- **Niższa wydajność niezadowolonych** – nie wdrożona (zostaje do decyzji po pomiarze). Wydajność zależy tylko od cechy.
+- **Kod:** `silnik/ludzie/zadowolenie.py` (wzór, odejścia, ostrzeżenia, ukrywanie cech w widoku gracza), boty:
+  `dba_o_ludzi` w `dane/boty.yaml`, panel: `panel_gracza/static/zakladki/hr.js`.
+- **Pomiar balansu i warianty progu:** `raporty/kalibracja/dziennik.md`, sekcja U20.

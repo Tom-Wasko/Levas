@@ -28,6 +28,8 @@ CELE = frozenset({
     "handel",      # tekst przekazania towaru/sprzętu między drużynami (silnik/rynek/handel.py): runda, id oferty
     "kasyno",      # zaproszenie i gry w klubie (silnik/pieniadze/kasyno.py): runda, firma[, nr zakładu]
     "kandydaci",   # rynek pracy: runda 0 = pula startowa
+    "cechy",       # ukryta cecha i opis osoby (U20): runda dołączenia do puli, id osoby
+    "odejscia",    # wypowiedzenie z niezadowolenia (silnik/ludzie/zadowolenie.py): runda, firma, id osoby
     "kolejnosc",   # kolejność firm w rundzie
     "parki",       # kolejność historii w parkach: runda = numer cyklu wszystkich historii
     "lokal",       # wybór lokalu przez bota: runda, nazwa firmy

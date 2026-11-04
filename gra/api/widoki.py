@@ -25,6 +25,7 @@ from silnik import harmonogram as hm
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
 from silnik.limity import naruszenia
+from silnik.ludzie import zadowolenie as zo
 from silnik.pieniadze import kasyno as kas
 from silnik.rynek import handel as hd
 
@@ -356,7 +357,7 @@ def api_widok(request, id_, firma):
 def _z_druzyna(request, v: dict, id_: str, g: GraSilnika, firma: str) -> dict:
     """Do widoku firmy: skład drużyny, kto ostatnio zapisał / wysłał decyzje, pauza i termin
     zamknięcia rundy, wgląd mistrza gry tylko do odczytu."""
-    v = _dla(request, v)
+    v = zo.ukryj(_dla(request, v))   # U20: bez ukrytych cech osób
     sklad = druzyny.sklad(id_).get(firma, [])
     v["druzyna"] = {"sklad": sklad, "autorzy": druzyny.autorzy(g, firma)}
     for f, wersja in druzyny.loga(id_).items():

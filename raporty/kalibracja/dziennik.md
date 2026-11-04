@@ -428,3 +428,47 @@ wpis na dole.
   jest gotowa na pierwszy tydzień sprzedaży. Balans bez istotnej zmiany.
 - Teksty: INSTRUKCJA rozdz. 4 (krok 5 „Ludzie”) i tabela w rozdz. 14; panel gracza `OD_RUNDY`.
   Test: `test_zatrudnienie_w_tygodniu_przygotowawczym` (`testy/ludzie/test_rynek_pracy.py`, dane gry).
+
+## U20 – zadowolenie osób, ukryte cechy i odejścia (4.11.2026, Claude Code, Opus 5.5) – decyzja autora
+- Projekt `raporty/projekt_U20_dynamika_pracownikow.md`. Decyzja autora 4.11.2026: etap 1 + ukryte cechy, które
+  gracz wnioskuje z krótkiego żartobliwego opisu pod „i”. Odejście nie jest pewne, szansa rośnie z niezadowoleniem.
+- Zadowolenie osoby liczy wzór karty dla jednej osoby (pensja z premią ÷ preferowana, sprzęt stanowiska,
+  udogodnienia lokalu, szkolenia, zlecenie) i odejmuje przepracowanie (próg i waga z kebabu karty). Wskaźnik karty
+  liczy się jak dotąd, więc kalibracja karty się nie zmienia.
+- `dane/zalozenia.yaml: pracownicy.odejscia` (`pewnosc: zalozenie`): próg 0,87. Pierwszy tydzień poniżej progu
+  daje tylko ostrzeżenie (lista błędów, pomarańczowy). Od drugiego tygodnia z rzędu jest szansa 5% za każde 0,01
+  poniżej progu, najwyżej 50%. Cecha mnoży tę szansę. Wypowiedzenie działa jak zwolnienie bez odprawy.
+- `dane/kandydaci.yaml: cechy`: 10 cech z wagami, każda ma 3 opisy. Panel gracza nie dostaje pola `cecha` ani `wydajnosc`.
+  Szybki/niespieszny: ±10% godzin stanowiska.
+- Boty: `dba_o_ludzi` (średni, trudny, niemożliwy, człowiek średni/dobry). Bot podnosi pensję
+  niezadowolonej osobie do progu + 0,01, najwyżej do 115% preferowanej. Cechy nie zna. Łatwy ignoruje ostrzeżenia.
+- Pomiar: 5 strategii × 6 ziaren (1–6) × 12 rund. Miara to suma wyniku działalności z 12 tygodni, średnia na firmę.
+  „Bez U20” to te same ziarna i cechy, ale osoby nie odchodzą.
+
+  | poziom | bez U20 | z U20 | odejścia (30 gier) | osobotygodnie niezadowolone |
+  |---|---|---|---|---|
+  | łatwy | 1,391 | 1,160 | 5 | 8,0% |
+  | średni | 4,080 | 4,079 | 0 | 1,3% |
+  | trudny | 4,549 | 4,527 | 0 | 1,4% |
+  | niemożliwy | 4,181 | 4,001 | 0 | 1,1% |
+
+  Skąpy gracz to boty płacące wszystkim płacę minimalną, bez podwyżek (pensja ≈ 95% preferowanej):
+
+  | poziom | bez U20 | próg 0,87 | próg 0,88 | próg 0,89 |
+  |---|---|---|---|---|
+  | łatwy, normalnie | 1,391 | 1,160 | 1,021 | 0,919 |
+  | łatwy, skąpo | 1,519 | 1,261 (9 odejść) | 0,979 (14) | 0,843 (16) |
+  | trudny, normalnie | 4,549 | 4,527 | 4,519 | 4,516 |
+  | trudny, skąpo | 4,716 | 4,650 (3 odejścia) | 4,698 (5) | 4,426 (8) |
+
+  - **Próg 0,87.** Odejścia zdarzają się tylko przy zaniedbaniu (przepracowanie, słaby sprzęt, niska pensja).
+    Poziomy średni i trudny prawie się nie zmieniają. Łatwy traci ok. 0,23, bo przeciąża ludzi i nie reaguje na
+    ostrzeżenia. Oszczędzanie na pensjach opłaca się mniej niż bez U20 (trudny: +0,17 → +0,12), ale nadal trochę się opłaca.
+  - **Próg 0,89.** Skąpstwo przestaje się opłacać (trudny: 4,426 wobec 4,516), ale łatwy spada o ok. 0,47.
+  - **Wahania między ziarnami** są duże (próg 0,88 na trudnym wypada lepiej dla skąpych niż 0,87).
+  - **Decyzja:** zostawiam 0,87, a autor może podnieść próg (jedna liczba w `zalozenia.yaml`).
+- Zmieniony test: `test_trudny_bot_otwiera_kolejny_lokal`. Na ziarnie 7 jedno odejście i podwyżki przesunęły próg gotówki
+  drugiego lokalu, a na ziarnach 1–5 liczba drugich lokali się nie zmienia, więc test sprawdza też drugie ziarno.
+  Nowe testy: `testy/ludzie/test_zadowolenie.py`.
+- Teksty: INSTRUKCJA rozdz. 8 i 15, podpowiedź „Dbaj o ludzi”. Usunięte zdanie „pracują gorzej”, bo wydajność
+  zależy od cechy, nie od nastroju. Panel HR: opis pod „i”, zadowolenie w profilu i wynikach, tabela wypowiedzeń.

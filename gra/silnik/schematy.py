@@ -210,10 +210,28 @@ class Agencja(Schemat):
         return v
 
 
+class Cecha(Schemat):
+    """Ukryta cecha osoby (U20) – mnożniki składników zadowolenia, opis w panelu (kółko „i”)."""
+    waga: float = Field(gt=0)
+    placa: float = Field(1.0, ge=0)
+    warunki: float = Field(1.0, ge=0)
+    przeciazenie: float = Field(1.0, ge=0)
+    odejscie: float = Field(1.0, ge=0)
+    zadowolenie: float = 0.0
+    wydajnosc: float = Field(1.0, gt=0)
+    opisy: list[str] = Field(min_length=1)
+
+
+class Cechy(Schemat):
+    zrodlo: str = Zrodlo
+    lista: dict[str, Cecha] = Field(min_length=1)
+
+
 class PlikKandydatow(Plik):
     znani: list[ZnanyKandydat]
     losowanie: Losowanie
     agencja: Agencja | None = None  # kanały rekrutacji gry z lokalami (F3a.8); katalog Revasa ich nie ma
+    cechy: Cechy | None = None      # U20: ukryte cechy osób; bez nich – wszyscy zwyczajni
     imiona_kobiet: list[str] = Field(min_length=1)
     imiona_mezczyzn: list[str] = Field(min_length=1)
     nazwiska: list[Nazwisko] = Field(min_length=1)
@@ -442,6 +460,11 @@ class PrognozaCzlowieka(Schemat):
     pule: bool = False
 
 
+class DbaOLudzi(Schemat):
+    podwyzka_maks: float = Field(ge=1)   # najwyżej tyle × pensja preferowana
+    zapas: float = Field(ge=0)           # podwyżka do progu zadowolenia + zapas
+
+
 class PoziomBota(Schemat):
     """Zachowanie bota na poziomie (gra z lokalami) – opis pól w dane/boty.yaml."""
     nazwa: str
@@ -461,6 +484,7 @@ class PoziomBota(Schemat):
     prognoza_czlowieka: PrognozaCzlowieka | None = None
     zamowienia_ze_sprzedazy: float | None = Field(None, ge=1)   # H17: limit zamówień po kolejce w kuchni
     tylko_pomiar: bool = False   # poziom do pomiarów (balans/), bez wyboru w panelu mistrza gry
+    dba_o_ludzi: DbaOLudzi | None = None   # U20: podwyżka dla niezadowolonych (łatwy ich ignoruje)
 
     @model_validator(mode="after")
     def _czlowiek_bez_modelu(self) -> PoziomBota:

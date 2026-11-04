@@ -206,7 +206,13 @@ widoczna w wynikach Menu i cen i bolesna dla zadowolenia klientów.
   headhuntera – tylko headhunter złoży ofertę pracownikowi innej drużyny (a jego szef może dać kontrofertę).
 - Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy.
 - **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3)
-  i szkoleniami (od tygodnia 7). Niezadowoleni pracują gorzej i odchodzą.
+  i szkoleniami (od tygodnia 7). Spada przez przepracowanie (pracownik zajęty prawie cały tydzień), słaby sprzęt
+  i umowę zlecenie. Gra liczy je **dla każdej osoby** – zobaczysz je w profilu pracownika i w wynikach.
+- **Niezadowoleni odchodzą.** Kto ma zadowolenie poniżej progu, dostaje ostrzeżenie na liście błędów (z powodami
+  i szansą odejścia). Jeśli tydzień później nadal jest niezadowolony, może złożyć wypowiedzenie – im bardziej
+  niezadowolony, tym większa szansa. Ratuje podwyżka, lepszy sprzęt albo odciążenie (drugi pracownik).
+- **Każdy ma charakter.** Pod kółkiem „i” przy pracowniku i kandydacie jest krótki opis. Z niego zgadniesz,
+  czy to ktoś lojalny, czy niespokojny duch, czy pracuje szybciej, czy liczy każdą złotówkę. Samej cechy gra nie pokazuje.
 - Zwolnienie i odejście do konkurencji mają **2 rundy wypowiedzenia** (umowa o pracę) – pracownik przez ten czas
   jeszcze pracuje i dostaje pensję; odprawę płacisz od razu. Zleceniobiorca odchodzi bez wypowiedzenia.
 - **Brakuje rąk?** Właściciel może sam stanąć na jednym wolnym stanowisku (przycisk *Stań sam* w zakładce
@@ -308,7 +314,7 @@ Mistrz gry może przesunąć te terminy (poza tygodniem 1 – tydzień przygotow
 4. **Patrz na utraconą sprzedaż.** Jeśli klienci odchodzą z kolejki – brakuje ludzi, sprzętu albo miejsc przy kasie.
 5. **Zamawiaj pod prognozę, nie na zapas.** Przeterminowane jedzenie to strata i zaproszenie dla sanepidu.
 6. **Czytaj kalendarz miejski.** Sesja, mecz Motoru, jarmark – zaplanuj obsadę i zamówienia, zanim tydzień się zacznie.
-7. **Dbaj o ludzi.** Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć.
+7. **Dbaj o ludzi.** Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć. Lista błędów ostrzeże Cię tydzień wcześniej.
 8. **Sprawdzaj listę błędów przed wysłaniem.** Zawsze.
 9. **Najedź na kółko „i”.** Każda zakładka i pole ma tam wyjaśnienie – przeczytaj je, zanim zgadniesz.
 10. **Nie bierz od Harpagona.** Serio.

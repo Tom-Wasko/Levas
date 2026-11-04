@@ -71,7 +71,7 @@ def jako_kandydat(p: Pracownik) -> dict:
     return {"id": p.id, "imie_nazwisko": p.imie_nazwisko, "gwiazdki": p.gwiazdki, "zawod": p.zawod,
             "pensja_preferowana": p.pensja_preferowana, "koszt_rekrutacji": p.koszt_rekrutacji,
             "koszt_odprawy": p.koszt_odprawy, "zadowolenie_klientow": p.zadowolenie_klientow,
-            "ryzyko_reklamacji": p.ryzyko_reklamacji}
+            "ryzyko_reklamacji": p.ryzyko_reklamacji, "cecha": p.cecha, "opis": p.opis, "wydajnosc": p.wydajnosc}
 
 
 def _raport() -> dict:
@@ -221,7 +221,7 @@ def po_decyzjach(dane: Dane, s: StanGry, runda: int, raport: dict, ksiegi: dict[
                                                  "– osoba wraca do puli kandydatów.")
                 continue
             nowy = p.model_copy(update={"pensja_gr": 0, "odchodzi": None, "od_rundy": runda, "stanowisko": st_n.nr,
-                                        "premia_gr": 0, "umowa": o.umowa})
+                                        "premia_gr": 0, "umowa": o.umowa, "zadowolenie": None, "niezadowolony": 0})
             nowy.pensja = o.pensja
             nowa.pracownicy[pid] = nowy
             st_n.pracownik = pid

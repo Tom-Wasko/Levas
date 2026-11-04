@@ -38,6 +38,7 @@ from .kuchnia.operacje import kasjerzy
 from .losowosc import strumien
 from .ludzie import czas_wlasciciela as cw
 from .ludzie import rynek_pracy as rp
+from .ludzie import zadowolenie as zo
 from .ludzie.kandydaci import dodaj_nowych
 from .model import Firma, StanGry, do_slownika
 from .nieruchomosci import lokale as lk
@@ -264,6 +265,9 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         f.skumulowany_dochod_netto = round(f.skumulowany_dochod_netto + netto, 2)
         wyniki[nazwa] = w = _wyniki_firmy(dane, f, r, ks, rach, info[nazwa], popyt.get(nazwa, {}),
                                           obsluga.get(nazwa), oferty, rynek, start[nazwa], bledy[nazwa], netto)
+        odejscia = zo.po_rundzie(dane, f, w, r, ziarno, info[nazwa]["szkolenia_procent"])   # U20
+        if odejscia is not None:
+            w["odejscia_pracownikow"] = odejscia
         w["lokale"] = lk.stan_lokali(dane, f, r)
         w["lokal_decyzja"] = info[nazwa]["lokal"]
         w["przejecia"] = pr.raport(dane, s.firmy, nazwa, r, info[nazwa]["przejecia"], przetargi, wyprowadzki.get(nazwa, []))

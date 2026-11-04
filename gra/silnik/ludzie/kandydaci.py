@@ -11,6 +11,25 @@ from ..dane import Dane
 from ..losowosc import strumien
 
 
+def cechy(dane: Dane) -> dict:
+    """Ukryte cechy osób (U20, kandydaci.yaml: cechy.lista); brak – wszyscy bez cechy."""
+    return (dane.rynek_pracy.get("cechy") or {}).get("lista") or {}
+
+
+def _z_cecha(dane: Dane, osoba: dict, ziarno, runda: int) -> dict:
+    """Cecha wg wag i jeden z jej opisów – z osobnego strumienia, więc reszta losowania puli się nie przesuwa."""
+    lista = cechy(dane)
+    if not lista:
+        return osoba
+    rng = strumien(ziarno, runda, "cechy", osoba["id"])
+    nazwy = list(lista)
+    wagi = [lista[n]["waga"] for n in nazwy]
+    n = nazwy[int(rng.choice(len(nazwy), p=[x / sum(wagi) for x in wagi]))]
+    opisy = lista[n]["opisy"]
+    return {**osoba, "cecha": n, "opis": opisy[int(rng.integers(len(opisy)))],
+            "wydajnosc": lista[n].get("wydajnosc", 1.0)}
+
+
 def _osoba(dane: Dane, rng, zawod: str, gwiazdki: int, id_: str, uzyte: set[str]) -> dict:
     rp = dane.rynek_pracy
     los = rp["losowanie"]
@@ -52,7 +71,7 @@ def pula_startowa(dane: Dane, ziarno) -> list[dict]:
     for zawod in dane.zawody:
         for j in range(dane.rynek_pracy["losowanie"]["na_start"]):
             pula.append(_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g0-{zawod[:3]}-{j}", uzyte))
-    return pula
+    return [_z_cecha(dane, o, ziarno, 0) for o in pula]
 
 
 def dodaj_nowych(dane: Dane, pula: list[dict], ziarno, runda: int) -> list[dict]:
@@ -60,4 +79,4 @@ def dodaj_nowych(dane: Dane, pula: list[dict], ziarno, runda: int) -> list[dict]
     uzyte = {o["imie_nazwisko"] for o in pula}
     nowi = [_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g{runda}-{zawod[:3]}-{j}", uzyte)
             for zawod in dane.zawody for j in range(dane.rynek_pracy["losowanie"]["co_runde"])]
-    return pula + nowi
+    return pula + [_z_cecha(dane, o, ziarno, runda) for o in nowi]

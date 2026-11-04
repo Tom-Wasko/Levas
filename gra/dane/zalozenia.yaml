@@ -407,6 +407,23 @@ magazyn:   # gra z lokalami (zmiana 26.10): bez kosztu magazynowania i zwrotów 
       potrzebna), resztę po tygodniu trzyma u siebie za 0,15 zł brutto za litr dziennie, a termin liczy się od
       ostatniego dnia tygodnia. Liczby – założenie do kalibracji (przechowanie tygodnia ≈ 1 zł/l, tyle co wynajęta
       chłodnia, ale za każdy tydzień)'
+pracownicy:   # U20 (decyzja autora 4.11.2026): zadowolenie każdej osoby i odejścia z niezadowolenia (silnik/ludzie/zadowolenie.py)
+  odejscia:
+    wartosc:
+      prog_zadowolenia: 0.87
+      szansa_na_setna: 0.05
+      szansa_maks: 0.5
+      tygodnie_ostrzezenia: 1
+      sprzet_bez_sprzetu: 2
+    pewnosc: zalozenie
+    zrodlo: 'U20: zadowolenie osoby – wzór karty (karta_wynikow.zadowolenie_pracownikow) liczony dla jednej osoby: jej
+      pensja i premia ÷ preferowana, sprzęt jej stanowiska (bez sprzętu – sprzet_bez_sprzetu gwiazdki), udogodnienia
+      jej lokalu, szkolenia firmy, umowa zlecenie i przepracowanie jak w kebabie karty, do tego ukryta cecha
+      (kandydaci.yaml: cechy). Poniżej progu przez pierwszy tydzień tylko ostrzeżenie (lista błędów); od kolejnego
+      tygodnia z rzędu losowanie wypowiedzenia: szansa = szansa_na_setna za każde 0,01 poniżej progu (najwyżej
+      szansa_maks) × mnożnik cechy. Odejście jak zwolnienie: umowa o pracę – okres wypowiedzenia, zlecenie – od razu,
+      bez odprawy. Próg 0,87: osoba przy pensji preferowanej, sprzęcie 2★ i wykorzystaniu do 85% ma ok. 0,93, przy
+      pełnym wykorzystaniu ok. 0,855 – założenie do kalibracji'
 lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
   udzial_skladnikow:
     wartosc: 0.5

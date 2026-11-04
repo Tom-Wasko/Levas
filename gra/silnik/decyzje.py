@@ -72,6 +72,7 @@ from .kuchnia.dostawcy import zasady_dostaw
 from .kuchnia.operacje import kasjerzy, stanowiska_uslugi
 from .ludzie import czas_wlasciciela as cw
 from .ludzie import rynek_pracy as rp
+from .ludzie import zadowolenie as zo
 from .model import Cena, Firma, Odejscie, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
 from .nieruchomosci import per_lokal as pl
 from .nieruchomosci.lokale import bledy as bledy_lokali
@@ -359,7 +360,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                       koszt_rekrutacji=kandydat["koszt_rekrutacji"], koszt_odprawy=kandydat["koszt_odprawy"],
                       zadowolenie_klientow=kandydat["zadowolenie_klientow"], ryzyko_reklamacji=kandydat["ryzyko_reklamacji"],
                       pensja=float(z.get("pensja") or kandydat["pensja_preferowana"]), umowa=z.get("umowa", "prace"),
-                      od_rundy=runda, stanowisko=st.nr)
+                      od_rundy=runda, stanowisko=st.nr, cecha=kandydat.get("cecha", ""), opis=kandydat.get("opis", ""),
+                      wydajnosc=kandydat.get("wydajnosc", 1.0))
         firma.pracownicy[p.id] = p
         st.pracownik = p.id
         ksieguj(firma, ksiega, rachunek, f"Koszt zatrudnienia: {p.imie_nazwisko}", koszt)
@@ -605,6 +607,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         for w in (info or {}).get("wypowiedzenia", []):
             dodaj("niebieski", "zatrudnienie", f"{w['imie_nazwisko']} dostaje wypowiedzenie – pracuje i dostaje pensję "
                   f"do rundy {w['runda_odejscia'] - 1}, potem wraca na rynek pracy.")
+        for poziom, tekst in zo.ostrzezenia(dane, firma, d.get("zmiany") or {}, runda):   # U20
+            dodaj(poziom, "zatrudnienie", tekst)
         wl = (info or {}).get("wlasciciel_stanowisko")
         if wl and not wl["przyjete"]:
             dodaj("czerwony", "zatrudnienie", f"Właściciel nie stanie na stanowisku nr {wl['nr']}: {wl['powod']}.")

@@ -38,6 +38,7 @@ from .kuchnia.planowanie import (
 )
 from .losowosc import strumien
 from .ludzie import rynek_pracy as rp
+from .ludzie import zadowolenie as zo
 from .model import Firma, StanGry
 from .nieruchomosci import lokale as lk
 from .nieruchomosci import per_lokal as pl
@@ -66,6 +67,24 @@ def _cena(dane: Dane, strategia: dict, stan: StanGry, u: str, runda: int, mnozni
         wsp = (sum(ceny.values()) / len(ceny) / pref) if ceny else dane.boty["ustawienia"]["cena_nasladowcy_bez_danych"]
     krok = dane.boty["ustawienia"]["krok_ceny"]
     return round(pref * wsp * mnoznik / krok) * krok
+
+
+def _podwyzki(dane: Dane, f: Firma, ust: dict) -> dict:
+    """Pensja do progu zadowolenia z zapasem, najwyżej podwyzka_maks × preferowana (U20). Bot nie zna cech – liczy
+    jak dla zwyczajnej osoby, więc materialiście czy marudzie podwyżka może nie wystarczyć."""
+    u = zo.ustawienia(dane)
+    if not u:
+        return {}
+    waga = dane.z["karta_wynikow"]["zadowolenie_pracownikow"]["placa_wzgledem_preferowanej"]
+    zmiany = {}
+    for p in sorted(f.pracownicy.values(), key=lambda p: p.id):
+        if p.odchodzi or not p.niezadowolony or p.zadowolenie is None:
+            continue
+        brak = u["prog_zadowolenia"] + ust["zapas"] - p.zadowolenie
+        nowa = min(p.pensja_preferowana * ust["podwyzka_maks"], p.pensja + p.pensja_preferowana * brak / waga)
+        if nowa > p.pensja:
+            zmiany[p.id] = {"pensja": round(nowa), "umowa": p.umowa, "premia": 0}
+    return zmiany
 
 
 def poziom(dane: Dane, konf: dict, nazwa: str) -> dict:
@@ -520,6 +539,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                                    "umowa": "prace", "zastepca": True, "wzor": {"zawod": zawod, "gwiazdki": q}})
     else:
         d.pop("_obsada", None)
+    if pz.get("dba_o_ludzi"):   # U20: podwyżka dla niezadowolonych (łatwy ich ignoruje)
+        d["zmiany"] = _podwyzki(dane, stan.firmy[nazwa], pz["dba_o_ludzi"])
 
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:
