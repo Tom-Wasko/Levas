@@ -64,9 +64,11 @@ function alarm(f, gra) {
   if (gra.zakonczona) return "";
   if (f.inwestor_przyslany) return ` <span class="chip ok" title="Wpłata na początku rundy ${gra.runda}">inwestor: ${zl(f.inwestor_przyslany)}</span>
     <a data-akcja="inwestor-odwolaj" data-f="${esc(f.nazwa)}">odwołaj</a>`;
-  if (!(f.alarm > 0)) return "";
+  // U12: po wykorzystaniu inwestora link znika – zostaje informacja, kiedy i ile wpłacił
+  const byl = f.inwestor ? ` <span class="chip" title="Bierze ${Math.round(f.inwestor.udzial * 100)}% dochodu do rundy ${f.inwestor.do_rundy}, dotąd wziął ${zl(f.inwestor.wyplacone)}">inwestor: runda ${f.inwestor.od_rundy}, ${zl(f.inwestor.kwota)}</span>` : "";
+  if (!(f.alarm > 0)) return byl;
   const ratunek = f.inwestor ? "" : ` <a data-akcja="inwestor" data-f="${esc(f.nazwa)}">przyślij inwestora</a>`;
-  return ` <span class="chip pom" title="W tej rundzie zablokowane inwestycje, kredyty, leasing i lokaty">debet ponad limit ${zl(f.alarm)}</span>${ratunek}`;
+  return ` <span class="chip pom" title="W tej rundzie zablokowane inwestycje, kredyty, leasing i lokaty">debet ponad limit ${zl(f.alarm)}</span>${ratunek}${byl}`;
 }
 
 function przyslijInwestora(nazwa) {
@@ -93,6 +95,7 @@ function decyzje() {
        Możesz zamknąć ją wcześniej – drużyny bez wysłanych decyzji zagrają wtedy decyzjami zapisanymi do tej pory.`;
   const harm = P.harmonogram.length ? esc(P.harmonogram_opis) : "brak – rundę zamykasz sam(a) albo zamyka się, gdy wyślą wszyscy";
   const wiersze = firmy.map((f) => [`<b>${esc(f.nazwa)}</b>`, prowadzi(f), statusDecyzji(f, gra), zl(f.gotowka) + alarm(f, gra),
+    wsk(f.wynik_skumulowany), f.miejsce ?? "–",   // U12: kto tonie w rankingu – bez przełączania na Wyniki
     `<a class="btn jasny maly" href="${strona(f)}" target="_blank" rel="noopener">Strona firmy</a>`]);
   const ustawienia = [["Kapitał startowy", zl(gra.kapital)], ["Ziarno losowości", esc(gra.ziarno)],
     ["Kredyt odnawialny", gra.kredyt_odnawialny === "na_biezaco" ? "na bieżąco" : "na niedobór na koniec rundy"],
@@ -103,7 +106,7 @@ function decyzje() {
   const opisAlarmu = alarmy.length ? info(`<b>Alarm – debet ponad limit konta:</b> ${alarmy.map((f) => esc(f.nazwa)).join(", ")}.
     W tej rundzie nie mogą inwestować ani brać kredytów, leasingu i lokat. Drużynę bez inwestora możesz uratować – link „przyślij inwestora” przy gotówce.`) : "";
   return `${info(opis)}${opisAlarmu}
-    ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", ""], wiersze, { klasy: ["l", "l"] })}
+    ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", "Wynik (skum.)", "Miejsce", ""], wiersze, { klasy: ["l", "l"] })}
     <div class="przyciski-mg">
       ${gra.zakonczona ? "" : `<button class="btn pom" data-akcja="zamknij" ${P.pauza ? "disabled" : ""}>Zamknij rundę ${gra.runda}</button>
         <button class="btn jasny" data-akcja="pauza">${P.pauza ? "Wznów grę" : "Wstrzymaj grę"}</button>`}

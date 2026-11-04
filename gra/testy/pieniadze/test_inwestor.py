@@ -75,7 +75,7 @@ def test_inwestor_splaca_debet_i_liczy_sie_jak_dlug():
 
 def test_widok_gracza_pokazuje_inwestora():
     """U11: inwestor w widoku drużyny – w podglądzie rundy wpłaty i po przeliczeniu."""
-    from api.prezentacja import widok
+    from api.prezentacja import przeglad_mg, widok
     g = _w_debecie()
     assert widok(g, "A")["inwestor"] is None
     g.ustaw_inwestora("A", 20000)
@@ -85,6 +85,8 @@ def test_widok_gracza_pokazuje_inwestora():
     i = widok(g, "A")["inwestor"]
     assert i["do_rundy"] == 1 + inw.warunki(g.dane)["rund"] and i["dlug"] == 20000 - i["wyplacone"]
     assert widok(g, "B")["inwestor"] is None
+    mg = {f["nazwa"]: f for f in przeglad_mg(g)["firmy"]}   # U12: mistrz gry widzi inwestora i po zniknięciu linku
+    assert mg["A"]["inwestor"]["od_rundy"] == 2 and mg["A"]["inwestor"]["kwota"] == 20000 and mg["B"]["inwestor"] is None
 
 def test_warunki_przyslania_inwestora():
     g = _w_debecie()

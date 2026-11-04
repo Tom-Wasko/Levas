@@ -330,7 +330,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] U9 [9] Dashboard: wyjaśnienie rozruchu i straty w pierwszym tygodniu sprzedaży lokalu – zrobione: Dashboard ma ramkę „Rozruch nowego lokalu” (start i przyrost z popyt.yaml, odsetek klientów każdego lokalu w poprzednim i bieżącym tygodniu; w rundzie startowej – ogólnie); znika, gdy lokale mają pełny popyt.
 - [x] U10 [10] Skala (kolor + słowo) przy wskaźnikach karty wyników – zrobione: progi karta_wynikow.skala w zalozenia.yaml (kwartyle kart botów); Karta wyników ma kafle Twoich wskaźników z oceną niski/średni/dobry, kolorem i „co go podnosi”, a liczby w rankingu są barwione tak samo.
 - [x] U11 [11] Inwestor widoczny dla ucznia po wpłacie (30% zysku, ile rund zostało, ile wziął) – zrobione: v.inwestor w widoku drużyny; ramka „Inwestor ratunkowy” (wpłata, udział, ile rund zostało, ile wziął, niezwrócony dług) w Finanse ▸ Bank, a na Dashboardzie do końca umowy.
-- [ ] U12 [12] Panel mistrza gry, Decyzje: kolumny wynik skumulowany i miejsce, informacja „inwestor wykorzystany”
+- [x] U12 [12] Panel mistrza gry, Decyzje: kolumny wynik skumulowany i miejsce, informacja „inwestor wykorzystany” – zrobione: w tabeli Decyzje panelu /mg/ kolumny „Wynik (skum.)” i „Miejsce”, przy gotówce chip „inwestor: runda R, kwota” (dymek: udział, do kiedy, ile wziął).
 - [ ] U13 [13] Wyniki: majątek netto obok wyniku i zdanie, jak liczy się ranking
 - [ ] U14 [14] Menu w rundzie 1: podpis „od tygodnia 3”, jeden komunikat zamiast dwóch, objaśnienie „popytu rocznego”
 - [ ] U15 [15] Harpagon: kwota do oddania w złotych przy pożyczce
