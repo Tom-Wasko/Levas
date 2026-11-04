@@ -46,6 +46,7 @@ class Gra:
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "na_biezaco"),
                 "auto_zamowienia": bool(opcje.get("auto_zamowienia", False)),   # przycisk „Zamów brakujące” (MG)
                 "refleksja": _refleksja(opcje.get("refleksja") or "opcjonalna"),
+                "podpowiedzi": bool(opcje.get("podpowiedzi", False)),   # U19: rady na pierwsze rundy (MG)
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,
                 "lokale": True}   # lokale z mapy miasta (dane/mapa); zapisy bez tego klucza – stary tryb REVAS
         if opcje.get("kapital_startowy") is not None:  # mistrz gry może zmienić kapitał z danych

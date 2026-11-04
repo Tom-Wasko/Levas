@@ -84,6 +84,9 @@ co widzi drużyna w zakładkach), poziom można zmienić w trakcie gry (od nast�
   drużynę bez uczniów prowadzi sam,
 - *Wyniki* → eksport do arkusza: **Ranking (CSV)** i **Wyniki firm w rundach (CSV)** (średnik, przecinek
   dziesiętny – otwiera się wprost w Excelu),
+- **podpowiedzi** (*Ustawienia gry*, domyślnie wyłączone, eksperyment) – przez 3 pierwsze rundy Dashboard
+  drużyny pokazuje „3 rzeczy do sprawdzenia w tej rundzie” z linkami do zakładek; teksty
+  (`api/prezentacja.py: PODPOWIEDZI`) pochodzą z rad w INSTRUKCJA rozdz. 15,
 - **refleksja drużyn** (*Ustawienia gry*: nieobowiązkowa / wymagana / wyłączona) – przy *Wyślij decyzje*
   drużyna pisze 1–2 zdania „co zmieniamy i dlaczego”; mistrz gry widzi je w tabeli *Refleksje drużyn* obok
   dochodu rundy i w kolumnie CSV wyników,

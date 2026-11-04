@@ -154,6 +154,38 @@ def miejsca(skum: dict) -> dict[str, int]:
     return {n: i + 1 for i, n in enumerate(ranking)}
 
 
+# U19: tryb podpowiedzi (włącza mistrz gry) – przez pierwsze rundy Dashboard pokazuje 3 rzeczy do sprawdzenia.
+# Teksty z INSTRUKCJA rozdz. 15 („Dziesięć rad na dobry start”); trzeci element – zakładka panelu gracza.
+PODPOWIEDZI = (
+    (("Policz, zanim kupisz", "Kapitał startowy znika szybciej, niż się wydaje: kaucja, sprzęt, pierwsze pensje "
+      "i towar. Zostaw zapas na pensje i zamówienia następnej rundy.", "dashboard"),
+     ("Lokal to połowa sukcesu", "Tani lokal w pustej strefie jest drogi. Porównaj na mapie ruch i konkurencję "
+      "w strefach, zanim podpiszesz najem.", "lokale"),
+     ("Najedź na kółko „i”", "Każda zakładka i pole ma tam wyjaśnienie – przeczytaj je, zanim zgadniesz. "
+      "Przed wysłaniem sprawdź listę błędów.", "lista_bledow")),
+    (("Patrz na utraconą sprzedaż", "Jeśli klienci odchodzą z kolejki, brakuje ludzi, sprzętu albo miejsc "
+      "przy kasie. Sprawdź, ile sprzedaży przepadło w poprzedniej rundzie.", "sprzedaz"),
+     ("Cena to nie wszystko", "Najtańszy kebab w mieście z jednym kucharzem to kolejka, której nikt nie obsłuży. "
+      "Sprawdź obsadę kuchni i kasy.", "zatrudnienie"),
+     ("Zamawiaj pod prognozę, nie na zapas", "Przeterminowane jedzenie to strata i zaproszenie dla sanepidu. "
+      "Zamów tyle, ile sprzedasz do następnej dostawy.", "dostawcy")),
+    (("Czytaj kalendarz miejski", "Sesja, mecz, jarmark – zaplanuj obsadę i zamówienia, zanim tydzień "
+      "się zacznie.", "kalendarz"),
+     ("Dbaj o ludzi", "Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć. Sprawdź pensje "
+      "i warunki pracy załogi.", "zatrudnienie"),
+     ("Nie bierz od Harpagona", "Szybka pożyczka kosztuje dużo więcej, niż pożyczasz. Gdy brakuje gotówki, "
+      "sprawdź najpierw kredyt w banku.", "bank")),
+)
+
+
+def podpowiedzi(gra, runda: int) -> list[dict]:
+    """U19: rady na Dashboardzie w pierwszych rundach gry, gdy mistrz gry włączył tryb podpowiedzi."""
+    nr = runda - gra.runda_startowa
+    if not gra.konfiguracja.get("podpowiedzi") or not 0 <= nr < len(PODPOWIEDZI):
+        return []
+    return [{"tytul": t, "tekst": x, "zakladka": z} for t, x, z in PODPOWIEDZI[nr]]
+
+
 def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     """Widok firmy w rundzie `runda` (domyślnie bieżąca). Decyzje: bieżąca runda – edytowalne, wcześniejsze – podgląd.
     Wyniki w rundzie r: skutki decyzji z rundy r−1 (jak w REVAS). Po końcu gry runda N+1 to podsumowanie: wyniki
@@ -171,9 +203,11 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "kredyt_odnawialny": gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
                  "auto_zamowienia": bool(gra.konfiguracja.get("auto_zamowienia")),
                  "refleksja": gra.tryb_refleksji,
+                 "podpowiedzi": bool(gra.konfiguracja.get("podpowiedzi")),
                  "lokale": True,
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
          "refleksja": gra.refleksje(runda).get(firma),   # U17: co drużyna napisała przy wysłaniu decyzji
+         "podpowiedzi": podpowiedzi(gra, runda) if edycja else [],
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja, "koniec": koniec,
          "odblokowane": sorted(dane.odblokowane(runda)),
          "harmonogram": {x["klucz"]: x["tydzien"] for x in hm.widok(dane, runda)}}   # z lokalami: tydzień elementu
@@ -455,6 +489,7 @@ def przeglad_mg(gra: Gra) -> dict:
                 "kredyt_odnawialny": konf.get("kredyt_odnawialny", "na_biezaco"),
                 "auto_zamowienia": bool(konf.get("auto_zamowienia")),
                 "refleksja": gra.tryb_refleksji,
+                "podpowiedzi": bool(konf.get("podpowiedzi")),
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
                 "lokale": True,
                 "inwestor": inw.warunki(dane),   # warunki inwestora ratunkowego (Z3)

@@ -310,6 +310,9 @@ Mistrz gry może przesunąć te terminy (poza tygodniem 1 – tydzień przygotow
 9. **Najedź na kółko „i”.** Każda zakładka i pole ma tam wyjaśnienie – przeczytaj je, zanim zgadniesz.
 10. **Nie bierz od Harpagona.** Serio.
 
+Jeśli mistrz gry włączył **podpowiedzi**, przez pierwsze trzy rundy Dashboard pokazuje „3 rzeczy do sprawdzenia
+w tej rundzie” – rady z tej listy dobrane do etapu gry. Kliknięcie rady otwiera właściwą zakładkę.
+
 ---
 
 *Pytania o zasady – do mistrza gry. Dokładne liczby i źródła mechanik są w plikach `dane/*.yaml`.*

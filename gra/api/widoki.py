@@ -164,6 +164,7 @@ def api_gry(request):
             kredyt_odnawialny=d.get("kredyt_odnawialny", "na_biezaco"),
             auto_zamowienia=bool(d.get("auto_zamowienia")),
             refleksja=d.get("refleksja") or "opcjonalna",
+            podpowiedzi=bool(d.get("podpowiedzi")),
             kapital_startowy=kapital,
             poziomy=poziomy,
             odblokowanie=d.get("odblokowanie") or None,   # {element: tydzień} – zmiany harmonogramu
@@ -207,7 +208,8 @@ def api_prowadzenie(request, id_):
     """Prowadzenie gry: {"pauza": bool}, {"harmonogram": [{"dzien", "godzina"}]},
     {"poziom": {"firma", "poziom"}} (poziom bota), {"odblokowanie": {element: tydzień}}
     (harmonogram odblokowań gry z lokalami), {"auto_zamowienia": bool} (przycisk „Zamów brakujące”
-    w Dostawcach), {"refleksja": "wylaczona" | "opcjonalna" | "wymagana"} (U17)
+    w Dostawcach), {"refleksja": "wylaczona" | "opcjonalna" | "wymagana"} (U17),
+    {"podpowiedzi": bool} (U19: rady na Dashboardzie w pierwszych rundach)
     albo {"inwestor": {"firma", "kwota"}} (inwestor ratunkowy, kwota 0 odwołuje)."""
     d = cialo(request)
     if "refleksja" in d:
@@ -226,6 +228,9 @@ def api_prowadzenie(request, id_):
     if "auto_zamowienia" in d:
         with serwisy.zmiana(id_) as g:
             g.konfiguracja["auto_zamowienia"] = bool(d["auto_zamowienia"])
+    if "podpowiedzi" in d:
+        with serwisy.zmiana(id_) as g:
+            g.konfiguracja["podpowiedzi"] = bool(d["podpowiedzi"])
     if "odblokowanie" in d:
         if not isinstance(d["odblokowanie"], dict):
             raise BladZapytania("Harmonogram odblokowań: {element: tydzień}.")

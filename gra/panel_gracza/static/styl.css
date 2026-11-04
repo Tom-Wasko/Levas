@@ -231,6 +231,9 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .plan .st.nie { background: var(--czerwony-jasny); color: var(--czerwony); }
 .plan .st.inf { background: var(--szary-jasny); color: var(--szary); }
 .plan small { display: block; font-weight: 500; color: var(--szary); font-size: 10.5px; }
+.plan.podpowiedzi { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }   /* U19: rady z instrukcji – dłuższy tekst */
+.plan.podpowiedzi a { align-items: flex-start; }
+.plan.podpowiedzi small { font-size: 12px; line-height: 1.4; margin-top: 3px; }
 .sekcja-tytul { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--szary); letter-spacing: .05em; margin: 4px 0 10px; }
 
 /* okna dialogowe */

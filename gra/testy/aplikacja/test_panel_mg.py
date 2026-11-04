@@ -91,6 +91,29 @@ def test_domyslny_kredyt_i_przycisk_zamow_brakujace(client):
     assert _przeglad(client, _nowa(client, auto_zamowienia=True).json()["id"])["gra"]["auto_zamowienia"] is True
 
 
+def test_tryb_podpowiedzi_na_pierwsze_rundy(client):
+    """U19: mistrz gry włącza podpowiedzi – przez 3 pierwsze rundy Dashboard drużyny pokazuje 3 rady
+    z zakładką; potem (i przy wyłączonym trybie) nic."""
+    from api.prezentacja import PODPOWIEDZI
+
+    id_ = _nowa(client).json()["id"]
+
+    def widok(r=None):
+        return client.get(f"/api/gry/{id_}/widok/Drużyna 1" + (f"?runda={r}" if r else "")).json()
+
+    assert _przeglad(client, id_)["gra"]["podpowiedzi"] is False and widok()["podpowiedzi"] == []
+    r = client.post(f"/api/gry/{id_}/prowadzenie", {"podpowiedzi": True}, content_type="application/json")
+    assert r.json()["gra"]["podpowiedzi"] is True
+    v = widok()
+    assert v["gra"]["podpowiedzi"] is True
+    assert [p["tytul"] for p in v["podpowiedzi"]] == [t for t, _, _ in PODPOWIEDZI[0]]
+    for _ in range(len(PODPOWIEDZI)):
+        assert len(widok()["podpowiedzi"]) == len(PODPOWIEDZI[0])
+        assert client.post(f"/api/gry/{id_}/przelicz").status_code == 200
+    assert widok()["podpowiedzi"] == [] and widok(1)["podpowiedzi"] == []   # po 3 rundach i w historii – nic
+    assert _przeglad(client, _nowa(client, podpowiedzi=True).json()["id"])["gra"]["podpowiedzi"] is True
+
+
 def test_miejsce_na_pulpicie_jak_ranking_mistrza_gry():
     """Z7: pulpit drużyny liczy miejsce ze średniej kart z rund 2…, a nie z karty ostatniej rundy."""
     from api import prezentacja as pr

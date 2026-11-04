@@ -136,6 +136,8 @@ function decyzje() {
     ["Ceny dostawców", gra.ceny_dostawcow === "losowe" ? "wszystkie generowane" : "z danych, dalej generowane"],
     ["Przycisk „Zamów brakujące” w Dostawcach", `${gra.auto_zamowienia ? "włączony" : "wyłączony"}${gra.zakonczona ? ""
       : ` <a data-akcja="auto-zamowienia">${gra.auto_zamowienia ? "wyłącz" : "włącz"}</a>`}`],
+    ["Podpowiedzi na Dashboardzie (3 pierwsze rundy)", `${gra.podpowiedzi ? "włączone" : "wyłączone"}${gra.zakonczona ? ""
+      : ` <a data-akcja="podpowiedzi">${gra.podpowiedzi ? "wyłącz" : "włącz"}</a>`}`],
     ["Refleksja drużyn przy wysyłaniu decyzji", `${TRYB_REFLEKSJI[gra.refleksja] || gra.refleksja}${gra.zakonczona ? ""
       : ` <a data-akcja="refleksja">zmień</a>`}`]];
   const alarmy = gra.zakonczona ? [] : firmy.filter((f) => f.alarm > 0 && !f.inwestor_przyslany);
@@ -334,6 +336,12 @@ async function wykonaj(akcja, el) {
     const auto = !S.p.gra.auto_zamowienia;
     await api(`${URL_GRY}/prowadzenie`, "POST", { auto_zamowienia: auto });
     toast(auto ? "Drużyny mogą zamawiać brakujące składniki jednym przyciskiem." : "Przycisk „Zamów brakujące” wyłączony.");
+    return wczytaj();
+  }
+  if (akcja === "podpowiedzi") {
+    const wlacz = !S.p.gra.podpowiedzi;
+    await api(`${URL_GRY}/prowadzenie`, "POST", { podpowiedzi: wlacz });
+    toast(wlacz ? "Drużyny widzą na Dashboardzie 3 rzeczy do sprawdzenia (pierwsze 3 rundy)." : "Podpowiedzi wyłączone.");
     return wczytaj();
   }
   if (akcja === "refleksja") {
