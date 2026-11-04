@@ -1,5 +1,6 @@
 // Oferta: wybór dań (menu) i prognoza popytu.
 import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, tabela, toast, wykres, zl } from "./wspolne.js";
+import { kolko } from "./dymki.js";
 import { lokalWybrany, menuLokalu, nazwaLokalu, wieleLokali, zapiszWLokalu } from "./lokal_wybor.js";
 
 const kategorie = (kat) => [...new Set(Object.values(kat.uslugi).map((u) => u.kategoria))];  // kolejność jak w uslugi.yaml
@@ -38,10 +39,16 @@ export const oferta = {
         const jest = klucz in wybrane;
         const dozwolona = (r > 1 || kat.oferty.rundy.uslugi_startowe.includes(klucz)) && (klucz in przed || klucz in v.stan.oferta || nowe < limit || jest);
         const baza = prognozaDania(v, kat, klucz, m);
+        // U14: czemu „Wybierz” jest wyszarzone – nowe dania dopiero od rundy nowe_uslugi_od_rundy albo limit wyczerpany
+        const od = kat.oferty.rundy.nowe_uslugi_od_rundy;
+        const czemu = !edycja || dozwolona || jest ? ""
+          : r < od && !(r === 1 && kat.oferty.rundy.uslugi_startowe.includes(klucz)) ? `od ${OKRES.dopelniacz} ${od}` : "limit nowych dań wyczerpany";
         html += `<div class="kafel ${jest ? "wybrany" : ""}">
           <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span></div>
           <div class="kt">
-            <div class="wiersz"><span>Popyt roczny</span><span>${licz(u.popyt_roczny)}</span></div>
+            <div class="wiersz"><span>Chętnych w strefie na ${OKRES.mianownik} ${kolko(`Popyt roczny ${licz(u.popyt_roczny)} porcji / ${OKRES.rund_w_roku}
+              – tyle osób w przeciętnej strefie ma ochotę na to danie w ${OKRES.miejscownik} (bez sezonu). Do Twojego lokalu trafi część:
+              zależy od strefy, cen, konkurencji i dni tygodnia.`)}</span><span>≈ ${licz(Math.round(u.popyt_roczny / OKRES.rund_w_roku))}</span></div>
             <div class="wiersz"><span>Preferowana cena</span><span>${zl(u.cena_preferowana)}</span></div>
             <div class="wiersz"><span>Czas przygotowania</span><span>${Math.round(u.godziny_prowadzacego * 600) / 10} min</span></div>
             <div class="wiersz"><span>Czas obsługi przy kasie</span><span>${Math.round(u.godziny_kasy * 600) / 10} min</span></div>
@@ -51,7 +58,7 @@ export const oferta = {
           <div class="kd">
             <button class="btn pom" data-akcja="szczegoly-uslugi" data-u="${klucz}">Więcej szczegółów</button>
             ${jest ? `<button class="btn zielony" data-akcja="usluga" data-u="${klucz}" ${edycja ? "" : "disabled"}>✓ Wybrano</button>`
-                   : `<button class="btn czarny" data-akcja="usluga" data-u="${klucz}" ${edycja && dozwolona ? "" : "disabled"}>Wybierz</button>`}
+                   : `<button class="btn czarny" data-akcja="usluga" data-u="${klucz}" ${edycja && dozwolona ? "" : "disabled"}>Wybierz</button>${czemu ? `<span class="podpowiedz">${czemu}</span>` : ""}`}
             ${jest ? `<label class="pole">Prognozowany popyt (na ${OKRES.mianownik})
               <input type="number" min="0" step="1" value="${wybrane[klucz] || ""}" ${v.popyt ? "" : `placeholder="${baza}"`} data-zmiana="prognoza" data-u="${klucz}" ${edycja ? "" : "disabled"}>
               ${v.popyt ? "" : `<span class="podpowiedz">Wg wzoru: ${licz(u.popyt_roczny)} / ${OKRES.rund_w_roku} × ${u.sezonowosc[m]} ≈ ${baza}</span>`}</label>` : ""}

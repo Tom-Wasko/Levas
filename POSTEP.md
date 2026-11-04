@@ -332,7 +332,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] U11 [11] Inwestor widoczny dla ucznia po wpłacie (30% zysku, ile rund zostało, ile wziął) – zrobione: v.inwestor w widoku drużyny; ramka „Inwestor ratunkowy” (wpłata, udział, ile rund zostało, ile wziął, niezwrócony dług) w Finanse ▸ Bank, a na Dashboardzie do końca umowy.
 - [x] U12 [12] Panel mistrza gry, Decyzje: kolumny wynik skumulowany i miejsce, informacja „inwestor wykorzystany” – zrobione: w tabeli Decyzje panelu /mg/ kolumny „Wynik (skum.)” i „Miejsce”, przy gotówce chip „inwestor: runda R, kwota” (dymek: udział, do kiedy, ile wziął).
 - [x] U13 [13] Wyniki: majątek netto obok wyniku i zdanie, jak liczy się ranking – zrobione: kolumna „Majątek netto” w rankingu Karty wyników (v.majatek_firm), zdanie RANKING_DLACZEGO pod rankiem ucznia i w Wynikach mistrza gry (tam majątek już był); INSTRUKCJA rozdz. 3.
-- [ ] U14 [14] Menu w rundzie 1: podpis „od tygodnia 3”, jeden komunikat zamiast dwóch, objaśnienie „popytu rocznego”
+- [x] U14 [14] Menu w rundzie 1: podpis „od tygodnia 3”, jeden komunikat zamiast dwóch, objaśnienie „popytu rocznego” – zrobione: podpis przy wyszarzonym „Wybierz” („od tygodnia 3” / „limit nowych dań wyczerpany”), „Popyt roczny” → „Chętnych w strefie na tydzień ≈ N” z dymkiem; jeden komunikat w rundzie 1 był już z U5.
 - [ ] U15 [15] Harpagon: kwota do oddania w złotych przy pożyczce
 - [ ] U16 [16] „Dlaczego mój wynik się zmienił?” – 1–3 zdania po rundzie z największych zmian karty
 - [ ] U17 [17] Refleksja drużyny przy wysyłaniu decyzji (pole tekstowe, widoczne u mistrza gry i w CSV; opcja gry)

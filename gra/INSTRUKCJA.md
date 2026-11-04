@@ -120,7 +120,8 @@ co jeszcze zostało do zrobienia):
    deklaracji nie złoży, płaci mandat co rundę – zwykle ponad dwa razy więcej niż najtańsze biuro (karta „Samodzielnie”
    pokazuje to porównanie).
 3. **Menu** (Lokale ▸ Menu i ceny) – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,
-   dodatki) dodasz od tygodnia 3.
+   dodatki) dodasz od tygodnia 3. „Chętnych w strefie na tydzień” na kafelku dania mówi, jak popularne jest danie
+   w przeciętnej strefie – do Twojego lokalu trafi tylko część tych klientów.
 4. **Stanowiska** (Lokale ▸ Sprzęt) – kuchnia i kasa. Każdy pracownik potrzebuje swojego stanowiska, a liczbę stanowisk ogranicza
    wielkość lokalu.
 
