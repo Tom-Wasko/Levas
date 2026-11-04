@@ -34,10 +34,24 @@ def test_bot_kupuje_lokal_na_kredyt_pod_jego_zastaw():
     g, (d,) = _gra({"lokal": {"forma": "kupno", "rezerwa": 10000}})
     lok = _lokal(g, d["lokal"]["id"])
     assert d["lokal"]["forma"] == "kupno" and lok["typ"] == "gotowy" and lok.get("cena")
-    (k,) = d["kredyty_wez"]
+    k, *doplata = d["kredyty_wez"]   # dopłata bez historii, gdy po kredycie pod zastaw zabrakłoby rezerwy
     assert k["zastaw"].endswith(lok["id"]) and k["kwota"] > 0   # zastaw: id majątku „lokal:…”
+    assert len(doplata) <= 1 and not any(x.get("zastaw") for x in doplata)
     f = g.stan().firmy["A"]
-    assert [(x.id, x.forma) for x in f.lokale] == [(lok["id"], "kupno")] and f.kredyty
+    assert [(x.id, x.forma) for x in f.lokale] == [(lok["id"], "kupno")] and len(f.kredyty) == 1 + len(doplata)
+
+
+def test_bot_kupuje_dzialke_z_budowa_i_doplaca_kredytem_bez_historii():
+    """Działka: wejście z budową w ratach ponad kredyt pod zastaw (0,7 × cena z budową) – brakującą kwotę i rezerwę
+    bot dopłaca kredytem bez wymogu historii (np. „na start”); bez niej bank przejmował działkę po zaległych ratach."""
+    g, (d,) = _gra({"lokal": {"typy": ["dzialka"], "forma": "kupno", "rezerwa": 10000}})
+    lok = _lokal(g, d["lokal"]["id"])
+    assert lok["typ"] == "dzialka" and d["lokal"]["forma"] == "kupno"
+    zastaw, doplata = d["kredyty_wez"]
+    assert zastaw["zastaw"] == f"lokal:{lok['id']}" and "zastaw" not in doplata
+    assert 40000 + zastaw["kwota"] + doplata["kwota"] >= lok["cena"] + lok["koszt_budowy"] + 10000
+    f = g.stan().firmy["A"]
+    assert [(x.id, x.forma) for x in f.lokale] == [(lok["id"], "kupno")] and len(f.kredyty) == 2
 
 
 def test_bot_bez_srodkow_na_kupno_bierze_gotowy_lokal_w_najmie():

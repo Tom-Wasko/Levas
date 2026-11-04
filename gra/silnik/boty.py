@@ -19,6 +19,7 @@ Poziomy (dane/boty.yaml: poziomy, gra z lokalami; bez lokali – zawsze dawne re
 """
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 
 import numpy as np
@@ -114,6 +115,36 @@ def _kredyt_na_lokal(dane: Dane, f: Firma, decyzja: dict, runda: int) -> dict | 
     return None
 
 
+def _kredyt_bez_historii(dane: Dane, f: Firma, brak: float, runda: int) -> dict | None:
+    """Dopłata do kupna lokalu (B6): kredyt bez zastawu i bez wymogu historii (np. „na start”) na brakującą kwotę
+    (w górę do pełnego złotego, najwyżej maks_kwota) – najtańszy, którego bank udzieli; None – żaden albo za mały."""
+    kwota = float(math.ceil(brak))
+    oferty = sorted(((p["oprocentowanie"], b, p) for b, bank in bk.banki(dane).items() for p in bank["kredyty"]
+                     if not p.get("historia") and not p.get("zastaw") and not p.get("od_lokalu")
+                     and p["maks_kwota"] >= kwota), key=lambda x: (x[0], x[1]))
+    for _, b, p in oferty:
+        k = {"bank": b, "produkt": p["produkt"], "rund": p["maks_rund"], "kwota": kwota}
+        if not bk.powod_kredytu(dane, f, k, runda):
+            return k
+    return None
+
+
+def _kredyty_na_kupno(dane: Dane, f: Firma, lok: dict, dec: dict, runda: int, rezerwa: float,
+                      przebicie: float = 1.0) -> list[dict] | None:
+    """Kredyty na kupno lokalu: pod jego zastaw, a gdy po wejściu (działka – z budową w ratach) nie zostaje
+    `rezerwa` gotówki – dopłata bez historii. None – nie stać nawet z nimi."""
+    k = _kredyt_na_lokal(dane, f, dec, runda)
+    kredyty = [k] if k else []
+    wejscie = lk.koszt_wejscia(dane, lok, "kupno", lok["cena"] * przebicie)         + lok.get("koszt_budowy", 0)   # działka: budowa w ratach w kolejnych rundach (lokale.py)
+    brak = rezerwa + wejscie - f.gotowka - sum(x["kwota"] for x in kredyty)
+    if brak > 0:
+        dop = _kredyt_bez_historii(dane, f, brak, runda)
+        if not dop:
+            return None
+        kredyty.append(dop)
+    return kredyty
+
+
 def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict,
                    min_kuchnia: int = 0, strefy: list[str] | None = None, wybor: dict | None = None,
                    f: Firma | None = None) -> tuple[dict | None, dict | None]:
@@ -123,26 +154,22 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
     strefach (strategia: strefy, np. pomiar w balans/warianty.py; bez wolnych – każda strefa). wybor – parametr
     strategii `lokal` (B6): `typy` lokali (bez – gotowy), `forma` (najem / kupno – na kredyt pod zastaw lokalu, gdy
     po wejściu zostaje `rezerwa` gotówki; bez takich lokali – gotowy w najmie), `przebicie` – oferta w licytacji
-    × cena wywoławcza. Zwraca (decyzja lokal, kredyt pod zastaw albo None)."""
+    × cena wywoławcza. Zwraca (decyzja lokal, kredyty na kupno – pusta lista przy najmie)."""
     w = wybor or {}
     forma = w.get("forma", "najem")
     pole = "czynsz" if forma == "najem" else "cena"
     wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy), len(stan.firmy))
              if lok["typ"] in w.get("typy", ["gotowy"]) and lok.get(pole)]
     if forma == "kupno" and f is not None:
-        def stac(lok: dict) -> bool:
-            k = _kredyt_na_lokal(dane, f, {"id": lok["id"], "forma": "kupno"}, runda)
-            wejscie = (lk.koszt_wejscia(dane, lok, "kupno", lok["cena"] * w.get("przebicie", 1.0))
-                       + lok.get("koszt_budowy", 0))   # działka: budowa w ratach w kolejnych rundach (lokale.py)
-            return f.gotowka + (k["kwota"] if k else 0.0) - wejscie >= w.get("rezerwa", 0)
-        wolne = [lok for lok in wolne if stac(lok)]
+        wolne = [lok for lok in wolne if _kredyty_na_kupno(dane, f, lok, {"id": lok["id"], "forma": "kupno"}, runda,
+                                                            w.get("rezerwa", 0), w.get("przebicie", 1.0)) is not None]
     if not wolne and wybor:
         return _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, min_kuchnia, strefy)
     wolne = [lok for lok in wolne if lok["miejsca"][KUCHNIA] >= min_kuchnia] or wolne
     if strefy:
         wolne = [lok for lok in wolne if lok["strefa"] in strefy] or wolne
     if not wolne:
-        return None, None
+        return None, []
     if strategia_klucz == "tani":
         wolne.sort(key=lambda lok: lok[pole])
     elif strategia_klucz == "premium":
@@ -155,7 +182,8 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
     dec = {"id": lok["id"], "forma": forma}
     if w.get("przebicie", 1.0) > 1.0 and runda >= dane.mapa["zasady"]["licytacje_od_rundy"]:
         dec["oferta"] = round(lok[pole] * w["przebicie"], 2)
-    return dec, (_kredyt_na_lokal(dane, f, dec, runda) if forma == "kupno" and f is not None else None)
+    kredyty = _kredyty_na_kupno(dane, f, lok, dec, runda, w.get("rezerwa", 0), w.get("przebicie", 1.0))         if forma == "kupno" and f is not None else None
+    return dec, kredyty or []
 
 
 def _przejecie(dane: Dane, stan: StanGry, f: Firma, nazwa: str, st: dict, runda: int) -> dict | None:
@@ -172,17 +200,20 @@ def _przejecie(dane: Dane, stan: StanGry, f: Firma, nazwa: str, st: dict, runda:
     return {"id": min(kandydaci)[1]} if kandydaci else None
 
 
-def _wez_lokal(dane: Dane, stan: StanGry, f: Firma, d: dict, dec: dict, kredyt: dict | None, runda: int) -> Firma:
-    """Decyzja o lokalu (i kredycie pod jego zastaw) w decyzjach bota; zwraca kopię firmy z tym lokalem – dalsze
-    decyzje liczone tak, jakby lokal już był."""
+def _wez_lokal(dane: Dane, stan: StanGry, f: Firma, d: dict, dec: dict, kredyty: list[dict] | None,
+               runda: int) -> Firma:
+    """Decyzja o lokalu (i kredytach na jego kupno) w decyzjach bota; zwraca kopię firmy z tym lokalem – dalsze
+    decyzje liczone tak, jakby lokal już był. Kredyt bez zastawu bank wypłaca przed zakupem, pod zastaw kupowanego
+    lokalu – razem z zakupem (silnik/pieniadze/banki.py: kredyty_na_lokal)."""
     d["lokal"] = dec
-    if kredyt:
-        d.setdefault("kredyty_wez", []).append(kredyt)
+    kredyty = kredyty or []
+    if kredyty:
+        d.setdefault("kredyty_wez", []).extend(kredyty)
     f = deepcopy(f)
-    lk.wybierz(dane, f, dec, runda, lk.zajete(stan.firmy), Ksiega(), Rachunek(),
-               finansowanie=kredyt["kwota"] if kredyt else 0.0)
-    if kredyt:
-        f.gotowka += kredyt["kwota"]
+    pod_zastaw = sum(k["kwota"] for k in kredyty if k.get("zastaw"))
+    f.gotowka += sum(k["kwota"] for k in kredyty if not k.get("zastaw"))
+    lk.wybierz(dane, f, dec, runda, lk.zajete(stan.firmy), Ksiega(), Rachunek(), finansowanie=pod_zastaw)
+    f.gotowka += pod_zastaw
     return f
 
 
@@ -479,14 +510,14 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if not f.lokale or wyprowadzka:
         # bez lokalu: najem gotowego lokalu; dalsze decyzje liczone tak, jakby lokal już był (przegrany spór o lokal
         # – stanowiska odrzucone, ponowna próba w następnej rundzie)
-        dec, kredyt = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf,
+        dec, kredyty = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf,
                                      st.get("min_kuchnia", 0) if planuje else 0, st.get("strefy"), st.get("lokal"), f)
         if dec is None:
             d["lokal"] = None
             if not f.lokale:
                 return d
         else:
-            f = _wez_lokal(dane, stan, f, d, dec, kredyt, runda)
+            f = _wez_lokal(dane, stan, f, d, dec, kredyty, runda)
     if not d.get("lokal") and (pr := _przejecie(dane, stan, f, nazwa, st, runda)):
         d["przejecie"] = pr
         f = deepcopy(f)
@@ -557,10 +588,10 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 and all(p["czesc"] < drugi["obsluga"] for p in plan["lokale"].values()) \
                 and f.gotowka > drugi["gotowka"] and len(f.lokale) < drugi["maks_lokali"] \
                 and runda >= lk.runda_nowego_lokalu(dane, f) and all(x.dziala_od <= runda for x in f.lokale):
-            dec, kredyt = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0),
+            dec, kredyty = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0),
                                          st.get("strefy"), {**st.get("lokal", {}), **drugi.get("lokal", {})}, f)
             if dec is not None:
-                f = _wez_lokal(dane, stan, f, d, dec, kredyt, runda)
+                f = _wez_lokal(dane, stan, f, d, dec, kredyty, runda)
                 prog, prog_lok = prognoza_cen(ceny)
                 plan = _plan_firmy(dane, f, prog_lok, r_sprz, runda, ekonomia(ceny))
         _zatrudnieni(f, plan)

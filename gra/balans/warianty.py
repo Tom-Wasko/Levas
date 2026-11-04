@@ -115,11 +115,14 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     # B6: typ i forma lokalu (strategia `lokal`, silnik/boty.py: _wybierz_lokal); kupno – na kredyt
     # pod zastaw lokalu, gdy zostaje rezerwa gotówki (inaczej gotowy w najmie); drugi lokal – jak
     # u trudnego, ale innego typu
+    # u lokalu bez zestawu – większa rezerwa na sprzęt kupowany po urządzeniu albo budowie;
+    # brakującą kwotę bot dopłaca kredytem bez historii (silnik/boty.py: _kredyty_na_kupno)
     kupno = {"forma": "kupno", "rezerwa": 10000}
+    bez_zestawu = {**kupno, "rezerwa": 30000}
     typy = {"kupno": {"typy": ["gotowy"], **kupno},
             "niewyposazony": {"typy": ["niewyposazony"]},
-            "niewyposazony_kupno": {"typy": ["niewyposazony"], **kupno},
-            "dzialka": {"typy": ["dzialka"], **kupno},
+            "niewyposazony_kupno": {"typy": ["niewyposazony"], **bez_zestawu},
+            "dzialka": {"typy": ["dzialka"], **bez_zestawu},
             "przebicie": {"przebicie": 1.2}}
     w += [Wariant(f"lokale:{n}", f"pierwszy i kolejny lokal: {x}", strategia=(("lokal", x),))
           for n, x in typy.items()]
@@ -133,7 +136,11 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant("leasing:sprzet", f"sprzęt w leasingu: {leasing}",
                   strategia=(("leasing", leasing),)),
           Wariant("lokale:niewyposazony_leasing", "niewyposażony w najmie, sprzęt w leasingu",
-                  strategia=(("lokal", typy["niewyposazony"]), ("leasing", leasing)))]
+                  strategia=(("lokal", typy["niewyposazony"]), ("leasing", leasing))),
+          # kompromis z inwentarza: niewyposażony wygrywa, gdy gracz chce własny, lepszy sprzęt –
+          # porównanie z `jakosc:3` (gotowy z zestawem wynajmującego, reszta 3★)
+          Wariant("lokale:niewyposazony_q3", "niewyposażony w najmie, sprzęt i reszta 3★",
+                  strategia=(("lokal", typy["niewyposazony"]), ("jakosc", 3)))]
     w += [Wariant(f"lokale:drugi_{n}", f"drugi lokal jak bot trudny, {x}",
                   poziom=(("kolejny_lokal", {**drugi, "lokal": x}),))
           for n, x in typy.items() if n in ("kupno", "niewyposazony", "dzialka")]
