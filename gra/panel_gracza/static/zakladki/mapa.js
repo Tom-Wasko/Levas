@@ -56,6 +56,22 @@ function budynek(g, b) {
   return { klucz: x + y + s + l, html: `<g class="klik" data-akcja="mapa-budynek" data-id="${esc(b.id)}">${tytul}${ksztalt}</g>` };
 }
 
+const ocena = (x) => x.toFixed(1).replace(".", ",");
+
+function liczbaOpinii(n) {
+  const r10 = n % 10, r100 = n % 100;
+  return `${n} ${n === 1 ? "opinia" : r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "opinie" : "opinii"}`;
+}
+
+/** U24: ocena klientów i ostatnie komentarze przy lokalu (okno lokalu na mapie). */
+function opinieHtml(op) {
+  if (!op) return "";
+  const gw = (n) => "★".repeat(n) + "☆".repeat(5 - n);
+  return `<div class="opinie"><p><b class="gwiazdki">★ ${ocena(op.ocena)}</b> / 5 · ${liczbaOpinii(op.liczba)} klientów</p>`
+    + (op.komentarze || []).map((k) => `<blockquote><span class="gwiazdki">${gw(k.gwiazdki)}</span> „${esc(k.tekst)}”<br><small>– ${esc(k.podpis)}</small></blockquote>`).join("")
+    + `</div>`;
+}
+
 function lokal(g, v, d, kat, lok) {
   const { x, y } = lok.mapa;
   const moje = (v.lokale.moje || []).find((l) => l.id === lok.id);
@@ -64,7 +80,8 @@ function lokal(g, v, d, kat, lok) {
   const stan = moje ? (wyb ? "wybrany" : "moj") : kto ? "zajety" : "wolny";
   const kolor = stan === "zajety" ? marka(v, kto).kolor : LOKAL[stan];   // lokal innej firmy – w jej kolorze
   const ktoNapis = moje ? (wyb ? "wybrany przez Ciebie w tej rundzie" : "Twój lokal") : kto ? `zajęty: ${nazwaFirmy(v, kto)}` : "wolny";
-  const tytul = `<title>${esc(lok.nazwa)} (${esc(nazwaStrefy(kat, lok.strefa))}) – ${esc(ktoNapis)}</title>`;
+  const op = (v.lokale.opinie || {})[lok.id];
+  const tytul = `<title>${esc(lok.nazwa)} (${esc(nazwaStrefy(kat, lok.strefa))}) – ${esc(ktoNapis)}${op ? ` – ★ ${ocena(op.ocena)} (${liczbaOpinii(op.liczba)})` : ""}</title>`;
   let ksztalt;
   if (lok.typ === "dzialka" && (stan === "wolny" || (moje && !moje.dziala))) {
     ksztalt = `<polygon points="${pkt(romb(g, x + 0.1, y + 0.1, 0.8, 0.8))}" fill="${stan === "wolny" ? "#d8bf8f" : kolor}"
@@ -73,8 +90,12 @@ function lokal(g, v, d, kat, lok) {
     const h = moje && !moje.dziala ? 8 : 16;
     ksztalt = bryla(g, x + 0.18, y + 0.18, 0.64, 0.64, h, kolor, stan === "wolny" ? "#555" : "rgba(0,0,0,.3)");
   }
-  const znacznik = stan === "wolny" || stan === "wybrany" || stan === "moj"
+  let znacznik = stan === "wolny" || stan === "wybrany" || stan === "moj"
     ? (() => { const [a, b] = g.p(x + 0.5, y + 0.5, lok.typ === "dzialka" ? 6 : 26); return `<circle cx="${a}" cy="${b}" r="3.2" fill="${LOKAL[stan === "wolny" ? "moj" : stan]}" stroke="#fff"/>`; })() : "";
+  if (op) {   // U24: ocena klientów nad budynkiem
+    const [a, b] = g.p(x + 0.5, y + 0.5, 34);
+    znacznik += `<text x="${a}" y="${b}" text-anchor="middle" font-size="9" font-weight="700" fill="#b8860b" stroke="#fff" stroke-width="2.5" paint-order="stroke">★${ocena(op.ocena)}</text>`;
+  }
   return { klucz: x + y + 2, html: `<g class="klik lokal-${stan}" data-akcja="mapa-lokal" data-id="${esc(lok.id)}">${tytul}${ksztalt}${znacznik}</g>` };
 }
 
@@ -108,7 +129,7 @@ const legenda = (v) => `<div class="mapa-legenda">
 
 export const mapa = {
   tytul: "Mapa miasta", ikona: "mapa",
-  info: "Mapa Lublina: kliknij budynek, żeby przejść do jego zakładki (bank, ratusz, dostawcy, agencje…), albo lokal, żeby go obejrzeć i wynająć lub kupić. Menu po lewej działa jak dotąd.",
+  info: "Mapa Lublina: kliknij budynek, żeby przejść do jego zakładki (bank, ratusz, dostawcy, agencje…), albo lokal, żeby go obejrzeć i wynająć lub kupić. Gwiazdki przy lokalach to ocena z opinii klientów (po kliknięciu – liczba opinii i komentarze). Menu po lewej działa jak dotąd.",
   decyzje(c) {
     const brak = c.v.lokale && !c.v.lokale.moje.length
       ? `<div class="komunikat">Nie masz jeszcze lokalu – kliknij wolny lokal (biały) albo działkę na mapie.</div>` : "";
@@ -126,7 +147,7 @@ export const mapa = {
       const moje = c.v.lokale.moje.find((l) => l.id === lok.id);
       const oferta = c.v.lokale.oferta.find((l) => l.id === lok.id);
       const kto = c.v.lokale.zajete[lok.id];
-      let html = opisLokalu(c.kat, lok), przyciski = "";
+      let html = opisLokalu(c.kat, lok) + opinieHtml((c.v.lokale.opinie || {})[lok.id]), przyciski = "";
       if (oferta) {
         przyciski = przyciskiLokalu(c.v, c.d, oferta, c.edycja);
         if (c.v.runda < c.v.lokale.nowy_od) html += `<p class="podpowiedz">${esc(c.v.lokale.odpoczynek || `Kolejny lokal możesz wziąć od rundy ${c.v.lokale.nowy_od}.`)}</p>`;

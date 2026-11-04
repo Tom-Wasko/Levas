@@ -58,8 +58,9 @@ function kartaKebabu(v) {
     .concat(SKLADNIKI_KEBABU.map(([s, k, opis, miara]) => [nazwa[s], opis, miara(K.miary), plus(K.skladniki[s]?.[k])]));
   return tabela("Skąd Twoja karta – sprawy kebabowe", ["Wskaźnik", "Miernik", "W minionym tygodniu", "Poprawka"], wiersze,
     { klasy: ["l", "l"], sortuj: false })
-    + `<p class="podpowiedz">Kolejki, braki w menu, mandaty i wypadki obniżają zadowolenie klientów – a od niego zależy, ilu
-      klientów przyjdzie w następnym tygodniu. Przepracowana załoga jest mniej zadowolona, każdy kolejny lokal podnosi
+    + `<p class="podpowiedz">Kolejki, braki w menu, mandaty i wypadki obniżają zadowolenie klientów. Kolejki, braki,
+      reklamacje, cena i jakość trafiają też do opinii o lokalu (gwiazdki na mapie) – a od nich zależy, ilu klientów
+      przyjdzie w następnych tygodniach. Przepracowana załoga jest mniej zadowolona, każdy kolejny lokal podnosi
       rozwój firmy, a dług u Harpagona waży w zadłużeniu więcej niż kredyt bankowy.</p>`;
 }
 

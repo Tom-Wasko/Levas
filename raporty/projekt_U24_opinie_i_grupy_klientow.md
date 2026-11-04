@@ -47,6 +47,18 @@
 - **Widoczność.** W zakładce Klienci widać skład grup strefy i ich upodobania, opisane krótko i z humorem. Raport
   sprzedaży pokazuje, które grupy kupowały w lokalu.
 
+## Wdrożenie (4.11.2026) – czym różni się od projektu
+
+- Wszystkie liczby są w `dane/mapa/klienci.yaml` (grupy, strefy, koszyki, opinie, komentarze), bez
+  `zalozenia.yaml`. Brak pliku wyłącza obie mechaniki (zamrożona kopia testów liczy popyt jak przed U24).
+- Dni tygodnia zostają ze strefy (`popyt.yaml`), grupy nie mają własnego rozkładu dni. Inaczej zmieniłby się
+  kalibrowany kształt tygodnia stref.
+- Ocena tygodnia startuje od 3,6★ (nie 3★), a mnożnik popytu = (ocena ÷ 3,3)^(0,4 × zaufanie). Przy tych liczbach
+  średni lokal botów ma mnożnik ok. 1,0, a rozpiętość 0,86–1,06, podobnie jak dawny mnożnik karty (0,83–1,05).
+- Zastępstwo: 10% klientów bez ulubionego dania bierze inne danie z koszyka w tym samym lokalu (przy 35%
+  lokal premium z wąskim menu zarabiał prawie 2× więcej).
+- Wskaźnik „Zadowolenie klientów” w karcie liczy się jak dotąd, ale nie zmienia już popytu – robią to opinie.
+
 ## Pomiar i teksty
 
 - Jeden pomiar na końcu: poziomy × strategie × ziarna, przed i po. Cele:

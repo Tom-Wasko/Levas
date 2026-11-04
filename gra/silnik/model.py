@@ -169,6 +169,12 @@ class Lokal(Model):
     ceny: dict[str, Cena] | None = None         # usługa → cena i rabat w lokalu
     wyposazenie: list[str] | None = None
     udogodnienia: list[str] | None = None
+    # U24: opinie klientów (silnik/rynek/opinie.py) – ocena 1–5 (średnia krocząca), liczba wszystkich opinii,
+    # waga opinii w średniej (po zaniku) i ostatnie komentarze {tekst, gwiazdki, podpis, powod}
+    ocena: float | None = None
+    opinie: int = 0
+    waga_opinii: float = 0.0
+    komentarze: list[dict] = Field(default_factory=list)
 
     czynsz = _kwota("czynsz")
     kaucja = _kwota("kaucja")

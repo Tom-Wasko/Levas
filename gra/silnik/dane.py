@@ -25,6 +25,7 @@ from .schematy import (
     PlikBankow,
     PlikBiur,
     PlikHarpagona,
+    PlikKlientow,
     PlikPromocji,
     PlikReklamy,
     sprawdz_zalozenia,
@@ -69,7 +70,8 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
     """Mapa miasta (`dane/mapa/`): strefy, lokale z zasadami i zestawami sprzętu, budynki. Brak katalogu = gra bez lokali."""
     if not (katalog / "strefy.yaml").exists():
         return None
-    st, lo, bu, po, me, ba, ha, bi, re, pm = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY)
+    st, lo, bu, po, me, ba, ha, bi, re, pm = (_wczytaj(katalog / n) for n in SCHEMATY_MAPY if n != "klienci.yaml")
+    kl = katalog / "klienci.yaml"
     return {"siatka": st["siatka"], "strefy": st["strefy"], "zasady": lo["zasady"], "zestawy": lo["zestawy"],
             "lokale": lo["lokale"], "budynki": bu["budynki"],
             "popyt": {k: po[k] for k in ("model", "dni_tygodnia", "strefy")},
@@ -78,7 +80,9 @@ def _wczytaj_mape(katalog: Path) -> dict | None:
             "harpagon": PlikHarpagona.model_validate(ha).model_dump(exclude={"opis", "zrodlo"}),
             "biura": PlikBiur.model_validate(bi).model_dump(exclude={"opis", "zrodlo"}),
             "reklama": PlikReklamy.model_validate(re).model_dump(exclude={"opis", "zrodlo"}),
-            "promocje": PlikPromocji.model_validate(pm).model_dump(exclude={"opis", "zrodlo"})}
+            "promocje": PlikPromocji.model_validate(pm).model_dump(exclude={"opis", "zrodlo"}),
+            # U24: grupy klientów i opinie (brak pliku – mechanika wyłączona, np. dane zamrożone testów)
+            "klienci": PlikKlientow.model_validate(_wczytaj(kl)).model_dump(exclude={"opis", "zrodlo"}) if kl.exists() else None}
 
 
 def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
@@ -253,6 +257,8 @@ def sprawdz(katalog: Path | None = None) -> list[str]:
     if mapa.exists():
         for nazwa, schemat in SCHEMATY_MAPY.items():
             if not (mapa / nazwa).exists():
+                if nazwa == "klienci.yaml":   # U24: plik opcjonalny – bez niego grupy i opinie wyłączone
+                    continue
                 bledy.append(f"brak pliku dane/mapa/{nazwa}")
                 continue
             try:
@@ -451,9 +457,30 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
     po = m["popyt"]
     for s in sorted(set(m["strefy"]) ^ set(po["strefy"])):
         bledy.append(f"mapa/popyt.yaml: strefa {s} " + ("bez popytu" if s in m["strefy"] else "nie ma jej w mapa/strefy.yaml"))
+    _sprawdz_klientow(d, bledy, brak)
     _sprawdz_kalendarz(d, bledy, brak)
     _sprawdz_zdarzenia(d, bledy, brak)
     return bledy
+
+
+def _sprawdz_klientow(d: Dane, bledy: list[str], brak):
+    """U24 – mapa/klienci.yaml: każda strefa popytu ma udziały grup, dania z uslugi.yaml."""
+    k = d.mapa.get("klienci")
+    if not k:
+        return
+    co = "mapa/klienci.yaml"
+    for s in sorted(set(d.mapa["popyt"]["strefy"]) ^ set(k["strefy"])):
+        bledy.append(f"{co}: strefa {s} " + ("bez udziałów grup" if s in d.mapa["popyt"]["strefy"] else "nie ma jej w mapa/popyt.yaml"))
+    if k["wydarzenia"] in {g for u in k["strefy"].values() for g in u}:
+        bledy.append(f"{co}: grupa {k['wydarzenia']} pochodzi z kalendarza – nie dawaj jej udziałów w strefach")
+    for gdzie, dania in [("mieso", k["mieso"]), ("wege", k["wege"]), *((f"zastepstwo.grupy_dan[{i}]", g)
+                         for i, g in enumerate(k["zastepstwo"]["grupy_dan"]))]:
+        for u in dania:
+            if u not in d.uslugi:
+                brak(u, f"{co}: {gdzie}", "danie", "uslugi.yaml")
+    for g, x in k["grupy"].items():
+        for u in sorted(set(d.uslugi) ^ set(x["koszyk"])):
+            bledy.append(f"{co}: grupy.{g}.koszyk: " + (f"brak dania {u}" if u in d.uslugi else f"nieznane danie {u}"))
 
 
 def _sprawdz_kalendarz(d: Dane, bledy: list[str], brak):

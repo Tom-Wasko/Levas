@@ -17,6 +17,8 @@ import json
 
 import numpy as np
 
+Strumien = np.random.Generator   # typ strumienia losowego (adnotacje w innych modułach)
+
 CELE = frozenset({
     "bot",         # decyzje bota: runda, nazwa firmy
     "wypadki",     # wypadki w lokalu (silnik/swiat/awarie.py): runda, firma
@@ -29,6 +31,7 @@ CELE = frozenset({
     "kasyno",      # zaproszenie i gry w klubie (silnik/pieniadze/kasyno.py): runda, firma[, nr zakładu]
     "kandydaci",   # rynek pracy: runda 0 = pula startowa
     "cechy",       # ukryta cecha i opis osoby (U20): runda dołączenia do puli, id osoby
+    "opinie",      # rozrzut nowych opinii i komentarze o lokalu (silnik/rynek/opinie.py): runda, firma, lokal
     "odejscia",    # wypowiedzenie z niezadowolenia (silnik/ludzie/zadowolenie.py): runda, firma, id osoby
     "kolejnosc",   # kolejność firm w rundzie
     "parki",       # kolejność historii w parkach: runda = numer cyklu wszystkich historii

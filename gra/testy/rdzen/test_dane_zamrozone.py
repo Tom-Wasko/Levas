@@ -1,6 +1,8 @@
 """Zamrożona kopia danych dla testów mechanik (B2): testy bez znacznika czytają `testy/dane_zamrozone/`,
 testy zasad ze znacznikiem `dane_gry` – `dane/` (testy/conftest.py)."""
 
+from pathlib import Path
+
 import pytest
 from pomocnicze import DANE_GRY, DANE_ZAMROZONE
 
@@ -22,5 +24,7 @@ def test_zamrozona_kopia_pasuje_do_schematow():
 
 
 def test_zamrozona_kopia_ma_wszystkie_pliki_danych():
-    pliki = {p.relative_to(DANE_GRY) for p in DANE_GRY.rglob("*.yaml")}
+    # mapa/klienci.yaml (U24) – plik opcjonalny: bez niego grupy klientów i opinie są wyłączone, testy mechanik
+    # liczą popyt jak przed U24
+    pliki = {p.relative_to(DANE_GRY) for p in DANE_GRY.rglob("*.yaml")} - {Path("mapa/klienci.yaml")}
     assert pliki <= {p.relative_to(DANE_ZAMROZONE) for p in DANE_ZAMROZONE.rglob("*.yaml")}

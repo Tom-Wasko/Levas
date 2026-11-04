@@ -930,6 +930,73 @@ class PlikPromocji(Plik):
     typy: dict[str, TypPromocji] = Field(min_length=1)
 
 
+class GrupaKlientow(Schemat):
+    nazwa: str
+    opis: str
+    podpisy: list[str] = Field(min_length=1)
+    cena: float = Field(gt=0)            # mnożnik wrażliwości cenowej strefy (w strefie uśredniany do 1)
+    czekanie: float = Field(ge=0)        # waga kolejki w ocenie lokalu
+    jakosc: float = Field(ge=0)          # waga jakości w ocenie lokalu
+    wegetarianie: float = Field(ge=0, lt=1)
+    koszyk: dict[str, float] = Field(min_length=1)
+
+
+class Zastepstwo(Schemat):
+    udzial: float = Field(ge=0, le=1)
+    grupy_dan: list[list[str]] = Field(default_factory=list)
+
+
+class UstawieniaOpinii(Schemat):
+    start: float = Field(ge=1)
+    jakosc: float = Field(ge=0)
+    cena: float = Field(ge=0)
+    cena_limit: float = Field(ge=0)
+    kolejka: float = Field(ge=0)
+    brak: float = Field(ge=0)
+    reklamacje: float = Field(ge=0)
+    wyposazenie: float = Field(ge=0)
+    udzial_opinii: float = Field(gt=0, le=1)
+    rozrzut: float = Field(ge=0)
+    zanik: float = Field(ge=0, lt=1)
+    n0: float = Field(gt=0)
+    odniesienie: float = Field(ge=1)
+    wykladnik: float = Field(ge=0)
+    komentarze: int = Field(ge=0)
+    prog_komentarza: float = Field(ge=0)
+    ocena_dobra: float = Field(ge=1)
+    skala: float = Field(gt=1)
+
+    @model_validator(mode="after")
+    def _w_skali(self):
+        for pole in ("start", "odniesienie", "ocena_dobra"):
+            if getattr(self, pole) > self.skala:
+                raise ValueError(f"opinie.{pole} ponad skalę ocen ({self.skala})")
+        return self
+
+
+class PlikKlientow(Plik):
+    """dane/mapa/klienci.yaml (U24): grupy klientów z koszykiem i opinie o lokalach."""
+    mieso: list[str]
+    wege: list[str]
+    zastepstwo: Zastepstwo
+    wydarzenia: str
+    grupy: dict[str, GrupaKlientow] = Field(min_length=1)
+    strefy: dict[str, dict[str, float]] = Field(min_length=1)
+    opinie: UstawieniaOpinii
+    komentarze: dict[str, list[str]]
+
+    @model_validator(mode="after")
+    def _spojnosc(self):
+        if self.wydarzenia not in self.grupy:
+            raise ValueError(f"wydarzenia: nieznana grupa {self.wydarzenia}")
+        for z, udzialy in self.strefy.items():
+            if set(udzialy) - set(self.grupy):
+                raise ValueError(f"strefy.{z}: nieznane grupy {sorted(set(udzialy) - set(self.grupy))}")
+            if abs(sum(udzialy.values()) - 1) > 1e-6:
+                raise ValueError(f"strefy.{z}: udziały grup sumują się do {sum(udzialy.values()):.3f}, a nie do 1")
+        return self
+
+
 SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "strefy.yaml": PlikStref,
     "lokale.yaml": PlikLokali,
@@ -941,6 +1008,7 @@ SCHEMATY_MAPY: dict[str, type[BaseModel]] = {
     "biura.yaml": PlikBiur,
     "reklama.yaml": PlikReklamy,
     "promocje.yaml": PlikPromocji,
+    "klienci.yaml": PlikKlientow,   # U24 – opcjonalny w danych gry (bez niego: bez grup i opinii)
 }
 
 # --- podatki_2026.yaml (gra z lokalami, F3a.11) ---

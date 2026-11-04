@@ -276,6 +276,10 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
 .dwie { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .trzy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .podpowiedz { color: var(--szary); font-size: 11px; text-transform: none; font-weight: 500; }
+/* U24: opinie klientów przy lokalu */
+.opinie blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid #e0c060; font-size: 13px; }
+.opinie small { color: var(--szary); }
+.gwiazdki { color: #b8860b; letter-spacing: 1px; }
 .pigulka { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
 .pigulka.ok { background: var(--zielony-jasny); color: var(--zielony); }
 .pigulka.nie { background: var(--czerwony-jasny); color: var(--czerwony); }

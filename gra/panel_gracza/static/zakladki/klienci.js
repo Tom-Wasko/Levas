@@ -33,13 +33,29 @@ function dniStrefy(P, s) {
       ><b style="height:${Math.max(1, Math.round((x / max) * 22))}px"></b></i>`).join("")}</div>`;
 }
 
+// U24: najliczniejsze grupy klientów strefy (opis grupy w dymku)
+function grupyStrefy(P, s) {
+  return Object.entries(s.grupy || {}).slice(0, 3).map(([g, x]) =>
+    `<span data-dymek="${esc(P.grupy[g]?.opis || "")}">${esc(P.grupy[g]?.nazwa || g)} ${proc(x)}</span>`).join(", ") || "–";
+}
+
+function grupyOpis(P) {
+  const g = Object.values(P.grupy || {});
+  if (!g.length) return "";
+  return `<details class="komunikat"><summary><b>Kim są klienci?</b> Każda grupa ma swoje ulubione dania, inną wrażliwość na cenę
+    i cierpliwość w kolejce – to widać potem w opiniach o lokalu.</summary>`
+    + g.map((x) => `<p><b>${esc(x.nazwa)}</b> – ${esc(x.opis)}</p>`).join("") + `</details>`;
+}
+
 function strefyDecyzje(v, kat) {
   const P = v.popyt;
+  const zGrupami = Object.keys(P.grupy || {}).length > 0;
   const wiersze = Object.entries(P.strefy).sort(([, a], [, b]) => b.pula - a.pula).map(([k, s]) => [
     `<span class="kropka" style="background:${esc(kat.mapa.strefy[k].kolor)}"></span>${esc(nazwaStrefy(kat, k))}`,
-    licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), dniStrefy(P, s)]);
-  return tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Ceny", "Wrażliwość na cenę", "Klienci w dni tygodnia"],
-    wiersze, { klasy: ["l", "", "l", "l", "l"] })
+    licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), ...(zGrupami ? [grupyStrefy(P, s)] : []), dniStrefy(P, s)]);
+  return grupyOpis(P) + tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Ceny", "Wrażliwość na cenę",
+    ...(zGrupami ? ["Najwięcej klientów"] : []), "Klienci w dni tygodnia"],
+    wiersze, { klasy: ["l", "", "l", "l", "l", "l"] })
     + `<p class="podpowiedz">Klienci strefy – wszyscy chętni na dania z Twojego menu w rundzie sprzedaży, zanim podzielą się między lokale
       (Twoje i konkurencji) i bary spoza gry.</p>`;
 }
@@ -51,10 +67,30 @@ function wynikiDni(k) {
     + `<div class="wykres"><canvas id="w-klienci-dni"></canvas></div>`;
 }
 
-function wynikiLokale(k, kat) {
-  return tabela("Lokale – skąd przyszli klienci", ["Lokal", "Strefa", "Popyt", "Sprzedaż", "Klienci ze stref"],
+function wynikiLokale(k, kat, P) {
+  const zGrupami = k.lokale.some((l) => l.grupy && Object.keys(l.grupy).length);
+  return tabela("Lokale – skąd przyszli klienci", ["Lokal", "Strefa", "Popyt", "Sprzedaż", "Klienci ze stref",
+    ...(zGrupami ? ["Grupy klientów"] : [])],
     k.lokale.map((l) => [esc(l.nazwa), esc(nazwaStrefy(kat, l.strefa)), licz(l.popyt), licz(l.sprzedaz),
-      Object.entries(l.strefy).slice(0, 4).map(([s, n]) => `${esc(nazwaStrefy(kat, s))}: ${licz(n)}`).join(", ")]), { klasy: ["l", "l", "", "", "l"] });
+      Object.entries(l.strefy).slice(0, 4).map(([s, n]) => `${esc(nazwaStrefy(kat, s))}: ${licz(n)}`).join(", "),
+      ...(zGrupami ? [Object.entries(l.grupy || {}).slice(0, 3).map(([g, n]) => `${esc(P?.grupy?.[g]?.nazwa || g)}: ${licz(n)}`).join(", ")] : [])]),
+    { klasy: ["l", "l", "", "", "l", "l"] });
+}
+
+// U24: ocena lokali z opinii klientów i jej powody (gwiazdki za jakość, cenę, kolejkę…)
+const POWODY = { jakosc: "Jakość", cena: "Cena", kolejka: "Kolejka", brak: "Brak dań", reklamacje: "Reklamacje", wyposazenie: "Wyposażenie" };
+const gw = (x) => x == null ? "–" : x.toFixed(1).replace(".", ",");
+function wynikiOpinie(v, k) {
+  const o = v.wyniki?.opinie;
+  if (!o || !Object.keys(o).length) return "";
+  const nazwa = Object.fromEntries(k.lokale.map((l) => [l.id, l.nazwa]));
+  const znak = (x) => x >= 0.05 ? `<span class="plus">+${gw(x)}</span>` : x <= -0.05 ? `<span class="minus">${gw(x)}</span>` : "0";
+  return tabela("Opinie klientów o Twoich lokalach", ["Lokal", "Ocena tygodnia", ...Object.values(POWODY), "Nowe opinie", "Ocena na mapie", "Mnożnik popytu"],
+    Object.entries(o).map(([id, x]) => [esc(nazwa[id] || id), `★ ${gw(x.ocena_tygodnia)}`, ...Object.keys(POWODY).map((p) => znak(x.powody[p])),
+      licz(x.nowe), `★ ${gw(x.ocena)} (${licz(x.liczba)})`, `× ${licz(x.mnoznik, 2)}`]), { klasy: ["l"], sortuj: false })
+    + `<p class="podpowiedz">Ocena tygodnia to ocena wyjściowa ± powody (w gwiazdkach): jakość dań, cena wobec cen w strefie, klienci odesłani
+      z kolejki albo bez dania, reklamacje, wyposażenie. Ocena na mapie to średnia z opinii – nowe ważą więcej, stare z czasem tracą znaczenie.
+      Im więcej opinii, tym mocniej ocena działa na klientów: lokal z oceną powyżej przeciętnej przyciąga ich więcej.</p>`;
 }
 
 function wynikiStrefy(v, kat, R) {
@@ -69,8 +105,9 @@ function wynikiStrefy(v, kat, R) {
 export const klienci = {
   tytul: "Klienci", tytulPelny: "Klienci i strefy", ikona: "klienci", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
   info: `Każda strefa miasta ma własnych klientów – ich liczba zależy od dania, pory roku, dnia tygodnia i wydarzeń w mieście.
-    Klienci strefy wybierają lokal: liczy się cena względem cen w strefie, jakość, odległość lokalu (sąsiednie strefy też przychodzą, ale mniej)
-    i zadowolenie klientów firmy. Dwa lokale w jednej strefie dzielą tych samych klientów, a część klientów zawsze wybiera bary spoza gry albo obiad w domu.${IG_KLIENCI}`,
+    Klienci strefy to różne grupy (studenci, pracownicy biur, rodziny, turyści…) – każda ma ulubione dania i inną wrażliwość na cenę.
+    Wybierając lokal, patrzą na cenę względem cen w strefie, jakość, odległość lokalu (sąsiednie strefy też przychodzą, ale mniej)
+    i opinie innych klientów o lokalu (gwiazdki na mapie). Dwa lokale w jednej strefie dzielą tych samych klientów, a część klientów zawsze wybiera bary spoza gry albo obiad w domu.${IG_KLIENCI}`,
   decyzje({ v, kat }) {
     const P = v.popyt;
     if (!P) return `<p class="podpowiedz">Brak danych o klientach.</p>`;
@@ -83,7 +120,7 @@ export const klienci = {
     const k = v.wyniki?.klienci, R = v.rynek?.strefy;
     if (!k || !R) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie sprzedaży.</p>`;
     return (R.wydarzenia.length ? `<div class="pasek">Wydarzenia w mieście</div>${wydarzeniaHtml(R.wydarzenia, kat)}` : "")
-      + wynikiDni(k) + wynikiLokale(k, kat) + wynikiStrefy(v, kat, R);
+      + wynikiDni(k) + wynikiLokale(k, kat, v.popyt) + wynikiOpinie(v, k) + wynikiStrefy(v, kat, R);
   },
   po({ v }, tryb) {
     const k = v.wyniki?.klienci;

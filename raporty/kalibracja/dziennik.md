@@ -472,3 +472,51 @@ wpis na dole.
   Nowe testy: `testy/ludzie/test_zadowolenie.py`.
 - Teksty: INSTRUKCJA rozdz. 8 i 15, podpowiedź „Dbaj o ludzi”. Usunięte zdanie „pracują gorzej”, bo wydajność
   zależy od cechy, nie od nastroju. Panel HR: opis pod „i”, zadowolenie w profilu i wynikach, tabela wypowiedzeń.
+
+## U24 – opinie klientów i 8 grup klientów (4.11.2026, Claude Code, Opus 5.5)
+- Decyzje autora: projekt `raporty/projekt_U24_opinie_i_grupy_klientow.md` (ocena z przeżyć klientów, wpływ
+  na popyt + komentarze, 8 grup z koszykiem, obie mechaniki razem).
+- Zrobione:
+  - `silnik/rynek/klienci.py` – grupy, koszyk (wegetarianie przenoszą popyt mięsny na bezmięsne dania koszyka,
+    popyt roczny miasta bez zmian), wrażliwość cenowa grup (średnio równa wrażliwości strefy), zastępstwo dań;
+  - `silnik/rynek/opinie.py` – ocena tygodnia z powodów, średnia krocząca, liczba opinii ze sprzedaży,
+    mnożnik popytu z zaufaniem, komentarze ze strumienia `opinie`;
+  - `popyt.podzial` liczy grupa × lokal × dzień. Mapa: gwiazdki i komentarze przy lokalach. Zakładka Klienci:
+    skład grup stref, grupy w lokalach, tabela powodów oceny.
+- Pomiar: 5 strategii × ziarna 7–10 × 14 rund. Miara to suma wyniku działalności, średnia na firmę. „Przed” to te
+  same gry bez `klienci.yaml`.
+
+  | poziom | strategia | przed | po | mnożnik (mediana) | ocena (mediana) |
+  |---|---|---|---|---|---|
+  | łatwy | agresywny | −4,91 | −3,83 | 0,87 | 2,3 |
+  | łatwy | naśladowca | −0,10 | 0,14 | 0,88 | 2,2 |
+  | łatwy | premium | 4,58 | 6,89 | 1,03 | 3,6 |
+  | łatwy | tani | 0,69 | 1,25 | 0,85 | 2,0 |
+  | łatwy | zrównoważony | 4,00 | 4,19 | 0,94 | 2,7 |
+  | średni | agresywny | 1,66 | 1,54 | 0,86 | 2,2 |
+  | średni | naśladowca | 5,24 | 6,21 | 1,00 | 3,4 |
+  | średni | premium | 7,17 | 9,76 | 1,06 | 3,9 |
+  | średni | tani | 4,59 | 4,60 | 0,90 | 2,4 |
+  | średni | zrównoważony | 6,06 | 6,83 | 1,00 | 3,3 |
+  | trudny | agresywny | 2,55 | 4,61 | 0,91 | 2,5 |
+  | trudny | naśladowca | 5,70 | 6,45 | 1,01 | 3,4 |
+  | trudny | premium | 7,53 | 8,96 | 1,03 | 3,7 |
+  | trudny | tani | 3,81 | 3,76 | 0,92 | 2,5 |
+  | trudny | zrównoważony | 6,23 | 7,40 | 1,01 | 3,4 |
+
+- Wnioski z kalibracji:
+  - **Zastępstwo dań** było najmocniejszą dźwignią. Przy 35% premium (wąskie menu, drogie dania) miał ok. 12
+    zamiast 6,6, bo klienci bez ulubionego dania i tak zostawali. Przy 10% reszta grup działa umiarkowanie.
+  - **Rozrzut wrażliwości cenowej grup** prawie nie zmienia wyników – grupy działają głównie przez koszyk.
+  - **Opinie:** pierwsza wersja (start 3,0, odniesienie 3,4, wykładnik 1) dawała typową ocenę 2,4 i mnożniki
+    0,58–1,0 – za mocno. Teraz start 3,6, jakość 0,3★ za gwiazdkę ponad 2, odniesienie 3,3, wykładnik 0,4:
+    mnożniki 0,86–1,06, jak dawny mnożnik karty (0,83–1,05).
+  - Prawie wszyscy zyskują (agresywny na średnim i tani na trudnym bez zmian). Najwięcej
+    zyskuje premium: na średnim prowadzi ok. 1,4× przed zrównoważonym (wcześniej 1,18×), na trudnym 1,21×
+    (wcześniej 1,21×). Tani ma najniższe oceny, bo jego kolejki i słaba jakość widać w opiniach.
+  - Kolejność strategii bez zmian. Do obserwacji w B: przewaga premium na średnim; jeśli w grze z drużynami
+    będzie za duża, pierwsza dźwignia to `opinie.jakosc` (0,3 → 0,2).
+- Zmienione testy: `test_zamrozona_kopia_ma_wszystkie_pliki_danych` (pomija opcjonalny `mapa/klienci.yaml`).
+  `sprawdz` nie wymaga tego pliku. Wyniki testów mechanik do grosza bez zmian (zamrożona kopia nie ma grup).
+  Nowe testy: `testy/rynek/test_klienci_opinie.py`.
+- Teksty: INSTRUKCJA rozdz. 6 i rada 4 w rozdz. 15, „i” w zakładkach Mapa i Klienci, podpowiedź karty.

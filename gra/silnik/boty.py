@@ -309,7 +309,8 @@ def _zatrudnieni(f: Firma, plan: dict) -> None:
 def _prognoza_lokali(dane: Dane, f: Firma, nazwa: str, oferta: list[str], ceny: dict[str, float], q: int,
                      wyp: float, konkurencja: dict, r_sprz: int) -> dict:
     moje = {lok.id: {u: {"strefa": dane.lokale[lok.id]["strefa"], "cena": ceny[u], "jakosc": (q, q, q),
-                         "wyposazenie": wyp, "rozruch": pp.rozruch(dane, lok, r_sprz)} for u in oferta}
+                         "wyposazenie": wyp, "rozruch": pp.rozruch(dane, lok, r_sprz),
+                         "zadowolenie": pp.zadowolenie_lokalu(dane, lok)} for u in oferta}
             for lok in f.lokale if lok.dziala_od <= r_sprz}
     return pp.prognoza(dane, r_sprz, {**konkurencja, nazwa: moje}, nazwa)
 

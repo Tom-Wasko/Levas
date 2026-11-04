@@ -1,0 +1,167 @@
+# Klienci miasta (U24): grupy klientów z koszykiem i opinie o lokalach
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'U24 (decyzja autora 4.11.2026). Grupy klientów (silnik/rynek/klienci.py): klienci strefy to mieszanka grup
+  (strefy – udziały, suma 1); goście wydarzeń to nadwyżka klientów z kalendarza miejskiego. Grupa ma wrażliwość
+  na cenę (cena: mnożnik wrażliwości strefy, w strefie uśredniony do 1), wrażliwość na czekanie i wagę jakości
+  (w ocenie lokalu), udział wegetarian i koszyk (ile chętniej niż przeciętnie bierze danie). Wegetarianie grupy
+  nie biorą dań z listy mieso – ich część przechodzi na dania z listy wege. Koszyk zmienia, które dania są popularne
+  w strefie; popyt całego miasta na danie zostaje jak w uslugi.yaml (normalizacja). zastepstwo: część klientów
+  dania, którego lokal nie ma, bierze u niego inne danie z tej samej grupy dań (atrakcyjność × udzial).
+  Opinie (silnik/rynek/opinie.py): ocena tygodnia lokalu z przeżyć klientów (jakość, cena wobec strefy, kolejka,
+  brak dań, reklamacje, wyposażenie), opinie – ułamek klientów; ocena lokalu = średnia krocząca (zanik wagi
+  starych opinii); mnożnik popytu = 1 + zaufanie × ((ocena / odniesienie)^wykladnik − 1), zaufanie = W / (W + n0).
+  Komentarze – szablony do powodów (losowane strumieniem „opinie”).'
+zrodlo: 'założenia U24 (pewność: założenie, do kalibracji): grupy i udziały – wg opisów klientów stref (strefy.yaml)
+  i starego Levasa (koszyk, wegetarianie); odniesienie oceny dobrane tak, żeby mnożnik typowego lokalu botów był
+  zbliżony do dawnego mnożnika z karty zadowolenia (mediana 0,91–0,98 dla poziomów łatwy…trudny, pomiar 4.11.2026 –
+  dziennik kalibracji U24)'
+mieso: [kebab_w_bulce, kebab_w_tortilli, kebab_box, talerz_kebab]
+wege: [falafel]
+zastepstwo:
+  udzial: 0.1            # U24 kalibracja 4.11: przy 0,35 lokale z wąskim menu (premium) zyskiwały ~2× wynik
+  grupy_dan:
+    - [kebab_w_bulce, kebab_w_tortilli, kebab_box, talerz_kebab]
+wydarzenia: goscie_wydarzen
+grupy:
+  studenci:
+    nazwa: Studenci
+    opis: Liczą każdą złotówkę, ale za dużą porcję oddadzą duszę. Wegetarian najwięcej w mieście.
+    podpisy: [student III roku, studentka prawa, doktorant, ktoś z akademika, studentka po kolokwium]
+    cena: 1.5
+    czekanie: 0.8
+    jakosc: 0.8
+    wegetarianie: 0.14
+    koszyk: {kebab_w_bulce: 1.3, kebab_w_tortilli: 1.1, kebab_box: 1.2, talerz_kebab: 0.5, falafel: 1.3, frytki: 1.2, napoj: 1.0, dodatek: 1.1}
+  uczniowie:
+    nazwa: Uczniowie
+    opis: Przychodzą stadem po lekcjach. Frytki i napój to dla nich pełny obiad.
+    podpisy: [uczeń 2b, licealistka, ktoś na wagarach, przewodniczący klasy]
+    cena: 1.6
+    czekanie: 0.9
+    jakosc: 0.6
+    wegetarianie: 0.08
+    koszyk: {kebab_w_bulce: 1.3, kebab_w_tortilli: 1.0, kebab_box: 1.0, talerz_kebab: 0.3, falafel: 0.6, frytki: 1.6, napoj: 1.4, dodatek: 1.2}
+  biurowi:
+    nazwa: Pracownicy biur
+    opis: Lunch w 30 minut, w tym 10 na kolejkę – więcej nie ma. Cena mniej ważna, byle szybko i porządnie.
+    podpisy: [specjalista ds. Excela, pani z księgowości, kierownik projektu, ktoś z open space’u]
+    cena: 0.8
+    czekanie: 1.5
+    jakosc: 1.1
+    wegetarianie: 0.10
+    koszyk: {kebab_w_bulce: 0.8, kebab_w_tortilli: 1.2, kebab_box: 1.3, talerz_kebab: 1.1, falafel: 1.2, frytki: 0.7, napoj: 0.9, dodatek: 0.8}
+  imprezowicze:
+    nazwa: Imprezowicze
+    opis: Przychodzą po północy i niczego nie pamiętają, oprócz frytek. Kolejka im niestraszna – jest z kim gadać.
+    podpisy: [ktoś po koncercie, dusza towarzystwa, gość z wieczoru kawalerskiego, nocny marek]
+    cena: 0.9
+    czekanie: 0.7
+    jakosc: 0.6
+    wegetarianie: 0.05
+    koszyk: {kebab_w_bulce: 1.3, kebab_w_tortilli: 1.1, kebab_box: 1.1, talerz_kebab: 0.8, falafel: 0.6, frytki: 1.4, napoj: 1.2, dodatek: 1.3}
+  rodziny:
+    nazwa: Rodziny
+    opis: Talerz dla taty, frytki dla dzieci, sos osobno. Liczą wydatki i pamiętają każdą reklamację.
+    podpisy: [mama trójki dzieci, tata na spacerze, babcia z wnukami, rodzina z osiedla]
+    cena: 1.2
+    czekanie: 1.2
+    jakosc: 1.2
+    wegetarianie: 0.07
+    koszyk: {kebab_w_bulce: 0.7, kebab_w_tortilli: 0.8, kebab_box: 0.9, talerz_kebab: 1.6, falafel: 0.9, frytki: 1.4, napoj: 1.2, dodatek: 1.0}
+  turysci:
+    nazwa: Turyści
+    opis: Na wakacjach się nie liczy pieniędzy. Liczy się zdjęcie talerza i opinia w internecie.
+    podpisy: [turysta z Warszawy, wycieczka z Niemiec, para na weekend, przewodnik z grupą]
+    cena: 0.6
+    czekanie: 1.0
+    jakosc: 1.3
+    wegetarianie: 0.09
+    koszyk: {kebab_w_bulce: 1.0, kebab_w_tortilli: 1.1, kebab_box: 0.8, talerz_kebab: 1.5, falafel: 1.1, frytki: 0.9, napoj: 1.0, dodatek: 0.9}
+  goscie_wydarzen:
+    nazwa: Goście wydarzeń
+    opis: Pojawiają się przy meczu, koncercie albo festynie. Głodni, w szaliku, nie patrzą na cenę.
+    podpisy: [kibic w szaliku, fanka po koncercie, gość festynu, ktoś z biletem w zębach]
+    cena: 0.7
+    czekanie: 1.1
+    jakosc: 0.8
+    wegetarianie: 0.07
+    koszyk: {kebab_w_bulce: 1.4, kebab_w_tortilli: 1.1, kebab_box: 0.9, talerz_kebab: 0.4, falafel: 0.7, frytki: 1.3, napoj: 1.5, dodatek: 1.0}
+  podrozni:
+    nazwa: Podróżni
+    opis: Pociąg za siedem minut. Kolejka dłuższa niż trzy osoby oznacza głodną podróż i gwiazdkę mniej.
+    podpisy: [pasażer IC, kierowca busa, ktoś z walizką, studentka wracająca do domu]
+    cena: 0.8
+    czekanie: 1.8
+    jakosc: 0.9
+    wegetarianie: 0.06
+    koszyk: {kebab_w_bulce: 1.3, kebab_w_tortilli: 1.2, kebab_box: 0.9, talerz_kebab: 0.5, falafel: 0.8, frytki: 1.0, napoj: 1.3, dodatek: 0.9}
+strefy:
+  stare_miasto: {turysci: 0.35, imprezowicze: 0.25, studenci: 0.1, biurowi: 0.1, rodziny: 0.1, uczniowie: 0.05, podrozni: 0.05}
+  centrum: {biurowi: 0.4, studenci: 0.15, uczniowie: 0.1, turysci: 0.1, imprezowicze: 0.1, rodziny: 0.1, podrozni: 0.05}
+  akademickie: {studenci: 0.7, imprezowicze: 0.1, uczniowie: 0.05, biurowi: 0.05, rodziny: 0.1}
+  politechnika: {studenci: 0.6, biurowi: 0.15, uczniowie: 0.1, imprezowicze: 0.05, rodziny: 0.1}
+  dworzec: {podrozni: 0.55, biurowi: 0.1, studenci: 0.1, uczniowie: 0.1, turysci: 0.1, rodziny: 0.05}
+  zygmuntowskie: {rodziny: 0.35, imprezowicze: 0.2, uczniowie: 0.15, biurowi: 0.15, studenci: 0.1, podrozni: 0.05}
+  lsm_czuby: {rodziny: 0.5, uczniowie: 0.2, biurowi: 0.1, studenci: 0.15, imprezowicze: 0.05}
+  czechow: {rodziny: 0.5, uczniowie: 0.2, biurowi: 0.15, studenci: 0.1, imprezowicze: 0.05}
+  felin: {biurowi: 0.45, podrozni: 0.25, rodziny: 0.15, uczniowie: 0.1, studenci: 0.05}
+  zemborzyce: {rodziny: 0.45, turysci: 0.25, imprezowicze: 0.15, uczniowie: 0.1, biurowi: 0.05}
+opinie:
+  start: 3.6             # ocena tygodnia przed przeżyciami klientów (gwiazdki 1–5)
+  jakosc: 0.3            # za każdą gwiazdkę jakości dania ponad 2 (średnia ważona składników, kucharzy, sprzętu)
+  cena: 2.0              # za każde +100% ceny ponad cenę preferowaną strefy (taniej – plus)
+  cena_limit: 0.6        # największy wpływ ceny w jedną stronę (gwiazdki)
+  kolejka: 4.0           # × udział klientów, którzy odeszli z kolejki (pracownicy, sprzęt, kasa) × czekanie grup
+  brak: 3.0              # × udział klientów odesłanych z braku dania (składniki, stanowisko)
+  reklamacje: 10.0       # × udział reklamacji w sprzedaży
+  wyposazenie: 2.0       # × (mnożnik wyposażenia − 1)
+  udzial_opinii: 0.02    # ułamek obsłużonych klientów, którzy wystawiają opinię
+  rozrzut: 0.8           # rozrzut pojedynczej opinii (gwiazdki); średnia tygodnia – rozrzut / √liczby
+  zanik: 0.6             # waga opinii z poprzednich tygodni (× co tydzień)
+  n0: 10                 # zaufanie do oceny: W / (W + n0)
+  odniesienie: 3.3       # ocena, przy której mnożnik popytu = 1
+  wykladnik: 0.4         # kalibracja 4.11: przy 1 ocena 4★ dawała +22% popytu – za mocno obok jakości w atrakcyjności
+  komentarze: 3          # ile komentarzy pokazać przy lokalu
+  prog_komentarza: 0.1   # powód oceny (gwiazdki) od którego klienci o nim piszą
+  ocena_dobra: 3.8       # od tej oceny komentarz ogólny jest pochwałą, poniżej – „średnio”
+  skala: 5               # najwyższa ocena (gwiazdki 1–skala)
+komentarze:
+  jakosc_plus:
+    - Mięso jak u babci, gdyby babcia była Turczynką. Pięć gwiazdek.
+    - Sos tak dobry, że wylizałem papierek. Nie oceniajcie mnie.
+    - Wróciłam po dokładkę, a potem jeszcze raz, „po przepis”.
+  jakosc_minus:
+    - Mięso miało fakturę podeszwy. Smak też.
+    - Bułka przeżyła więcej niż ja przez cały semestr.
+    - Sos czosnkowy bez czosnku. Nawet wampir by się nie przestraszył.
+  cena_minus:
+    - Smaczne, ale za tę cenę spodziewałem się kebaba ze złotą folią.
+    - Zapłaciłam jak za obiad w Paryżu, a jestem na Lubelszczyźnie.
+    - Portfel płakał głośniej niż ja przy cebuli.
+  cena_plus:
+    - Za te pieniądze to praktycznie dobroczynność. Dziękuję!
+    - Najtańszy obiad od czasu stołówki w podstawówce.
+    - Najadłem się za drobne z kieszeni kurtki.
+  kolejka:
+    - Stałem w kolejce tak długo, że dostałem pocztą wezwanie na wybory.
+    - Kolejka sięgała do sąsiedniej strefy. Odpuściłam.
+    - Przyszedłem głodny, wyszedłem głodny, ale za to starszy.
+  brak:
+    - Chciałam falafel, a usłyszałam „dziś nie ma”. Wczoraj też nie było.
+    - Połowa menu wykreślona markerem. Fajne bazgroły.
+    - Zamówiłem danie z menu i okazało się, że to była tylko propozycja.
+  reklamacje:
+    - Oddałem jedzenie do reklamacji. Kucharz wyglądał, jakby to była rutyna.
+    - Zamiast frytek dostałam rozczarowanie w papierowej torbie.
+    - Było zimne. Gorąca była tylko moja reklamacja.
+  wyposazenie:
+    - Klimatyzacja, wygodne krzesła – prawie zostałem tu zamieszkać.
+    - Ładnie tu, nawet kwiatek w doniczce na serio żyje.
+  ogolnie_plus:
+    - Szybko, smacznie, uprzejmie. Czego chcieć więcej? Może drugiego kebaba.
+    - Moje ulubione miejsce. Nie mówcie nikomu, bo będą kolejki.
+    - Obsługa uśmiechnięta, jedzenie ciepłe, życie piękne.
+  ogolnie_srednio:
+    - Kebab jak kebab. Zjadłem, przeżyłem, polecam umiarkowanie.
+    - Ani źle, ani dobrze – idealnie przeciętnie.
+    - Nie zachwyca, nie rozczarowuje. Trzy gwiazdki z rozpędu.

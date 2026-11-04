@@ -51,6 +51,7 @@ from .pieniadze import lichwiarz as lw
 from .pieniadze import wlasciciel as wl
 from .rynek import handel as hd
 from .rynek import konkurencja as kn
+from .rynek import opinie as op
 from .rynek import popyt as pp
 from .rynek import promocje as pm
 from .rynek import reklama as rk
@@ -175,6 +176,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     # --- rynek i sprzedaż ----------------------------------------------------------------------
     popyt, obsluga, oferty = {}, {}, {}
     strefowy = None
+    opinie_rundy: dict = {}
     kampanie = rk.efekty_rundy(dane, s.firmy, r, ziarno) if rk.zasady(dane) is not None else None   # agencje reklamowe
     if r >= 2:
         oferty_lok = {}
@@ -193,6 +195,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         strefowy = pp.rynek_lokali(dane, s.firmy, oferty_lok, r, ziarno, (kampanie or {}).get("pula"),
                                    {n: info[n].get("przewozy") or [] for n in nazwy})
         popyt, obsluga, rynek = strefowy["popyt"], strefowy["obsluga"], strefowy["rynek"]
+        opinie_rundy = op.po_rundzie(dane, s.firmy, strefowy, oferty_lok, r, ziarno)   # U24: opinie klientów o lokalach
         for nazwa, lokale in oferty_lok.items():  # oferta firmy: jakość lokalu z największym popytem dania
             for u in popyt[nazwa]:
                 lok = max((x for x in lokale if u in lokale[x]), key=lambda x: rynek[u][nazwa]["skladniki"]["lokale"][x])
@@ -313,6 +316,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
                     w["sprzedaz"][u]["przychod"] = round(zl, 2)
         if strefowy:
             w["klienci"] = strefowy["klienci"][nazwa]
+            if nazwa in opinie_rundy:
+                w["opinie"] = opinie_rundy[nazwa]
             w["swiezosc"] = strefowy["swiezosc"][nazwa]
             mag.dolicz_oddane(strefowy["swiezosc"][nazwa], (info[nazwa].get("zdarzenia") or {}).get("oddane"))
             _straty_w_zasobach(w["zasoby"], strefowy["swiezosc"][nazwa]["straty"])
@@ -329,6 +334,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     s.rynek[r]["przejecia"] = pr.publiczne(dane, s.firmy, przetargi)
     if strefowy:
         s.rynek[r]["strefy"] = strefowy["strefy"]
+    if op.ustawienia(dane):   # oceny i komentarze klientów widać na mapie
+        s.rynek[r]["opinie"] = op.publiczne(s.firmy)
     if kampanie:   # reklamy widać na mieście: kto, gdzie i za ile
         s.rynek[r]["kampanie"] = rk.publiczne(dane, kampanie)
     if pm.zasady(dane):   # promocje widać na drzwiach lokali

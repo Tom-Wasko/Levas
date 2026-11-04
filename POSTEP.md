@@ -342,7 +342,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] U21 [22] Pomiar „zamknięcia firmy” z wypowiedzeniem najmu (wariant w `balans/warianty.py`) – zrobione: Zamknięcie się nie opłaca (0/20 par; R11 −0,65, R6 −0,97 karty); najemca nie może wypowiedzieć najmu – dziennik kalibracji U21.
 - [x] U22 (pyt. 3) Wskaźnik zadłużenia: gotówka w mianowniku – kredyt leżący na koncie nie karze karty – zrobione: gotówka w mianowniku; ekspansja na kredyt 0,18 → 0,37 karty (wskaźnik 0,42 → 0,75), gry bez długu bez zmian – dziennik kalibracji U22.
 - [x] U23 (pyt. 6) Zatrudnianie od tygodnia 1 (`dane/katalog.yaml:52`, hr_zatrudnienie) – zrobione: hr_zatrudnienie od tygodnia 1 (pracuj.pl), boty też; karta botów 0,523 → 0,528, dochód −1,1 tys. zł – dziennik kalibracji U23.
-- [ ] U24 (decyzja autora 4.11, po U20) Opinie klientów na mapie (ocena lokalu z przeżyć klientów, wpływ na popyt, żartobliwe komentarze) + 8 grup klientów z koszykiem (wegetarianie przenoszą udziały) – razem, jeden pomiar balansu; projekt `raporty/projekt_U24_opinie_i_grupy_klientow.md`
+- [x] U24 (decyzja autora 4.11, po U20) Opinie klientów na mapie (ocena lokalu z przeżyć klientów, wpływ na popyt, żartobliwe komentarze) + 8 grup klientów z koszykiem (wegetarianie przenoszą udziały) – razem, jeden pomiar balansu; projekt `raporty/projekt_U24_opinie_i_grupy_klientow.md` – zrobione 4.11: klienci.py, opinie.py, mapa i zakładka Klienci, pomiar w dzienniku kalibracji.
 
 - [ ] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu
 

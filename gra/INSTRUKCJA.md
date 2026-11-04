@@ -160,12 +160,25 @@ sprzątania odbioru nie będzie.
 ## 6. Klienci – skąd się biorą
 
 Lublin podzielono na **strefy**. Każda ma swoich klientów, a ich liczba zależy od dania, dnia tygodnia, pogody
-roku akademickiego i wydarzeń w mieście (sesja, Halloween, jarmark, mecze). Klienci strefy wybierają lokal według:
+roku akademickiego i wydarzeń w mieście (sesja, Halloween, jarmark, mecze).
+
+Klienci strefy to mieszanka **grup**: studenci, uczniowie, pracownicy biur, imprezowicze, rodziny, turyści,
+podróżni i goście wydarzeń. Każda grupa ma ulubione dania (rodziny biorą talerze i boxy, uczniowie – frytki
+i napój), inną wrażliwość na cenę (studenci liczą każdą złotówkę, turyści mniej) i inną cierpliwość w kolejce
+(podróżni i biurowi nie czekają). Wśród klientów są też wegetarianie – oni wybierają falafel i dania bez mięsa.
+Skład grup strefy widać w zakładce **Klienci i strefy** – dlatego w różnych strefach opłaca się inna oferta.
+Gdy w menu brakuje ulubionego dania, część klientów weźmie u Ciebie coś innego.
+
+Klienci wybierają lokal według:
 
 - **ceny** w porównaniu z cenami w strefie,
 - **jakości** dania (gwiazdki sprzętu i składników),
 - **odległości** – sąsiednie strefy też przychodzą, ale mniej chętnie,
-- **zadowolenia** – firmy, z której klienci wyszli zadowoleni, wracają chętniej.
+- **opinii o lokalu** – gwiazdki na mapie (ocena 1–5★ i liczba opinii, kliknij lokal, żeby przeczytać
+  komentarze). Klienci oceniają to, co przeżyli w lokalu: jakość dań, cenę na tle strefy, czekanie w kolejce,
+  brakujące dania, reklamacje i wyposażenie. Ocena to średnia z opinii – nowe ważą więcej niż stare. Im więcej
+  opinii, tym bardziej klienci jej ufają: lokal z oceną powyżej przeciętnej przyciąga więcej klientów, poniżej –
+  mniej. Rozbicie oceny Twoich lokali na powody jest w wynikach zakładki Klienci i strefy.
 - **renomy lokalu** – nowy lokal dopiero zdobywa stałych bywalców: w pierwszym tygodniu sprzedaży
   przychodzi niecała połowa klientów, co tydzień więcej, aż po kilku tygodniach lokal jest „znany”.
   Tak samo jest z każdym kolejnym lokalem – zaplanuj na start mniejszą obsadę i zamówienia. Dopóki lokal
@@ -173,7 +186,7 @@ roku akademickiego i wydarzeń w mieście (sesja, Halloween, jarmark, mecze). Kl
 
 Dwa lokale w jednej strefie dzielą tych samych klientów, a część ludzi i tak zje u konkurencji spoza gry albo
 w domu. Jeśli brakuje rąk, sprzętu albo miejsc przy kasie, klienci odchodzą z kolejki – to **utracona sprzedaż**,
-widoczna w wynikach Menu i cen i bolesna dla zadowolenia klientów.
+widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o lokalu.
 
 ## 7. Dostawcy i świeżość
 
@@ -311,7 +324,8 @@ Mistrz gry może przesunąć te terminy (poza tygodniem 1 – tydzień przygotow
 1. **Policz, zanim kupisz.** 40 000 zł znika szybciej, niż się wydaje: kaucja, sprzęt, pierwsze pensje i towar.
 2. **Lokal to połowa sukcesu.** Tani lokal w pustej strefie jest drogi.
 3. **Cena to nie wszystko.** Najtańszy kebab w mieście z jednym kucharzem to kolejka, której nikt nie obsłuży.
-4. **Patrz na utraconą sprzedaż.** Jeśli klienci odchodzą z kolejki – brakuje ludzi, sprzętu albo miejsc przy kasie.
+4. **Patrz na utraconą sprzedaż i opinie.** Jeśli klienci odchodzą z kolejki – brakuje ludzi, sprzętu albo miejsc
+   przy kasie. Zapamiętają to w opiniach, a gwiazdki na mapie widzą wszyscy.
 5. **Zamawiaj pod prognozę, nie na zapas.** Przeterminowane jedzenie to strata i zaproszenie dla sanepidu.
 6. **Czytaj kalendarz miejski.** Sesja, mecz Motoru, jarmark – zaplanuj obsadę i zamówienia, zanim tydzień się zacznie.
 7. **Dbaj o ludzi.** Niezadowolony pracownik odchodzi, a nowego trzeba znaleźć i przyuczyć. Lista błędów ostrzeże Cię tydzień wcześniej.

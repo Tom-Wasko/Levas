@@ -44,6 +44,7 @@ from silnik.pieniadze import wlasciciel as wl
 from silnik.rynek import handel as hd
 from silnik.rynek import kalendarz as kl
 from silnik.rynek import konkurencja as kn
+from silnik.rynek import opinie as op
 from silnik.rynek import promocje as pm
 from silnik.rynek import reklama as rk
 from silnik.rynek.popyt import rozruch, widok_popytu
@@ -387,7 +388,9 @@ def _lokale(gra: Gra, firma: str, runda: int, f: Firma, poprzedni, stan, info: d
             "nowy_od": runda_nowego_lokalu(dane, poprzedni.firmy[firma]),
             "odpoczynek": komunikat_odpoczynku(dane, poprzedni.firmy[firma], runda)
             if runda < runda_nowego_lokalu(dane, poprzedni.firmy[firma]) else None,
-            "decyzja": decyzja}
+            "decyzja": decyzja,
+            # U24: oceny i komentarze klientów (stan po poprzedniej rundzie) – publiczne, widać je na mapie
+            "opinie": op.publiczne(poprzedni.firmy) if op.ustawienia(dane) else {}}
 
 
 def _dashboard(gra: Gra, firma: str, runda: int, poprzedni, skum: dict) -> dict:
