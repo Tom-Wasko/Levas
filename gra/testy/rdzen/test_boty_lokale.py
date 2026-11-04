@@ -1,5 +1,6 @@
 """B6: boty korzystają z każdej opcji lokalu – kupno na kredyt pod zastaw, lokal niewyposażony, działka, przebicie
-w licytacji – i z leasingu sprzętu (parametry strategii `lokal` i `leasing`, pomiar w balans/warianty.py)."""
+w licytacji – z leasingu sprzętu i z kupna budynku z najemcą (parametry strategii `lokal`, `leasing`, `wykup`,
+`przejecie`; pomiar w balans/warianty.py)."""
 import copy
 
 import pytest
@@ -10,9 +11,9 @@ from silnik.gra import Gra
 pytestmark = pytest.mark.dane_gry
 
 
-def _gra(strategia: dict, rund: int = 1) -> tuple[Gra, list[dict]]:
+def _gra(strategia: dict, rund: int = 1, **opcje) -> tuple[Gra, list[dict]]:
     """Gra dwóch firm; firma A (zrównoważony) z nadpisaną strategią – decyzje z `rund` rund."""
-    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5)
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5, **opcje)
     dane = copy.copy(g.dane)
     st = dane.boty["strategie"]
     dane.boty = {**dane.boty, "strategie": {**st, "zrownowazony": {**st["zrownowazony"], **strategia}}}
@@ -75,3 +76,21 @@ def test_bot_z_dwoma_lokalami_zamawia_z_zapasow_kazdego_lokalu(monkeypatch):
     for (lok,), mag in wywolania:   # zapasy z widoku lokalu, nie całej firmy
         assert mag == boty.pl.widok(f, lok).magazyn
     assert {z["lokal"] for z in d["zamowienia"]} == {x.id for x in f.lokale}
+
+
+def test_bot_wykupuje_wynajmowany_lokal_gdy_go_stac():
+    g, dec = _gra({"strefy": ["felin"], "wykup": {"rezerwa": 0}}, rund=4, kapital_startowy=300000)
+    lok = dec[0]["lokal"]["id"]
+    assert dec[0]["lokal"]["forma"] == "najem" and _lokal(g, lok).get("cena")
+    assert not any(d.get("przejecie") for d in dec[:3])   # przejęcia od rundy 4
+    assert dec[3]["przejecie"] == {"id": lok}
+    assert [(x.id, x.forma) for x in g.stan().firmy["A"].lokale] == [(lok, "kupno")]
+
+
+def test_bot_kupuje_budynek_rywala_i_wypowiada_mu_najem():
+    g, dec = _gra({"przejecie": {"rezerwa": 0, "wypowiedz": True}}, rund=5, kapital_startowy=300000)
+    lok = dec[3]["przejecie"]["id"]
+    assert lok in {x.id for x in g.stan(3).firmy["B"].lokale}
+    assert dec[4]["wypowiedz"] == [{"id": lok, "ulepszenia": "zatrzymaj"}]
+    umowa = next(x for x in g.stan().firmy["B"].lokale if x.id == lok)
+    assert umowa.wlasciciel == "A" and umowa.najem_do is not None

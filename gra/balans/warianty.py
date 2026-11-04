@@ -123,6 +123,12 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
             "przebicie": {"przebicie": 1.2}}
     w += [Wariant(f"lokale:{n}", f"pierwszy i kolejny lokal: {x}", strategia=(("lokal", x),))
           for n, x in typy.items()]
+    w += [Wariant("lokale:wykup", "wykup własnego lokalu, gdy zostaje 30 tys. zł",
+                  strategia=(("wykup", {"rezerwa": 30000}),)),
+          Wariant("lokale:przejecie", "kupno budynku rywala, gdy zostaje 30 tys. zł",
+                  strategia=(("przejecie", {"rezerwa": 30000}),)),
+          Wariant("lokale:przejecie_wypowiedz", "kupno budynku rywala i wypowiedzenie najmu",
+                  strategia=(("przejecie", {"rezerwa": 30000, "wypowiedz": True}),))]
     leasing = {"gotowka": 30000, "rund": 26}   # leasing, gdy gotówki mniej niż bufor botów
     w += [Wariant("leasing:sprzet", f"sprzęt w leasingu: {leasing}",
                   strategia=(("leasing", leasing),)),

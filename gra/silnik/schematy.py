@@ -431,9 +431,19 @@ class LeasingBota(Schemat):
     rund: int = Field(gt=0)
 
 
+class PrzejecieBota(Schemat):
+    """Kupno budynku z najemcą (B6), gdy po zakupie zostaje `rezerwa` gotówki: przy `wykup` – własnego lokalu
+    w najmie, przy `przejecie` – budynku rywala; `wypowiedz` – potem wypowiada rywalowi najem."""
+    rezerwa: float = Field(0, ge=0)
+    wypowiedz: bool = False
+    ulepszenia: Literal["zatrzymaj", "przywroc"] = "zatrzymaj"
+
+
 class Strategia(Schemat):
     nazwa: str
     leasing: LeasingBota | None = None   # gra z lokalami: sprzęt w leasingu przy małej gotówce (bez – zawsze zakup)
+    wykup: PrzejecieBota | None = None       # wykup własnego lokalu w najmie (bez – nie wykupuje)
+    przejecie: PrzejecieBota | None = None   # kupno budynku wynajmowanego przez rywala (bez – nie kupuje)
     lokal: LokalBota | None = None   # gra z lokalami: typ, forma i oferta lokalu (bez – gotowy w najmie, cena wywoławcza)
     min_kuchnia: int = Field(0, ge=0)   # gra z lokalami, bot planujący: najmniej miejsc w kuchni wybieranego lokalu
     cena: float | None  # ułamek ceny preferowanej; None = średnia rynku z poprzedniej rundy

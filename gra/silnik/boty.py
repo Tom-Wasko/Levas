@@ -157,6 +157,20 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
     return dec, (_kredyt_na_lokal(dane, f, dec, runda) if forma == "kupno" and f is not None else None)
 
 
+def _przejecie(dane: Dane, stan: StanGry, f: Firma, nazwa: str, st: dict, runda: int) -> dict | None:
+    """B6: kupno budynku z najemcą – wykup własnego lokalu w najmie (strategia `wykup`) albo budynku, który
+    wynajmuje rywal (`przejecie`), gdy po zakupie zostaje `rezerwa` gotówki; najtańszy z możliwych."""
+    if runda < dane.mapa["zasady"]["przejecia_od_rundy"]:
+        return None
+    firmy = [f] if st.get("wykup") else []
+    firmy += [g for n, g in stan.firmy.items() if n != nazwa] if st.get("przejecie") else []
+    kandydaci = [(c, x.id) for g in firmy for x in g.lokale
+                 if x.forma == "najem" and not x.wlasciciel and x.najem_do is None
+                 and (c := dane.lokale[x.id].get("cena"))
+                 and f.gotowka - c >= st["wykup" if g is f else "przejecie"]["rezerwa"]]
+    return {"id": min(kandydaci)[1]} if kandydaci else None
+
+
 def _wez_lokal(dane: Dane, stan: StanGry, f: Firma, d: dict, dec: dict, kredyt: dict | None, runda: int) -> Firma:
     """Decyzja o lokalu (i kredycie pod jego zastaw) w decyzjach bota; zwraca kopię firmy z tym lokalem – dalsze
     decyzje liczone tak, jakby lokal już był."""
@@ -463,6 +477,13 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 return d
         else:
             f = _wez_lokal(dane, stan, f, d, dec, kredyt, runda)
+    if not d.get("lokal") and (pr := _przejecie(dane, stan, f, nazwa, st, runda)):
+        d["przejecie"] = pr
+        f = deepcopy(f)
+        f.gotowka -= dane.lokale[pr["id"]]["cena"]   # dalsze zakupy z gotówki po kupnie budynku
+    if (p := st.get("przejecie")) and p.get("wypowiedz"):
+        d["wypowiedz"] = [{"id": b.id, "ulepszenia": p.get("ulepszenia", "zatrzymaj")} for b in f.budynki
+                          if (u := pl.lokal(stan.firmy[b.najemca], b.id)) and u.najem_do is None]
     miejsca = lk.wolne_miejsca(dane, f, runda)
     if not f.bank:
         d["bank"] = bk.najlepsze(dane)["konto"]
