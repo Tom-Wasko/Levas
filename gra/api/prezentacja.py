@@ -266,6 +266,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["ubezpieczenia"] = aw.widok(dane, f, runda, info.get("ubezpieczenia") if edycja
                                       else wr.get("ubezpieczenia"), poprzedni.wyniki, firma)
     fp = poprzedni.firmy[firma]   # zastawy i limit – stan na początku rundy (przed decyzjami)
+    v["inwestor"] = inw.raport(f, None, 0.0)   # U11: inwestor ratunkowy (z wpłatą w tej rundzie – w podglądzie)
     v["banki"] = {"najlepsze": bk.najlepsze(dane), "historia": bk.historia(fp, runda), "zastawy": bk.zastawy(dane, fp),
                   "wolny_limit": bk.wolny_limit(dane, fp), "decyzja": {"bank": info.get("bank"), "leasing": info.get("leasing")}}
     v["kandydaci"] = rp.widoczni(dane, v["kandydaci"], runda)

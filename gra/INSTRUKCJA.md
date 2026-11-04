@@ -235,6 +235,8 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   stanowiska, sprzęt, wyposażenie), nowe kredyty, leasing i lokaty. Alarm zobaczysz jako czerwony pasek
   na Dashboardzie i pierwszą pozycję Listy błędów. Spłać debet albo poproś mistrza gry o **inwestora ratunkowego**:
   wpłaci pieniądze (najpierw spłaci debet), a przez kilka tygodni weźmie część dochodu. Dopóki wpłata nie wróci, liczy się jak dług – firma gra dalej, ale miejsca w rankingu to nie poprawia.
+  Ile inwestor wpłacił, ile już wziął i przez ile tygodni jeszcze bierze udział – zobaczysz w Finanse ▸ Bank
+  (i na Dashboardzie do końca umowy).
 - **Środki trwałe**: kupiony lokal i drogi sprzęt płacisz od razu, ale w księdze koszt rozkłada się na lata
   (amortyzacja).
 - **Portfel właściciela**: z jednoosobowej działalności można wypłacić pieniądze dla siebie albo dołożyć własne

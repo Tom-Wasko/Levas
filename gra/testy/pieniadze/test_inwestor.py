@@ -72,6 +72,20 @@ def test_inwestor_splaca_debet_i_liczy_sie_jak_dlug():
     assert w["uzgodnienie"]["roznica"] == 0
 
 
+
+def test_widok_gracza_pokazuje_inwestora():
+    """U11: inwestor w widoku drużyny – w podglądzie rundy wpłaty i po przeliczeniu."""
+    from api.prezentacja import widok
+    g = _w_debecie()
+    assert widok(g, "A")["inwestor"] is None
+    g.ustaw_inwestora("A", 20000)
+    i = widok(g, "A")["inwestor"]
+    assert (i["kwota"], i["od_rundy"], i["wyplacone"]) == (20000, 2, 0)
+    _runda(g, A={})
+    i = widok(g, "A")["inwestor"]
+    assert i["do_rundy"] == 1 + inw.warunki(g.dane)["rund"] and i["dlug"] == 20000 - i["wyplacone"]
+    assert widok(g, "B")["inwestor"] is None
+
 def test_warunki_przyslania_inwestora():
     g = _w_debecie()
     with pytest.raises(ValueError, match="debetem ponad limit"):

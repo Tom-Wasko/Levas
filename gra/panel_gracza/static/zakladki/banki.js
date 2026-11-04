@@ -1,6 +1,6 @@
 // Bank w grze z lokalami (silnik/pieniadze/banki.py, dane/mapa/banki.yaml): sześć banków, konto firmowe z terminalem
 // i limitem, lokaty, kredyty (na start, inwestycyjny pod zastaw, obrotowy) i leasing sprzętu w dowolnym banku.
-import { esc, OKRES, okno, proc, tabela, toast, zamknijOkno, zl, zl2 } from "./wspolne.js";
+import { esc, inwestorHtml, OKRES, okno, proc, tabela, toast, zamknijOkno, zl, zl2 } from "./wspolne.js";
 
 const PRODUKTY = { start: "na start", inwestycyjny: "inwestycyjny", obrotowy: "obrotowy" };
 const KATEGORIE = { konto: "Najtańsze konto i terminal", lokata: "Najlepsza lokata", kredyt_bez_historii: "Kredyt bez historii firmy",
@@ -106,7 +106,7 @@ export function decyzjeBanku({ v, kat, edycja }) {
       <div class="siatka trojka" style="margin-top:16px">${bankiLista(kat).map((x) => kafel(v, x, wybrany, edycja)).join("")}</div>`;
   }
   const zak = { historia: "Historia rachunku", porownanie: "Porównanie banków", lokaty: "Lokaty", kredyty: "Kredyty", leasing: "Leasing", limit: "Limit w koncie" };
-  let html = `<div class="kafel"><div class="kt" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center">
+  let html = inwestorHtml(v) + `<div class="kafel"><div class="kt" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center">
     <div><h3 style="margin:0 0 6px">Konto firmowe: ${esc(b.nazwa)}</h3>Dostępne saldo: <b class="akcent">${zl2(v.stan.gotowka)}</b>
       <span class="podpowiedz">(po decyzjach tej rundy, przed sprzedażą)</span><br>Wolny limit: ${zl2(v.banki.wolny_limit)} · historia firmy: ${rundy(v.banki.historia)}</div>
     <button class="btn pom" data-akcja="bk-zmien" ${edycja ? "" : "disabled"}>Zmień bank konta</button></div></div>

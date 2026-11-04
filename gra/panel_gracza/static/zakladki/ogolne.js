@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji.
-import { esc, godzina, inicjaly, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, godzina, inicjaly, inwestorHtml, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -145,7 +145,8 @@ export const dashboard = {
     const alarm = (v.lista_bledow || []).find((b) => b.alarm);   // U2: debet ponad limit – blokada w tej rundzie
     const pasek = alarm ? `<div class="komunikat zly">${esc(alarm.tekst)}
       <button class="btn jasny maly" data-akcja="popraw" data-z="bank">Przejdź do banku</button></div>` : "";
-    return `${pasek}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}${rozruchHtml(v)}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
+    const inwestor = v.inwestor && v.runda <= v.inwestor.do_rundy + 1 ? inwestorHtml(v) : "";   // U11: potem tylko w Banku
+    return `${pasek}${inwestor}${status}${klub}${rundaMarki ? formularzMarki(v, szkic) : ""}${v.edycja ? planRundy(v, kat) : ""}${rozruchHtml(v)}<div class="sekcja-tytul">Twoja firma</div><div class="dash">
       ${kafel("Nazwa i logo firmy", "osoba", `<div class="srodek">${znakFirmy(m)}<b>${esc(m.nazwa)}</b>${m.slogan ? `<div class="maly-tekst">„${esc(m.slogan)}”</div>` : ""}</div>`)}
       ${kafel("Miejsce", "karta", d.miejsce ? `${d.miejsce} / ${d.liczba_firm}` : `<span class="maly-tekst">Ranking dostępny od rundy 3</span>`)}
       ${kafel(`Liczba rund w grze`, "zegar", `<div>${Math.min(v.gra.runda, v.gra.liczba_rund)} / ${v.gra.liczba_rund}

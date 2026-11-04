@@ -22,6 +22,18 @@ const F0 = fmt(0, 0), F2 = fmt(2, 2), F3 = fmt(0, 3);
 
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const zl = (x, grosze = false) => x == null ? "–" : (grosze ? F2 : F0).format(x) + " PLN";
+
+// U11: inwestor ratunkowy (silnik/pieniadze/inwestor.py) – ile wpłacił, jaki udział i do kiedy, ile już wziął
+export function inwestorHtml(v) {
+  const I = v.inwestor;
+  if (!I) return "";
+  const zostalo = Math.max(0, I.do_rundy - v.runda + 1), udz = `${Math.round(I.udzial * 100)}%`;
+  const rund = (n) => n === 1 ? "1 rundę" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? `${n} rundy` : `${n} rund`;
+  return `<div class="komunikat"><b>Inwestor ratunkowy</b> wpłacił ${zl(I.kwota)} w rundzie ${I.od_rundy}. ${zostalo
+    ? `Bierze ${udz} dodatniego dochodu netto jeszcze przez ${rund(zostalo)} (do rundy ${I.do_rundy})`
+    : `Umowa skończyła się w rundzie ${I.do_rundy}`}; dotąd wziął ${zl(I.wyplacone)}.
+    ${I.dlug > 0 ? `Niezwrócone ${zl(I.dlug)} liczy się jak dług (wskaźnik zadłużenia, majątek netto).` : "Wpłata już wróciła do inwestora."}</div>`;
+}
 export const zl2 = (x) => zl(x, true);
 export const licz = (x, max = 0) => x == null ? "–" : fmt(0, max).format(x);
 export const ulamek = (x) => x == null ? "–" : F3.format(x);
