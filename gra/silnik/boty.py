@@ -132,7 +132,8 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
     if forma == "kupno" and f is not None:
         def stac(lok: dict) -> bool:
             k = _kredyt_na_lokal(dane, f, {"id": lok["id"], "forma": "kupno"}, runda)
-            wejscie = lk.koszt_wejscia(dane, lok, "kupno", lok["cena"] * w.get("przebicie", 1.0))
+            wejscie = (lk.koszt_wejscia(dane, lok, "kupno", lok["cena"] * w.get("przebicie", 1.0))
+                       + lok.get("koszt_budowy", 0))   # działka: budowa w ratach w kolejnych rundach (lokale.py)
             return f.gotowka + (k["kwota"] if k else 0.0) - wejscie >= w.get("rezerwa", 0)
         wolne = [lok for lok in wolne if stac(lok)]
     if not wolne and wybor:
@@ -321,6 +322,11 @@ def _plan_firmy(dane: Dane, f: Firma, prognoza_lokali: dict[str, dict[str, float
     return {"lokale": plany, "sprzedaz": sprzedaz, "dni": [float(x) for x in dni] if dni is not None else None}
 
 
+def _przechowywanie(dane: Dane) -> list[str]:
+    """Sprzęt kuchni z miejscem na składniki (szafa chłodnicza, zamrażarka – sprzet.yaml `przechowywanie`)."""
+    return [n for n, s in dane.sprzet.items() if s.get("przechowywanie")]
+
+
 def _decyzje_planu(dane: Dane, plan: dict, q: int) -> tuple[list[dict], list[tuple[str, int, str]], dict[str, int]]:
     """Z planu lokali: zakupy sprzętu, stanowiska do obsadzenia [(typ, nr, zawód)] (najpierw pierwszy kucharz
     i kasjer lokalu bez nich – bez nich lokal nic nie sprzeda) i liczba nowych stanowisk każdego typu."""
@@ -337,6 +343,10 @@ def _decyzje_planu(dane: Dane, plan: dict, q: int) -> tuple[list[dict], list[tup
                     sp[n] = q
                     kup.append({"typ": KUCHNIA, "nr": nr, "nazwa": n, "jakosc": q})
                     brak -= 1
+        for n in _przechowywanie(dane):   # chłodnia i zamrażarka – jak w zestawie gotowego lokalu (B6)
+            if miejsca and not any(n in sp for _, sp, _ in miejsca):
+                miejsca[0][1][n] = q
+                kup.append({"typ": KUCHNIA, "nr": miejsca[0][0], "nazwa": n, "jakosc": q})
         wolne = [nr for nr, _, prac in miejsca if not prac]
         for z, ile in p["kucharze"].items():
             maja = p["zatrudnieni"].get(z, 0)

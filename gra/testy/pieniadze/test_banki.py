@@ -107,6 +107,23 @@ def test_kredyt_inwestycyjny_pod_zastaw_lokalu_i_przejecie():
     assert not [x for x in f.srodki_trwale if x.rodzaj == "lokal"]
 
 
+def test_kredyt_pod_zastaw_kupowanej_dzialki_liczy_budowany_lokal():
+    """B6: zastaw działki to budowany lokal – wartość = cena + koszt budowy, więc kredyt pokrywa też budowę."""
+    g = _gra(("A", None), ("B", None))
+    dz = g.dane.lokale["czechow_3"]
+    nowy = bk.nowy_lokal(g.dane, _lokal("czechow_3", "kupno"), 1)
+    assert nowy["wartosc"] == dz["cena"] + dz["koszt_budowy"]
+    kwota = round(0.7 * nowy["wartosc"], 2)   # więcej niż cena działki – na start i budowę
+    assert kwota > dz["cena"]
+    s = _runda(g, A={**_lokal("czechow_3", "kupno"), "bank": "PKO BP",
+                     "kredyty_wez": [{"bank": "PKO BP", "produkt": "inwestycyjny", "kwota": kwota, "rund": 104,
+                                      "zastaw": nowy["id"]}]},
+               B={**_lokal("centrum_3"), "bank": "mBank"})
+    f = s.firmy["A"]
+    assert [(x.id, x.forma) for x in f.lokale] == [("czechow_3", "kupno")]
+    assert [(k.kwota, k.zastaw) for k in f.kredyty] == [(kwota, "lokal:czechow_3")]
+
+
 def test_spozniona_rata_splacana_razem_z_biezaca():
     g, s = _start()
     s = _runda(g, A={"kredyty_wez": [{"bank": "Crédit Agricole", "produkt": "start", "kwota": 26000, "rund": 26}]})

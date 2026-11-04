@@ -156,9 +156,10 @@ export function wynikiBanku({ v }) {
 }
 
 // lokal kupowany w tej rundzie (zakładka Lokale) – zastaw kredytu inwestycyjnego, wartość = cena z oferty
+// (działka – razem z kosztem budowy, silnik/pieniadze/banki.py: nowy_lokal)
 function kupowanyLokal(c) {
   const wyb = c.d.lokal, lok = wyb?.forma === "kupno" ? (c.v.lokale?.oferta || []).find((l) => l.id === wyb.id) : null;
-  return lok?.cena ? [{ id: `lokal:${lok.id}`, nazwa: `${lok.typ === "dzialka" ? "Działka" : "Lokal"}: ${lok.adres} (kupowany w tej rundzie)`, wartosc: +wyb.oferta || lok.cena }] : [];
+  return lok?.cena ? [{ id: `lokal:${lok.id}`, nazwa: `${lok.typ === "dzialka" ? "Działka" : "Lokal"}: ${lok.adres} (kupowany w tej rundzie)`, wartosc: (+wyb.oferta || lok.cena) + (lok.koszt_budowy || 0) }] : [];
 }
 
 const pole = (id, etykieta, html) => `<label class="pole">${etykieta}${html.replace("<select", `<select id="${id}"`).replace("<input", `<input id="${id}"`)}</label>`;
@@ -195,7 +196,8 @@ export const akcjeBanku = {
       ${pole("bk-k-rund", `Okres (${OKRES.mnoga})`, `<input type="number" min="1" value="26">`)}</div>
       ${pole("bk-k-zastaw", "Zastaw (kredyt inwestycyjny)", `<select><option value="">– bez zastawu –</option>${zastawy.join("")}</select>`)}
       <p class="podpowiedz">Pod zastaw można dać kupiony lokal albo kupiony sprzęt (wartość netto po amortyzacji), a także lokal
-        kupowany w tej rundzie – kredyt wchodzi przed zakupem, więc pokrywa część ceny.</p>`,
+        kupowany w tej rundzie – kredyt wchodzi przed zakupem, więc pokrywa część ceny (przy działce zastawem jest
+        budowany lokal: wartość = cena + koszt budowy).</p>`,
     { male: true, przyciski: przyciski("bk-wez-kredyt", "Weź kredyt") });
   },
   "bk-wez-kredyt": async (el, c) => {

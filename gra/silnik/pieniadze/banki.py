@@ -6,7 +6,8 @@ odsetki karne). Lokaty, kredyty i leasing można brać w dowolnym banku – rozl
 
 Kredyty: „na start” bez historii firmy, obrotowe dopiero po `historia_rund` rundach od otwarcia pierwszego lokalu;
 inwestycyjny (`od_lokalu`) – od wzięcia pierwszego lokalu, pod zastaw własnego lokalu albo sprzętu (kwota do części
-wartości netto zastawu); zastawem może być lokal kupowany w tej samej rundzie (wartość – cena z oferty): kredyt
+wartości netto zastawu); zastawem może być lokal kupowany w tej samej rundzie (wartość – cena z oferty, przy
+działce razem z kosztem budowy – zastawem jest budowany lokal, B6): kredyt
 liczy się do gotówki na zakup, a wchodzi po decyzji o lokalu (`kredyty_na_lokal`) – gdy lokalu nie uda się kupić,
 kredyt przepada. Raty kapitałowe
 równe + odsetki od pozostałej kwoty, od rundy po zaciągnięciu. Gdy gotówki i wolnego limitu nie starcza na ratę,
@@ -76,13 +77,17 @@ def _nazwa_sprzetu(typ: str, nr: int, nazwa: str) -> str:
 
 def zastawy(dane: Dane, firma: Firma) -> list[dict]:
     """Majątek, który można dać pod zastaw: kupione lokale i sprzęt w ewidencji środków trwałych (bez już
-    zastawionych). Wartość – netto (po amortyzacji)."""
+    zastawionych). Wartość – netto (po amortyzacji); działka w budowie – razem z kosztem budowy (zastawem jest
+    budowany lokal, jak w `nowy_lokal`)."""
     zajete = {k.zastaw for k in firma.kredyty if k.zastaw}
     wynik = []
     for lok in firma.lokale:
         if lok.forma != "kupno" or f"lokal:{lok.id}" in zajete:
             continue
-        wartosc = sum(s.wartosc - s.umorzenie for s in _srodki_lokalu(dane, firma, lok.id))
+        srodki = _srodki_lokalu(dane, firma, lok.id)
+        wartosc = sum(s.wartosc - s.umorzenie for s in srodki)
+        if not any(s.rodzaj == "budynek" for s in srodki):
+            wartosc += dane.lokale[lok.id].get("koszt_budowy", 0)
         if wartosc > EPS:
             wynik.append({"id": f"lokal:{lok.id}", "nazwa": f"Lokal: {dane.lokale[lok.id]['adres']}", "wartosc": round(wartosc, 2)})
     for st in firma.stanowiska:
@@ -97,14 +102,16 @@ def zastawy(dane: Dane, firma: Firma) -> list[dict]:
 
 def nowy_lokal(dane: Dane, decyzje: dict, runda: int) -> dict | None:
     """Lokal (albo działka) kupowany w tej rundzie jako zastaw kredytu inwestycyjnego; wartość – cena z oferty
-    (tyle wejdzie do ewidencji środków trwałych)."""
+    (tyle wejdzie do ewidencji środków trwałych), przy działce razem z kosztem budowy (budynek wejdzie do ewidencji
+    po budowie – zastawem jest budowany lokal, B6)."""
     dl = decyzje.get("lokal") or {}
     lok = dane.lokale.get(dl.get("id")) if dl.get("forma") == "kupno" else None
     kwota = oferta(dane, dl, lok, "kupno", runda)[0] if lok and lok.get("cena") else None
     if not kwota:
         return None
     co = "Działka" if lok["typ"] == "dzialka" else "Lokal"
-    return {"id": f"lokal:{lok['id']}", "nazwa": f"{co}: {lok['adres']} (kupowany w tej rundzie)", "wartosc": round(kwota, 2)}
+    return {"id": f"lokal:{lok['id']}", "nazwa": f"{co}: {lok['adres']} (kupowany w tej rundzie)",
+            "wartosc": round(kwota + lok.get("koszt_budowy", 0), 2)}
 
 
 def finansowanie_lokalu(dane: Dane, firma: Firma, decyzje: dict, runda: int) -> float:
