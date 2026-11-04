@@ -259,4 +259,19 @@ do 40%, szkoda do 8000 zł, karencja 1 runda)
 | H16 | Dyskont z gazetką dominuje zakupy małej firmy (rabat 15–35%), a hurtownia nie zwraca się nigdy przy 1 lokalu | kod | pary: dostawcy wymuszeni |
 | H17 | Łatwy bot agresywny bankrutuje (towary 115% przychodu) – proste planowanie zamawia cały popyt i towar się psuje | gry botów | B3: czy łatwy ma być aż tak słaby; H17 (29.10.2026): słaby „jak człowiek” bez alarmu dzięki `zamowienia_ze_sprzedazy`, łatwy bez zmian |
 
-Hipotezy z raportu części A dopisuje się tu w kroku U (numery H18…), a sprawdza w B6–B12.
+Hipotezy z raportu części A (`raporty/analiza_gracza.md`, sekcja 6, H-A1…H-A8) i z kontroli K (4.11.2026) – sprawdza
+się je w B6–B14.
+
+| nr | hipoteza | skąd | jak sprawdzić |
+|---|---|---|---|
+| H18 | Premium z cenami × 1,2 jeszcze poprawia wynik (0,69–0,96 wobec 0,34–0,49) – popyt premium za mało czuły na cenę przy jakości 3★ (H-A1). Po U24 premium na średnim prowadzi ok. 1,4× przed zrównoważonym | A, U24 | B7: pary cena 1,0/1,15/1,2/1,3 przy jakości 3; pierwsza dźwignia `opinie.jakosc` w `mapa/klienci.yaml` |
+| H19 | „Nic nie rób” (bez lokalu, gotówka na lokacie) daje ok. −0,02 i bije aktywnych słabych (H-A2). Autor (pyt. 2): zostaje jak jest | A | B13: tylko pomiar – czy słaba wersja „jak człowiek” jest nad zerem; bez zmiany zasad |
+| H20 | Kredyt trzymany na koncie karał kartę (0,18 wobec 0,55) – po U22 gotówka w mianowniku (0,18 → 0,37) (H-A3) | A, U22 | B11: para kredyt 50 tys. zł na rozwój / bez, czy nie stał się darmową dźwignią |
+| H21 | Drugi lokal przegrywa – odwrotnie niż w B4 (H6: dominował w 85% par). K: `lokale:drugi` −0,31 (1/7 par wygranych, szum przy 7 parach). Trop: koszt urządzania w jednej rundzie ze stratą o wadze 1,0; po U24 nowy lokal startuje bez opinii (H-A4) | A, K | B6 poz. 1: pary z drugim lokalem / bez, w tym „drugi lokal niewyposażony”, różne rundy i 4/8 firm |
+| H22 | Wypłaty właściciela nie obniżają karty (H-A5). Autor (pyt. 1): zostaje jak jest | A | B13: tylko opis w instrukcji, bez zmiany liczb |
+| H23 | Płaca minimalna daje tylko +0,01–0,015 – dźwignia za słaba, żeby uczeń ją odczuł (H-A6); po U20 dochodzi zadowolenie i odejścia | A | B9: pary płaca minimalna / rynkowa / wyższa |
+| H24 | Poziomy „jak człowiek” nie są monotoniczne: K – dobra > średnia tylko 34/50 par (B5: 47/50), karta średniej 0,36 = dobrej 0,36, przy agresywnym 4/10 (H-A7) | A, K | B14 (i decyzja autora po K): co z U20–U24 obniżyło przewagę dobrej – pary dobra / średnia z wyłączonymi `klienci.yaml` i odejściami |
+| H25 | Reklama 10 emisji ulotek i plakatów pomaga przy 1 lokalu (+0,01…+0,11) – sprawdzić nasycenie (H-A8). K: `kampanie:brak` −0,04 (szum) | A, K | B10: pary liczba emisji 0/3/10/20 przy wolnej i pełnej kuchni |
+| H26 | Komplet polis się opłaca: K – `polisy:wszystkie` +0,02, 6/7 par (odwrotnie niż H14) | K | B12: pary komplet polis / brak, 30 ziaren – czy to nie szum małej próby |
+| H27 | Umowa zlecenie nadal dominuje: K – +0,09, 7/7 par, pierwszy plus 3,1 → 2,7 (H3; autor: zlecenie dostaje składki ZUS pracodawcy w B9) | K | B9: po składkach – para wszyscy na zleceniu / na umowie o pracę |
+| H28 | Jakość 3★ dominuje: K – `jakosc:3` +0,08 (71% par, przedział z zerem), przy zrównoważonym 0,85 wobec 0,64 (H8, po U24 jakość podnosi ocenę lokalu) | K | B7: pary jakość 1/2/3 przy tej samej cenie, 30 ziaren |

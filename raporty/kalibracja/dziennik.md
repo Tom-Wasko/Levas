@@ -520,3 +520,33 @@ wpis na dole.
   `sprawdz` nie wymaga tego pliku. Wyniki testów mechanik do grosza bez zmian (zamrożona kopia nie ma grup).
   Nowe testy: `testy/rynek/test_klienci_opinie.py`.
 - Teksty: INSTRUKCJA rozdz. 6 i rada 4 w rozdz. 15, „i” w zakładkach Mapa i Klienci, podpowiedź karty.
+
+## K – kontrola po U (4.11.2026, Claude Code, Opus 5.5)
+- Pomiary (limit autora: 10 min): `pomiary/k_trudnosc` – bot „jak człowiek” słaby / średni / dobry × 5 strategii ×
+  ziarna 1000–1009, 6 firm, 18 rund, rywale średni (150 gier); `pomiary/k_szybki` – `balans.warianty szybki`,
+  3 strategie × 3 ziarna (254 gry, 247 par, przerwany limitem – 7 par na wariant, wynik orientacyjny).
+- Trudność – porównanie z B5 na tych samych ziarnach 1000–1009 (50 trójek gier):
+
+  | miara | B5 | K (po U1–U24) | cel |
+  |---|---|---|---|
+  | pierwszy plus średniej w rundach 4–6 | 33/50 (w 3: 17) | 29/50 (w 3: 21, w 2: 0) | 4–6 |
+  | alarmy wersji słabej | 3/50 (agresywny) | **0/50** | 0 |
+  | dobra > średnia (pary) | 47/50 | **34/50** | ≥ 80% |
+  | słaba < średnia (pary) | 46/50 | 42/50 | – |
+  | karta słaba / średnia / dobra | 0,01 / 0,26 / 0,38 | 0,11 / 0,36 / 0,36 | słaba może być na minusie |
+  | majątek netto średniej (tys. zł) | 96 | 103 | – |
+
+  Dobra > średnia wg strategii: agresywny 4/10, naśladowca 7/10, tani 7/10, premium 8/10, zrównoważony 8/10.
+- Wnioski:
+  - **Cel „dobra wyraźnie wygrywa” rozjechał się** (68% par wobec ≥ 80%). Średnia i słaba zyskały po U (karta
+    +0,10), dobra – nie. Najbardziej przy agresywnym. To nie liczby B5 (rozruch, pule), tylko poziom
+    `czlowiek_dobry` w `dane/boty.yaml` albo mechaniki U20/U24, które dobra wykorzystuje gorzej (np. drugi lokal
+    bez opinii). Propozycja i decyzja – u autora (hipoteza H24 w inwentarzu).
+  - Pierwszy plus lekko wcześniej (w 3. rundzie 21/50 wobec 17/50) – w granicach szumu 10 ziaren; nie proponuję
+    zmiany rozruchu.
+  - Alarmy wersji słabej zniknęły – cel spełniony.
+- Obszary (`k_szybki`, 7 par): bank i biuro bez zmian (mBank, e-Księgi24 najtańsze – H4, H5); higiena brak
+  katastrofą, HACCP lekko gorsza (H15); **umowa zlecenie +0,09 w 7/7 par** (H3, czeka na składki w B9);
+  **polisy komplet +0,02 w 6/7 par** – nowe, odwrotnie niż H14; jakość 3★ +0,08 (szum, 5/7); drugi lokal −0,31
+  (szum, 1/7) – odwrotnie niż H6 z B4. Nowe hipotezy H18–H28 w inwentarzu (H18–H25 z raportu A, H26–H28 z K).
+- Do pełnego K zostaje decyzja autora o poziomie „dobrym” (poprawka liczb tylko za zgodą).
