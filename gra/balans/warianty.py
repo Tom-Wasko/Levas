@@ -123,6 +123,17 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     # B3: umiejętności poziomu trudnego pojedynczo wyłączone (na innych poziomach – bez zmian)
     w += [Wariant(f"poziom:bez_{u}", f"poziom bez ustawienia {u}", poziom=((u, None),))
           for u in ("korekta_prognozy", "mnozniki_ceny", "obsluga_kampanii")]
+    # K: diagnoza poziomu „jak człowiek – dobry” – po jednej przewadze nad średnim zabranej
+    # (`--poziom czlowiek_dobry --rywale sredni`); „jak_sredni” – wszystkie naraz, punkt kontrolny
+    if sr := dane.boty["poziomy"].get("czlowiek_sredni"):
+        jak_sr = (("prognoza_czlowieka", sr["prognoza_czlowieka"]),
+                  ("blad_prognozy", sr.get("blad_prognozy")))
+        w += [Wariant("czlowiek:prognoza_bez_pul", "prognoza z 2 rund, bez poprawki o pulę",
+                      poziom=(("prognoza_czlowieka", {**sr["prognoza_czlowieka"], "rund": 2}),)),
+              Wariant("czlowiek:prognoza_jak_sredni", "prognoza i jej błąd jak u średniego",
+                      poziom=jak_sr),
+              Wariant("czlowiek:jak_sredni", "prognoza, reklama i lokale jak u średniego",
+                      poziom=jak_sr + (("kolejny_lokal", None), ("obsluga_kampanii", None)))]
     return {x.nazwa: x for x in w}
 
 

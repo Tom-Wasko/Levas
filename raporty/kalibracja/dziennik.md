@@ -557,6 +557,29 @@ wpis na dole.
   cena 1,15 przy premium +0,05 w 6/6 par (szum przedziału, H18). Nowe hipotezy H18–H29 w inwentarzu (H18–H25
   z raportu A, H26–H29 z K).
 - Do pełnego K zostaje decyzja autora o poziomie „dobrym” (poprawka liczb tylko za zgodą).
+- **Diagnoza poziomu dobrego** (`pomiary/k_dobry`, decyzja autora po K, pkt 1): `balans.warianty pelny --poziom
+  czlowiek_dobry --rywale sredni`, 5 strategii × ziarna 1000–1019 × 18 rund × 6 firm (600 gier, 16 min).
+  Gra bazowa = dobra z `k_trudnosc` (100/100 kart identycznych), więc każdy wariant porównuję z tą samą grą
+  średniej. Nowe warianty `czlowiek:*` w `balans/warianty.py` zabierają dobremu po jednej przewadze nad średnim;
+  `czlowiek:jak_sredni` (wszystkie naraz) daje gry identyczne ze średnią (karta 0,320) – kontrola metody.
+
+  | dobry … | karta | dobra > średnia | agresywny | naśladowca | premium | tani | zrównoważony |
+  |---|---|---|---|---|---|---|---|
+  | jak teraz | 0,351 | 74/100 | 13/20 | 15/20 | 15/20 | 14/20 | 17/20 |
+  | bez drugiego lokalu (`lokale:jeden`) | **0,398** | **85/100** | 19/20 | 15/20 | 16/20 | 18/20 | 17/20 |
+  | bez reklamy z wolną kuchnią | 0,340 | 73/100 | 10/20 | 15/20 | 15/20 | 16/20 | 17/20 |
+  | prognoza bez poprawki o pulę | 0,306 | 52/100 | 12/20 | 10/20 | 13/20 | 7/20 | 10/20 |
+  | prognoza jak średni (1 tydzień, ±10%) | 0,269 | 18/100 | 12/20 | 0/20 | 1/20 | 4/20 | 1/20 |
+  | wszystko jak średni (kontrola) | 0,320 | 0/100 (remisy) | – | – | – | – | – |
+
+  - **Cała przewaga dobrego to prognoza** (2 tygodnie z poprawką o pulę strefy, bez błędu): bez niej dobry
+    przegrywa ze średnim w 82% par.
+  - **Drugi lokal ją zjada:** dobry otwiera go w 14/100 gier (agresywny 7, tani 4, premium 3) i w tych grach
+    traci (agresywny −0,15, 68% par). To ten sam problem co H21 (drugi lokal się nie opłaca w 18 rundach –
+    rozruch B5, opinie od zera), nie błąd poziomu.
+  - Reklama z wolną kuchnią pomaga tylko agresywnemu (+0,07), reszta bez zmian.
+  - Propozycja dla autora (czeka na zgodę): w `czlowiek_dobry` usunąć `kolejny_lokal` – 85/100 par, cel ≥ 80%
+    spełniony; drugi lokal wraca do dobrego, gdy B (H21) sprawi, że się opłaca.
 - Decyzje autora po K (4.11.2026): (1) bot dobry – zdiagnozować parami i zaproponować zmiany poziomu
   `czlowiek_dobry` (tabela przed zmianą, zmiana po zgodzie); (2) pomiary B6–B15 **bez limitu czasu**, wiele
   pomiarów naraz; (3) przewaga premium – w B7 razem z ceną (H18, H28); (4) U20 i U24 – propozycje tekstów do
