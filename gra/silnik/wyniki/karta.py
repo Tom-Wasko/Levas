@@ -78,12 +78,13 @@ def rozwoj_firmy(dane: Dane, majatek: float, inwestycje: float, przyrost: int, u
     return round(x, 3)
 
 
-def wskaznik_zadluzenia(dlug: float, majatek: float, skumulowany_dochod: float) -> float:
-    """Udział kapitału własnego: 1 − dług / (majątek + skumulowany dochód netto + dług). ATH październik: kredyt 199 900,
-    wzór 0,912 vs 0,911 w grze (bez „+ dług” w mianowniku byłoby 0,903)."""
+def wskaznik_zadluzenia(dlug: float, majatek: float, skumulowany_dochod: float, gotowka: float = 0.0) -> float:
+    """Udział kapitału własnego: 1 − dług / (majątek + skumulowany dochód netto + dług + gotówka). ATH październik:
+    kredyt 199 900, wzór 0,912 vs 0,911 w grze (bez „+ dług” w mianowniku byłoby 0,903). U22 (decyzja autora
+    3.11.2026): gotówka na koncie w mianowniku – kredyt leżący na koncie karze mniej niż przejedzony."""
     if dlug <= 0:
         return 1.0
-    podstawa = majatek + max(0.0, skumulowany_dochod) + dlug
+    podstawa = majatek + max(0.0, skumulowany_dochod) + dlug + max(0.0, gotowka)
     return round(max(0.0, 1 - dlug / podstawa), 3)
 
 
@@ -151,7 +152,7 @@ def kebab(dane: Dane, f, w: dict, netto: float, zadluzenie_bankowe: float) -> di
     zp = max(0.0, k["zadowolenie_pracownikow"] + sum(sp.values())) if k["zadowolenie_pracownikow"] else 0.0
     roz = max(0.0, k["rozwoj_firmy"] + sum(sr.values()))
     dlug = zadluzenie_bankowe + p["wskaznik_zadluzenia"]["waga_harpagona"] * m["dlug_harpagona"]
-    zad = wskaznik_zadluzenia(dlug, majatek_karty(f), f.skumulowany_dochod_netto)
+    zad = wskaznik_zadluzenia(dlug, majatek_karty(f), f.skumulowany_dochod_netto, f.gotowka)
     skladniki["wskaznik_zadluzenia"] = {"dlug_harpagona": zad - k["wskaznik_zadluzenia"]}
     w["karta"] = karta(dane, netto, round(zk, 3), round(zp, 3), round(roz, 3), zad)
     return {"miary": m, "skladniki": {s: {x: round(y, 4) for x, y in d.items() if abs(y) > EPS}

@@ -170,7 +170,8 @@ export const bank = {
     },
     "nowy-kredyt": (el, c) => okno("Kredyt", `<div class="dwie"><label class="pole">Kwota kredytu<input type="number" id="k-kwota" min="100" step="1000" value="10000"></label>
       <label class="pole">Okres (${OKRES.mnoga})<input type="number" id="k-mies" min="1" max="${c.kat.oferty.banki.kredyt_maks_miesiecy}" value="6"></label></div>
-      <p class="podpowiedz">Kredyt obniża wskaźnik zadłużenia w karcie wyników.</p>`,
+      <p class="podpowiedz">Kredyt obniża wskaźnik zadłużenia w karcie wyników. Gotówka na koncie i majątek firmy
+        łagodzą spadek – najbardziej szkodzi kredyt wydany na bieżące koszty.</p>`,
       { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Zamknij</button><button class="btn zielony" data-akcja="wez-kredyt">Weź kredyt</button>` }),
     "wez-kredyt": async (el, c) => {
       const kwota = +document.getElementById("k-kwota").value, m = Math.max(1, Math.min(c.kat.oferty.banki.kredyt_maks_miesiecy, +document.getElementById("k-mies").value));

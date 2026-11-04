@@ -111,3 +111,7 @@ def test_deterministycznosc_i_zapis(tmp_path):
 def test_wskaznik_zadluzenia():
     # kredyt 199 900, majątek ≈ 115 871, skumulowany dochód netto 1 953 410 → 0,911 (wzór z gry ATH)
     assert wskaznik_zadluzenia(199_900, 115_871, 1_953_410) == pytest.approx(0.911, abs=0.002)
+    # U22: gotówka w mianowniku – kredyt 50 tys. zł leżący na koncie karze mniej niż wydany
+    assert wskaznik_zadluzenia(50_000, 50_000, 0) == pytest.approx(0.5)
+    assert wskaznik_zadluzenia(50_000, 50_000, 0, gotowka=50_000) == pytest.approx(0.667, abs=0.001)
+    assert wskaznik_zadluzenia(50_000, 50_000, 0, gotowka=-5_000) == pytest.approx(0.5)   # debet nie pomaga

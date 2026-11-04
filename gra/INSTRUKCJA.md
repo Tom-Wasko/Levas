@@ -91,7 +91,7 @@ stan konta – dlatego firma z mniejszym **majątkiem netto** (widać go w ranki
 | Zadowolenie klientów | Czy klienci są zadowoleni | Rozsądne ceny, dobra jakość, szersze menu, nikt nie odchodzi z kolejki |
 | Zadowolenie pracowników | Czy załodze dobrze się pracuje | Uczciwe pensje, dobry sprzęt, udogodnienia, szkolenia |
 | Rozwój firmy | Czy firma inwestuje i ile jest warta | Nowy sprzęt i wyposażenie, kupione lokale, kolejne lokale |
-| Wskaźnik zadłużenia | Jaką część firmy finansuje bank | Nie żyć na kredycie dłużej, niż trzeba |
+| Wskaźnik zadłużenia | Jaką część firmy (majątku i gotówki) finansuje dług | Nie żyć na kredycie dłużej, niż trzeba |
 
 Iloczyn działa bezlitośnie: słaby jeden składnik ciągnie w dół wszystkie pozostałe. Lepiej być dobrym we
 wszystkim niż genialnym w jednym.

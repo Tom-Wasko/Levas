@@ -495,7 +495,7 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
                           f.rozwoj_poprzedni, info.get("sprzedany_majatek", 0.0), info.get("majatek_przed"),
                           f.szczyt_majatku)
     f.rozwoj_poprzedni = roz
-    zad = kw.wskaznik_zadluzenia(zadluzenie(f), maj, f.skumulowany_dochod_netto)
+    zad = kw.wskaznik_zadluzenia(zadluzenie(f), maj, f.skumulowany_dochod_netto, f.gotowka)
     return kw.karta(dane, netto, zk, zp, roz, zad)
 
 

@@ -340,7 +340,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] U19 [20] Tryb podpowiedzi na pierwsze 3 rundy, włączany przez mistrza gry (eksperyment) – zrobione: opcja gry podpowiedzi (domyślnie wyłączona; formularz nowej gry i Ustawienia gry w panelu MG); przez 3 pierwsze rundy Dashboard pokazuje 3 rady z INSTRUKCJA rozdz. 15 z linkiem do zakładki (api/prezentacja.py: PODPOWIEDZI).
 - [ ] U20 [21] Kandydaci z `ROZNICE_LEVAS_STARY.md`: (4) dynamika pracowników, (7) opinie na mapie, (2) grupy klientów – koszt L, najpierw (4)
 - [x] U21 [22] Pomiar „zamknięcia firmy” z wypowiedzeniem najmu (wariant w `balans/warianty.py`) – zrobione: Zamknięcie się nie opłaca (0/20 par; R11 −0,65, R6 −0,97 karty); najemca nie może wypowiedzieć najmu – dziennik kalibracji U21.
-- [ ] U22 (pyt. 3) Wskaźnik zadłużenia: gotówka w mianowniku – kredyt leżący na koncie nie karze karty
+- [x] U22 (pyt. 3) Wskaźnik zadłużenia: gotówka w mianowniku – kredyt leżący na koncie nie karze karty – zrobione: gotówka w mianowniku; ekspansja na kredyt 0,18 → 0,37 karty (wskaźnik 0,42 → 0,75), gry bez długu bez zmian – dziennik kalibracji U22.
 - [ ] U23 (pyt. 6) Zatrudnianie od tygodnia 1 (`dane/katalog.yaml:52`, hr_zatrudnienie)
 
 - [ ] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu

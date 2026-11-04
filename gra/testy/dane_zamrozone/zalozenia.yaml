@@ -302,9 +302,10 @@ karta_wynikow:
   wskaznik_zadluzenia:
     wartosc:
       bez_kredytu: 1.0
-      wzor: 1 − dług / (majątek + skumulowany dochód netto), min 0
+      wzor: 1 − dług / (majątek + skumulowany dochód netto + dług + gotówka), min 0
     pewnosc: zalozenie
-    zrodlo: instrukcja; Fruukulele z kredytem 0,2–0,6
+    zrodlo: 'instrukcja; Fruukulele z kredytem 0,2–0,6; „+ dług” – zgodność z ATH (silnik/wyniki/karta.py);
+      gotówka – U22 (decyzja autora 3.11.2026: kredyt leżący na koncie nie ma karać jak przejedzony)'
   kebab:
     wartosc:
       zadowolenie_klientow:

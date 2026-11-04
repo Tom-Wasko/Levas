@@ -383,3 +383,25 @@ wpis na dole.
   = gorzej (R6 gorzej niż R11). Sprzedaż sprzętu prawie nic nie zmienia (sprzęt poniżej 10 000 zł jest już
   zamortyzowany w kosztach). Bezczynność od R1 daje karta ≈ 0 – zgodnie z odpowiedzią autora na pyt. 2,
   ale to 5.–6. miejsce. Pułapki „zarób i zamknij” w tej grze nie ma; zmiana zasad niepotrzebna.
+
+## U22 – wskaźnik zadłużenia z gotówką w mianowniku (4.11.2026, Claude Code, Opus 5.5) – decyzja autora
+- Pytanie 3 raportu `raporty/analiza_gracza.md`, odpowiedź autora 3.11.2026: gotówka wchodzi do mianownika.
+  Dotąd kredyt leżący na koncie karał tak samo jak przejedzony (A2: „nigdy nie bierz kredytu”).
+- Wzór (`silnik/wyniki/karta.py: wskaznik_zadluzenia`, `dane/zalozenia.yaml`):
+  1 − dług / (majątek karty + skumulowany dochód netto + dług + gotówka), min 0. Ujemna gotówka (debet)
+  nie zmniejsza mianownika – debet jest już w długu. Bez długu wskaźnik = 1, jak dotąd.
+- Pomiar: warianty A2 `ekspansja` i `ekspansja_na_kredyt` (kredyt 50 tys. zł w R1, 52 tygodnie),
+  `raporty/analiza/skrypty/eksperymenty.py`, ziarna 202–204, ten sam silnik ze starym i nowym wzorem:
+
+  | ziarno | ekspansja | na kredyt – przed | na kredyt – po | wskaźnik przed → po |
+  |---|---|---|---|---|
+  | 202 | 0,555 | 0,183 | 0,370 | 0,42 → 0,75 |
+  | 203 | 0,487 | 0,199 | 0,360 | 0,39 → 0,75 |
+  | 204 | 0,521 | 0,184 | 0,374 | 0,42 → 0,75 |
+
+  „Przed” odtwarza liczby z A2 (`raporty/analiza/dziennik_optymalizator.md`, pkt 3). Dochód i majątek bez
+  zmian (wzór dotyczy tylko karty). Kara za kredyt zmalała mniej więcej o połowę; kredyt nadal kosztuje
+  (odsetki, wskaźnik < 1), więc bierze się go po to, żeby na nim zarobić. Gry bez długu – bez zmian (boty
+  kredytów nie biorą).
+- Teksty: podpowiedź przy nowym kredycie (Finanse ▸ Bank) i tabela wskaźników w INSTRUKCJA.
+  Test: `test_wskaznik_zadluzenia` (gotówka w mianowniku, debet nie pomaga).
