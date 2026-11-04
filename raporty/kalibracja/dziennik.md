@@ -550,3 +550,7 @@ wpis na dole.
   **polisy komplet +0,02 w 6/7 par** – nowe, odwrotnie niż H14; jakość 3★ +0,08 (szum, 5/7); drugi lokal −0,31
   (szum, 1/7) – odwrotnie niż H6 z B4. Nowe hipotezy H18–H28 w inwentarzu (H18–H25 z raportu A, H26–H28 z K).
 - Do pełnego K zostaje decyzja autora o poziomie „dobrym” (poprawka liczb tylko za zgodą).
+- Decyzje autora po K (4.11.2026): (1) bot dobry – zdiagnozować parami i zaproponować zmiany poziomu
+  `czlowiek_dobry` (tabela przed zmianą, zmiana po zgodzie); (2) pomiary B6–B15 **bez limitu czasu**, wiele
+  pomiarów naraz; (3) przewaga premium – w B7 razem z ceną (H18, H28); (4) U20 i U24 – propozycje tekstów do
+  `notatki_do_zmiany.md`, wpis do `notatki/` po zgodzie.
