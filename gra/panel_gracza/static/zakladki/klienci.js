@@ -17,9 +17,10 @@ function wydarzeniaHtml(lista, kat) {
 }
 
 function jakLiczyc(P) {
-  return `<div class="komunikat"><b>Prognozę popytu liczysz sam</b> (zakładka Menu): weź klientów strefy, w której masz lokal
-    (trochę przychodzi też z sąsiednich stref), oceń, jaką ich część przyciągniesz ceną i jakością na tle konkurencji w strefie,
-    i pamiętaj, że część klientów zawsze idzie do barów spoza gry. Obsługa liczona jest dzień po dniu – godziny pracowników
+  return `<div class="komunikat"><b>Prognozę popytu liczysz sam</b> (zakładka Menu, krok po kroku w dymku ⓘ przy „Popyt roczny”):
+    popyt roczny dania ÷ liczba rund w roku × sezonowość dania × wielkość strefy Twojego lokalu (kolumna niżej), a z tego część,
+    którą przyciągniesz ceną i jakością na tle konkurencji w strefie (trochę klientów przychodzi z sąsiednich stref, część zawsze
+    idzie do barów spoza gry). Obsługa liczona jest dzień po dniu – godziny pracowników
     i sprzętu rozkładają się równo na ${P.dni.length} dni, więc w najmocniejszym dniu strefy zbyt mała obsada to utracona sprzedaż.</div>`;
 }
 
@@ -52,11 +53,12 @@ function strefyDecyzje(v, kat) {
   const zGrupami = Object.keys(P.grupy || {}).length > 0;
   const wiersze = Object.entries(P.strefy).sort(([, a], [, b]) => b.pula - a.pula).map(([k, s]) => [
     `<span class="kropka" style="background:${esc(kat.mapa.strefy[k].kolor)}"></span>${esc(nazwaStrefy(kat, k))}`,
-    licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), ...(zGrupami ? [grupyStrefy(P, s)] : []), dniStrefy(P, s)]);
-  return grupyOpis(P) + tabela("Strefy miasta", ["Strefa", "Klienci strefy", "Ceny", "Wrażliwość na cenę",
+    `× ${licz(s.wielkosc, 2)}`, licz(s.pula), POZIOM(s.cena), WRAZLIWOSC(s.wrazliwosc_ceny), ...(zGrupami ? [grupyStrefy(P, s)] : []), dniStrefy(P, s)]);
+  return grupyOpis(P) + tabela("Strefy miasta", ["Strefa", "Wielkość strefy", "Klienci strefy", "Ceny", "Wrażliwość na cenę",
     ...(zGrupami ? ["Najwięcej klientów"] : []), "Klienci w dni tygodnia"],
-    wiersze, { klasy: ["l", "", "l", "l", "l", "l"] })
-    + `<p class="podpowiedz">Klienci strefy – wszyscy chętni na dania z Twojego menu w rundzie sprzedaży, zanim podzielą się między lokale
+    wiersze, { klasy: ["l", "", "", "l", "l", "l", "l"] })
+    + `<p class="podpowiedz">Wielkość strefy – mnożnik popytu rocznego dania w miesiącu sprzedaży (× 1 = przeciętna strefa; z porą roku).
+      Klienci strefy – wszyscy chętni na dania z Twojego menu w rundzie sprzedaży, zanim podzielą się między lokale
       (Twoje i konkurencji) i bary spoza gry.</p>`;
 }
 

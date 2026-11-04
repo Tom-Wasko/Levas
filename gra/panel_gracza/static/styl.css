@@ -193,6 +193,8 @@ textarea { font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px
 textarea:focus, input:focus, select:focus { outline: none; border-color: var(--pom); box-shadow: 0 0 0 3px rgba(30,158,90,.15); }
 input.krotkie { width: 92px; }
 input:disabled, select:disabled { background: var(--szary-jasny); color: var(--szary); }
+.pola-dania { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pola-dania input { width: 100%; }
 label.pole { display: flex; flex-direction: column; gap: 5px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--szary); }
 label.pole-wyboru { display: flex; gap: 8px; align-items: center; margin: 8px 0 4px; cursor: pointer; }
 

@@ -27,7 +27,8 @@ export function zlozona({ tytul, tytulPelny, info, czesci, odRundy }) {
     odblokowanie: (v) => widoczne(v).some(([, z]) => dostepnaCzesc(v, z)),
     ukryta: (v) => !widoczne(v).length,
     decyzje(c) {
-      return kafelkiLokali(c.v) + widoczne(c.v).map(([k, z]) => {
+      // część tylkoWyniki (Sprzedaż – ceny są w kafelkach Menu) nie ma osobnego nagłówka w decyzjach
+      return kafelkiLokali(c.v) + widoczne(c.v).filter(([, z]) => !z.tylkoWyniki).map(([k, z]) => {
         if (!dostepnaCzesc(c.v, z)) {
           const od = odRundy(c.v, k);
           return sekcja(c, k, z, "decyzje", `<p class="podpowiedz">${od ? `Dostępne od rundy ${od}.` : "Jeszcze niedostępne."}</p>`);

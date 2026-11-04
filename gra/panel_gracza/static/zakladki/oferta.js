@@ -1,7 +1,8 @@
-// Oferta: wybór dań (menu) i prognoza popytu.
-import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, tabela, toast, wykres, zl } from "./wspolne.js";
+// Oferta: wybór dań (menu), prognoza popytu i cena – wybrane danie jest w sprzedaży (silnik: _ceny_domyslne).
+import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, proc, tabela, toast, wykres, zl, zl2 } from "./wspolne.js";
 import { kolko } from "./dymki.js";
-import { lokalWybrany, menuLokalu, nazwaLokalu, wieleLokali, zapiszWLokalu } from "./lokal_wybor.js";
+import { cenyLokalu, lokalWybrany, menuLokalu, nazwaLokalu, wieleLokali, zapiszWLokalu } from "./lokal_wybor.js";
+import { widelki } from "./sprzedaz.js";
 
 const kategorie = (kat) => [...new Set(Object.values(kat.uslugi).map((u) => u.kategoria))];  // kolejność jak w uslugi.yaml
 const JAK = { 1: "Niska", 2: "Średnia", 3: "Wysoka" };
@@ -12,15 +13,51 @@ const prognozaDania = (v, kat, klucz, m) => v.popyt ? 0 : prognozaBazowa(kat.usl
 // miesiąc (sezonowość), w którym sprzedaje się dania wybrane w rundzie r – runda 1 przygotowuje sprzedaż w rundzie 2
 const miesiacSprzedazy = (r) => miesiacRundy(Math.max(r, 2));
 const popytOkresu = () => `popyt ${OKRES.przymiotnik.toLowerCase()}`;
+const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
+const sprzedazOtwarta = (v) => v.odblokowane.includes("sprzedaz");
+
+// instrukcja liczenia prognozy na rundę (silnik/rynek/popyt.py: pule i udział lokalu)
+function jakPrognoza(u, m) {
+  const tyg = Math.round(u.popyt_roczny / OKRES.rund_w_roku), sez = u.sezonowosc[m];
+  return `<b>Popyt roczny</b> – tyle porcji dania zjadają w roku klienci przeciętnej strefy miasta.<br><b>Jak policzyć prognozę na ${OKRES.mianownik}:</b>
+    <br>1. ${licz(u.popyt_roczny)} ÷ ${OKRES.rund_w_roku} ≈ ${licz(tyg)} – przeciętny ${OKRES.mianownik} bez pory roku.
+    <br>2. × sezonowość dania w miesiącu sprzedaży (${MIESIACE[m]}: × ${licz(sez, 2)}) ≈ ${licz(Math.round(tyg * sez))}.
+    <br>3. × wielkość strefy Twojego lokalu – kolumna „Wielkość strefy” w zakładce Klienci i strefy (z porą roku: np. kampusy pustoszeją w wakacje).
+    Wydarzenia w mieście i upodobania grup klientów strefy mogą to podbić albo obniżyć.
+    <br>4. × część, którą przyciągniesz: klienci strefy dzielą się między lokale z tym daniem (Twoje i konkurencji) i bary spoza gry.
+    Przy cenie i jakości jak u innych dostajesz mniej więcej równą część; niższa cena, lepsza jakość i dobre opinie – więcej. Nowy lokal na początku ma mniej klientów.
+    <br>5. Wynik wpisz w pole „Prognozowany popyt”. Z prognozy wychodzą zakupy składników (Dostawy i magazyn: „Wpisz wg prognozy”) i potrzebna obsada – za mała to utracona sprzedaż, za duża to zmarnowany towar.`;
+}
+
+// cena, rabat i podpowiedzi przy wybranym daniu (dawniej osobna część „Sprzedaż”)
+function cenaDania(v, kat, klucz, edycja) {
+  const u = kat.uslugi[klucz];
+  if (!sprzedazOtwarta(v)) {
+    return `<span class="podpowiedz">Cenę ustalisz od rundy, w której zaczyna się sprzedaż – na start danie ma cenę preferowaną ${zl(u.cena_preferowana)}.</span>`;
+  }
+  const c = cenyLokalu(v, lokalWybrany(v))[klucz] || { cena: u.cena_preferowana, rabat: 0 }, wd = widelki(kat, klucz);
+  const inni = Object.entries(v.rynek?.ceny?.[klucz] || {}).filter(([f]) => f !== v.firma).map(([, x]) => x);
+  const braki = (v.stan.gotowe_uslugi[klucz] || []).filter((b) => !b.includes("włączona"));
+  const dis = edycja ? "" : "disabled";
+  return `<div class="pola-dania">
+      <label class="pole">Cena (zł)<input type="number" min="${wd ? wd.min : 1}" ${wd ? `max="${wd.max}"` : ""} step="0.5" value="${c.cena}" data-zmiana="cena" data-u="${klucz}" ${dis}></label>
+      <label class="pole">Rabat (zł)<input type="number" min="0" step="0.5" value="${c.rabat}" data-zmiana="rabat" data-u="${klucz}" ${dis}></label>
+    </div>
+    <span class="podpowiedz">Dla klienta: <b>${zl2(c.cena - c.rabat)}</b> (${proc((c.cena - c.rabat) / u.cena_preferowana, 0)} preferowanej)${wd ? ` · dozwolone ${zl2(wd.min)}–${zl2(wd.max)}` : ""}
+      · konkurencja: ${inni.length ? `średnio ${zl2(inni.reduce((a, b) => a + b, 0) / inni.length)}` : "brak danych"}</span>
+    ${braki.length ? `<span class="podpowiedz" style="color:var(--czerwony)">${braki.map(esc).join("; ")}</span>` : ""}`;
+}
+
 const limitNowych = (kat, r) => r === 1 ? kat.oferty.rundy.uslugi_w_rundzie_1
   : r >= kat.oferty.rundy.nowe_uslugi_od_rundy ? kat.oferty.rundy.nowe_uslugi_na_runde : 0;
 
 export const oferta = {
   tytul: "Menu", tytulPelny: "Menu – dania, ceny i prognoza", ikona: "⚑", odblokowanie: "oferta",
-  info: ({ v, kat }) => v.runda === 1
+  info: ({ v, kat }) => (v.runda === 1
     ? `Wybierz dania do menu i określ ich ${popytOkresu()}. W pierwszej rundzie można wybrać tylko ${kat.oferty.rundy.uslugi_startowe.map((u) => nazwaUslugi(kat, u)).join(", ")}.`
     : v.runda < kat.oferty.rundy.nowe_uslugi_od_rundy ? "W rundzie 2 sprzedajesz dania wybrane w rundzie 1. Nowe dania można dodawać od rundy 3."
-    : `Wybierz dania do menu i określ ich ${popytOkresu()}. W każdej rundzie będzie można uruchamiać maksymalnie ${kat.oferty.rundy.nowe_uslugi_na_runde} nowe dania.`,
+    : `Wybierz dania do menu i określ ich ${popytOkresu()}. W każdej rundzie będzie można uruchamiać maksymalnie ${kat.oferty.rundy.nowe_uslugi_na_runde} nowe dania.`)
+    + " Danie wybrane do menu jest w sprzedaży – cenę i rabat ustalasz w jego kafelku. Klient płaci cenę pomniejszoną o rabat.",
   decyzje({ v, kat, edycja }) {
     // Z3: przy kilku lokalach – menu wybranego lokalu; limit nowych dań liczony dla całej firmy (suma menu lokali)
     const wybrane = menuLokalu(v, lokalWybrany(v)), przed = v.stan_przed.oferta, r = v.runda;
@@ -30,7 +67,7 @@ export const oferta = {
     const okres = r === 1 ? `prognoza na ${esc(nazwaRundy(2))} – sprzedaż zaczyna się w rundzie 2` : esc(v.miesiac);
     let html = `${wieleLokali(v) ? `<div class="komunikat ok">Menu lokalu <b>${esc(nazwaLokalu(v, lokalWybrany(v).id))}</b> – prognoza popytu tylko dla tego lokalu.</div>` : ""}
       <div class="komunikat">Nowe dania w tej rundzie (cała firma): <b>${nowe} / ${limit}</b>. ${v.popyt
-      ? `Prognozę popytu (${okres}) policz sam: ilu klientów stref może przyjść do Twoich lokali przy Twoich cenach, cenach konkurencji i dniach tygodnia – dane w zakładce <a data-zakladka-k="klienci">Klienci i strefy</a>.`
+      ? `Prognozę popytu (${okres}) policz sam – krok po kroku w dymku ⓘ przy „Popyt roczny” w kafelku dania; wielkość stref, konkurencja i dni tygodnia są w zakładce <a data-zakladka-k="klienci">Klienci i strefy</a>.`
       : `Prognozowany popyt = popyt roczny / ${OKRES.rund_w_roku} × sezonowość (${okres}).`}</div>`;
     for (const k of kategorie(kat)) {
       const uslugi = Object.entries(kat.uslugi).filter(([, u]) => u.kategoria === k);
@@ -46,9 +83,8 @@ export const oferta = {
         html += `<div class="kafel ${jest ? "wybrany" : ""}">
           <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span></div>
           <div class="kt">
-            <div class="wiersz"><span>Chętnych w strefie na ${OKRES.mianownik} ${kolko(`Popyt roczny ${licz(u.popyt_roczny)} porcji / ${OKRES.rund_w_roku}
-              – tyle osób w przeciętnej strefie ma ochotę na to danie w ${OKRES.miejscownik} (bez sezonu). Do Twojego lokalu trafi część:
-              zależy od strefy, cen, konkurencji i dni tygodnia.`)}</span><span>≈ ${licz(Math.round(u.popyt_roczny / OKRES.rund_w_roku))}</span></div>
+            <div class="wiersz"><span>Popyt roczny ${kolko(jakPrognoza(u, m))}</span><span>${licz(u.popyt_roczny)} porcji</span></div>
+            <div class="wiersz"><span>Sezonowość (${MIESIACE[m]})</span><span>× ${licz(u.sezonowosc[m], 2)}</span></div>
             <div class="wiersz"><span>Preferowana cena</span><span>${zl(u.cena_preferowana)}</span></div>
             <div class="wiersz"><span>Czas przygotowania</span><span>${Math.round(u.godziny_prowadzacego * 600) / 10} min</span></div>
             <div class="wiersz"><span>Czas obsługi przy kasie</span><span>${Math.round(u.godziny_kasy * 600) / 10} min</span></div>
@@ -61,7 +97,8 @@ export const oferta = {
                    : `<button class="btn czarny" data-akcja="usluga" data-u="${klucz}" ${edycja && dozwolona ? "" : "disabled"}>Wybierz</button>${czemu ? `<span class="podpowiedz">${czemu}</span>` : ""}`}
             ${jest ? `<label class="pole">Prognozowany popyt (na ${OKRES.mianownik})
               <input type="number" min="0" step="1" value="${wybrane[klucz] || ""}" ${v.popyt ? "" : `placeholder="${baza}"`} data-zmiana="prognoza" data-u="${klucz}" ${edycja ? "" : "disabled"}>
-              ${v.popyt ? "" : `<span class="podpowiedz">Wg wzoru: ${licz(u.popyt_roczny)} / ${OKRES.rund_w_roku} × ${u.sezonowosc[m]} ≈ ${baza}</span>`}</label>` : ""}
+              ${v.popyt ? "" : `<span class="podpowiedz">Wg wzoru: ${licz(u.popyt_roczny)} / ${OKRES.rund_w_roku} × ${u.sezonowosc[m]} ≈ ${baza}</span>`}</label>
+              ${cenaDania(v, kat, klucz, edycja)}` : ""}
           </div></div>`;
       }
       html += `</div>`;
@@ -110,7 +147,14 @@ export const oferta = {
         if (!(u in c.v.stan_przed.oferta) && !(u in c.v.stan.oferta) && przyrost >= limit) return toast(`W tej rundzie liczba dań może wzrosnąć najwyżej o ${limit}.`);
         of[u] = prognozaDania(c.v, c.kat, u, miesiacSprzedazy(r));
       }
-      await c.zmien((d) => { zapiszWLokalu(d, c.v, "oferta", of); });
+      // wybrane danie od razu w sprzedaży – po cenie preferowanej, dopóki drużyna jej nie zmieni
+      const ceny = { ...cenyLokalu(c.v, lokalWybrany(c.v)) };
+      const nowaCena = u in of && !ceny[u] && sprzedazOtwarta(c.v);
+      if (nowaCena) ceny[u] = { cena: c.kat.uslugi[u].cena_preferowana, rabat: 0 };
+      await c.zmien((d) => {
+        zapiszWLokalu(d, c.v, "oferta", of);
+        if (nowaCena) zapiszWLokalu(d, c.v, "sprzedaz", ceny);
+      });
     },
   },
   zmiany: {

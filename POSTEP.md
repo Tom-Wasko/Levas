@@ -346,6 +346,14 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 
 - [ ] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu
 
+## Poprawki 4.11 (uwagi autora na czacie)
+
+- [x] P1 Menu: zamiast „Chętnych w strefie na tydzień” – popyt roczny i sezonowość dania, w dymku ⓘ instrukcja liczenia
+  prognozy na tydzień krok po kroku; kolumna „Wielkość strefy” w Klientach i strefach (`widok_popytu`: `wielkosc`)
+- [x] P2 Menu i ceny bez osobnej części „Sprzedaż”: danie wybrane w menu jest w sprzedaży (silnik: danie z menu bez ceny
+  – cena preferowana, `decyzje._ceny_domyslne`), cena i rabat w kafelku dania obok prognozy; wyniki sprzedaży zostają
+- [ ] P3 Parki i zdarzenia – nowy układ (autor wybrał: lista spraw + szczegóły wybranej, opcje jako kafelki, pasek czasu)
+
 ## Krok 5 – kalibracja, część druga: obszary B6–B15
 
 - [ ] B6 Lokale (typ × forma × strefa, licytacje, przejęcia)

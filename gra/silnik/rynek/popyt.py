@@ -582,7 +582,10 @@ def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float 
         for lok in g.lokale:
             lokale_stref.setdefault(dane.lokale[lok.id]["strefa"], []).append(n)
     sklad = kl.sklad_stref(dane, dni)   # U24: grupy klientów stref
+    m = dane.miesiac_rundy(r)
+    # wielkość strefy – mnożnik popytu rocznego dania (pula × miesiąc strefy), krok 3 instrukcji prognozy w panelu
     strefy = {z: {"pula": round(sum(float(pr[z][u].sum()) for u in dania)), "potencjal": pot[z],
+                  "wielkosc": round(ps["pula"] * (ps["miesiace"][m] if ps.get("miesiace") else 1.0), 2),
                   "cena": ps["cena"], "wrazliwosc_ceny": ps["wrazliwosc_ceny"],
                   "dni": [round(x * 7, 3) for x in wagi_dni(dane, z, dni)] if len(dni) == 7 else [],
                   "firmy": sorted(lokale_stref.get(z, [])), "grupy": sklad.get(z, {})}

@@ -174,3 +174,22 @@ def test_decyzje_w_lokalu(gra_bota):
     # U1: udogodnienie poniżej progu amortyzacji – koszt tej rundy (bez VAT) i ostrzeżenie o karcie
     cena = dane.pozycje("udogodnienia")[ud]["cena"]
     assert 0 < info["inwestycje_w_koszty"] < cena and any("idą w koszty" in x["tekst"] for x in lb)
+
+
+def test_danie_z_menu_bez_ceny_po_cenie_preferowanej(gra_bota):
+    """Panel: wybór dania w menu = sprzedaż – danie z menu bez ceny dostaje cenę preferowaną bez rabatu, w każdym lokalu;
+    cena podana przez drużynę zostaje."""
+    dane, f, r, pierwszy = _dwa_lokale(gra_bota)
+    pl.utrwal(f)
+    u, v = list(f.oferta)[:2]
+    for lok in f.lokale:
+        lok.ceny.pop(v, None)
+    f.ceny.pop(v, None)
+    d = {"w_lokalu": {DRUGI: {"sprzedaz": {u: {"cena": f.ceny[u].cena + 1}}}}}
+    zastosuj(dane, f, d, r, [], ceny_rundy(dane, 1, r, "dane"), Ksiega(vat=rz.reguly_vat(dane)), Rachunek())
+    a, b = f.lokale
+    pref = dane.uslugi[v]["cena_preferowana"]
+    assert a.ceny[v].cena == pytest.approx(pref) and a.ceny[v].rabat == 0
+    if v in b.menu:
+        assert b.ceny[v].cena == pytest.approx(pref)
+    assert b.ceny[u].cena == pytest.approx(a.ceny[u].cena + 1)

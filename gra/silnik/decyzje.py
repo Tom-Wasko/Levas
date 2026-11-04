@@ -3,7 +3,8 @@
 Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     nazwa, misja
     oferta:            {usługa: prognoza popytu}           – pełna lista usług w ofercie
-    sprzedaz:          {usługa: {"cena", "rabat"}}          – usługi włączone do sprzedaży
+    sprzedaz:          {usługa: {"cena", "rabat"}}          – ceny dań; danie z menu bez ceny sprzedaje się po cenie
+                                                            preferowanej (od rundy sprzedaży, `_ceny_domyslne`)
     lokal:             {"id", "forma": "najem" | "kupno", "oferta"}   – nowy lokal z mapy, oferta w licytacji
                                                               (silnik/nieruchomosci/lokale.py)
     przejecie:         {"id", "oferta"}                     – kupno budynku z najemcą; wypowiedz: [{"id", "ulepszenia":
@@ -182,6 +183,23 @@ def _nowe_ceny(dane: Dane, stare: dict[str, Cena], zadane: dict, info: dict) -> 
     return ceny
 
 
+def _ceny_domyslne(dane: Dane, firma: Firma, zadane: dict | None) -> None:
+    """Danie z menu, które nie ma ceny, wchodzi do sprzedaży po cenie preferowanej bez rabatu (panel: wybór dania
+    w menu = sprzedaż). Bez zmian dla dania, któremu drużyna w tej rundzie podała cenę (także odrzuconą)."""
+    for lok in firma.lokale or [None]:
+        menu, ceny = (pl.menu(firma, lok), pl.ceny(firma, lok)) if lok else (firma.oferta, firma.ceny)
+        podane = (zadane or {}).get(lok.id if lok else None) or {}
+        nowe = {u: Cena(cena=float(dane.uslugi[u]["cena_preferowana"]), rabat=0.0)
+                for u in menu if u not in ceny and u not in podane}
+        if not nowe:
+            continue
+        if lok:
+            lok.ceny = {**ceny, **nowe}
+        else:
+            firma.ceny = {**ceny, **nowe}
+    pl.synchronizuj(firma)
+
+
 def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ceny_dostawcow: dict,
              ksiega: Ksiega, rachunek: Rachunek) -> dict:
     """Wykonuje decyzje zakupowe i kadrowe (przed sprzedażą). Zwraca informacje do wyników (np. zakupy zasobów).
@@ -238,6 +256,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         if info.get("odrzucone_ceny"):
             info["odrzucone_ceny"] = list(dict.fromkeys(info["odrzucone_ceny"]))
         pl.synchronizuj(firma)
+    if "sprzedaz" in odbl:
+        _ceny_domyslne(dane, firma, zadane)
     if d.get("bank") and d["bank"] in dane.dostepne("banki", runda):
         firma.bank = d["bank"]
     if d.get("biuro") and bo.poprawny_wybor(dane, d["biuro"]):   # biura z mapy albo samodzielna księgowość

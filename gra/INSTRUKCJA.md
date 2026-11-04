@@ -126,8 +126,11 @@ co jeszcze zostało do zrobienia):
    deklaracji nie złoży, płaci mandat co rundę – zwykle ponad dwa razy więcej niż najtańsze biuro (karta „Samodzielnie”
    pokazuje to porównanie).
 3. **Menu** (Lokale ▸ Menu i ceny) – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,
-   dodatki) dodasz od tygodnia 3. „Chętnych w strefie na tydzień” na kafelku dania mówi, jak popularne jest danie
-   w przeciętnej strefie – do Twojego lokalu trafi tylko część tych klientów.
+   dodatki) dodasz od tygodnia 3. Kafelek dania pokazuje **popyt roczny** (ile porcji zjada w roku przeciętna strefa)
+   i sezonowość. Prognozę na tydzień liczysz sam – krok po kroku w dymku ⓘ przy „Popyt roczny”: popyt roczny ÷ 52
+   × sezonowość × wielkość strefy (Rynek ▸ Klienci i strefy), a z tego część, którą przyciągniesz na tle konkurencji.
+   Wybrane danie jest od razu w sprzedaży: cenę i rabat wpisujesz w tym samym kafelku co prognozę (od tygodnia 2;
+   na start cena preferowana).
 4. **Stanowiska** (Lokale ▸ Sprzęt) – kuchnia i kasa. Każdy pracownik potrzebuje swojego stanowiska, a liczbę stanowisk ogranicza
    wielkość lokalu.
 5. **Ludzie** (Lokale ▸ Ludzie) – kucharzy i kasjerów możesz zatrudnić już w tygodniu 1, żeby w pierwszym
@@ -152,7 +155,7 @@ Od drugiego tygodnia lokal sprzedaje. Żeby danie trafiło do klienta, potrzebuj
 | Sprzęt | Lokale ▸ Sprzęt | Rożen, frytownica, lodówka… kupowany na konkretne stanowisko |
 | Pracowników | Lokale ▸ Ludzie | Kucharze gotują, kasjer sprzedaje; każdy ma gwiazdki umiejętności i oczekiwaną pensję |
 | Składniki | Lokale ▸ Dostawy i magazyn | Mięso, pita, warzywa, sosy – kupione wcześniej niż sprzedane |
-| Cenę | Lokale ▸ Menu i ceny | Cena brutto dania; za droga – klienci idą obok, za tania – sprzedajesz ze stratą |
+| Cenę | Lokale ▸ Menu i ceny | Cena brutto dania w kafelku dania (obok prognozy); za droga – klienci idą obok, za tania – sprzedajesz ze stratą |
 
 Sanepid musi **odebrać lokal** przed pierwszą sprzedażą (zakładka Firma ▸ Urząd i sanepid) – bez porządnego
 sprzątania odbioru nie będzie.
