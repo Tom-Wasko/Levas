@@ -1,5 +1,6 @@
 """Strony gracza: lista gier, wybór firmy, strona z zakładkami."""
 
+import secrets
 from urllib.parse import quote
 
 from django.core.exceptions import PermissionDenied
@@ -9,6 +10,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from gry import serwisy
 from gry.models import Gra
+from konta.druzyny import CIASTKO_URZADZENIA
 from konta.role import firmy_ucznia, jest_mg, moze_firme
 from silnik.dane import dane_domyslne
 
@@ -68,4 +70,8 @@ def strona_gry(request, id_, firma):
     if not moze_firme(request.user, id_, firma):
         raise PermissionDenied("To nie jest firma Twojej drużyny.")
     kontekst = {"id": id_, "firma": firma, "mg": jest_mg(request.user)}
-    return render(request, "panel_gracza/gra.html", kontekst)
+    odp = render(request, "panel_gracza/gra.html", kontekst)
+    if not request.COOKIES.get(CIASTKO_URZADZENIA):   # U18: przeglądarka w dzienniku zapisów
+        odp.set_cookie(CIASTKO_URZADZENIA, secrets.token_hex(16), max_age=400 * 24 * 3600,
+                       httponly=True, samesite="Lax")
+    return odp

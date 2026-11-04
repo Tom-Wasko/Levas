@@ -20,6 +20,12 @@ ZNAKI_HASLA = "abcdefghjkmnpqrstuvwxyz23456789"  # bez l/1, o/0 – hasło przep
 DLUGOSC_HASLA = 8
 MAKS_LOGO_KB = 300  # logo firmy (runda 1) – mały obrazek, trzymany w bazie jako data URL
 FORMATY_LOGO = {"image/png": b"\x89PNG", "image/jpeg": b"\xff\xd8\xff"}
+# U18: dziennik zapisów decyzji. Ciasteczko przeglądarki przetrwa wylogowanie (klucz sesji
+# Django zmienia się przy każdym logowaniu, a w szkole wszyscy wychodzą jednym adresem IP);
+# w dzienniku jest tylko jego skrót.
+CIASTKO_URZADZENIA = "levas_urz"
+MAKS_DZIENNIKA = 200   # wpisów na drużynę w rundzie (starsze odpadają)
+CO_W_DZIENNIKU = {None: "zapis", True: "wysłanie", False: "powrót do decyzji"}
 
 
 def nazwa(user) -> str:
@@ -147,10 +153,32 @@ def nowe_konto(login: str, imie: str = "") -> tuple[object, str]:
     return user, haslo
 
 
-def autor(g, firma: str, user, wyslal: bool | None = None) -> None:
-    """Zapisuje w rundzie, kto z drużyny ostatnio zapisał (albo wysłał) decyzje; podbija wersję."""
+def skrot_urzadzenia(request) -> str | None:
+    """Skrót ciasteczka przeglądarki (ustawia je strona gry): ta sama przeglądarka, także po
+    przelogowaniu na inne konto."""
+    c = request.COOKIES.get(CIASTKO_URZADZENIA)
+    return hashlib.sha256(c.encode()).hexdigest()[:10] if c else None
+
+
+def autor(g, firma: str, user, wyslal: bool | None = None, zakladka: str | None = None,
+          urzadzenie: str | None = None) -> None:
+    """Zapisuje w rundzie, kto z drużyny ostatnio zapisał (albo wysłał) decyzje; podbija wersję.
+    U18: dopisuje wpis do dziennika – kolejne zapisy tej samej osoby w tej samej zakładce łączą się
+    w jeden wpis z licznikiem."""
     a = g.decyzje.setdefault(g.runda, {}).setdefault("_autorzy", {}).setdefault(firma, {})
-    ktos = {"login": user.username, "nazwa": nazwa(user), "kiedy": timezone.now().isoformat()}
+    teraz = timezone.now().isoformat()
+    ktos = {"login": user.username, "nazwa": nazwa(user), "kiedy": teraz}
+    dz = a.setdefault("dziennik", [])
+    wpis = {"login": user.username, "nazwa": nazwa(user), "co": CO_W_DZIENNIKU[wyslal],
+            "zakladka": zakladka or "", "urz": urzadzenie, "mg": jest_mg(user),
+            "od": teraz, "do": teraz, "n": 1}
+    ost = dz[-1] if dz else None
+    ten_sam = ost and all(ost.get(k) == wpis[k] for k in ("login", "co", "zakladka", "urz"))
+    if ten_sam and wyslal is None:
+        ost["do"], ost["n"] = teraz, ost.get("n", 1) + 1
+    else:
+        dz.append(wpis)
+        del dz[:-MAKS_DZIENNIKA]
     if wyslal is None:
         a["zapisal"] = ktos
     elif wyslal:
@@ -163,10 +191,35 @@ def autor(g, firma: str, user, wyslal: bool | None = None) -> None:
 def autorzy(g, firma: str) -> dict:
     """Kto zapisał / wysłał decyzje firmy w bieżącej rundzie: {zapisal, wyslal, wersja}."""
     a = dict(g.decyzje.get(g.runda, {}).get("_autorzy", {}).get(firma, {}))
+    a.pop("dziennik", None)   # dziennik widzi tylko mistrz gry (dziennik())
     if firma not in g.wyslane():
         a.pop("wyslal", None)
     a.setdefault("wersja", 0)
     return a
+
+
+def dziennik(g, firma: str, runda: int | None = None) -> list[dict]:
+    """U18: zapisy decyzji drużyny w rundzie (od najstarszego) – dla mistrza gry."""
+    a = g.decyzje.get(runda or g.runda, {}).get("_autorzy", {}).get(firma, {})
+    return list(a.get("dziennik", []))
+
+
+def ostrzezenia(g) -> list[dict]:
+    """U18: ta sama przeglądarka zapisywała decyzje dwóch (lub więcej) drużyn w bieżącej albo
+    ostatniej przeliczonej rundzie – np. uczeń przelogował się na konto kolegi. Zapisy mistrza gry
+    się nie liczą."""
+    wynik = []
+    for r in (g.runda, g.runda - 1):
+        przez: dict[str, dict[str, set]] = {}
+        for firma, a in g.decyzje.get(r, {}).get("_autorzy", {}).items():
+            for w in a.get("dziennik", []):
+                if w.get("urz") and not w.get("mg"):
+                    przez.setdefault(w["urz"], {}).setdefault(firma, set()).add(w["nazwa"])
+        for firmy in przez.values():
+            if len(firmy) > 1:
+                lista = [{"firma": f, "osoby": sorted(o)} for f, o in sorted(firmy.items())]
+                wynik.append({"runda": r, "firmy": lista})
+    return wynik
 
 
 POLSKIE = str.maketrans("ąćęłńóśźżĄĆĘŁŃÓŚŹŻ", "acelnoszzACELNOSZZ")

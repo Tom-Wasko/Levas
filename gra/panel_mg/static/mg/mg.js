@@ -59,6 +59,27 @@ function statusDecyzji(f, gra) {
   return `<span class="chip pom" title="${a.zapisal ? `Ostatni zapis: ${esc(a.zapisal.nazwa)}, ${godzina(a.zapisal.kiedy)}` : "Brak zapisanych decyzji"}">czeka</span>`;
 }
 
+// U18: dziennik zapisów decyzji drużyny w bieżącej rundzie (kto, kiedy, w której zakładce, z której przeglądarki)
+function dziennik(nazwa) {
+  const f = S.p.firmy.find((x) => x.nazwa === nazwa);
+  const wiersze = [...(f.dziennik || [])].reverse().map((w) => [
+    w.od === w.do ? godzina(w.od) : `${godzina(w.od)}–${godzina(w.do)}`, esc(w.nazwa) + (w.mg ? " (mistrz gry)" : ""),
+    esc(w.co), esc(w.zakladka || "–"), w.n, w.urz ? `<code>${esc(w.urz.slice(0, 4))}</code>` : "–"]);
+  okno(`Dziennik zapisów – ${esc(nazwa)}, runda ${S.p.gra.runda}`, `<p class="podpowiedz">Kolejne zapisy tej samej osoby w tej samej
+      zakładce są złączone w jeden wiersz. „Przeglądarka” to skrót znacznika przeglądarki – ten sam w dwóch drużynach znaczy,
+      że ktoś zapisywał z jednego komputera za obie (np. po przelogowaniu na konto kolegi).</p>
+    ${wiersze.length ? tabela("", ["Kiedy", "Kto", "Co", "Zakładka", "Zapisów", "Przeglądarka"], wiersze, { klasy: ["l", "l", "l", "l"], sortuj: false })
+      : "<p>W tej rundzie nikt jeszcze nie zapisał decyzji.</p>"}`, { srednie: true });
+}
+
+function ostrzezeniaHtml() {
+  const O = S.p.ostrzezenia || [];
+  if (!O.length) return "";
+  const li = O.map((o) => `<li>runda ${o.runda}: ${o.firmy.map((x) => `<b>${esc(x.firma)}</b> (${x.osoby.map(esc).join(", ")})`).join(" i ")}</li>`).join("");
+  return info(`<b>Ta sama przeglądarka zapisywała decyzje kilku drużyn:</b><ul>${li}</ul>
+    Może to być uczeń zalogowany na konto kolegi albo wspólny komputer w pracowni – sprawdź w dzienniku zapisów (link przy statusie decyzji).`);
+}
+
 // Z3: debet ponad limit – w tej rundzie blokada inwestycji i kredytów; mistrz gry może przysłać inwestora ratunkowego
 function alarm(f, gra) {
   if (gra.zakonczona) return "";
@@ -105,7 +126,9 @@ function decyzje() {
     : `Decyzje wysłało ${wyslaly} z ${druzyny.length} ${druzyny.length === 1 ? "drużyny" : "drużyn"}. Runda zamyka się sama, gdy wyślą wszystkie.${kiedy}
        Możesz zamknąć ją wcześniej – drużyny bez wysłanych decyzji zagrają wtedy decyzjami zapisanymi do tej pory.`;
   const harm = P.harmonogram.length ? esc(P.harmonogram_opis) : "brak – rundę zamykasz sam(a) albo zamyka się, gdy wyślą wszyscy";
-  const wiersze = firmy.map((f) => [`<b>${esc(f.nazwa)}</b>`, prowadzi(f), statusDecyzji(f, gra), zl(f.gotowka) + alarm(f, gra),
+  const wiersze = firmy.map((f) => [`<b>${esc(f.nazwa)}</b>`, prowadzi(f),
+    statusDecyzji(f, gra) + (f.dziennik?.length ? ` <a data-akcja="dziennik" data-f="${esc(f.nazwa)}" title="Kto i kiedy zapisywał decyzje">dziennik</a>` : ""),
+    zl(f.gotowka) + alarm(f, gra),
     wsk(f.wynik_skumulowany), f.miejsce ?? "–",   // U12: kto tonie w rankingu – bez przełączania na Wyniki
     `<a class="btn jasny maly" href="${strona(f)}" target="_blank" rel="noopener">Strona firmy</a>`]);
   const ustawienia = [["Kapitał startowy", zl(gra.kapital)], ["Ziarno losowości", esc(gra.ziarno)],
@@ -118,7 +141,7 @@ function decyzje() {
   const alarmy = gra.zakonczona ? [] : firmy.filter((f) => f.alarm > 0 && !f.inwestor_przyslany);
   const opisAlarmu = alarmy.length ? info(`<b>Alarm – debet ponad limit konta:</b> ${alarmy.map((f) => esc(f.nazwa)).join(", ")}.
     W tej rundzie nie mogą inwestować ani brać kredytów, leasingu i lokat. Drużynę bez inwestora możesz uratować – link „przyślij inwestora” przy gotówce.`) : "";
-  return `${info(opis)}${opisAlarmu}
+  return `${info(opis)}${opisAlarmu}${ostrzezeniaHtml()}
     ${tabela(gra.zakonczona ? "Firmy" : `Decyzje rundy ${gra.runda}`, ["Firma", "Prowadzi", "Decyzje", "Gotówka", "Wynik (skum.)", "Miejsce", ""], wiersze, { klasy: ["l", "l"] })}
     ${refleksje()}
     <div class="przyciski-mg">
@@ -320,6 +343,7 @@ async function wykonaj(akcja, el) {
     toast(`Refleksja drużyn: ${TRYB_REFLEKSJI[tryb]}.`);
     return wczytaj();
   }
+  if (akcja === "dziennik") return dziennik(el.dataset.f);
   if (akcja === "inwestor") return przyslijInwestora(el.dataset.f);
   if (akcja === "inwestor-tak" || akcja === "inwestor-odwolaj") {
     const kwota = akcja === "inwestor-tak" ? +document.getElementById("kwota-inwestora").value : 0;

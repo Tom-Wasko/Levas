@@ -80,7 +80,8 @@ async function zmien(fn) {
     try {
       // wersja: ktoś z drużyny zapisał w międzyczasie → 409 i wczytanie jego decyzji (bez nadpisania)
       const wersja = S.v.druzyna?.autorzy?.wersja ?? "";
-      const v = await api(`/api/gry/${GRA}/decyzje/${encodeURIComponent(FIRMA)}?wersja=${wersja}`,
+      const zakladka = encodeURIComponent(ZAKLADKI[S.zakladka]?.tytul || S.zakladka || "");   // U18: dziennik zapisów (MG)
+      const v = await api(`/api/gry/${GRA}/decyzje/${encodeURIComponent(FIRMA)}?wersja=${wersja}&zakladka=${zakladka}`,
         { method: "PUT", body: JSON.stringify(S.d) });
       // w kolejce czeka nowsza zmiana: szkic S.d już ją ma (ustaw by ją skasował) – tylko nowa wersja do zapisu
       if (S.oczekujace > 1) S.v = v;

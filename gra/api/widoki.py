@@ -189,6 +189,8 @@ def _przeglad(id_: str) -> dict:
         if not f["bot"]:
             f["sklad"] = sklad.get(f["nazwa"], [])
             f["autorzy"] = druzyny.autorzy(g, f["nazwa"])
+            f["dziennik"] = druzyny.dziennik(g, f["nazwa"])   # U18
+    p["ostrzezenia"] = druzyny.ostrzezenia(g)
     p["prowadzenie"] = hg.prowadzenie(id_)
     p["prowadzenie"]["dni"] = hg.DNI
     poziomy = g.dane.boty.get("poziomy") or {}
@@ -434,7 +436,8 @@ def api_decyzje(request, id_, firma):
         if bledy:
             raise BladZapytania(" ".join(bledy))
         g.ustaw_decyzje(firma, d)
-        druzyny.autor(g, firma, request.user)
+        druzyny.autor(g, firma, request.user, zakladka=str(request.GET.get("zakladka", ""))[:40],
+                      urzadzenie=druzyny.skrot_urzadzenia(request))
     return odpowiedz(_z_druzyna(request, widok(g, firma), id_, g, firma))
 
 
@@ -485,7 +488,8 @@ def api_wyslij(request, id_, firma):
             g.wyslij(firma, wyslane, None if refleksja is None else str(refleksja)[:MAKS_REFLEKSJI])
         except ValueError as e:
             raise BladZapytania(str(e)) from e
-        druzyny.autor(g, firma, request.user, wyslal=wyslane)
+        druzyny.autor(g, firma, request.user, wyslal=wyslane, zakladka="Wyślij decyzje",
+                      urzadzenie=druzyny.skrot_urzadzenia(request))
         if wyslane and not g.brakujace() and not g.zakonczona:
             g.przelicz()
             przeliczono = True

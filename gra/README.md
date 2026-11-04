@@ -83,7 +83,14 @@ co widzi drużyna w zakładkach), poziom można zmienić w trakcie gry (od nast�
 - strony drużyn uczniów mistrz gry ogląda **tylko do odczytu** (decyzje zmieniają i wysyłają uczniowie);
   drużynę bez uczniów prowadzi sam,
 - *Wyniki* → eksport do arkusza: **Ranking (CSV)** i **Wyniki firm w rundach (CSV)** (średnik, przecinek
-  dziesiętny – otwiera się wprost w Excelu).
+  dziesiętny – otwiera się wprost w Excelu),
+- **refleksja drużyn** (*Ustawienia gry*: nieobowiązkowa / wymagana / wyłączona) – przy *Wyślij decyzje*
+  drużyna pisze 1–2 zdania „co zmieniamy i dlaczego”; mistrz gry widzi je w tabeli *Refleksje drużyn* obok
+  dochodu rundy i w kolumnie CSV wyników,
+- **dziennik zapisów** – link *dziennik* przy statusie decyzji: kto, kiedy i w której zakładce zapisywał
+  decyzje w bieżącej rundzie. Gdy ta sama przeglądarka (ciasteczko ze strony gry, przetrwa przelogowanie)
+  zapisuje decyzje dwóch drużyn, panel pokazuje ostrzeżenie (eksperyment – wspólny komputer w pracowni
+  też je wywoła).
 
 **Drużyny.** Drużyna to 1–4 uczniów prowadzących jedną firmę; uczeń gra w jednej drużynie danej gry (w innej
 grze może być w innej). Mistrz gry wpisuje w zakładce *Drużyny* listę imion i nazwisk – powstają konta z loginem

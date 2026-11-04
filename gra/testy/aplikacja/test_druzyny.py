@@ -199,3 +199,38 @@ def test_strony_mistrza_gry_i_druzyny(client, gra):
     assert client.get(f"/mg/gra/{gra}").status_code == 200
     strona = zaloguj(j["login"]).get(f"/gra/{gra}/{DRUZYNY[0]}").content.decode()
     assert '"ala.nowak"' in strona  # login do odświeżania (kto zmienia decyzje)
+
+
+def test_dziennik_zapisow_i_jedna_przegladarka_w_dwoch_druzynach(client, gra):
+    """U18: mistrz gry widzi dziennik zapisów drużyny i ostrzeżenie, gdy ta sama przeglądarka
+    (ciasteczko ze strony gry) zapisuje decyzje dwóch drużyn."""
+    from konta.druzyny import CIASTKO_URZADZENIA
+
+    konta = client.post("/api/konta", {"osoby": ["Ala Nowak", "Ola Kot"]}, content_type=JSON)
+    ala_login, ola_login = [k["login"] for k in konta.json()["konta"]]
+    dopisz(client, gra, DRUZYNY[0], ala_login)
+    dopisz(client, gra, DRUZYNY[1], ola_login)
+    ala, ola = zaloguj(ala_login), zaloguj(ola_login)
+    strona = ala.get(f"/gra/{gra}/{DRUZYNY[0]}")
+    ciastko = strona.cookies[CIASTKO_URZADZENIA].value
+    assert len(ciastko) == 32
+    url = f"/api/gry/{gra}/decyzje/{DRUZYNY[0]}"
+    d = ala.get(f"/api/gry/{gra}/widok/{DRUZYNY[0]}").json()["decyzje"]
+    for wersja in (0, 1):
+        v = ala.put(f"{url}?wersja={wersja}&zakladka=Lokale", d, content_type=JSON).json()
+    assert "dziennik" not in v["druzyna"]["autorzy"]   # uczniowie dziennika nie dostają
+    ala.put(f"{url}?wersja=2&zakladka=Menu", d, content_type=JSON)
+    ala.post(f"/api/gry/{gra}/wyslij/{DRUZYNY[0]}", {}, content_type=JSON)
+    p = client.get(f"/api/gry/{gra}/mg").json()
+    dz = next(f for f in p["firmy"] if f["nazwa"] == DRUZYNY[0])["dziennik"]
+    assert [(w["co"], w["zakladka"], w["n"]) for w in dz] == [
+        ("zapis", "Lokale", 2), ("zapis", "Menu", 1), ("wysłanie", "Wyślij decyzje", 1)]
+    assert dz[0]["nazwa"] == "Ala Nowak" and dz[0]["urz"] and not dz[0]["mg"]
+    assert p["ostrzezenia"] == []
+    # Ola zapisuje z tej samej przeglądarki (to samo ciasteczko) – ostrzeżenie dla mistrza gry
+    ola.cookies[CIASTKO_URZADZENIA] = ciastko
+    d2 = ola.get(f"/api/gry/{gra}/widok/{DRUZYNY[1]}").json()["decyzje"]
+    ola.put(f"/api/gry/{gra}/decyzje/{DRUZYNY[1]}?wersja=0&zakladka=Lokale", d2, content_type=JSON)
+    p = client.get(f"/api/gry/{gra}/mg").json()
+    assert p["ostrzezenia"] == [{"runda": 1, "firmy": [{"firma": DRUZYNY[0], "osoby": ["Ala Nowak"]},
+                                                       {"firma": DRUZYNY[1], "osoby": ["Ola Kot"]}]}]
