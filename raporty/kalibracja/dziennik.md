@@ -354,3 +354,32 @@ wpis na dole.
   traci (dochód słabej ok. −1 tys. zł za grę) – balans strategii zostaje do B6–B12.
 - Test: nowy `test_slaby_czlowiek_zamawia_mniej_gdy_kuchnia_nie_nadazyla` (`testy/rdzen/test_boty.py`;
   bez reguły nie przechodzi). Inne testy bez zmian.
+
+## U21 – „zarób i zamknij”: pomiar zamknięcia firmy (4.11.2026, Claude Code, Opus 5.5)
+- Pozycja [22] raportu `raporty/analiza_gracza.md`: czy opłaca się zarobić kilka rund i zamknąć firmę
+  (karta rund bez sprzedaży ≈ 0, pyt. 2 – autor: zostaje jak jest).
+- **Najemca nie może wypowiedzieć najmu.** `wypowiedz` w decyzjach to wypowiedzenie przez nowego właściciela
+  budynku po przejęciu (`silnik/nieruchomosci/przejecia.py`), nie przez gracza. Zamknięta firma płaci więc
+  czynsz (i media) do końca gry – „wypowiedzenie najmu” z opisu pozycji nie istnieje.
+- Warianty w `balans/warianty.py` (`zamknij_od`, `zamknij_twardo`, decyzje z `_zamknij`): od rundy N firma
+  zwalnia wszystkich i nic nie zamawia, nie reklamuje się, nie bierze kredytów; wersja „twarda” do tego
+  sprzedaje sprzęt, zdejmuje menu i polisy. `zamkniecie:1` – od rundy 1 nic nie robi (bez lokalu), punkt
+  odniesienia.
+- Pomiar: zrównoważony, 18 rund, 6 firm, poziom średni, 20 ziaren (1000–1019), 120 gier,
+  `pomiary/u21_zamkniecie/`. Karta = średni wynik działalności rund 2–18 (jak ranking).
+
+  | wariant | karta | Δ karta vs baza (95%) | dochód zł | majątek zł | miejsce (z 6) |
+  |---|---|---|---|---|---|
+  | baza (gra do końca) | 0,523 | – | 70 308 | 118 316 | 2,7 |
+  | zamknięcie od R11 | −0,130 | −0,65 ± 0,06 | 3 365 | 50 782 | 5,9 |
+  | zamknięcie od R11, twarde | −0,123 | −0,65 ± 0,06 | 3 862 | 47 253 | 5,85 |
+  | zamknięcie od R6 | −0,449 | −0,97 ± 0,11 | −33 686 | 11 423 | 6,0 |
+  | zamknięcie od R6, twarde | −0,442 | −0,96 ± 0,11 | −33 110 | 9 298 | 6,0 |
+  | nic od R1 (bez lokalu) | −0,016 | −0,54 ± 0,10 | −1 347 | 40 653 | 5,65 |
+
+- **Wniosek: zamknięcie się nie opłaca** – 0 z 20 par lepszych od gry do końca, przy każdym terminie.
+  Zamknięta firma ma gorszą kartę niż ta, która w ogóle nie otworzyła lokalu: czynsz bez sprzedaży to strata
+  każdego tygodnia, a strata liczy się do karty z wagą 1,0. Wcześniejsze zamknięcie = dłużej płacony czynsz
+  = gorzej (R6 gorzej niż R11). Sprzedaż sprzętu prawie nic nie zmienia (sprzęt poniżej 10 000 zł jest już
+  zamortyzowany w kosztach). Bezczynność od R1 daje karta ≈ 0 – zgodnie z odpowiedzią autora na pyt. 2,
+  ale to 5.–6. miejsce. Pułapki „zarób i zamknij” w tej grze nie ma; zmiana zasad niepotrzebna.

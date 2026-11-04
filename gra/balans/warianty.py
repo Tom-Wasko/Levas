@@ -12,6 +12,9 @@ i `raport.md`.
 
 Wariant to dane, nie kod: nadpisanie parametrów strategii albo poziomu bota (dane/boty.yaml),
 decyzji, którą bot podejmuje (klucz z silnik/decyzje.py), albo pól każdego zatrudnienia.
+Wyjątek – „zamknięcie firmy” od rundy N (U21): badana firma od tej rundy nie gra (decyzje
+z `_zamknij`), a gra trwa. Najemca nie może wypowiedzieć najmu (`wypowiedz` w decyzjach to
+wypowiedzenie przez nowego właściciela budynku), więc czynsz płaci do końca gry.
 Kontekst: strategia badanej firmy, długość gry, liczba firm, poziom botów, strefa lokalu
 (parametr strategii `strefy`), kapitał startowy i poziom rywali (bez niego – jak badanej; trudność
 mierzy badana firma „jak człowiek” wśród rywali na poziomie średnim, Z5:
@@ -72,6 +75,8 @@ class Wariant:
     poziom: tuple = ()        # ((ustawienie, wartość), …) – nadpisanie poziomu bota badanej firmy
     decyzje: tuple = ()       # ((klucz, wartość), …) – zamiast decyzji bota, gdy ją podejmuje
     zatrudnienie: tuple = ()  # ((pole, wartość), …) – w każdym zatrudnieniu (np. umowa)
+    zamknij_od: int = 0       # U21: od tej rundy firma się zamyka (0 – nie zamyka)
+    zamknij_twardo: bool = False   # przy zamknięciu też sprzedaje sprzęt, zdejmuje menu i polisy
 
 
 @dataclass
@@ -107,6 +112,14 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant("lokale:drugi", "drugi lokal jak bot trudny",
                   poziom=(("kolejny_lokal", drugi),)),
           Wariant("lokale:jeden", "bez drugiego lokalu", poziom=(("kolejny_lokal", None),))]
+    # U21: „zarób i zamknij” – zwolnienia i koniec zamówień (jak w analizie A), wersja twarda:
+    # do tego sprzedaż sprzętu, puste menu i bez polis; lokal zostaje (najemca nie wypowie najmu)
+    w += [Wariant(f"zamkniecie:{r}{'_twarde' if t else ''}",
+                  f"od rundy {r} zwalnia wszystkich i nie zamawia"
+                  + (", sprzedaje sprzęt, bez menu i polis" if t else ""),
+                  zamknij_od=r, zamknij_twardo=t) for r in (6, 11) for t in (False, True)]
+    w.append(Wariant("zamkniecie:1", "od rundy 1 nic nie robi (bez lokalu) – punkt odniesienia",
+                     zamknij_od=1))
     # B3: umiejętności poziomu trudnego pojedynczo wyłączone (na innych poziomach – bez zmian)
     w += [Wariant(f"poziom:bez_{u}", f"poziom bez ustawienia {u}", poziom=((u, None),))
           for u in ("korekta_prognozy", "mnozniki_ceny", "obsluga_kampanii")]
@@ -151,6 +164,21 @@ def _wymus(w: Wariant, d: dict) -> dict:
     return d
 
 
+def _zamknij(w: Wariant, f, r: int) -> dict:
+    """U21: decyzje zamkniętej firmy (brak klucza = bez zmian): nic nie kupuje, nie zatrudnia, nie
+    reklamuje się; w rundzie zamknięcia zwalnia wszystkich (wersja twarda: sprzedaje sprzęt)."""
+    d = {"zatrudnij": [], "zamowienia": [], "kampanie": [], "promocje": [], "sprzet_kup": [],
+         "kredyty_wez": [], "leasing_wez": [], "lokaty_zaloz": [], "szkolenia": []}
+    if r == w.zamknij_od:
+        d["zwolnij"] = [pid for pid, p in f.pracownicy.items() if not p.odchodzi]
+        if w.zamknij_twardo:
+            d["sprzet_sprzedaj"] = [{"typ": s.typ, "nr": s.nr, "nazwa": n} for s in f.stanowiska
+                                    for n in s.sprzet if n not in s.sprzet_wynajmujacego]
+    if w.zamknij_twardo:
+        d |= {"oferta": {}, "sprzedaz": {}, "polisy": []}
+    return d
+
+
 def firmy(k: Kontekst, ziarno: int, strategie: list[str]) -> list[tuple[str, str]]:
     """Badana firma i rywale: kolejne strategie od przesunięcia zależnego od ziarna."""
     rywale = [strategie[(ziarno + i) % len(strategie)] for i in range(1, k.firm)]
@@ -168,8 +196,11 @@ def rozegraj(z: Zadanie) -> dict:
     nad = dict(w.strategia) | ({"strefy": [k.strefa]} if k.strefa else {})
     db = _dane_badanej(g.dane, k.strategia, k.poziom, nad, dict(w.poziom))
     for r in range(1, k.rund + 1):
-        d = decyzje_bota(db, g.stan(r - 1), BADANA, k.strategia, r, g.konfiguracja)
-        g.ustaw_decyzje(BADANA, _wymus(w, d))
+        if w.zamknij_od and r >= w.zamknij_od:
+            d = _zamknij(w, g.stan(r - 1).firmy[BADANA], r)
+        else:
+            d = _wymus(w, decyzje_bota(db, g.stan(r - 1), BADANA, k.strategia, r, g.konfiguracja))
+        g.ustaw_decyzje(BADANA, d)
         s = g.przelicz(wymus=True)
     return {**miary(s, k.rund), "czas_s": round(time.perf_counter() - t, 2)}
 
