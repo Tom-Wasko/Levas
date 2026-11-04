@@ -62,9 +62,45 @@ Proponowany dopisek:
 
 ## B5 – rozruch nowego lokalu i pule stref (29.10.2026) → `notatki/Ustalenia gry.md`, „Limity i czasy”
 
-**Nowa mechanika – czeka na zgodę autora.** Proponowany wiersz tabeli:
+**Nowa mechanika – zatwierdzona przez autora 29.10.2026** (POSTEP, B5: „4 × tak”); tekst do notatek czeka na
+wpisanie. Proponowany wiersz tabeli:
 > | Rozruch nowego lokalu | w pierwszym tygodniu sprzedaży lokal ma 40% klientów, co tydzień +10 p.p., pełny popyt od 7. tygodnia sprzedaży (każdy kolejny lokal tak samo) |
 
 Proponowany dopisek do opisu popytu (jeśli autor trzyma go w „Prawidłach świata”):
 > Pule klientów stref zmniejszone o 10% (B5): jeden lokal średniej drużyny sprzedawał ok. 97 tys. zł
 > miesięcznie, po zmianie ok. 85 tys. zł – bliżej typowego kebaba na dobrej ulicy w Lublinie.
+
+## U20 – zadowolenie pracowników i odejścia (4.11.2026) → `notatki/Ustalenia gry.md`, nowa sekcja po „Limity i czasy”
+
+Mechanika zatwierdzona przez autora 4.11.2026 (etap 1 + ukryte cechy). Proponowana sekcja:
+> ## Pracownicy – zadowolenie i odejścia
+> - Każda osoba ma własne **zadowolenie**: pensja z premią wobec preferowanej, sprzęt stanowiska, udogodnienia
+>   lokalu, szkolenia, rodzaj umowy; przepracowanie je obniża. Wskaźnik zadowolenia w karcie wyników liczy się
+>   jak dotąd (średnia firmy).
+> - **Próg 0,87** (`zalozenia.yaml: pracownicy.odejscia`, założenie): pierwszy tydzień poniżej – tylko
+>   ostrzeżenie na liście błędów; od drugiego tygodnia z rzędu szansa wypowiedzenia 5% za każde 0,01 poniżej
+>   progu, najwyżej 50%. Wypowiedzenie działa jak zwolnienie bez odprawy.
+> - **10 ukrytych cech** (np. szybki, niespieszny, lojalny) – gracz ich nie widzi, wnioskuje z krótkiego
+>   żartobliwego opisu pod „i” w profilu. Cecha mnoży szansę odejścia albo zmienia godziny stanowiska o ±10%.
+> - Boty od poziomu średniego podnoszą pensję niezadowolonej osobie (najwyżej do 115% preferowanej); łatwy
+>   ostrzeżenia ignoruje.
+> - Pomiar (dziennik kalibracji, U20): przy progu 0,87 odchodzą tylko zaniedbani; średni i trudny prawie bez
+>   zmian, łatwy −0,23. Wyższy próg (0,89) sprawia, że skąpienie na pensjach się nie opłaca – do decyzji autora.
+
+## U24 – opinie klientów i grupy klientów (4.11.2026) → `notatki/Prawidła świata.md`, nowa sekcja „Klienci”; krótko w `notatki/Elementy mapy.md`
+
+Mechanika zatwierdzona przez autora 4.11.2026. Proponowana sekcja w „Prawidłach świata”:
+> ## Klienci – grupy i opinie
+> - Klienci strefy to mieszanka **8 grup**: studenci, uczniowie, pracownicy biur, imprezowicze, rodziny, turyści,
+>   goście wydarzeń, podróżni (udziały wg opisu strefy, z porą roku i wydarzeniami). Każda grupa ma swój koszyk
+>   dań, wrażliwość na cenę, czekanie i jakość oraz udział wegetarian (najwięcej wśród studentów, 14%) –
+>   wegetarianie zamiast kebabów biorą falafel. Popyt roczny miasta się nie zmienia – zmienia się, kto go zjada i gdzie.
+> - Klient, który nie znajdzie w lokalu swojego kebaba, w 10% przypadków bierze tam inny kebab (zastępstwo).
+> - **Opinie:** każdy lokal ma ocenę 1–5★ z przeżyć klientów w tygodniu (jakość, cena wobec oczekiwań,
+>   kolejki, braki, reklamacje, wyposażenie) – średnia krocząca, start 3,6★. Ocena zmienia popyt lokalu
+>   (mnożnik ok. 0,86–1,06, mocniej, gdy opinii jest dużo).
+> - Pomiar (dziennik, U24): kolejność strategii bez zmian, najwięcej zyskuje premium; jeśli w grze z drużynami
+>   przewaga premium będzie za duża, pierwsza dźwignia to waga jakości w ocenie (0,3 → 0,2★).
+
+Proponowany dopisek w „Elementach mapy” (przy lokalach):
+> Nad lokalem na mapie widać jego ocenę klientów (gwiazdki) i kilka żartobliwych komentarzy z ostatniego tygodnia.
