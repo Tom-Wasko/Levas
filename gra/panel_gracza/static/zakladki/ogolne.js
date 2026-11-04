@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji.
-import { esc, godzina, inicjaly, inwestorHtml, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, godzina, inicjaly, inwestorHtml, RANKING_DLACZEGO, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -218,13 +218,15 @@ export const karta_wynikow = {
     const karty = skumulowana ? v.karta_skumulowana : v.rynek.karta;
     const firmy = Object.keys(karty || {}).sort((a, b) => karty[b].wynik_dzialalnosci - karty[a].wynik_dzialalnosci);
     const wiersze = firmy.map((f) => [`${f === v.firma ? "<b>" : ""}${esc(nazwaFirmy(v, f))}${f === v.firma ? "</b>" : ""}`,
-      ...WSKAZNIKI.map(([k]) => `<span class="ocena-tekst ${ocena(v.skala_karty, k, karty[f][k])?.[0] || ""}">${wsk(karty[f][k])}</span>`)]);
+      ...WSKAZNIKI.map(([k]) => `<span class="ocena-tekst ${ocena(v.skala_karty, k, karty[f][k])?.[0] || ""}">${wsk(karty[f][k])}</span>`),
+      zl(v.majatek_firm?.[f])]);
     return `<div style="display:flex;gap:10px;justify-content:center">
         <button class="btn ${skumulowana ? "jasny" : "pom"}" data-akcja="karta-skum" data-s="0">Karta wyników</button>
         <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.odblokowane.includes("karta_skumulowana") ? "" : "disabled"}>Skumulowana karta wyników</button></div>
       ${karty?.[v.firma] ? `<div class="sekcja-tytul">${skumulowana ? "Twoja skumulowana karta" : "Twoja karta"} – niski, średni czy dobry?</div>
         ${skalaKarty(v, karty[v.firma])}` : ""}
-      ${tabela("Ranking zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n)], wiersze, { klasy: ["l"] })}
+      ${tabela("Ranking zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n), "Majątek netto"], wiersze, { klasy: ["l"] })}
+      <p class="podpowiedz">${RANKING_DLACZEGO} Majątek netto – stan na koniec ostatniej przeliczonej rundy.</p>
       ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>
       <div class="wykres"><canvas id="w-historia"></canvas></div>

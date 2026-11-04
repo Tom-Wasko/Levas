@@ -1,7 +1,7 @@
 // Panel mistrza gry: zakładki Decyzje (kto wysłał, zamknięcie i cofnięcie rundy, pauza, harmonogram zamykania rund,
 // harmonogram odblokowań gry z lokalami, poziomy botów, alarm debetu i inwestor ratunkowy), Wyniki (ranking, wykresy, eksport CSV) i Drużyny (skład 1–4 uczniów, konta uczniów).
 // Dane: GET /api/gry/<id>/mg (api/prezentacja.py: przeglad_mg), GET /api/gry/<id>/druzyny.
-import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, skrotRundy, tabela, termin, toast, ustawKalendarz, wsk, wyczyscWykresy,
+import { esc, godzina, info, inicjaly, licz, nazwaRundy, okno, RANKING_DLACZEGO, skrotRundy, tabela, termin, toast, ustawKalendarz, wsk, wyczyscWykresy,
   wykres, zamknijOkno, zl }
   from "../zakladki/wspolne.js";
 
@@ -219,7 +219,7 @@ function wyniki() {
     wsk(f.wynik_skumulowany), wsk(f.wynik_ostatni), zl(f.dochod_ostatni), zl(f.dochod_suma), zl(f.majatek_netto), zl(f.gotowka), zl(f.zadluzenie),
     zl(f.lokaty), licz(f.pracownicy), licz(f.stanowiska)]);
   return `${info(`Ranking według wyniku działalności (karta wyników) – średnia z rund od 2, jak w Revasie.
-      Ostatnia przeliczona runda: ${esc(nazwaRundy(ostatnia.runda))}.`)}
+      Ostatnia przeliczona runda: ${esc(nazwaRundy(ostatnia.runda))}. ${RANKING_DLACZEGO}`)}
     <p class="przyciski-mg"><a class="btn jasny" href="${URL_GRY}/ranking.csv">Ranking do arkusza (CSV)</a>
       <a class="btn jasny" href="${URL_GRY}/wyniki.csv">Wyniki firm w rundach (CSV)</a></p>
     ${tabela("Ranking", ["Miejsce", "Firma", "Wynik działalności (średnia)", `Wynik działalności (${esc(skrotRundy(ostatnia.runda))})`,

@@ -23,6 +23,10 @@ const F0 = fmt(0, 0), F2 = fmt(2, 2), F3 = fmt(0, 3);
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const zl = (x, grosze = false) => x == null ? "–" : (grosze ? F2 : F0).format(x) + " PLN";
 
+// U13: jedno zdanie „dlaczego” pod rankingiem (uczeń i mistrz gry) – miejsce to nie stan konta
+export const RANKING_DLACZEGO = "Ranking liczy średnią kartę wyników ze wszystkich tygodni sprzedaży (od tygodnia 2) – liczy się zarabianie "
+  + "co tydzień, zadowolenie klientów i pracowników oraz rozwój, a nie sam stan konta.";
+
 // U11: inwestor ratunkowy (silnik/pieniadze/inwestor.py) – ile wpłacił, jaki udział i do kiedy, ile już wziął
 export function inwestorHtml(v) {
   const I = v.inwestor;

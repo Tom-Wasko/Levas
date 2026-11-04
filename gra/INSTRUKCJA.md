@@ -76,7 +76,8 @@ dania, dostawy przyjeżdżają w swoje dni, a bułki z poniedziałku we wtorek w
 
 Na końcu liczy się **wynik działalności** z karty wyników – średnia ze wszystkich tygodni sprzedaży (od tygodnia 2;
 tydzień przygotowawczy się nie liczy). Tę średnią pokazuje **skumulowana karta wyników**, a według niej mistrz gry
-układa ranking i Dashboard pokazuje Twoje miejsce. Wynik działalności jednego tygodnia to iloczyn:
+układa ranking i Dashboard pokazuje Twoje miejsce. Liczy się zarabianie co tydzień, zadowolenie i rozwój, a nie sam
+stan konta – dlatego firma z mniejszym **majątkiem netto** (widać go w rankingu obok wskaźników) może stać wyżej. Wynik działalności jednego tygodnia to iloczyn:
 
 | Składnik | Co mierzy | Jak go poprawić |
 |---|---|---|

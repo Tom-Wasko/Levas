@@ -174,3 +174,12 @@ def test_skala_wskaznikow_karty():
         skala = dane.z["karta_wynikow"]["skala"]
         assert set(skala) <= set(karta) and len(skala) == 6
         assert all(len(p) == 2 and p[0] < p[1] for p in skala.values())
+
+
+def test_ranking_ucznia_z_majatkiem_netto():
+    """U13: w rankingu drużyna widzi majątek netto wszystkich firm z ostatniej przeliczonej rundy."""
+    from api.prezentacja import widok
+    g = _gra()
+    s = _runda(g, A=_lokal("centrum_3"), B=_lokal("dworzec_1"))
+    m = widok(g, "A")["majatek_firm"]
+    assert set(m) == set(s.wyniki[1]) and m["B"] == s.wyniki[1]["B"]["majatek_netto"]["razem"]
