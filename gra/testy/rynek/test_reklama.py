@@ -158,7 +158,7 @@ def test_gra_kampania_popyt_wyniki_i_bledy(monkeypatch):
     dodatki = {}
     bot = boty.decyzje_bota
     monkeypatch.setattr(boty, "decyzje_bota", lambda dane, stan, nazwa, *a: {**bot(dane, stan, nazwa, *a), **dodatki.get((nazwa, a[1]), {})})
-    monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a: _lokal({"A": "centrum_3", "B": "centrum_1"}[nazwa])["lokal"])
+    monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a: (_lokal({"A": "centrum_3", "B": "centrum_1"}[nazwa])["lokal"], None))
     g = _gra(("A", "nasladowca"), ("B", "nasladowca"))
     g.przelicz(wymus=True)
     g.przelicz(wymus=True)

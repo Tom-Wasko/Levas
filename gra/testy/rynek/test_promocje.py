@@ -148,7 +148,7 @@ def test_gra_zestaw_i_2za1_wyniki_kpir_rynek(monkeypatch):
     dodatki = {}
     bot = boty.decyzje_bota
     monkeypatch.setattr(boty, "decyzje_bota", lambda dane, stan, nazwa, *a: {**bot(dane, stan, nazwa, *a), **dodatki.get((nazwa, a[1]), {})})
-    monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a: _lokal({"A": "akademickie_1", "B": "akademickie_2"}[nazwa])["lokal"])
+    monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a: (_lokal({"A": "akademickie_1", "B": "akademickie_2"}[nazwa])["lokal"], None))
     g = _gra(("A", "nasladowca"), ("B", "nasladowca"))
     g.przelicz(wymus=True)
     g.przelicz(wymus=True)

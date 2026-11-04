@@ -163,7 +163,7 @@ def test_widok_zakladki_przejecia():
 def test_bot_po_wypowiedzeniu_szuka_nowego_lokalu(monkeypatch):
     from silnik import boty
     monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a:
-                        _lokal("felin_1" if stan.firmy[nazwa].lokale else "politechnika_1")["lokal"])
+                        (_lokal("felin_1" if stan.firmy[nazwa].lokale else "politechnika_1")["lokal"], None))
     g = _gra(("H", None), ("Bot", "zrownowazony"), rund=12, kapital_startowy=300000)
     od = g.dane.mapa["zasady"]["przejecia_od_rundy"]
     _do_rundy(g, od)

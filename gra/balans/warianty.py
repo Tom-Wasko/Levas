@@ -112,6 +112,25 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant("lokale:drugi", "drugi lokal jak bot trudny",
                   poziom=(("kolejny_lokal", drugi),)),
           Wariant("lokale:jeden", "bez drugiego lokalu", poziom=(("kolejny_lokal", None),))]
+    # B6: typ i forma lokalu (strategia `lokal`, silnik/boty.py: _wybierz_lokal); kupno – na kredyt
+    # pod zastaw lokalu, gdy zostaje rezerwa gotówki (inaczej gotowy w najmie); drugi lokal – jak
+    # u trudnego, ale innego typu
+    kupno = {"forma": "kupno", "rezerwa": 10000}
+    typy = {"kupno": {"typy": ["gotowy"], **kupno},
+            "niewyposazony": {"typy": ["niewyposazony"]},
+            "niewyposazony_kupno": {"typy": ["niewyposazony"], **kupno},
+            "dzialka": {"typy": ["dzialka"], **kupno},
+            "przebicie": {"przebicie": 1.2}}
+    w += [Wariant(f"lokale:{n}", f"pierwszy i kolejny lokal: {x}", strategia=(("lokal", x),))
+          for n, x in typy.items()]
+    leasing = {"gotowka": 30000, "rund": 26}   # leasing, gdy gotówki mniej niż bufor botów
+    w += [Wariant("leasing:sprzet", f"sprzęt w leasingu: {leasing}",
+                  strategia=(("leasing", leasing),)),
+          Wariant("lokale:niewyposazony_leasing", "niewyposażony w najmie, sprzęt w leasingu",
+                  strategia=(("lokal", typy["niewyposazony"]), ("leasing", leasing)))]
+    w += [Wariant(f"lokale:drugi_{n}", f"drugi lokal jak bot trudny, {x}",
+                  poziom=(("kolejny_lokal", {**drugi, "lokal": x}),))
+          for n, x in typy.items() if n in ("kupno", "niewyposazony", "dzialka")]
     # U21: „zarób i zamknij” – zwolnienia i koniec zamówień (jak w analizie A), wersja twarda:
     # do tego sprzedaż sprzętu, puste menu i bez polis; lokal zostaje (najemca nie wypowie najmu)
     w += [Wariant(f"zamkniecie:{r}{'_twarde' if t else ''}",

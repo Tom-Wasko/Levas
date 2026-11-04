@@ -110,7 +110,7 @@ def test_dni_tygodnia_i_kalendarz():
 
 def test_gra_obsluga_dzien_po_dniu_i_wyniki_klientow(monkeypatch):
     # dwa boty w Centrum: dzielą klientów strefy, obsługa dzień po dniu
-    monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a: _lokal({"A": "centrum_3", "B": "centrum_1"}[nazwa])["lokal"])
+    monkeypatch.setattr(boty, "_wybierz_lokal", lambda dane, stan, nazwa, *a: (_lokal({"A": "centrum_3", "B": "centrum_1"}[nazwa])["lokal"], None))
     g = _gra(("A", "zrownowazony"), ("B", "zrownowazony"))
     g.przelicz(wymus=True)
     s = g.przelicz(wymus=True)

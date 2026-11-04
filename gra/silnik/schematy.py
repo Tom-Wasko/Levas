@@ -417,8 +417,24 @@ class PromocjaBota(Schemat):
     nazwa: str
 
 
+class LokalBota(Schemat):
+    """Wybór lokalu przez bota (B6) – opis pól w silnik/boty.py: _wybierz_lokal."""
+    typy: list[Literal["gotowy", "niewyposazony", "dzialka"]] = ["gotowy"]
+    forma: Literal["najem", "kupno"] = "najem"
+    przebicie: float = Field(1.0, ge=1)
+    rezerwa: float = Field(0, ge=0)
+
+
+class LeasingBota(Schemat):
+    """Nowy sprzęt w leasingu, gdy gotówki (po decyzji o lokalu) jest mniej niż `gotowka` (B6)."""
+    gotowka: float = Field(ge=0)
+    rund: int = Field(gt=0)
+
+
 class Strategia(Schemat):
     nazwa: str
+    leasing: LeasingBota | None = None   # gra z lokalami: sprzęt w leasingu przy małej gotówce (bez – zawsze zakup)
+    lokal: LokalBota | None = None   # gra z lokalami: typ, forma i oferta lokalu (bez – gotowy w najmie, cena wywoławcza)
     min_kuchnia: int = Field(0, ge=0)   # gra z lokalami, bot planujący: najmniej miejsc w kuchni wybieranego lokalu
     cena: float | None  # ułamek ceny preferowanej; None = średnia rynku z poprzedniej rundy
     jakosc: int = Field(ge=1, le=3)
@@ -452,6 +468,7 @@ class KolejnyLokalBota(Schemat):
     obsluga: float = Field(gt=0, le=1)
     gotowka: float = Field(ge=0)
     maks_lokali: int = Field(ge=1)
+    lokal: LokalBota | None = None   # kolejny lokal inaczej niż pierwszy (pola nadpisują `lokal` strategii)
 
 
 class PrognozaCzlowieka(Schemat):

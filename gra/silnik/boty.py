@@ -100,28 +100,75 @@ def przewaga_popytu(dane: Dane, konf: dict, nazwa: str) -> float:
     return poziom(dane, konf, nazwa).get("przewaga_popytu", 1.0)
 
 
+def _kredyt_na_lokal(dane: Dane, f: Firma, decyzja: dict, runda: int) -> dict | None:
+    """Kredyt pod zastaw kupowanego lokalu (produkt banku z `od_lokalu` i `zastaw`) – najwięcej, ile bank da; None –
+    żaden bank nie udzieli (np. ten kredyt już w spłacie)."""
+    nowy = bk.nowy_lokal(dane, {"lokal": decyzja}, runda)
+    for b, bank in bk.banki(dane).items():
+        for p in bank["kredyty"]:
+            if p.get("od_lokalu") and p.get("zastaw") and nowy:
+                k = {"bank": b, "produkt": p["produkt"], "rund": p["maks_rund"], "zastaw": nowy["id"],
+                     "kwota": float(int(min(p["maks_kwota"], p["zastaw"] * nowy["wartosc"])))}
+                if not bk.powod_kredytu(dane, f, k, runda, nowy):
+                    return k
+    return None
+
+
 def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, runda: int, konf: dict,
-                   min_kuchnia: int = 0, strefy: list[str] | None = None) -> dict | None:
-    """Gotowy lokal do najmu wg strategii: tani – najniższy czynsz, premium – Stare Miasto i Centrum, inni – środek
-    stawki. Losowanie spośród trzech najlepszych (ziarno gry), żeby boty nie biły się zawsze o ten sam lokal.
+                   min_kuchnia: int = 0, strefy: list[str] | None = None, wybor: dict | None = None,
+                   f: Firma | None = None) -> tuple[dict | None, dict | None]:
+    """Lokal wg strategii: tani – najniższy czynsz (cena), premium – Stare Miasto i Centrum, inni – środek stawki.
+    Losowanie spośród trzech najlepszych (ziarno gry), żeby boty nie biły się zawsze o ten sam lokal.
     min_kuchnia – najmniej miejsc w kuchni (planujący bot; bez takich lokali – każdy); strefy – tylko lokale w tych
-    strefach (strategia: strefy, np. pomiar w balans/warianty.py; bez wolnych – każda strefa)."""
-    wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy), len(stan.firmy)) if lok["typ"] == "gotowy" and lok.get("czynsz")]
+    strefach (strategia: strefy, np. pomiar w balans/warianty.py; bez wolnych – każda strefa). wybor – parametr
+    strategii `lokal` (B6): `typy` lokali (bez – gotowy), `forma` (najem / kupno – na kredyt pod zastaw lokalu, gdy
+    po wejściu zostaje `rezerwa` gotówki; bez takich lokali – gotowy w najmie), `przebicie` – oferta w licytacji
+    × cena wywoławcza. Zwraca (decyzja lokal, kredyt pod zastaw albo None)."""
+    w = wybor or {}
+    forma = w.get("forma", "najem")
+    pole = "czynsz" if forma == "najem" else "cena"
+    wolne = [lok for lok in lk.dostepne(dane, runda, lk.zajete(stan.firmy), len(stan.firmy))
+             if lok["typ"] in w.get("typy", ["gotowy"]) and lok.get(pole)]
+    if forma == "kupno" and f is not None:
+        def stac(lok: dict) -> bool:
+            k = _kredyt_na_lokal(dane, f, {"id": lok["id"], "forma": "kupno"}, runda)
+            wejscie = lk.koszt_wejscia(dane, lok, "kupno", lok["cena"] * w.get("przebicie", 1.0))
+            return f.gotowka + (k["kwota"] if k else 0.0) - wejscie >= w.get("rezerwa", 0)
+        wolne = [lok for lok in wolne if stac(lok)]
+    if not wolne and wybor:
+        return _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, min_kuchnia, strefy)
     wolne = [lok for lok in wolne if lok["miejsca"][KUCHNIA] >= min_kuchnia] or wolne
     if strefy:
         wolne = [lok for lok in wolne if lok["strefa"] in strefy] or wolne
     if not wolne:
-        return None
+        return None, None
     if strategia_klucz == "tani":
-        wolne.sort(key=lambda lok: lok["czynsz"])
+        wolne.sort(key=lambda lok: lok[pole])
     elif strategia_klucz == "premium":
-        wolne.sort(key=lambda lok: (lok["strefa"] not in ("stare_miasto", "centrum"), -lok["miejsca"]["kuchnia"], lok["czynsz"]))
+        wolne.sort(key=lambda lok: (lok["strefa"] not in ("stare_miasto", "centrum"), -lok["miejsca"]["kuchnia"], lok[pole]))
     else:
-        sr = sorted(lok["czynsz"] for lok in wolne)[len(wolne) // 2]
-        wolne.sort(key=lambda lok: (abs(lok["czynsz"] - sr), lok["id"]))
+        sr = sorted(lok[pole] for lok in wolne)[len(wolne) // 2]
+        wolne.sort(key=lambda lok: (abs(lok[pole] - sr), lok["id"]))
     najlepsze = wolne[:3]
     lok = najlepsze[int(strumien(konf["ziarno"], runda, "lokal", nazwa).integers(len(najlepsze)))]
-    return {"id": lok["id"], "forma": "najem"}
+    dec = {"id": lok["id"], "forma": forma}
+    if w.get("przebicie", 1.0) > 1.0 and runda >= dane.mapa["zasady"]["licytacje_od_rundy"]:
+        dec["oferta"] = round(lok[pole] * w["przebicie"], 2)
+    return dec, (_kredyt_na_lokal(dane, f, dec, runda) if forma == "kupno" and f is not None else None)
+
+
+def _wez_lokal(dane: Dane, stan: StanGry, f: Firma, d: dict, dec: dict, kredyt: dict | None, runda: int) -> Firma:
+    """Decyzja o lokalu (i kredycie pod jego zastaw) w decyzjach bota; zwraca kopię firmy z tym lokalem – dalsze
+    decyzje liczone tak, jakby lokal już był."""
+    d["lokal"] = dec
+    if kredyt:
+        d.setdefault("kredyty_wez", []).append(kredyt)
+    f = deepcopy(f)
+    lk.wybierz(dane, f, dec, runda, lk.zajete(stan.firmy), Ksiega(), Rachunek(),
+               finansowanie=kredyt["kwota"] if kredyt else 0.0)
+    if kredyt:
+        f.gotowka += kredyt["kwota"]
+    return f
 
 
 def _kampanie(dane: Dane, f: Firma, st: dict, runda: int, ust: dict) -> list[dict]:
@@ -408,13 +455,14 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if not f.lokale or wyprowadzka:
         # bez lokalu: najem gotowego lokalu; dalsze decyzje liczone tak, jakby lokal już był (przegrany spór o lokal
         # – stanowiska odrzucone, ponowna próba w następnej rundzie)
-        d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf,
-                                    st.get("min_kuchnia", 0) if planuje else 0, st.get("strefy"))
-        if d["lokal"] is None and not f.lokale:
-            return d
-        if d["lokal"] is not None:
-            f = deepcopy(f)
-            lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
+        dec, kredyt = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf,
+                                     st.get("min_kuchnia", 0) if planuje else 0, st.get("strefy"), st.get("lokal"), f)
+        if dec is None:
+            d["lokal"] = None
+            if not f.lokale:
+                return d
+        else:
+            f = _wez_lokal(dane, stan, f, d, dec, kredyt, runda)
     miejsca = lk.wolne_miejsca(dane, f, runda)
     if not f.bank:
         d["bank"] = bk.najlepsze(dane)["konto"]
@@ -478,13 +526,10 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 and all(p["czesc"] < drugi["obsluga"] for p in plan["lokale"].values()) \
                 and f.gotowka > drugi["gotowka"] and len(f.lokale) < drugi["maks_lokali"] \
                 and runda >= lk.runda_nowego_lokalu(dane, f) and all(x.dziala_od <= runda for x in f.lokale):
-            d["lokal"] = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0),
-                                        st.get("strefy"))
-            if d["lokal"] is None:
-                d.pop("lokal")
-            else:
-                f = deepcopy(f)
-                lk.wybierz(dane, f, d["lokal"], runda, lk.zajete(stan.firmy), Ksiega(), Rachunek())
+            dec, kredyt = _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, st.get("min_kuchnia", 0),
+                                         st.get("strefy"), {**st.get("lokal", {}), **drugi.get("lokal", {})}, f)
+            if dec is not None:
+                f = _wez_lokal(dane, stan, f, d, dec, kredyt, runda)
                 prog, prog_lok = prognoza_cen(ceny)
                 plan = _plan_firmy(dane, f, prog_lok, r_sprz, runda, ekonomia(ceny))
         _zatrudnieni(f, plan)
@@ -579,6 +624,11 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         d["szkolenia"] = [{"firma": szk["firmy"][1]["nazwa"], "szkolenie": p["nazwa"]} for p in najlepsze]
     if dane.zdarzenia:   # eventy w parkach: losowa opcja (najwyżej 3 h właściciela)
         d["zdarzenia"] = zd.wybor_bota(dane, f, runda, konf["ziarno"])
+    if (ls := st.get("leasing")) and d.get("sprzet_kup") and f.gotowka < ls["gotowka"]:
+        # B6: przy małej gotówce nowy sprzęt w leasingu (bank z najtańszym leasingiem) zamiast zakupu
+        bank = bk.najlepsze(dane)["leasing"]
+        d["leasing_wez"] = [{**x, "bank": bank, "rund": ls["rund"]} for x in d["sprzet_kup"]]
+        d["sprzet_kup"] = []
     if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
         d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
     if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
