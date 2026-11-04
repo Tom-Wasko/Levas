@@ -54,6 +54,20 @@ def test_bot_kupuje_dzialke_z_budowa_i_doplaca_kredytem_bez_historii():
     assert [(x.id, x.forma) for x in f.lokale] == [(lok["id"], "kupno")] and len(f.kredyty) == 2
 
 
+def test_bot_finansuje_sprzet_lokalu_niewyposazonego_kredytem_bez_historii():
+    """Lokal bez zestawu: cały sprzęt 3★ naraz (od tygodnia 2) to więcej, niż bot ma gotówki – resztę i rezerwę
+    (ustawienia.rezerwa_po_sprzecie) bierze kredytem bez historii, zamiast wpaść w debet ponad limit konta."""
+    g, (d1, d2) = _gra({"lokal": {"typy": ["niewyposazony"]}, "jakosc": 3}, rund=2)
+    assert _lokal(g, d1["lokal"]["id"])["typ"] == "niewyposazony" and not d1.get("kredyty_wez")
+    przed = g.stan(1).firmy["A"].gotowka
+    koszt = sum(g.dane.sprzet[x["nazwa"]]["ceny"][str(x["jakosc"])] for x in d2["sprzet_kup"])
+    assert koszt > przed
+    (k,) = d2["kredyty_wez"]
+    assert "zastaw" not in k and przed + k["kwota"] - koszt >= g.dane.boty["ustawienia"]["rezerwa_po_sprzecie"]
+    f = g.stan(2).firmy["A"]
+    assert len(f.kredyty) == 1 and f.gotowka > 0
+
+
 def test_bot_bez_srodkow_na_kupno_bierze_gotowy_lokal_w_najmie():
     _, (d,) = _gra({"lokal": {"forma": "kupno", "rezerwa": 10 ** 6}})
     assert d["lokal"]["forma"] == "najem" and not d.get("kredyty_wez")

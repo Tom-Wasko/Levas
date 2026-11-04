@@ -463,6 +463,7 @@ class Strategia(Schemat):
 
 class UstawieniaBotow(Schemat):
     bufor_gotowki: float
+    rezerwa_po_sprzecie: float = Field(0, ge=0)   # B6: gotówka po zakupie sprzętu; resztę bot bierze kredytem bez historii
     bufor_kampanii: float = Field(0, ge=0)   # gra z lokalami: gotówka, która musi zostać po kampaniach reklamowych
     emisje_kampanii: int = Field(6, ge=1)     # tyle emisji bot zamawia w kampanii (najwyżej maks_emisji kanału)
     przerwa_kampanii: int = Field(1, ge=0)    # rund przerwy po kampanii w tym samym kanale i strefie

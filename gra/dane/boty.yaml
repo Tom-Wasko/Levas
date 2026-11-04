@@ -9,6 +9,7 @@ opis: 'Strategie botów: cena w ułamku ceny preferowanej (null = średnia rynku
 zrodlo: założenie (strategie typowych drużyn z gier ATH i A/B/C), liczba dań dopasowana do menu kebaba
 ustawienia:
   bufor_gotowki: 30000
+  rezerwa_po_sprzecie: 10000   # B6: gotówka po zakupie sprzętu (płace i towar tygodnia), resztę – kredyt bez historii
   bufor_kampanii: 12000
   emisje_kampanii: 6
   przerwa_kampanii: 1

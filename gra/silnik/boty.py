@@ -115,16 +115,17 @@ def _kredyt_na_lokal(dane: Dane, f: Firma, decyzja: dict, runda: int) -> dict | 
     return None
 
 
-def _kredyt_bez_historii(dane: Dane, f: Firma, brak: float, runda: int) -> dict | None:
+def _kredyt_bez_historii(dane: Dane, f: Firma, brak: float, runda: int, wziete: list[dict] = ()) -> dict | None:
     """Dopłata do kupna lokalu (B6): kredyt bez zastawu i bez wymogu historii (np. „na start”) na brakującą kwotę
-    (w górę do pełnego złotego, najwyżej maks_kwota) – najtańszy, którego bank udzieli; None – żaden albo za mały."""
+    (w górę do pełnego złotego, najwyżej maks_kwota) – najtańszy, którego bank udzieli; None – żaden albo za mały.
+    wziete – kredyty już w decyzjach tej rundy (tego samego produktu bank nie da drugi raz)."""
     kwota = float(math.ceil(brak))
     oferty = sorted(((p["oprocentowanie"], b, p) for b, bank in bk.banki(dane).items() for p in bank["kredyty"]
                      if not p.get("historia") and not p.get("zastaw") and not p.get("od_lokalu")
                      and p["maks_kwota"] >= kwota), key=lambda x: (x[0], x[1]))
     for _, b, p in oferty:
         k = {"bank": b, "produkt": p["produkt"], "rund": p["maks_rund"], "kwota": kwota}
-        if not bk.powod_kredytu(dane, f, k, runda):
+        if not any((x["bank"], x["produkt"]) == (b, p["produkt"]) for x in wziete)                 and not bk.powod_kredytu(dane, f, k, runda):
             return k
     return None
 
@@ -702,6 +703,14 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         bank = bk.najlepsze(dane)["leasing"]
         d["leasing_wez"] = [{**x, "bank": bank, "rund": ls["rund"]} for x in d["sprzet_kup"]]
         d["sprzet_kup"] = []
+    if plan is not None and d.get("sprzet_kup") and "inwestycje_sprzet" in odbl:
+        # B6: sprzęt ponad gotówkę (lokal bez zestawu – cały komplet naraz) na kredyt bez historii, gdy po zakupach
+        # zostałoby mniej niż rezerwa_po_sprzecie – wcześniej bot wpadał w debet ponad limit i bank blokował mu
+        # inwestycje na kilka rund
+        koszt = sum(dane.sprzet[x["nazwa"]]["ceny"][str(x["jakosc"])] for x in d["sprzet_kup"])
+        brak = koszt + ust.get("rezerwa_po_sprzecie", 0.0) - f.gotowka   # f – z lokalem i kredytami na niego (_wez_lokal)
+        if brak > 0 and (k := _kredyt_bez_historii(dane, f, brak, runda, d.get("kredyty_wez", []))):
+            d.setdefault("kredyty_wez", []).append(k)
     if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
         d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
     if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
