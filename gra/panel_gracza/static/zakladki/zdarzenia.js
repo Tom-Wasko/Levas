@@ -27,20 +27,68 @@ function skutekTekst(s) {
 const skutkiHtml = (sk) => sk?.length ? `<ul>${sk.map((s) => `<li>${skutekTekst(s)}</li>`).join("")}</ul>` : "";
 const naglowek = (s) => `<h3>${esc(s.tytul)}</h3>`;
 
-function scenaHtml(s, wybor, edycja) {
-  const opcje = s.opcje.map((o) => {
-    const wybrana = (wybor ?? s.domyslna) === o.id;
-    // U8: opcja, na którą nie starcza wolnych godzin właściciela (po scenach powyżej) – wyszarzona z wyjaśnieniem
-    const brak = edycja && o.koszt?.czas && s.wolne != null && o.koszt.czas > s.wolne + 1e-9;
-    const etykieta = `${esc(o.tekst)}${o.id === s.domyslna ? " <small>(domyślnie)</small>" : ""}<br><small>${kosztTekst(o.koszt)}</small>`
-      + (brak ? `<br><small class="minus">Wymaga ${licz(o.koszt.czas, 1)} h, masz wolne ${licz(s.wolne, 1)} h${wybrana
-        ? ` – bez zmiany gra wykona reakcję domyślną` : ""}.</small>` : "");
-    return edycja ? `<button class="btn ${wybrana ? (brak ? "jasny" : "zielony") : "jasny"}" data-akcja="zd-wybierz" data-h="${esc(s.historia)}" data-o="${esc(o.id)}"
-        ${brak && !wybrana ? "disabled " : ""}style="text-align:left;margin:4px 0;width:100%${wybrana && brak ? ";border:2px solid var(--czerwony)" : ""}">${etykieta}</button>`
-      : `<div class="wiersz"><span>${wybrana ? "▶ " : ""}${etykieta}</span></div>`;
+// P3: układ „lista spraw + szczegóły” – która sprawa jest pokazana po prawej (stan przeglądarki, nie decyzja)
+let pokazana = null;
+
+const nazwaParku = (kat, id) => kat?.mapa?.budynki?.find((b) => b.id === id)?.nazwa || id;
+const gdzie = (s, kat) => s.park ? nazwaParku(kat, s.park) : s.wypadek ? "wypadek w lokalu" : "w lokalu";
+
+// stan sprawy: wybrana opcja, czy własny wybór i czy starcza na nią godzin (U8: wolne godziny przed tą sprawą)
+function stanSprawy(s, wybor, edycja) {
+  const id = wybor ?? s.domyslna, o = s.opcje.find((x) => x.id === id) || s.opcje[0];
+  const brakNa = (x) => !!(edycja && x?.koszt?.czas && s.wolne != null && x.koszt.czas > s.wolne + 1e-9);
+  return { id, o, wlasny: wybor != null, brak: brakNa(o), brakNa };
+}
+
+function pasekCzasu(Z, C, wybory, edycja) {
+  if (!C) return "";
+  const sprawy = Z.aktywne.reduce((a, s) => a + (stanSprawy(s, wybory[s.historia], edycja).o?.koszt?.czas || 0), 0);
+  const zajete = C.pula - C.wolne, inne = Math.max(0, zajete - sprawy);
+  const szer = (h) => `${Math.max(0, Math.min(100, h / C.pula * 100)).toFixed(1)}%`;
+  return `<div class="zd-czas">
+      <div class="zd-czas-tekst"><b>Czas właściciela: ${licz(zajete, 1)} / ${licz(C.pula, 1)} h</b>
+        <span>sprawy w parkach ${licz(sprawy, 1)} h · inne zadania ${licz(inne, 1)} h · wolne ${licz(C.wolne, 1)} h</span></div>
+      <div class="zd-czas-pasek" title="Sprawy ${licz(sprawy, 1)} h, inne zadania ${licz(inne, 1)} h">
+        <i class="inne" style="width:${szer(inne)}"></i><i class="sprawy" style="width:${szer(sprawy)}"></i></div>
+      <p class="podpowiedz">Na wszystkie sprawy czasu raczej nie starczy – wybierz, które są warte Twoich godzin. Bez wyboru gra wykona reakcję domyślną.</p>
+    </div>`;
+}
+
+function listaSpraw(Z, wybory, edycja, kat, akt) {
+  const poz = Z.aktywne.map((s) => {
+    const st = stanSprawy(s, wybory[s.historia], edycja);
+    const [znak, klasa, opis] = st.brak ? ["!", "nie", "brak czasu"] : st.wlasny ? ["✓", "ok", "wybrano"] : ["○", "inf", "domyślna"];
+    return `<button class="zd-poz${s.historia === akt ? " aktywna" : ""}" data-akcja="zd-pokaz" data-h="${esc(s.historia)}">
+        <span class="zd-znak ${klasa}">${znak}</span>
+        <span class="zd-poz-tekst"><b>${esc(s.tytul)}</b><small>${esc(gdzie(s, kat))}${s.nowa ? "" : " · ciąg dalszy"}</small>
+          <small>${opis}: ${esc(st.o?.tekst || "")}${st.o?.koszt?.czas ? ` (${licz(st.o.koszt.czas, 1)} h)` : ""}</small></span>
+      </button>`;
   }).join("");
-  return `<div class="karta">${naglowek(s)}<p class="podpowiedz">${s.nowa ? (s.park ? "Nowe wydarzenie w parku" : s.wypadek ? "Wypadek w lokalu" : "Nowe wydarzenie w lokalu") : "Ciąg dalszy"}</p>
-    <p>${esc(s.tekst)}</p>${opcje}${skutkiHtml(s.skutki)}</div>`;
+  const dalej = Z.oczekujace.length ? `<div class="zd-dalej"><b>Ciąg dalszy</b>${Z.oczekujace.map((o) =>
+    `<div>${esc(o.tytul)} <small>– runda ${o.runda}</small></div>`).join("")}</div>` : "";
+  return `<div class="zd-lista"><div class="zd-lista-tytul">Sprawy w tym tygodniu</div>${poz}${dalej}</div>`;
+}
+
+function scenaHtml(s, wybor, edycja, kat) {
+  const st = stanSprawy(s, wybor, edycja);
+  const opcje = s.opcje.map((o) => {
+    const wybrana = st.id === o.id, brak = st.brakNa(o);
+    const koszt = o.koszt?.gotowka || o.koszt?.porcje ? kosztTekst({ ...o.koszt, czas: 0 }) : "–";
+    const tresc = `<div class="kg">${o.id === s.domyslna ? `<span class="pigulka inf">domyślna</span>` : "<span></span>"}
+        ${wybrana ? `<span class="pigulka ${brak ? "nie" : "ok"}">${brak ? "brak czasu" : "wybrano"}</span>` : ""}</div>
+      <div class="kt">${esc(o.tekst)}</div>
+      <div class="kd"><div class="wiersz"><span>Czas</span><span>${o.koszt?.czas ? `${licz(o.koszt.czas, 1)} h` : "–"}</span></div>
+        <div class="wiersz"><span>Koszt</span><span>${koszt}</span></div>
+        ${brak ? `<small class="minus">Wymaga ${licz(o.koszt.czas, 1)} h, masz wolne ${licz(s.wolne, 1)} h${wybrana
+          ? " – bez zmiany gra wykona reakcję domyślną" : ""}.</small>` : ""}</div>`;
+    const kl = `kafel zd-opcja${wybrana ? " wybrany" : ""}${brak && !wybrana ? " niedostepny" : ""}${wybrana && brak ? " zd-brak" : ""}`;
+    return edycja && !(brak && !wybrana)
+      ? `<button class="${kl}" data-akcja="zd-wybierz" data-h="${esc(s.historia)}" data-o="${esc(o.id)}">${tresc}</button>`
+      : `<div class="${kl}">${tresc}</div>`;
+  }).join("");
+  return `<div class="zd-scena"><h3>${esc(s.tytul)} <small>· ${esc(gdzie(s, kat))}</small></h3>
+    <p class="podpowiedz">${s.nowa ? (s.park ? "Nowe wydarzenie w parku" : s.wypadek ? "Wypadek w lokalu" : "Nowe wydarzenie w lokalu") : "Ciąg dalszy"}</p>
+    <p>${esc(s.tekst)}</p><div class="zd-opcje">${opcje}</div>${skutkiHtml(s.skutki)}</div>`;
 }
 
 function efektyHtml(E) {
@@ -64,15 +112,19 @@ export const zdarzenia = {
     – pieniądze, klienci, nowy pracownik – bywają odłożone w czasie. Bez wyboru gra wybiera reakcję domyślną.
     Czasem coś przytrafia się tylko Tobie – w lokalu. Wypadki kosztują, a część kosztów zwraca
     <a data-zakladka-k="ubezpieczenia">polisa</a>, jeśli kupiłeś ją zawczasu.`,
-  decyzje({ v, edycja }) {
+  decyzje({ v, kat, edycja }) {
     const Z = v.zdarzenia;
     if (!Z) return `<p class="podpowiedz">Brak danych.</p>`;
     const wybory = v.decyzje?.zdarzenia || {}, C = v.czas_wlasciciela;
-    const czas = C && Z.aktywne.length ? `<div class="komunikat">Wolny czas właściciela: <b>${licz(C.wolne, 1)} h</b> z ${licz(C.pula, 1)} h.
-      W tym tygodniu ${Z.aktywne.length === 1 ? "jedna sprawa czeka" : Z.aktywne.length < 5 ? `${Z.aktywne.length} sprawy czekają` : `${Z.aktywne.length} spraw czeka`} – na wszystkie czasu raczej nie starczy.</div>` : "";
-    return czas + (Z.aktywne.length ? Z.aktywne.map((s) => scenaHtml(s, wybory[s.historia], edycja)).join("")
-      : `<p class="podpowiedz">${v.runda < Z.od_rundy ? `Parki budzą się do życia od rundy ${Z.od_rundy}.` : "W tej rundzie w parkach spokojnie."}</p>`)
-      + (Z.oczekujace.length ? `<p class="podpowiedz">Czekają na ciąg dalszy: ${Z.oczekujace.map((o) => `${esc(o.tytul)} (runda ${o.runda})`).join(", ")}.</p>` : "")
+    if (!Z.aktywne.length) {
+      return `<p class="podpowiedz">${v.runda < Z.od_rundy ? `Parki budzą się do życia od rundy ${Z.od_rundy}.` : "W tej rundzie w parkach spokojnie."}</p>`
+        + (Z.oczekujace.length ? `<p class="podpowiedz">Czekają na ciąg dalszy: ${Z.oczekujace.map((o) => `${esc(o.tytul)} (runda ${o.runda})`).join(", ")}.</p>` : "")
+        + efektyHtml(Z.efekty) + `<p class="podpowiedz">Porcja jedzenia kosztuje ${zl2(Z.koszt_porcji)}.</p>`;
+    }
+    const akt = Z.aktywne.some((s) => s.historia === pokazana) ? pokazana : Z.aktywne[0].historia;
+    const s = Z.aktywne.find((x) => x.historia === akt);
+    return pasekCzasu(Z, C, wybory, edycja)
+      + `<div class="zd-uklad">${listaSpraw(Z, wybory, edycja, kat, akt)}${scenaHtml(s, wybory[s.historia], edycja, kat)}</div>`
       + efektyHtml(Z.efekty)
       + `<p class="podpowiedz">Porcja jedzenia kosztuje ${zl2(Z.koszt_porcji)}.</p>`;
   },
@@ -85,6 +137,7 @@ export const zdarzenia = {
         [w.runda, esc(w.tytul), esc(w.opcja_tekst || "–")]), { klasy: ["", "l", "l"] }) : "");
   },
   akcje: {
-    "zd-wybierz": (el, c) => c.zmien((d) => { d.zdarzenia = { ...(d.zdarzenia || {}), [el.dataset.h]: el.dataset.o }; }),
+    "zd-wybierz": (el, c) => { pokazana = el.dataset.h; return c.zmien((d) => { d.zdarzenia = { ...(d.zdarzenia || {}), [el.dataset.h]: el.dataset.o }; }); },
+    "zd-pokaz": (el, c) => { pokazana = el.dataset.h; c.rysuj(); },
   },
 };

@@ -352,7 +352,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
   prognozy na tydzień krok po kroku; kolumna „Wielkość strefy” w Klientach i strefach (`widok_popytu`: `wielkosc`)
 - [x] P2 Menu i ceny bez osobnej części „Sprzedaż”: danie wybrane w menu jest w sprzedaży (silnik: danie z menu bez ceny
   – cena preferowana, `decyzje._ceny_domyslne`), cena i rabat w kafelku dania obok prognozy; wyniki sprzedaży zostają
-- [ ] P3 Parki i zdarzenia – nowy układ (autor wybrał: lista spraw + szczegóły wybranej, opcje jako kafelki, pasek czasu)
+- [x] P3 Parki i zdarzenia – nowy układ (autor wybrał: lista spraw + szczegóły wybranej, opcje jako kafelki, pasek czasu). Po lewej sprawy tygodnia ze stanem ✓/○/! i nazwą parku oraz „Ciąg dalszy”, po prawej opis i kafelki reakcji (czas, koszt, domyślna, wybrano, U8 brak czasu); na górze pasek: sprawy / inne zadania / wolne z 20 h; wąski ekran – jedna kolumna.
 
 ## Krok 5 – kalibracja, część druga: obszary B6–B15
 

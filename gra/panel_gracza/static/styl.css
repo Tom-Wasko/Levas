@@ -193,6 +193,37 @@ textarea { font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px
 textarea:focus, input:focus, select:focus { outline: none; border-color: var(--pom); box-shadow: 0 0 0 3px rgba(30,158,90,.15); }
 input.krotkie { width: 92px; }
 input:disabled, select:disabled { background: var(--szary-jasny); color: var(--szary); }
+/* P3: Parki i zdarzenia – pasek czasu, lista spraw + szczegóły sprawy z kafelkami opcji */
+.zd-czas { margin-bottom: 14px; }
+.zd-czas-tekst { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 13px; margin-bottom: 6px; }
+.zd-czas-tekst span { color: var(--szary); font-size: 12px; }
+.zd-czas-pasek { display: flex; height: 12px; border-radius: 6px; background: var(--szary-jasny); overflow: hidden; border: 1px solid var(--linia); }
+.zd-czas-pasek i { display: block; height: 100%; }
+.zd-czas-pasek i.inne { background: #b9c7be; }
+.zd-czas-pasek i.sprawy { background: var(--pom); }
+.zd-uklad { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 16px; align-items: start; margin-bottom: 14px; }
+.zd-lista { display: flex; flex-direction: column; gap: 6px; }
+.zd-lista-tytul { font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--szary); }
+.zd-poz { display: flex; gap: 10px; align-items: flex-start; text-align: left; background: #fff; border: 1px solid var(--linia);
+  border-radius: var(--r); padding: 9px 10px; cursor: pointer; font: inherit; color: inherit; }
+.zd-poz:hover { box-shadow: var(--cien); }
+.zd-poz.aktywna { border-color: var(--pom); box-shadow: 0 0 0 1px var(--pom) inset; background: var(--pom-jasny); }
+.zd-poz-tekst { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.zd-poz-tekst small { color: var(--szary); font-size: 11px; }
+.zd-znak { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 12px; }
+.zd-znak.ok { background: var(--zielony-jasny); color: var(--zielony); }
+.zd-znak.inf { background: var(--szary-jasny); color: var(--szary); }
+.zd-znak.nie { background: var(--czerwony-jasny); color: var(--czerwony); }
+.zd-dalej { margin-top: 6px; padding: 8px 10px; border: 1px dashed var(--linia); border-radius: var(--r); font-size: 12px; }
+.zd-dalej b { display: block; font-size: 11px; text-transform: uppercase; color: var(--szary); margin-bottom: 4px; }
+.zd-scena h3 { margin-top: 0; }
+.zd-scena h3 small { color: var(--szary); font-weight: 600; }
+.zd-opcje { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 10px 0; }
+.zd-opcja { text-align: left; font: inherit; color: inherit; padding: 0; cursor: pointer; }
+div.zd-opcja { cursor: default; }
+.zd-opcja.zd-brak { border-color: var(--czerwony); box-shadow: 0 0 0 1px var(--czerwony) inset; }
+@media (max-width: 760px) { .zd-uklad { grid-template-columns: 1fr; } }
 .pola-dania { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pola-dania input { width: 100%; }
 label.pole { display: flex; flex-direction: column; gap: 5px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--szary); }

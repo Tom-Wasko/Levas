@@ -287,8 +287,10 @@ jedzenia cebularzy, pan Zbyszek z ławki, profesor przy szachownicy, wiewiórka 
 czas właściciela (zwykle 2–5 h), gotówkę albo porcje jedzenia, a skutki (pieniądze, klienci, nowy pracownik) bywają
 odłożone w czasie. **Na wszystko nie starczy czasu** – właściciel ma 20 h w tygodniu, więc wybierz to, co się opłaca.
 Jeśli kilka drużyn wybierze to samo, każda dostaje tę samą nagrodę. Bez wyboru gra wybiera reakcję domyślną
-(bez czasu właściciela). Reakcja, na którą nie starcza wolnych godzin, jest wyszarzona z dopiskiem „wymaga 5 h, masz
-wolne 3 h” – zwolnij czas gdzie indziej albo wybierz inną.
+(bez czasu właściciela). W zakładce po lewej masz listę spraw tygodnia: ✓ – wybrałeś reakcję, ○ – zostaje domyślna,
+! – na wybraną reakcję brakuje czasu. Kliknij sprawę, żeby po prawej zobaczyć opis i reakcje jako kafelki (czas, koszt);
+pasek na górze pokazuje, ile z 20 h zajmują sprawy w parkach, a ile inne zadania. Reakcja, na którą nie starcza wolnych
+godzin, jest wyszarzona z dopiskiem „wymaga 5 h, masz wolne 3 h” – zwolnij czas gdzie indziej albo wybierz inną.
 
 Czasem coś przytrafia się **tylko Tobie** – w lokalu. Rożen odmawia posłuszeństwa, kot sąsiada wchodzi do kuchni.
 Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji). Im dłużej spokojnie, tym
