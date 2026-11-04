@@ -592,10 +592,21 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     if "dostawcy" in odbl:
         ceny_d = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
         ceny_d = {k: v for k, v in ceny_d.items() if not z_rynku(dane, k)}   # Z4: boty nie kupują w Auchan
-        d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni,
-                                             dane.data_rundy(runda))
-        if len(f.lokale) > 1:   # magazyn każdego lokalu osobno (Z2): dostawy wg prognozy lokali
-            d["zamowienia"] = pl.podziel_zamowienia(d["zamowienia"], {x: sum(v.values()) for x, v in prog_lok.items()})
+        if len(f.lokale) > 1 and prog_lok:
+            # magazyn każdego lokalu osobno (Z2): zamówienie z zapasów lokalu na jego część klientów (B6: wcześniej
+            # z zapasów całej firmy, dzielone potem wg prognozy – nadmiar w jednym lokalu „pokrywał” braki w drugim,
+            # więc w drugim brakowało towaru, a w pierwszym się psuł)
+            waga = {x: {u: n * (plan["lokale"][x]["czesc"] if plan is not None else 1.0) for u, n in v.items()}
+                    for x, v in prog_lok.items()}
+            d["zamowienia"] = []
+            for x, wx in waga.items():
+                kx = {u: k * wx.get(u, 0.0) / s for u, k in klienci.items()
+                      if (s := sum(w.get(u, 0.0) for w in waga.values())) > 0}
+                d["zamowienia"] += [{**z, "lokal": x} for z in zamowienie_zasobow(
+                    dane, pl.widok(f, x), kx, ceny_d, q, ust["zapas_zasobow"], udzialy_dni, dane.data_rundy(runda))]
+        else:
+            d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, q, ust["zapas_zasobow"], udzialy_dni,
+                                                 dane.data_rundy(runda))
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka): po zakupach zostaje bufor gotówki (B5: wcześniej bot
     # kupował od razu cały komplet i wpadał w debet)

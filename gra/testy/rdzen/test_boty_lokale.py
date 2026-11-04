@@ -56,3 +56,22 @@ def test_bot_z_mala_gotowka_bierze_sprzet_w_leasingu():
     assert d["leasing_wez"] and not d["sprzet_kup"]
     assert all(x["rund"] == 26 for x in d["leasing_wez"])
     assert len(g.stan().firmy["A"].leasingi) == len(d["leasing_wez"])
+
+
+def test_bot_z_dwoma_lokalami_zamawia_z_zapasow_kazdego_lokalu(monkeypatch):
+    """Magazyn każdego lokalu jest osobny (Z2), więc zamówienie bot liczy osobno z zapasów lokalu (B6: wcześniej z
+    zapasów całej firmy – nadmiar jednego lokalu „pokrywał” braki drugiego; drugi lokal tracił sprzedaż)."""
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5, poziomy={"A": "trudny", "B": "sredni"},
+                 kapital_startowy=200000)
+    for _ in range(6):
+        g.przelicz(wymus=True)
+    f = g.stan(6).firmy["A"]
+    assert len(f.lokale) == 2
+    wywolania, oryginal = [], boty.zamowienie_zasobow
+    monkeypatch.setattr(boty, "zamowienie_zasobow", lambda dane, firma, *a: (
+        wywolania.append((tuple(x.id for x in firma.lokale), dict(firma.magazyn))) or oryginal(dane, firma, *a)))
+    d = boty.decyzje_bota(g.dane, g.stan(6), "A", "zrownowazony", 7, g.konfiguracja)
+    assert sorted(lok for lok, _ in wywolania) == sorted((x.id,) for x in f.lokale)
+    for (lok,), mag in wywolania:   # zapasy z widoku lokalu, nie całej firmy
+        assert mag == boty.pl.widok(f, lok).magazyn
+    assert {z["lokal"] for z in d["zamowienia"]} == {x.id for x in f.lokale}
