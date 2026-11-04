@@ -578,8 +578,9 @@ wpis na dole.
     traci (agresywny −0,15, 68% par). To ten sam problem co H21 (drugi lokal się nie opłaca w 18 rundach –
     rozruch B5, opinie od zera), nie błąd poziomu.
   - Reklama z wolną kuchnią pomaga tylko agresywnemu (+0,07), reszta bez zmian.
-  - Propozycja dla autora (czeka na zgodę): w `czlowiek_dobry` usunąć `kolejny_lokal` – 85/100 par, cel ≥ 80%
-    spełniony; drugi lokal wraca do dobrego, gdy B (H21) sprawi, że się opłaca.
+  - Propozycja: w `czlowiek_dobry` usunąć `kolejny_lokal` (85/100 par). **Decyzja autora 4.11.2026: nie** – boty
+    mają dalej kupować kolejne lokale; naprawa w B6 (H21: drugi lokal ma się opłacać w swojej sytuacji), cel
+    „dobra wyraźnie wygrywa” sprawdza ponownie B14. K zamknięte.
 - Decyzje autora po K (4.11.2026): (1) bot dobry – zdiagnozować parami i zaproponować zmiany poziomu
   `czlowiek_dobry` (tabela przed zmianą, zmiana po zgodzie); (2) pomiary B6–B15 **bez limitu czasu**, wiele
   pomiarów naraz; (3) przewaga premium – w B7 razem z ceną (H18, H28); (4) U20 i U24 – propozycje tekstów do

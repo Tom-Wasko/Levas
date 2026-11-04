@@ -344,7 +344,7 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] U23 (pyt. 6) Zatrudnianie od tygodnia 1 (`dane/katalog.yaml:52`, hr_zatrudnienie) – zrobione: hr_zatrudnienie od tygodnia 1 (pracuj.pl), boty też; karta botów 0,523 → 0,528, dochód −1,1 tys. zł – dziennik kalibracji U23.
 - [x] U24 (decyzja autora 4.11, po U20) Opinie klientów na mapie (ocena lokalu z przeżyć klientów, wpływ na popyt, żartobliwe komentarze) + 8 grup klientów z koszykiem (wegetarianie przenoszą udziały) – razem, jeden pomiar balansu; projekt `raporty/projekt_U24_opinie_i_grupy_klientow.md` – zrobione 4.11: klienci.py, opinie.py, mapa i zakładka Klienci, pomiar w dzienniku kalibracji.
 
-- [ ] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu
+- [x] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu – zrobione 4.11.2026: słaba bez alarmu (0/100), pierwszy plus średniej w rundach 4–6 w 51/100, dobra > średnia 74/100 (B5: 92/100); diagnoza `k_dobry`: przewaga dobrej to prognoza, drugi lokal ją zjada (bez niego 85/100). Decyzja autora 4.11: boty dalej kupują kolejne lokale – drugi lokal ma się opłacać po B6 (H21), poziomy sprawdza B14; nowe hipotezy H18–H29 w inwentarzu.
 
 ## Poprawki 4.11 (uwagi autora na czacie)
 
