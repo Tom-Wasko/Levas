@@ -43,6 +43,19 @@ def test_pozyczka_poza_kpir_i_odsetki_od_calego_dlugu():
     assert not _kpir_harpagona(s, 3, "A") and not _bledy(s, 3, "A")
 
 
+
+def test_kwota_do_oddania_w_terminie_jak_w_oknie_pozyczki():
+    """U15: okno pożyczki (harpagon.js) podaje kwota × (1 + oprocentowanie) ** termin_rund – tyle trzeba oddać
+    na początku rundy terminu."""
+    g = _gra(("A", None), ("B", None))
+    u = lw.ustawienia(g.dane)
+    s = _runda(g, A={**_lokal("centrum_3"), "harpagon_wez": 5000}, B=_lokal("dworzec_1"))
+    for _ in range(u["termin_rund"] - 1):
+        s = _runda(g)
+    p = s.firmy["A"].harpagon
+    assert g.runda == p.termin == 1 + u["termin_rund"]
+    assert abs(p.dlug - 5000 * (1 + u["oprocentowanie_rundy"]) ** u["termin_rund"]) < 1
+
 def test_odrzucone_pozyczki_i_splata_bez_gotowki():
     g = _gra(("A", None), ("B", None))
     s = _runda(g, A={**_lokal("centrum_3"), "harpagon_wez": 50000}, B=_lokal("dworzec_1"))

@@ -69,11 +69,20 @@ export const harpagon = {
       + (!ruchy.length && !H.stan && !(Pr.teksty || []).length ? `<p class="podpowiedz">W tej rundzie Harpagon się nie pojawił.</p>` : "");
   },
   akcje: {
-    "hp-wez": (el, c) => okno("Pożyczka od Harpagona", `<label class="pole">Kwota<input type="number" id="hp-kwota"
-        min="${c.v.harpagon.warunki.min_kwota}" max="${c.v.harpagon.warunki.maks_kwota}" step="500" value="${c.v.harpagon.warunki.min_kwota}"></label>
+    "hp-wez": (el, c) => {
+      const W = c.v.harpagon.warunki, termin = c.v.runda + W.termin_rund;
+      // U15: kwota do oddania na żywo – odsetki od całego długu doliczane na koniec każdej rundy (silnik/pieniadze/lichwiarz.py)
+      const oddasz = (k) => `Oddasz ok. <b>${zl2(Math.round(k * (1 + W.oprocentowanie_rundy) ** W.termin_rund))}</b>, jeśli spłacisz
+        w terminie (na początku rundy ${termin}, po ${W.termin_rund} rundach odsetek).`;
+      const z = okno("Pożyczka od Harpagona", `<label class="pole">Kwota<input type="number" id="hp-kwota"
+        min="${W.min_kwota}" max="${W.maks_kwota}" step="500" value="${W.min_kwota}"></label>
+      <p id="hp-oddasz">${oddasz(W.min_kwota)}</p>
       <p class="podpowiedz">Gotówka trafia do kasy od razu. Spłata w ciągu ${c.v.harpagon.warunki.termin_rund} rund – potem Harpagon zaczyna
       „przypominać”. Pożyczka nie obniża wskaźnika zadłużenia w karcie wyników, ale Harpagon pamięta.</p>`,
-    { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Zamknij</button><button class="btn zielony" data-akcja="hp-wez-ok">Pożycz</button>` }),
+    { male: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Zamknij</button><button class="btn zielony" data-akcja="hp-wez-ok">Pożycz</button>` });
+      const pole = z.querySelector("#hp-kwota");
+      pole.addEventListener("input", () => { z.querySelector("#hp-oddasz").innerHTML = +pole.value > 0 ? oddasz(+pole.value) : ""; });
+    },
     "hp-wez-ok": async (el, c) => {
       const kwota = +document.getElementById("hp-kwota").value, W = c.v.harpagon.warunki;
       if (!(kwota >= W.min_kwota && kwota <= W.maks_kwota)) return toast(`Harpagon pożycza od ${zl2(W.min_kwota)} do ${zl2(W.maks_kwota)}.`);

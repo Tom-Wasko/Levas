@@ -245,6 +245,7 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   oszczędności. To nie jest koszt ani przychód firmy.
 - **Harpagon** spod dworca pożycza od ręki i bez pytań. Spłata po terminie to przypomnienia, odsetki karne, a potem
   wizyty, po których w lokalu brakuje krzeseł. Ostatnia deska ratunku – naprawdę ostatnia.
+  Okno pożyczki od razu pokazuje, ile oddasz w terminie – np. 5000 zł zamienia się w ponad 6000 zł.
 - **Jak to działa naprawdę?** W zakładkach VAT, KPiR, Podatki, Bank i Raport finansowy jest zwinięta niebieska
   ramka 📘 – krótko i na przykładach wyjaśnia, jak te sprawy wyglądają w prawdziwej firmie.
 
