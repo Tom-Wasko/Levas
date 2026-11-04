@@ -405,3 +405,26 @@ wpis na dole.
   kredytów nie biorą).
 - Teksty: podpowiedź przy nowym kredycie (Finanse ▸ Bank) i tabela wskaźników w INSTRUKCJA.
   Test: `test_wskaznik_zadluzenia` (gotówka w mianowniku, debet nie pomaga).
+
+## U23 – zatrudnianie od tygodnia 1 (4.11.2026, Claude Code, Opus 5.5) – decyzja autora
+- Pytanie 6 raportu `raporty/analiza_gracza.md`, odpowiedź autora 3.11.2026: zatrudnienie od tygodnia 1, żeby
+  pierwszy tydzień sprzedaży nie startował z rekrutacją.
+- `dane/katalog.yaml`: `hr_zatrudnienie` tydzień 2 → 1 (zakładki i lista odblokowania). Tydzień 1 jest
+  przygotowawczy, więc mistrz gry nie przesunie już tego terminu w harmonogramie. W tygodniu 1 działa tylko
+  pracuj.pl (agencja od 2, headhunter od 4 – `dane/kandydaci.yaml`, bez zmian). Pensja liczy się od tygodnia
+  zatrudnienia. Dane zamrożone testów bez zmian (testy mechanik zostają przy tygodniu 2).
+- Boty zatrudniają, gdy zakładka jest odblokowana, więc teraz robią to w tygodniu 1. Pomiar (zrównoważony,
+  18 rund, 6 firm, średni, ziarna 1000–1019, baza z `pomiary/u21_zamkniecie` wobec tej samej serii po zmianie):
+
+  | miara | tydzień 2 | tydzień 1 |
+  |---|---|---|
+  | karta | 0,523 | 0,528 |
+  | dochód zł | 70 308 | 69 179 |
+  | majątek zł | 118 316 | 117 058 |
+  | pierwszy plus (runda) | 3,7 | 3,6 |
+  | alarmy | 0 | 0 |
+
+  Tydzień pensji więcej kosztuje ok. 1,1 tys. zł dochodu, a karta (od tygodnia 2) minimalnie rośnie – obsada
+  jest gotowa na pierwszy tydzień sprzedaży. Balans bez istotnej zmiany.
+- Teksty: INSTRUKCJA rozdz. 4 (krok 5 „Ludzie”) i tabela w rozdz. 14; panel gracza `OD_RUNDY`.
+  Test: `test_zatrudnienie_w_tygodniu_przygotowawczym` (`testy/ludzie/test_rynek_pracy.py`, dane gry).

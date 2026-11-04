@@ -130,6 +130,9 @@ co jeszcze zostało do zrobienia):
    w przeciętnej strefie – do Twojego lokalu trafi tylko część tych klientów.
 4. **Stanowiska** (Lokale ▸ Sprzęt) – kuchnia i kasa. Każdy pracownik potrzebuje swojego stanowiska, a liczbę stanowisk ogranicza
    wielkość lokalu.
+5. **Ludzie** (Lokale ▸ Ludzie) – kucharzy i kasjerów możesz zatrudnić już w tygodniu 1, żeby w pierwszym
+   tygodniu sprzedaży kuchnia była obsadzona. W tygodniu 1 działa tylko pracuj.pl (agencja pracy – od tygodnia 2).
+   Pensja liczy się od tygodnia zatrudnienia, choć sprzedaż rusza dopiero w tygodniu 2.
 
 > **Wskazówka.** We wrześniu studenci jeszcze siedzą u rodziców – Miasteczko Akademickie świeci pustkami aż do
 > ostatniego weekendu miesiąca. Prawdziwy ruch zaczyna się w październiku. Kalendarz miejski (Rynek ▸
@@ -288,8 +291,8 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 
 | Tydzień | Nowe zakładki |
 |---|---|
-| 1 | Mapa, Inwestycje ▸ Lokale, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska), Bank, Biuro rachunkowe, Kalendarz miejski |
-| 2 | Sprzęt i Ludzie w lokalu, Rynek pracy, Dostawy i magazyn (z auto-dostawcą i przewozem towaru), Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
+| 1 | Mapa, Inwestycje ▸ Lokale, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska, Ludzie), Rynek pracy, Bank, Biuro rachunkowe, Kalendarz miejski |
+| 2 | Sprzęt w lokalu, Dostawy i magazyn (z auto-dostawcą i przewozem towaru), Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
 | 3 | Karta wyników, Udogodnienia, Agencje reklamowe, nowe dania w menu |
 | 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali |
 | 5 | Handel z drużynami, kolejne kampanie reklamowe |

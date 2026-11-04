@@ -1,7 +1,8 @@
 """Agencja pracy i rynek pracy (F3a.8): kanały rekrutacji, licytacja kandydatów, limit nowych, podkupienie
 przez headhuntera z kontrofertą i okresem wypowiedzenia, powrót zwolnionych do puli."""
 
-from pomocnicze import _gra, _kandydat, _lokal, _runda, _z
+import pytest
+from pomocnicze import _gra, _kandydat, _lokal, _rachunek, _runda, _z
 
 from silnik.dane import dane_domyslne
 from silnik.ludzie import rynek_pracy as rp
@@ -42,6 +43,19 @@ def test_zatrudnienie_kanalem_koszt_i_czas_wlasciciela():
     assert any(p["godziny"] == u["pracuj"]["czas_wlasciciela"] and p["zakladka"] == "zatrudnienie"
                for p in s.wyniki[2]["A"]["czas_wlasciciela"]["pozycje"])
     assert {k1["id"], k3["id"]}.isdisjoint({k["id"] for k in s.kandydaci})
+
+
+@pytest.mark.dane_gry
+def test_zatrudnienie_w_tygodniu_przygotowawczym():
+    """U23: zatrudnianie od tygodnia 1 (decyzja autora) – pracownik przez pracuj.pl stoi na stanowisku przed
+    pierwszym tygodniem sprzedaży, a jego pensja liczy się od tygodnia zatrudnienia."""
+    g = _gra(("A", None), ("B", None))
+    assert "hr_zatrudnienie" in g.dane.odblokowane(1)
+    k1 = _kandydat(g.stan_poczatkowy(), 1)
+    s = _runda(g, A={**_lokal("centrum_3"), "zatrudnij": [_z(k1, 1)]})
+    assert k1["id"] in s.firmy["A"].pracownicy and s.firmy["A"].stanowisko("kuchnia", 1).pracownik == k1["id"]
+    assert [z["kanal"] for z in s.wyniki[1]["A"]["rynek_pracy"]["zatrudnieni"]] == ["pracuj"]
+    assert _rachunek(s, 1, "A", "Wynagrodzenia pracowników")[0] < 0
 
 
 def test_kanal_niedostepny_odrzuca_zatrudnienie():

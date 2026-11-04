@@ -490,7 +490,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     else:
         cele = _stanowiska_proste(dane, f, d, oferta, klienci, szczyt, miejsca, q)
 
-    # zatrudnienie (od rundy 2): stanowiska bez pracownika, które mają (albo dostają) sprzęt
+    # zatrudnienie (od tygodnia z harmonogramu, domyślnie 1 – U23): stanowiska bez pracownika, które mają (albo dostają) sprzęt
     if "hr_zatrudnienie" in odbl:
         pula = kandydaci_firmy(rp.widoczni(dane, stan.kandydaci, runda), stan.firmy[nazwa])
         rng = strumien(konf["ziarno"], runda, "bot", nazwa)

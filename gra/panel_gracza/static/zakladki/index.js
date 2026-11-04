@@ -38,7 +38,7 @@ export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", lokal_dos
 
 // od której rundy zakładka jest dostępna (podpowiedź w menu)
 export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
-  przejecia: 4, sprzet: 2, zatrudnienie: 2, rynek_pracy: 2, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, vat: 2, zdarzenia: 2, ubezpieczenia: 2, handel: 5 };
+  przejecia: 4, sprzet: 2, zatrudnienie: 1, rynek_pracy: 1, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, vat: 2, zdarzenia: 2, ubezpieczenia: 2, handel: 5 };
 
 // zakładka → element harmonogramu gry z lokalami (silnik/harmonogram.py); tydzień z widoku zastępuje OD_RUNDY
 export const ELEMENT = { karta_wynikow: "karta_wynikow", agencje: "reklama", promocje: "promocje", udogodnienia: "hr_udogodnienia",
