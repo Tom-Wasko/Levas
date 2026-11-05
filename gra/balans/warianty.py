@@ -7,6 +7,7 @@ i `raport.md`.
     python -X utf8 -m balans.warianty szybki [-o katalog]        # ≤ 10 min, kontrola regresji
     python -X utf8 -m balans.warianty pelny -o katalog --minut 60 [--ziarna 30] [--strategie …]
         [--firm 4,6,8] [--rund 12,18,26] [--strefy …] [--warianty bank,jakosc:3] [--procesy 5]
+        [--dane "mapa.popyt.model.zasieg=2|mapa.popyt.model.zasieg=4"]   # B6: liczby całej gry
     python -X utf8 -m balans.warianty raport katalog             # tabela z zapisanych gier
     python -X utf8 -m balans.warianty lista                      # dostępne warianty
 
@@ -19,6 +20,8 @@ Kontekst: strategia badanej firmy, długość gry, liczba firm, poziom botów, s
 (parametr strategii `strefy`), kapitał startowy i poziom rywali (bez niego – jak badanej; trudność
 mierzy badana firma „jak człowiek” wśród rywali na poziomie średnim, Z5:
 `--poziom czlowiek_dobry --rywale sredni`). Rywale – boty kolejnych strategii, przesunięte o ziarno.
+Kontekst `dane` (B6) zmienia liczby dla wszystkich firm (`dane_ze_zmianami`) – do porównania tabel
+kontekstów przy innych liczbach; `--warianty baza` – same gry bazowe.
 """
 from __future__ import annotations
 
@@ -32,7 +35,10 @@ import sys
 import time
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from dataclasses import asdict, dataclass, field
+from functools import lru_cache
 from pathlib import Path
+
+import yaml
 
 from silnik.boty import decyzje_bota
 from silnik.dane import KATALOG_GRY, Dane, dane_domyslne
@@ -60,12 +66,50 @@ class Kontekst:
     strefa: str = ""
     kapital: int = 0          # 0 – kapitał domyślny gry
     rywale: str = ""          # poziom rywali; "" – jak badanej (poziom)
+    dane: str = ""            # B6: zmiany danych gry „ścieżka=wartość;…” (dane_ze_zmianami)
 
     def klucz(self) -> str:
         k = f"{self.strategia}/{self.rund}r/{self.firm}f/{self.poziom}"
         k += f"/{self.strefa}" if self.strefa else ""
         k += f"/{self.kapital}zl" if self.kapital else ""
-        return k + (f"/rywale_{self.rywale}" if self.rywale else "")
+        k += f"/rywale_{self.rywale}" if self.rywale else ""
+        return k + (f"/{self.dane}" if self.dane else "")
+
+
+def dane_ze_zmianami(zmiany: str = "") -> Dane:
+    """Dane domyślne ze zmianami `ścieżka=wartość` po „;”, np. `mapa.popyt.model.zasieg=2`
+    (B6: liczby dla wszystkich firm w grze – porównanie kontekstów, nie par wariantów).
+    Ścieżka: atrybut danych, potem klucze słowników, `*` – każdy klucz; wartość w składni YAML."""
+    d = dane_domyslne()
+    return _ze_zmianami(d, zmiany) if zmiany else d
+
+
+@lru_cache(maxsize=8)
+def _ze_zmianami(dane: Dane, zmiany: str) -> Dane:   # klucz z danymi – testy zmieniają katalog
+    d = copy.deepcopy(dane)
+    for z in zmiany.split(";"):
+        sciezka, _, wartosc = z.partition("=")
+        atrybut, *klucze = sciezka.strip().split(".")
+        cele = [getattr(d, atrybut)]
+        for k in klucze[:-1]:
+            cele = [c[x] for c in cele for x in (c if k == "*" else [k])]
+        for c in cele:
+            if klucze[-1] not in c:
+                raise KeyError(f"{sciezka}: nie ma klucza {klucze[-1]}")
+            c[klucze[-1]] = yaml.safe_load(wartosc)
+    return d
+    d = copy.deepcopy(d)
+    for z in zmiany.split(";"):
+        sciezka, _, wartosc = z.partition("=")
+        atrybut, *klucze = sciezka.strip().split(".")
+        cele = [getattr(d, atrybut)]
+        for k in klucze[:-1]:
+            cele = [c[x] for c in cele for x in (c if k == "*" else [k])]
+        for c in cele:
+            if klucze[-1] not in c:
+                raise KeyError(f"{sciezka}: nie ma klucza {klucze[-1]}")
+            c[klucze[-1]] = yaml.safe_load(wartosc)
+    return d
 
 
 @dataclass(frozen=True)
@@ -236,7 +280,8 @@ def rozegraj(z: Zadanie) -> dict:
     fs = firmy(k, z.ziarno, list(dane_domyslne().boty["strategie"]))
     opcje = {"kapital_startowy": k.kapital} if k.kapital else {}
     poziomy = {n: k.poziom if n == BADANA else k.rywale or k.poziom for n, _ in fs}
-    g = Gra.nowa("warianty", fs, k.rund, z.ziarno, poziomy=poziomy, **opcje)
+    g = Gra.nowa("warianty", fs, k.rund, z.ziarno, poziomy=poziomy, dane=dane_ze_zmianami(k.dane),
+                 **opcje)
     nad = dict(w.strategia) | ({"strefy": [k.strefa]} if k.strefa else {})
     db = _dane_badanej(g.dane, k.strategia, k.poziom, nad, dict(w.poziom))
     for r in range(1, k.rund + 1):
@@ -440,6 +485,8 @@ def main(argv: list[str]) -> int:
     pa.add_argument("--rywale", default="", help="poziom rywali (bez – jak --poziom)")
     pa.add_argument("--strefy", help="strefy lokalu badanej firmy, po przecinku (bez – strategia)")
     pa.add_argument("--kapital", type=int, default=0)
+    pa.add_argument("--dane", default="",
+                    help="zmiany danych gry „ścieżka=wartość;…”, kolejne konteksty po „|” (B6)")
     pa.add_argument("--warianty", help="nazwy albo przedrostki po przecinku (bez – wszystkie)")
     pa.add_argument("--minut", type=float)
     pa.add_argument("--procesy", type=int, default=max(1, (os.cpu_count() or 2) - 1))
@@ -456,9 +503,11 @@ def main(argv: list[str]) -> int:
     szybki = a.polecenie == "szybki"
     strategie = lista(a.strategie) or (SZYBKI["strategie"] if szybki
                                         else list(dane.boty["strategie"]))
-    konteksty = [Kontekst(s, r, f, a.poziom, st, a.kapital, a.rywale) for s in strategie
+    konteksty = [Kontekst(s, r, f, a.poziom, st, a.kapital, a.rywale, zm) for s in strategie
                  for r in lista(a.rund, int) for f in lista(a.firm, int)
-                 for st in lista(a.strefy) or [""]]
+                 for st in lista(a.strefy) or [""] for zm in a.dane.split("|")]
+    for zm in {k.dane for k in konteksty}:
+        dane_ze_zmianami(zm)   # błąd w ścieżce – od razu, nie w procesie pomiaru
     ile = a.ziarna or (SZYBKI["ziarna"] if szybki else 30)
     ziarna = list(range(a.od_ziarna, a.od_ziarna + ile))
     warianty = wybierz_warianty(dane, lista(a.warianty))

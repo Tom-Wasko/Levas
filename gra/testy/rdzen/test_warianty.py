@@ -108,3 +108,16 @@ def test_badana_jak_czlowiek_wsrod_rywali_innego_poziomu():
     assert wsrod.klucz() == sami.klucz() + "/rywale_sredni"
     assert wr.rozegraj(wr.Zadanie(wsrod, 3))["karta"] != wr.rozegraj(wr.Zadanie(sami, 3))["karta"]
     assert wr.wybierz_warianty(D, [wr.BAZA]) == []
+
+
+def test_kontekst_ze_zmianami_danych_gry():
+    """B6: kontekst `dane` zmienia liczby dla wszystkich firm (kopia danych; `*` – każdy klucz)."""
+    d = wr.dane_ze_zmianami("mapa.popyt.model.zasieg=2;mapa.popyt.strefy.*.pula=0.5")
+    assert d.mapa["popyt"]["model"]["zasieg"] == 2 and D.mapa["popyt"]["model"]["zasieg"] != 2
+    assert {s["pula"] for s in d.mapa["popyt"]["strefy"].values()} == {0.5}
+    with pytest.raises(KeyError):
+        wr.dane_ze_zmianami("mapa.popyt.model.nie_ma=1")
+    k = wr.Kontekst(rund=3, firm=2, dane="mapa.popyt.strefy.*.pula=0.05")
+    assert k.klucz().endswith("/mapa.popyt.strefy.*.pula=0.05")
+    zwykla = wr.rozegraj(wr.Zadanie(wr.Kontekst(rund=3, firm=2), 1))
+    assert wr.rozegraj(wr.Zadanie(k, 1))["dochod"] < zwykla["dochod"]

@@ -705,6 +705,14 @@ przypadki, w których pomiar strefy mierzy inną strefę (6 ziaren × 3 strategi
 Pomiar zapisuje teraz w `gry.csv` kolumnę `strefy_lokali` (strefy lokali badanej na koniec gry) – tabela strefa ×
 wariant liczy tylko gry, w których firma stoi w swojej strefie.
 
+**Kontekst `dane` w pomiarze** (5.11): przewaga centrum i starego miasta to popyt, nie czynsz (szacunek tygodniowy
+przy 5 rywalach: stare_miasto 14,9 tys. zł przychodu, centrum 14,5 … felin 8,3, zemborzyce 7,3). Żeby porównać
+tabele stref przy innych liczbach popytu bez zmiany `dane/`, pomiar ma kontekst `--dane "ścieżka=wartość;…|…"`
+(`dane_ze_zmianami` w `balans/warianty.py`, test `test_kontekst_ze_zmianami_danych_gry`) – zmiana dotyczy
+wszystkich firm w grze. Szacunek przy `mapa.popyt.model.zasieg` 3 → 2: stare_miasto 13,1, centrum 11,1,
+akademickie i dworzec 10,0, lsm_czuby 9,8 … zemborzyce 4,9 – centrum traci najwięcej, peryferie zostają w tyle
+(odległości 4,5–18 na mapie, klient sięga dalej niż jedna dzielnica).
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. Propozycja dla autora (`dane/mapa/lokale.yaml`): niższa adaptacja albo odkup zestawu w ratach – czynsz już

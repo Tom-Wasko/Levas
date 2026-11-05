@@ -31,8 +31,11 @@ Skrypt: gra botów na jednym poziomie, sumy KPiR z 18 rund. Liczby zgrubne – d
 - Parametry: `L/lokale.yaml` (zasady: `nowy_lokal_co_rund` 3, `kaucja_miesiecy` 2, `licytacje_od_rundy` 1,
   `oferta_max` 3, `urzadzanie_rund`; na lokal: czynsz, cena, utrzymanie, miejsca, zestaw, metraż, koszt i czas
   budowy), `L/strefy.yaml`, `L/popyt.yaml` (pula strefy), `L/budynki.yaml`; kredyt pod zastaw – `L/banki.yaml`.
-- Boty: tylko gotowy lokal w najmie (`boty.py: _wybierz_lokal`); trudny bierze drugi lokal (`kolejny_lokal`,
-  maks. 2), niemożliwy – trzeci.
+- Boty (B6, `boty.py: _wybierz_lokal`): domyślnie gotowy lokal w najmie; trudny bierze drugi lokal
+  (`kolejny_lokal`, maks. 2), niemożliwy – trzeci. Parametr strategii `lokal` (warianty `lokale:*` w
+  `balans/warianty.py`) daje każdy typ i formę: `typy` (gotowy / niewyposażony / działka), `forma` kupno na kredyt
+  pod zastaw (zastaw działki liczy budynek) z `rezerwa` gotówki po wejściu, `przebicie` w licytacji; sprzęt
+  niewyposażonego ponad gotówkę – leasing, resztę kredyt bez historii. `strefy` zawęża lokale do stref (pomiar).
 - Kompromis:
   - najem – mało kapitału i elastyczność, drożej w długiej grze;
   - kupno – duży wkład, tańsze od około połowy gry 18 rund, w majątku netto (po amortyzacji); ryzyko: zamrożona
@@ -47,13 +50,14 @@ Skrypt: gra botów na jednym poziomie, sumy KPiR z 18 rund. Liczby zgrubne – d
   - licytacja – przepłacenie kontra utrata lokalu.
 
 **`przejecie`** – `{id, oferta}`, kupno budynku z najemcą (od `przejecia_od_rundy` 4)
-- Boty: nie.
+- Boty (B6, `boty.py: _przejecie`): parametr strategii `wykup` (własny lokal w najmie) i `przejecie` (budynek
+  rywala), gdy po zakupie zostaje `rezerwa` gotówki; najtańszy z możliwych.
 - Kompromis: czynsz od najemcy (przychód) i możliwość wypowiedzenia rywalowi kontra zamrożony kapitał; opłaca
   się w dłuższej grze albo jako ruch przeciw silnemu rywalowi, nie zawsze.
 
 **`wypowiedz`** – `[{id, ulepszenia: zatrzymaj | przywroc}]` (`wypowiedzenie_rund` 4, `ulepszenia_zwrot` 0,5,
 `przywrocenie_koszt` 0,3)
-- Boty: nie.
+- Boty (B6): `przejecie: {wypowiedz: true}` – wypowiada najem rywalom we wszystkich swoich budynkach.
 - Kompromis: usunięcie konkurenta z budynku za cenę czasu (4 rundy) i rozliczenia nakładów; nie może być tanim
   sposobem na wykończenie rywala.
 
