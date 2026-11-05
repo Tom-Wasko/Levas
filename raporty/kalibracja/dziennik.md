@@ -752,6 +752,33 @@ wszystkich firm w grze. Szacunek przy `mapa.popyt.model.zasieg` 3 → 2: stare_m
 akademickie i dworzec 10,0, lsm_czuby 9,8 … zemborzyce 4,9 – centrum traci najwięcej, peryferie zostają w tyle
 (odległości 4,5–18 na mapie, klient sięga dalej niż jedna dzielnica).
 
+**Pomiar `b6_strefy`** (5.11; gry bazowe, 10 stref × 3 strategie × 18/26 rund × 6 ziaren, 6 firm, konteksty: dane
+domyślne i `zasieg=2`; liczone tylko gry, w których badana stoi w swojej strefie – skrypt pomocniczy jak w
+`strefy_lokali`). Średnia karta, kolejność stref (zrównoważony, 26 rund, dane domyślne): centrum 0,89,
+stare_miasto 0,76, dworzec 0,71, akademickie 0,46, lsm_czuby 0,42, zygmuntowskie 0,35, czechów 0,34,
+politechnika 0,32, felin 0,24. Tani: centrum 0,83 … felin 0,18; premium: centrum 0,90, stare_miasto 0,84 …
+felin −0,05. **Centrum jest najlepsze (albo w szumie od najlepszego) we wszystkich 6 grupach** strategia × rund,
+stare_miasto w 2; przy `zasieg=2` to samo (centrum 6, stare_miasto 4), wszystkie strefy niżej. Kompromis z
+inwentarza („każda strefa najlepsza dla jakiejś strategii”) nie działa – dominacja.
+
+Diagnoza (gra zrównoważonego, rundy 4–8, 2 ziarna, przychód / czynsz / dochód netto na tydzień): centrum
+23,7 tys. / 1,2 tys. (5,0%) / 5,5 tys.; stare_miasto 22,5 / 1,7 (7,5%) / 5,4; dworzec 21,0 / 1,0 / 4,7;
+lsm_czuby 15,5 / 0,6 (3,7%) / 2,6; politechnika 14,8 / 0,6 / 2,4; felin 12,0 / 0,45 / 2,1. Czynsz to 3–8%
+przychodu (widełki planu 8–15%), a różnica zysku centrum – osiedla (~3 tys. zł/tydz.) jest kilka razy większa
+niż cały czynsz centrum. Podniesienie stawki strefy do górnej granicy ofert Lublina (130 zł/m², `zrodlo` F3a.3)
+daje +350 zł/tydz. – za mało. Źródło przewagi: popyt (`silnik/rynek/popyt.py: podzial` – udział lokalu =
+a / (opcja_zewnetrzna + Σa); pula centrum 1,08, najbliżej wszystkich stref).
+
+Poprawka (wzór, nie nowa decyzja): **`konkurencja` strefy** w `dane/mapa/popyt.yaml` (strefy), mnożnik opcji
+zewnętrznej klientów tej strefy – lokale miasta spoza gry (w centrum i na Starym Mieście jest ich dużo, na
+osiedlach mniej). `popyt.py: podzial` – `a0 × konkurencja strefy klienta`; bez klucza 1 (test
+`test_konkurencja_strefy`). Na razie wszędzie 1,0 (bez zmiany gry). Szybka próba (2 ziarna, rundy 4–8, dochód
+netto/tydz.): centrum i stare_miasto 1,6, dworzec 1,2, osiedla i peryferie 0,7–0,8 → centrum 5,2, stare_miasto
+4,3, zemborzyce/dworzec 4,2–4,5, lsm_czuby 3,7, akademickie 3,5, zygmuntowskie 3,3, politechnika 2,7, felin 2,3
+(różnica centrum – osiedla mniej więcej o połowę mniejsza); mocniej (centrum i stare_miasto 2,5, dworzec 1,8,
+reszta 1) wyrównuje zysk, ale obniża całą gospodarkę (centrum 2,9) – psułoby cele B5. Pełny pomiar `b6_strefy2`
+po `b6_wykup`.
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:

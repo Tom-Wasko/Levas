@@ -213,7 +213,7 @@ def podzial(dane: Dane, pule_rundy: dict, oferty: dict[str, dict[tuple[str, str]
             x = np.array([w[3] for w in wiersze])
             a = (bez[None, :, None] * np.exp(-cv[:, None, None] * x[None, :, None])
                  * np.vstack([w[4] for w in wiersze])[None])
-            mianownik = a0 + a.sum(axis=1)
+            mianownik = a0 * dane.mapa["popyt"]["strefy"][z].get("konkurencja", 1.0) + a.sum(axis=1)
             kg = pz[u][None, None, :] * udzialy[:, None, :] * a / mianownik[:, None, :]   # grupa × lokal × dzień
             klienci_k = kg.sum(axis=0)
             for i, (k, v, *_) in enumerate(wiersze):

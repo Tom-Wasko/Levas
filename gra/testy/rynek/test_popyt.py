@@ -30,6 +30,24 @@ def test_dwa_lokale_w_jednej_strefie_dziela_klientow():
 
 
 
+def test_konkurencja_strefy(tmp_path):
+    """B6: `konkurencja` strefy mnoży opcję zewnętrzną jej klientów (lokale miasta spoza gry) – więcej
+    konkurencji w strefie, mniej jej klientów w lokalach gry; klienci innych stref bez zmian. Bez klucza – 1."""
+    dane = dane_domyslne()
+    kat = _kopia(tmp_path / "konk")
+    _zmien(kat, "mapa/popyt.yaml", lambda d: d["strefy"]["centrum"].update(konkurencja=2.0))
+    tlok = Dane(kat)
+    lokale = [("centrum", _oferta("centrum")), ("dworzec", _oferta("dworzec"))]
+    a = _podzial(dane, 5, *lokale)[("F0", "centrum")][KEBAB]["strefy"]
+    b = _podzial(tlok, 5, *lokale)[("F0", "centrum")][KEBAB]["strefy"]
+    assert b["centrum"] < 0.9 * a["centrum"]
+    assert b["zemborzyce"] == pytest.approx(a["zemborzyce"])
+    bez = _kopia(tmp_path / "bez")
+    _zmien(bez, "mapa/popyt.yaml", lambda d: [s.pop("konkurencja", None) for s in d["strefy"].values()])
+    c = _podzial(Dane(bez), 5, *lokale)[("F0", "centrum")][KEBAB]["strefy"]
+    assert c["centrum"] == pytest.approx(a["centrum"])
+
+
 def test_rozruch_nowego_lokalu(tmp_path):
     """B5: nowy lokal dopiero zdobywa klientów – mnożnik popytu od `start` w pierwszym tygodniu sprzedaży
     (najwcześniej runda 2) rośnie o `przyrost` co tydzień do 1; bez klucza w danych – 1."""
