@@ -152,6 +152,7 @@ def _skladniki(dane: Dane, strefa_klienta: str, usluga: str, o: dict, jakosc: fl
     r = o["cena"] / (dane.uslugi[usluga]["cena_preferowana"] * ps["cena"])
     q = menu.jakosc_dania(dane, o["jakosc"]) if jakosc is None else jakosc
     return (q * math.exp(-odleglosc(dane, strefa_klienta, o["strefa"]) / p["model"]["zasieg"])
+            / p["strefy"][o["strefa"]].get("konkurencja", 1.0)   # B6: lokal ginie wśród innych lokali swojej strefy
             * o.get("zadowolenie", 1.0) * o.get("wyposazenie", 1.0) * o.get("mnoznik_firmy", 1.0) * o.get("rozruch", 1.0)
             * (1 + o.get("reklama", 0.0) + (o.get("reklama_strefy") or {}).get(strefa_klienta, 0.0)),
             p["model"]["elastycznosc_ceny"] * ps["wrazliwosc_ceny"] * (r - 1))
@@ -213,7 +214,7 @@ def podzial(dane: Dane, pule_rundy: dict, oferty: dict[str, dict[tuple[str, str]
             x = np.array([w[3] for w in wiersze])
             a = (bez[None, :, None] * np.exp(-cv[:, None, None] * x[None, :, None])
                  * np.vstack([w[4] for w in wiersze])[None])
-            mianownik = a0 * dane.mapa["popyt"]["strefy"][z].get("konkurencja", 1.0) + a.sum(axis=1)
+            mianownik = a0 + a.sum(axis=1)
             kg = pz[u][None, None, :] * udzialy[:, None, :] * a / mianownik[:, None, :]   # grupa × lokal × dzień
             klienci_k = kg.sum(axis=0)
             for i, (k, v, *_) in enumerate(wiersze):

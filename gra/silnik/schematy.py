@@ -703,7 +703,7 @@ class PopytStrefy(Schemat):
     pula: float = Field(ge=0)
     cena: float = Field(gt=0)
     wrazliwosc_ceny: float = Field(ge=0)
-    konkurencja: float = Field(default=1.0, gt=0)   # B6: mnożnik opcji zewnętrznej klientów strefy (istniejące lokale miasta)
+    konkurencja: float = Field(default=1.0, gt=0)   # B6: dzielnik atrakcyjności lokali gry w strefie (lokale miasta spoza gry)
     dni: list[float] | None = Field(default=None, min_length=7, max_length=7)
     miesiace: list[float] | None = Field(default=None, min_length=12, max_length=12)
 
