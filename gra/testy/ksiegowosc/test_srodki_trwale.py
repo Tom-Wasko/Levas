@@ -14,10 +14,16 @@ def _kpir(s, r, firma, poczatek):
 
 
 def test_kupiony_lokal_amortyzuje_sie_od_nastepnej_rundy():
+    """B6: sprzęt zestawu gotowego lokalu jest częścią ceny – lokal w ewidencji bez niego, sprzęt poniżej progu
+    w kosztach od razu (bez wydatku), majątek firmy liczony raz."""
     g = _gra()
-    cena = g.dane.lokale["zygmuntowskie_1"]["cena"]
+    lok = g.dane.lokale["zygmuntowskie_1"]
+    sprzet = sum(g.dane.sprzet[n]["ceny"][str(q)] for st in g.dane.mapa["zestawy"][lok["zestaw"]]["stanowiska"]
+                 for n, q in st["sprzet"].items())
+    cena = lok["cena"] - sprzet
     s = _runda(g, B=_lokal("zygmuntowskie_1", "kupno"))
     assert _kpir(s, 1, "B", "Amortyzacja") == [] and not _kpir(s, 1, "B", "Zakup lokalu")
+    assert sum(_kpir(s, 1, "B", "Sprzęt w cenie lokalu")) == pytest.approx(sprzet) and sprzet > 0
     [e] = s.wyniki[1]["B"]["srodki_trwale"]
     assert e["rodzaj"] == "lokal" and e["wartosc"] == pytest.approx(cena) and e["stawka"] == pytest.approx(0.025)
     s = _runda(g)

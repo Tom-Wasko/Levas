@@ -92,15 +92,18 @@ def przejmij(dane: Dane, firmy: dict[str, Firma], nazwa: str, decyzja: dict | No
     kwota = oferta(dane, decyzja, lok, "kupno", runda)[0]
     najemca, umowa = najem(firmy, lok["id"])
     rachunek.zapisz(f, f"Zakup budynku z najemcą: {lok['adres']}", -kwota, "inwestycje")
-    st_trwale.przyjmij(dane, f, f"Lokal: {lok['adres']}", "lokal", kwota, runda)
-    if najemca == nazwa:   # wykup: najem zamienia się we własność
+    if najemca == nazwa:   # wykup: najem zamienia się we własność, sprzęt wynajmującego – część ceny (B6)
         rachunek.zapisz(f, f"Zwrot kaucji za lokal: {lok['adres']}", umowa.kaucja, "kaucje")
         umowa.forma, umowa.cena, umowa.czynsz, umowa.kaucja, umowa.naklady = "kupno", kwota, 0, 0, 0
+        sprzet = []
         for st in f.stanowiska:
             if st.lokal == lok["id"] and st.sprzet_wynajmujacego:
-                f.majatek += sum(dane.sprzet[n]["ceny"][str(st.sprzet[n])] for n in st.sprzet_wynajmujacego if n in st.sprzet)
+                sprzet += [(n, st.sprzet[n]) for n in st.sprzet_wynajmujacego if n in st.sprzet]
                 st.sprzet_wynajmujacego = []
+        w_cenie = st_trwale.sprzet_w_cenie(dane, f, ksiega, lok["adres"], sprzet, runda)
+        st_trwale.przyjmij(dane, f, f"Lokal: {lok['adres']}", "lokal", max(0.0, kwota - w_cenie), runda)
         return {**info, "przyjety": True, "powod": None, "kwota": kwota, "najemca": najemca, "wykup": True}
+    st_trwale.przyjmij(dane, f, f"Lokal: {lok['adres']}", "lokal", kwota, runda)
     umowa.wlasciciel = nazwa
     f.budynki.append(KupionyBudynek(id=lok["id"], od_rundy=runda, cena_gr=0, najemca=najemca))
     f.budynki[-1].cena = kwota

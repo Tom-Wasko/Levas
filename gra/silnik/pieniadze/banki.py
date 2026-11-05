@@ -24,7 +24,7 @@ from ..dane import Dane
 from ..ksiegowosc import srodki_trwale as st_trwale
 from ..ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
 from ..model import Firma, Kredyt, Leasing, Lokata
-from ..nieruchomosci.lokale import oferta
+from ..nieruchomosci.lokale import oferta, sprzet_zestawu
 
 EPS = 1e-6
 
@@ -101,8 +101,8 @@ def zastawy(dane: Dane, firma: Firma) -> list[dict]:
 
 
 def nowy_lokal(dane: Dane, decyzje: dict, runda: int) -> dict | None:
-    """Lokal (albo działka) kupowany w tej rundzie jako zastaw kredytu inwestycyjnego; wartość – cena z oferty
-    (tyle wejdzie do ewidencji środków trwałych), przy działce razem z kosztem budowy (budynek wejdzie do ewidencji
+    """Lokal (albo działka) kupowany w tej rundzie jako zastaw kredytu inwestycyjnego; wartość – cena z oferty bez
+    sprzętu zestawu (tyle wejdzie do ewidencji środków trwałych – sprzęt to osobne pozycje), przy działce razem z kosztem budowy (budynek wejdzie do ewidencji
     po budowie – zastawem jest budowany lokal, B6)."""
     dl = decyzje.get("lokal") or {}
     lok = dane.lokale.get(dl.get("id")) if dl.get("forma") == "kupno" else None
@@ -111,7 +111,8 @@ def nowy_lokal(dane: Dane, decyzje: dict, runda: int) -> dict | None:
         return None
     co = "Działka" if lok["typ"] == "dzialka" else "Lokal"
     return {"id": f"lokal:{lok['id']}", "nazwa": f"{co}: {lok['adres']} (kupowany w tej rundzie)",
-            "wartosc": round(kwota + lok.get("koszt_budowy", 0), 2)}
+            "wartosc": round(max(0.0, kwota - sum(dane.sprzet[n]["ceny"][str(q)] for n, q in sprzet_zestawu(dane, lok)))
+                             + lok.get("koszt_budowy", 0), 2)}
 
 
 def finansowanie_lokalu(dane: Dane, firma: Firma, decyzje: dict, runda: int) -> float:

@@ -36,6 +36,24 @@ def zakup(dane: Dane, firma: Firma, ksiega: Ksiega, rachunek: Rachunek, opis: st
     return ksieguj(firma, ksiega, rachunek, opis, cena)
 
 
+def sprzet_w_cenie(dane: Dane, firma: Firma, ksiega: Ksiega, adres: str, sprzet: list[tuple[str, int]],
+                   runda: int) -> float:
+    """B6: sprzęt kupiony razem z lokalem (kupno gotowego, wykup najmowanego) – część ceny lokalu, nie dodatek:
+    poniżej progu amortyzacji koszt w KPiR od razu (bez wydatku – zapłacony w cenie lokalu), od progu środek
+    trwały; majątek firmy (rozwój) jak przy zakupie osobno. Zwraca wartość sprzętu – o tyle mniej wart jest
+    lokal w ewidencji (wcześniej sprzęt liczył się drugi raz ponad cenę)."""
+    razem = 0.0
+    for n, q in sprzet:
+        c = dane.sprzet[n]["ceny"][str(q)]
+        if c >= dane.z["finanse"]["amortyzacja_prog"]:
+            przyjmij(dane, firma, f"{n} ({adres})", "sprzet", c, runda)
+        else:
+            ksiega.dodaj(f"Sprzęt w cenie lokalu: {n} ({adres})", c, bez_gotowki=True)
+        firma.majatek += c
+        razem += c
+    return round(razem, 2)
+
+
 def sprzedaj(firma: Firma, nazwa: str, ksiega: Ksiega) -> bool:
     """Usuwa środek trwały z ewidencji; niezamortyzowana wartość – koszt w KPiR. False – nie było go w ewidencji."""
     st = next((s for s in firma.srodki_trwale if s.nazwa == nazwa), None)

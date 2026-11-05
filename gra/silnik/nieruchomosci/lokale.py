@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from ..dane import TYPY_STANOWISK, Dane
 from ..ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
-from ..ksiegowosc.srodki_trwale import przyjmij
+from ..ksiegowosc.srodki_trwale import przyjmij, sprzet_w_cenie
 from ..model import Firma, Lokal, Stanowisko
 
 FORMY = ("najem", "kupno")
@@ -87,6 +87,13 @@ def koszt_wejscia(dane: Dane, lok: dict, forma: str, kwota: float | None = None)
     if forma == "kupno":
         return (kwota or lok["cena"]) + lok.get("adaptacja", 0)
     return dane.mapa["zasady"]["kaucja_miesiecy"] * (kwota or lok["czynsz"]) + lok.get("adaptacja", 0)
+
+
+def sprzet_zestawu(dane: Dane, lok: dict) -> list[tuple[str, int]]:
+    """Sprzęt zestawu gotowego lokalu [(nazwa, jakość)] – przy kupnie część ceny lokalu (B6)."""
+    if lok.get("typ") != "gotowy" or not lok.get("zestaw"):
+        return []
+    return [(n, q) for st in dane.mapa["zestawy"][lok["zestaw"]]["stanowiska"] for n, q in st["sprzet"].items()]
 
 
 def oferta(dane: Dane, decyzja: dict, lok: dict, forma: str, runda: int) -> tuple[float | None, str | None]:
@@ -159,8 +166,10 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
     else:
         nowy.cena = kwota
         rachunek.zapisz(firma, f"Zakup {'działki' if lok['typ'] == 'dzialka' else 'lokalu'}: {lok['adres']}", -nowy.cena, "inwestycje")
+        # sprzęt zestawu gotowego lokalu jest częścią ceny (B6)
+        w_cenie = sprzet_w_cenie(dane, firma, ksiega, lok["adres"], sprzet_zestawu(dane, lok), runda)
         przyjmij(dane, firma, f"{'Działka' if lok['typ'] == 'dzialka' else 'Lokal'}: {lok['adres']}",
-                 "grunt" if lok["typ"] == "dzialka" else "lokal", nowy.cena, runda)
+                 "grunt" if lok["typ"] == "dzialka" else "lokal", max(0.0, nowy.cena - w_cenie), runda)
     if lok.get("adaptacja"):
         ksieguj(firma, ksiega, rachunek, f"Adaptacja lokalu: {lok['adres']}", lok["adaptacja"])
         if forma == "najem":   # nakład najemcy – rozliczenie ulepszeń po wypowiedzeniu (silnik/nieruchomosci/przejecia.py)
@@ -169,8 +178,6 @@ def wybierz(dane: Dane, firma: Firma, decyzja: dict | None, runda: int, zajete_l
     zajete_lokale[lok["id"]] = firma.nazwa
     if lok["typ"] == "gotowy":
         for st in dane.mapa["zestawy"][lok["zestaw"]]["stanowiska"]:
-            if forma == "kupno":  # kupiony sprzęt jest firmy – liczy się do majątku (rozwój firmy), jak kupiony osobno
-                firma.majatek += sum(dane.sprzet[n]["ceny"][str(q)] for n, q in st["sprzet"].items())
             firma.stanowiska.append(Stanowisko(
                 nr=firma.nowy_nr(st["typ"]), typ=st["typ"], od_rundy=runda, lokal=lok["id"],
                 sprzet=dict(st["sprzet"]), sprzet_wynajmujacego=list(st["sprzet"]) if forma == "najem" else []))
