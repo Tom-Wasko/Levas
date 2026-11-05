@@ -73,6 +73,14 @@ def test_bot_finansuje_sprzet_lokalu_niewyposazonego_leasingiem():
     assert len(f.leasingi) == len(lea) and not f.kredyty and f.gotowka > 0
 
 
+def test_strefa_strategii_wazniejsza_niz_liczba_kuchni():
+    """Pomiar strefy (strategia `strefy`): w zygmuntowskich jedyny gotowy lokal w najmie ma 1 kuchnię – planujący bot
+    bierze go mimo min_kuchnia, zamiast lokalu z 2 kuchniami w innej strefie (wcześniej pomiar mierzył inną strefę)."""
+    g, (d,) = _gra({"strefy": ["zygmuntowskie"]})
+    lok = _lokal(g, d["lokal"]["id"])
+    assert lok["strefa"] == "zygmuntowskie" and lok["miejsca"]["kuchnia"] < g.dane.boty["strategie"]["zrownowazony"]["min_kuchnia"]
+
+
 def test_bot_bez_srodkow_na_kupno_bierze_gotowy_lokal_w_najmie():
     _, (d,) = _gra({"lokal": {"forma": "kupno", "rezerwa": 10 ** 6}})
     assert d["lokal"]["forma"] == "najem" and not d.get("kredyty_wez")

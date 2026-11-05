@@ -693,6 +693,18 @@ przy 3 procesach Claude Code zatrzymał pomiar przy braku pamięci; wznowiony od
   900 zł/m² to dolna granica, prawdziwy pawilon kosztuje kilka razy więcej) – działka jako pierwszy lokal to
   projekt na dłuższą grę; sprawdzam ją jako drugi lokal (`b6_drugi_po2`).
 
+**Pomiar strefy – gdzie naprawdę stoi badana firma** (5.11): kontekst strefy (`--strefy`) zawęża lokale bota,
+ale dotąd planujący bot (zrównoważony, premium: `min_kuchnia` 2) najpierw odrzucał lokale z 1 kuchnią, a dopiero
+potem filtrował strefę – w zygmuntowskich (jedyny gotowy w najmie ma 1 kuchnię) brał lokal w innej strefie.
+Teraz strefa idzie przed kuchnią (test `test_strefa_strategii_wazniejsza_niz_liczba_kuchni`). Zostają dwa
+przypadki, w których pomiar strefy mierzy inną strefę (6 ziaren × 3 strategie, firma po 3 rundach):
+- zemborzyce – nie ma tam lokalu w najmie (budka tylko na kupno, działka od 6 firm): 18/18 gier w innej strefie;
+  wyniki „zemborzyce” w najmie to w praktyce dworzec, centrum, stare_miasto albo felin;
+- zajęta strefa – w rundzie 1 rywal wygrywa ten sam lokal, a reszta strefy jest zajęta (np. tani w centrum: 2/6
+  gier w czechowie, akademickie 3/18).
+Pomiar zapisuje teraz w `gry.csv` kolumnę `strefy_lokali` (strefy lokali badanej na koniec gry) – tabela strefa ×
+wariant liczy tylko gry, w których firma stoi w swojej strefie.
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. Propozycja dla autora (`dane/mapa/lokale.yaml`): niższa adaptacja albo odkup zestawu w ratach – czynsz już

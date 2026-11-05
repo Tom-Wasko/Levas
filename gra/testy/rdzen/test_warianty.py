@@ -71,6 +71,21 @@ def test_pomiar_zapisuje_gry_i_wznawia_sie(tmp_path):
     assert (tmp_path / "pary.csv").exists()
 
 
+def test_pomiar_zapisuje_strefe_lokalu_i_wznawia_stary_uklad(tmp_path):
+    """Kolumna strefy_lokali (B6) – a pomiar sprzed niej wznawia się w swoim układzie kolumn."""
+    kat = wr.katalog_wariantow(D)
+    k = wr.Kontekst(rund=2, firm=2, strefa="felin")
+    assert wr.mierz(tmp_path, wr.zadania([k], [1], [])) == 1
+    assert wr._wczytaj_gry(tmp_path / "gry.csv")[0]["strefy_lokali"] == "felin"
+    stary = tmp_path / "stary"
+    stary.mkdir()
+    (stary / "gry.csv").write_text(",".join(["kontekst", *wr.asdict(k), "ziarno", "wariant", *wr.POLA_GRY]) + "\n",
+                                   encoding="utf-8")
+    assert wr.mierz(stary, wr.zadania([k], [1], [kat["bank:ING"]])) == 2
+    gry = wr._wczytaj_gry(stary / "gry.csv")
+    assert len(gry) == 2 and "strefy_lokali" not in gry[0] and len(wr.pary(gry)) == 1
+
+
 def _para(d: float) -> dict:
     return {"d_karta": d, "d_majatek": 100 * d, "pierwszy_plus_baza": 2, "pierwszy_plus_wariant": 3,
             "alarmy_baza": 0, "alarmy_wariant": 1}

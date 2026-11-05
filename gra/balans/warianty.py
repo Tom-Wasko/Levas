@@ -45,6 +45,7 @@ BADANA = "Badana"
 BAZA = "baza"
 POLA_GRY = ["karta", "dochod", "gotowka", "majatek", "pierwszy_plus", "alarmy", "miejsce",
             "lokale", "czas_s"]
+POLA_OPISU = ["strefy_lokali"]   # B6: strefy lokali badanej na koniec (strefa bywa zajęta)
 ROZNICE = ("karta", "majatek", "dochod")   # różnice w parach
 DOMINACJA = 0.7   # plan: opcja wygrywa ≥ 70% par przy istotnej różnicy
 POMIARY = KATALOG_GRY.parent / "raporty" / "kalibracja" / "pomiary"
@@ -262,7 +263,9 @@ def miary(s, rund: int) -> dict:
             "gotowka": round(ws[-1]["gotowka"], 2), "majatek": z_portfelem(ws[-1]),
             "pierwszy_plus": plus, "alarmy": alarmy,
             "miejsce": 1 + sum(v > karty[BADANA] for v in karty.values()),
-            "lokale": len(s.firmy[BADANA].lokale)}
+            "lokale": len(s.firmy[BADANA].lokale),
+            "strefy_lokali": ";".join(dane_domyslne().lokale[x.id]["strefa"]
+                                      for x in s.firmy[BADANA].lokale)}
 
 
 # --- pomiar ----------------------------------------------------------------------------------
@@ -290,8 +293,12 @@ def mierz(katalog: Path, lista: list[Zadanie], procesy: int = 1, minut: float | 
     czas_minal = lambda: koniec is not None and time.monotonic() > koniec   # noqa: E731
     nowy = not plik.exists()
     nowe = 0
+    pola = ["kontekst", *asdict(Kontekst()), "ziarno", "wariant", *POLA_GRY, *POLA_OPISU]
+    if not nowy:   # wznowienie pomiaru sprzed nowych kolumn – w starym układzie
+        with open(plik, encoding="utf-8", newline="") as p:
+            pola = next(csv.reader(p), pola)
     with open(plik, "a", encoding="utf-8", newline="") as p:
-        pisz = csv.DictWriter(p, ["kontekst", *asdict(Kontekst()), "ziarno", "wariant", *POLA_GRY])
+        pisz = csv.DictWriter(p, pola, extrasaction="ignore")
         if nowy:
             pisz.writeheader()
 

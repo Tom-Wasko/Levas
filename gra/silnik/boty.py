@@ -166,9 +166,9 @@ def _wybierz_lokal(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, 
                                                             w.get("rezerwa", 0), w.get("przebicie", 1.0)) is not None]
     if not wolne and wybor:
         return _wybierz_lokal(dane, stan, nazwa, strategia_klucz, runda, konf, min_kuchnia, strefy)
-    wolne = [lok for lok in wolne if lok["miejsca"][KUCHNIA] >= min_kuchnia] or wolne
-    if strefy:
+    if strefy:   # B6: strefa przed kuchnią – inaczej pomiar strefy bez lokalu z min_kuchnia mierzył inną strefę
         wolne = [lok for lok in wolne if lok["strefa"] in strefy] or wolne
+    wolne = [lok for lok in wolne if lok["miejsca"][KUCHNIA] >= min_kuchnia] or wolne
     if not wolne:
         return None, []
     if strategia_klucz == "tani":
