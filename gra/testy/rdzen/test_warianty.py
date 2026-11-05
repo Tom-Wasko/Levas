@@ -33,7 +33,7 @@ def test_wymuszona_decyzja_tylko_gdy_bot_ja_podejmuje():
 
 def test_wariant_zmienia_wynik_badanej_firmy():
     kat = wr.katalog_wariantow(D)
-    assert {"bank:ING", "umowa:zlecenie", "jakosc:3", "lokale:drugi"} <= set(kat)
+    assert {"bank:ING", "umowa:zlecenie", "jakosc:3", "lokale:drugi", "menu:3", "promocja:karta"} <= set(kat)
     baza = wr.rozegraj(wr.Zadanie(K, 3))
     assert wr.rozegraj(wr.Zadanie(K, 3, kat["bank:ING"]))["karta"] != baza["karta"]
 

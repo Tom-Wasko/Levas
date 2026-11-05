@@ -152,7 +152,12 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant(f"jakosc:{q}", f"jakość {q}★ (sprzęt, składniki, ludzie)",
                   strategia=(("jakosc", q),)) for q in (1, 2, 3)]
     w += [Wariant(f"cena:{c}", f"cena {c:.0%} ceny preferowanej", strategia=(("cena", c),))
-          for c in (0.85, 1.0, 1.15)]
+          for c in (0.85, 1.0, 1.15, 1.3)]
+    # B7: szerokość menu (liczba dań bota) i jedna promocja danego typu zamiast promocji strategii
+    w += [Wariant(f"menu:{n}", f"menu {n} dań", strategia=(("uslugi", n),)) for n in (3, 5, 8)]
+    w += [Wariant(f"promocja:{t}", f"tylko promocja {t}",
+                  strategia=(("promocje", [{"typ": t, "nazwa": f"Promocja {t}"}]),))
+          for t in dane.mapa["promocje"]["typy"]]
     drugi = dane.boty["poziomy"]["trudny"]["kolejny_lokal"]
     w += [Wariant("lokale:drugi", "drugi lokal jak bot trudny",
                   poziom=(("kolejny_lokal", drugi),)),
