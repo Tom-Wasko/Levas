@@ -693,6 +693,27 @@ przy 3 procesach Claude Code zatrzymał pomiar przy braku pamięci; wznowiony od
   900 zł/m² to dolna granica, prawdziwy pawilon kosztuje kilka razy więcej) – działka jako pierwszy lokal to
   projekt na dłuższą grę; sprawdzam ją jako drugi lokal (`b6_drugi_po2`).
 
+**`b6_drugi_po2`** (kod 95f7d5f; 5 strategii × 18/26 rund × 6 firm × 8 ziaren, 400 gier, 2 procesy), drugi lokal:
+
+| wariant | − baza 18 r. | − baza 26 r. | − drugi gotowy w najmie |
+|---|---|---|---|
+| drugi gotowy w najmie | +0,07 (21/40) | **+0,22 (32/40)** | – |
+| drugi gotowy na kupno | +0,06 | +0,19 | −0,02 (26/80) – w szumie |
+| drugi niewyposażony | −0,14 | +0,06 | −0,19 (1/80) |
+| drugi na działce | −0,12 | −0,06 | −0,24 (6/80) |
+
+- Drugi lokal opłaca się dalej (H21), najem i kupno gotowego prawie równe – kupno to rozsądna alternatywa.
+- Niewyposażony – ta sama przyczyna co przy pierwszym lokalu (sprzęt od razu w koszty, np. −17 tys. zł dochodu
+  w rundzie zakupu); propozycja dla autora w `notatki_do_zmiany.md` (B6 – lokal niewyposażony).
+- Działka: wszystkie 5 działek leży w strefach peryferyjnych (czechow, felin, lsm_czuby, zemborzyce,
+  zygmuntowskie – popyt 7–12 tys. zł na tydzień wobec 14,5 tys. w centrum). Kupiona w rundzie ok. 10 działa od
+  rundy 13–14, budynek na 5 kuchni z 1 kuchnią; np. zrównoważony, ziarno 1000, 26 rund: działka w zemborzycach
+  (72 tys. + 99 tys. zł budowy na kredyt) daje dochód 8–10 tys. zł na rundę, drugi gotowy w centrum 10–16 tys.
+  Liczby działki są już po stronie taniej (budowa 900 zł/m² – dolna granica realiów, 3–4 rundy budowy – szybciej
+  niż w rzeczywistości; m² działki z budową ok. 1400–1600 zł wobec ok. 2200–2500 zł przy kupnie gotowego), więc nie
+  stroję ich w dół. Działka zostaje opcją niszową: jako pierwszy lokal w 26 rundach jest w szumie od najmu
+  (`b6_kupno2`: felin −0,02, czechow −0,09), jako drugi przegrywa przez strefę i późny start.
+
 **Pomiar strefy – gdzie naprawdę stoi badana firma** (5.11): kontekst strefy (`--strefy`) zawęża lokale bota,
 ale dotąd planujący bot (zrównoważony, premium: `min_kuchnia` 2) najpierw odrzucał lokale z 1 kuchnią, a dopiero
 potem filtrował strefę – w zygmuntowskich (jedyny gotowy w najmie ma 1 kuchnię) brał lokal w innej strefie.
@@ -715,10 +736,9 @@ akademickie i dworzec 10,0, lsm_czuby 9,8 … zemborzyce 4,9 – centrum traci n
 
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
-2. Propozycja dla autora (`dane/mapa/lokale.yaml`): niższa adaptacja albo odkup zestawu w ratach – czynsz już
-   nie wystarczy (wyżej); zgoda autora, bo to balans typów lokali.
-3. Pomiary jeszcze niezrobione na nowym kodzie: `b6_kupno2` (kupno, kupno niewyposażonego, działka – 6 stref
-   peryferyjnych), `b6_przejecia`, `b6_drugi_po2` (drugi niewyposażony, drugi na działce); polecenia jak
-   `b6_niewyp2` (6 ziaren, 3 procesy, jeden pomiar naraz – przy 8 procesach zabrakło pamięci).
+2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:
+   wybór amortyzacji sprzętu poniżej progu); czeka na decyzję autora.
+3. ~~Pomiary `b6_kupno2`, `b6_drugi_po2`~~ (zrobione 5.11); `b6_przejecia` (wykup, przejęcie, wypowiedzenie,
+   przebicie w licytacji) – w toku; 2 procesy, jeden pomiar naraz (przy 3 procesach zabrakło pamięci).
 4. Potem: tabela strefa × wariant (każda strefa najlepsza dla jakiejś strategii), kupno od połowy gry 18 rund,
    działka tylko w 26 rundach, licytacja, inwentarz (opis botów w sekcji `lokal`), odhaczenie B6 w POSTEP.

@@ -104,3 +104,27 @@ Mechanika zatwierdzona przez autora 4.11.2026. Proponowana sekcja w „Prawidła
 
 Proponowany dopisek w „Elementach mapy” (przy lokalach):
 > Nad lokalem na mapie widać jego ocenę klientów (gwiazdki) i kilka żartobliwych komentarzy z ostatniego tygodnia.
+
+## B6 – lokal niewyposażony (5.11.2026) → `notatki/Elementy mapy.md`, lokale; do decyzji autora
+
+Stan: lokal niewyposażony przegrywa z gotowym w każdym pomiarze (dziennik kalibracji, B6), choć ma czynsz ok. 40%
+niższy (0,75 wobec 1,25 stawki strefy). Trzy próby po stronie botów (kredyt na sprzęt, leasing sprzętu, rachunek
+czynszu) zmniejszyły stratę z −0,68 do −0,03…−0,06 karty, ale nie dały wygranej:
+- niewyposażony 3★ − gotowy 3★: −0,09 (126/360 par wygranych); wygrywa tylko w lsm_czuby;
+- drugi lokal niewyposażony − drugi gotowy: −0,19 (1 z 80 par wygrana, `b6_drugi_po2`).
+
+Przyczyna: cały sprzęt kupuje się naraz, a pozycje do 10 000 zł idą od razu w koszty (KPiR, `amortyzacja_prog`).
+W rundzie zakupu dochód spada o kilkanaście tysięcy (np. premium, drugi lokal: −17 tys. zł, karta −3,7 w tej
+rundzie). Oszczędność czynszu i mediów to ok. 90–550 zł na rundę, więc zwrot sprzętu i adaptacji trwa ok. 45 rund,
+a gra ma 18–26 rund. Nawet zerowy czynsz nie zwraca tego w grze, więc sama zmiana liczb nie wystarczy.
+
+Propozycje (do wyboru, każda to zmiana mechaniki):
+1. **Wybór amortyzacji sprzętu poniżej progu** – gracz przy zakupie decyduje: od razu w koszty albo amortyzacja
+   20% rocznie (jak w prawie: środek do 10 000 zł można zamortyzować). Uczy realnej decyzji podatkowej i usuwa
+   jednorazowy spadek dochodu. Bot przy lokalu niewyposażonym wybiera amortyzację.
+2. **Okres bez czynszu na urządzenie lokalu** (2–4 rundy; tak bywa w umowach najmu) – liczba w `lokale.yaml`.
+3. **Wynajmujący pokrywa adaptację** (adaptacja 0 zł przy najmie, zostaje przy kupnie).
+4. **Bez zmian** – niewyposażony zostaje opcją na długą grę i własny lepszy sprzęt (3★), a uczniowie uczą się,
+   że tańszy czynsz nie zawsze się opłaca. Wtedy opis w instrukcji powinien to mówić wprost.
+
+Rekomendacja: 1 (największy sens edukacyjny, nie zmienia cen świata); po zgodzie – pomiar jak `b6_niewyp3`.
