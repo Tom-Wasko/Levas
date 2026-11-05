@@ -669,6 +669,30 @@ debet, inwestor), więc nie obniża wskaźnika zadłużenia. Pomiar **`b6_niewyp
   zwrot ok. 45 rund przy grze 18–26 rund; nawet zerowy czynsz nie zwraca tego w grze. Dalsza zmiana czynszu nic nie
   da – zostaje adaptacja albo odkup zestawu wynajmującego w ratach (decyzja autora, balans typów lokali).
 
+**`b6_kupno2`** (kod 4d7cfb2; 6 stref peryferyjnych × 3 strategie × 18/26 rund × 6 ziaren, 864 gry, 2 procesy –
+przy 3 procesach Claude Code zatrzymał pomiar przy braku pamięci; wznowiony od 51. gry), wariant − baza:
+
+| strefa | kupno gotowego | kupno niewyposażonego | działka |
+|---|---|---|---|
+| czechow | +0,07 (32/36) | −0,05 (7/36) | −0,09 (10/36) |
+| felin | +0,04 (26/36) | −0,13 (9/36) | −0,04 (18/36; 26 rund −0,02) |
+| lsm_czuby | +0,06 (31/36) | −0,17 (1/36) | −0,14 (9/36) |
+| politechnika | +0,08 (29/36) | −0,12 (5/36) | −0,12 (11/36) |
+| zemborzyce | −0,31 (2/36) | −0,37 (10/36) | −0,67 (0/36, alarmy) |
+| zygmuntowskie | −0,28 (12/36) | −0,34 (12/36) | −0,39 (10/36) |
+| **razem** | **−0,06 (132/216)** | **−0,20 (44/216)** | **−0,24 (58/216)** |
+
+- Kupno gotowego wygrywa w 4 strefach (72–89% par); przegrywa tam, gdzie lokal do kupna jest słaby albo drogi
+  względem czynszu: w zemborzycach jedyny gotowy to budka nad Zalewem (tylko kupno, 1 kuchnia) – baza wynajmuje
+  wtedy lokal w zygmuntowskich; w zygmuntowskich ten sam lokal (35 m², 1 kuchnia) za 77 tys. zł = 35 czynszów,
+  a kredyt pod zastaw obniża wskaźnik zadłużenia karty (dług ≈ majątek → ok. 0,5–0,6).
+- Działka (110–130 m², 5 kuchni, grunt 54–82 tys. + budowa 99–117 tys. zł) to całość na kredyt (np. zemborzyce:
+  119,7 tys. pod zastaw + 41,3 tys. bez historii, rata ok. 1950 zł na rundę). Bot kupuje 1 kuchnię, popyt strefy nie
+  wypełnia budynku – gotówka spada do zera w rundzie 9 i nie wraca (alarmy). W felin i politechnice (bez działki
+  przy 6 firmach) bot bierze działkę z innej strefy. Liczby nie odbiegają od realiów w stronę drożyzny (budowa
+  900 zł/m² to dolna granica, prawdziwy pawilon kosztuje kilka razy więcej) – działka jako pierwszy lokal to
+  projekt na dłuższą grę; sprawdzam ją jako drugi lokal (`b6_drugi_po2`).
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. Propozycja dla autora (`dane/mapa/lokale.yaml`): niższa adaptacja albo odkup zestawu w ratach – czynsz już
