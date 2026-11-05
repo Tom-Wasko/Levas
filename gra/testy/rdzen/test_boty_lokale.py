@@ -7,6 +7,7 @@ import pytest
 
 from silnik import boty
 from silnik.gra import Gra
+from silnik.pieniadze import banki as bk
 
 pytestmark = pytest.mark.dane_gry
 
@@ -54,18 +55,22 @@ def test_bot_kupuje_dzialke_z_budowa_i_doplaca_kredytem_bez_historii():
     assert [(x.id, x.forma) for x in f.lokale] == [(lok["id"], "kupno")] and len(f.kredyty) == 2
 
 
-def test_bot_finansuje_sprzet_lokalu_niewyposazonego_kredytem_bez_historii():
-    """Lokal bez zestawu: cały sprzęt 3★ naraz (od tygodnia 2) to więcej, niż bot ma gotówki – resztę i rezerwę
-    (ustawienia.rezerwa_po_sprzecie) bierze kredytem bez historii, zamiast wpaść w debet ponad limit konta."""
+def test_bot_finansuje_sprzet_lokalu_niewyposazonego_leasingiem():
+    """Lokal bez zestawu: cały sprzęt 3★ naraz (od tygodnia 2) to więcej, niż bot ma gotówki – najdroższe pozycje
+    bierze w leasing (nie liczy się do wskaźnika zadłużenia karty), aż po zakupach i opłatach wstępnych zostanie
+    rezerwa (ustawienia.rezerwa_po_sprzecie); bez tego wpadał w debet ponad limit konta."""
     g, (d1, d2) = _gra({"lokal": {"typy": ["niewyposazony"]}, "jakosc": 3}, rund=2)
     assert _lokal(g, d1["lokal"]["id"])["typ"] == "niewyposazony" and not d1.get("kredyty_wez")
     przed = g.stan(1).firmy["A"].gotowka
-    koszt = sum(g.dane.sprzet[x["nazwa"]]["ceny"][str(x["jakosc"])] for x in d2["sprzet_kup"])
-    assert koszt > przed
-    (k,) = d2["kredyty_wez"]
-    assert "zastaw" not in k and przed + k["kwota"] - koszt >= g.dane.boty["ustawienia"]["rezerwa_po_sprzecie"]
+    cena = lambda x: g.dane.sprzet[x["nazwa"]]["ceny"][str(x["jakosc"])]   # noqa: E731
+    lea, kup = d2["leasing_wez"], d2["sprzet_kup"]
+    assert lea and sum(map(cena, lea + kup)) > przed and not d2.get("kredyty_wez")
+    assert min(map(cena, lea)) >= max(map(cena, kup), default=0)   # w leasing najdroższe
+    wplata = bk.banki(g.dane)[lea[0]["bank"]]["leasing"]["wplata"]
+    zostaje = przed - sum(map(cena, kup)) - wplata * sum(map(cena, lea))
+    assert zostaje >= g.dane.boty["ustawienia"]["rezerwa_po_sprzecie"]
     f = g.stan(2).firmy["A"]
-    assert len(f.kredyty) == 1 and f.gotowka > 0
+    assert len(f.leasingi) == len(lea) and not f.kredyty and f.gotowka > 0
 
 
 def test_bot_bez_srodkow_na_kupno_bierze_gotowy_lokal_w_najmie():

@@ -648,12 +648,31 @@ badana firma w strefie z listy; Δ – wariant − baza na tych samych grach (pa
   zł, pozycje < 10 tys. od razu w koszty) wobec oszczędności czynszu i mediów ok. 90–220 zł na rundę.
   Kompromis z inwentarza (niewyposażony wygrywa przy własnym lepszym sprzęcie) nie działa.
 
-**Następne kroki (sesja przerwana 4.11 ok. 22:20 – wyłączenie komputera):**
-1. Bot: zamiast kredytu bez historii na sprzęt – leasing albo zakup sprzętu w ratach rund (porównać na tych samych
-   ziarnach z 8655353 i z kodem sprzed niego); ewentualnie cofnąć 8655353, jeśli nic nie wypada lepiej.
-2. Propozycja liczb dla autora (`dane/mapa/lokale.yaml`, po sprawdzeniu realizmu): wyraźnie niższy czynsz
-   niewyposażonego (oszczędność rzędu kosztu sprzętu w 10–15 rundach) albo niższa adaptacja – zgoda autora,
-   bo to balans typów lokali.
+**Sprzęt lokalu niewyposażonego w leasingu (5.11):** zamiast kredytu bez historii bot bierze w leasing najdroższe
+pozycje (bank z najtańszym leasingiem, 26 rund), aż po zakupach i opłatach wstępnych zostanie `rezerwa_po_sprzecie`;
+kredyt bez historii tylko na resztę braku. Leasing nie wchodzi do zadłużenia karty (`finanse.zadluzenie`: kredyty,
+debet, inwestor), więc nie obniża wskaźnika zadłużenia. Pomiar **`b6_niewyp3`** – ten sam układ i ziarna co
+`b6_niewyp2` (baza praktycznie bez zmian: średnio −0,0005, różnice tylko przez rywali):
+
+| wariant − baza | `b6_niewyp2` (kredyt) | `b6_niewyp3` (leasing) |
+|---|---|---|
+| niewyposażony w najmie | −0,12 (100/360) | −0,06 (139/360) |
+| niewyposażony, sprzęt w leasingu (strategia) | −0,06 | −0,06 |
+| gotowy, jakość 3★ | +0,06 | +0,06 |
+| niewyposażony 3★ | −0,15 (99/360) | −0,03 (176/360) |
+| **niewyposażony 3★ − gotowy 3★** | **−0,20 (59/360)** | **−0,09 (126/360)** |
+
+- Strefy (niewyposażony 3★ − gotowy 3★): lsm_czuby +0,19 (21/36), zemborzyce +0,02 (25/36); czechow, stare_miasto
+  −0,03, centrum −0,06; politechnika, felin, dworzec −0,12, akademickie −0,24, zygmuntowskie −0,37.
+- Rachunek lokali (`dane/mapa/lokale.yaml`): niewyposażony ma już czynsz ok. 40% niższy od gotowego (0,75 vs 1,25
+  stawki strefy), np. centrum 50 m²: ok. 550 zł oszczędności na rundę wobec adaptacji i sprzętu 1★ ok. 25 tys. zł –
+  zwrot ok. 45 rund przy grze 18–26 rund; nawet zerowy czynsz nie zwraca tego w grze. Dalsza zmiana czynszu nic nie
+  da – zostaje adaptacja albo odkup zestawu wynajmującego w ratach (decyzja autora, balans typów lokali).
+
+**Następne kroki:**
+1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
+2. Propozycja dla autora (`dane/mapa/lokale.yaml`): niższa adaptacja albo odkup zestawu w ratach – czynsz już
+   nie wystarczy (wyżej); zgoda autora, bo to balans typów lokali.
 3. Pomiary jeszcze niezrobione na nowym kodzie: `b6_kupno2` (kupno, kupno niewyposażonego, działka – 6 stref
    peryferyjnych), `b6_przejecia`, `b6_drugi_po2` (drugi niewyposażony, drugi na działce); polecenia jak
    `b6_niewyp2` (6 ziaren, 3 procesy, jeden pomiar naraz – przy 8 procesach zabrakło pamięci).

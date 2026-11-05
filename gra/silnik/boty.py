@@ -704,11 +704,19 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         d["leasing_wez"] = [{**x, "bank": bank, "rund": ls["rund"]} for x in d["sprzet_kup"]]
         d["sprzet_kup"] = []
     if plan is not None and d.get("sprzet_kup") and "inwestycje_sprzet" in odbl:
-        # B6: sprzęt ponad gotówkę (lokal bez zestawu – cały komplet naraz) na kredyt bez historii, gdy po zakupach
-        # zostałoby mniej niż rezerwa_po_sprzecie – wcześniej bot wpadał w debet ponad limit i bank blokował mu
-        # inwestycje na kilka rund
-        koszt = sum(dane.sprzet[x["nazwa"]]["ceny"][str(x["jakosc"])] for x in d["sprzet_kup"])
-        brak = koszt + ust.get("rezerwa_po_sprzecie", 0.0) - f.gotowka   # f – z lokalem i kredytami na niego (_wez_lokal)
+        # B6: sprzęt ponad gotówkę (lokal bez zestawu – cały komplet naraz), gdy po zakupach zostałoby mniej niż
+        # rezerwa_po_sprzecie – wcześniej bot wpadał w debet ponad limit i bank blokował mu inwestycje na kilka rund.
+        # Najpierw leasing (najdroższe pozycje, bank z najtańszym leasingiem, najkrótszy okres) – nie liczy się do
+        # wskaźnika zadłużenia karty; resztę braku kredytem bez historii
+        cena = {id(x): dane.sprzet[x["nazwa"]]["ceny"][str(x["jakosc"])] for x in d["sprzet_kup"]}
+        brak = sum(cena.values()) + ust.get("rezerwa_po_sprzecie", 0.0) - f.gotowka   # f – z lokalem (_wez_lokal)
+        bank = bk.banki(dane).get(bk.najlepsze(dane)["leasing"])
+        for x in sorted(d["sprzet_kup"], key=lambda x: -cena[id(x)]) if bank and brak > 0 else []:
+            d.setdefault("leasing_wez", []).append({**x, "bank": bank["nazwa"], "rund": min(bank["leasing"]["rund"])})
+            d["sprzet_kup"].remove(x)
+            brak -= cena[id(x)] * (1 - bank["leasing"]["wplata"])
+            if brak <= 0:
+                break
         if brak > 0 and (k := _kredyt_bez_historii(dane, f, brak, runda, d.get("kredyty_wez", []))):
             d.setdefault("kredyty_wez", []).append(k)
     if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
