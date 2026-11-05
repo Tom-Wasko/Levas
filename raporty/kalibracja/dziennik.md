@@ -779,6 +779,25 @@ netto/tydz.): centrum i stare_miasto 1,6, dworzec 1,2, osiedla i peryferie 0,7�
 reszta 1) wyrównuje zysk, ale obniża całą gospodarkę (centrum 2,9) – psułoby cele B5. Pełny pomiar `b6_strefy2`
 po `b6_wykup`.
 
+**Pomiar `b6_wykup`** (5.11; strefy peryferyjne z lokalami na kupno: czechów, felin, lsm_czuby, politechnika,
+zygmuntowskie; 3 strategie × 18/26 rund × 6 ziaren, warianty `lokale:kupno`, `lokale:wykup`,
+`lokale:przejecie_wypowiedz`, rezerwa bota 30 tys.). Wykup i przejęcie z wypowiedzeniem = baza: bot nigdy nie ma
+ceny budynku + rezerwy w gotówce (mediana gotówki na koniec 42–100 tys., cena 110–200 tys.) – opcja jest w grze
+dla graczy, ale nie dla bota. **Kupno dominuje najem**: +0,06 ± 0,01 karty, 86% wygranych par (premium 18r
++0,14 / 29 z 30, tani +0,06–0,07, zrównoważony −0,01…+0,01 – szum). Kompromis z inwentarza („kupno opłaca się
+od połowy gry 18 rund”) nie działa – kupno wygrywa od początku.
+
+Diagnoza: (1) **sprzęt liczony dwa razy** – przy kupnie gotowego lokalu (i wykupie, i przejęciu ze sprzętem
+wynajmującego) lokal szedł do ewidencji za pełną cenę, a wartość sprzętu zestawu (11,5 tys. przy zestawie
+podstawowym, 10–19% ceny) dodatkowo do majątku firmy – bez wydatku i bez kosztu; zawyżało to rozwój firmy.
+Poprawione (1e69d61): cena dzieli się na lokal (cena − sprzęt) i sprzęt (od progu amortyzacji środek trwały,
+poniżej – koszt w KPiR od razu, bez wydatku); zastaw kupowanego lokalu liczony tak samo jak ewidencja.
+(2) Kupno jest tanie w utrzymaniu: odsetki (7,9%) + amortyzacja lokalu (2,5% rocznie) ≈ 150 zł/tydz. przy
+czynszu ≈ 650 zł/tydz. (cena ≈ 35–40 czynszów miesięcznych). Po poprawce (1) – ponowny pomiar `b6_kupno3`
+(peryferie, `lokale:kupno`); jeśli kupno dalej wygrywa od początku 18 rund, kolejny krok to cena lokalu
+(liczba czynszów w cenie, F3a.3) albo koszty posiadania (podatek od nieruchomości – nowa pozycja, do zgody
+autora).
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:
