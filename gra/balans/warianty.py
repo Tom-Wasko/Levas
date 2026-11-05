@@ -480,7 +480,7 @@ def main(argv: list[str]) -> int:
     pa.add_argument("--strategie")
     pa.add_argument("--firm", default="6")
     pa.add_argument("--rund", default="18")
-    pa.add_argument("--poziom", default="sredni")
+    pa.add_argument("--poziom", default="sredni", help="poziomy badanej firmy, po przecinku")
     pa.add_argument("--rywale", default="", help="poziom rywali (bez – jak --poziom)")
     pa.add_argument("--strefy", help="strefy lokalu badanej firmy, po przecinku (bez – strategia)")
     pa.add_argument("--kapital", type=int, default=0)
@@ -502,8 +502,8 @@ def main(argv: list[str]) -> int:
     szybki = a.polecenie == "szybki"
     strategie = lista(a.strategie) or (SZYBKI["strategie"] if szybki
                                         else list(dane.boty["strategie"]))
-    konteksty = [Kontekst(s, r, f, a.poziom, st, a.kapital, a.rywale, zm) for s in strategie
-                 for r in lista(a.rund, int) for f in lista(a.firm, int)
+    konteksty = [Kontekst(s, r, f, p, st, a.kapital, a.rywale, zm) for s in strategie
+                 for p in lista(a.poziom) for r in lista(a.rund, int) for f in lista(a.firm, int)
                  for st in lista(a.strefy) or [""] for zm in a.dane.split("|")]
     for zm in {k.dane for k in konteksty}:
         dane_ze_zmianami(zm)   # błąd w ścieżce – od razu, nie w procesie pomiaru
