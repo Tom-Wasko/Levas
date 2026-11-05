@@ -714,6 +714,24 @@ przy 3 procesach Claude Code zatrzymał pomiar przy braku pamięci; wznowiony od
   stroję ich w dół. Działka zostaje opcją niszową: jako pierwszy lokal w 26 rundach jest w szumie od najmu
   (`b6_kupno2`: felin −0,02, czechow −0,09), jako drugi przegrywa przez strefę i późny start.
 
+**`b6_przejecia`** (kod 655712d; 3 strategie × 18/26 rund × 6 firm × 6 ziaren, strefa wg strategii), wariant − baza:
+
+| wariant | 18 rund | 26 rund | razem |
+|---|---|---|---|
+| wykup własnego lokalu | 0 | 0 | 0 (nigdy się nie zdarzył) |
+| kupno budynku rywala | +0,01 | +0,04 | +0,03 (13/36; tani – nigdy) |
+| kupno budynku rywala z wypowiedzeniem | +0,01 | +0,05 | +0,03 (13/36; zrównoważony 26 r. +0,11, 5/6) |
+| przebicie w licytacji (oferta × 1,2) | −0,04 | −0,04 | −0,04 (2/36) |
+
+- Wykup: lokale w centrum, na Starym Mieście, przy dworcu i akademikach są tylko w najmie (bez ceny), więc bot,
+  który tam stoi, nie ma czego wykupić. Kupić da się 14 lokali w strefach peryferyjnych (cena ok. 35 czynszów
+  gotowego, 40 niewyposażonego) – wykup sprawdzam osobno w tych strefach (`b6_wykup`).
+- Przejęcie budynku rywala: mały zysk w długiej grze (czynsz od najemcy), z wypowiedzeniem trochę więcej –
+  zgodnie z kompromisem z inwentarza („opłaca się w dłuższej grze, nie zawsze”); nie dominuje.
+- Przebicie: boty rzadko biją się o ten sam lokal, więc wyższa oferta to zwykle wyższy czynsz bez zysku. To
+  zamierzony kompromis (przepłacenie kontra utrata lokalu) – przebicie ma sens tylko w sporze, którego w tym
+  pomiarze prawie nie ma. Bez zmian.
+
 **Pomiar strefy – gdzie naprawdę stoi badana firma** (5.11): kontekst strefy (`--strefy`) zawęża lokale bota,
 ale dotąd planujący bot (zrównoważony, premium: `min_kuchnia` 2) najpierw odrzucał lokale z 1 kuchnią, a dopiero
 potem filtrował strefę – w zygmuntowskich (jedyny gotowy w najmie ma 1 kuchnię) brał lokal w innej strefie.
@@ -738,7 +756,8 @@ akademickie i dworzec 10,0, lsm_czuby 9,8 … zemborzyce 4,9 – centrum traci n
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:
    wybór amortyzacji sprzętu poniżej progu); czeka na decyzję autora.
-3. ~~Pomiary `b6_kupno2`, `b6_drugi_po2`~~ (zrobione 5.11); `b6_przejecia` (wykup, przejęcie, wypowiedzenie,
-   przebicie w licytacji) – w toku; 2 procesy, jeden pomiar naraz (przy 3 procesach zabrakło pamięci).
+3. ~~Pomiary `b6_kupno2`, `b6_drugi_po2`, `b6_przejecia`~~ (zrobione 5.11); w toku `b6_strefy` (tabela stref,
+   konteksty: dane domyślne i `mapa.popyt.model.zasieg=2`), potem `b6_wykup` (strefy z lokalami na kupno);
+   2 procesy, jeden pomiar naraz (przy 3 procesach zabrakło pamięci).
 4. Potem: tabela strefa × wariant (każda strefa najlepsza dla jakiejś strategii), kupno od połowy gry 18 rund,
    działka tylko w 26 rundach, licytacja, inwentarz (opis botów w sekcji `lokal`), odhaczenie B6 w POSTEP.
