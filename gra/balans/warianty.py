@@ -79,7 +79,8 @@ class Kontekst:
 def dane_ze_zmianami(zmiany: str = "") -> Dane:
     """Dane domyślne ze zmianami `ścieżka=wartość` po „;”, np. `mapa.popyt.model.zasieg=2`
     (B6: liczby dla wszystkich firm w grze – porównanie kontekstów, nie par wariantów).
-    Ścieżka: atrybut danych, potem klucze słowników, `*` – każdy klucz; wartość w składni YAML."""
+    Ścieżka: atrybut danych, potem klucze słowników, `*` – każdy klucz; wartość w składni YAML;
+    `ścieżka*=x` mnoży liczbę, np. `lokale.*.cena*=1.5`."""
     d = dane_domyslne()
     return _ze_zmianami(d, zmiany) if zmiany else d
 
@@ -89,26 +90,19 @@ def _ze_zmianami(dane: Dane, zmiany: str) -> Dane:   # klucz z danymi – testy 
     d = copy.deepcopy(dane)
     for z in zmiany.split(";"):
         sciezka, _, wartosc = z.partition("=")
-        atrybut, *klucze = sciezka.strip().split(".")
+        razy = sciezka.endswith("*")
+        atrybut, *klucze = sciezka.strip().rstrip("*").split(".")
         cele = [getattr(d, atrybut)]
         for k in klucze[:-1]:
             cele = [c[x] for c in cele for x in (c if k == "*" else [k])]
         for c in cele:
-            if klucze[-1] not in c:
+            if klucze[-1] not in c and not razy:
                 raise KeyError(f"{sciezka}: nie ma klucza {klucze[-1]}")
-            c[klucze[-1]] = yaml.safe_load(wartosc)
-    return d
-    d = copy.deepcopy(d)
-    for z in zmiany.split(";"):
-        sciezka, _, wartosc = z.partition("=")
-        atrybut, *klucze = sciezka.strip().split(".")
-        cele = [getattr(d, atrybut)]
-        for k in klucze[:-1]:
-            cele = [c[x] for c in cele for x in (c if k == "*" else [k])]
-        for c in cele:
-            if klucze[-1] not in c:
-                raise KeyError(f"{sciezka}: nie ma klucza {klucze[-1]}")
-            c[klucze[-1]] = yaml.safe_load(wartosc)
+            if razy:   # `ścieżka*=x` – mnożnik (puste wartości zostają)
+                if c.get(klucze[-1]) is not None:
+                    c[klucze[-1]] = round(c[klucze[-1]] * float(wartosc), 2)
+            else:
+                c[klucze[-1]] = yaml.safe_load(wartosc)
     return d
 
 

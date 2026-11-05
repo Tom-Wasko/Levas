@@ -117,6 +117,10 @@ def test_kontekst_ze_zmianami_danych_gry():
     assert {s["pula"] for s in d.mapa["popyt"]["strefy"].values()} == {0.5}
     with pytest.raises(KeyError):
         wr.dane_ze_zmianami("mapa.popyt.model.nie_ma=1")
+    m = wr.dane_ze_zmianami("lokale.*.cena*=1.5")   # mnożnik; lokale tylko do najmu (bez ceny) zostają
+    assert m.lokale["politechnika_1"]["cena"] == pytest.approx(1.5 * D.lokale["politechnika_1"]["cena"])
+    assert {k for k, x in m.lokale.items() if x.get("cena") is None} == {
+        k for k, x in D.lokale.items() if x.get("cena") is None}
     k = wr.Kontekst(rund=3, firm=2, dane="mapa.popyt.strefy.*.pula=0.05")
     assert k.klucz().endswith("/mapa.popyt.strefy.*.pula=0.05")
     zwykla = wr.rozegraj(wr.Zadanie(wr.Kontekst(rund=3, firm=2), 1))
