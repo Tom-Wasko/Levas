@@ -128,3 +128,16 @@ Propozycje (do wyboru, każda to zmiana mechaniki):
    że tańszy czynsz nie zawsze się opłaca. Wtedy opis w instrukcji powinien to mówić wprost.
 
 Rekomendacja: 1 (największy sens edukacyjny, nie zmienia cen świata); po zgodzie – pomiar jak `b6_niewyp3`.
+
+## B6 – wykup najmowanego lokalu na kredyt (5.11.2026) → `notatki/Ustalenia gry.md`, kredyty; do decyzji autora
+
+Pomiar `b6_wykup`: bot nie wykupuje lokalu ani nie przejmuje budynku rywala, bo nigdy nie ma ceny budynku (110–200 tys.
+zł) plus rezerwy w gotówce. Kredyt pod zastaw działa dziś tylko przy kupnie lokalu z Inwestycje ▸ Lokale; budynek
+kupowany z najemcą może być zastawem dopiero od następnej rundy (wykupiony lokal), a kupiony z cudzym najemcą – wcale.
+Uczeń, który chce wykupić swój lokal, musi więc najpierw mieć całą kwotę.
+
+Propozycja (rozszerzenie istniejącej zasady): **budynek kupowany z najemcą może być zastawem kredytu inwestycyjnego
+w tej samej rundzie**, jak kupowany lokal (limit: część wartości, `zastaw` produktu). Przy cudzym najemcy zastawem
+jest budynek, którego firma jest właścicielem (dochód z czynszu spłaca raty – dobra lekcja o inwestycji w
+nieruchomość na wynajem). Po zgodzie: bank (`nowy_lokal` także dla decyzji `przejecie`), bot (wykup na kredyt, jak
+kupno), pomiar jak `b6_wykup`.
