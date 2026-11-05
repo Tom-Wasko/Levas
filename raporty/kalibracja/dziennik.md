@@ -779,6 +779,19 @@ netto/tydz.): centrum i stare_miasto 1,6, dworzec 1,2, osiedla i peryferie 0,7�
 reszta 1) wyrównuje zysk, ale obniża całą gospodarkę (centrum 2,9) – psułoby cele B5. Pełny pomiar `b6_strefy2`
 po `b6_wykup`.
 
+**Pomiar `b6_strefy2`** (5.11; konteksty K1: centrum i stare_miasto 1,6, dworzec 1,2, reszta 0,7–0,8; K2: 2,0 /
+1,4 / 0,6–0,7 – konkurencja jako mnożnik opcji zewnętrznej klientów strefy). Centrum dalej najlepsze w 6 z 6 grup
+przy obu (zrównoważony 26r: centrum 0,89 → 0,83 / 0,77, felin 0,24 → 0,27 / 0,28). Przyczyna: lokal w centrum łapie
+klientów sąsiednich stref, a mniejsza konkurencja na osiedlach obniżała opcję zewnętrzną także dla niego.
+**Zmiana wzoru** (190cb3c): `konkurencja` dzieli atrakcyjność lokali gry stojących w strefie (`popyt.py:
+_skladniki`) – lokal ginie wśród lokali miasta spoza gry, dla klientów wszystkich stref. Szybka próba (2 ziarna,
+rundy 4–8, dochód netto/tydz., zrównoważony): K1 w nowym wzorze za mocne (peryferie przed centrum); K3 (centrum
+1,25, stare_miasto 1,2, dworzec 1,1, akademickie 1, politechnika i zygmuntowskie 0,85, lsm_czuby i czechów 0,9,
+felin 0,8, zemborzyce 0,85): centrum 5,5 → 4,4 tys., stare_miasto 5,4 → 4,2, politechnika 2,4 → 3,4, lsm_czuby
+2,6 → 3,2, felin 2,1 → 2,5; średnia stref 3,87 → 3,67 tys. (−5%). Pełny pomiar `b6_strefy3` (K3 i mocniejsze K4:
+1,4 / 1,35 / 1,15 / 1 / 0,8 / 0,85 / 0,75) – w toku; potem wybór wartości do `popyt.yaml`, szybki pomiar celów
+B5 i `b6_kupno3` (peryferie, kontekst cen `lokale.*.cena*=1;1,5;2`).
+
 **Pomiar `b6_wykup`** (5.11; strefy peryferyjne z lokalami na kupno: czechów, felin, lsm_czuby, politechnika,
 zygmuntowskie; 3 strategie × 18/26 rund × 6 ziaren, warianty `lokale:kupno`, `lokale:wykup`,
 `lokale:przejecie_wypowiedz`, rezerwa bota 30 tys.). Wykup i przejęcie z wypowiedzeniem = baza: bot nigdy nie ma
