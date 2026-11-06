@@ -448,6 +448,9 @@ class Strategia(Schemat):
     min_kuchnia: int = Field(0, ge=0)   # gra z lokalami, bot planujący: najmniej miejsc w kuchni wybieranego lokalu
     cena: float | None  # ułamek ceny preferowanej; None = średnia rynku z poprzedniej rundy
     jakosc: int = Field(ge=1, le=3)
+    jakosc_zasobow: int | None = Field(None, ge=1, le=3)   # B8: gwiazdki składników (bez – jak jakosc)
+    zapas_zasobow: float | None = Field(None, ge=1)   # B8: zapas w zamówieniach (bez – ustawienia botów)
+    dostawcy: list[str] | None = None   # B8: dostawcy, u których bot zamawia (bez – wszyscy poza hipermarketem)
     uslugi: int = Field(gt=0)
     pokrycie: float = Field(gt=0)
     wyposazenie: int = Field(ge=0)

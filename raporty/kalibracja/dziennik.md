@@ -1016,3 +1016,25 @@ mnożnik 3★; premium ma też tylko 5 dań – zob. `notatki_do_zmiany.md`, „
 `zalozenia.yaml: popyt.wspolczynniki_jakosci` (1★ 0,616 → 0,55, 3★ 1,0 → 0,82, 2★ bez zmian – pule B5) i
 `boty.yaml: tani.min_kuchnia` 1 → 2. Testy bez zmian (380 zielonych – żaden nie liczył na krzywej jakości).
 Sprawdzenie trudności B5 po zmianie – pomiar `b7_trudnosc`.
+
+**Próba `b7_promocje2`** (6.11; mocniejsze przyciąganie – happy hours 0,6 → 0,4, karta do 0,3, studencka 0,55,
+2 za 1 0,8 → 0,2; gry na starej krzywej jakości – pule procesów wczytały dane przed jej wdrożeniem, więc wynik
+porównywalny z `b7_promocje`). Karta wariant − baza, 18r, 6 ziaren:
+
+| wariant | zrównoważony (przed → po) | premium (przed → po) |
+|---|---|---|
+| bez promocji | −0,01 → −0,01 | +0,13 → +0,14 |
+| 2 za 1 | −0,09 → −0,11 | −0,27 → −0,25 |
+| happy hours | −0,07 → −0,08 | −0,01 → −0,01 |
+| karta stałego klienta | −0,07 → −0,08 | baza |
+| studencka | −0,02 → −0,03 | +0,13 → +0,14 |
+
+Mocniejsze przyciąganie nic nie daje, a u zrównoważonego nawet szkodzi. Rozbicie jednej gry (`para.py`,
+zrównoważony, ziarno 1000, 18r): z happy hours przychód spada o 12,8 tys. zł, towary o 2 tys. zł, ludzie bez
+zmian (3 osoby), a utracona sprzedaż rośnie z 2,4 do 3,0 tys. sztuk. Karta stałego klienta: przychód −11,6 tys.
+zł, sprzedaż bez zmian. Dodatkowi klienci promocji trafiają do kolejki, bo kuchnia bota jest pełna, a rabat
+dostają wszyscy objęci, także ci, którzy przyszliby i tak. Do tego bot ustala cenę blisko optimum (`b7_jakosc2`
+– wszystkie odchylenia ceny tracą), więc obniżka ceny przez promocję z zasady nie może wygrać. W modelu promocja
+nie ma trwałego skutku (nowi klienci nie wracają po jej końcu) – bez tego różni się od obniżki ceny tylko maską
+dni i stref. Liczby promocji bez zmian; propozycja dla autora w `notatki_do_zmiany.md` („B7 – promocje bez
+trwałego skutku”), sprawdzenie w B10 (marketing) razem z reklamą.

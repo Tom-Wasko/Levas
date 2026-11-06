@@ -211,3 +211,23 @@ Propozycje (do wyboru):
    jakości i menu też przesuną pierwszy plus.
 2. **Start 0,25** (25% popytu w 1. tygodniu sprzedaży, +10 p.p. co tydzień): jedyna próba, która trafia w cel
    (61/100); koszt – karta średniego −0,08 i 1 alarm słabego na 100 gier.
+
+## B7 – promocje bez trwałego skutku (6.11.2026) → `notatki/Ustalenia gry.md` (promocje); do decyzji autora
+
+Pomiary `b7_promocje` i `b7_promocje2` (126 + 126 gier, 18 rund): żadna promocja z rabatem nie wygrywa z brakiem
+promocji. Premium bez karty stałego klienta zyskuje +0,13 karty (6/6), a „2 za 1” zawsze traci 0,1–0,27. Nawet
+dwa razy mocniejsze przyciąganie nic nie zmienia. Przyczyny:
+- rabat dostają wszyscy objęci, także stali klienci, a przyciąganie działa tylko w czasie promocji – to zwykła
+  obniżka ceny z maską dni i stref, a cena botów jest już blisko optimum;
+- dodatkowi klienci trafiają do kolejki, gdy kuchnia jest pełna.
+
+Lekcja „promocja kosztuje, a zarabia tylko w dobrych warunkach” jest realistyczna, ale dziś promocja nie zarabia
+nigdy. Możliwości:
+1. **Trwały skutek promocji (zalecane):** klienci przyciągnięci promocją zostają częściowo stałymi klientami –
+   np. po jej końcu atrakcyjność lokalu spada stopniowo (pamięć: 30–50% przyciągnięcia, zanika o 20% na tydzień).
+   Promocja opłaca się przy wolnej kuchni na starcie lokalu albo w słabym tygodniu, a nie przy pełnej kuchni.
+   Nowa mechanika – wymaga zgody.
+2. **Promocja tylko dla nowych klientów:** rabat dostaje tylko przyrost klientów ponad zwykły popyt. Prostsze,
+   ale mniej realistyczne (kasa nie wie, kto jest nowy) – nie polecam.
+3. **Bez zmian:** promocje to pułapka dla gracza, a instrukcja mówi to wprost. Najmniej pracy, ale decyzja,
+   która zawsze przegrywa, uczy mało.

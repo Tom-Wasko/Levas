@@ -1,0 +1,44 @@
+"""B8: boty potrafią wybrać każdą opcję zaopatrzenia – gwiazdki składników niezależnie od sprzętu
+(`jakosc_zasobow`), zapas w zamówieniach (`zapas_zasobow`) i dostawców (`dostawcy`); pomiar w balans/warianty.py."""
+import copy
+
+import pytest
+
+from silnik import boty
+from silnik.gra import Gra
+
+pytestmark = pytest.mark.dane_gry
+
+
+def _zamowienia(strategia: dict, rund: int = 3) -> list[dict]:
+    """Zamówienia firmy A (zrównoważony z nadpisaną strategią) w rundzie `rund` tej samej gry."""
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5)
+    for _ in range(rund - 1):
+        g.przelicz(wymus=True)
+    dane = copy.copy(g.dane)
+    st = dane.boty["strategie"]
+    dane.boty = {**dane.boty, "strategie": {**st, "zrownowazony": {**st["zrownowazony"], **strategia}}}
+    return boty.decyzje_bota(dane, g.stan(rund - 1), "A", "zrownowazony", rund, g.konfiguracja)["zamowienia"]
+
+
+def _ilosc(zamowienia: list[dict]) -> float:
+    return sum(z["ilosc"] for z in zamowienia)
+
+
+def test_bot_zamawia_skladniki_w_gwiazdkach_z_jakosc_zasobow():
+    baza = _zamowienia({})
+    assert baza and {z["jakosc"] for z in baza} == {2}   # bez ustawienia – jak jakość strategii
+    wyzsze = _zamowienia({"jakosc_zasobow": 3})
+    assert wyzsze and all(z["jakosc"] >= 2 for z in wyzsze) and any(z["jakosc"] == 3 for z in wyzsze)
+    assert {z["jakosc"] for z in _zamowienia({"jakosc_zasobow": 1})} == {1}
+
+
+def test_bot_zamawia_tylko_u_wybranych_dostawcow():
+    baza = _zamowienia({})
+    assert len({z["dostawca"] for z in baza}) > 1
+    makro = _zamowienia({"dostawcy": ["Makro"]})
+    assert makro and {z["dostawca"] for z in makro} == {"Makro"}
+
+
+def test_wiekszy_zapas_to_wieksze_zamowienie():
+    assert _ilosc(_zamowienia({"zapas_zasobow": 1.3})) > _ilosc(_zamowienia({"zapas_zasobow": 1.0}))

@@ -152,6 +152,20 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant(f"promocja:{t}", f"tylko promocja {t}",
                   strategia=(("promocje", [{"typ": t, "nazwa": f"Promocja {t}"}]),))
           for t in dane.mapa["promocje"]["typy"]]
+    # B8: zaopatrzenie – gwiazdki składników (sprzęt i ludzie wg strategii), zapas, dostawcy
+    w += [Wariant(f"skladniki:{q}", f"składniki {q}★ (sprzęt i ludzie wg strategii)",
+                  strategia=(("jakosc_zasobow", q),)) for q in (1, 2, 3)]
+    w += [Wariant(f"zapas:{z}", f"zapas zamówień ×{z}", strategia=(("zapas_zasobow", z),))
+          for z in (1.0, 1.15, 1.3)]
+    rodzaj = {k: v.get("rodzaj") for k, v in dane.dostawcy_info.items()}
+    hurt = [k for k, r in rodzaj.items() if r in ("hurtownia", "piekarnia")]
+    w += [Wariant("dostawcy:bez_producenta", "hurtownie i piekarnia, bez producenta mięsa",
+                  strategia=(("dostawcy", hurt),)),
+          Wariant("dostawcy:bez_piekarni", "bez piekarni",
+                  strategia=(("dostawcy", [k for k, r in rodzaj.items() if r != "piekarnia"]),))]
+    w += [Wariant(f"dostawcy:tylko_{k}", f"wszystko z jednej hurtowni {k}",
+                  strategia=(("dostawcy", [k]),))
+          for k, r in rodzaj.items() if r == "hurtownia"]
     drugi = dane.boty["poziomy"]["trudny"]["kolejny_lokal"]
     w += [Wariant("lokale:drugi", "drugi lokal jak bot trudny",
                   poziom=(("kolejny_lokal", drugi),)),
