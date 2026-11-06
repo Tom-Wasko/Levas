@@ -945,3 +945,51 @@ Diagnoza (pary rozpisane skryptami w scratchpadzie, ziarno 1000):
    nie odtworzą bez sztucznych kosztów, potrzebna mechanika (zastępowalność dań albo koszt stały dania) –
    propozycja dla autora w `notatki_do_zmiany.md`. Ranking dań bota (`silnik/boty.py: _ranking_uslug`, przychód na
    godzinę kucharza) daje premium frytki, napój i dodatek zamiast talerza i boxa.
+
+**Próba `b7_jakosc`** (6.11; konteksty dla wszystkich firm: krzywa A – mnożniki jakości 1★/2★/3★ 0,616 / 0,75 /
+0,95, krzywa C – 0,6 / 0,72 / 0,9, oraz tani z `boty.strategie.tani.min_kuchnia: 2`; 18 rund, 6 ziaren, 378 gier).
+Karta wariant − baza, wygrane pary z 6:
+
+| kontekst | zrównoważony 1★ / 3★ | premium 1★ / 2★ | tani 2★ / 3★ | tani cena 1,0 / 1,15 / 1,3 |
+|---|---|---|---|---|
+| dziś (`b7_cena`, 18r) | −0,00 / **+0,23 (6/6)** | −0,18 / −0,19 | −0,03 / −0,04 | +0,12 / +0,16 / +0,11 |
+| A 0,616 / 0,75 / 0,95 | −0,17 (0/6) / +0,05 ± 0,04 (4/6) | −0,18 / −0,05 (3/6) | +0,03 / −0,03 | +0,11 / +0,17 / +0,10 |
+| C 0,6 / 0,72 / 0,9 | −0,15 (0/6) / +0,01 ± 0,02 (4/6) | −0,16 / −0,05 (2/6) | +0,02 / −0,04 | +0,10 / +0,16 / +0,09 |
+| tani `min_kuchnia: 2` | (bez zmian krzywej) | | −0,05 / −0,07 | **−0,06 / −0,09 / −0,15** |
+
+Obie krzywe usuwają dominację 3★: zrównoważony ma 2★ i 3★ prawie równe, 1★ wyraźnie gorsze, premium dalej
+woli 3★ (−0,05 przy 2★), tani – 1★ albo 2★. Karta bazowa zrównoważonego rośnie jednak 0,57 → 0,67–0,70, bo
+2★ dostaje +10–15% popytu (wszystkie firmy z 2★). Pule stref B5 kalibrowano na lokalu 2★, więc do wdrożenia
+wybieram krzywą o tych samych proporcjach co C, ale z 2★ bez zmian: **1★ 0,55, 2★ 0,654, 3★ 0,82** (2★/1★ = 1,19,
+3★/2★ = 1,25; dziś 1,06 i 1,53).
+
+Tani z dwoma miejscami w kuchni ma kartę bazową 0,54 zamiast 0,29 (majątek 117 vs 84 tys.), a podwyżka ceny
+przestaje się opłacać (1,3: −0,15, 0/6). Z jednym miejscem tani bot nie da się prowadzić jako „tani”, bo kolejka
+zjada mu połowę popytu. `min_kuchnia: 2` u taniego (dane botów, nie zasady gry) – razem z krzywą w `b7_jakosc2`.
+
+**Pomiar `b7_promocje`** (6.11; `promocje:brak` i `promocja:<typ>` – jedna promocja przez całą grę od rundy 2,
+18 rund, 6 ziaren, 126 gier). Karta wariant − baza (baza strategii: zrównoważony – zestaw, tani – happy hours i
+studencka, premium – karta stałego klienta), wygrane z 6:
+
+| wariant | zrównoważony | tani | premium |
+|---|---|---|---|
+| bez promocji | −0,01 (1/6) | +0,02 (4/6) | **+0,13 (6/6)** |
+| 2 za 1 | −0,09 (0/6) | +0,00 | −0,27 (0/6) |
+| zestaw | baza | +0,02 | +0,19 (6/6) |
+| happy hours | −0,07 (0/6) | +0,00 | −0,01 |
+| karta stałego klienta | −0,07 (0/6) | +0,00 | baza |
+| studencka | −0,02 (0/6) | +0,02 | +0,13 (6/6) |
+
+Żadna promocja z rabatem nie wygrywa z brakiem promocji, a zestaw (dopłata zamiast rabatu) wychodzi na zero. Tani
+wyłącza promocje, bo nie obsługuje całego popytu (`min_obsluga_promocji`), stąd zera. Diagnoza
+(`silnik/rynek/popyt.py: podzial`, `silnik/rynek/promocje.py`): rabat promocji nie wchodzi do ceny w atrakcyjności,
+klientów przyciąga tylko `przyciaganie` z `mapa/promocje.yaml`. Obniżka ceny o r daje w modelu popytu
+atrakcyjność × exp(2 · wrażliwość · r): −10% → +22%, −15% → +35%, −20% → +49%. Promocje mają mniej: karta (−10% na
+całe menu) +5% → +22% po 6 tygodniach, happy hours (−20% pn–czw) +35% → +20%, studencka (−15%, studenci o
+wrażliwości 1,3–1,4) +40% (obniżka ceny dałaby ok. +50%). Promocja jest więc zawsze gorsza od zwykłej obniżki
+ceny, a ta przy cenach botów jest na granicy opłacalności. 2 za 1 daje dwie porcje za cenę jednej (marża porcji
+spada z ok. 0,7 do 0,4 ceny), a bot trzyma promocję całą grę, choć jej przyciąganie spada z 0,5 do 0,2.
+
+Próba (`b7_promocje2`): przyciąganie co najmniej jak obniżka ceny o rabat, plus mały efekt promocji – happy hours
+0,6 → 0,4 (−0,04 na tydzień), karta 0,05 → 0,3 (+0,04), studencka 0,55, 2 za 1 0,8 → 0,2 (−0,12); zestaw bez
+zmian. Wtedy promocja ma się opłacać przy wolnej kuchni (słabe dni, strefy studenckie), a przy pełnej nie.
