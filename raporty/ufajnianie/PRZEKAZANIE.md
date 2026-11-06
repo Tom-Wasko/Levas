@@ -55,7 +55,8 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
     w node (kopia `static/` z `package.json {"type":"module"}`, atrapa `document`) – 358 wyrysowań bez błędów.
     Node w systemie jest stary (v14): pliki ES trzeba kopiować do katalogu z `"type":"module"`.
 - Środki trwałe i Parki i zdarzenia nie mają już pozycji w menu, ale zakładki jeszcze istnieją (UF12, UF13 to kończą).
-- Następne: UF12, potem kolejno: UF13 → UF11 → UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF12 – zakładka Środki trwałe usunięta; `ewidencja`, `RODZAJ_ST` eksportowane z inwestycje.js, tabela i odpisy na końcu KPiR (`amortyzacja()` w finanse.js), alias `srodki_trwale → kpir`.
+- Następne: UF13, potem kolejno: → UF11 → UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 
 ## Pułapki
 - Pomiary bambiczkowania czytają dane z `levas_gra`, nie stąd – tu możesz zmieniać `gra/dane/`.

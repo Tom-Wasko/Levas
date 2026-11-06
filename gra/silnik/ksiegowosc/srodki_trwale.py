@@ -91,6 +91,6 @@ def zmniejsz_majatek(firma: Firma, wartosc: float) -> None:
 
 
 def ewidencja(firma: Firma) -> list[dict]:
-    """Tabela ewidencji środków trwałych (zakładka Środki trwałe; od UF12 w KPiR)."""
+    """Tabela ewidencji środków trwałych (Księgowość ▸ KPiR, od UF12)."""
     return [{"nazwa": s.nazwa, "rodzaj": s.rodzaj, "od_rundy": s.od_rundy, "stawka": s.stawka, "wartosc": s.wartosc,
              "umorzenie": s.umorzenie, "netto": round(s.wartosc - s.umorzenie, 2)} for s in firma.srodki_trwale]

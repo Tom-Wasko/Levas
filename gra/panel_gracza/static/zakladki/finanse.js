@@ -2,6 +2,7 @@
 import { akcjeBanku, decyzjeBanku, wynikiBanku } from "./banki.js";
 import { krokiKpir, LEKCJA_BANK, LEKCJA_KPIR, LEKCJA_RAPORT } from "./lekcje.js";
 import { esc, OKRES, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
+import { ewidencja, RODZAJ_ST } from "./inwestycje.js";
 
 const GRUPY = [
   ["Zakup składników", (p) => p.towary],
@@ -92,9 +93,25 @@ export const kpir = {
       + tabela(null, ["", "Kwota"], [["Dochód do opodatkowania", zl2(k.dochod)], ...(R
         ? [["Zaliczka na PIT", zl2(R.zaliczka)], ["Składka zdrowotna", zl2(R.zdrowotna)]]   // JDG – zakładka Podatki
         : [["Podatek", zl2(k.podatek)]]), ["Dochód netto", zl2(k.dochod_netto)]], { klasy: ["l", "r"] })
-      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Księgowość ▸ VAT.</p>` : "") + LEKCJA_KPIR;
+      + (R ? `<p class="podpowiedz">Kwoty w KPiR są netto – VAT jest w zakładce Księgowość ▸ VAT.</p>` : "")
+      + (v.gra.lokale ? amortyzacja(v) : "") + LEKCJA_KPIR;
   },
 };
+
+// UF12: ewidencja środków trwałych i odpisy amortyzacji (dawniej osobna zakładka Środki trwałe)
+function amortyzacja(v) {
+  const a = v.amortyzacja || { prog: 0, stawki: {} };
+  const stawki = Object.entries(a.stawki).filter(([, s]) => s > 0).map(([r, s]) => `${esc(RODZAJ_ST[r] || r)}: ${proc(s)} rocznie`).join(" · ");
+  const odpisy = (v.wyniki?.kpir?.pozycje || []).filter((p) => p.opis.startsWith("Amortyzacja") || p.opis.startsWith("Niezamortyzowana"))
+    .map((p) => [esc(p.opis), zl(p.pozostale)]);
+  return `<div class="sekcja-tytul" style="margin-top:24px">Środki trwałe i amortyzacja</div>`
+    + ewidencja(v.wyniki?.srodki_trwale, "Ewidencja środków trwałych na koniec rundy")
+    + tabela("Odpisy w KPiR", ["Pozycja", "Kwota"], odpisy.length ? odpisy : [["W tej rundzie bez odpisów.", ""]], { klasy: ["l"] })
+    + `<p class="podpowiedz">Kupiony lokal, wybudowany budynek i zakupy od ${zl(a.prog)} netto to środki trwałe: płacisz od razu,
+       ale w KPiR koszt rozkłada się na lata – odpis liniowo od rundy po zakupie (${stawki}; grunt się nie amortyzuje).
+       Tańsze zakupy idą od razu w koszty. Przy sprzedaży niezamortyzowana wartość idzie w koszty. Amortyzacja zmniejsza dochód
+       i podatek, ale nie gotówkę.</p>`;
+}
 
 let zakladkaBanku = "historia", wyborBanku = false;
 export const bank = {

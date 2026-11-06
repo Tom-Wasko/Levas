@@ -1,7 +1,7 @@
 // Rejestr zakładek i układ menu (UF15, 6.11.2026: Miasto · Twój lokal · Firma · Wyniki; każda funkcja ma decyzje i wyniki).
 import { dashboard, karta_wynikow, lista_bledow, wnioski, wyslij } from "./ogolne.js";
 import { oferta } from "./oferta.js";
-import { sprzet, srodki_trwale, stanowiska, wyposazenie } from "./inwestycje.js";
+import { sprzet, stanowiska, wyposazenie } from "./inwestycje.js";
 import { szkolenia, udogodnienia, zatrudnienie, zespol } from "./hr.js";
 import { dostawcy } from "./dostawcy.js";
 import { agencje, promocje } from "./marketing.js";
@@ -28,7 +28,7 @@ import { stan_lokalu, zlozona } from "./lokal.js";
 import { gielda } from "./gielda.js";
 
 const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, lokale, licytacje, przejecia, urzad, sanepid, klienci, kalendarz, konkurencja, oferta,
-  stanowiska, sprzet, wyposazenie, srodki_trwale, zatrudnienie, zespol, rynek_pracy, udogodnienia, szkolenia, dostawcy, swiezosc, przewozy,
+  stanowiska, sprzet, wyposazenie, zatrudnienie, zespol, rynek_pracy, udogodnienia, szkolenia, dostawcy, swiezosc, przewozy,
   czas_wlasciciela, zdarzenia, agencje, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia,
   wlasciciel, gielda, kasyno, lista_bledow, wyslij };
 
@@ -37,7 +37,7 @@ export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", zaop_dost
   wnetrze_sprzet: "sprzet", wnetrze_wyposazenie: "wyposazenie", stan_lokalu: "lokale",
   dashboard: "dashboard", mapa: "mapa", wnioski: "ok", lokale: "lokale", licytacje: "lokale", przejecia: "lokale", urzad: "urzad", sanepid: "swiezosc",
   klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
-  wyposazenie: "wyposazenie", srodki_trwale: "srodki_trwale", zatrudnienie: "zatrudnienie", zespol: "zatrudnienie", rynek_pracy: "rynek_pracy",
+  wyposazenie: "wyposazenie", zatrudnienie: "zatrudnienie", zespol: "zatrudnienie", rynek_pracy: "rynek_pracy",
   udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", przewozy: "dostawcy", czas_wlasciciela: "zegar",
   zdarzenia: "zdarzenia", agencje: "tradycyjny", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir",
   vat: "procent", podatki: "podatki", bank: "bank", harpagon: "harpagon", biuro: "biuro", ubezpieczenia: "tarcza", wlasciciel: "portfel",
@@ -88,10 +88,10 @@ Object.assign(klienci, { tytul: "Strefy" });
 export const ALIAS = { oferta: "lokal_menu", sprzedaz: "lokal_przeglad", zatrudnienie: "lokal_przeglad", stan_lokalu: "lokal_przeglad",
   dostawcy: "zaop_dostawy", swiezosc: "zaop_magazyn", przewozy: "zaop_przewozy",
   stanowiska: "wnetrze_sprzet", sprzet: "wnetrze_sprzet", wyposazenie: "wnetrze_wyposazenie",
-  lokal_dostawy: "zaop_dostawy", lokal_sprzet: "wnetrze_sprzet", lokal_ludzie: "zespol" };
+  lokal_dostawy: "zaop_dostawy", lokal_sprzet: "wnetrze_sprzet", lokal_ludzie: "zespol", srodki_trwale: "kpir" };
 
 // Układ menu (UF15, raporty/ufajnianie/plan.md). { sekcja } – nagłówek sekcji (w menu poziomym kreska), { sekcja: "" } – sama kreska.
-// Bez pozycji w menu: Środki trwałe (amortyzacja → KPiR, UF12), Parki i zdarzenia (wejście z mapy, UF13), Kasyno (ukryte).
+// Bez pozycji w menu: Parki i zdarzenia (wejście z mapy, UF13), Kasyno (ukryte).
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { sekcja: "Miasto" },

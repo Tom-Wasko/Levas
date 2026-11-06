@@ -285,7 +285,7 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   Ile inwestor wpłacił, ile już wziął i przez ile tygodni jeszcze bierze udział – zobaczysz w Pieniądze ▸ Bank
   (i na Dashboardzie do końca umowy).
 - **Środki trwałe**: kupiony lokal i drogi sprzęt płacisz od razu, ale w księdze koszt rozkłada się na lata
-  (amortyzacja).
+  (amortyzacja). Ewidencję i odpisy widać w Księgowość ▸ KPiR, a sprzęt sprzedajesz w Wnętrze ▸ Stanowiska i sprzęt.
 - **Portfel właściciela**: z jednoosobowej działalności można wypłacić pieniądze dla siebie albo dołożyć własne
   oszczędności. To nie jest koszt ani przychód firmy.
 - **Harpagon** spod dworca pożycza od ręki i bez pytań. Spłata po terminie to przypomnienia, odsetki karne, a potem
