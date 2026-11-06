@@ -173,6 +173,20 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
                   poziom=(("dba_o_ludzi", None),))]
     w += [Wariant(f"wlasciciel:{h}", f"właściciel {h} h na kasie zamiast kasjera",
                   strategia=(("wlasciciel_godziny", h),)) for h in (10, 20)]
+    # B10: marketing – jeden kanał kampanii zamiast kanałów strategii, emisje i przerwa,
+    # udogodnienia i wyposażenie
+    agencje = ((dane.mapa or {}).get("reklama") or {}).get("agencje", {})
+    kanaly = [f"{a}/{k}" for a, x in agencje.items() for k in x["kanaly"]]
+    w += [Wariant(f"kampania:{k}", f"tylko kampania {k}", strategia=(("kampanie", [k]),))
+          for k in kanaly]
+    w += [Wariant(f"emisje:{n}", f"{n} emisji w kampanii", strategia=(("emisje_kampanii", n),))
+          for n in (3, 10, 15)]
+    w += [Wariant(f"przerwa:{n}", f"{n} rund przerwy po kampanii",
+                  strategia=(("przerwa_kampanii", n),)) for n in (0, 3)]
+    w += [Wariant(f"udogodnienia:{n}", f"{n} udogodnień", strategia=(("udogodnienia", n),))
+          for n in (0, 3, 6, 9)]
+    w += [Wariant(f"wyposazenie:{n}", f"{n} sztuk wyposażenia", strategia=(("wyposazenie", n),))
+          for n in (0, 3, 6)]   # w katalogu 6 pozycji
     rodzaj = {k: v.get("rodzaj") for k, v in dane.dostawcy_info.items()}
     hurt = [k for k, r in rodzaj.items() if r in ("hurtownia", "piekarnia")]
     w += [Wariant("dostawcy:bez_producenta", "hurtownie i piekarnia, bez producenta mięsa",

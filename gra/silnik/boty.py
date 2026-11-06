@@ -230,7 +230,9 @@ def _wez_lokal(dane: Dane, stan: StanGry, f: Firma, d: dict, dec: dict, kredyty:
 
 def _kampanie(dane: Dane, f: Firma, st: dict, runda: int, ust: dict) -> list[dict]:
     """Kampanie ze strategii w strefach własnych lokali: dostępne, po przerwie od poprzedniej w tym kanale i strefie,
-    emisje_kampanii emisji (najwyżej maks_emisji kanału), a po zapłacie zostaje bufor gotówki."""
+    emisje_kampanii emisji (najwyżej maks_emisji kanału), a po zapłacie zostaje bufor gotówki. Emisje i przerwę
+    może nadpisać strategia (B10)."""
+    ust = {**ust, **{k: st[k] for k in ("emisje_kampanii", "przerwa_kampanii") if st.get(k) is not None}}
     strefy = sorted({dane.lokale[lok.id]["strefa"] for lok in f.lokale})
     wynik, wydatki = [], 0.0
     for x in st.get("kampanie", []) if strefy else []:

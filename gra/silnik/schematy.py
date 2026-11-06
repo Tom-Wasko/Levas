@@ -468,6 +468,9 @@ class Strategia(Schemat):
     internet: list[str]
     szkolenia: int = Field(ge=0)
     kampanie: list[str] = Field(default_factory=list)   # gra z lokalami: "agencja/kanał" z mapa/reklama.yaml
+    # B10: emisje w kampanii i rundy przerwy po kampanii w tym kanale i strefie (bez – ustawienia botów)
+    emisje_kampanii: int | None = Field(None, ge=1)
+    przerwa_kampanii: int | None = Field(None, ge=0)
     promocje: list[PromocjaBota] = Field(default_factory=list)   # gra z lokalami: typy z mapa/promocje.yaml
     polisy: list[str] = Field(default_factory=list)   # gra z lokalami: rodzaje polis z zdarzenia/losowe.yaml
     higiena: str | None = None   # gra z lokalami: poziom higieny z zdarzenia/urzad.yaml (None – domyślny)

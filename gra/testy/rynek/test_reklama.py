@@ -215,3 +215,19 @@ def test_widok_api_i_gra_bez_lokali():
     assert kanaly["ulotki"]["dostepny"] and not kanaly["influencer"]["dostepny"]
     assert list(kanaly["radio"]["ceny"]) == ["miasto"] and kanaly["ulotki"]["znizki"] and kanaly["ulotki"]["emisja"]
     assert [(x["faza"], x["emisje"]) for x in r["trwajace"]] == [("trwa", 5)]
+
+
+def test_strategia_nadpisuje_emisje_i_przerwe_kampanii():
+    """B10: emisje_kampanii i przerwa_kampanii ze strategii mają pierwszeństwo przed ustawieniami botów."""
+    g = _gra(("Zrown", "zrownowazony"), ("Tani", "tani"))
+    st = g.dane.boty["strategie"]
+    g.dane = copy.copy(g.dane)
+    g.dane.boty = {**g.dane.boty, "strategie": {**st, "zrownowazony": {**st["zrownowazony"],
+                                                                       "emisje_kampanii": 3, "przerwa_kampanii": 0}}}
+    for _ in range(6):
+        s = g.przelicz(wymus=True)
+    k = s.firmy["Zrown"].kampanie
+    assert k and all(x.emisje == 3 for x in k)
+    rundy = sorted(x.od_rundy for x in k if (x.agencja, x.kanal) == ("papier_przyjmie", "ulotki"))
+    assert len(rundy) >= 2 and any(b - a == 1 for a, b in zip(rundy, rundy[1:]))   # bez przerwy – co rundę
+    assert all(x.emisje == g.dane.boty["ustawienia"]["emisje_kampanii"] for x in s.firmy["Tani"].kampanie)
