@@ -129,7 +129,7 @@ agencje:
         od_rundy: 5
         zasieg: miasto
         emisja: spot w radiu
-        cena_emisji: 180
+        cena_emisji: 70   # B10: przy 180 zł radio przegrywało z każdym kanałem (−0,04 karty, b10_kanaly); przy 70 zł ≈ inne kanały
         znizki: [[10, 0.2], [21, 0.3]]
         maks_emisji: 30
         pula: 0.03
@@ -151,7 +151,7 @@ agencje:
         od_rundy: 3
         zasieg: strefa
         emisja: godzina degustacji
-        cena_emisji: 110
+        cena_emisji: 80   # B10: przy 110 zł 1,5× drożej na efekt niż druk
         znizki: [[4, 0.15], [8, 0.25]]
         maks_emisji: 12
         pula: 0.06
@@ -169,7 +169,7 @@ agencje:
         - akademickie
         - politechnika
         emisja: godzina stoiska na imprezie
-        cena_emisji: 400
+        cena_emisji: 200   # B10: przy 400 zł przegrywała z brakiem kampanii nawet w strefie akademickiej
         znizki: [[3, 0.15], [6, 0.3]]
         maks_emisji: 8
         pula: 0.16

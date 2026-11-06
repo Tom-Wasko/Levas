@@ -232,6 +232,12 @@ nigdy. Możliwości:
 3. **Bez zmian:** promocje to pułapka dla gracza, a instrukcja mówi to wprost. Najmniej pracy, ale decyzja,
    która zawsze przegrywa, uczy mało.
 
+**Dopisek B10 (6.11.2026, `b10_marketing`, `b10_promocje`):** po zmianach B8–B10 zestaw (bez rabatu, z dopłatą)
+wygrywa: premium +0,064 karty wobec braku promocji (6/6), zrównoważony +0,024 (5/6), tani ≈ 0. Studencka ≈ brak
+promocji. Promocje z rabatem dla wszystkich (karta stałego klienta, 2 za 1, happy hours) nadal przegrywają z brakiem
+promocji, także karta z rabatem 5% zamiast 10% (premium −0,03, tani −0,016). Liczbą tego się nie naprawi –
+propozycja 1 (trwały skutek) zostaje aktualna; boty: premium i tani przeszły na zestaw/studencką.
+
 ## B9 – płaca minimalna bez kosztu rotacji (6.11.2026) → `notatki/Ustalenia gry.md` (rynek pracy, U20); do decyzji autora
 
 Pomiary `b9_ludzie` i `b9_po` (360 + 468 gier, 18 rund): pensja minimalna zamiast preferowanej wygrywa zawsze –
@@ -261,3 +267,16 @@ Inwentarz zakłada „koszt teraz, zadowolenie i jakość później; w krótkiej
 działa tylko w tygodniu zakupu i trzeba je kupować co tydzień. Propozycja: szkolenie kosztuje cenę miesięczną
 raz, a efekt trwa 4 tygodnie (albo zanika o 25% na tydzień). Nowa mechanika – wymaga zgody; do tego czasu
 zostaje przeliczenie ceny na rundę.
+
+## B10 – udogodnienia dla pracowników nie opłacają się przy uczciwej płacy (6.11.2026) → `notatki/Ustalenia gry.md` (HR, U20); do decyzji autora
+
+Pomiary `b10_marketing` i `b10_po` (504 + 216 gier, 18 rund): premium bez udogodnień zamiast 9 zyskuje +0,060 karty
+(6/6), agresywny przy 3 zamiast 6 +0,024…+0,028 (6/6). Udogodnienia podnoszą tylko zadowolenie pracowników, a przy
+pensji preferowanej zadowolenie i tak jest nad progiem odejść 0,87 – nikt nie odchodzi, więc udogodnienie to czysty
+koszt. To ta sama przyczyna co w „B9 – płaca minimalna bez kosztu rotacji”: zadowolenie pracowników rzadko coś
+zmienia. Możliwości:
+1. **Zadowolenie wpływa na wydajność (zalecane razem z propozycją B9):** np. zadowolenie ponad 0,95 skraca czas
+   obsługi o kilka procent, a poniżej 0,9 wydłuża. Udogodnienia i pensja stają się kompromisem, a nie tylko
+   ochroną przed odejściem. Nowa mechanika – wymaga zgody.
+2. **Bez zmian:** udogodnienia mają sens, gdy firma płaci mało (płaca minimalna po propozycji B9) – wtedy ratują
+   przed odejściami. Boty premium i agresywny kupują teraz 3 udogodnienia zamiast 9 i 6.

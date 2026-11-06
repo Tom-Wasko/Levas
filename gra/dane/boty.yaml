@@ -153,7 +153,7 @@ strategie:
     - papier_przyjmie/ulotki
     - lajk/grupa_osiedlowa
     promocje:
-    - {typ: happy_hours, nazwa: Tanie Godziny Nocnego}
+    # B10: bez happy hours +0,04 karty (b10_promocje, 6/6)
     - {typ: studencka, nazwa: Indeks Głodomora}
     polisy: []                   # oszczędza na wszystkim, także na ubezpieczeniu
     higiena: podstawowa          # mop i grafik – bez tego sanepid nie odbierze lokalu
@@ -175,7 +175,8 @@ strategie:
     - lajk/influencer
     - fala_koziolka/billboard
     promocje:
-    - {typ: karta, nazwa: Złota Karta Sułtana}
+    # B10: zestaw +0,156 karty wobec karty stałego klienta (b10_promocje, 6/6)
+    - {typ: zestaw, nazwa: Zestaw Sułtana}
     polisy: [lokal, sprzet, oc]
     higiena: haccp
   agresywny:
