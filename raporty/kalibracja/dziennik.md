@@ -836,6 +836,28 @@ czynszu ≈ 650 zł/tydz. (cena ≈ 35–40 czynszów miesięcznych). Po poprawc
 (liczba czynszów w cenie, F3a.3) albo koszty posiadania (podatek od nieruchomości – nowa pozycja, do zgody
 autora).
 
+**Pomiar `b6_kupno3`** (6.11; po poprawce sprzętu, peryferie jak `b6_wykup`, `lokale:kupno`, konteksty cen
+`lokale.*.cena*=1 / 1,5 / 2`, 1080 gier). Karta (różnica kupno − najem, wygrane pary) i majątek netto:
+
+| cena | karta | zrównoważony 18r / 26r | tani 18r / 26r | premium 18r / 26r |
+|---|---|---|---|---|
+| ×1 | +0,029, 135/180 | maj. −1,4 / +0,2 tys. | maj. +4,9 / +6,4 tys. (28/30) | maj. +3,6 / +5,6 tys. |
+| ×1,5 | +0,002, 107/180 | maj. −5,8 / −5,3 tys. (7–9/30) | maj. +2,6 / +2,8 tys. (25–27/30) | maj. +0,3 / +2,5 tys. |
+| ×2 | −0,006, 102/180 | maj. −10,6 / −11,3 tys. | maj. +0,8 / +0,6 tys. | maj. −0,9 / +3,4 tys. |
+
+Rozbicie (skrypty w scratchpadzie: składniki karty, KPiR, decyzje bota w parze): (1) zrównoważony po kupnie na
+kredyt ma 1–3 tys. gotówki zamiast 30 tys. i przez całą grę nie kupuje ulotek, promocji, udogodnień ani
+wyposażenia – przychód z tego samego lokalu −11% (czechów ×2: 289 vs 324 tys.). To zamierzone ryzyko kupna
+(zamrożona gotówka). (2) Tani nie wydaje na marketing, więc nic nie traci, a zyskuje brak czynszu. (3) **Rozwój
+firmy w karcie**: najemca bez własnego sprzętu ma rozwój = stała 0,535, kupiony lokal za 77 tys. podnosi go do 0,764
+(+43%), więc kupno wygrywa kartą w zygmuntowskim w 34–36/36 par przy każdej cenie (droższy lokal = wyższy rozwój).
+Stosunek cena/czynsz jest równy w strefach (35–41), więc to nie dane lokali.
+
+Decyzja: **cena kupna ×1,5** (≈ 60 czynszów; f4335c5; 15 lokali, działki bez zmian): każda forma ma swoją sytuację
+– tani zyskuje na kupnie, zrównoważony traci (marketing), premium wychodzi na zero w 18 rundach i na plus w 26
+(kompromis z inwentarza). Przy ×2 kupno nie wygrywa majątkiem w żadnej grupie. Efekt rozwoju firmy to wzór Z1 –
+propozycja (waga nieruchomości w rozwoju) w `notatki_do_zmiany.md`. Kontrola stref centralnych: `b6_kupno4`.
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:

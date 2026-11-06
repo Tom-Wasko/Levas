@@ -141,3 +141,27 @@ w tej samej rundzie**, jak kupowany lokal (limit: część wartości, `zastaw` p
 jest budynek, którego firma jest właścicielem (dochód z czynszu spłaca raty – dobra lekcja o inwestycji w
 nieruchomość na wynajem). Po zgodzie: bank (`nowy_lokal` także dla decyzji `przejecie`), bot (wykup na kredyt, jak
 kupno), pomiar jak `b6_wykup`.
+
+## B6 – kupiony lokal w „rozwoju firmy” na karcie (6.11.2026) → `notatki/Ustalenia gry.md`, karta wyników; do decyzji autora
+
+Z1 (ustalone z autorem): kupiony lokal, budynek i grunt wchodzą do majątku w rozwoju firmy. Wzór rozwoju z Revasa
+(`0,535 + 0,106 · ln(1 + majątek / 10 000) + …`) był kalibrowany na majątku ze sprzętu (kilkanaście–kilkadziesiąt
+tys. zł). Lokal za 90–330 tys. zł wychodzi daleko poza ten zakres i sam podnosi rozwój o 0,2–0,3, czyli kartę o
+40–55%, bez względu na to, czy kupno się opłaciło.
+
+Pomiar `b6_kupno3` (tani, zygmuntowskie, ziarno 1000, średnie z rund 2–18): najem – rozwój 0,535 (sama stała, bo
+sprzęt w lokalu jest wynajmującego), karta 0,221; kupno – rozwój **0,764**, wynik ekonomiczny +20% (bez czynszu),
+wskaźnik zadłużenia 0,712 (kredyt), karta 0,265. W zygmuntowskim kupno wygrywa kartą w 34–36/36 par **przy każdej
+cenie** (×1, ×1,5, ×2), choć majątek netto prawie się nie różni. Droższy lokal jeszcze podnosi rozwój, więc cena
+kupna słabo działa na kartę – po ×1,5 (f4335c5) tani dalej wygrywa kartą 28–29/30, a majątkiem 25–27/30.
+
+Propozycje (do wyboru):
+1. **Nieruchomości w rozwoju z wagą** (np. 0,25–0,5): lokal dalej się liczy (Z1 zostaje), ale nie przeważa nad
+   sprzętem. Jeden parametr `rozwoj_firmy.waga_nieruchomosci` w `zalozenia.yaml`; wskaźnik zadłużenia liczy
+   majątek w pełni. Po zgodzie – pomiar jak `b6_kupno3` z wagami 1 / 0,5 / 0,25.
+2. **Osobna skala dla nieruchomości** (`ln(1 + lokale / 100 000)`): podobny efekt, trudniej wytłumaczyć uczniowi.
+3. **Bez zmian** – kupno lokalu „rozwija firmę” na karcie, a cena działa tylko na majątek netto. Wtedy kupno
+   zostaje najlepsze kartą w słabych strefach i dla strategii bez wydatków na marketing.
+
+Rekomendacja: 1 z wagą 0,5 (lokal za 115 tys.: rozwój ok. 0,74 zamiast 0,80 – nadal wyraźnie wyżej niż 0,535 przy
+   najmie).
