@@ -1,0 +1,271 @@
+kontekst,strategia,rund,firm,poziom,strefa,kapital,rywale,dane,ziarno,wariant,karta,dochod,gotowka,majatek,pierwszy_plus,alarmy,miejsce,lokale,czas_s,strefy_lokali
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,bank:Crédit Agricole,0.804,85487.57,113938.4,140246.55,3,0,2,1,8.22,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,baza,0.8158,87397.29,115848.49,141260.65,3,0,2,1,8.34,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,bank:PKO BP,0.8063,85741.73,114190.48,140498.63,3,0,2,1,8.7,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,bank:Pekao,0.8062,85725.89,114174.64,140482.79,3,0,2,1,8.73,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,bank:ING,0.8042,85517.32,113968.15,140276.3,3,0,2,1,7.57,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,bank:mBank,0.8158,87397.29,115848.49,141260.65,3,0,2,1,7.68,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,bank:Santander,0.8062,85725.89,114174.64,140482.79,3,0,2,1,7.0,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,lokata:4,0.8095,87410.08,54052.51,141282.17,3,0,2,1,7.01,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,lokata:13,0.8083,87265.28,38661.33,141136.41,3,0,2,1,7.14,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,kredyt:start,0.6201,88091.17,150243.81,142955.98,3,0,5,1,7.22,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,kredyt:obrotowy,0.6658,86107.31,146093.42,139967.11,3,0,2,1,7.1,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,harpagon:ratunek,0.8158,87397.29,115848.49,141260.65,3,0,2,1,7.19,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,kasyno:czerwone,0.8157,87392.58,109844.4,135256.56,3,0,2,1,7.03,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,kasyno:zero,0.8158,87395.43,105846.94,131259.1,3,0,2,1,7.09,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1000,kasyno:automat,0.8157,87392.58,139844.4,165256.56,3,0,2,1,7.14,centrum
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,baza,0.5172,69136.21,101684.32,112525.47,3,0,5,1,7.32,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,bank:Crédit Agricole,0.5085,67947.55,100496.21,111300.87,3,0,5,1,7.24,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,bank:PKO BP,0.5101,68167.08,100718.66,111523.32,3,0,5,1,7.27,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,bank:Pekao,0.5099,68151.21,100702.79,111507.45,3,0,5,1,7.17,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,bank:ING,0.5087,67976.28,100524.94,111329.6,3,0,5,1,7.27,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,bank:mBank,0.5172,69136.21,101684.32,112525.47,3,0,5,1,7.25,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,bank:Santander,0.5099,68151.21,100702.79,111507.45,3,0,5,1,7.26,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,lokata:4,0.5192,69545.9,52411.81,112911.62,3,0,4,1,7.42,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,lokata:13,0.5032,67130.7,35301.35,111268.17,3,0,5,1,7.51,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,kredyt:start,0.3864,66560.46,132765.55,109952.88,3,0,5,1,7.34,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,kredyt:obrotowy,0.4119,67846.26,131934.28,111236.96,3,0,5,1,7.34,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,harpagon:ratunek,0.5172,69136.21,101684.32,112525.47,3,0,5,1,7.03,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,kasyno:czerwone,0.5172,69131.51,95679.24,106520.39,3,0,5,1,7.1,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,kasyno:zero,0.5172,69133.36,91681.78,102522.93,3,0,5,1,8.11,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1000,kasyno:automat,0.5172,69131.51,125679.24,136520.39,3,0,5,1,8.29,felin
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,baza,0.671,71764.55,94015.29,128636.32,4,0,3,1,8.54,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,bank:Crédit Agricole,0.6586,70429.54,92680.54,127301.57,4,0,4,1,8.65,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,bank:PKO BP,0.6608,70681.23,92931.15,127552.18,4,0,4,1,7.53,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,bank:Pekao,0.6608,70665.33,92915.25,127536.28,4,0,4,1,7.39,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,bank:ING,0.6588,70459.33,92710.33,127331.36,4,0,4,1,6.99,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,bank:mBank,0.671,71764.55,94015.29,128636.32,4,0,3,1,7.06,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,bank:Santander,0.6608,70665.33,92915.25,127536.28,4,0,4,1,6.96,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,lokata:4,0.6862,73170.54,50399.23,130181.62,4,0,2,1,6.99,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,lokata:13,0.6854,73077.05,36207.44,130087.79,4,0,2,1,6.94,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,kredyt:start,0.5549,77195.94,133951.33,136449.92,4,0,4,1,7.04,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,kredyt:obrotowy,0.5392,70810.09,124599.94,127660.59,4,0,5,1,7.18,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,harpagon:ratunek,0.671,71764.55,94015.29,128636.32,4,0,3,1,7.21,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,kasyno:czerwone,0.6709,71759.84,88010.2,122631.23,4,0,3,1,7.09,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,kasyno:zero,0.671,71762.7,84012.75,118633.78,4,0,3,1,7.12,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1000,kasyno:automat,0.6709,71759.84,118010.2,152631.23,4,0,3,1,7.02,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,baza,0.8852,96318.38,125318.15,151720.02,3,0,2,1,7.13,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,bank:Crédit Agricole,0.8727,94937.94,123937.97,150339.84,3,0,2,1,7.09,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,bank:PKO BP,0.875,95197.76,124196.71,150598.58,3,0,2,1,7.03,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,bank:Pekao,0.8749,95181.87,124180.82,150582.69,3,0,2,1,6.78,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,bank:ING,0.8731,94966.68,123966.71,150368.58,3,0,2,1,6.82,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,bank:mBank,0.8852,96318.38,125318.15,151720.02,3,0,2,1,6.75,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,bank:Santander,0.8749,95181.87,124180.82,150582.69,3,0,2,1,6.76,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,lokata:4,0.8865,96480.92,62320.5,151882.86,3,0,2,1,6.76,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,lokata:13,0.8849,96290.15,37532.84,151692.51,3,0,2,1,6.82,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,kredyt:start,0.6954,96274.66,158927.8,151563.0,3,0,3,1,6.96,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,kredyt:obrotowy,0.7441,95028.44,155566.12,150429.52,3,0,2,1,7.0,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,harpagon:ratunek,0.8852,96318.38,125318.15,151720.02,3,0,2,1,6.78,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,kasyno:czerwone,0.8852,96318.38,125318.15,151720.02,3,0,2,1,6.8,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,kasyno:zero,0.8852,96318.38,125318.15,151720.02,3,0,2,1,8.05,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1001,kasyno:automat,0.8852,96318.38,125318.15,151720.02,3,0,2,1,8.44,dworzec
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,baza,0.574,76222.02,108370.22,121726.43,3,0,6,1,8.41,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,bank:Crédit Agricole,0.5651,74990.64,107140.1,120496.31,3,0,6,1,8.49,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,bank:PKO BP,0.5668,75222.21,107371.59,120727.8,3,0,6,1,8.31,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,bank:Pekao,0.5666,75206.38,107355.76,120711.97,3,0,6,1,8.38,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,bank:ING,0.5651,75020.28,107169.74,120525.95,3,0,6,1,8.99,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,bank:mBank,0.574,76222.02,108370.22,121726.43,3,0,6,1,9.14,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,bank:Santander,0.5666,75206.38,107355.76,120711.97,3,0,6,1,8.21,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,lokata:4,0.5821,77584.72,55263.6,123614.8,3,0,6,1,8.22,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,lokata:13,0.5814,77442.46,39189.23,123472.96,3,0,6,1,8.32,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,kredyt:start,0.4356,73559.1,139363.27,119081.65,3,0,6,1,8.36,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,kredyt:obrotowy,0.4751,74931.04,138617.15,120434.89,3,0,6,1,8.22,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,harpagon:ratunek,0.574,76222.02,108370.22,121726.43,3,0,6,1,8.34,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,kasyno:czerwone,0.574,76222.02,108370.22,121726.43,3,0,6,1,8.47,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,kasyno:zero,0.574,76222.02,108370.22,121726.43,3,0,6,1,8.43,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1001,kasyno:automat,0.574,76222.02,108370.22,121726.43,3,0,6,1,7.92,czechow
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,baza,0.6984,76713.64,91764.38,133984.69,3,0,2,1,7.8,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,bank:Crédit Agricole,0.5852,66470.95,80820.62,123506.73,3,0,6,1,8.41,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,bank:PKO BP,0.5877,66736.25,81086.84,123772.95,3,0,6,1,8.41,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,bank:Pekao,0.5875,66720.3,81070.89,123757.0,3,0,6,1,7.79,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,bank:ING,0.5856,66499.9,80849.57,123535.68,3,0,6,1,7.5,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,bank:mBank,0.6984,76713.64,91764.38,133984.69,3,0,2,1,6.89,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,bank:Santander,0.5875,66720.3,81070.89,123757.0,3,0,6,1,6.93,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,lokata:4,0.7029,76759.35,45225.36,134038.08,3,0,2,1,7.33,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,lokata:13,0.7023,76693.89,37642.18,133972.97,3,0,2,1,7.6,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,kredyt:start,0.6225,86997.47,136651.86,147946.65,4,0,5,1,8.16,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,kredyt:obrotowy,0.5932,78330.18,125868.86,136539.18,3,0,6,1,8.31,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,harpagon:ratunek,0.6984,76713.64,91764.38,133984.69,3,0,2,1,8.19,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,kasyno:czerwone,0.6984,76713.64,91764.38,133984.69,3,0,2,1,8.48,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,kasyno:zero,0.6984,76713.64,91764.38,133984.69,3,0,2,1,8.36,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1001,kasyno:automat,0.6984,76713.64,91764.38,133984.69,3,0,2,1,8.28,stare_miasto
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,baza,0.874,94448.02,123096.38,150714.48,3,0,2,1,8.72,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,bank:Crédit Agricole,0.8673,94070.97,122721.07,150234.41,3,0,2,1,8.76,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,bank:PKO BP,0.8698,94328.71,122978.73,150492.07,3,0,2,1,7.78,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,bank:Pekao,0.8696,94311.89,122961.91,150475.25,3,0,2,1,7.21,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,bank:ING,0.8675,94099.6,122749.7,150263.04,3,0,2,1,6.68,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,bank:mBank,0.874,94448.02,123096.38,150714.48,3,0,2,1,6.72,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,bank:Santander,0.8696,94311.89,122961.91,150475.25,3,0,2,1,6.95,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,lokata:4,0.8662,94432.12,60382.49,150734.74,3,0,2,1,6.96,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,lokata:13,0.8644,94230.69,34990.7,150531.73,3,0,2,1,6.7,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,kredyt:start,0.6754,94180.77,156485.33,150366.84,3,0,3,1,7.39,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,kredyt:obrotowy,0.7354,93158.05,153344.32,149423.95,3,0,3,1,7.59,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,harpagon:ratunek,0.874,94448.02,123096.38,150714.48,3,0,2,1,7.23,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,kasyno:czerwone,0.8739,94441.46,111090.75,150708.85,3,0,2,1,7.73,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,kasyno:zero,0.874,94444.31,103093.29,130711.39,3,0,2,1,7.76,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1002,kasyno:automat,0.8739,94441.46,107090.75,144708.85,3,0,2,1,7.16,dworzec
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,baza,0.4543,65016.82,99117.66,110123.72,3,0,6,1,7.29,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,bank:Crédit Agricole,0.446,63895.11,97996.59,109002.65,3,0,6,1,7.62,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,bank:PKO BP,0.4475,64106.46,98205.86,109211.92,3,0,6,1,7.64,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,bank:Pekao,0.4474,64089.52,98188.92,109194.98,3,0,6,1,8.25,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,bank:ING,0.4462,63924.06,98025.54,109031.6,3,0,6,1,9.04,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,bank:mBank,0.4543,65016.82,99117.66,110123.72,3,0,6,1,8.42,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,bank:Santander,0.4474,64089.52,98188.92,109194.98,3,0,6,1,8.41,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,lokata:4,0.4454,63829.96,44584.52,109522.16,3,0,6,1,8.09,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,lokata:13,0.4445,63730.37,34706.23,109422.61,3,0,6,1,7.38,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,kredyt:start,0.3345,62438.68,130193.88,107546.12,3,0,6,1,7.37,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,kredyt:obrotowy,0.3619,63724.0,129362.75,108830.34,3,0,6,1,7.38,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,harpagon:ratunek,0.4543,65016.82,99117.66,110123.72,3,0,6,1,7.16,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,kasyno:czerwone,0.4543,65010.26,87110.03,110116.09,3,0,6,1,7.35,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,kasyno:zero,0.4544,65012.11,79112.57,90118.63,3,0,6,1,7.27,felin
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1002,kasyno:automat,0.4543,65010.26,83110.03,104116.09,3,0,6,1,7.19,felin
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,baza,0.6901,76210.43,91760.1,134070.85,3,0,3,1,7.2,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,bank:Crédit Agricole,0.6478,71588.82,87788.68,130316.51,3,0,4,1,7.19,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,bank:PKO BP,0.6501,71857.87,88057.65,130585.48,3,0,4,1,7.1,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,bank:Pekao,0.6501,71840.97,88040.75,130568.58,3,0,4,1,7.23,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,bank:ING,0.6481,71618.68,87818.54,130346.37,3,0,4,1,7.15,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,bank:mBank,0.6901,76210.43,91760.1,134070.85,3,0,3,1,7.14,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,bank:Santander,0.6501,71840.97,88040.75,130568.58,3,0,4,1,7.12,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,lokata:4,0.6905,76249.01,42081.09,134107.94,3,0,3,1,7.13,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,lokata:13,0.69,76191.62,39720.81,134051.52,3,0,3,1,7.16,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,kredyt:start,0.5464,79190.28,128591.78,140435.24,4,0,6,1,7.28,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,kredyt:obrotowy,0.5578,74533.95,122271.86,132918.31,3,0,6,1,7.09,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,harpagon:ratunek,0.6901,76210.43,91760.1,134070.85,3,0,3,1,7.13,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,kasyno:czerwone,0.6879,76509.42,80058.33,134369.08,3,0,3,1,7.21,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,kasyno:zero,0.688,76511.27,72059.87,114370.62,3,0,3,1,7.17,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1002,kasyno:automat,0.6879,76509.42,76058.33,128369.08,3,0,3,1,7.21,stare_miasto
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,baza,0.4855,56304.58,87302.24,111565.36,4,0,5,1,7.14,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,bank:Crédit Agricole,0.4738,55691.99,86691.88,110069.45,4,0,5,1,7.13,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,bank:PKO BP,0.4758,55914.96,86915.77,110293.34,4,0,5,1,7.23,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,bank:Pekao,0.4758,55898.95,86899.76,110277.33,4,0,5,1,7.09,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,bank:ING,0.4741,55722.03,86721.92,110099.49,4,0,5,1,7.01,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,bank:mBank,0.4855,56304.58,87302.24,111565.36,4,0,5,1,7.15,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,bank:Santander,0.4758,55898.95,86899.76,110277.33,4,0,5,1,7.11,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,lokata:4,0.4866,56415.5,41862.59,111677.65,4,0,5,1,7.23,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,lokata:13,0.4881,56677.92,27881.3,111941.11,4,0,5,1,7.41,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,kredyt:start,0.329,57491.29,122194.33,112856.18,4,0,5,1,7.35,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,kredyt:obrotowy,0.3671,54981.56,117522.13,110246.78,4,0,5,1,7.44,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,harpagon:ratunek,0.4855,56304.58,87302.24,111565.36,4,0,5,1,7.35,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,kasyno:czerwone,0.4854,56299.88,89298.16,113561.28,4,0,5,1,7.13,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,kasyno:zero,0.4855,56302.73,77300.7,101563.82,4,0,5,1,7.22,akademickie
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1003,kasyno:automat,0.4854,56299.88,83298.16,107561.28,4,0,5,1,7.21,akademickie
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,baza,0.6121,83355.12,116157.78,129691.95,3,0,3,1,7.22,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,bank:Crédit Agricole,0.6029,82089.45,114891.37,128425.54,3,0,4,1,7.27,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,bank:PKO BP,0.6045,82327.44,115127.28,128661.45,3,0,4,1,7.18,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,bank:Pekao,0.6044,82310.66,115110.5,128644.67,3,0,4,1,7.19,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,bank:ING,0.6031,82118.07,114919.99,128454.16,3,0,4,1,7.33,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,bank:mBank,0.6121,83355.12,116157.78,129691.95,3,0,3,1,7.28,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,bank:Santander,0.6044,82310.66,115110.5,128644.67,3,0,4,1,7.27,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,lokata:4,0.6124,82931.62,54163.56,129685.9,3,0,3,1,7.36,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,lokata:13,0.6116,82770.87,42146.1,129544.64,3,0,3,1,7.19,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,kredyt:start,0.4771,82550.24,148954.87,128825.32,3,0,5,1,7.29,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,kredyt:obrotowy,0.5156,82064.14,146402.71,128398.41,3,0,5,1,7.29,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,harpagon:ratunek,0.6121,83355.12,116157.78,129691.95,3,0,3,1,7.24,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,kasyno:czerwone,0.6121,83350.42,118152.7,131686.87,3,0,3,1,7.27,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,kasyno:zero,0.6121,83352.27,106155.24,119689.41,3,0,3,1,7.29,lsm_czuby
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1003,kasyno:automat,0.6121,83350.42,112152.7,125686.87,3,0,3,1,7.22,lsm_czuby
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,baza,0.7315,82084.62,112084.99,141436.49,3,0,3,1,7.24,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,bank:Crédit Agricole,0.7192,80720.53,110722.16,140073.66,3,0,3,1,7.1,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,bank:PKO BP,0.7215,80977.28,110976.83,140328.33,3,0,3,1,7.12,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,bank:Pekao,0.7213,80961.29,110960.84,140312.34,3,0,3,1,7.13,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,bank:ING,0.7194,80749.45,110751.08,140102.58,3,0,3,1,7.18,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,bank:mBank,0.7315,82084.62,112084.99,141436.49,3,0,3,1,7.08,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,bank:Santander,0.7213,80961.29,110960.84,140312.34,3,0,3,1,7.21,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,lokata:4,0.7445,82613.9,56042.95,141959.95,3,0,2,1,7.07,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,lokata:13,0.7417,82768.17,39015.6,142113.26,3,0,3,1,7.15,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,kredyt:start,0.6027,87867.46,150921.58,148738.1,4,0,4,1,7.21,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,kredyt:obrotowy,0.5944,80758.61,142297.89,140110.92,3,0,4,1,7.22,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,harpagon:ratunek,0.7315,82084.62,112084.99,141436.49,3,0,3,1,7.12,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,kasyno:czerwone,0.7315,82079.91,114079.9,143431.4,3,0,3,1,7.21,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,kasyno:zero,0.7315,82081.77,102082.45,131433.95,3,0,3,1,7.08,centrum
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1003,kasyno:automat,0.7315,82079.91,108079.9,137431.4,3,0,3,1,7.22,centrum
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,baza,0.748,81113.22,107713.33,134688.7,3,0,1,1,7.09,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,bank:Crédit Agricole,0.7364,79804.16,106403.53,133378.9,3,0,1,1,7.11,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,bank:PKO BP,0.7386,80050.63,106651.92,133627.29,3,0,1,1,7.16,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,bank:Pekao,0.7384,80033.77,106635.06,133610.43,3,0,1,1,7.25,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,bank:ING,0.7365,79832.9,106432.27,133407.64,3,0,1,1,7.02,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,bank:mBank,0.748,81113.22,107713.33,134688.7,3,0,1,1,7.18,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,bank:Santander,0.7384,80033.77,106635.06,133610.43,3,0,1,1,7.04,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,lokata:4,0.7489,81214.78,55209.64,134790.56,3,0,1,1,7.22,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,lokata:13,0.7478,81084.99,36503.14,134661.19,3,0,1,1,7.17,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,kredyt:start,0.5901,84073.44,144727.51,137892.81,3,0,2,1,7.16,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,kredyt:obrotowy,0.6095,79822.25,137961.27,133398.17,3,0,2,1,7.14,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,harpagon:ratunek,0.748,81113.22,107713.33,134688.7,3,0,1,1,7.23,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,kasyno:czerwone,0.7479,81108.51,109708.24,136683.61,3,0,1,1,7.07,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,kasyno:zero,0.7479,81110.37,97709.79,124685.16,3,0,1,1,7.21,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1004,kasyno:automat,0.7479,81108.51,99708.24,126683.61,3,0,1,1,7.2,dworzec
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,baza,0.5865,78887.21,111386.3,124994.54,3,0,2,1,7.25,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,bank:Crédit Agricole,0.5775,77645.93,110145.28,123753.52,3,0,3,1,7.12,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,bank:PKO BP,0.5792,77879.01,110380.28,123988.52,3,0,3,1,7.27,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,bank:Pekao,0.5791,77863.21,110364.48,123972.72,3,0,3,1,7.12,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,bank:ING,0.5776,77674.56,110173.91,123782.15,3,0,3,1,7.27,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,bank:mBank,0.5865,78887.21,111386.3,124994.54,3,0,2,1,7.27,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,bank:Santander,0.5791,77863.21,110364.48,123972.72,3,0,3,1,7.94,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,lokata:4,0.5927,79799.54,55013.66,125948.56,3,0,2,1,7.72,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,lokata:13,0.5909,79378.87,40711.11,125512.22,3,0,2,1,7.27,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,kredyt:start,0.4453,75998.38,142152.87,122165.94,3,0,6,1,7.5,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,kredyt:obrotowy,0.4845,77596.24,141634.24,123704.01,3,0,5,1,7.7,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,harpagon:ratunek,0.5865,78887.21,111386.3,124994.54,3,0,2,1,7.24,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,kasyno:czerwone,0.5865,78882.51,113381.22,126989.46,3,0,2,1,8.06,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,kasyno:zero,0.5865,78884.36,101382.76,114991.0,3,0,2,1,8.25,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1004,kasyno:automat,0.5865,78882.51,103381.22,116989.46,3,0,2,1,7.97,czechow
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,baza,0.7252,80500.66,94850.82,136700.45,3,0,1,1,7.57,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,bank:Crédit Agricole,0.7122,79043.46,93393.88,135247.35,3,0,1,1,8.38,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,bank:PKO BP,0.7148,79318.9,93667.24,135520.71,3,0,1,1,8.44,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,bank:Pekao,0.7145,79302.96,93651.3,135504.77,3,0,1,1,7.69,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,bank:ING,0.7125,79072.3,93422.72,135276.19,3,0,1,1,7.97,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,bank:mBank,0.7252,80500.66,94850.82,136700.45,3,0,1,1,10.35,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,bank:Santander,0.7145,79302.96,93651.3,135504.77,3,0,1,1,10.11,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,lokata:4,0.7259,79912.73,48987.76,136178.58,3,0,1,1,7.87,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,lokata:13,0.7252,79841.4,39982.81,136105.6,3,0,1,1,7.42,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,kredyt:start,0.5686,80025.96,128629.44,139883.78,4,0,2,1,7.33,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,kredyt:obrotowy,0.5785,78508.6,124399.0,135024.0,3,0,2,1,7.13,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,harpagon:ratunek,0.7252,80500.66,94850.82,136700.45,3,0,1,1,7.29,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,kasyno:czerwone,0.6904,77972.38,94322.67,136630.83,3,0,1,1,7.16,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,kasyno:zero,0.7176,80566.48,84966.91,126997.02,3,0,1,1,7.18,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1004,kasyno:automat,0.7144,80512.18,86912.72,128937.83,3,0,1,1,7.06,stare_miasto
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,baza,0.8166,87243.99,116843.38,143176.68,3,0,2,1,7.33,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,bank:Crédit Agricole,0.8045,85911.63,115512.28,141845.58,3,0,2,1,7.15,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,bank:PKO BP,0.8068,86162.86,115762.43,142095.73,3,0,2,1,7.26,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,bank:Pekao,0.8066,86147.01,115746.58,142079.88,3,0,2,1,7.16,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,bank:ING,0.8048,85940.38,115541.03,141874.33,3,0,2,1,7.18,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,bank:mBank,0.8166,87243.99,116843.38,143176.68,3,0,2,1,7.09,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,bank:Santander,0.8066,86147.01,115746.58,142079.88,3,0,2,1,7.22,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,lokata:4,0.8228,87397.05,56212.87,143339.8,3,0,2,1,7.09,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,lokata:13,0.8191,87527.6,38669.03,143468.77,3,0,2,1,7.25,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,kredyt:start,0.5978,83372.45,146076.78,138633.37,3,0,3,1,7.16,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,kredyt:obrotowy,0.6784,85951.46,147090.76,141885.59,3,0,2,1,7.23,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,harpagon:ratunek,0.8166,87243.99,116843.38,143176.68,3,0,2,1,7.08,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,kasyno:czerwone,0.8166,87243.99,116843.38,143176.68,3,0,2,1,7.33,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,kasyno:zero,0.8166,87243.99,116843.38,143176.68,3,0,2,1,7.28,dworzec
+zrownowazony/18r/6f/sredni,zrownowazony,18,6,sredni,,0,,,1005,kasyno:automat,0.8166,87243.99,116843.38,143176.68,3,0,2,1,7.25,dworzec
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,baza,0.6609,88974.47,123372.11,136445.61,3,0,2,1,7.21,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,bank:PKO BP,0.6535,87940.72,122341.54,135415.04,3,0,2,1,7.2,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,bank:Crédit Agricole,0.6516,87700.7,122099.6,135173.1,3,0,2,1,7.35,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,bank:Pekao,0.6534,87924.89,122325.71,135399.21,3,0,2,1,7.16,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,bank:ING,0.6518,87729.33,122128.23,135201.73,3,0,2,1,7.27,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,bank:mBank,0.6609,88974.47,123372.11,136445.61,3,0,2,1,7.22,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,bank:Santander,0.6534,87924.89,122325.71,135399.21,3,0,2,1,7.31,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,lokata:4,0.6427,86756.15,56016.61,133901.85,3,0,3,1,7.24,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,lokata:13,0.6414,86580.45,36234.98,133727.64,3,0,3,1,7.38,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,kredyt:start,0.5062,86230.11,154284.41,133702.36,3,0,4,1,7.48,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,kredyt:obrotowy,0.5491,87684.53,153623.08,135158.11,3,0,4,1,7.83,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,harpagon:ratunek,0.6609,88974.47,123372.11,136445.61,3,0,2,1,9.64,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,kasyno:czerwone,0.6609,88974.47,123372.11,136445.61,3,0,2,1,9.95,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,kasyno:zero,0.6609,88974.47,123372.11,136445.61,3,0,2,1,9.08,czechow
+tani/18r/6f/sredni,tani,18,6,sredni,,0,,,1005,kasyno:automat,0.6609,88974.47,123372.11,136445.61,3,0,2,1,9.56,czechow
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,baza,0.3825,45987.1,62588.21,97826.26,3,0,6,1,10.99,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,bank:Crédit Agricole,0.3716,44753.87,61354.24,96592.29,4,0,6,1,10.95,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,bank:PKO BP,0.3737,44986.52,61585.81,96823.86,3,0,6,1,9.79,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,bank:Pekao,0.3736,44970.21,61569.5,96807.55,3,0,6,1,9.41,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,bank:ING,0.372,44783.87,61384.24,96622.29,4,0,6,1,8.3,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,bank:mBank,0.3825,45987.1,62588.21,97826.26,3,0,6,1,8.47,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,bank:Santander,0.3735,44968.35,61567.64,96805.69,3,0,6,1,7.23,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,lokata:4,0.391,45990.34,41453.14,97855.22,3,0,6,1,7.26,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,lokata:13,0.3902,46274.08,34030.11,98138.48,3,0,6,1,7.19,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,kredyt:start,0.4069,65705.54,115960.22,119665.45,4,0,6,1,7.36,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,kredyt:obrotowy,0.4141,62114.64,110252.93,113842.75,3,0,6,1,7.12,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,harpagon:ratunek,0.3825,45987.1,62588.21,97826.26,3,0,6,1,7.26,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,kasyno:czerwone,0.3825,45987.1,62588.21,97826.26,3,0,6,1,7.18,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,kasyno:zero,0.3825,45987.1,62588.21,97826.26,3,0,6,1,7.24,stare_miasto
+premium/18r/6f/sredni,premium,18,6,sredni,,0,,,1005,kasyno:automat,0.3825,45987.1,62588.21,97826.26,3,0,6,1,7.69,stare_miasto

@@ -75,7 +75,7 @@ def test_bot_odklada_nadwyzke_na_lokate_i_zrywa_ja_przy_braku_gotowki():
     assert d["lokaty_zerwij"] == [s.firmy["A"].lokaty[0].id] and not d.get("lokaty_zaloz")
 
 
-def test_bot_pozycza_u_harpagona_przy_braku_gotowki_i_splaca_przy_nadwyzce():
+def test_bot_pozycza_u_harpagona_przy_braku_gotowki_i_splaca_z_nadwyzki():
     g = _gra(3)
     assert not _decyzje(g, {"harpagon": {"prog": 0, "kwota": 5000}}, 3).get("harpagon_wez")
     d = _decyzje(g, {"harpagon": {"prog": 10**9, "kwota": 5000}}, 3)
@@ -85,6 +85,9 @@ def test_bot_pozycza_u_harpagona_przy_braku_gotowki_i_splaca_przy_nadwyzce():
     assert (p := s.firmy["A"].harpagon) is not None
     d = _decyzje(g, {"harpagon": {"prog": 1, "kwota": 5000}}, 4)
     assert d["harpagon_splac"] == p.dlug and not d.get("harpagon_wez")
+    got = s.firmy["A"].gotowka   # nadwyżka ponad próg mniejsza niż dług – spłata częściowa
+    d = _decyzje(g, {"harpagon": {"prog": got - 1000, "kwota": 5000}}, 4)
+    assert d["harpagon_splac"] == pytest.approx(1000) and not d.get("harpagon_wez")
 
 
 def test_boty_dostaja_zaproszenia_do_klubu_tylko_przy_kasyno_botow():

@@ -1316,3 +1316,53 @@ na Felinie; jeden kanał zamiast kanałów strategii, Δ wobec bazy – średnio
 Karta średniej +0,07 – boty rywali kupują mniej udogodnień, premium ma zestaw zamiast karty; skala słów karty do
 B13. B10 zamknięte; otwarte – decyzje autora: trwały skutek promocji, udogodnienia przy uczciwej płacy.
 
+
+## B11 – finanse (6.11.2026, gałąź `kalibracja-b6`)
+
+Boty umieją korzystać z finansów (`silnik/boty.py`, `_finanse`; ustawienia strategii `lokaty`, `kredyt`,
+`harpagon`, `kasyno`, domyślnie wyłączone – testy `testy/rdzen/test_boty_finanse.py`). Zaproszenia do klubu
+dostają boty tylko w pomiarach (opcja gry `kasyno_botow`, włączana w `balans/warianty.py`). Harpagon: bot spłaca
+z nadwyżki ponad próg, także częściowo – przy spłacie tylko całości dług rósł szybciej niż gotówka (premium
+przy 15 tys. zł kapitału: majątek z 117 tys. zł spadał do −41 tys. zł).
+
+**Pomiary** (18 rund, 6 firm, rywale średni; Δ względem bazy w parach z tym samym ziarnem):
+
+| wariant | `b11_finanse` (6 ziaren × 3 strategie) Δ karta / Δ majątek | `b11_stres` (kapitał 15 tys. zł) Δ karta / Δ majątek |
+|---|---|---|
+| inny bank niż mBank | −0,02 / −1,6…−1,9 tys. zł (0%) | −0,02 / −2,4…−2,7 tys. zł (0%) |
+| lokata 4 tyg. | +0,00 / +0,1 tys. zł (78%) | −0,00 / +0,06 tys. zł |
+| lokata 13 tyg. | −0,00 / −0,0 tys. zł | – |
+| kredyt start 50 tys. zł bez celu | −0,14 / +2,6 tys. zł | −0,05 / +9,3 tys. zł |
+| kredyt obrotowy 40 tys. zł bez celu | −0,11 / −0,1 tys. zł | – |
+| kredyt start + drugi lokal (`b11_rozwoj`) | +0,30 ± 0,10 / +50 tys. zł (89%) | +0,16 ± 0,07 / +33 tys. zł (78%) |
+| kredyt obrotowy + drugi lokal (`b11_rozwoj`) | +0,12 ± 0,07 / +25 tys. zł (72%) | – |
+| sam drugi lokal (`b11_rozwoj`) | +0,11 ± 0,07 / +10 tys. zł (78%) | – |
+
+- **Banki:** konto w mBanku (opłata 0 zł, terminal 0,79%) wygrywa zawsze o 1–3 tys. zł; różnica w karcie −0,02.
+  Limit Santandera (40 tys. zł) pod stresem usuwa alarmy premium (1,2 → 0,0 na parę), ale nie odrabia opłat.
+  Lekcja „porównaj opłaty banku” działa; bank to mały wybór, nie pułapka.
+- **Lokata** daje grosze (H9: dużo mniej niż inwestycja w firmę) – zgodnie z planem.
+- **Kredyt** bez celu przegrywa w karcie (zadłużenie z U22: 50 tys. zł długu na koncie daje zad ≈ 0,87), a
+  kredyt wydany na drugi lokal wygrywa najmocniej ze wszystkich dotąd zmierzonych decyzji (H20 spełnione:
+  „kredyt nie zawsze zły”).
+- **Harpagon** (`b11_harpagon`, 12 ziaren, kapitał 15 tys. zł, po zmianie spłaty): zrównoważony −1,6 tys. zł
+  (1/12 na plus), tani −0,2 tys. zł, premium −11,8 tys. zł i −0,10 karty (2/12 na plus), ale alarmy premium
+  spadają z 3,5 do 0,7 na grę. Ryzykowny, czasem opłacalny – zgodnie z planem. W zwykłym starcie bot nie
+  potrzebuje Harpagona (wariant = baza).
+- **Kasyno** (`b11_kasyno`, 30 ziaren, zrównoważony, 5 × 2000 zł na zaproszenie; zaproszenie w 24/30 gier):
+
+| gra | Δ majątek średnio | w grach z zaproszeniem | na plus / na minus | najlepsza / najgorsza |
+|---|---|---|---|---|
+| ruletka – czerwone | −0,9 tys. zł | −1,1 tys. zł | 10 / 14 | +10,0 / −13,1 tys. zł |
+| ruletka – zero | −2,0 tys. zł | −2,6 tys. zł | 4 / 20 | +62,0 / −21,0 tys. zł |
+| automat | −2,1 tys. zł | −2,6 tys. zł | 5 / 19 | +24,0 / −14,0 tys. zł |
+
+  Średnio traci, ale co trzecia–czwarta gra wygrywa – reguła „ryzykowne, czasem opłacalne” spełniona; karta się
+  nie zmienia (pieniądze z portfela właściciela, poza firmą).
+- **Z3 (debet ponad limit):** bez górnej granicy, z odsetkami karnymi 19%, blokadą w następnej rundzie i
+  inwestorem ratunkowym – pod stresem (kapitał 15 tys. zł) alarmy ma tylko premium (1,2 na parę), bez zmian.
+
+Danych gry i domyślnych strategii botów nie zmieniono (zmiana spłaty Harpagona działa tylko przy ustawieniu
+`harpagon`), więc kontrola trudności z B10 (`b10_trudnosc`) obowiązuje. Do decyzji autora – „B11 – kredyt bez
+celu” w `notatki_do_zmiany.md`. Otwarte do B13: rywale trudni mogą finansować drugi lokal kredytem (dziś kupują go
+z gotówki), co wzmocni poziom trudny.

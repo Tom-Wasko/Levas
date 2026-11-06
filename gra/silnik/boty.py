@@ -797,8 +797,8 @@ def _finanse(dane: Dane, f: Firma, st: dict, runda: int, d: dict) -> None:
     if (h := st.get("harpagon")) and lw.ustawienia(dane):
         if f.harpagon is None and f.gotowka < h["prog"]:
             d["harpagon_wez"] = h["kwota"]
-        elif f.harpagon is not None and f.gotowka - f.harpagon.dlug >= h["prog"]:
-            d["harpagon_splac"] = f.harpagon.dlug
+        elif f.harpagon is not None and (x := min(f.harpagon.dlug, f.gotowka - h["prog"])) > 0.005:
+            d["harpagon_splac"] = round(x, 2)   # spłata z nadwyżki ponad próg – także częściowa
     if (lo := st.get("lokaty")) and f.lokale:
         if f.gotowka < lo.get("zerwij_ponizej", 0) and f.lokaty:
             d["lokaty_zerwij"] = [max(f.lokaty, key=lambda x: x.od_rundy).id]

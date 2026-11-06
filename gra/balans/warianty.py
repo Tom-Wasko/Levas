@@ -220,6 +220,15 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     drugi = dane.boty["poziomy"]["trudny"]["kolejny_lokal"]
     w += [Wariant("lokale:drugi", "drugi lokal jak bot trudny",
                   poziom=(("kolejny_lokal", drugi),)),
+          # B11 (H20): kredyt na rozwój – gotówka z kredytu przyspiesza drugi lokal
+          Wariant("kredyt:rozwoj", "kredyt start 50 tys. zł w 1. rundzie, drugi lokal jak trudny",
+                  strategia=(("kredyt", {"produkt": "start", "kwota": 50000, "rund": 52}),),
+                  poziom=(("kolejny_lokal", drugi),)),
+          Wariant("kredyt:rozwoj_obrotowy", "kredyt obrotowy 40 tys. zł w 7. rundzie,"
+                  " drugi lokal jak trudny",
+                  strategia=(("kredyt", {"produkt": "obrotowy", "kwota": 40000, "rund": 52,
+                                         "od_rundy": 7}),),
+                  poziom=(("kolejny_lokal", drugi),)),
           Wariant("lokale:jeden", "bez drugiego lokalu", poziom=(("kolejny_lokal", None),))]
     # B6: typ i forma lokalu (strategia `lokal`, silnik/boty.py: _wybierz_lokal); kupno – na kredyt
     # pod zastaw lokalu, gdy zostaje rezerwa gotówki (inaczej gotowy w najmie); drugi lokal – jak

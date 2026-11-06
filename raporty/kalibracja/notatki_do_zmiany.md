@@ -280,3 +280,14 @@ zmienia. Możliwości:
    ochroną przed odejściem. Nowa mechanika – wymaga zgody.
 2. **Bez zmian:** udogodnienia mają sens, gdy firma płaci mało (płaca minimalna po propozycji B9) – wtedy ratują
    przed odejściami. Boty premium i agresywny kupują teraz 3 udogodnienia zamiast 9 i 6.
+
+## B11 – kredyt bez celu obniża kartę mimo gotówki na koncie (6.11.2026) → `notatki/Ustalenia gry.md` (finanse, U22); do decyzji autora
+
+Pomiar `b11_finanse`: kredyt start 50 tys. zł wzięty w 1. rundzie i trzymany na koncie daje −0,14 karty, choć
+majątek rośnie o 2,6 tys. zł (premium +10 tys. zł, 6/6). Przyczyna: wskaźnik zadłużenia z U22 liczy cały dług
+(zad ≈ 0,87), a gotówka z kredytu tylko dodaje się do mianownika. Kredyt na rozwój i tak wygrywa (+0,30 karty,
+`b11_rozwoj`), więc lekcja działa. Możliwości:
+1. **Bez zmian (zalecane):** „pożyczone pieniądze trzymane bezczynnie kosztują” to też dobra lekcja; kara jest
+   umiarkowana, a kredyt z celem wyraźnie się opłaca.
+2. **Dług netto:** w liczniku dług minus gotówka (nie mniej niż 0). Kredyt bez celu przestaje karać, ale znika
+   też sygnał „zadłużenie”, a gracz może podbić kartę, biorąc kredyt na koniec gry – wymaga zmiany decyzji U22.
