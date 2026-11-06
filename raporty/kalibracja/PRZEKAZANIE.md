@@ -6,10 +6,10 @@ w całości, potem `AGENTS.md`, `POSTEP.md` (sekcja „Krok 5” i lista B6–B1
 
 ## 1. Gdzie jesteśmy
 
-- Repo: `C:\Users\PC\Pulpit\Levas\levas_gra`, **gałąź `kalibracja-b6`** (cała praca B6–B15 tylko tutaj).
+- Repo: `C:\Users\PC\Pulpit\Levas\levas_gra`, **gałąź `kalibracja-b`** (do 7.11.2026 `kalibracja-b6`, nazwę zmienił autor na GitHubie) (cała praca B6–B15 tylko tutaj).
 - B6–B14 zamknięte i wypchnięte. Zostaje **B15 – raport końcowy** (opis w `POSTEP.md`).
 - Równolegle sesja „ufajnianie” (worktree `Pulpit\Levas\levas_ufajnianie`, gałąź `ufajnianie`) przebudowuje
-  Ludzi i menu i scali `kalibracja-b6` + `ufajnianie` do main na zlecenie autora (instrukcja
+  Ludzi i menu i scali `kalibracja-b` + `ufajnianie` do main na zlecenie autora (instrukcja
   `raporty/ufajnianie/SCALANIE.md` na jej gałęzi). Każdy wynik commitować od razu; zmiany w `gra/silnik/ludzie/`,
   `panel_gracza/static/zakladki/index.js`, `hr.js`, `rynek_pracy.js` opisywać w dzienniku (konflikty).
 - Pełny dziennik pomiarów i decyzji: `raporty/kalibracja/dziennik.md`. Propozycje czekające na autora:
@@ -20,7 +20,7 @@ w całości, potem `AGENTS.md`, `POSTEP.md` (sekcja „Krok 5” i lista B6–B1
 ## 2. Zasady (od autora – obowiązują zawsze)
 
 Gałąź i git:
-- Wszystko z B6–B15 na `kalibracja-b6`. **Bez merge do main bez zgody autora.** Bez `push --force`.
+- Wszystko z B6–B15 na `kalibracja-b`. **Bez merge do main bez zgody autora.** Bez `push --force`.
 - Po każdym zamkniętym etapie: testy, ruff, `sprawdz` (pkt 3), wpis w dzienniku, odhaczenie w `POSTEP.md`,
   commit, `git pull --rebase`, push. Pushe na tę gałąź **nie** idą na FTP (lustro FTP tylko dla main).
 - Nigdy nie commitować: `plan.txt`, `gra/db.sqlite3`, `gra/lokalne.json`, `gra/zapisy/`,
@@ -95,7 +95,7 @@ B14: …
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MKxrroukbs3PDn3sd7B3z1
 EOF
-git pull -q --rebase --autostash origin kalibracja-b6 && git push -q origin kalibracja-b6
+git pull -q --rebase --autostash origin kalibracja-b && git push -q origin kalibracja-b
 ```
 
 ## 4. B14 zrobione – co dalej (B15)
@@ -129,4 +129,4 @@ W `notatki_do_zmiany.md`: waga nieruchomości (Z1), lokal niewyposażony, wykup 
 (menu 8 dań u premium +0,53 karty), rozruch (liczba B5), promocje bez trwałego skutku / z rabatem przegrywają,
 płaca minimalna bez rotacji, szkolenie z efektem na kilka tygodni, udogodnienia bez skutku przy uczciwej płacy,
 kredyt bez celu obniża kartę (U22), mandaty skarbowe nie obniżają karty (Z1), „jak człowiek – dobry” kupuje
-drugi lokal jak trudny (B14). Merge `kalibracja-b6` → main.
+drugi lokal jak trudny (B14). Merge `kalibracja-b` → main.
