@@ -858,6 +858,14 @@ Decyzja: **cena kupna ×1,5** (≈ 60 czynszów; f4335c5; 15 lokali, działki be
 (kompromis z inwentarza). Przy ×2 kupno nie wygrywa majątkiem w żadnej grupie. Efekt rozwoju firmy to wzór Z1 –
 propozycja (waga nieruchomości w rozwoju) w `notatki_do_zmiany.md`. Kontrola stref centralnych: `b6_kupno4`.
 
+**Pomiar `b6_kupno4`** (6.11; ceny ×1,5, strefy centrum, stare_miasto, dworzec, akademickie, zemborzyce; 360 gier).
+W strefach centralnych nie ma lokali na sprzedaż (cena tylko na peryferiach), więc bot z kupnem kupuje w czechowie,
+na politechnice, w zygmuntowskim itd., a baza wynajmuje w swojej strefie: to para „najem w centrum” kontra „kupno
+na peryferiach”. Najem w centrum wygrywa: karta −0,16 ± 0,03 dla kupna (47/180 par), majątek −26 tys. (centrum
+−0,21, stare_miasto −0,12, dworzec −0,13, akademickie −0,10). Zemborzyce (tylko budka na kupno, najem w innej
+strefie): kupno −0,23 (5/36). Kompromis lokali po B6: centrum – najem i duży ruch, peryferie – własność albo tani
+najem; kupno wygrywa tylko dla strategii bez wydatków na marketing (tani) i to w strefie, w której kupuje.
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:

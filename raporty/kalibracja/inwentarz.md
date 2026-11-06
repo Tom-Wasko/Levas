@@ -48,6 +48,12 @@ Skrypt: gra botów na jednym poziomie, sumy KPiR z 18 rund. Liczby zgrubne – d
   - drugi lokal – wzrost, ale koszty stałe i ryzyko; przy jednym lokalu z wolnym popytem ma przegrywać z
     lepszym wykorzystaniem pierwszego;
   - licytacja – przepłacenie kontra utrata lokalu.
+- Stan po B6 (6.11.2026, gałąź `kalibracja-b6`): konkurencja strefy w `popyt.yaml` (K4) – najlepsza strefa
+  zależy od strategii (premium: centrum, dworzec, Stare Miasto; tani: lsm_czuby, czechów, politechnika); cena kupna
+  ×1,5 (≈ 60 czynszów) – kupno lepsze dla taniego, gorsze dla zrównoważonego (zamrożona gotówka), premium na zero
+  w 18 rundach i na plus w 26; lokale na kupno tylko na peryferiach (najem w centrum bije kupno na peryferiach).
+  Otwarte (do decyzji autora, `notatki_do_zmiany.md`): kupiony lokal w rozwoju firmy (karta), niewyposażony,
+  wykup na kredyt.
 
 **`przejecie`** – `{id, oferta}`, kupno budynku z najemcą (od `przejecia_od_rundy` 4)
 - Boty (B6, `boty.py: _przejecie`): parametr strategii `wykup` (własny lokal w najmie) i `przejecie` (budynek
@@ -256,7 +262,7 @@ do 40%, szkoda do 8000 zł, karencja 1 runda)
 | H9 | Lokata ING bez ryzyka bije trzymanie gotówki ponad bufor – zamierzone, ale nie może bić inwestycji | kod | pary: lokata z nadwyżki / bez |
 | H10 | Harpagon jest darmową dźwignią dla karty (poza KPiR) – do naprawy w Z1 | kod | po Z1: para z pożyczką / bez |
 | H11 | Zakup sprzętu pompuje „rozwój firmy” w karcie – do naprawy w Z1 | kod, plan | po Z1: para z zakupem / bez |
-| H12 | Kupno gotowego lokalu bije najem już w grze 18 rund | kod | pary: najem / kupno tego samego lokalu, 12/18/26 rund |
+| H12 | Kupno gotowego lokalu bije najem już w grze 18 rund. **B6:** potwierdzone (×1: 135/180 par); po cenie ×1,5 – 107/180, różnice wg strategii; reszta przez rozwój firmy w karcie (propozycja) | kod | pary: najem / kupno tego samego lokalu, 12/18/26 rund |
 | H13 | 2 za 1 opłaca się zawsze przy wolnej kuchni (przyciąganie startowe 0,5) | kod | pary: każda promocja / brak |
 | H14 | Polisy mają ujemną wartość także dla biednej firmy – nikt rozsądny ich nie kupi | kod | pary: komplet polis / brak, wiele ziaren |
 | H15 | Higiena „podstawowa” wystarcza zawsze – „firma” i „haccp” się nie zwracają | kod, boty | pary: 4 poziomy higieny |
