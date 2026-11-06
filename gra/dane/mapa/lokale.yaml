@@ -5,8 +5,9 @@ opis: 'Lokale do najmu lub kupna. Kwoty w złotych, czynsz i utrzymanie (media) 
   urządzania, jednorazowa adaptacja, cały sprzęt trzeba kupić; dzialka: tylko kupno, budowa budowa_rund rund, koszt_budowy
   płatny w równych ratach co rundę budowy. miejsca: ile stanowisk każdego typu zmieści lokal. Kaucja przy najmie:
   kaucja_miesiecy × czynsz (zwrotna po końcu najmu).'
-zrodlo: 'założenie F3a.3: czynsz = metraż × stawka strefy (strefy.yaml: czynsz_m2; gotowy +25%), cena kupna ≈ 40
-  miesięcznych czynszów (gotowy +10%; ceny rynkowe przeskalowane do kapitału gry), działka = m² gruntu × 3 × czynsz_m2,
+zrodlo: 'założenie F3a.3: czynsz = metraż × stawka strefy (strefy.yaml: czynsz_m2; gotowy +25%), cena kupna ≈ 60
+  miesięcznych czynszów (gotowy +10%; B6 6.11.2026: ×1,5 z 40 – pomiar b6_kupno3, przy 40 kupno wygrywało
+  z najmem w 75% par już w 18 rundach; rynek ok. 150 czynszów, ceny przeskalowane do kapitału gry), działka = m² gruntu × 3 × czynsz_m2,
   budowa 900 zł/m², adaptacja 100 zł/m², media 300 zł + 25 zł/m²; niewyposażony: czynsz i cena kupna −25% (test gry
   28.10: lokal do urządzenia razem z adaptacją i zakupem sprzętu wychodził drożej niż gotowy z zestawem); rząd wielkości (oferty najmu w Lublinie 2025:
   40–130 zł/m²), do kalibracji w kroku 5'
@@ -326,7 +327,7 @@ lokale:
     kasa: 1
   zestaw: podstawowy
   czynsz: 3400
-  cena: 119000
+  cena: 178000
   utrzymanie: 1400
   mapa:
     x: 2
@@ -342,7 +343,7 @@ lokale:
     kuchnia: 3
     kasa: 2
   czynsz: 2900
-  cena: 117000
+  cena: 176000
   adaptacja: 6500
   utrzymanie: 1900
   mapa:
@@ -361,7 +362,7 @@ lokale:
     kasa: 1
   zestaw: solidny
   czynsz: 4100
-  cena: 145000
+  cena: 218000
   utrzymanie: 1700
   mapa:
     x: 1
@@ -445,7 +446,7 @@ lokale:
     kasa: 1
   zestaw: podstawowy
   czynsz: 2200
-  cena: 77000
+  cena: 116000
   utrzymanie: 1200
   mapa:
     x: 12
@@ -462,7 +463,7 @@ lokale:
     kuchnia: 3
     kasa: 2
   czynsz: 2600
-  cena: 105000
+  cena: 158000
   adaptacja: 7000
   utrzymanie: 2050
   mapa:
@@ -497,7 +498,7 @@ lokale:
     kasa: 1
   zestaw: podstawowy
   czynsz: 3100
-  cena: 109000
+  cena: 164000
   utrzymanie: 1400
   mapa:
     x: 0
@@ -515,7 +516,7 @@ lokale:
     kasa: 2
   zestaw: podwojny
   czynsz: 6200
-  cena: 218000
+  cena: 327000
   utrzymanie: 2550
   mapa:
     x: 2
@@ -532,7 +533,7 @@ lokale:
     kuchnia: 2
     kasa: 1
   czynsz: 2200
-  cena: 91000
+  cena: 136000
   adaptacja: 5500
   utrzymanie: 1700
   mapa:
@@ -568,7 +569,7 @@ lokale:
     kasa: 1
   zestaw: podstawowy
   czynsz: 2800
-  cena: 99000
+  cena: 148000
   utrzymanie: 1550
   mapa:
     x: 4
@@ -584,7 +585,7 @@ lokale:
     kuchnia: 3
     kasa: 2
   czynsz: 2000
-  cena: 81000
+  cena: 122000
   adaptacja: 6000
   utrzymanie: 1800
   mapa:
@@ -619,7 +620,7 @@ lokale:
     kasa: 1
   zestaw: podstawowy
   czynsz: 1700
-  cena: 59000
+  cena: 88000
   utrzymanie: 1050
   od_rundy: 4
   mapa:
@@ -637,7 +638,7 @@ lokale:
     kasa: 1
   zestaw: podstawowy
   czynsz: 2400
-  cena: 85000
+  cena: 128000
   utrzymanie: 1700
   mapa:
     x: 16
@@ -653,7 +654,7 @@ lokale:
     kuchnia: 3
     kasa: 2
   czynsz: 1800
-  cena: 74000
+  cena: 111000
   adaptacja: 7000
   utrzymanie: 2050
   mapa:
@@ -689,7 +690,7 @@ lokale:
     kuchnia: 1
     kasa: 1
   zestaw: podstawowy
-  cena: 45000
+  cena: 68000
   utrzymanie: 1200
   tylko_kupno: true
   wlasciciel: Tymek
@@ -708,7 +709,7 @@ lokale:
     kuchnia: 2
     kasa: 1
   czynsz: 1500
-  cena: 60000
+  cena: 90000
   adaptacja: 5000
   utrzymanie: 1550
   mapa:
