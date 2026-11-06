@@ -218,7 +218,6 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     for nazwa in nazwy:
         f, ks, rach = s.firmy[nazwa], ksiegi[nazwa], rachunki[nazwa]
         d = decyzje.get(nazwa, {})
-        etat = [p for p in f.pracownicy.values() if p.umowa == "prace"]
         # premia: osobna pozycja na pracownika, w kolumnie wynagrodzeń, bez ZUS (KPiR gry A/B/C online, marzec:
         # „Bonus dla pracownika: …” 3 × 500, ZUS 9576 = 19% samych pensji 50 400)
         for p in f.pracownicy.values():
@@ -227,7 +226,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         ksieguj(f, ks, rach, "Wynagrodzenia pracowników", dane.na_runde(sum(p.pensja for p in f.pracownicy.values())),
                 "wynagrodzenia")
         ksieguj(f, ks, rach, "Składki ZUS pracodawcy",
-                dane.na_runde(sum(p.pensja for p in etat)) * rz.zus_pracodawcy(dane))
+                dane.na_runde(sum(p.pensja * rz.zus_pracodawcy(dane, p.umowa) for p in f.pracownicy.values())))
         utrz_sprzetu = sum(dane.sprzet[n]["utrzymanie"][str(q)] for st in f.stanowiska for n, q in st.sprzet.items())
         ksieguj(f, ks, rach, "Koszty utrzymania sprzętu", dane.na_runde(utrz_sprzetu))
         ud, wy = dane.pozycje("udogodnienia"), dane.pozycje("wyposazenie")
@@ -245,7 +244,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         if not podglad:   # zaproszenie do klubu na następną rundę
             info[nazwa]["zaproszenie"] = kas.zaproszenie(dane, f, r, ziarno, konfiguracja["liczba_rund"])
         if f.biuro in bo.biura(dane):   # biura z mapy albo samodzielna księgowość (silnik/ksiegowosc/biuro.py)
-            info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, len(etat), len(f.pracownicy) - len(etat))
+            info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, *bo._umowy(f))
         # JDG: składki właściciela, zaliczka PIT i VAT (silnik/ksiegowosc/rozliczenie.py)
         samodzielnie = bo.zamknij_samodzielnie(f, r >= konfiguracja["liczba_rund"])
         stan_przed = bo.stan_rozliczen(f)

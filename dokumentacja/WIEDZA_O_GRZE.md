@@ -182,7 +182,7 @@ Sprawdzenie: utrzymanie posiadanych 20 + 1500 + 100 + 200 + 0 = 1820 PLN = warto
 - Te same osoby mają w różnych grach nieco inne parametry (np. Miś: pref. 5280 vs 5390) → przy generowaniu nowej gry losujemy parametry z niewielkim rozrzutem ≈.
 
 ### 6.2 Zatrudnienie ✔
-- Pensja ≥ 4806 brutto. Umowa o pracę: + 19% ZUS i wyższa opłata kadrowa. Umowa zlecenie: bez ZUS, niższa opłata kadrowa, niższe zadowolenie pracownika.
+- Pensja ≥ 4806 brutto. Umowa o pracę: + 20,48% ZUS pracodawcy i wyższa opłata kadrowa. Umowa zlecenie (od B9, decyzja autora P1): te same składki pracodawcy, niższa opłata kadrowa, niższe zadowolenie pracownika, odejście bez okresu wypowiedzenia.
 - Nowo zatrudniony w bieżącej rundzie: przycisk „Anuluj zatrudnienie”. Zatrudniony wcześniej: zmiana pensji, **premia** (jednorazowa), zmiana umowy, „Zwolnij” (odprawa).
 - KPiR: koszt zatrudnienia w miesiącu zatrudnienia; wynagrodzenia i ZUS miesięcznie (luty: 5300 + 5300 + 5400 = 16 000; ZUS 3040 = 19%).
 - Wykorzystanie czasu pracownika = godziny pracy / 160 h ✔ (instruktor 80,3%, recepcja 47,2% – przeliczone dokładnie).

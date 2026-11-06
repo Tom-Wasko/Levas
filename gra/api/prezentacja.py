@@ -130,7 +130,8 @@ def katalogi(dane: Dane) -> dict:
     return {"mapa": dane.mapa, "uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_kasy": dane.sprzet_kasy, "zawody": dane.zawody, "zasoby": dane.zasoby,
             "oferty": dane.katalog_ofert, "placa_minimalna": dane.z["finanse"]["placa_minimalna"],
             "parametry": {"kapital": dane.z["finanse"]["kapital_startowy"], "godziny": dane.z["operacje"]["godziny_pracownika"],
-                          "zus": dane.z["finanse"]["zus_pracodawcy"], "amortyzacja_prog": dane.z["finanse"]["amortyzacja_prog"],
+                          "zus": rz.zus_pracodawcy(dane), "zus_zlecenie": rz.zus_pracodawcy(dane, "zlecenie"),
+                          "amortyzacja_prog": dane.z["finanse"]["amortyzacja_prog"],
                           "na_runde": 12 / dane.rund_w_roku, "rund_w_roku": dane.rund_w_roku,
                           "sprzedaz_sprzetu": dane.z["finanse"]["sprzedaz_sprzetu"]}}
 
@@ -352,6 +353,7 @@ def _podatki(dane: Dane, fp: Firma, runda: int, rejestr: dict | None) -> dict:
                           "limit_odliczenia": p["zdrowotna"]["limit_odliczenia_roczny"],
                           "spoleczne": dane.na_runde(p["zus_wlasciciela"]["spoleczne_miesieczne"]),
                           "ulga_rund": p["zus_wlasciciela"]["ulga_na_start_rund"], "zus_pracodawcy": p["zus_pracodawcy"],
+                          "zus_pracodawcy_zlecenie": rz.zus_pracodawcy(dane, "zlecenie"),
                           "vat_uslug": {u: rz.stawka_sprzedazy(dane, u) for u in dane.uslugi},
                           "vat_zasobow": {z: rz.stawka_zasobu(dane, z) for z in dane.zasoby},
                           "vat_kosztow": p["vat"]["koszty"], "vat_srodkow_trwalych": p["vat"]["srodki_trwale"]}}

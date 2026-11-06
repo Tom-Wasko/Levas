@@ -1090,6 +1090,7 @@ class PlikPodatkow(Plik):
     zus_wlasciciela: ZusWlasciciela
     vat: Vat
     zus_pracodawcy: float = Stawka
+    zus_pracodawcy_zlecenie: float = Field(0.0, ge=0, le=1)   # P1: składki przy umowie zlecenie
 
 
 # --- zdarzenia/*.yaml (eventy w parkach F3b.1; katalog opcjonalny – bez niego gra bez eventów) ---

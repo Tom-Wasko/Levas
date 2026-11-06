@@ -88,3 +88,7 @@ vat:
     stawka: 0.23
   srodki_trwale: 0.23          # sprzęt, wyposażenie, stanowiska od progu amortyzacji (lokal i działka – bez VAT)
 zus_pracodawcy: 0.2048         # od pensji na umowie o pracę: emerytalna 9,76%, rentowa 6,5%, wypadkowa 1,67%, FP 2,45%, FGŚP 0,1%
+# P1 (decyzja autora 29.10.2026, B9): umowa zlecenie – te same składki pracodawcy co etat (ustawa o systemie
+# ubezpieczeń społecznych art. 6 ust. 1 pkt 4; FP i FGŚP od zleceniobiorców z pensją ≥ płaca minimalna – w grze
+# zawsze). Bez składek tylko student do 26 lat – kandydaci w grze nie są studentami.
+zus_pracodawcy_zlecenie: 0.2048

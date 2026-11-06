@@ -28,7 +28,7 @@ function parametryHtml(P, ulga) {
   return `<div class="pasek ciemny"><span>PIT liniowy: <span class="kwota">${proc(P.pit, 0)}</span></span>
     <span>Zdrowotna: <span class="kwota">${proc(P.zdrowotna, 1)}</span> dochodu, min. ${zl2(P.zdrowotna_minimum)} na rundę</span>
     <span>ZUS społeczny: <span class="kwota">${ulga ? `0 zł – ulga na start (do rundy ${P.ulga_rund})` : `${zl2(P.spoleczne)} na rundę`}</span></span>
-    <span>ZUS pracodawcy: <span class="kwota">${proc(P.zus_pracodawcy, 2)}</span> pensji na etacie</span></div>`;
+    <span>ZUS pracodawcy: <span class="kwota">${proc(P.zus_pracodawcy, 2)}</span> pensji na etacie${P.zus_pracodawcy_zlecenie ? ` i ${proc(P.zus_pracodawcy_zlecenie, 2)} na zleceniu` : ""}</span></div>`;
 }
 
 function stawkiVatHtml(P, kat) {

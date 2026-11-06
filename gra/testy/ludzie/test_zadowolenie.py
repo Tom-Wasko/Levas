@@ -114,3 +114,16 @@ def test_bot_daje_podwyzke_niezadowolonemu():
     nowa = _podwyzki(g.dane, s.firmy["A"], ust)[p.id]["pensja"]
     assert stara < nowa <= p.pensja_preferowana * ust["podwyzka_maks"]
     assert "dba_o_ludzi" not in g.dane.boty["poziomy"]["latwy"]
+
+
+def test_zlecenie_placi_skladki_zus_pracodawcy_jak_etat():
+    # P1 (decyzja autora 29.10.2026, B9): zlecenie ma te same składki pracodawcy co umowa o pracę
+    from pomocnicze import _rachunek
+
+    from silnik.ksiegowosc import rozliczenie as rz
+    for umowa in ("prace", "zlecenie"):
+        g, s, p = _start(umowa=umowa)
+        s = _runda(g)
+        zus = -sum(_rachunek(s, 3, "A", "Składki ZUS pracodawcy"))
+        assert rz.zus_pracodawcy(g.dane, umowa) == rz.zus_pracodawcy(g.dane) > 0.2
+        assert zus == pytest.approx(g.dane.na_runde(p.pensja) * rz.zus_pracodawcy(g.dane), abs=0.02)

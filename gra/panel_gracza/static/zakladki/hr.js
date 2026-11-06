@@ -15,7 +15,7 @@ const zadowolenieOsoby = (p) => p.zadowolenie == null ? "–"
   : `<span class="${p.niezadowolony ? "minus" : ""}">${licz(p.zadowolenie, 2)}</span>`;
 
 function kosztWynagrodzen(v, kat) {
-  return v.stan.pracownicy.reduce((s, p) => s + (p.pensja + (p.premia || 0)) * (p.umowa === "prace" ? 1 + kat.parametry.zus : 1), 0);
+  return v.stan.pracownicy.reduce((s, p) => s + (p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0)) + (p.premia || 0)), 0);
 }
 
 export const zatrudnienie = {
@@ -183,7 +183,7 @@ function oknoZatrudnienia({ v, kat }, id, typ, nr) {
     <div class="dwie"><label class="pole">Wynagrodzenie brutto (min. ${licz(kat.placa_minimalna)} PLN)
       <input type="number" id="z-pensja" min="${kat.placa_minimalna}" step="10" value="${k.pensja_preferowana}"></label>
     <label class="pole">Forma zatrudnienia<select id="z-umowa"><option value="prace">Umowa o pracę (+${proc(kat.parametry.zus, 0)} ZUS pracodawcy)</option>
-      <option value="zlecenie">Umowa zlecenie</option></select></label></div>${kanalyRekrutacji(v, k)}
+      <option value="zlecenie">Umowa zlecenie${kat.parametry.zus_zlecenie ? ` (+${proc(kat.parametry.zus_zlecenie, 0)} ZUS pracodawcy)` : ""}</option></select></label></div>${kanalyRekrutacji(v, k)}
     <p class="podpowiedz">Pensja wyższa od preferowanej i umowa o pracę podnoszą zadowolenie pracowników.</p>`,
     { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="potwierdz-zatrudnienie" data-k="${esc(id)}" data-t="${typ}" data-n="${nr}">Potwierdź</button>` });

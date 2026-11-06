@@ -36,7 +36,10 @@ def stawka_zasobu(dane: Dane, zasob: str) -> float | None:
     return s["zasoby"].get(zasob, s["domyslna"])
 
 
-def zus_pracodawcy(dane: Dane) -> float:
+def zus_pracodawcy(dane: Dane, umowa: str = "prace") -> float:
+    """Stawka składek ZUS pracodawcy od pensji; umowa zlecenie – osobna stawka z podatków (P1, bez niej 0)."""
+    if umowa == "zlecenie":
+        return dane.podatki.get("zus_pracodawcy_zlecenie", 0.0) if dane.podatki else 0.0
     return dane.podatki["zus_pracodawcy"] if dane.podatki else dane.z["finanse"]["zus_pracodawcy"]
 
 

@@ -55,12 +55,12 @@ export function zlozona({ tytul, tytulPelny, info, czesci, odRundy }) {
 const magazynLokalu = (v, id) => (id && v.swiezosc?.lokale?.[id]) || v.swiezosc || null;
 const STATUS = (l, v) => (l.dziala_od <= v.runda ? `<span class="pigulka ok">działa</span>` : `<span class="pigulka inf">rusza w rundzie ${l.dziala_od}</span>`);
 
-// pensje (miesięczne, z ZUS pracodawcy przy umowie o pracę) ludzi na stanowiskach lokalu
+// pensje (miesięczne, z ZUS pracodawcy, premia bez ZUS) ludzi na stanowiskach lokalu
 function pensjeLokalu(v, kat, id) {
   const st = v.stan.stanowiska.filter((s) => !wieleLokali(v) || s.lokal === id);
   return st.reduce((suma, s) => {
     const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
-    return suma + (p ? (p.pensja + (p.premia || 0)) * (p.umowa === "prace" ? 1 + kat.parametry.zus : 1) : 0);
+    return suma + (p ? (p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0)) + (p.premia || 0)) : 0);
   }, 0);
 }
 const kosztLokalu = (o) => (o ? (o.forma === "najem" ? naRunde(o.czynsz) : 0) + (o.dziala ? naRunde(o.utrzymanie) : 0) : 0);
