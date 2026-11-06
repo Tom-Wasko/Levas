@@ -6,9 +6,9 @@ import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, pon
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
 import { kolko } from "./dymki.js";
 import { idWybranego, nazwaLokalu, stanowiskaLokalu, wyborLokaluKrotki } from "./lokal_wybor.js";
+import { forma, kosztMiesieczny, minimum, nazwaFormy, oczekiwana, opcjeForm, opisFormy, pigulkaStudenta } from "./formy.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
-const UMOWY = { prace: "Umowa o pracę", zlecenie: "Umowa zlecenie" };
 const NIEZADOWOLENIE = "niezadowolenie";   // silnik/ludzie/zadowolenie.py: powód wypowiedzenia (U20)
 
 // U20: krótki żartobliwy opis osoby pod „i” – z niego gracz zgaduje ukrytą cechę
@@ -16,9 +16,15 @@ const opisOsoby = (o) => kolko(esc(o.opis || ""));
 const zadowolenieOsoby = (p) => p.zadowolenie == null ? "–"
   : `<span class="${p.niezadowolony ? "minus" : ""}">${licz(p.zadowolenie, 2)}</span>`;
 
-// koszt za rundę: pensje miesięczne z ZUS pracodawcy przeliczone na rundę + premie (za rundę, bez ZUS)
+// koszt za rundę: pensje miesięczne z ZUS pracodawcy (wg formy zatrudnienia, UF21) przeliczone na rundę + premie (bez ZUS)
 function kosztWynagrodzen(v, kat) {
-  return v.stan.pracownicy.reduce((s, p) => s + naRunde(p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0))) + (p.premia || 0), 0);
+  return v.stan.pracownicy.reduce((s, p) => s + naRunde(kosztMiesieczny(kat, p)) + (p.premia || 0), 0);
+}
+
+// UF21: pensja w oknie zatrudnienia/profilu musi spełnić minimum formy (pół etatu – połowa, B2B i staż – bez)
+function zlaPensja(kat, pensja, umowa, osoba) {
+  const min = minimum(kat, umowa, osoba?.student);
+  return pensja < min ? `Pensja w tej formie nie może być niższa niż ${licz(min)} PLN.` : null;
 }
 
 export const zatrudnienie = {
@@ -48,7 +54,7 @@ export const zatrudnienie = {
           : p.niezadowolony ? '<span class="pigulka nie">niezadowolony</span>' : "";
         return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}${ruch}${wyp}${opisOsoby(p)}</div>
           <div class="kt srodek" data-akcja="profil" data-id="${esc(p.id)}" style="cursor:pointer"><div class="awatar">${inicjaly(p.imie_nazwisko)}</div>
-          <b>${esc(p.imie_nazwisko)}</b><br><span class="podpowiedz">${esc(p.zawod)} · ${UMOWY[p.umowa]}</span><br>${gw(p.gwiazdki)}<br>
+          <b>${esc(p.imie_nazwisko)}</b>${pigulkaStudenta(p)}<br><span class="podpowiedz">${esc(p.zawod)} · ${nazwaFormy(kat, p.umowa)}</span><br>${gw(p.gwiazdki)}<br>
           <b class="akcent">${zl(p.pensja)}</b>${p.premia ? `<br><span class="podpowiedz">premia ${zl(p.premia)}</span>` : ""}</div>
           ${prz ? `<button class="btn jasny maly" data-akcja="cofnij-przenosiny" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Cofnij przeniesienie</button>` : ""}</div>`;
       }).join("")}</div>`;
@@ -92,8 +98,10 @@ export const zatrudnienie = {
       return oknoZatrudnienia(c, k, t, t ? +n : null);
     },
     "potwierdz-zatrudnienie": async (el, c) => {
-      const pensja = +document.getElementById("z-pensja").value, umowa = document.getElementById("z-umowa").value;
-      if (pensja < c.kat.placa_minimalna) return toast(`Pensja nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);
+      const umowa = document.getElementById("z-umowa").value;
+      const pensja = forma(c.kat, umowa).staz ? 0 : +document.getElementById("z-pensja").value;
+      const blad = zlaPensja(c.kat, pensja, umowa, c.v.kandydaci.find((x) => x.id === el.dataset.k));
+      if (blad) return toast(blad);
       const miejsce = document.getElementById("z-miejsce");
       if (miejsce && !miejsce.value) return toast("Wybierz lokal i stanowisko dla nowej osoby.");
       const [t, n] = miejsce ? miejsce.value.split(":") : [el.dataset.t, el.dataset.n];
@@ -126,9 +134,11 @@ export const zatrudnienie = {
     profil: (el, c) => oknoProfilu(c, el.dataset.id),
     "zapisz-profil": async (el, c) => {
       const id = el.dataset.id, nowy = el.dataset.nowy === "1";
-      const pensja = +document.getElementById("p-pensja").value, umowa = document.getElementById("p-umowa").value;
+      const umowa = document.getElementById("p-umowa").value;
+      const pensja = forma(c.kat, umowa).staz ? 0 : +document.getElementById("p-pensja").value;
       const premia = +(document.getElementById("p-premia")?.value || 0);
-      if (pensja < c.kat.placa_minimalna) return toast(`Pensja nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);
+      const blad = zlaPensja(c.kat, pensja, umowa, c.v.stan.pracownicy.find((x) => x.id === id));
+      if (blad) return toast(blad);
       zamknijOkno();
       await c.zmien((d) => {
         if (nowy) d.zatrudnij = (d.zatrudnij || []).map((z) => z.kandydat === id ? { ...z, pensja, umowa } : z);
@@ -147,6 +157,22 @@ export const zatrudnienie = {
     "cofnij-zwolnienie": async (el, c) => {
       zamknijOkno();
       await c.zmien((d) => { d.zwolnij = (d.zwolnij || []).filter((x) => x !== el.dataset.id); });
+    },
+  },
+  zmiany: {
+    // UF21: zmiana formy w oknie zatrudnienia/profilu – pensja oczekiwana w tej formie, minimum i opis
+    "forma-zatrudnienia": (el, c) => {
+      const osoba = c.v.kandydaci.find((x) => x.id === el.dataset.k) || c.v.stan.pracownicy.find((x) => x.id === el.dataset.k);
+      if (!osoba) return;
+      const pole = document.getElementById(el.dataset.pensja), u = el.value, staz = !!forma(c.kat, u).staz;
+      if (pole) {
+        pole.disabled = staz;
+        pole.min = minimum(c.kat, u, osoba.student);
+        if (staz) pole.value = 0;   // kandydat – pensja oczekiwana w nowej formie; pracownik – tylko po stażu (0)
+        else if (c.v.kandydaci.includes(osoba) || !+pole.value) pole.value = oczekiwana(c.kat, osoba, u);
+      }
+      const opis = document.getElementById(el.dataset.opis);
+      if (opis) opis.innerHTML = opisFormy(c.kat, u, osoba);
     },
   },
 };
@@ -183,7 +209,7 @@ function oknoWlasciciela({ v }, typ, nr) {
 function oknoKandydatow({ v, kat }, typ, nr) {
   const typy = kat.oferty.stanowiska.typy, zawody = typy[typ].zawody;
   const lista = v.kandydaci.filter((k) => zawody.includes(k.zawod)).sort((a, b) => b.zadowolenie_klientow - a.zadowolenie_klientow);
-  const w = lista.map((k) => [esc(k.imie_nazwisko) + opisOsoby(k), gw(k.gwiazdki), esc(k.zawod), licz(k.pensja_preferowana), licz(k.koszt_rekrutacji),
+  const w = lista.map((k) => [esc(k.imie_nazwisko) + pigulkaStudenta(k) + opisOsoby(k), gw(k.gwiazdki), esc(k.zawod), licz(k.pensja_preferowana), licz(k.koszt_rekrutacji),
     licz(k.koszt_odprawy), proc(k.zadowolenie_klientow, 0), proc(k.ryzyko_reklamacji, 0),
     `<button class="btn pom maly" data-akcja="zatrudnij" data-k="${esc(k.id)}" data-t="${typ}" data-n="${nr}">Zatrudnij +</button>`]);
   okno(`Zatrudnienie na „Stanowisko nr ${nr}”`, tabela(null, ["Imię i nazwisko", "Doświadczenie", "Zawód", "Preferowane wynagrodzenie",
@@ -226,11 +252,12 @@ function oknoZatrudnienia({ v, kat }, id, typ, nr) {
   const k = v.kandydaci.find((x) => x.id === id);
   okno(`Zatrudnienie: ${esc(k.imie_nazwisko)}`, `<p>${esc(k.zawod)} ${gw(k.gwiazdki)} · preferowane wynagrodzenie <b>${zl(k.pensja_preferowana)}</b>
       · ${v.agencja ? "bazowy " : ""}koszt rekrutacji ${zl(k.koszt_rekrutacji)}</p>
-    <div class="dwie"><label class="pole">Wynagrodzenie brutto (min. ${licz(kat.placa_minimalna)} PLN)
-      <input type="number" id="z-pensja" min="${kat.placa_minimalna}" step="10" value="${k.pensja_preferowana}"></label>
-    <label class="pole">Forma zatrudnienia<select id="z-umowa"><option value="prace">Umowa o pracę (+${proc(kat.parametry.zus, 0)} ZUS pracodawcy)</option>
-      <option value="zlecenie">Umowa zlecenie${kat.parametry.zus_zlecenie ? ` (+${proc(kat.parametry.zus_zlecenie, 0)} ZUS pracodawcy)` : ""}</option></select></label></div>${typ ? "" : wyborMiejsca(v, kat, k.zawod)}${kanalyRekrutacji(v, k)}
-    <p class="podpowiedz">Pensja wyższa od preferowanej i umowa o pracę podnoszą zadowolenie pracowników.</p>`,
+    <div class="dwie"><label class="pole">Wynagrodzenie brutto (miesięcznie)
+      <input type="number" id="z-pensja" min="${minimum(kat, "prace", k.student)}" step="10" value="${oczekiwana(kat, k, "prace")}"></label>
+    <label class="pole">Forma zatrudnienia<select id="z-umowa" data-zmiana="forma-zatrudnienia" data-k="${esc(id)}" data-pensja="z-pensja"
+      data-opis="z-opis-formy">${opcjeForm(v, kat, k, "prace")}</select></label></div>
+    <p class="podpowiedz" id="z-opis-formy">${opisFormy(kat, "prace", k)}</p>${typ ? "" : wyborMiejsca(v, kat, k.zawod)}${kanalyRekrutacji(v, k)}
+    <p class="podpowiedz">Pensja wyższa od oczekiwanej i umowa o pracę podnoszą zadowolenie pracowników.</p>`,
     { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
       <button class="btn pom" data-akcja="potwierdz-zatrudnienie" data-k="${esc(id)}"${typ ? ` data-t="${typ}" data-n="${nr}"` : ""}>Potwierdź</button>` });
 }
@@ -244,7 +271,7 @@ export function kandydaciRynku({ v, kat, edycja }) {
     return s ? `${v.lokale ? `${esc(nazwaLokalu(v, s.lokal))} · ` : ""}${esc(typy[s.typ]?.nazwa ?? s.typ)} nr ${s.nr}` : "–";
   };
   const lista = [...v.kandydaci].sort((a, b) => a.zawod.localeCompare(b.zawod) || b.zadowolenie_klientow - a.zadowolenie_klientow);
-  const w = lista.map((k) => [esc(k.imie_nazwisko) + opisOsoby(k), esc(k.zawod), gw(k.gwiazdki), zl(k.pensja_preferowana), zl(k.koszt_rekrutacji),
+  const w = lista.map((k) => [esc(k.imie_nazwisko) + pigulkaStudenta(k) + opisOsoby(k), esc(k.zawod), gw(k.gwiazdki), zl(k.pensja_preferowana), zl(k.koszt_rekrutacji),
     proc(k.zadowolenie_klientow, 0), proc(k.ryzyko_reklamacji, 0),
     `<button class="btn pom maly" data-akcja="zatrudnij" data-k="${esc(k.id)}" ${edycja ? "" : "disabled"}>Zatrudnij +</button>`]);
   return tabela("Kandydaci", ["Imię i nazwisko", "Zawód", "Doświadczenie", "Preferowane wynagrodzenie", "Bazowy koszt rekrutacji",
@@ -252,7 +279,7 @@ export function kandydaciRynku({ v, kat, edycja }) {
     + `<p class="podpowiedz">Przy zatrudnieniu wybierasz lokal i wolne stanowisko (${TYPY.map((t) => `${esc(typy[t].kto)}: ${typy[t].zawody.map(esc).join(", ")}`).join(" · ")}).
       Obsadę zmienisz potem w zakładce <a data-zakladka-k="lokal_przeglad">Mój lokal</a>.</p>`
     + (czekaja.length ? tabela("Zatrudnienia w tej rundzie", ["Osoba", "Zawód", "Lokal i stanowisko", "Pensja", "Umowa", ""],
-      czekaja.map((p) => [esc(p.imie_nazwisko), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, gdzie(p), zl(p.pensja), UMOWY[p.umowa],
+      czekaja.map((p) => [esc(p.imie_nazwisko) + pigulkaStudenta(p), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, gdzie(p), zl(p.pensja), nazwaFormy(kat, p.umowa),
         `<button class="btn jasny maly" data-akcja="profil" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Zmień</button>
          <button class="btn czarny maly" data-akcja="zwolnij" data-id="${esc(p.id)}" data-nowy="1" ${edycja ? "" : "disabled"}>Anuluj</button>`]),
       { klasy: ["l", "l", "l"] }) : "");
@@ -333,12 +360,14 @@ function oknoProfilu({ v, kat, edycja }, id) {
       ${p.niezadowolony && !p.odchodzi ? `<p class="minus" style="text-align:left">Niezadowolony od ${p.niezadowolony} tyg. – szczegóły na liście błędów.
         Pomaga podwyżka, lepszy sprzęt albo odciążenie.</p>` : ""}</div>
     <div style="display:flex;flex-direction:column;gap:12px">
-      ${pole("Aktualne wynagrodzenie brutto", `<input type="number" id="p-pensja" step="10" value="${p.pensja}" ${edycja ? "" : "disabled"}>`)}
+      ${pole("Aktualne wynagrodzenie brutto", `<input type="number" id="p-pensja" step="10" value="${p.pensja}" ${edycja && !forma(kat, p.umowa).staz ? "" : "disabled"}>`)}
       ${nowy ? "" : pole("Premia (jednorazowo w tej rundzie)", `<input type="number" id="p-premia" step="50" value="${p.premia || 0}" ${edycja ? "" : "disabled"}>`)}
-      ${pole("Forma zatrudnienia", `<select id="p-umowa" ${edycja ? "" : "disabled"}>${Object.entries(UMOWY).map(([k, n]) => `<option value="${k}" ${p.umowa === k ? "selected" : ""}>${n}</option>`).join("")}</select>`)}
+      ${pole("Forma zatrudnienia", `<select id="p-umowa" data-zmiana="forma-zatrudnienia" data-k="${esc(id)}" data-pensja="p-pensja" data-opis="p-opis-formy"
+        ${edycja ? "" : "disabled"}>${opcjeForm(v, kat, p, p.umowa, { nowy })}</select>`)}
+      <span class="podpowiedz" id="p-opis-formy">${opisFormy(kat, p.umowa, p)}${forma(kat, p.umowa).staz ? ` Staż do rundy ${p.od_rundy + forma(kat, p.umowa).staz.rund}.` : ""}</span>
       ${(v.decyzje.zwolnij || []).includes(id)
     ? `<button class="btn jasny" data-akcja="cofnij-zwolnienie" data-id="${esc(id)}" ${edycja ? "" : "disabled"}>Cofnij zwolnienie</button>
-       <span class="podpowiedz">${p.umowa === "prace" ? "Umowa o pracę: przez 2 rundy wypowiedzenia jeszcze pracuje i dostaje pensję." : "Umowa zlecenie: odchodzi od razu."}</span>`
+       <span class="podpowiedz">${forma(kat, p.umowa).wypowiedzenie ? `${nazwaFormy(kat, p.umowa)}: przez okres wypowiedzenia jeszcze pracuje i dostaje pensję.` : `${nazwaFormy(kat, p.umowa)}: odchodzi od razu.`}</span>`
     : p.odchodzi ? `<span class="minus">${p.odchodzi.powod === NIEZADOWOLENIE ? "Złożył(a) wypowiedzenie z niezadowolenia" : "W okresie wypowiedzenia"} – odchodzi w rundzie ${p.odchodzi.runda}.</span>`
       : `<button class="btn czarny" data-akcja="zwolnij" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>${nowy ? "Anuluj zatrudnienie" : "Zwolnij"}</button>`}
     </div></div>`, { przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
@@ -359,7 +388,7 @@ export const zespol = {
       const stanOsoby = p.odchodzi ? `<span class="pigulka${p.odchodzi.powod === NIEZADOWOLENIE ? " nie" : ""}">odchodzi w r. ${p.odchodzi.runda}</span>`
         : p.od_rundy === v.runda ? `<span class="pigulka inf">nowy</span>` : p.niezadowolony ? `<span class="pigulka nie">niezadowolony</span>` : "";
       return [`<a data-akcja="profil" data-id="${esc(p.id)}">${esc(p.imie_nazwisko)}</a> ${stanOsoby}`, esc(p.zawod), gw(p.gwiazdki), gdzie,
-        UMOWY[p.umowa] ?? esc(p.umowa), zl(p.pensja), p.premia ? zl(p.premia) : "–", zadowolenieOsoby(p)];
+        nazwaFormy(kat, p.umowa) + pigulkaStudenta(p), zl(p.pensja), p.premia ? zl(p.premia) : "–", zadowolenieOsoby(p)];
     });
     return `<div class="pasek ciemny"><span>Pracownicy: <span class="kwota">${licz(P.length)}</span></span>
       <span>Koszty wynagrodzeń: <span class="kwota">${zl(kosztWynagrodzen(v, kat), true)}</span>${naOkres()} (z ZUS pracodawcy)</span></div>`

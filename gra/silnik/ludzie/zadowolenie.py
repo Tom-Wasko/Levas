@@ -17,6 +17,7 @@ from ..dane import Dane
 from ..losowosc import strumien
 from ..model import Firma, Odejscie, Pracownik, do_slownika
 from ..nieruchomosci import per_lokal as pl
+from . import formy as fz
 from .kandydaci import cechy
 from .rynek_pracy import okres_wypowiedzenia
 
@@ -37,8 +38,13 @@ def wplyw(dane: Dane, p: Pracownik) -> dict:
 
 def placa_wzgledna(dane: Dane, p: Pracownik) -> float:
     """B9: (pensja + premia) ÷ pensja preferowana; pensja jest miesięczna, a premia – za rundę, więc w grze
-    tygodniowej liczy się jak miesięczna podwyżka o premia × rund_w_roku / 12 (na ten tydzień)."""
-    return (p.pensja + p.premia * dane.rund_w_roku / 12) / p.pensja_preferowana
+    tygodniowej liczy się jak miesięczna podwyżka o premia × rund_w_roku / 12 (na ten tydzień).
+    UF21: zamiast preferowanej – pensja oczekiwana w tej formie (pół etatu, B2B, student); staż – płaca neutralna."""
+    premia = p.premia * dane.rund_w_roku / 12
+    oczekiwana = fz.oczekiwana(dane, p)
+    if oczekiwana is None:
+        return 1 + premia / p.pensja_preferowana
+    return (p.pensja + premia) / oczekiwana
 
 
 def skladniki(dane: Dane, f: Firma, p: Pracownik, wykorzystanie: float, szkolenia_procent: float) -> dict[str, float]:
@@ -57,7 +63,7 @@ def skladniki(dane: Dane, f: Firma, p: Pracownik, wykorzystanie: float, szkoleni
         "udogodnienia": w["udogodnienia_na_procent"] * udog * c["warunki"],
         "szkolenia": (w["szkolenia_w_miesiacu_na_procent"] * szkolenia_procent
                       + w.get("szkolenie_w_miesiacu", 0.0) * (szkolenia_procent > 0)),
-        "umowa": w["udzial_umow_zlecenie"] * (p.umowa == "zlecenie"),
+        "umowa": w["udzial_umow_zlecenie"] * bool(fz.forma(dane, p.umowa)["kara_zlecenia"]),
         "przeciazenie": kb["przepracowanie"] * max(0.0, wykorzystanie - kb["prog_przepracowania"]) * c["przeciazenie"],
         "charakter": c["zadowolenie"],
     }
@@ -71,7 +77,8 @@ def szansa(dane: Dane, p: Pracownik, z: float) -> float:
     """Szansa wypowiedzenia w tygodniu: za każde 0,01 poniżej progu szansa_na_setna (najwyżej szansa_maks) × cecha."""
     u = ustawienia(dane)
     brak = max(0.0, u["prog_zadowolenia"] - z) * 100
-    return round(min(1.0, min(u["szansa_maks"], u["szansa_na_setna"] * brak) * wplyw(dane, p)["odejscie"]), 3)
+    return round(min(1.0, min(u["szansa_maks"], u["szansa_na_setna"] * brak) * wplyw(dane, p)["odejscie"]
+                     * fz.mnoznik_odejsc(dane, p)), 3)
 
 
 def _procent(x: float) -> str:
@@ -124,14 +131,14 @@ def po_rundzie(dane: Dane, f: Firma, w: dict, r: int, ziarno, szkolenia_procent:
     return odejscia
 
 
-def _z_projektem(p: Pracownik, zm: dict | None) -> Pracownik:
+def _z_projektem(dane: Dane, p: Pracownik, zm: dict | None) -> Pracownik:
     """Osoba z pensją, umową i premią z projektu decyzji (jak w decyzje.zastosuj)."""
     if not zm:
         return p
     q = p.model_copy()
     if zm.get("pensja"):
         q.pensja = float(zm["pensja"])
-    if zm.get("umowa") in ("prace", "zlecenie"):
+    if zm.get("umowa") in fz.formy(dane):
         q.umowa = zm["umowa"]
     q.premia = float(zm.get("premia", 0) or 0)
     return q
@@ -154,7 +161,7 @@ def ostrzezenia(dane: Dane, f: Firma, zmiany: dict, runda: int) -> list[tuple[st
             continue
         if o or not p.niezadowolony or p.zadowolenie is None:
             continue
-        q = _z_projektem(p, zmiany.get(p.id))
+        q = _z_projektem(dane, p, zmiany.get(p.id))
         przed = skladniki(dane, f, p, p.wykorzystanie, 0.0)
         po = skladniki(dane, f, q, p.wykorzystanie, 0.0)
         z = round(p.zadowolenie + sum(po.values()) - sum(przed.values()), 3)

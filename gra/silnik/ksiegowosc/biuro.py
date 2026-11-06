@@ -92,14 +92,16 @@ def najtansze(dane: Dane, dokumenty: int, etat: int, zlecenie: int) -> str:
     return min(biura(dane).values(), key=lambda b: szacunek(dane, b, dokumenty, etat, zlecenie))["id"]
 
 
-def _umowy(firma: Firma) -> tuple[int, int]:
-    etat = sum(1 for p in firma.pracownicy.values() if p.umowa == "prace")
-    return etat, len(firma.pracownicy) - etat
+def _umowy(dane: Dane, firma: Firma) -> tuple[int, int]:
+    """Osoby do opłaty kadrowej: (jak etat, jak zlecenie) wg formy zatrudnienia (UF21; B2B – bez opłaty)."""
+    from ..ludzie.formy import forma
+    rodzaje = [forma(dane, p.umowa)["kadry"] for p in firma.pracownicy.values()]
+    return rodzaje.count("etat"), rodzaje.count("zlecenie")
 
 
 def najnizsza_oplata(dane: Dane, firma: Firma, dokumenty: int) -> tuple[str, float]:
     """U6: biuro z najniższą opłatą za rundę przy tylu dokumentach i pracownikach firmy – (nazwa, kwota brutto)."""
-    oplaty = [(b["nazwa"], oplata(dane, b, dokumenty, *_umowy(firma))["razem"]) for b in biura(dane).values()]
+    oplaty = [(b["nazwa"], oplata(dane, b, dokumenty, *_umowy(dane, firma))["razem"]) for b in biura(dane).values()]
     return min(oplaty, key=lambda x: x[1])
 
 
@@ -357,7 +359,7 @@ def widok(dane: Dane, firma_przed: Firma, firma: Firma, d: dict, wyniki: dict | 
     """Zakładka Biuro rachunkowe (gra z lokalami): oferty z szacunkiem opłaty, deklaracja do złożenia (dokumenty
     bez poprawnych zapisów) i podpowiedzi – zapisy, które drużyna już raz zrobiła dobrze (ten sam opis)."""
     u = ustawienia(dane)
-    etat, zlecenie = _umowy(firma)
+    etat, zlecenie = _umowy(dane, firma)
     dok = len(dokumenty_ostatnie := (firma_przed.deklaracja or {}).get("dokumenty") or []) or u["szacunek_dokumentow"]
     oferty = [{**b, "szacunek": oplata(dane, b, dok, etat, zlecenie),
                "limit_rundy": limit_rundy(b)} for b in u["biura"]]

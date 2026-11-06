@@ -116,8 +116,8 @@ def test_bot_daje_podwyzke_niezadowolonemu():
     assert "dba_o_ludzi" not in g.dane.boty["poziomy"]["latwy"]
 
 
-def test_zlecenie_placi_skladki_zus_pracodawcy_jak_etat():
-    # P1 (decyzja autora 29.10.2026, B9): zlecenie ma te same składki pracodawcy co umowa o pracę
+def test_zlecenie_bez_skladek_zus_pracodawcy():
+    # UF10 (decyzja autora 6.11.2026, zastępuje P1 z 29.10): w grze zlecenie bez składek pracodawcy, etat – ze składkami
     from pomocnicze import _rachunek
 
     from silnik.ksiegowosc import rozliczenie as rz
@@ -125,8 +125,9 @@ def test_zlecenie_placi_skladki_zus_pracodawcy_jak_etat():
         g, s, p = _start(umowa=umowa)
         s = _runda(g)
         zus = -sum(_rachunek(s, 3, "A", "Składki ZUS pracodawcy"))
-        assert rz.zus_pracodawcy(g.dane, umowa) == rz.zus_pracodawcy(g.dane) > 0.2
-        assert zus == pytest.approx(g.dane.na_runde(p.pensja) * rz.zus_pracodawcy(g.dane), abs=0.02)
+        stawka = rz.zus_pracodawcy(g.dane, umowa)
+        assert stawka == (0.0 if umowa == "zlecenie" else rz.zus_pracodawcy(g.dane)) and rz.zus_pracodawcy(g.dane) > 0.2
+        assert zus == pytest.approx(g.dane.na_runde(p.pensja) * stawka, abs=0.02)
 
 
 def test_premia_za_runde_liczy_sie_jak_miesieczna_podwyzka():

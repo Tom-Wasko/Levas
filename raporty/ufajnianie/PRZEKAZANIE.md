@@ -73,10 +73,30 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   przy dodatkach 0/¼/½/1 pensji – `szansaPrzejscia` to kopia wzoru, odległości w `v.agencja.przenosiny`) i „Stań sam”;
   zatrudnianie – `kandydaciRynku` w Rynku pracy (okno zatrudnienia bez stanowiska ma `<select id="z-miejsce">` typ:nr).
   Gra bez lokali (stare zapisy) – po staremu. Test: `testy/ludzie/test_przenosiny.py`.
-- Następne: UF21+UF10, potem kolejno: UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF21+UF10 – formy zatrudnienia. Dane: `zalozenia.yaml: pracownicy.formy_zatrudnienia` (prace, pol_etatu,
+  zlecenie, student, staz, b2b – etat, rodzaj ZUS, wypowiedzenie, kadry biura, kara zlecenia, mnożnik oczekiwanej pensji,
+  płaca minimalna) i `pracownicy.studenci` (wiek, udział, godziny, odejścia, pensja). `podatki_2026.yaml:
+  zus_pracodawcy_zlecenie: 0` (UF10) i reguła VAT „Faktura B2B”. Logika: `silnik/ludzie/formy.py` (bez danych –
+  dawne dwie formy, więc testy na zamrożonej kopii działają po staremu). `Pracownik.student`; studenci losowani
+  osobnym strumieniem „studenci” (reszta puli bez zmian). Godziny: `Firma.godziny_stanowiska(…, dane)` × `fz.etat`.
+  B2B: zamiast pensji i ZUS księgowana „Faktura B2B: <imię>” brutto z VAT. Staż: pensja 0, `fz.koniec_stazu` na
+  początku kadr w `decyzje.zastosuj`. Zmiana formy w `zmiany` walidowana (`fz.blad`), błędy na liście (`hr_zatrudnienie`).
+  Licytacja kandydata porównuje oferty `fz.porownawcza` (w przeliczeniu na etat). Opcja MG (TYMCZASOWE – do usunięcia
+  przed oficjalną wersją): `konfiguracja.formy_zatrudnienia`, POST `prowadzenie {formy_zatrudnienia: [...]}`, wiersz
+  „Formy zatrudnienia (test)” w panelu MG; wyłączone formy w decyzjach → umowa o pracę (`fz.przytnij` w runda.py).
+  Panel: `zakladki/formy.js` (nazwy, ZUS, koszt, minimum, formy dla osoby, opis), okno zatrudnienia i profil (hr.js,
+  `zmiany["forma-zatrudnienia"]` przelicza pensję i opis), Rynek pracy, Lokal (koszt), Podatki (tekst).
+  Testy: `testy/ludzie/test_formy.py`, test MG w `test_panel_mg.py`, przepisany test ZUS zlecenia w test_zadowolenie.py.
+- Następne kolejno: UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
+  nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 
 ## Pułapki
 - Pomiary bambiczkowania czytają dane z `levas_gra`, nie stąd – tu możesz zmieniać `gra/dane/`.
 - Konflikty przy scalaniu będą w: `POSTEP.md` (tu skrócony), `gra/dane/boty.yaml` i `silnik/boty.py` (B14 zmienia
   boty; tu boty dostają tylko nowe decyzje – dopisuj osobnymi blokami, nie przestawiaj kodu), `gra/INSTRUKCJA.md`.
 - `zus_zlecenie` z B9 (20,48%) – UF10 przywraca zlecenie bez ZUS (decyzja autora 6.11.2026, zastępuje P1 z 29.10).
+  Zrobione w UF21; przy scalaniu z kalibracja-b sprawdź, czy B14/B15 nie zmieniły `zus_pracodawcy_zlecenie` z powrotem.
+- UF21: boty pomijają kandydatów-studentów i zatrudniają po staremu (umowa o pracę / zlecenie). Zlecenie bez ZUS
+  może stać się dla graczy wyraźnie tańsze od etatu – do sprawdzenia w następnej kalibracji (kara zadowolenia
+  `udzial_umow_zlecenie`). Testy z `_kandydat()` biorą domyślnie nie-studentów.

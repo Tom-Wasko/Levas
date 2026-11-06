@@ -32,6 +32,8 @@ vat:
   koszty:                      # pierwszy pasujący fragment opisu pozycji KPiR; brak dopasowania – bez VAT (zw)
   - zawiera: Czynsz najmu
     stawka: 0.23
+  - zawiera: Faktura B2B         # UF21: kontrakt B2B – osoba wystawia fakturę z VAT
+    stawka: 0.23
   - zawiera: Adaptacja lokalu
     stawka: 0.23
   - zawiera: koszt utrzymania lokalu
@@ -88,7 +90,8 @@ vat:
     stawka: 0.23
   srodki_trwale: 0.23          # sprzęt, wyposażenie, stanowiska od progu amortyzacji (lokal i działka – bez VAT)
 zus_pracodawcy: 0.2048         # od pensji na umowie o pracę: emerytalna 9,76%, rentowa 6,5%, wypadkowa 1,67%, FP 2,45%, FGŚP 0,1%
-# P1 (decyzja autora 29.10.2026, B9): umowa zlecenie – te same składki pracodawcy co etat (ustawa o systemie
-# ubezpieczeń społecznych art. 6 ust. 1 pkt 4; FP i FGŚP od zleceniobiorców z pensją ≥ płaca minimalna – w grze
-# zawsze). Bez składek tylko student do 26 lat – kandydaci w grze nie są studentami.
-zus_pracodawcy_zlecenie: 0.2048
+# UF10 (decyzja autora 6.11.2026, zastępuje P1 z 29.10.2026): w grze umowa zlecenie jest bez składek pracodawcy
+# – uproszczenie, żeby wybór formy zatrudnienia był wyraźny (naprawdę zlecenie ma składki jak etat, ustawa o
+# systemie ubezpieczeń społecznych art. 6 ust. 1 pkt 4; bez nich tylko student do 26 lat). Parametr zostaje – wpisz
+# 0.2048, żeby wrócić do P1.
+zus_pracodawcy_zlecenie: 0.0

@@ -3,8 +3,9 @@
 import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
 import { kandydaciRynku } from "./hr.js";
 import { nazwaLokalu } from "./lokal_wybor.js";
+import { minimum, nazwaFormy, opcjeForm } from "./formy.js";
 
-const UMOWY = { prace: "umowa o pracę", zlecenie: "umowa zlecenie" };
+const UMOWA = (kat, u) => nazwaFormy(kat, u).toLowerCase();   // UF21: nazwy form z katalogu
 const WYNIK_ZLOZONEJ = { przyjeta: "przyjęta", odrzucona: "odrzucona – pensja nie wyższa od obecnej", kontroferta: "przebita kontrofertą",
   inna_firma: "pracownik wybrał inną firmę", "nieważna": "nieważna" };
 const WYNIK_OTRZYMANEJ = { odchodzi: "przyjął ofertę – odchodzi", kontroferta: "został – kontroferta", odrzucona: "odrzucił ofertę" };
@@ -23,8 +24,8 @@ function kanalyHtml(A) {
     return `staż ${nast ? `${x.staz_od}–${nast.staz_od - 1}` : `od ${x.staz_od}`} rund: ${rundy(x.rund)}`;
   }).join(" · ");
   return tabela("Kanały rekrutacji", ["Kanał", "Kandydaci", "Koszt zatrudnienia", "Czas właściciela", "Dostępność"], w, { klasy: ["l", "l", "l"] })
-    + `<p class="podpowiedz">Bez wskazania kanału zatrudnienie idzie najtańszym dostępnym. Okres wypowiedzenia (umowa o pracę): ${wyp};
-       zleceniobiorca odchodzi od razu.
+    + `<p class="podpowiedz">Bez wskazania kanału zatrudnienie idzie najtańszym dostępnym. Okres wypowiedzenia (umowa o pracę, pół etatu): ${wyp};
+       przy zleceniu, stażu i B2B osoba odchodzi od razu.
        Wypowiedzenie działa w obie strony: zwolniony pracownik też pracuje (i dostaje pensję) do końca okresu.</p>`;
 }
 
@@ -35,7 +36,7 @@ export const rynek_pracy = {
     (pracuj.pl, agencja pracy) oraz lokal i stanowisko. Obsadę stanowisk zmienisz w zakładce Mój lokal. Tylko headhunter złoży ofertę
     pracownikowi innej drużyny – jego szef może odpowiedzieć kontrofertą w tej samej rundzie.`,
   decyzje(c) {
-    const { v, edycja } = c;
+    const { v, kat, edycja } = c;
     const A = v.agencja, d = v.decyzje || {};
     if (!A) return `<p class="podpowiedz">Brak danych.</p>`;
     const nowi = (d.zatrudnij || []).length + (d.podkup || []).length;
@@ -52,7 +53,7 @@ export const rynek_pracy = {
          Wygrana kontroferta staje się jego nową pensją. Oferty widać, gdy druga drużyna zapisze decyzje.</p>`;
 
     html += tabela("Twoi pracownicy – staż i okres wypowiedzenia", ["Pracownik", "Zawód", "Umowa", "Staż", "Okres wypowiedzenia", "Status"],
-      A.moi.length ? A.moi.map((p) => [esc(p.imie_nazwisko), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, UMOWY[p.umowa], rundy(p.staz),
+      A.moi.length ? A.moi.map((p) => [esc(p.imie_nazwisko), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, UMOWA(kat, p.umowa), rundy(p.staz),
         p.okres ? rundy(p.okres) : "od razu",
         p.odchodzi ? `<span class="minus">${p.odchodzi.do ? `odchodzi do ${esc(nazwaFirmy(v, p.odchodzi.do))}` : "zwolniony – odchodzi"} w rundzie ${p.odchodzi.runda}</span>` : "pracuje"])
         : [["Nie masz jeszcze pracowników.", "", "", "", "", ""]], { klasy: ["l", "l", "l"] });
@@ -63,7 +64,7 @@ export const rynek_pracy = {
     const moje = Object.fromEntries((d.podkup || []).map((o) => [o.pracownik, o]));
     html += tabela("Headhunter – pracownicy innych drużyn", ["Pracownik", "Drużyna", "Zawód", "Pensja", "Umowa", "Okres wypowiedzenia", "Twoja oferta"],
       A.cudzy.length ? A.cudzy.map((p) => [esc(p.imie_nazwisko), esc(nazwaFirmy(v, p.firma)), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, zl(p.pensja),
-        UMOWY[p.umowa], p.okres ? rundy(p.okres) : "od razu",
+        UMOWA(kat, p.umowa), p.okres ? rundy(p.okres) : "od razu",
         p.odchodzi ? `<span class="podpowiedz">w okresie wypowiedzenia</span>`
           : moje[p.id] ? `${zl(moje[p.id].pensja)} <button class="btn jasny maly" data-akcja="wycofaj-oferte" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Wycofaj</button>`
             : `<button class="btn pom maly" data-akcja="oferta-podkupienia" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Złóż ofertę</button>`])
@@ -101,7 +102,8 @@ export const rynek_pracy = {
   akcje: {
     kontroferta: async (el, c) => {
       const id = el.dataset.id, x = +document.getElementById(`kf-${id}`).value || 0;
-      if (x && x < c.kat.placa_minimalna) return toast(`Kontroferta nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);
+      const moj = c.v.agencja.moi.find((p) => p.id === id), min = minimum(c.kat, moj?.umowa || "prace", moj?.student);
+      if (x && x < min) return toast(`Kontroferta nie może być niższa niż ${licz(min)} PLN.`);
       await c.zmien((d) => {
         const kf = { ...(d.kontroferty || {}) };
         if (x) kf[id] = x; else delete kf[id];
@@ -116,7 +118,8 @@ export const rynek_pracy = {
     "potwierdz-oferte": async (el, c) => {
       const p = c.v.agencja.cudzy.find((x) => x.id === el.dataset.id);
       const pensja = +document.getElementById("o-pensja").value, umowa = document.getElementById("o-umowa").value;
-      if (pensja < c.kat.placa_minimalna) return toast(`Pensja nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);
+      const min = minimum(c.kat, umowa, p.student);
+      if (pensja < min) return toast(`Pensja w tej formie nie może być niższa niż ${licz(min)} PLN.`);
       zamknijOkno();
       await c.zmien((d) => {
         d.podkup = [...(d.podkup || []).filter((o) => o.pracownik !== p.id), { pracownik: p.id, firma: p.firma, pensja, umowa }];
@@ -143,11 +146,11 @@ function oknoOferty({ v, kat }, id) {
   const p = v.agencja.cudzy.find((x) => x.id === id), hh = v.agencja.kanaly.headhunter;
   const krok = 10, propozycja = Math.ceil(p.pensja * 1.1 / krok) * krok;
   okno(`Oferta przez headhuntera: ${esc(p.imie_nazwisko)}`, `<p>${esc(p.zawod)} ${gw(p.gwiazdki)} · ${esc(nazwaFirmy(v, p.firma))} ·
-      obecna pensja <b>${zl(p.pensja)}</b> · ${UMOWY[p.umowa]} (okres wypowiedzenia: ${p.okres ? rundy(p.okres) : "od razu"})</p>
+      obecna pensja <b>${zl(p.pensja)}</b> · ${UMOWA(kat, p.umowa)} (okres wypowiedzenia: ${p.okres ? rundy(p.okres) : "od razu"})</p>
     <div class="dwie"><label class="pole">Oferowane wynagrodzenie brutto
-      <input type="number" id="o-pensja" min="${kat.placa_minimalna}" step="10" value="${propozycja}"></label>
-    <label class="pole">Forma zatrudnienia u ciebie<select id="o-umowa"><option value="prace">Umowa o pracę</option>
-      <option value="zlecenie">Umowa zlecenie</option></select></label></div>
+      <input type="number" id="o-pensja" min="${minimum(kat, "prace", p.student)}" step="10" value="${propozycja}"></label>
+    <label class="pole">Forma zatrudnienia u ciebie<select id="o-umowa">${opcjeForm(v, kat, p, "prace", { nowy: false })}</select></label></div>
+    <p class="podpowiedz">Pracownik porównuje oferty w przeliczeniu na umowę o pracę (pół etatu × 2, B2B ÷ narzut kontraktu).</p>
     <p class="podpowiedz">Opłata headhuntera po przyjęciu oferty: ${licz(hh.podkupienie_czesc_pensji * 100)}% oferowanej pensji.
       Obecny pracodawca może złożyć kontrofertę. Gdy pracownik przyjdzie, potrzebuje wolnego stanowiska.</p>`,
   { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>

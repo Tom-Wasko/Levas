@@ -130,7 +130,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
     mozliwe = {u: [indeks[s.nr] for s in stanowiska_uslugi(dane, firma, u)] for u in popyt}
     zajecia_potrzebne = {u: math.ceil(d / dane.uslugi[u]["grupa"] - EPS) for u, d in popyt.items()}
     potrzeby = {u: zajecia_potrzebne[u] * dane.uslugi[u]["godziny_prowadzacego"] for u in popyt}
-    pojemnosc = [firma.godziny_stanowiska(s, pelny_etat) * skala_godzin for s in stanowiska]
+    pojemnosc = [firma.godziny_stanowiska(s, pelny_etat, dane) * skala_godzin for s in stanowiska]
     pula = model_puli(dane)
     wspolne = []
     if pula:
@@ -195,7 +195,7 @@ def obsluz(dane: Dane, firma: Firma, popyt: dict[str, int], ziarno, runda: int,
     # recepcja – po zużyciu zasobów: klienci utraceni przez brak recepcji zużyli już zasoby
     # (gra ATH: luty i maj – zużycie napoju = popyt + ok. 0,5%, a nie sprzedaż)
     rec = kasjerzy(dane, firma)
-    godz_rec = sum(firma.godziny_stanowiska(s, pelny_etat) for s in rec) * skala_godzin
+    godz_rec = sum(firma.godziny_stanowiska(s, pelny_etat, dane) for s in rec) * skala_godzin
     potrzebne_rec = sum(obsluzeni[u] * dane.uslugi[u]["godziny_kasy"] for u in popyt)
     if potrzebne_rec > godz_rec + EPS:
         skala = godz_rec / potrzebne_rec if potrzebne_rec else 0.0

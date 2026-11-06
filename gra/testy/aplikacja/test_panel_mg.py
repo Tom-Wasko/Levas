@@ -160,3 +160,17 @@ def test_po_koncu_gry_druzyna_widzi_wyniki_ostatniej_rundy():
     assert g.zakonczona and v["koniec"] and not v["edycja"] and v["runda"] == 4 and v["decyzje"] == {}
     assert v["wyniki"] == g.stan(3).wyniki[3]["A"] and v["dashboard"]["miejsce"] in (1, 2)
     assert not pr.widok(g, "A", 3)["koniec"]   # wcześniejsze rundy – zwykły podgląd
+
+
+def test_formy_zatrudnienia_opcja_mg(client):
+    """UF21 (TYMCZASOWE): mistrz gry wyłącza formy zatrudnienia – umowa o pracę zostaje zawsze."""
+    id_ = _nowa(client).json()["id"]
+    g = _przeglad(client, id_)["gra"]
+    assert "prace" in g["formy_zatrudnienia"] and set(g["formy_wszystkie"]) == set(g["formy_zatrudnienia"])
+    r = client.post(f"/api/gry/{id_}/prowadzenie", {"formy_zatrudnienia": ["zlecenie"]}, content_type="application/json")
+    assert r.json()["gra"]["formy_zatrudnienia"] == ["prace", "zlecenie"]
+    v = client.get(f"/api/gry/{id_}/widok/Drużyna 1").json()
+    assert v["gra"]["formy_zatrudnienia"] == ["prace", "zlecenie"]
+    assert "zus_stawka" in client.get("/api/katalogi").json()["parametry"]["formy"]["prace"]
+    zle = client.post(f"/api/gry/{id_}/prowadzenie", {"formy_zatrudnienia": "b2b"}, content_type="application/json")
+    assert zle.status_code == 400

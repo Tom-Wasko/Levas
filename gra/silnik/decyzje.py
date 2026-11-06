@@ -13,7 +13,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
                                                               miejsc w działających lokalach)
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
-    zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
+    zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: forma (silnik/ludzie/formy.py)
     przenosiny:        [{"pracownik", "typ", "nr", "dodatek"}]          UF20: na wolne stanowisko (inny lokal – za zgodą)
                        opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/ludzie/rynek_pracy.py)
     podkup:            [{"pracownik", "firma", "pensja", "umowa"}]   – oferta przez headhuntera
@@ -73,6 +73,7 @@ from .kuchnia import swiezosc as sw
 from .kuchnia.dostawcy import zasady_dostaw
 from .kuchnia.operacje import kasjerzy, stanowiska_uslugi
 from .ludzie import czas_wlasciciela as cw
+from .ludzie import formy as fz
 from .ludzie import przenosiny as przen
 from .ludzie import rynek_pracy as rp
 from .ludzie import zadowolenie as zo
@@ -332,6 +333,9 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         info["inwestycje"] += cena
 
     # kadry
+    if kadry_ok:   # UF21: po stażu – umowa o pracę za pensję preferowaną
+        for x in fz.koniec_stazu(dane, firma, runda):
+            info.setdefault("koniec_stazu", []).append(x)
     for pid in d.get("zwolnij", []) if kadry_ok else []:
         p = firma.pracownicy.get(pid)
         if not p or p.odchodzi:
@@ -353,8 +357,17 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             continue
         if zm.get("pensja"):
             p.pensja = float(zm["pensja"])
-        if zm.get("umowa") in ("prace", "zlecenie"):
-            p.umowa = zm["umowa"]
+        if zm.get("umowa") and zm["umowa"] != p.umowa:
+            powod = ("na staż przyjmuje się tylko nowe osoby" if zm["umowa"] == fz.STAZ
+                     else fz.blad(dane, p.model_dump(), zm["umowa"], firma))
+            if powod:
+                info.setdefault("bledy_form", []).append(f"{p.imie_nazwisko}: {powod}.")
+            else:
+                p.umowa = zm["umowa"]
+        if p.umowa == fz.STAZ:   # stażysta nie dostaje pensji od firmy
+            p.pensja = 0
+        elif not p.pensja:       # koniec stażu zmianą formy – pensja preferowana
+            p.pensja = max(p.pensja_preferowana, fz.placa_minimalna(dane, p.umowa, p.student))
         p.premia = float(zm.get("premia", 0) or 0)
     if kadry_ok and d.get("przenosiny"):   # UF20: obsada i przenosiny – przed zatrudnieniami (silnik/ludzie/przenosiny.py)
         info["przenosiny"] = przen.zastosuj(dane, firma, d["przenosiny"], ksiega, rachunek)
@@ -373,6 +386,16 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
             continue
         if dane.typ_zawodu(kandydat["zawod"]) != st.typ:
             continue
+        umowa = z.get("umowa", "prace")
+        if powod := fz.blad(dane, kandydat, umowa, firma):   # UF21: forma niedostępna dla tej osoby
+            info.setdefault("bledy_form", []).append(f"{kandydat['imie_nazwisko']}: {powod}.")
+            info.setdefault("nieudane_zatrudnienia", []).append(z)
+            continue
+        pensja = 0.0 if umowa == fz.STAZ else float(z.get("pensja") or kandydat["pensja_preferowana"])
+        minimum = fz.placa_minimalna(dane, umowa, bool(kandydat.get("student")))
+        if pensja < minimum:
+            info.setdefault("placa_ponizej", []).append(f"{kandydat['imie_nazwisko']}: pensja poniżej płacy minimalnej "
+                                                        f"w tej formie ({minimum:.0f} zł).")
         # kanał rekrutacji: wskazany albo najtańszy, na który starcza czasu właściciela
         kanal = _kanal(dane, kandydat, z.get("kanal"), runda, czas, info)
         if kanal is None:
@@ -383,7 +406,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
                       gwiazdki=kandydat["gwiazdki"], pensja_preferowana=kandydat["pensja_preferowana"],
                       koszt_rekrutacji=kandydat["koszt_rekrutacji"], koszt_odprawy=kandydat["koszt_odprawy"],
                       zadowolenie_klientow=kandydat["zadowolenie_klientow"], ryzyko_reklamacji=kandydat["ryzyko_reklamacji"],
-                      pensja=float(z.get("pensja") or kandydat["pensja_preferowana"]), umowa=z.get("umowa", "prace"),
+                      pensja=pensja, umowa=umowa, student=bool(kandydat.get("student")),
                       od_rundy=runda, stanowisko=st.nr, cecha=kandydat.get("cecha", ""), opis=kandydat.get("opis", ""),
                       wydajnosc=kandydat.get("wydajnosc", 1.0))
         firma.pracownicy[p.id] = p
@@ -697,10 +720,14 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         dodaj("czerwony", "finanse_bank", "Nie wybrano banku.")
     if not firma.biuro and not d.get("biuro"):
         dodaj("czerwony", "finanse_biuro", "Nie wybrano biura rachunkowego.")
-    placa_min = dane.z["finanse"]["placa_minimalna"]
-    for z in d.get("zatrudnij", []):
-        if float(z.get("pensja") or placa_min) < placa_min:
-            dodaj("czerwony", "hr_zatrudnienie", f"Pensja poniżej płacy minimalnej ({placa_min} PLN).")
+    if info is not None and "zatrudnieni" in info:   # UF21: zastosuj zna osobę i formę (student, pół etatu, B2B…)
+        for t in info.get("placa_ponizej", []) + info.get("bledy_form", []):
+            dodaj("czerwony", "hr_zatrudnienie", t)
+    else:
+        for z in d.get("zatrudnij", []):
+            minimum = fz.placa_minimalna(dane, z.get("umowa", "prace"))
+            if z.get("umowa") != fz.STAZ and float(z.get("pensja") or minimum) < minimum:
+                dodaj("czerwony", "hr_zatrudnienie", f"Pensja poniżej płacy minimalnej ({minimum:.0f} PLN).")
     if runda >= 2:
         for lok_id, v in _widoki_bledow(firma, runda):
             for u, braki in gotowe_uslugi(dane, v).items():

@@ -22,6 +22,7 @@ from silnik.kuchnia import swiezosc
 from silnik.kuchnia.dostawcy import ceny_rundy, oferta_rundy
 from silnik.kuchnia.dostawcy import info as info_dostawcy
 from silnik.ludzie import czas_wlasciciela as cw
+from silnik.ludzie import formy as fz
 from silnik.ludzie import przenosiny as przen
 from silnik.ludzie import rynek_pracy as rp
 from silnik.model import Firma, do_slownika
@@ -132,6 +133,7 @@ def katalogi(dane: Dane) -> dict:
             "oferty": dane.katalog_ofert, "placa_minimalna": dane.z["finanse"]["placa_minimalna"],
             "parametry": {"kapital": dane.z["finanse"]["kapital_startowy"], "godziny": dane.z["operacje"]["godziny_pracownika"],
                           "zus": rz.zus_pracodawcy(dane), "zus_zlecenie": rz.zus_pracodawcy(dane, "zlecenie"),
+                          **fz.widok(dane),   # UF21: formy zatrudnienia i studenci
                           "amortyzacja_prog": dane.z["finanse"]["amortyzacja_prog"],
                           "na_runde": 12 / dane.rund_w_roku, "rund_w_roku": dane.rund_w_roku,
                           "sprzedaz_sprzetu": dane.z["finanse"]["sprzedaz_sprzetu"]}}
@@ -224,6 +226,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
                  "auto_zamowienia": bool(gra.konfiguracja.get("auto_zamowienia")),
                  "refleksja": gra.tryb_refleksji,
                  "podpowiedzi": bool(gra.konfiguracja.get("podpowiedzi")),
+                 "formy_zatrudnienia": fz.dozwolone(dane, gra.konfiguracja),   # UF21 (TYMCZASOWE – opcja MG)
                  "lokale": True,
                  "kalendarz": kalendarz(dane, gra.konfiguracja["liczba_rund"])},
          "refleksja": gra.refleksje(runda).get(firma),   # U17: co drużyna napisała przy wysłaniu decyzji
@@ -393,7 +396,7 @@ def _agencja(gra: Gra, firma: str, runda: int, f: Firma, stan, edycja: bool) -> 
                            "prog": ((dane.z.get("pracownicy") or {}).get("odejscia") or {}).get("prog_zadowolenia", 0.0),
                            "odleglosci": {a.id: {b.id: przen.odleglosc(dane, a.id, b.id) for b in f.lokale} for a in f.lokale}},
             "moi": [{"id": p.id, "imie_nazwisko": p.imie_nazwisko, "zawod": p.zawod, "gwiazdki": p.gwiazdki, "pensja": p.pensja,
-                     "umowa": p.umowa, "staz": rp.staz(p, runda), "okres": rp.okres_wypowiedzenia(dane, p, runda),
+                     "umowa": p.umowa, "student": p.student, "staz": rp.staz(p, runda), "okres": rp.okres_wypowiedzenia(dane, p, runda),
                      "odchodzi": do_slownika(p.odchodzi) if p.odchodzi else None}
                     for p in sorted(f.pracownicy.values(), key=lambda p: p.id)]}
 
@@ -518,6 +521,9 @@ def przeglad_mg(gra: Gra) -> dict:
                 "auto_zamowienia": bool(konf.get("auto_zamowienia")),
                 "refleksja": gra.tryb_refleksji,
                 "podpowiedzi": bool(konf.get("podpowiedzi")),
+                # UF21 – TYMCZASOWE, usunąć przed oficjalną wersją: które formy zatrudnienia są w grze
+                "formy_zatrudnienia": fz.dozwolone(dane, konf),
+                "formy_wszystkie": {k: f["nazwa"] for k, f in fz.formy(dane).items()},
                 "ceny_dostawcow": konf.get("ceny_dostawcow", "dane"),
                 "lokale": True,
                 "inwestor": inw.warunki(dane),   # warunki inwestora ratunkowego (Z3)

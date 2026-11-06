@@ -22,6 +22,7 @@ from ..dane import Dane
 from ..ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
 from ..losowosc import strumien
 from ..model import Firma, Odejscie, Pracownik, StanGry
+from . import formy as fz
 from . import przenosiny as przen
 
 HEADHUNTER = "headhunter"
@@ -56,8 +57,9 @@ def staz(p: Pracownik, runda: int) -> int:
 
 
 def okres_wypowiedzenia(dane: Dane, p: Pracownik, runda: int) -> int:
-    """Rundy do odejścia: umowa zlecenie 0, umowa o pracę wg danych (jedna długość, wpisy wg stażu – na przyszłość)."""
-    if p.umowa != "prace":
+    """Rundy do odejścia: bez wypowiedzenia (zlecenie, staż, B2B – UF21) 0, umowa o pracę wg danych (jedna długość,
+    wpisy wg stażu – na przyszłość)."""
+    if not fz.forma(dane, p.umowa)["wypowiedzenie"]:
         return 0
     s = staz(p, runda)
     return max((w["rund"] for w in ustawienia(dane)["wypowiedzenie"] if s >= w["staz_od"]), default=0)
@@ -72,7 +74,8 @@ def jako_kandydat(p: Pracownik) -> dict:
     return {"id": p.id, "imie_nazwisko": p.imie_nazwisko, "gwiazdki": p.gwiazdki, "zawod": p.zawod,
             "pensja_preferowana": p.pensja_preferowana, "koszt_rekrutacji": p.koszt_rekrutacji,
             "koszt_odprawy": p.koszt_odprawy, "zadowolenie_klientow": p.zadowolenie_klientow,
-            "ryzyko_reklamacji": p.ryzyko_reklamacji, "cecha": p.cecha, "opis": p.opis, "wydajnosc": p.wydajnosc}
+            "ryzyko_reklamacji": p.ryzyko_reklamacji, "cecha": p.cecha, "opis": p.opis, "wydajnosc": p.wydajnosc,
+            **({"student": True} if p.student else {})}
 
 
 def _raport() -> dict:
@@ -86,7 +89,6 @@ def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int
     decyzji bez losowania). Zwraca (decyzje po filtrze, rezerwacje kandydatów {id: firma}, raporty firm).
     Wygrane kontroferty podnoszą pensje, przyjęte oferty ustawiają `odchodzi`."""
     limit = ustawienia(dane)["limit_nowych"]
-    placa_min = dane.z["finanse"]["placa_minimalna"]
     raport = {n: _raport() for n in s.firmy}
     nowe = {}
     for n in s.firmy:
@@ -121,7 +123,8 @@ def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int
         for z in nowe[n]["zatrudnij"]:
             if z.get("kandydat") in pula:
                 pensja = float(z.get("pensja") or pula[z["kandydat"]]["pensja_preferowana"])
-                oferty.setdefault(z["kandydat"], []).append((pensja, n))
+                # UF21: oferty różnych form porównywane w przeliczeniu na umowę o pracę (B2B ÷ 1,25, pół etatu × 2)
+                oferty.setdefault(z["kandydat"], []).append((round(fz.porownawcza(dane, pensja, z.get("umowa", "prace")), 2), n))
     rezerwacje = {}
     for kid, lista in sorted(oferty.items()):
         najwyzsza = max(p for p, _ in lista)
@@ -153,7 +156,9 @@ def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int
             powod = ("headhunter od rundy " + str(kanaly(dane, runda)[HEADHUNTER]["od_rundy"]) if not hh
                      else "pracownika już nie ma" if p is None
                      else "pracownik jest w okresie wypowiedzenia" if p.odchodzi
-                     else f"pensja poniżej płacy minimalnej ({placa_min:.0f} zł)" if pensja < placa_min else None)
+                     else "na staż przyjmuje się tylko osoby z puli kandydatów" if wpis["umowa"] == fz.STAZ
+                     else f"pensja poniżej płacy minimalnej ({fz.placa_minimalna(dane, wpis['umowa']):.0f} zł)"
+                     if pensja < fz.placa_minimalna(dane, wpis["umowa"]) else None)
             if powod:
                 raport[n]["oferty_zlozone"].append({**wpis, "wynik": "nieważna", "powod": powod})
                 raport[n]["uwagi"].append(f"Oferta dla {wpis['imie_nazwisko']} nieważna: {powod}.")
@@ -255,6 +260,6 @@ def oferty_dla(gra_decyzje: dict[str, dict], firma: Firma, nazwa: str) -> list[d
 def pracownicy_rynku(dane: Dane, s: StanGry, nazwa: str, runda: int) -> list[dict]:
     """Pracownicy innych firm (dla headhuntera): pensja, staż i okres wypowiedzenia."""
     return [{"id": p.id, "imie_nazwisko": p.imie_nazwisko, "firma": n, "zawod": p.zawod, "gwiazdki": p.gwiazdki,
-             "pensja": p.pensja, "umowa": p.umowa, "staz": staz(p, runda), "okres": okres_wypowiedzenia(dane, p, runda),
+             "pensja": p.pensja, "umowa": p.umowa, "student": p.student, "staz": staz(p, runda), "okres": okres_wypowiedzenia(dane, p, runda),
              "odchodzi": bool(p.odchodzi)}
             for n, f in sorted(s.firmy.items()) if n != nazwa for p in f.pracownicy.values()]

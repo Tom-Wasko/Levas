@@ -62,8 +62,10 @@ def _oferta(strefa, cena_proc=1.0, jakosc=(2, 2, 2), **inne):
     return {"strefa": strefa, "cena": cena, "jakosc": jakosc, **inne}
 
 
-def _kandydat(s, gwiazdki, pomin=()):
-    return next(k for k in s.kandydaci if k["gwiazdki"] == gwiazdki and k["zawod"] == "Kucharz" and k["id"] not in pomin)
+def _kandydat(s, gwiazdki, pomin=(), student=False):
+    """Kucharz o tylu gwiazdkach; domyślnie nie student (UF21: student pracuje mniej godzin i chce mniej)."""
+    return next(k for k in s.kandydaci if k["gwiazdki"] == gwiazdki and k["zawod"] == "Kucharz" and k["id"] not in pomin
+                and bool(k.get("student")) == student)
 
 
 def _z(k, nr, **kw):

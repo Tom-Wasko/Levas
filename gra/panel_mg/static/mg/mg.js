@@ -138,6 +138,12 @@ function decyzje() {
       : ` <a data-akcja="auto-zamowienia">${gra.auto_zamowienia ? "wyłącz" : "włącz"}</a>`}`],
     ["Podpowiedzi na Dashboardzie (3 pierwsze rundy)", `${gra.podpowiedzi ? "włączone" : "wyłączone"}${gra.zakonczona ? ""
       : ` <a data-akcja="podpowiedzi">${gra.podpowiedzi ? "wyłącz" : "włącz"}</a>`}`],
+    // UF21 – TYMCZASOWE, usunąć przed oficjalną wersją: włączanie i wyłączanie form zatrudnienia (umowa o pracę zawsze)
+    ...(gra.formy_wszystkie ? [["Formy zatrudnienia (test)", Object.entries(gra.formy_wszystkie).map(([u, n]) => {
+      const wl = gra.formy_zatrudnienia.includes(u);
+      return u === "prace" || gra.zakonczona ? `${esc(n)}${wl ? "" : " (wył.)"}`
+        : `<a data-akcja="forma-zatrudnienia" data-u="${esc(u)}" title="${wl ? "wyłącz" : "włącz"}">${wl ? "☑" : "☐"} ${esc(n)}</a>`;
+    }).join(" · ")]] : []),
     ["Refleksja drużyn przy wysyłaniu decyzji", `${TRYB_REFLEKSJI[gra.refleksja] || gra.refleksja}${gra.zakonczona ? ""
       : ` <a data-akcja="refleksja">zmień</a>`}`]];
   const alarmy = gra.zakonczona ? [] : firmy.filter((f) => f.alarm > 0 && !f.inwestor_przyslany);
@@ -342,6 +348,13 @@ async function wykonaj(akcja, el) {
     const wlacz = !S.p.gra.podpowiedzi;
     await api(`${URL_GRY}/prowadzenie`, "POST", { podpowiedzi: wlacz });
     toast(wlacz ? "Drużyny widzą na Dashboardzie 3 rzeczy do sprawdzenia (pierwsze 3 rundy)." : "Podpowiedzi wyłączone.");
+    return wczytaj();
+  }
+  if (akcja === "forma-zatrudnienia") {   // UF21 – TYMCZASOWE, usunąć przed oficjalną wersją
+    const u = el.dataset.u, teraz = S.p.gra.formy_zatrudnienia;
+    const nowe = teraz.includes(u) ? teraz.filter((x) => x !== u) : [...teraz, u];
+    await api(`${URL_GRY}/prowadzenie`, "POST", { formy_zatrudnienia: nowe });
+    toast(`${S.p.gra.formy_wszystkie[u]}: ${teraz.includes(u) ? "wyłączona – takie umowy liczą się jako umowa o pracę" : "włączona"}.`);
     return wczytaj();
   }
   if (akcja === "refleksja") {

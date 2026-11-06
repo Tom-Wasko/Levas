@@ -37,6 +37,7 @@ from .kuchnia.dostawcy import ceny_rundy
 from .kuchnia.operacje import kasjerzy
 from .losowosc import strumien
 from .ludzie import czas_wlasciciela as cw
+from .ludzie import formy as fz
 from .ludzie import rynek_pracy as rp
 from .ludzie import zadowolenie as zo
 from .ludzie.kandydaci import dodaj_nowych
@@ -72,6 +73,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     if not lk.tryb_lokali(dane, konfiguracja):
         raise ValueError("Gra bez lokali (tryb REVAS) nie jest już obsługiwana – potrzebne dane z mapą miasta.")
     ziarno = konfiguracja["ziarno"]
+    decyzje = {n: fz.przytnij(dane, d, konfiguracja) for n, d in decyzje.items()}   # UF21: formy wyłączone przez MG
     if r >= 2:
         s.kandydaci = dodaj_nowych(dane, s.kandydaci, ziarno, r)
     ceny_dost = ceny_rundy(dane, ziarno, r, konfiguracja.get("ceny_dostawcow", "dane"))
@@ -224,10 +226,15 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         for p in f.pracownicy.values():
             if p.premia > 0:
                 ksieguj(f, ks, rach, f"Bonus dla pracownika: {p.imie_nazwisko}", p.premia, "wynagrodzenia")
-        ksieguj(f, ks, rach, "Wynagrodzenia pracowników", dane.na_runde(sum(p.pensja for p in f.pracownicy.values())),
-                "wynagrodzenia")
+        # UF21: kontrakt B2B – faktura z VAT zamiast wynagrodzenia; ZUS pracodawcy wg formy (student na zleceniu – 0)
+        b2b = [p for p in f.pracownicy.values() if fz.forma(dane, p.umowa).get("faktura")]
+        ksieguj(f, ks, rach, "Wynagrodzenia pracowników",
+                dane.na_runde(sum(p.pensja for p in f.pracownicy.values() if p not in b2b)), "wynagrodzenia")
         ksieguj(f, ks, rach, "Składki ZUS pracodawcy",
-                dane.na_runde(sum(p.pensja * rz.zus_pracodawcy(dane, p.umowa) for p in f.pracownicy.values())))
+                dane.na_runde(sum(p.pensja * fz.stawka_zus(dane, p.umowa, p.student) for p in f.pracownicy.values())))
+        for p in b2b:
+            opis, kwota = f"{fz.forma(dane, p.umowa)['faktura']}: {p.imie_nazwisko}", dane.na_runde(p.pensja)
+            ksieguj(f, ks, rach, opis, kwota * (1 + ks.stawka_vat(opis)) if ks.vat is not None else kwota)
         utrz_sprzetu = sum(dane.sprzet[n]["utrzymanie"][str(q)] for st in f.stanowiska for n, q in st.sprzet.items())
         ksieguj(f, ks, rach, "Koszty utrzymania sprzętu", dane.na_runde(utrz_sprzetu))
         ud, wy = dane.pozycje("udogodnienia"), dane.pozycje("wyposazenie")
@@ -246,7 +253,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
             info[nazwa]["zaproszenie"] = kas.zaproszenie(dane, f, r, ziarno, konfiguracja["liczba_rund"],
                                                          bool(konfiguracja.get("kasyno_botow")))
         if f.biuro in bo.biura(dane):   # biura z mapy albo samodzielna księgowość (silnik/ksiegowosc/biuro.py)
-            info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, *bo._umowy(f))
+            info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, *bo._umowy(dane, f))
         # JDG: składki właściciela, zaliczka PIT i VAT (silnik/ksiegowosc/rozliczenie.py)
         samodzielnie = bo.zamknij_samodzielnie(f, r >= konfiguracja["liczba_rund"])
         stan_przed = bo.stan_rozliczen(f)
@@ -401,7 +408,7 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
         elif wl.typ == KUCHNIA:
             uzycie = obsluga["godziny_stanowisk"].get(wl.nr, 0.0) / wl.godziny
         else:
-            pojemnosc = sum(f.godziny_stanowiska(s, godz) for s in kasjerzy(dane, f))
+            pojemnosc = sum(f.godziny_stanowiska(s, godz, dane) for s in kasjerzy(dane, f))
             uzycie = obsluga["godziny_kasy"] / pojemnosc if pojemnosc else 0.0
         w["wlasciciel_stanowisko"] = {**info["wlasciciel_stanowisko"], "wykorzystanie": round(min(1.0, uzycie), 4)}
     elif info.get("wlasciciel_stanowisko"):
@@ -491,7 +498,7 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
     prac = list(f.pracownicy.values())
     if prac:
         placa = float(np.mean([zo.placa_wzgledna(dane, p) for p in prac]))
-        zlecenia = sum(p.umowa == "zlecenie" for p in prac) / len(prac)
+        zlecenia = sum(bool(fz.forma(dane, p.umowa)["kara_zlecenia"]) for p in prac) / len(prac)
     else:
         placa, zlecenia = 1.0, 0.0
     jakosci = [q for st in f.stanowiska for q in st.sprzet.values()]

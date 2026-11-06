@@ -238,9 +238,20 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
   samego lokalu (od razu) albo z innego Twojego lokalu. Na przejście do innego lokalu **pracownik musi się zgodzić** –
   chętniej, gdy jest zadowolony, lokale są blisko na mapie i dostanie jednorazowy dodatek (płacisz go tylko po zgodzie).
   Odpowiedź poznasz po przeliczeniu tygodnia (Rynek pracy ▸ wyniki); kto odmówi, zostaje na swoim miejscu.
-- Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy (przy umowie o pracę
-  i przy zleceniu tyle samo). **Premia** jest jednorazowa – płacisz ją w tym tygodniu, bez ZUS, i tylko w tym
+- Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy (płacisz go tylko przy
+  umowie o pracę i pół etatu). **Premia** jest jednorazowa – płacisz ją w tym tygodniu, bez ZUS, i tylko w tym
   tygodniu podnosi zadowolenie.
+- **Formy zatrudnienia** wybierasz przy zatrudnieniu (i zmieniasz w profilu pracownika):
+  - *umowa o pracę* – pełne godziny, ZUS pracodawcy, okres wypowiedzenia, pracownicy ją lubią;
+  - *pół etatu* – połowa godzin za połowę pensji, poza tym jak umowa o pracę;
+  - *umowa zlecenie* – bez ZUS pracodawcy i bez wypowiedzenia, ale obniża zadowolenie;
+  - *zlecenie ze studentem* – tylko dla kandydatów-studentów (do 26 lat, plakietka „student”): bez ZUS i PIT,
+    więc zgodzą się na niższą pensję, ale pracują mniej godzin i częściej odchodzą;
+  - *staż z urzędu pracy* – tylko osoba bez doświadczenia (1★), jedna naraz: przez 6 tygodni nie płacisz pensji
+    (stypendium daje urząd), potem osoba sama przechodzi na umowę o pracę za pensję preferowaną;
+  - *kontrakt B2B* – osoba wystawia fakturę z VAT (VAT odliczysz), bez ZUS, bez płacy minimalnej i bez wypowiedzenia,
+    ale chce ok. 25% więcej niż na etacie.
+  Mistrz gry może część form wyłączyć – wtedy w oknie zatrudnienia ich nie ma.
 - **Szkolenie** obejmuje całą załogę i działa w tygodniu, w którym je kupisz (cena w tabeli jest za tydzień).
 - **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3)
   i szkoleniami (od tygodnia 7). Spada przez przepracowanie (pracownik zajęty prawie cały tydzień), słaby sprzęt
@@ -251,7 +262,7 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
 - **Każdy ma charakter.** Pod kółkiem „i” przy pracowniku i kandydacie jest krótki opis. Z niego zgadniesz,
   czy to ktoś lojalny, czy niespokojny duch, czy pracuje szybciej, czy liczy każdą złotówkę. Samej cechy gra nie pokazuje.
 - Zwolnienie i odejście do konkurencji mają **2 rundy wypowiedzenia** (umowa o pracę) – pracownik przez ten czas
-  jeszcze pracuje i dostaje pensję; odprawę płacisz od razu. Zleceniobiorca odchodzi bez wypowiedzenia.
+  jeszcze pracuje i dostaje pensję; odprawę płacisz od razu. Na zleceniu, stażu i B2B odchodzi się bez wypowiedzenia.
 - **Brakuje rąk?** Właściciel może sam stanąć na jednym wolnym stanowisku (przycisk *Stań sam* w zakładce
   Mój lokal). Pracuje jak pracownik 1★ i nie bierze pensji, ale każda godzina za ladą schodzi z jego 20 godzin.
 

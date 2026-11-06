@@ -78,7 +78,8 @@ class Pracownik(Model):
     zadowolenie_klientow: float
     ryzyko_reklamacji: float
     pensja_gr: int = 0
-    umowa: str = "prace"          # "prace" (umowa o pracę, + ZUS) albo "zlecenie"
+    umowa: str = "prace"          # forma zatrudnienia (UF21, silnik/ludzie/formy.py): "prace", "zlecenie", "pol_etatu", …
+    student: bool = False         # UF21: student do 26 lat – bez PIT, mniej godzin, częściej odchodzi
     od_rundy: int = 0
     stanowisko: int = 0           # numer stanowiska (od 1) w grupie: instruktor/trener albo recepcja
     premia_gr: int = 0            # premia w bieżącej rundzie
@@ -450,11 +451,17 @@ class Firma(Model):
                          zadowolenie_klientow=w.zadowolenie_klientow, ryzyko_reklamacji=w.ryzyko_reklamacji,
                          stanowisko=s.nr)
 
-    def godziny_stanowiska(self, s: Stanowisko, godziny_pracownika: float) -> float:
-        """Godziny pracy na stanowisku w rundzie: etat pracownika albo godziny właściciela (0 – nieobsadzone)."""
+    def godziny_stanowiska(self, s: Stanowisko, godziny_pracownika: float, dane: Any = None) -> float:
+        """Godziny pracy na stanowisku w rundzie: etat pracownika albo godziny właściciela (0 – nieobsadzone).
+        `dane` – mnożnik godzin formy zatrudnienia i studenta (UF21, silnik/ludzie/formy.py: etat)."""
         if s.pracownik:
             p = self.pracownicy.get(s.pracownik)
-            return godziny_pracownika * p.wydajnosc if p else 0.0
+            if not p:
+                return 0.0
+            if dane is None:
+                return godziny_pracownika * p.wydajnosc
+            from .ludzie.formy import etat
+            return godziny_pracownika * p.wydajnosc * etat(dane, p)
         w = self.wlasciciel_na
         return min(godziny_pracownika, w.godziny) if w and (w.typ, w.nr) == (s.typ, s.nr) else 0.0
 

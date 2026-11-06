@@ -158,7 +158,7 @@ def test_brak_deklaracji_na_liscie_bledow_mowi_co_zrobic_i_ile_kosztuje_biuro():
     f = g.stan().firmy["H"]
     b = [x for x in bo.bledy(g.dane, f, {"biuro": "samodzielnie"}) if x["poziom"] == "czerwony"]
     nazwa, zl = bo.najnizsza_oplata(g.dane, f, len(dk["dokumenty"]))
-    etat, zlecenie = bo._umowy(f)
+    etat, zlecenie = bo._umowy(g.dane, f)
     assert zl == min(bo.oplata(g.dane, x, len(dk["dokumenty"]), etat, zlecenie)["razem"] for x in bo.biura(g.dane).values())
     assert len(b) == 1 and "Księgowość ▸ Biuro rachunkowe" in b[0]["tekst"] and f"({nazwa}) kosztuje ok. {zl:.0f} zł" in b[0]["tekst"]
     assert zl < bo.ustawienia(g.dane)["samodzielna"]["kara_brak"]

@@ -7,6 +7,7 @@ import { kolko } from "./dymki.js";
 import { nazwaStrefy } from "./lokale.js";
 import { akcjeWyboru, idWybranego, kafelkiLokali, lokalWybrany, menuLokalu, mojeLokale, nazwaLokalu, opisLokalu, wieleLokali }
   from "./lokal_wybor.js";
+import { kosztMiesieczny } from "./formy.js";
 
 const dostepnaCzesc = (v, z) => !z.odblokowanie
   || (typeof z.odblokowanie === "function" ? z.odblokowanie(v) : v.odblokowane.includes(z.odblokowanie));
@@ -59,7 +60,7 @@ function pensjeLokalu(v, kat, id) {
   const st = v.stan.stanowiska.filter((s) => !wieleLokali(v) || s.lokal === id);
   return st.reduce((suma, s) => {
     const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
-    return suma + (p ? naRunde(p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0))) + (p.premia || 0) : 0);
+    return suma + (p ? naRunde(kosztMiesieczny(kat, p)) + (p.premia || 0) : 0);
   }, 0);
 }
 const kosztLokalu = (o) => (o ? (o.forma === "najem" ? naRunde(o.czynsz) : 0) + (o.dziala ? naRunde(o.utrzymanie) : 0) : 0);

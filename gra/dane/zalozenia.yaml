@@ -450,6 +450,101 @@ pracownicy:   # U20 (decyzja autora 4.11.2026): zadowolenie każdej osoby i odej
       na mapie (pola siatki; między lokalami Lublina średnio ok. 8,5, najwyżej ok. 23) + za_dodatek × min(1, dodatek
       ÷ pensja), w granicach szansa_min…szansa_maks. Zadowolony pracownik przy średniej odległości zgadza się w ok.
       45–70%, dodatek równy pensji podnosi szansę o 0,6. Losowanie przy przeliczeniu rundy – założenie do kalibracji'
+  formy_zatrudnienia:
+    wartosc:
+      prace:
+        nazwa: Umowa o pracę
+        opis: pełny etat, ZUS pracodawcy, okres wypowiedzenia; ludzie najbardziej ją lubią
+        etat: 1.0
+        zus: etat
+        wypowiedzenie: true
+        kadry: etat
+        kara_zlecenia: false
+        oczekiwana: 1.0
+        placa_minimalna: true
+      pol_etatu:
+        nazwa: Umowa o pracę – pół etatu
+        opis: połowa godzin za połowę pensji (płaca minimalna – w połowie), ZUS i wypowiedzenie jak na etacie
+        etat: 0.5
+        zus: etat
+        wypowiedzenie: true
+        kadry: etat
+        kara_zlecenia: false
+        oczekiwana: 0.5
+        placa_minimalna: true
+      zlecenie:
+        nazwa: Umowa zlecenie
+        opis: bez ZUS pracodawcy i bez wypowiedzenia (odchodzi od razu), ale ludzie są mniej zadowoleni
+        etat: 1.0
+        zus: zlecenie
+        wypowiedzenie: false
+        kadry: zlecenie
+        kara_zlecenia: true
+        oczekiwana: 1.0
+        placa_minimalna: true
+      student:
+        nazwa: Zlecenie ze studentem
+        opis: tylko dla studentów do 26 lat – bez ZUS i bez PIT, więc zgodzą się na niższą pensję; mniej godzin, częściej odchodzą
+        etat: 1.0
+        zus: brak
+        wypowiedzenie: false
+        kadry: zlecenie
+        kara_zlecenia: true
+        oczekiwana: 1.0
+        placa_minimalna: true
+        tylko_studenci: true
+      staz:
+        nazwa: Staż z urzędu pracy
+        opis: urząd płaci stypendium, firma nie płaci pensji ani ZUS; tylko osoby bez doświadczenia (1★), jedna naraz,
+          po stażu zostaje na umowie o pracę za pensję preferowaną
+        etat: 1.0
+        zus: brak
+        wypowiedzenie: false
+        kadry: zlecenie
+        kara_zlecenia: false
+        oczekiwana: 0.0
+        placa_minimalna: false
+        staz:
+          rund: 6
+          max_gwiazdek: 1
+          naraz: 1
+          stypendium: 2000
+      b2b:
+        nazwa: Kontrakt B2B
+        opis: osoba prowadzi firmę i wystawia fakturę z VAT 23% (VAT odliczasz); bez ZUS i bez wypowiedzenia, ale chce
+          wyższej stawki, bo sama płaci swój ZUS
+        etat: 1.0
+        zus: brak
+        wypowiedzenie: false
+        kadry: brak
+        kara_zlecenia: false
+        oczekiwana: 1.25
+        placa_minimalna: false
+        faktura: Faktura B2B
+    pewnosc: zalozenie
+    zrodlo: 'UF21 (decyzja autora 6.11.2026): formy zatrudnienia do wyboru przy zatrudnianiu i w profilu osoby. etat –
+      mnożnik godzin pracy; zus – stawka składek pracodawcy (etat: podatki.zus_pracodawcy, zlecenie:
+      podatki.zus_pracodawcy_zlecenie, brak: 0); kadry – opłata biura za osobę (etat/zlecenie/brak); kara_zlecenia –
+      składnik „umowa zlecenie” w zadowoleniu; oczekiwana – mnożnik pensji preferowanej, przy którym osoba jest
+      zadowolona z płacy (pół etatu 0,5; B2B 1,25 – sama płaci ZUS ok. 1,6–1,9 tys. zł i nie ma urlopu; staż – pensji
+      nie ma); placa_minimalna – czy pensja musi być co najmniej płacą minimalną × etat. Staż: stypendium 120% zasiłku
+      dla bezrobotnych (ustawa o rynku pracy i służbach zatrudnienia z 20.03.2025, ok. 2 tys. zł – płaci urząd, w grze
+      tylko informacyjnie), staż trwa rund tygodni, potem umowa o pracę. B2B: faktura z VAT (podatki.vat.koszty:
+      „Faktura B2B”), w KPiR w pozostałych wydatkach. Boty zatrudniają tylko na umowę o pracę. Liczby – założenie
+      do kalibracji'
+  studenci:
+    wartosc:
+      wiek_do: 26
+      udzial: 0.8
+      godziny: 0.6
+      odejscia: 1.5
+      pensja: 0.92
+    pewnosc: zalozenie
+    zrodlo: 'UF10/UF21 (decyzja autora 6.11.2026): student do 26 lat – kandydat młodszy niż wiek_do jest studentem z
+      szansą udzial (osobne losowanie, strumień „studenci”). Bez PIT (ulga dla młodych, art. 21 ust. 1 pkt 148 ustawy
+      o PIT) na każdej umowie, więc przy tej samej pensji brutto dostaje więcej na rękę – zadowala go pensja ×
+      pensja; na zleceniu bez ZUS (art. 6 ust. 4 ustawy o systemie ubezpieczeń społecznych). Uczy się, więc pracuje
+      godziny × zwykłych godzin i odchodzi z niezadowolenia odejscia × częściej. Liczby – założenie'
 lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
   udzial_skladnikow:
     wartosc: 0.5

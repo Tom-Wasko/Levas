@@ -25,6 +25,7 @@ from silnik import harmonogram as hm
 from silnik.dane import dane_domyslne
 from silnik.gra import Gra as GraSilnika
 from silnik.limity import naruszenia
+from silnik.ludzie import formy as fz
 from silnik.ludzie import zadowolenie as zo
 from silnik.pieniadze import kasyno as kas
 from silnik.rynek import handel as hd
@@ -232,6 +233,14 @@ def api_prowadzenie(request, id_):
     if "podpowiedzi" in d:
         with serwisy.zmiana(id_) as g:
             g.konfiguracja["podpowiedzi"] = bool(d["podpowiedzi"])
+    # UF21 – TYMCZASOWE, usunąć przed oficjalną wersją (test form zatrudnienia)
+    if "formy_zatrudnienia" in d:
+        lista = d["formy_zatrudnienia"]
+        if not isinstance(lista, list) or not all(isinstance(x, str) for x in lista):
+            raise BladZapytania("Formy zatrudnienia: lista kluczy form.")
+        with serwisy.zmiana(id_) as g:
+            g.konfiguracja["formy_zatrudnienia"] = [u for u in fz.formy(g.dane)
+                                                    if u in lista or u == fz.PRACE]
     if "odblokowanie" in d:
         if not isinstance(d["odblokowanie"], dict):
             raise BladZapytania("Harmonogram odblokowań: {element: tydzień}.")

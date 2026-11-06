@@ -30,7 +30,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF0 Sprzątanie Pulpit\Levas i repo, notatki zaktualizowane, plan i przekazanie (89db989)
 - [ ] UF23 (11) Redakcja kart wyników, Wniosków i widoków „Wyniki” wszystkich zakładek
 - [ ] UF22 (20) Lista zadań po prawej (z sytuacji + własne, na żywo)
-- [ ] UF21 (10) Formy zatrudnienia + przełączniki w panelu MG
+- [x] UF21 (10) Formy zatrudnienia (pół etatu, student, staż, B2B) + przełączniki w panelu MG (tymczasowe)
 - [x] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
 - [ ] UF19 (15) Marketing internetowy od rundy 7
 - [ ] UF18 (9) Licytacje pracowników widoczne
@@ -40,7 +40,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF13 (2) Parki tylko z mapy: znak „!” na parku, lista spraw nad mapą, okno parku (kafelki A/B/C, poprzednia runda, historia); sprawy w lokalu w Moim lokalu
 - [x] UF12 Środki trwałe → KPiR (ewidencja i odpisy), sprzedaż sprzętu w Wnętrzu z uwagą o amortyzacji; zakładka usunięta
 - [x] UF11 Ranking w Wynikach: tabela drużyn (miejsce, zmiana, średnia i ostatnia karta, majątek) + wykres miejsc
-- [ ] UF10 (4) Zlecenie bez ZUS, student <26 bez PIT
+- [x] UF10 (4) Zlecenie bez ZUS pracodawcy, student <26 – forma „zlecenie ze studentem” (razem z UF21)
 - [ ] UF9 (16) Nowe udogodnienia (do rundy 14, kot zakładowy)
 - [ ] UF8 (13) Falafel – bójka
 - [ ] UF7 (8) 4 słupki sezonowości w kafelku dania

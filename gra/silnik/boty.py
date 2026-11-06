@@ -656,7 +656,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         cele = cele[: rp.ustawienia(dane)["limit_nowych"]]   # agencja pracy: limit nowych, reszta w kolejnych
         ql, kanal = st.get("jakosc_ludzi") or q, st.get("kanal")
         for typ, nr, zawod in cele:
-            kandydaci = [k for k in pula if k["zawod"] == zawod
+            kandydaci = [k for k in pula if k["zawod"] == zawod and not k.get("student")   # UF21: boty bez studentów
                          and (kanal is None or kanal in rp.kanaly_kandydata(dane, k, runda))]
             if not kandydaci:
                 continue

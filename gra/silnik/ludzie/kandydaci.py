@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from ..dane import Dane
 from ..losowosc import strumien
+from .formy import studenci
 
 
 def cechy(dane: Dane) -> dict:
@@ -56,6 +57,16 @@ def _gwiazdki(dane: Dane, rng) -> int:
     return int(rng.choice([int(g) for g in p], p=list(p.values())))
 
 
+def _ze_studentem(dane: Dane, osoba: dict, ziarno, runda: int) -> dict:
+    """UF21: kandydat młodszy niż wiek_do jest studentem z szansą udzial – osobny strumień, reszta puli bez zmian."""
+    s = studenci(dane)
+    if not s or osoba.get("wiek", s["wiek_do"]) >= s["wiek_do"]:
+        return osoba
+    if strumien(ziarno, runda, "studenci", osoba["id"]).random() < s["udzial"]:
+        return {**osoba, "student": True}
+    return osoba
+
+
 def pula_startowa(dane: Dane, ziarno) -> list[dict]:
     rng = strumien(ziarno, 0, "kandydaci")
     rozrzut = dane.z["losowosc"]["kandydaci"]["rozrzut_pensji"]
@@ -71,7 +82,7 @@ def pula_startowa(dane: Dane, ziarno) -> list[dict]:
     for zawod in dane.zawody:
         for j in range(dane.rynek_pracy["losowanie"]["na_start"]):
             pula.append(_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g0-{zawod[:3]}-{j}", uzyte))
-    return [_z_cecha(dane, o, ziarno, 0) for o in pula]
+    return [_ze_studentem(dane, _z_cecha(dane, o, ziarno, 0), ziarno, 0) for o in pula]
 
 
 def dodaj_nowych(dane: Dane, pula: list[dict], ziarno, runda: int) -> list[dict]:
@@ -79,4 +90,4 @@ def dodaj_nowych(dane: Dane, pula: list[dict], ziarno, runda: int) -> list[dict]
     uzyte = {o["imie_nazwisko"] for o in pula}
     nowi = [_osoba(dane, rng, zawod, _gwiazdki(dane, rng), f"g{runda}-{zawod[:3]}-{j}", uzyte)
             for zawod in dane.zawody for j in range(dane.rynek_pracy["losowanie"]["co_runde"])]
-    return pula + [_z_cecha(dane, o, ziarno, runda) for o in nowi]
+    return pula + [_ze_studentem(dane, _z_cecha(dane, o, ziarno, runda), ziarno, runda) for o in nowi]
