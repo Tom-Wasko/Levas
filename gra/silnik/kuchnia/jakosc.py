@@ -1,6 +1,8 @@
 """Mnożniki jakości i wyposażenia (wspólne dla popytu strefowego, menu i planowania; parametry w dane/zalozenia.yaml)."""
 from __future__ import annotations
 
+import math
+
 from ..dane import Dane
 
 
@@ -22,5 +24,9 @@ def mnoznik_jakosci(dane: Dane, pracownicy: float, sprzet: float, zasoby: float,
 
 
 def mnoznik_wyposazenia(dane: Dane, wyposazenie: list[str]) -> float:
-    pozycje = dane.pozycje("wyposazenie")
-    return 1 + dane.z["popyt"]["wyposazenie_na_procent_klientow"] * sum(pozycje[n]["procent"] / 100 for n in wyposazenie)
+    """1 + κ · x, x = Σ % klientów oczekujących wyposażenia / 100; z `wyposazenie_nasycenie` S (B10) przyrost nasyca się:
+    1 + κ · S · (1 − e^(−x / S)) – pierwsza sztuka działa jak dawniej, każda kolejna słabiej."""
+    p, pozycje = dane.z["popyt"], dane.pozycje("wyposazenie")
+    x = sum(pozycje[n]["procent"] / 100 for n in wyposazenie)
+    s = p.get("wyposazenie_nasycenie")
+    return 1 + p["wyposazenie_na_procent_klientow"] * (s * (1 - math.exp(-x / s)) if s else x)

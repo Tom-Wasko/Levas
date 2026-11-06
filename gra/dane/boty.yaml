@@ -124,7 +124,7 @@ strategie:
     jakosc: 2
     uslugi: 6
     pokrycie: 0.9
-    wyposazenie: 2
+    wyposazenie: 6   # B10: przy wolnej kuchni komplet +0,06 karty (b10_po, 6/6)
     udogodnienia: 2
     reklama: {}
     internet: []
@@ -142,7 +142,7 @@ strategie:
     jakosc: 1
     uslugi: 8
     pokrycie: 0.85
-    wyposazenie: 0
+    wyposazenie: 3   # B10: WiFi, parking, terminal +0,05 karty (b10_po, 5/6)
     udogodnienia: 0
     reklama:
       Ulotki: 10
@@ -165,7 +165,7 @@ strategie:
     uslugi: 5
     pokrycie: 1.0
     wyposazenie: 6
-    udogodnienia: 9
+    udogodnienia: 3   # B10: przy uczciwej płacy udogodnienia nic nie dają (9 → 3: +0,055 karty)
     reklama:
       Smaki Lublina (dziennik): 6
     internet:
@@ -186,7 +186,7 @@ strategie:
     uslugi: 8
     pokrycie: 1.0
     wyposazenie: 6
-    udogodnienia: 6
+    udogodnienia: 3   # B10: jak premium (6 → 3: +0,024 karty)
     reklama:
       Ulotki: 20
       Ekrany LED: 11
