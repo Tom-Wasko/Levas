@@ -171,3 +171,22 @@ def test_marka_firmy_w_pierwszej_rundzie(client):
     assert v["marki"][GRACZ] == {"nazwa": "Kebab Test", "slogan": "Zawsze ciepły", "kolor": "#2d73d6", "logo": logo}
     r = client.put(_url(id_, "logo"), {"logo": ""}, content_type="application/json")
     assert r.status_code == 400 and "pierwszej rundzie" in r.json()["blad"]
+
+
+def test_wlasne_zadania_druzyny_przechodza_na_kolejna_runde(client):
+    """UF22: lista zadań – własne zadania w decyzjach rundy, nieodhaczone przechodzą dalej, walidacja przy zapisie."""
+    id_ = _nowa(client)
+    zadania = [{"id": "a", "tekst": "  Sprawdzić   ceny konkurencji ", "zrobione": False},
+               {"id": "b", "tekst": "Kupić grill", "zrobione": True}]
+    v = client.put(_url(id_, "decyzje"), {"zadania_wlasne": zadania}, content_type="application/json").json()
+    assert v["decyzje"]["zadania_wlasne"][0]["tekst"] == "Sprawdzić ceny konkurencji"
+    for zle in ("nie lista", [{"tekst": " "}], [{"tekst": "x"}] * 31):
+        r = client.put(_url(id_, "decyzje"), {"zadania_wlasne": zle}, content_type="application/json")
+        assert r.status_code == 400
+    client.post(f"/api/gry/{id_}/przelicz")
+    v = client.get(_url(id_, "widok")).json()
+    assert v["runda"] == 2 and [z["id"] for z in v["decyzje"]["zadania_wlasne"]] == ["a"]
+    client.post(f"/api/gry/{id_}/przelicz")   # runda 2 bez zapisu – zadania dalej z rundy 1
+    assert [z["id"] for z in client.get(_url(id_, "widok")).json()["decyzje"]["zadania_wlasne"]] == ["a"]
+    client.put(_url(id_, "decyzje"), {"zadania_wlasne": []}, content_type="application/json")
+    assert client.get(_url(id_, "widok")).json()["decyzje"]["zadania_wlasne"] == []

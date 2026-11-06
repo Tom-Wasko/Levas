@@ -87,7 +87,17 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   Panel: `zakladki/formy.js` (nazwy, ZUS, koszt, minimum, formy dla osoby, opis), okno zatrudnienia i profil (hr.js,
   `zmiany["forma-zatrudnienia"]` przelicza pensję i opis), Rynek pracy, Lokal (koszt), Podatki (tekst).
   Testy: `testy/ludzie/test_formy.py`, test MG w `test_panel_mg.py`, przepisany test ZUS zlecenia w test_zadowolenie.py.
-- Następne kolejno: UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF22 – lista zadań. Panel: `zakladki/zadania.js` (`zadaniaAutomatyczne` – grupy czerwonych pozycji listy błędów
+  według klucza zakładki `GRUPY`, reszta jako „Popraw: <zakładka>”; sprawy w parkach – jedno zadanie na park, sprawy
+  w lokalu, Harpagon przy terminie ≤ 1 runda, „Wyślij decyzje”; zadanie z listy błędów, które się pojawiło, zostaje
+  w rundzie jako odhaczone – pamięć w `localStorage` na rundę). `app.js`: `rysujZadania(ctx())` na początku `rysuj()`
+  (ten sam hak co lista błędów), przycisk „Zadania” w menu za Listą błędów, `AKCJE_ZADAN`, Enter w polu → Dodaj.
+  Własne zadania: decyzje `zadania_wlasne: [{id, tekst, zrobione}]` (silnik ich nie czyta); walidacja w
+  `api/widoki.py: _zadania_wlasne` (≤ 30 zadań, ≤ 120 znaków); przeniesienie nieodhaczonych –
+  `api/prezentacja.py: zadania_z_poprzedniej` (w widoku, zapis przy pierwszej zmianie decyzji). Style na końcu
+  `styl.css`. Test: `test_api.py: test_wlasne_zadania_druzyny_przechodza_na_kolejna_runde`; panel sprawdzony w node
+  na zrzucie widoków (bez przeglądarki – wygląd panelu do obejrzenia przy scalaniu).
+- Następne kolejno: UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

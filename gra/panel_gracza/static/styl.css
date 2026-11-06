@@ -478,3 +478,35 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
 /* UF15: zakładki przed swoją rundą – szare, z kłódką i „od rundy N” */
 .menu .klodka { display: inline-flex; vertical-align: -2px; margin-right: 2px; opacity: .8; }
 .menu .poz > a.zablokowana .od-gora { font-size: 9px; text-transform: none; font-weight: 600; color: var(--szary); }
+
+/* UF22: lista zadań – panel po prawej (wysuwany, zwijany do paska z licznikiem) */
+.zadania { position: fixed; right: 16px; top: 140px; z-index: 30; width: 290px; max-height: calc(100vh - 170px); overflow: auto;
+  background: var(--karta); border: 1px solid var(--linia); border-radius: 12px; box-shadow: var(--cien); padding: 12px 14px; }
+.zadania.zwiniete { width: auto; padding: 0; overflow: visible; border-radius: 10px 0 0 10px; right: 0; }
+.zad-pasek { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 7px; cursor: pointer;
+  color: var(--tekst); text-decoration: none; font-weight: 700; font-size: 11px; }
+.zad-pasek span:first-of-type { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; text-transform: uppercase; }
+.zad-glowa { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 4px; }
+.zad-zwin { margin-left: auto; cursor: pointer; font-size: 20px; line-height: 1; padding: 0 4px; color: var(--tekst); text-decoration: none; }
+.zad-licznik, .menu .poz .znaczek.zad { background: var(--pom); color: #fff; border-radius: 9px; min-width: 18px; padding: 0 5px;
+  font-size: 10px; line-height: 18px; text-align: center; }
+.zad-sekcja { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; opacity: .65; margin: 10px 0 4px; }
+.zad-lista { list-style: none; margin: 0; padding: 0; }
+.zad-lista li { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px dashed var(--linia); }
+.zad-lista li:last-child { border-bottom: 0; }
+.zad-lista li a[data-akcja="zadanie-idz"] { cursor: pointer; color: var(--tekst); text-decoration: none; flex: 1; }
+.zad-lista li a[data-akcja="zadanie-idz"]:hover { text-decoration: underline; }
+.zad-lista li.gotowe a[data-akcja="zadanie-idz"], .zad-lista li.gotowe .zad-tekst { text-decoration: line-through; opacity: .55; }
+.zad-tekst { flex: 1; }
+.zad-pole { flex: none; width: 16px; height: 16px; margin-top: 1px; border: 2px solid var(--linia); border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center; cursor: default; }
+a.zad-pole { cursor: pointer; }
+.zad-pole.ok { border-color: var(--zielony); color: var(--zielony); }
+.zad-pole .ikona { width: 12px; height: 12px; }
+.zad-usun { cursor: pointer; opacity: .45; font-size: 16px; line-height: 1; text-decoration: none; color: var(--tekst); }
+.zad-usun:hover { opacity: 1; color: var(--czerwony); }
+.zad-nowe { display: flex; gap: 6px; margin-top: 8px; }
+.zad-nowe input { flex: 1; min-width: 0; }
+.zad-pusto { font-size: 11.5px; opacity: .65; margin: 4px 0; }
+@media (max-width: 700px) { .zadania:not(.zwiniete) { left: 16px; right: 16px; width: auto; top: auto; bottom: 16px; max-height: 60vh; } }
+@media print { .zadania { display: none; } }

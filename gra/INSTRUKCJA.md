@@ -87,6 +87,12 @@ dania, dostawy przyjeżdżają w swoje dni, a bułki z poniedziałku we wtorek w
 > zwinięte – kliknij, żeby rozwinąć). Kilka dań bez sprzętu czy towar do wyrzucenia w jednym lokalu to jedna pozycja.
 > Decyzje da się wysłać mimo czerwonych błędów, ale zwykle się tego żałuje.
 
+**Lista zadań** (przycisk *Zadania* obok Listy błędów, panel po prawej stronie – można go zwinąć do paska z licznikiem)
+podpowiada, co jeszcze trzeba zrobić w tym tygodniu: wybrać lokal, ustawić menu i ceny, zamówić składniki, obsadzić
+stanowiska, zareagować w parku, spłacić Harpagona, wysłać decyzje. Zadania odhaczają się same, gdy decyzja jest
+podjęta; kliknięcie zadania przenosi do właściwej zakładki. Niżej drużyna dopisuje **własne zadania** (widzą je wszyscy
+z drużyny) – nieodhaczone przechodzą na następny tydzień.
+
 ## 3. Cel gry – karta wyników
 
 Na końcu liczy się **wynik działalności** z karty wyników – średnia ze wszystkich tygodni sprzedaży (od tygodnia 2;

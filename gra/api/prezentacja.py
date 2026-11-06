@@ -128,6 +128,19 @@ def kalendarz(dane: Dane, liczba_rund: int) -> dict:
             "miesiace": [dane.miesiac_rundy(r) for r in rundy]}
 
 
+def zadania_z_poprzedniej(gra, firma: str, szkic: dict) -> dict:
+    """UF22: nieodhaczone własne zadania drużyny przechodzą na kolejną rundę – szkic bez listy zadań dostaje
+    listę z ostatniej rundy, w której drużyna ją miała (do decyzji trafi przy pierwszym zapisie)."""
+    if "zadania_wlasne" in szkic:
+        return szkic
+    for r in range(gra.runda - 1, gra.runda_startowa - 1, -1):
+        stare = gra.decyzje.get(r, {}).get(firma, {}).get("zadania_wlasne")
+        if stare is not None:
+            reszta = [z for z in stare if isinstance(z, dict) and not z.get("zrobione")]
+            return {**szkic, "zadania_wlasne": reszta} if reszta else szkic
+    return szkic
+
+
 def katalogi(dane: Dane) -> dict:
     return {"mapa": dane.mapa, "uslugi": dane.uslugi, "sprzet": dane.sprzet, "sprzet_kasy": dane.sprzet_kasy, "zawody": dane.zawody, "zasoby": dane.zasoby,
             "oferty": dane.katalog_ofert, "placa_minimalna": dane.z["finanse"]["placa_minimalna"],
@@ -237,7 +250,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
 
     if edycja:
         stan, f, ks, info, bledy = stan_po_szkicu(gra, firma)
-        v["decyzje"] = gra.szkic(firma)
+        v["decyzje"] = zadania_z_poprzedniej(gra, firma, gra.szkic(firma))
         v["wyslane"] = firma in gra.wyslane()
     elif koniec:
         stan = gra.stan(runda - 1)

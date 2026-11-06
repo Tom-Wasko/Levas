@@ -432,6 +432,22 @@ def _sprawdz_wersje(request, g: GraSilnika, firma: str) -> None:
     )
 
 
+ZADANIA_MAX, ZADANIE_ZNAKI = 30, 120   # limity listy zadań (interfejs, nie liczby gry)
+
+
+def _zadania_wlasne(lista) -> list[dict]:
+    if not isinstance(lista, list) or len(lista) > ZADANIA_MAX:
+        raise BladZapytania(f"Lista zadań: najwyżej {ZADANIA_MAX} zadań.")
+    wynik = []
+    for z in lista:
+        if not isinstance(z, dict) or not str(z.get("tekst", "")).strip():
+            raise BladZapytania("Zadanie musi mieć treść.")
+        tekst = " ".join(str(z["tekst"]).split())[:ZADANIE_ZNAKI]
+        wynik.append({"id": str(z.get("id", ""))[:40], "tekst": tekst,
+                      "zrobione": bool(z.get("zrobione"))})
+    return wynik
+
+
 @require_http_methods(["PUT"])
 @api
 def api_decyzje(request, id_, firma):
@@ -446,6 +462,8 @@ def api_decyzje(request, id_, firma):
         _sprawdz_wersje(request, g, firma)
         if _bez_klubu(request):
             d = kas.ukryj_decyzje(d)
+        if "zadania_wlasne" in d:   # UF22: własne zadania drużyny (lista zadań w panelu)
+            d["zadania_wlasne"] = _zadania_wlasne(d["zadania_wlasne"])
         # limity (silnik/limity.py): zapis z przekroczeniem jest odrzucony
         bledy = naruszenia(g.dane, g.stan().firmy[firma], d, g.runda)
         if bledy:

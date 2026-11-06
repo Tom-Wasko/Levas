@@ -4,9 +4,10 @@ import { esc, godzina, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, 
 import ZAKLADKI, { ALIAS, ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
 import { kolko, zwinPodpowiedzi } from "./zakladki/dymki.js";
+import { AKCJE_ZADAN, podepnijZadania, rysujZadania } from "./zakladki/zadania.js";
 
 const S = { v: null, kat: null, zakladka: "dashboard", tryb: "decyzje", runda: null, d: {}, zapis: Promise.resolve(),
-  nrZapytania: 0, oczekujace: 0, poleZmiany: null, odliczanie: null };
+  nrZapytania: 0, oczekujace: 0, poleZmiany: null, odliczanie: null, zadania: 0 };
 
 const postep = document.createElement("div");
 postep.className = "postep";
@@ -134,10 +135,13 @@ function rysujMenu() {
     const zablokowana = poz.pod ? !poz.pod.some((k) => dostepna(ZAKLADKI[k])) : !dostepna(z);
     const cel = poz.pod ? poz.pod.find((k) => dostepna(ZAKLADKI[k])) || poz.pod[0] : poz.klucz;
     const znaczek = poz.klucz === "lista_bledow" && czerwone && S.v.edycja ? `<span class="znaczek">${czerwone}</span>` : "";
+    // UF22: obok Listy błędów – przycisk panelu zadań (z liczbą otwartych zadań)
+    const zadania = poz.klucz === "lista_bledow" ? `<div class="poz"><a data-akcja="zadania-przelacz" title="Lista zadań – panel po prawej">
+      ${ikona("ok")}Zadania${S.zadania ? `<span class="znaczek zad">${S.zadania}</span>` : ""}</a></div>` : "";
     const od = zablokowana ? (poz.pod ? najwczesniej(poz.pod.map(odRundy)) : odRundy(poz.klucz)) : null;
     const tytulOd = zablokowana ? ` title="${od ? `Dostępne od rundy ${od}` : "Jeszcze niedostępne"}"` : "";
     return `<div class="poz ${poz.klasa || ""}" data-dzial="${poz.klucz}"><a data-zakladka="${cel}" class="${aktywna ? "aktywna" : ""} ${zablokowana ? "zablokowana" : ""}"${tytulOd}>
-      ${ikona(zablokowana ? "klodka" : poz.ikona)}${poz.tytul}${znaczek}${od ? `<span class="od-gora">od rundy ${od}</span>` : ""}</a>${pod}</div>`;
+      ${ikona(zablokowana ? "klodka" : poz.ikona)}${poz.tytul}${znaczek}${od ? `<span class="od-gora">od rundy ${od}</span>` : ""}</a>${pod}</div>${zadania}`;
   }).join("");
 }
 
@@ -220,6 +224,7 @@ function rysuj() {
   const fokus = kluczPola(document.activeElement);
   const przewiniecie = window.scrollY;
   wyczyscWykresy();
+  S.zadania = rysujZadania(ctx());   // UF22: przeliczane po każdej zmianie decyzji, jak lista błędów
   rysujMenu();
   const v = S.v, z = ZAKLADKI[S.zakladka];
   const grupa = MENU.find((p) => p.pod ? p.pod.includes(S.zakladka) : p.klucz === S.zakladka);
@@ -299,6 +304,7 @@ document.addEventListener("click", async (e) => {
     if (a === "runda") return przesunRunde(+el.dataset.d);
     if (a === "runda-idz") return idzDoRundy(+el.dataset.r);
     if (a === "tryb") { S.tryb = el.dataset.t; return rysuj(); }
+    if (AKCJE_ZADAN[a]) return await AKCJE_ZADAN[a](el, ctx(), e);
     for (const z of Object.values(ZAKLADKI)) {
       if (z.akcje && z.akcje[a]) return await z.akcje[a](el, ctx(), e);
     }
@@ -328,6 +334,7 @@ document.addEventListener("keydown", (e) => {
     const [h, tryb] = location.hash.slice(1).split("/");
     if (ZAKLADKI[h]) S.zakladka = docelowa(h);
     if (tryb === "wyniki") S.tryb = "wyniki";
+    podepnijZadania(ctx);
     await wczytaj();
   } catch (e) {
     document.getElementById("karta").innerHTML = `<div class="ladowanie">Nie udało się wczytać gry: ${esc(e.message)}</div>`;

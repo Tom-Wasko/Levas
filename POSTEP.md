@@ -29,7 +29,7 @@ Kolejność pracy (od najtrudniejszych): UF15 → UF12 → UF13 → UF11 → UF2
 UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (w nawiasie numer poprawki autora).
 - [x] UF0 Sprzątanie Pulpit\Levas i repo, notatki zaktualizowane, plan i przekazanie (89db989)
 - [ ] UF23 (11) Redakcja kart wyników, Wniosków i widoków „Wyniki” wszystkich zakładek
-- [ ] UF22 (20) Lista zadań po prawej (z sytuacji + własne, na żywo)
+- [x] UF22 (20) Lista zadań po prawej (z sytuacji + własne drużyny, odhaczają się same, nieodhaczone przechodzą dalej)
 - [x] UF21 (10) Formy zatrudnienia (pół etatu, student, staż, B2B) + przełączniki w panelu MG (tymczasowe)
 - [x] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
 - [ ] UF19 (15) Marketing internetowy od rundy 7
