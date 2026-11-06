@@ -792,6 +792,31 @@ felin 0,8, zemborzyce 0,85): centrum 5,5 → 4,4 tys., stare_miasto 5,4 → 4,2,
 1,4 / 1,35 / 1,15 / 1 / 0,8 / 0,85 / 0,75) – w toku; potem wybór wartości do `popyt.yaml`, szybki pomiar celów
 B5 i `b6_kupno3` (peryferie, kontekst cen `lokale.*.cena*=1;1,5;2`).
 
+**Pomiar `b6_strefy3`** (5.11; nowy wzór, K3 i K4, 720 gier). Strefa najlepsza albo w szumie od najlepszej
+w 6 grupach strategia × rund: K3 – centrum 6 (dalej dominacja); **K4 – centrum 6, dworzec 4, lsm_czuby 3,
+stare_miasto 2, czechów 1, politechnika 1**. Premium wygrywa w centrum, na dworcu i Starym Mieście, tani – na
+lsm_czuby, w czechowie i na politechnice (np. tani 26r: centrum 0,63, lsm_czuby 0,60, czechów 0,60, politechnika
+0,57; premium 26r: centrum 0,57, dworzec 0,53, stare_miasto 0,49, politechnika 0,42). Centrum nadal na czele
+każdej grupy, ale w szumie (4–5 gier w strefie). Średnia karta gospodarki bez spadku (zrównoważony 26r 0,523 →
+0,546, tani 18r 0,391 → 0,446, premium 18r 0,344 → 0,358). **K4 wpisane do `popyt.yaml`** (e624cd0); felin i
+zygmuntowskie zostają najsłabsze (0,2–0,4) – mało klientów, a nie czynsz.
+
+**Kontrola trudności `b6_trudnosc`** (6.11; jak K: słaby / średni / dobry × 5 strategii × ziarna 1000–1019,
+18 rund, rywale średni, 300 gier):
+
+| miara | K | po K4 | cel |
+|---|---|---|---|
+| pierwszy plus średniej w rundach 4–6 | 51/100 (w 3: 48) | **33/100 (w 3: 67)** | 4–6 |
+| alarmy wersji słabej | 0/100 | 0/100 | 0 |
+| dobra > średnia (pary) | 74/100 | **86/100** | ≥ 80% |
+| słaba < średnia (pary) | 89/100 | 94/100 | – |
+| karta słaba / średnia / dobra | 0,09 / 0,32 / 0,35 | 0,07 / 0,28 / 0,35 | – |
+
+Dobra > średnia wróciła do celu (agresywny 13 → 18, naśladowca 15 → 18, premium 15 → 18). Pierwszy plus średniej
+przyspieszył: w rundzie 3 zrównoważony 4 → 13 z 20, naśladowca 4 → 13 (tani i premium już wcześniej w 3).
+To liczba B5 (rozruch nowego lokalu) – zmiana wymaga zgody autora; propozycja w `notatki_do_zmiany.md` po
+próbie wariantu rozruchu (po `b6_kupno3`).
+
 **Pomiar `b6_wykup`** (5.11; strefy peryferyjne z lokalami na kupno: czechów, felin, lsm_czuby, politechnika,
 zygmuntowskie; 3 strategie × 18/26 rund × 6 ziaren, warianty `lokale:kupno`, `lokale:wykup`,
 `lokale:przejecie_wypowiedz`, rezerwa bota 30 tys.). Wykup i przejęcie z wypowiedzeniem = baza: bot nigdy nie ma
