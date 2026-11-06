@@ -1232,3 +1232,87 @@ Diagnoza:
 Karty wyższe o ok. 0,09, bo rywale (premium, agresywny) i badane firmy płacą za szkolenia czterokrotnie mniej –
 skala słów karty (U10) do odświeżenia w B13. B9 zamknięte; otwarte – decyzje autora: płaca minimalna,
 trwały skutek szkoleń. Bez pomiaru: podkupienia i kontroferty (boty ich nie robią), zwolnienia.
+
+## B10 – marketing (6.11.2026, gałąź `kalibracja-b6`)
+
+Krok 0: boty umieją emisje i przerwę kampanii (`emisje_kampanii`, `przerwa_kampanii` w strategii); warianty
+`kampania:<agencja/kanał>`, `emisje:N`, `przerwa:N`, `udogodnienia:N`, `wyposazenie:N`, `zdarzenia:brak`.
+
+**Pomiar `b10_marketing`** (504 gry, 18 rund, 6 firm, średni; Δ karty wobec bazy, pary wygrane z 6):
+
+| wariant | zrównoważony | tani | premium |
+|---|---|---|---|
+| wyposazenie:6 (komplet) | +0,131 (6/6) | +0,117 (6/6) | ≈ 0 |
+| udogodnienia:0 | – | – | +0,060 (6/6) |
+| kampanie:brak | −0,027 | −0,035 | −0,15 |
+| najlepszy kanał | influencer | influencer | baza (2 kanały) |
+| radio (cała Lublin) | traci | traci | traci |
+| emisje:3 / 10 / 15 | ≈ 0 | ≈ 0 | ≈ 0 |
+| przerwa:0 | +0,015 | +0,015 | +0,057 (5/6) |
+
+- **Wyposażenie dominowało:** mnożnik popytu był liniowy (1 + 0,073 × suma % klientów), więc komplet dawał +31%
+  popytu za ok. 7 tys. zł i 420 zł tygodniowo – każda sztuka się opłacała. Teraz przyrost się nasyca:
+  1 + κ·S·(1 − e^(−x/S)), S = 3 (`popyt.wyposazenie_nasycenie`, `silnik/kuchnia/jakosc.py`) – pierwsza sztuka
+  działa jak dawniej, komplet daje ok. +17%.
+
+**Pomiar `b10_po`** (216 gier, z agresywnym; po nasyceniu):
+
+| wariant | zrównoważony | tani | premium | agresywny |
+|---|---|---|---|---|
+| wyposazenie:3 | baza (2) +0,033 | +0,048 | ≈ 0 | ≈ 0 |
+| wyposazenie:6 | +0,062 (6/6) | +0,072 (6/6) | ≈ 0 | ≈ 0 |
+| udogodnienia:0 / 3 | – | – | +0,055…+0,059 (6/6) | +0,024…+0,028 (6/6) |
+| zdarzenia:brak | −0,02…−0,05 | −0,02…−0,05 | −0,02…−0,05 | −0,02…−0,05 |
+| promocje:brak | −0,014 | +0,051 | +0,105 (6/6) | +0,046 (3/6) |
+
+- Wyposażenie to teraz kompromis: komplet opłaca się przy wolnej kuchni (tani, zrównoważony), przy pełnej
+  (premium, agresywny) wystarczą 3 sztuki. Boty: tani 3, zrównoważony 6.
+- Udogodnienia przy pensji preferowanej nic nie dają (nikt nie odchodzi) – premium i agresywny 3 zamiast 9 i 6;
+  propozycja w `notatki_do_zmiany.md` (ta sama przyczyna co płaca minimalna w B9).
+
+**Pomiar `b10_promocje`** (216 gier; drugi kontekst – karta z rabatem 5%):
+
+| promocja | zrównoważony (baza zestaw) | tani (baza happy + studencka) | premium (baza karta) |
+|---|---|---|---|
+| brak | −0,024 | +0,045 (6/6) | +0,092 (6/6) |
+| zestaw | baza | +0,048 (6/6) | +0,156 (6/6) |
+| studencka | −0,021 | +0,043 (6/6) | +0,091 (6/6) |
+| happy hours | −0,102 | +0,004 | +0,002 |
+| 2 za 1 | −0,182 | +0,001 | −0,114 |
+| karta przy rabacie 5% | −0,074 | +0,029 (6/6) | baza; brak +0,030 |
+
+- Zestaw (dopłata, bez rabatu) wygrywa – premium przechodzi z karty na zestaw, tani zostaje przy studenckiej.
+  Promocje z rabatem dla wszystkich nadal przegrywają, także karta z rabatem 5% – rabat zostaje 10%, dopisek
+  do propozycji B7 (trwały skutek promocji).
+
+**Pomiary `b10_kanaly` i `b10_kanaly2`** (po 360 gier; zrównoważony, premium; lokal w centrum, akademickich,
+na Felinie; jeden kanał zamiast kanałów strategii, Δ wobec bazy – średnio z 18 par):
+
+| kanał | zrówn. przed | zrówn. po | premium przed | premium po |
+|---|---|---|---|---|
+| radio (180 → 70 zł) | −0,042 (0/18) | −0,008 (6/18) | −0,072 | −0,033 |
+| degustacja (110 → 80 zł) | −0,007 | +0,004 (10/18) | −0,029 | −0,020 |
+| noc kebaba (400 → 200 zł) | −0,027 | −0,011 | −0,068 | −0,056 |
+| noc kebaba, lokal w akademickich | −0,041 | +0,008 | −0,045 | +0,002 |
+| influencer | +0,007 (13/18) | +0,005 | −0,018 | −0,019 |
+| plakaty | +0,006 | +0,008 | −0,020 | −0,020 |
+| brak kampanii | −0,028 | −0,028 | −0,070 | −0,067 |
+
+- Przy starych cenach radio, degustacja i noc kebaba przegrywały z każdym kanałem; po obniżce wszystkie kanały
+  mieszczą się w ±0,01 u zrównoważonego, a noc kebaba (tylko strefy akademickie i politechnika) jest na plus
+  tam, gdzie działa. Brak kampanii traci zawsze. W połowie ziaren strefa akademicka była zajęta przez rywali –
+  wiersz „lokal w akademickich” liczy tylko pary z lokalem badanej w tej strefie (3 z 6).
+
+**Trudność** (`b10_trudnosc`, 5 strategii × 20 ziaren, rywale średni):
+
+| miara | `b9_trudnosc` | `b10_trudnosc` | cel |
+|---|---|---|---|
+| pierwszy plus średniej w rundach 4–6 | 43/100 (w 3: 57) | 43/100 (w 3: 57) | 4–6 |
+| alarmy wersji słabej | 0/100 | 0/100 | 0 |
+| dobra > średnia (pary) | 88/100 | 85/100 | ≥ 80% |
+| słaba < średnia (pary) | 90/100 | 99/100 | – |
+| karta słaba / średnia / dobra | 0,11 / 0,38 / 0,46 | 0,10 / 0,45 / 0,52 | – |
+
+Karta średniej +0,07 – boty rywali kupują mniej udogodnień, premium ma zestaw zamiast karty; skala słów karty do
+B13. B10 zamknięte; otwarte – decyzje autora: trwały skutek promocji, udogodnienia przy uczciwej płacy.
+
