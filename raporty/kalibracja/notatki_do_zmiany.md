@@ -190,3 +190,24 @@ Propozycje (do wyboru):
 
 Rekomendacja: 1 – zgodne z realiami (klient przychodzi „na kebaba”, a nie na konkretną pozycję) i z istniejącą
 zasadą zmiany dania. Po zgodzie: pomiar `menu` 3/5/8 jak w `b7_cena` z `zastepowalnosc` 0,4 / 0,6.
+
+## B6 – rozruch nowego lokalu (6.11.2026) → liczba B5 w `dane/mapa/popyt.yaml: model.rozruch`; do decyzji autora
+
+Cel B5: pierwszy plus średniego gracza („jak człowiek – średni”) w tygodniu 4–6. W K (4.11) było 51/100, po B6
+(konkurencja stref, ceny lokali) 33/100 – reszta ma plus już w tygodniu 3. Słaby gracz dalej bez alarmów, dobry
+wygrywa ze średnim w 86/100 (cel spełniony). Pomiary (100 trójek słaby/średni/dobry, rywale średni, 18 rund):
+
+| rozruch | plus średniej w 4–6 | alarmy słabej | dobra > średnia | karta S / Ś / D |
+|---|---|---|---|---|
+| start 0,4, przyrost 0,1 (dziś) | 33 | 0 | 86 | 0,07 / 0,28 / 0,35 |
+| start 0,3 | 42 | 2 | 81 | 0,04 / 0,23 / 0,30 |
+| start 0,25 | 61 | 1 | 81 | 0,03 / 0,20 / 0,27 |
+| przyrost 0,07 | 38 | 0 | 85 | 0,06 / 0,25 / 0,32 |
+| przyrost 0,05 | 43 | 1 | 85 | 0,06 / 0,21 / 0,28 |
+
+Propozycje (do wyboru):
+1. **Bez zmian** (rekomendowana na teraz): plus w tygodniu 3 zamiast 4–6 to różnica jednego tygodnia, a każda
+   próba obniża karty wszystkich poziomów i daje pojedyncze alarmy. Wrócić do tego po B7–B12, bo zmiany cen,
+   jakości i menu też przesuną pierwszy plus.
+2. **Start 0,25** (25% popytu w 1. tygodniu sprzedaży, +10 p.p. co tydzień): jedyna próba, która trafia w cel
+   (61/100); koszt – karta średniego −0,08 i 1 alarm słabego na 100 gier.

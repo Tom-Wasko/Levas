@@ -879,6 +879,17 @@ Niższy start opóźnia pierwszy plus, ale daje pojedyncze alarmy (premium i agr
 obniża wszystkie karty. Następna próba: start 0,4 i wolniejszy przyrost (0,07 / 0,05) – mniejsza strata w
 pierwszych tygodniach.
 
+**Próba `b6_rozruch2`** (6.11; start 0,4, `mapa.popyt.model.rozruch.przyrost` 0,07 i 0,05, 600 gier):
+
+| przyrost | plus średniej w 4–6 | alarmy słabej | dobra > średnia | karta S / Ś / D | majątek Ś |
+|---|---|---|---|---|---|
+| 0,1 (dziś) | 33/100 | 0 | 86 | 0,07 / 0,28 / 0,35 | 96 tys. |
+| 0,07 | 38/100 | 0 | 85 | 0,06 / 0,25 / 0,32 | 92 tys. |
+| 0,05 | 43/100 | 1 | 85 | 0,06 / 0,21 / 0,28 | 87 tys. |
+
+Wolniejszy przyrost działa słabiej niż niższy start, a też obniża karty. Cel B5 (ok. połowa w 4–6, jak 51/100 w K)
+osiąga tylko start 0,25 (61/100, 1 alarm na 100). Propozycja dla autora w `notatki_do_zmiany.md` (B6 – rozruch).
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:
