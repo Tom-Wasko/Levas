@@ -156,7 +156,7 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w += [Wariant(f"skladniki:{q}", f"składniki {q}★ (sprzęt i ludzie wg strategii)",
                   strategia=(("jakosc_zasobow", q),)) for q in (1, 2, 3)]
     w += [Wariant(f"zapas:{z}", f"zapas zamówień ×{z}", strategia=(("zapas_zasobow", z),))
-          for z in (1.0, 1.15, 1.3)]
+          for z in (1.0, 1.15, 1.3, 1.5, 2.0)]
     rodzaj = {k: v.get("rodzaj") for k, v in dane.dostawcy_info.items()}
     hurt = [k for k, r in rodzaj.items() if r in ("hurtownia", "piekarnia")]
     w += [Wariant("dostawcy:bez_producenta", "hurtownie i piekarnia, bez producenta mięsa",

@@ -17,7 +17,7 @@ ustawienia:
   cena_nasladowcy_bez_danych: 0.95
   krok_ceny: 0.5
   losuj_z_najlepszych_kandydatow: 3
-  zapas_zasobow: 1.05
+  zapas_zasobow: 1.2   # B8: przy 1,05 boty traciły ok. 9% sprzedaży na brakach; optimum 1,15–1,3 (b8_zaopatrzenie)
 # Poziomy trudności (gra z lokalami): mistrz gry wybiera je dla każdego bota (konfiguracja gry: firmy[].poziom,
 # bez niego – sredni). Same mnożniki pokrycia popytu, błędu ceny i reklamy dawały słabszemu botowi często WIĘKSZY
 # zysk, więc poziomy różnią się sposobem planowania (silnik/boty.py):
