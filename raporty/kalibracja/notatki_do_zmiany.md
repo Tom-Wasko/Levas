@@ -291,3 +291,16 @@ majątek rośnie o 2,6 tys. zł (premium +10 tys. zł, 6/6). Przyczyna: wskaźni
    umiarkowana, a kredyt z celem wyraźnie się opłaca.
 2. **Dług netto:** w liczniku dług minus gotówka (nie mniej niż 0). Kredyt bez celu przestaje karać, ale znika
    też sygnał „zadłużenie”, a gracz może podbić kartę, biorąc kredyt na koniec gry – wymaga zmiany decyzji U22.
+
+## B12 – mandaty skarbowe nie obniżają karty (6.11.2026) → `notatki/Ustalenia gry.md` (karta, Z1); do decyzji autora
+
+Pomiar `b12_urzedy` (18 rund, 3 strategie × 6 ziaren): samodzielna księgowość **bez składania deklaracji** daje
++0,012 karty (zrównoważony, tani – tyle samo co rzetelna), choć majątek spada o 6,5–7,8 tys. zł (mandat 500 zł co
+rundę). Przyczyna: mandaty są poza KPiR (tak jak w prawie – nie są kosztem podatkowym), a karta liczy dochód z
+KPiR; oszczędność na biurze podnosi dochód, a mandat nie jest widoczny. Z deklaracjami błędnymi (co 4. zaniżona
+o 20%) – też +0,012 karty, majątek tylko +0,04 tys. zł. Lekcja „łamanie zasad średnio się nie opłaca” działa w
+majątku, ale nie w karcie. Odsetki Harpagona (też poza KPiR) już obniżają dochód do karty (Z1). Możliwości:
+1. **Mandaty obniżają dochód do karty jak odsetki Harpagona (zalecane):** w `silnik/runda.py` (`_netto_karty`)
+   odjąć mandaty z rundy (skarbowe za deklaracje, z błędu biura bez OC, sanepidu). KPiR i podatki bez zmian.
+   Rozszerzenie Z1 – wymaga zgody.
+2. **Bez zmian:** mandat widać tylko w gotówce i majątku; karta nagradza oszczędność na księgowości.

@@ -1366,3 +1366,68 @@ Danych gry i domyślnych strategii botów nie zmieniono (zmiana spłaty Harpagon
 `harpagon`), więc kontrola trudności z B10 (`b10_trudnosc`) obowiązuje. Do decyzji autora – „B11 – kredyt bez
 celu” w `notatki_do_zmiany.md`. Otwarte do B13: rywale trudni mogą finansować drugi lokal kredytem (dziś kupują go
 z gotówki), co wzmocni poziom trudny.
+
+## B12 – księgowość i urzędy (6.11.2026, gałąź `kalibracja-b6`)
+
+Boty umieją samodzielną księgowość (`silnik/boty.py`, `_ksiegowosc`; ustawienie strategii `ksiegowosc` –
+`bledy`: szansa błędnej deklaracji, `odchylenie`: o ile zaniżona; bez ustawienia bot nie składa deklaracji i urząd
+rozlicza go z urzędu z mandatem) oraz obniżenie higieny dopiero po odbiorze lokali (`higiena_po_odbiorze`). Testy:
+`testy/rdzen/test_boty_finanse.py`. Domyślne strategie bez zmian (wszystkie przy biurze eksiegi).
+
+**Pomiar `b12_urzedy`** (18 rund, 6 firm, rywale średni, 3 strategie × 6 ziaren; Δ względem bazy w parach):
+
+| wariant | Δ karta | wygrane | Δ majątek zł | ocena |
+|---|---|---|---|---|
+| biuro eksiegi (domyślne) | = baza | – | – | – |
+| biuro halinka / trybunał / debet-kredyt | −0,01…0,00 | 6% | −0,5…+0,2 tys. | szum |
+| biuro jks | −0,01 | 3% | −0,4 tys. | gorszy |
+| samodzielnie, rzetelnie | +0,02 ± 0,02 | 83% | +3,0 ± 1,7 tys. | lepszy |
+| samodzielnie, co 4. deklaracja zaniżona o 20% | +0,02 ± 0,02 | 89% | +1,4 ± 1,8 tys. | lepszy |
+| samodzielnie, bez deklaracji | +0,01 ± 0,02 | 83% | **−6,9 ± 1,5 tys.** | szum |
+| higiena brak | −1,73 | 0% | −168 tys. (lokal nieodebrany) | gorszy |
+| higiena brak dopiero po odbiorze | −0,01 ± 0,02 | 39% | −2,5 ± 2,2 tys. | szum |
+| higiena podstawowa | +0,01 ± 0,02 | 67% | +1,4 ± 1,8 tys. (premium +4,3 tys., 5/6) | szum |
+| higiena firma | +0,01 ± 0,02 | 33% | +0,8 ± 2,2 tys. | szum |
+| higiena haccp | −0,02 ± 0,01 | 28% | −1,5 ± 1,3 tys. | gorszy |
+
+- **Biura (H5):** najtańsze eksiegi (bez OC, ryzyko 12%) wygrywa nieznacznie; droższe biura tracą 0,1–0,5 tys. zł
+  na 18 tygodni, a z niszami (halinka, trybunał wygrywają w pojedynczych grach do +1,2 tys. zł) – mały wybór,
+  bez pułapki.
+- **Samodzielnie** oszczędza opłatę biura (ok. 3 tys. zł) kosztem pracy gracza przy każdej rundzie i ryzyka błędu
+  (200 zł za błędną deklarację) – kompromis „pieniądze za czas”; u bota czas jest darmowy, stąd wygrana.
+- **Łamanie zasad** średnio się nie opłaca w majątku: bez deklaracji −6,9 tys. zł, higiena „brak” po odbiorze
+  −2,5 tys. zł (7/18 par na plus – czasem się udaje). **Karta tego nie widzi:** bez deklaracji +0,01 karty, bo
+  mandaty są poza KPiR – propozycja „B12 – mandaty skarbowe nie obniżają karty” w `notatki_do_zmiany.md`.
+- **Higiena (H15):** podstawowa wystarcza; wyższe poziomy to ubezpieczenie przy dużej chłodni i ryzyku
+  przeterminowania (premium przy haccp traci 4,3 tys. zł względem podstawowej) – zgodne z planem.
+
+**Polisy (H26).** Pomiar `b12_polisy` (30 ziaren, zrównoważony i tani): komplet polis +1,67 ± 0,5 tys. zł, 82%
+wygranych – dominacja. Rachunek w grach (4 ziarna × 6 firm, wszyscy z kompletem): odszkodowania średnio 2,8 tys. zł
+na firmę, składki 0,96 tys. zł – lokal 1,9 ×, sprzęt 24 × (składka tylko od majątku, ok. 60 zł na grę), OC 0,63 ×
+składki. Wypadki są w grze dużo częstsze niż w życiu (2–3 na 18 tygodni), więc składki z cen rynkowych dawały
+pewny zysk. Zmiana w `dane/zdarzenia/losowe.yaml` (miesięcznie): lokal 140 → 300 zł za lokal, sprzęt 0 → 400 zł
+stałej + 0,2% majątku, OC 80 → 60 zł. Teraz odszkodowania ≈ 0,85–0,88 składki każdej polisy.
+
+| `b12_polisy2` (30 ziaren) | zrównoważony (lokal, OC) | tani (bez polis) | premium (komplet) |
+|---|---|---|---|
+| komplet polis | +0,66 tys. zł, 20/30 | −0,19 tys. zł, 13/30, od −6,7 do +5,0 tys. | = baza |
+| bez polis | +0,98 tys. zł, 22/30, od −2,4 do +6,1 tys. | = baza | +0,53 tys. zł, 18/30, **od −12,1 do +14,6 tys.** |
+
+Wszystkie konteksty: komplet +0,16 ± 0,35 tys. zł (52%), brak +0,50 ± 0,57 tys. zł (63%) – oba „szum”, karta
+±0,01. Polisa ma lekko ujemną wartość oczekiwaną i zmniejsza rozrzut (premium bez polis traci w złej grze do 12
+tys. zł) – tak, jak zakłada inwentarz.
+
+**Trudność** (`b12_trudnosc`, 5 strategii × 20 ziaren, rywale średni – po zmianie składek):
+
+| miara | `b10_trudnosc` | `b12_trudnosc` | cel |
+|---|---|---|---|
+| pierwszy plus średniej w rundach 4–6 | 43/100 (w 3: 57) | 43/100 (w 3: 57) | 4–6 |
+| alarmy wersji słabej | 0/100 | 1/100 | 0 |
+| dobra > średnia (pary) | 85/100 | 87/100 | ≥ 80% |
+| słaba < średnia (pary) | 99/100 | 99/100 | – |
+| karta słaba / średnia / dobra | 0,10 / 0,45 / 0,52 | 0,10 / 0,45 / 0,52 | – |
+
+Jedyny alarm: premium słaba, ziarno 1018 – 151 zł ponad limit w rundzie 5 (gotówka 0 zł w rundach 2–6 już w
+B10, droższy komplet polis przesunął grę za granicę). Do przejrzenia w B14 razem z rezerwą gotówki poziomu słabego.
+B11 i B12 nie zmieniły kart (rywale na poziomie średnim mają polisy lokal + OC, tani – żadnych). B12 zamknięte;
+do decyzji autora – „B12 – mandaty skarbowe nie obniżają karty” w `notatki_do_zmiany.md`.

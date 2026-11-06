@@ -1,12 +1,14 @@
 """B11: boty potrafią korzystać z finansów – lokata z nadwyżki (`lokaty`), jeden kredyt (`kredyt`), Harpagon przy
 braku gotówki (`harpagon`) i kasyno po zaproszeniu (`kasyno`); bez ustawień – nic z tego. Pomiar w
-balans/warianty.py (warianty lokata:*, kredyt:*, harpagon:*, kasyno:*)."""
+balans/warianty.py (warianty lokata:*, kredyt:*, harpagon:*, kasyno:*). B12: samodzielna księgowość
+(`ksiegowosc`) i higiena obniżona po odbiorze lokali (`higiena_po_odbiorze`)."""
 import copy
 
 import pytest
 
 from silnik import boty
 from silnik.gra import Gra
+from silnik.ksiegowosc import biuro as bo
 from silnik.pieniadze import banki as bk
 from silnik.pieniadze import kasyno as kas
 from silnik.pieniadze import wlasciciel as wl
@@ -112,3 +114,41 @@ def test_bot_gra_w_kasynie_tylko_po_zaproszeniu_i_wplaca_wygrana():
     wygrana = wl.portfel(g.dane, s.firmy["A"]) - wl.dane_portfela(g.dane)["portfel"]["oszczednosci"]
     d = _decyzje(g, {"kasyno": ka}, r + 1)
     assert d.get("wplata_wlasna", 0) == pytest.approx(max(wygrana, 0)) and not d.get("kasyno")
+
+
+def _samodzielnie(rund: int, ksiegowosc: dict | None) -> tuple[Gra, dict]:
+    """Gra, w której A od 1. rundy księguje sam; decyzje A w rundzie `rund` z ustawieniem `ksiegowosc`."""
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5)
+    for r in range(1, rund):
+        if r == 1:
+            g.ustaw_decyzje("A", {**_decyzje(g, {}, 1), "biuro": bo.SAMODZIELNIE})
+        g.przelicz(wymus=True)
+    return g, _decyzje(g, {"ksiegowosc": ksiegowosc} if ksiegowosc else {}, rund)
+
+
+def test_bot_ksieguje_sam_bez_bledow_i_nie_placi_mandatu():
+    g, bez = _samodzielnie(3, None)
+    assert not bez.get("ksiegowosc")   # bez ustawienia – nie składa deklaracji
+    _, d = _samodzielnie(3, {"bledy": 0})
+    dk = g.stan(2).firmy["A"].deklaracja
+    assert d["ksiegowosc"]["deklaracja"] == dk["poprawne"]
+    assert bo.sprawdz_zapisy(dk["dokumenty"], d["ksiegowosc"]["zapisy"])["dobre"] == len(dk["dokumenty"])
+    g.ustaw_decyzje("A", d)
+    g.przelicz(wymus=True)
+    k = g.stan().wyniki[g.runda - 1]["A"]["ksiegowosc"]
+    assert k["tryb"] == "deklaracja" and k["kara"] == 0
+
+
+def test_bot_z_bledami_zaniza_deklaracje_o_odchylenie():
+    g, d = _samodzielnie(3, {"bledy": 1, "odchylenie": 0.5})
+    pop = g.stan(2).firmy["A"].deklaracja["poprawne"]
+    assert d["ksiegowosc"]["deklaracja"] == {p: round(v * 0.5, 2) for p, v in pop.items()}
+
+
+def test_bot_obniza_higiene_dopiero_po_odbiorze_lokali():
+    g = _gra(3)
+    f = g.stan(2).firmy["A"]
+    assert f.lokale and all(x.id in f.odbiory for x in f.lokale)
+    assert _decyzje(g, {"higiena_po_odbiorze": "brak"}, 3)["higiena"] == "brak"
+    g0 = _gra(1)   # przed pierwszym lokalem – higiena ze strategii (odbiór jeszcze przed nami)
+    assert _decyzje(g0, {"higiena": "podstawowa", "higiena_po_odbiorze": "brak"}, 1)["higiena"] == "podstawowa"

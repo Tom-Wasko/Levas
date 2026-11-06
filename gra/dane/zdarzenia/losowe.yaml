@@ -10,7 +10,8 @@ zrodlo: 'Notatka „Zdarzenia i historie” (rzadkie wypadki, limit straty, ubez
   komicznych, ok. 20% poważnych bez żartów, lubelskie smaczki, przykłady: Gołąb Zenon, Pani Halina z drugiego
   piętra, Najazd koziołków, Zalanie z góry); składki – rząd wielkości polis dla małej gastronomii (lokal ok.
   1,5–2 tys. zł rocznie, OC ok. 1 tys. zł rocznie, sprzęt ok. 2–3% wartości rocznie), szansa, szkody i pokrycie
-  – założenie F3b.5, do kalibracji w kroku 5'
+  – założenie F3b.5; B12 (6.11.2026): składki podniesione do ok. 0,9 × średnich odszkodowań w grze (wypadki
+  są w grze dużo częstsze niż w życiu – 2–3 na 18 tygodni), pomiar raporty/kalibracja/pomiary/b12_polisy2'
 zasady:
   od_rundy: 4          # pierwsze tygodnie bez wypadków – drużyny dopiero się urządzają
   szansa: 0.08         # w pierwszej rundzie z wypadkami i zaraz po wypadku; z przyrostem ok. 2–3 wypadki na grę
@@ -26,14 +27,14 @@ ubezpieczyciel:
       nazwa: Polisa na lokal
       opis: Mury, szyby, instalacje i sufity – ogień, woda, stłuczenia i inne nieszczęścia budowlane.
       stala: 0
-      za_lokal: 140
+      za_lokal: 300        # B12: było 140 – odszkodowania 1,9 × składki
       od_majatku: 0
       pokrycie: 0.9
       franszyza: 300
     sprzet:
       nazwa: Polisa na sprzęt
       opis: Sprzęt kuchenny, stanowiska i wyposażenie – kradzież, przepięcia, zalanie, upadki z wysokości.
-      stala: 0
+      stala: 400          # B12: było 0 – sama składka od majątku to 1/24 odszkodowań
       za_lokal: 0
       od_majatku: 0.002
       pokrycie: 0.85
@@ -41,7 +42,7 @@ ubezpieczyciel:
     oc:
       nazwa: OC działalności
       opis: Szkody, które firma wyrządzi innym – klientom, sąsiadom i ich praniu.
-      stala: 80
+      stala: 60           # B12: było 80 – odszkodowania 0,63 × składki
       za_lokal: 0
       od_majatku: 0
       pokrycie: 1

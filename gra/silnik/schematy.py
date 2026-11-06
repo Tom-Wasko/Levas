@@ -457,10 +457,17 @@ class KredytBota(Schemat):
 
 
 class HarpagonBota(Schemat):
-    """B11: pożyczka `kwota` od Harpagona, gdy gotówki jest mniej niż `prog`; spłata całego długu, gdy po niej
-    zostaje co najmniej `prog`."""
+    """B11: pożyczka `kwota` od Harpagona, gdy gotówki jest mniej niż `prog`; spłata z nadwyżki ponad `prog`
+    (także częściowa)."""
     prog: float
     kwota: float = Field(gt=0)
+
+
+class KsiegowoscBota(Schemat):
+    """B12: samodzielna księgowość (gdy firma wybrała `biuro: samodzielnie`) – bot księguje dokumenty i składa
+    deklaracje; każda deklaracja z szansą `bledy` jest błędna o `odchylenie` (część poprawnej kwoty, w dół)."""
+    bledy: float = Field(default=0, ge=0, le=1)
+    odchylenie: float = Field(default=0, ge=0, le=1)
 
 
 class KasynoBota(Schemat):
@@ -479,6 +486,7 @@ class Strategia(Schemat):
     kredyt: KredytBota | None = None
     harpagon: HarpagonBota | None = None
     kasyno: KasynoBota | None = None
+    ksiegowosc: KsiegowoscBota | None = None   # B12: deklaracje przy samodzielnej księgowości (bez – nie składa)
     leasing: LeasingBota | None = None   # gra z lokalami: sprzęt w leasingu przy małej gotówce (bez – zawsze zakup)
     wykup: PrzejecieBota | None = None       # wykup własnego lokalu w najmie (bez – nie wykupuje)
     przejecie: PrzejecieBota | None = None   # kupno budynku wynajmowanego przez rywala (bez – nie kupuje)
@@ -512,6 +520,7 @@ class Strategia(Schemat):
     promocje: list[PromocjaBota] = Field(default_factory=list)   # gra z lokalami: typy z mapa/promocje.yaml
     polisy: list[str] = Field(default_factory=list)   # gra z lokalami: rodzaje polis z zdarzenia/losowe.yaml
     higiena: str | None = None   # gra z lokalami: poziom higieny z zdarzenia/urzad.yaml (None – domyślny)
+    higiena_po_odbiorze: str | None = None   # B12: poziom, gdy wszystkie lokale już odebrane (None – jak `higiena`)
 
 
 class UstawieniaBotow(Schemat):

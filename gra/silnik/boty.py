@@ -776,11 +776,28 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         if brak > 0 and (k := _kredyt_bez_historii(dane, f, brak, runda, d.get("kredyty_wez", []))):
             d.setdefault("kredyty_wez", []).append(k)
     _finanse(dane, f, st, runda, d)
+    _ksiegowosc(f, st, runda, d, konf, nazwa)
     if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
         d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
     if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
         d["higiena"] = st["higiena"]
+    if (h := st.get("higiena_po_odbiorze")) and f.lokale and all(x.id in f.odbiory for x in f.lokale):
+        d["higiena"] = h   # B12: oszczędność na higienie dopiero po odbiorze lokali przez sanepid
     return d
+
+
+def _ksiegowosc(f: Firma, st: dict, runda: int, d: dict, konf: dict, nazwa: str) -> None:
+    """B12: przy samodzielnej księgowości bot księguje dokumenty poprzedniej rundy i składa deklaracje (`ksiegowosc`;
+    bez – nie składa, urząd rozlicza z urzędu z mandatem). Błąd: deklaracja zaniżona o `odchylenie`."""
+    k, dk = st.get("ksiegowosc"), f.deklaracja
+    if not k or not dk or (d.get("biuro") or f.biuro) != bo.SAMODZIELNIE:
+        return
+    rng = strumien(konf["ziarno"], runda, "bot", nazwa, "ksiegowosc")
+    zle, o = k.get("bledy", 0), k.get("odchylenie", 0)
+    d["ksiegowosc"] = {
+        "zapisy": {x["id"]: {"kolumna": x["poprawne"]["kolumna"], "stawka": x["poprawne"]["stawka"]}
+                   for x in dk["dokumenty"]},
+        "deklaracja": {p: round(v * (1 - o) if rng.random() < zle else v, 2) for p, v in dk["poprawne"].items()}}
 
 
 def _finanse(dane: Dane, f: Firma, st: dict, runda: int, d: dict) -> None:

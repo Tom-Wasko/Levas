@@ -134,8 +134,20 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     w = [Wariant(f"bank:{b}", f"konto w {b}", decyzje=(("bank", b),)) for b in bk.banki(dane)]
     w += [Wariant(f"biuro:{b}", f"biuro rachunkowe {x['nazwa']}", decyzje=(("biuro", b),))
           for b, x in bo.biura(dane).items()]
+    # B12: samodzielna księgowość – rzetelna, z błędami (co 4. deklaracja zaniżona o 20%),
+    # bez deklaracji
+    sam = (("biuro", bo.SAMODZIELNIE),)
+    w += [Wariant("biuro:samodzielnie", "samodzielna księgowość bez błędów", decyzje=sam,
+                  strategia=(("ksiegowosc", {"bledy": 0}),)),
+          Wariant("samodzielnie:bledy", "samodzielna księgowość, 25% deklaracji błędnych",
+                  decyzje=sam,
+                  strategia=(("ksiegowosc", {"bledy": 0.25, "odchylenie": 0.2}),)),
+          Wariant("samodzielnie:brak", "samodzielna księgowość bez składania deklaracji",
+                  decyzje=sam)]
     w += [Wariant(f"higiena:{h}", f"higiena: {x['nazwa']}", strategia=(("higiena", h),))
           for h, x in zd["urzad"]["higiena"]["poziomy"].items()]
+    w += [Wariant(f"higiena:{h}_po_odbiorze", f"higiena {h} po odbiorze lokali",
+                  strategia=(("higiena_po_odbiorze", h),)) for h in ("brak",)]
     polisy = list(zd["losowe"]["ubezpieczyciel"]["polisy"])
     w += [Wariant("polisy:brak", "bez polis", strategia=(("polisy", []),)),
           Wariant("polisy:wszystkie", "wszystkie polisy", strategia=(("polisy", polisy),)),
