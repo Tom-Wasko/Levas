@@ -586,7 +586,7 @@ wpis na dole.
   pomiarów naraz; (3) przewaga premium – w B7 razem z ceną (H18, H28); (4) U20 i U24 – propozycje tekstów do
   `notatki_do_zmiany.md`, wpis do `notatki/` po zgodzie.
 
-## B6 – lokale (4.11.2026, Claude Code, Opus 5.5) – w toku, gałąź `kalibracja-b6`
+## B6 – lokale (4.11.2026, Claude Code, Opus 5.5) – zakończone 6.11, gałąź `kalibracja-b6`
 
 Cała praca B6–B15 na gałęzi `kalibracja-b6` (decyzja autora: bez merge do main bez zgody, bez FTP).
 Pomiary `balans.warianty pelny`, 3 strategie (zrównoważony, tani, premium) × 18 i 26 rund × 6 firm, poziom średni,
@@ -900,7 +900,7 @@ osiąga tylko start 0,25 (61/100, 1 alarm na 100). Propozycja dla autora w `nota
 4. Potem: tabela strefa × wariant (każda strefa najlepsza dla jakiejś strategii), kupno od połowy gry 18 rund,
    działka tylko w 26 rundach, licytacja, inwentarz (opis botów w sekcji `lokal`), odhaczenie B6 w POSTEP.
 
-## B7 – menu i ceny (6.11.2026, Claude Code, Opus 5.5) – w toku, gałąź `kalibracja-b6`
+## B7 – menu i ceny (6.11.2026, Claude Code, Opus 5.5) – zakończone 6.11, gałąź `kalibracja-b6`
 
 **Pomiar `b7_cena`** (warianty `cena` 0,85/1,0/1,15/1,3, `jakosc` 1/2/3, `menu` 3/5/8; zrównoważony, tani,
 premium; 18 i 26 rund, 6 firm, 6 ziaren, 792 gry). Różnica karty wariant − baza (średnio 18 i 26 rund, wygrane
@@ -1038,3 +1038,19 @@ dostają wszyscy objęci, także ci, którzy przyszliby i tak. Do tego bot ustal
 nie ma trwałego skutku (nowi klienci nie wracają po jej końcu) – bez tego różni się od obniżki ceny tylko maską
 dni i stref. Liczby promocji bez zmian; propozycja dla autora w `notatki_do_zmiany.md` („B7 – promocje bez
 trwałego skutku”), sprawdzenie w B10 (marketing) razem z reklamą.
+
+**Kontrola trudności `b7_trudnosc`** (6.11; po krzywej jakości i kuchni taniego, jak `b6_trudnosc`, 300 gier):
+
+| miara | `b6_trudnosc` | `b7_trudnosc` | cel |
+|---|---|---|---|
+| pierwszy plus średniej w rundach 4–6 | 33/100 (w 3: 67) | 37/100 (w 3: 63) | 4–6 |
+| alarmy wersji słabej | 0/100 | 0/100 | 0 |
+| dobra > średnia (pary) | 86/100 | 87/100 | ≥ 80% |
+| słaba < średnia (pary) | 94/100 | 86/100 | – |
+| karta słaba / średnia / dobra | 0,07 / 0,28 / 0,35 | 0,06 / 0,29 / 0,36 | – |
+
+Bez regresji; dobra > średnia w każdej strategii 16–18/20. Słaba < średnia spadła (94 → 86) – słaba częściej
+dorównuje średniej, cel B5 jej nie dotyczy. Wczesny plus średniej dalej za wcześnie (propozycja rozruchu czeka).
+
+**B7 zamknięte** (6.11): wdrożona krzywa jakości i kuchnia taniego; otwarte decyzje autora – szerokie menu bez
+kosztu i promocje bez trwałego skutku (`notatki_do_zmiany.md`), promocje wracają w B10.
