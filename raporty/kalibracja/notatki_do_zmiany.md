@@ -231,3 +231,33 @@ nigdy. Możliwości:
    ale mniej realistyczne (kasa nie wie, kto jest nowy) – nie polecam.
 3. **Bez zmian:** promocje to pułapka dla gracza, a instrukcja mówi to wprost. Najmniej pracy, ale decyzja,
    która zawsze przegrywa, uczy mało.
+
+## B9 – płaca minimalna bez kosztu rotacji (6.11.2026) → `notatki/Ustalenia gry.md` (rynek pracy, U20); do decyzji autora
+
+Pomiary `b9_ludzie` i `b9_po` (360 + 468 gier, 18 rund): pensja minimalna zamiast preferowanej wygrywa zawsze –
+premium +0,050 karty (6/6, +6 tys. zł), zrównoważony +0,006 (6/6), tani +0,001 (u niego preferowana ≈ minimalna).
+Pensja ponad preferowaną (×1,1, ×1,25) zawsze traci. Przyczyna: kandydat przyjmuje każdą ofertę od płacy
+minimalnej (`silnik/ludzie/rynek_pracy.py`), a zadowolenie 3★ przy płacy minimalnej (4806 wobec 5280–5500 zł)
+spada tylko o ok. 0,035 – z ok. 0,945 do 0,91, powyżej progu odejść 0,87. Nikt nie odchodzi, więc kompromis
+z inwentarza („pensja ponad preferowaną – mniejsza rotacja kontra koszt”) nie działa. Próg 0,90 (kontekst
+w `b9_po`) zmniejsza przewagę tylko do +0,032 (6/6); wyższy próg wyrzuca ludzi także przy pensji preferowanej
+(tani ze sprzętem 1★ ma ok. 0,91).
+
+Możliwości:
+1. **Kandydat odrzuca zbyt niską ofertę (zalecane):** oferta poniżej np. 95% pensji preferowanej przepada
+   (komunikat jak przy płacy poniżej minimalnej), a przy 95–100% kandydat przychodzi z niższym zadowoleniem.
+   Płaca minimalna zostaje dla 1★, a dobrego kucharza trzeba opłacić. Prosta reguła, realistyczna – nowa
+   mechanika, wymaga zgody.
+2. **Rywale podkupują niedopłaconych:** boty używają `podkup` wobec osób z pensją poniżej preferowanej
+   (przez kanał headhunter). Bardziej „żywe”, ale zależy od botów i ich budżetu, trudniej wyjaśnić graczowi.
+3. **Bez zmian:** lekcja „płaca minimalna jest legalna, ale ludzie są mniej zadowoleni” zostaje tylko w karcie
+   (−0,01…−0,04 zadowolenia pracowników). Przewaga premium +0,05 karty – mała, ale pewna.
+
+## B9 – szkolenia działają tylko w tygodniu zakupu (6.11.2026) → `notatki/Ustalenia gry.md` (HR); do decyzji autora
+
+Po przeliczeniu cen szkoleń na rundę (ceny z gry ATH są miesięczne, B9) jedno szkolenie w tygodniu daje
++0,006…+0,024 karty, drugie i trzecie traci (efekt to włącznik +0,0755 zadowolenia, skalibrowany na Revasie).
+Inwentarz zakłada „koszt teraz, zadowolenie i jakość później; w krótkiej grze mniej warte”, a dziś szkolenie
+działa tylko w tygodniu zakupu i trzeba je kupować co tydzień. Propozycja: szkolenie kosztuje cenę miesięczną
+raz, a efekt trwa 4 tygodnie (albo zanika o 25% na tydzień). Nowa mechanika – wymaga zgody; do tego czasu
+zostaje przeliczenie ceny na rundę.

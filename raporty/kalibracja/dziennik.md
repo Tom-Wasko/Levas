@@ -1157,3 +1157,78 @@ kupują, a przy zapasie 1,2 braki są małe, więc zysk byłby niewielki.
 dyskonty, auto-dostawy, wybór gwiazdek składników i dostawców. Liczby gry bez zmian – dominacji nie ma: każda
 strategia wygrywa na składnikach swojej jakości, zapas ma optimum, dyskont daje mniej niż godzina płacy
 minimalnej za czas właściciela (do sprawdzenia w B9), auto-dostawy są droższe od dobrych własnych zakupów.
+
+## B9 – ludzie (6.11.2026, gałąź `kalibracja-b6`)
+
+**P1 (decyzja autora 29.10.2026, f8484fd):** umowa zlecenie płaci składki ZUS pracodawcy 20,48% jak umowa o pracę
+(`podatki_2026.yaml: zus_pracodawcy_zlecenie`, art. 6 ust. 1 pkt 4 ustawy o s.u.s.; studentów w grze nie ma).
+Panel pokazuje stawkę zlecenia w HR, Lokalu i Podatkach (wcześniej panel liczył 19% z `finanse`).
+
+**Krok 0 – boty (78a76a6):** strategie umieją pensję (`minimalna` albo × preferowana), gwiazdki zatrudnianych
+niezależnie od jakości (`jakosc_ludzi`), kanał rekrutacji, premię co rundę i właściciela na ostatniej kasie
+(`wlasciciel_godziny`, z odjęciem czasu rekrutacji); warianty `pensja:*`, `ludzie:*`, `kanal:*`, `premia:*`,
+`szkolenia:*`, `podwyzki:brak`, `wlasciciel:*`; testy `testy/rdzen/test_boty_ludzie.py`.
+
+**Pomiar `b9_ludzie`** (360 gier, 18 rund, 6 firm, 6 ziaren; różnica karty wariant − baza, ile par wygrało):
+
+| wariant | zrównoważony | tani | premium |
+|---|---|---|---|
+| umowa:zlecenie | −0,008 (0/6) | −0,005 (0/6) | −0,003 (1/6) |
+| pensja:minimalna | +0,006 (6/6) | +0,001 (6/6) | +0,044 (6/6) |
+| pensja:1.25 | −0,067 | −0,059 | −0,104 |
+| ludzie:3 | +0,016 (5/6) | +0,030 (6/6) | baza |
+| kanal:headhunter | −0,174 | −0,078 | −0,158 |
+| premia:300 | −0,084 | −0,079 | −0,103 |
+| szkolenia:1 / 3 | −0,085 / −0,340 | −0,094 / −0,353 | +0,106 / −0,103 (baza 2) |
+| podwyzki:brak | +0,001 | +0,001 | −0,001 |
+| wlasciciel:20 / 10 | −0,187 / −0,960 | −0,141 / −0,882 | −0,152 / −0,604 |
+
+Diagnoza:
+- **Szkolenia i premia – pomylona jednostka.** Ceny szkoleń w katalogu są miesięczne (gra ATH), a
+  `silnik/decyzje.py` pobierał je co tydzień – szkolenie kosztowało 4,3 raza za dużo (premium bez szkoleń
+  +0,21 karty 6/6). Premia jest za rundę, a pensja miesięczna – w zadowoleniu tygodniowa premia 100 zł liczyła
+  się jak miesięczna podwyżka o 100 zł. Poprawka (6b7cadf): koszt szkolenia = `na_runde(cena)` (jak czynsz),
+  w zadowoleniu premia × rund_w_roku / 12 (`zadowolenie.placa_wzgledna`); panel: ceny szkoleń za rundę, koszt
+  wynagrodzeń = pensje z ZUS na rundę + premie (wcześniej premia była dzielona przez 52/12).
+- **Zlecenie (H27):** po P1 traci 0,003–0,008 (tylko −0,0115 zadowolenia) – bez dominacji; zostaje elastyczność
+  (odejście bez okresu wypowiedzenia).
+- **Właściciel na kasie:** 20 h zamiast 40 h kasjera – kasa staje się wąskim gardłem; przegrywa zawsze. Zgodne
+  z kompromisem („przy większej firmie ma przegrywać”); oszczędność pensji ma sens tylko przy bardzo małym ruchu.
+- **Headhunter:** drogi i bez podkupów (boty ich nie robią) – przegrywa; agencja i pracuj.pl ≈ 0.
+- **Lepsi ludzie:** 3★ u taniego +0,03 (6/6), u zrównoważonego +0,016 (5/6) – słaba przewaga jakości (dania
+  i obsługa) nad pensją większą o ok. 10%. Bez zmiany (rozpiętość pensji realistyczna, przewaga mała).
+
+**Pomiar `b9_po`** (468 gier; drugi kontekst – próg odejść 0,90 dla wszystkich firm):
+
+| wariant | zrównoważony | tani | premium (baza 2 szkolenia) |
+|---|---|---|---|
+| szkolenia:0 | baza | baza | +0,028 (6/6) |
+| szkolenia:1 | +0,019 (6/6) | +0,006 (5/6) | +0,024 (6/6) |
+| szkolenia:2 | −0,005 | −0,016 | baza |
+| szkolenia:3 | −0,038 | −0,047 | −0,032 |
+| premia:100 / 300 | −0,011 / −0,039 | −0,018 / −0,047 | −0,021 / −0,122 |
+| pensja:minimalna (próg 0,87) | +0,006 (6/6) | +0,001 (6/6) | +0,050 (6/6) |
+| pensja:minimalna (próg 0,90) | +0,004 (5/6) | +0,001 (6/6) | +0,032 (6/6) |
+
+- Szkolenie jest teraz decyzją: jedno w tygodniu daje mały plus, kolejne tracą (efekt to włącznik). Ustawienia
+  botów (`boty.yaml`): zrównoważony 0 → 1, premium i agresywny 2 → 1; tani zostaje przy 0.
+- Premia nadal przegrywa – pomaga tylko niezadowolonej osobie (przed odejściem), a przy zadowoleniu nad progiem
+  to czysty koszt. Zgodne z jej rolą (narzędzie doraźne).
+- **Płaca minimalna (H23)** dominuje u premium: kandydat przyjmuje każdą ofertę od płacy minimalnej, a 3★ przy
+  płacy minimalnej ma ok. 0,91 – powyżej progu odejść. Próg 0,90 tylko zmniejsza przewagę (+0,032), wyższy
+  wyrzuca ludzi także przy pensji preferowanej. Liczbą się nie da – propozycja „kandydat odrzuca ofertę poniżej
+  95% preferowanej” w `notatki_do_zmiany.md`; próg zostaje 0,87. Tam też: szkolenie z efektem na 4 tygodnie.
+
+**Trudność** (`b9_trudnosc`, 5 strategii × 20 ziaren, rywale średni):
+
+| miara | `b8_trudnosc2` | `b9_trudnosc` | cel |
+|---|---|---|---|
+| pierwszy plus średniej w rundach 4–6 | 43/100 (w 3: 57) | 43/100 (w 3: 57) | 4–6 |
+| alarmy wersji słabej | 0/100 | 0/100 | 0 |
+| dobra > średnia (pary) | 90/100 | 88/100 | ≥ 80% |
+| słaba < średnia (pary) | 89/100 | 90/100 | – |
+| karta słaba / średnia / dobra | 0,06 / 0,29 / 0,37 | 0,11 / 0,38 / 0,46 | – |
+
+Karty wyższe o ok. 0,09, bo rywale (premium, agresywny) i badane firmy płacą za szkolenia czterokrotnie mniej –
+skala słów karty (U10) do odświeżenia w B13. B9 zamknięte; otwarte – decyzje autora: płaca minimalna,
+trwały skutek szkoleń. Bez pomiaru: podkupienia i kontroferty (boty ich nie robią), zwolnienia.

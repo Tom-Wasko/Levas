@@ -128,7 +128,7 @@ strategie:
     udogodnienia: 2
     reklama: {}
     internet: []
-    szkolenia: 0
+    szkolenia: 1   # B9: jedno szkolenie +0,02 karty (b9_po), dwa już tracą
     kampanie:
     - papier_przyjmie/ulotki
     promocje:
@@ -170,7 +170,7 @@ strategie:
       Smaki Lublina (dziennik): 6
     internet:
     - Strona www firmy
-    szkolenia: 2
+    szkolenia: 1   # B9: drugie szkolenie nic nie daje (efekt włącznik), −0,02 karty
     kampanie:
     - lajk/influencer
     - fala_koziolka/billboard
@@ -196,7 +196,7 @@ strategie:
     - Strona www firmy
     - Profil na Facebook
     - Informacje na forach internetowych
-    szkolenia: 2
+    szkolenia: 1   # B9: jak premium
     kampanie:
     - papier_przyjmie/plakaty
     - lajk/influencer
