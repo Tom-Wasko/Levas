@@ -866,6 +866,19 @@ na peryferiach”. Najem w centrum wygrywa: karta −0,16 ± 0,03 dla kupna (47/
 strefie): kupno −0,23 (5/36). Kompromis lokali po B6: centrum – najem i duży ruch, peryferie – własność albo tani
 najem; kupno wygrywa tylko dla strategii bez wydatków na marketing (tani) i to w strefie, w której kupuje.
 
+**Próba rozruchu `b6_rozruch`** (6.11; jak `b6_trudnosc`, konteksty `mapa.popyt.model.rozruch.start` 0,3 i 0,25,
+600 gier). Liczba B5 – tylko pomiar, zmiana za zgodą autora:
+
+| start | plus średniej w 4–6 | alarmy słabej | dobra > średnia | karta S / Ś / D | majątek Ś |
+|---|---|---|---|---|---|
+| 0,4 (dziś, `b6_trudnosc`) | 33/100 (reszta w 3) | 0 | 86 | 0,07 / 0,28 / 0,35 | 96 tys. |
+| 0,3 | 42/100 | 2 | 81 | 0,04 / 0,23 / 0,30 | 90 tys. |
+| 0,25 | 61/100 | 1 | 81 | 0,03 / 0,20 / 0,27 | 87 tys. |
+
+Niższy start opóźnia pierwszy plus, ale daje pojedyncze alarmy (premium i agresywny na słabym, 1–2 na 100) i
+obniża wszystkie karty. Następna próba: start 0,4 i wolniejszy przyrost (0,07 / 0,05) – mniejsza strata w
+pierwszych tygodniach.
+
 **Następne kroki:**
 1. ~~Bot: zamiast kredytu bez historii na sprzęt – leasing~~ (zrobione 5.11, `b6_niewyp3`).
 2. ~~Propozycja dla autora~~ – zapisana 5.11 w `notatki_do_zmiany.md` (B6 – lokal niewyposażony; rekomendacja:
