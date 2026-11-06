@@ -488,7 +488,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     if pm.zasady(dane):
         info["promocje"] = pm.ustaw(dane, firma, d, runda, ksiega, rachunek)
 
-    # szkolenia (koszt łączny w firmie szkoleniowej, efekt w tym miesiącu)
+    # szkolenia (koszt łączny w firmie szkoleniowej, efekt w tej rundzie)
     if "hr_szkolenia" in odbl:
         szk = dane.katalog_ofert["szkolenia"]
         firmy = [f["nazwa"] for f in szk["firmy"]]
@@ -497,7 +497,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         for s in d.get("szkolenia", []):
             if s.get("szkolenie") in pozycje and s.get("firma") in firmy:
                 p = pozycje[s["szkolenie"]]
-                cena = p["ceny"][firmy.index(s["firma"])]
+                cena = dane.na_runde(p["ceny"][firmy.index(s["firma"])])   # B9: ceny w danych – miesięczne
                 koszty[s["firma"]] = koszty.get(s["firma"], 0) + cena
                 info["szkolenia_procent"] += p["procent"] / 100
                 info.setdefault("szkolenia", []).append({"szkolenie": p["nazwa"], "firma": s["firma"],

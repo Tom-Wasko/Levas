@@ -35,6 +35,12 @@ def wplyw(dane: Dane, p: Pracownik) -> dict:
     return {k: c.get(k, v) for k, v in NEUTRALNA.items()}
 
 
+def placa_wzgledna(dane: Dane, p: Pracownik) -> float:
+    """B9: (pensja + premia) ÷ pensja preferowana; pensja jest miesięczna, a premia – za rundę, więc w grze
+    tygodniowej liczy się jak miesięczna podwyżka o premia × rund_w_roku / 12 (na ten tydzień)."""
+    return (p.pensja + p.premia * dane.rund_w_roku / 12) / p.pensja_preferowana
+
+
 def skladniki(dane: Dane, f: Firma, p: Pracownik, wykorzystanie: float, szkolenia_procent: float) -> dict[str, float]:
     w = dane.z["karta_wynikow"]["zadowolenie_pracownikow"]
     kb = dane.z["karta_wynikow"]["kebab"]["zadowolenie_pracownikow"]
@@ -46,7 +52,7 @@ def skladniki(dane: Dane, f: Firma, p: Pracownik, wykorzystanie: float, szkoleni
     poz = dane.pozycje("udogodnienia")
     udog = sum(poz[n]["procent"] / 100 for n in pl.lista(f, lok, "udogodnienia")) if lok else 0.0
     return {
-        "placa": w["placa_wzgledem_preferowanej"] * ((p.pensja + p.premia) / p.pensja_preferowana - 1) * c["placa"],
+        "placa": w["placa_wzgledem_preferowanej"] * (placa_wzgledna(dane, p) - 1) * c["placa"],
         "sprzet": w["sprzet_na_gwiazdke"] * (sprzet - 3) * c["warunki"],
         "udogodnienia": w["udogodnienia_na_procent"] * udog * c["warunki"],
         "szkolenia": (w["szkolenia_w_miesiacu_na_procent"] * szkolenia_procent
@@ -76,11 +82,11 @@ def _liczba(x: float) -> str:
     return f"{x:.2f}".replace(".", ",")
 
 
-def powody(p: Pracownik, skl: dict[str, float], wykorzystanie: float) -> list[str]:
+def powody(dane: Dane, p: Pracownik, skl: dict[str, float], wykorzystanie: float) -> list[str]:
     """Widoczne powody niezadowolenia (bez cechy – tę gracz zgaduje z opisu)."""
     wynik = []
     if skl["placa"] < 0:
-        wynik.append(f"pensja {_procent(1 - (p.pensja + p.premia) / p.pensja_preferowana)} poniżej oczekiwanej")
+        wynik.append(f"pensja {_procent(1 - placa_wzgledna(dane, p))} poniżej oczekiwanej")
     if skl["przeciazenie"] < 0:
         wynik.append(f"przepracowanie (wykorzystanie {_procent(wykorzystanie)})")
     if skl["sprzet"] < 0:
@@ -104,7 +110,7 @@ def po_rundzie(dane: Dane, f: Firma, w: dict, r: int, ziarno, szkolenia_procent:
         p.zadowolenie, p.wykorzystanie = z, x["wykorzystanie"]
         p.niezadowolony = p.niezadowolony + 1 if z < u["prog_zadowolenia"] else 0
         x.update(zadowolenie=z, niezadowolony=p.niezadowolony,
-                 powody=powody(p, skl, x["wykorzystanie"]) if p.niezadowolony else [])
+                 powody=powody(dane, p, skl, x["wykorzystanie"]) if p.niezadowolony else [])
         if p.odchodzi or p.niezadowolony <= u["tygodnie_ostrzezenia"]:
             continue
         if strumien(ziarno, r, "odejscia", f.nazwa, p.id).random() >= szansa(dane, p, z):
@@ -157,7 +163,7 @@ def ostrzezenia(dane: Dane, f: Firma, zmiany: dict, runda: int) -> list[tuple[st
         s = szansa(dane, q, z)
         ile = "ok. " + _procent(s) if p.niezadowolony >= u["tygodnie_ostrzezenia"] else "na razie zero"
         wynik.append(("pomaranczowy", f"{p.imie_nazwisko}: zadowolenie {_liczba(z)} (próg {_liczba(u['prog_zadowolenia'])}) – "
-                                      f"{', '.join(powody(q, po, p.wykorzystanie))}. Jeśli tak zostanie, po tym tygodniu "
+                                      f"{', '.join(powody(dane, q, po, p.wykorzystanie))}. Jeśli tak zostanie, po tym tygodniu "
                                       f"może złożyć wypowiedzenie (szansa {ile}). Pomaga podwyżka, lepszy sprzęt "
                                       "albo odciążenie."))
     return wynik

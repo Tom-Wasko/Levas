@@ -188,6 +188,8 @@ Sprawdzenie: utrzymanie posiadanych 20 + 1500 + 100 + 200 + 0 = 1820 PLN = warto
 - Wykorzystanie czasu pracownika = godziny pracy / 160 h ✔ (instruktor 80,3%, recepcja 47,2% – przeliczone dokładnie).
 
 ### 6.3 Zadowolenie pracowników ✔ (skalibrowane, błąd 0,0006)
+W grze tygodniowej (B9 6.11.2026) premia jest za tydzień, a pensja miesięczna – w płacy premia liczy się
+× 52/12 (jak miesięczna podwyżka na ten tydzień).
 ```
 0,9464 + 0,3162 · (płaca / preferowana − 1)          płaca = średnia (pensja + premia) / preferowana
        + 0,0163 · (średnie gwiazdki całego sprzętu − 3)
@@ -224,6 +226,8 @@ Trzy firmy szkoleniowe: Edu for Fitness (90% zadowolonych klientów), Gym Master
 KPiR ATH: lipiec „Szkolenie w firmie: Edu for fitness” 4800 PLN (trening metaboliczny 2300 + stretching 2500), sierpień 3300 PLN
 (crossfit master 1600 + fit with ball 1700). Zadowolenie pracowników ATH i botów wzrosło w tych miesiącach o 0,07 i nie
 rosło dalej. Efekt działa więc w miesiącu szkolenia i zależy od Σ % oczekujących.
+W grze tygodniowej (kebab, B9 6.11.2026) ceny z katalogu są miesięczne i za rundę liczą się × 12/52 (jak czynsz),
+a efekt działa w tygodniu szkolenia.
 
 ---
 

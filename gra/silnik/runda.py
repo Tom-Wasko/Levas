@@ -488,7 +488,7 @@ def _karta(dane: Dane, f: Firma, r: int, sprzedaz: dict, info: dict, start: dict
 
     prac = list(f.pracownicy.values())
     if prac:
-        placa = float(np.mean([(p.pensja + p.premia) / p.pensja_preferowana for p in prac]))
+        placa = float(np.mean([zo.placa_wzgledna(dane, p) for p in prac]))
         zlecenia = sum(p.umowa == "zlecenie" for p in prac) / len(prac)
     else:
         placa, zlecenia = 1.0, 0.0

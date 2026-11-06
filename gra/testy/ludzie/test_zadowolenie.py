@@ -127,3 +127,27 @@ def test_zlecenie_placi_skladki_zus_pracodawcy_jak_etat():
         zus = -sum(_rachunek(s, 3, "A", "Składki ZUS pracodawcy"))
         assert rz.zus_pracodawcy(g.dane, umowa) == rz.zus_pracodawcy(g.dane) > 0.2
         assert zus == pytest.approx(g.dane.na_runde(p.pensja) * rz.zus_pracodawcy(g.dane), abs=0.02)
+
+
+def test_premia_za_runde_liczy_sie_jak_miesieczna_podwyzka():
+    # B9: pensja w umowie jest miesięczna, premia – za rundę (tydzień), więc w zadowoleniu premia × rund_w_roku / 12
+    g, s, p = _start()
+    d = g.dane
+    p.pensja, p.premia = p.pensja_preferowana, 120.0
+    z_premia = zo.skladniki(d, s.firmy["A"], p, 0.5, 0.0)["placa"]
+    p.pensja, p.premia = p.pensja_preferowana + 120.0 * d.rund_w_roku / 12, 0.0
+    assert d.rund_w_roku == 52 and zo.skladniki(d, s.firmy["A"], p, 0.5, 0.0)["placa"] == pytest.approx(z_premia)
+    assert z_premia > 0
+
+
+def test_szkolenie_kosztuje_cene_miesieczna_przeliczona_na_runde():
+    # B9: ceny szkoleń w katalogu są miesięczne (gra ATH), efekt działa jedną rundę – koszt za rundę jak czynsz
+    from pomocnicze import _rachunek
+    g = _gra(("A", None), ("B", None), odblokowanie={"hr_szkolenia": 2})
+    szk = g.dane.katalog_ofert["szkolenia"]
+    firma, poz = szk["firmy"][0]["nazwa"], szk["pozycje"][0]
+    _runda(g, A={**_lokal("centrum_3")}, B={**_lokal("dworzec_1")})
+    s = _runda(g, A={"szkolenia": [{"firma": firma, "szkolenie": poz["nazwa"]}]})
+    koszt = -sum(_rachunek(s, 2, "A", f"Szkolenie w firmie: {firma}"))
+    assert koszt == pytest.approx(g.dane.na_runde(poz["ceny"][0])) and koszt < poz["ceny"][0] / 4
+    assert s.wyniki[2]["A"]["szkolenia"][0]["koszt"] == pytest.approx(koszt)

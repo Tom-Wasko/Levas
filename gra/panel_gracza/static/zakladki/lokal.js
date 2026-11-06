@@ -55,12 +55,12 @@ export function zlozona({ tytul, tytulPelny, info, czesci, odRundy }) {
 const magazynLokalu = (v, id) => (id && v.swiezosc?.lokale?.[id]) || v.swiezosc || null;
 const STATUS = (l, v) => (l.dziala_od <= v.runda ? `<span class="pigulka ok">działa</span>` : `<span class="pigulka inf">rusza w rundzie ${l.dziala_od}</span>`);
 
-// pensje (miesięczne, z ZUS pracodawcy, premia bez ZUS) ludzi na stanowiskach lokalu
+// pensje za rundę (miesięczne z ZUS pracodawcy przeliczone na rundę, premia za rundę bez ZUS) ludzi lokalu
 function pensjeLokalu(v, kat, id) {
   const st = v.stan.stanowiska.filter((s) => !wieleLokali(v) || s.lokal === id);
   return st.reduce((suma, s) => {
     const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
-    return suma + (p ? (p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0)) + (p.premia || 0)) : 0);
+    return suma + (p ? naRunde(p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0))) + (p.premia || 0) : 0);
   }, 0);
 }
 const kosztLokalu = (o) => (o ? (o.forma === "najem" ? naRunde(o.czynsz) : 0) + (o.dziala ? naRunde(o.utrzymanie) : 0) : 0);
@@ -83,7 +83,7 @@ function porownanie(v, kat) {
 function liczby(v, kat, id) {
   const o = opisLokalu(v, id) || {}, kl = (v.wyniki?.klienci?.lokale || []).find((k) => k.id === id) || (!wieleLokali(v) ? v.wyniki?.klienci?.lokale?.[0] : null);
   const S = magazynLokalu(v, wieleLokali(v) ? id : null);
-  const lokal = kosztLokalu(o), pensje = naRunde(pensjeLokalu(v, kat, id));
+  const lokal = kosztLokalu(o), pensje = pensjeLokalu(v, kat, id);
   const maxZaj = S?.zajetosc?.length ? Math.max(...S.zajetosc.map((z) => z.chlodnia || 0)) : null;
   const wklad = kl?.przychod != null ? kl.przychod - (kl.skladniki || 0) - lokal - pensje : null;
   const kafel = (etykieta, wartosc, opis = "", klasa = "") => `<div class="liczba ${klasa}"><span class="etykieta">${etykieta}</span><b>${wartosc}</b>${opis ? `<span class="podpowiedz">${opis}</span>` : ""}</div>`;

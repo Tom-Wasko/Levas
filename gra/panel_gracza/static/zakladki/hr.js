@@ -14,15 +14,16 @@ const opisOsoby = (o) => kolko(esc(o.opis || ""));
 const zadowolenieOsoby = (p) => p.zadowolenie == null ? "–"
   : `<span class="${p.niezadowolony ? "minus" : ""}">${licz(p.zadowolenie, 2)}</span>`;
 
+// koszt za rundę: pensje miesięczne z ZUS pracodawcy przeliczone na rundę + premie (za rundę, bez ZUS)
 function kosztWynagrodzen(v, kat) {
-  return v.stan.pracownicy.reduce((s, p) => s + (p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0)) + (p.premia || 0)), 0);
+  return v.stan.pracownicy.reduce((s, p) => s + naRunde(p.pensja * (1 + (p.umowa === "prace" ? kat.parametry.zus : kat.parametry.zus_zlecenie || 0))) + (p.premia || 0), 0);
 }
 
 export const zatrudnienie = {
   tytul: "Zatrudnienie", tytulPelny: "HR - zatrudnienie", ikona: "☺", odblokowanie: "hr_zatrudnienie",
   info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Lokale → Sprzęt).",
   decyzje({ v, kat, edycja }) {
-    let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(naRunde(kosztWynagrodzen(v, kat)), true)}</span>${naOkres()} brutto (z ZUS pracodawcy; pensje w umowach – miesięczne)</span></div>`;
+    let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(kosztWynagrodzen(v, kat), true)}</span>${naOkres()} brutto (z ZUS pracodawcy; pensje w umowach – miesięczne)</span></div>`;
     if (v.nieudane_zatrudnienia?.length) html += `<div class="komunikat zly">Część kandydatów zatrudniła już inna firma – wybierz innych.</div>`;
     for (const typ of TYPY) {
       const st = stanowiskaLokalu(v, v.stan.stanowiska).filter((s) => s.typ === typ);
@@ -235,12 +236,12 @@ export const szkolenia = {
   info: () => `Zapewnij swoim pracownikom możliwości rozwoju i zaoferuj im udział w szkoleniach (szkolenie obejmuje wszystkich pracowników, działa w tym ${OKRES.miejscownik}).`,
   decyzje({ v, kat, edycja }) {
     const s = kat.oferty.szkolenia, wyb = v.decyzje.szkolenia || [];
-    const koszt = wyb.reduce((a, x) => { const p = s.pozycje.find((q) => q.nazwa === x.szkolenie); const i = s.firmy.findIndex((f) => f.nazwa === x.firma); return a + (p && i >= 0 ? p.ceny[i] : 0); }, 0);
+    const koszt = wyb.reduce((a, x) => { const p = s.pozycje.find((q) => q.nazwa === x.szkolenie); const i = s.firmy.findIndex((f) => f.nazwa === x.firma); return a + (p && i >= 0 ? naRunde(p.ceny[i]) : 0); }, 0);
     const w = s.pozycje.map((p) => [esc(p.nazwa), `${p.procent}%`, ...s.firmy.map((f, i) => {
       const jest = wyb.some((x) => x.szkolenie === p.nazwa && x.firma === f.nazwa);
-      return `${zl(p.ceny[i])}<br><button class="btn ${jest ? "zielony" : "jasny"} maly" data-akcja="szkolenie" data-s="${esc(p.nazwa)}" data-f="${esc(f.nazwa)}" ${edycja ? "" : "disabled"}>${jest ? "✓ Wybrano" : "Wybierz"}</button>`;
+      return `${zl(naRunde(p.ceny[i]))}<br><button class="btn ${jest ? "zielony" : "jasny"} maly" data-akcja="szkolenie" data-s="${esc(p.nazwa)}" data-f="${esc(f.nazwa)}" ${edycja ? "" : "disabled"}>${jest ? "✓ Wybrano" : "Wybierz"}</button>`;
     })]);
-    return `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl(koszt)}</span></span></div>`
+    return `<div class="pasek ciemny"><span>Koszt zakupu: <span class="kwota">${zl(koszt)}</span>${naOkres()}</span></div>`
       + tabela(null, ["Szkolenie", "% pracowników oczekujących", ...s.firmy.map((f) => `${esc(f.nazwa)}<br><span class="podpowiedz">${f.zadowoleni_klienci}% zadowolonych klientów</span>`)], w, { klasy: ["l"] });
   },
   wyniki({ v }) {
