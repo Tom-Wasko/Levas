@@ -1,4 +1,4 @@
-// Zakładka „Lokale” (Z3, przebudowa 2.11.2026, raporty/przebudowa_zakladek.md): kafelki lokali na górze i pięć
+// Zakładka „Lokale” (Z3, przebudowa 2.11.2026, archiwum/plany/przebudowa_zakladek.md): kafelki lokali na górze i pięć
 // podzakładek – Przegląd, Menu i ceny, Dostawy i magazyn, Ludzie, Sprzęt. Podzakładka (poza Przeglądem) składa się
 // z dawnych zakładek („części”), które działają na wybranym lokalu (lokal_wybor.js); dawne klucze zakładek prowadzą
 // tu przez ALIAS (index.js), a część ma kotwicę #czesc-<klucz>.

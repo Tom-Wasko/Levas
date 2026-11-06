@@ -1,4 +1,4 @@
-r"""Ustawienia Django do analizy A2: osobna baza w raporty/analiza/ (poza gitem), żeby partie
+r"""Ustawienia Django do analizy A2: osobna baza w archiwum/czesc_A/analiza/ (poza gitem), żeby partie
 analizy nie trafiały na listę gier na komputerze autora. Uruchomienie z katalogu gra/:
 
     set PYTHONPATH=..\raporty\analiza\skrypty

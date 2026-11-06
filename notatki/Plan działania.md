@@ -1,4 +1,4 @@
-[[Główny obraz]] · [[Plan optymalizacji]] · `archiwum/Plan implementacji.md` (archiwum)
+[[Główny obraz]] · [[Plan optymalizacji]] · `archiwum/plany/Plan implementacji.md` (archiwum)
 
 # Plan działania
 
@@ -10,11 +10,12 @@
    - **3b – reszta:** parki, agencje reklamowe, promocje, licytacje, wypadki i ubezpieczenia, urząd, handel między drużynami, kalendarz miejski.
 4. Dopasowanie starych funkcji (z Revasa) do nowych – karta wyników, lista błędów, odblokowywanie zakładek, boty, analiza „co jeśli”.
 
-Kroki 1–4 są zrobione (28.10.2026, `POSTEP.md`). Ich plan – `archiwum/Plan implementacji.md` – jest już archiwum.
+Kroki 1–4 są zrobione (28.10.2026, `POSTEP.md`). Ich plan – `archiwum/plany/Plan implementacji.md` – jest już archiwum.
 
 ## Optymalizacyjne
 5. Kalibracja algorytmów i testy – [[Plan optymalizacji]], część B.
 6. Analiza i ewentualne ulepszenia – [[Plan optymalizacji]], część A (analiza oczami gracza).
+6a. Ufajnianie (6.11.2026) – 24 poprawki autora i nowy układ zakładek (`raporty/ufajnianie/plan.md`).
 7. Przedstawienie Marcinowi.
 
 ## Graficzne

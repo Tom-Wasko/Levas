@@ -10,7 +10,7 @@ plus zmiana z wariantu. Miary:
 - **dochód netto razem** z 18 rund;
 - liczba **lokali** na końcu gry.
 
-Powtórzenie (z `raporty/analiza/skrypty`, ok. 1–2 min na grę):
+Powtórzenie (z `archiwum/czesc_A/analiza/skrypty`, ok. 1–2 min na grę):
 ```
 ../../../gra/.venv/Scripts/python -X utf8 eksperymenty.py 202 203 204           → eksperymenty.json
 ../../../gra/.venv/Scripts/python -X utf8 eksperymenty.py --warianty=lokal_i_zamkniecie 202 203 204

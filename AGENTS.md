@@ -12,18 +12,21 @@ Levas to edukacyjna symulacja biznesowa dla uczniów i studentów. Gra się tak:
 
 W grze biorą udział boty o 5 strategiach i 4 poziomach. Levas powstał z kopii gry REVAS (klub fitness), przebudowanej na kebab i rozbudowanej o nowe mechaniki.
 
-**Stan (29.10.2026):** kroki 1–4 są zrobione (cała gra grywalna). Teraz kolej na kroki 5–6: kalibrację (B) i analizę (A) według `notatki/Plan optymalizacji.md` – sesje po kolei: B1–B5, potem A, uwagi z A (U), kontrola K i B6–B15. Zadania i postęp są w `POSTEP.md`, instrukcje dla sesji w `zadania/` (polecenia do wklejenia: `zadania/README.md`).
+**Stan (6.11.2026):** kroki 1–4, część A i uwagi U1–U24 są zrobione. Kalibracja B6–B13 jest na gałęzi
+`kalibracja-b6`, B14–B15 są w toku. Na gałęzi `ufajnianie` trwa „ufajnianie”: 24 poprawki od autora i nowy układ
+zakładek (plan, przekazanie i instrukcja scalania w `raporty/ufajnianie/`). Zadania i postęp są w `POSTEP.md`.
 
 ## Mapa repozytorium
 ```
 AGENTS.md            ten plik
-POSTEP.md            lista zadań z checkboxami (F/P/Q – zrobione; A, U, B – bieżące)
-zadania/             instrukcje dla sesji: README.md (polecenia), A_analiza_gracza.md, B_kalibracja.md
-raporty/             wyniki analiz i kalibracji (tworzysz tu pliki)
+POSTEP.md            bieżące zadania z checkboxami (B, UF); pełna historia: archiwum/POSTEP_do_2026-11-06.md
+zadania/             instrukcje dla sesji: README.md (polecenia), B_kalibracja.md
+raporty/             bieżące prace: kalibracja/ (B6–B15), ufajnianie/ (plan, PRZEKAZANIE, SCALANIE)
 notatki/             notatki projektowe autora (Obsidian) – NIE zmieniaj bez zgody (niżej)
 dokumentacja/        STACK.md (technologie, architektura, polecenia), WIEDZA_O_GRZE.md (oryginalny
                      REVAS: karta wyników, mechaniki), ROZNICE_LEVAS_STARY.md (stara wersja Levasa)
-archiwum/            zakończone plany, dzienniki prac, stary STACK (Plan implementacji – tylko do odczytu)
+archiwum/            zakończone prace – tylko do odczytu: plany/ (Plan implementacji, PRACA_NOCNA,
+                     przebudowa zakładek, stary STACK), czesc_A/ (analiza gracza, projekty U20/U24), stary POSTEP
 plan.txt             prywatny plik autora – nie commituj, nie zmieniaj
 gra/
   silnik/            silnik gry: czysty Python (pydantic, numpy), bez Django
@@ -110,7 +113,7 @@ Najważniejsze notatki:
 - `Ustalenia gry` – wszystkie parametry;
 - `Prawidła świata`, `Elementy mapy`, `Menu i składniki` – zasady świata;
 - `Główny obraz` i `Zarys aplikacji` – wizja;
-- `archiwum/Plan implementacji.md` – plan kroków 1–4, archiwum, wyłącznie do odczytu.
+- `archiwum/plany/Plan implementacji.md` – plan kroków 1–4, archiwum, wyłącznie do odczytu.
 
 ## Kiedy pytać autora
 Pytaj o decyzje projektowe, których nie da się wyprowadzić z notatek ani z celów planu: nowa mechanika, zmiana zasad widocznych dla gracza, usunięcie funkcji. Liczb i wzorów nie musisz konsultować, o ile służą celom z `notatki/Plan optymalizacji.md`. Gdy pytanie czeka na odpowiedź, zapisz je w raporcie zadania i zajmij się czymś niezależnym.

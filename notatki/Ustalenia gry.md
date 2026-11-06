@@ -1,4 +1,4 @@
-[[Główny obraz]] · [[Prawidła świata]] · [[Elementy mapy]] · `archiwum/Plan implementacji.md`
+[[Główny obraz]] · [[Prawidła świata]] · [[Elementy mapy]] · `archiwum/plany/Plan implementacji.md`
 
 # Ustalenia gry
 
@@ -24,7 +24,12 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 - Rozliczenia **co tydzień**: płace, ZUS, zaliczka PIT, VAT.
 - PIT liniowy 19%; składka zdrowotna 4,9% (z minimum).
 - ZUS właściciela: ulga na start przez 26 tygodni (tylko zdrowotna), potem ZUS preferencyjny.
-- ZUS pracodawcy przy umowie o pracę ok. 20,5%; student poniżej 26 lat na zleceniu – bez ZUS i PIT.
+- ZUS pracodawcy przy umowie o pracę ok. 20,5%; umowa zlecenie – bez ZUS (uproszczenie gry, ustalenie 6.11.2026);
+  student poniżej 26 lat – bez PIT (ulga dla młodych) na umowie o pracę i zleceniu, ale pracuje mniej godzin i częściej odchodzi.
+- Formy zatrudnienia: umowa o pracę (pełny etat, pół etatu), zlecenie, student < 26 lat, staż z urzędu pracy, B2B.
+  Mistrz gry włącza i wyłącza dostępne formy w panelu (przełączniki robocze – do usunięcia przed oficjalną wersją).
+- Zatrudnia się tylko w Rynku pracy – od razu z przypisaniem do lokalu i stanowiska. Przeniesienie do innego lokalu:
+  zgoda pracownika zależy od zadowolenia i odległości, za jednorazowy dodatek.
 - Płaca minimalna 2026: 4806 zł miesięcznie (31,40 zł/h); w grze przeliczana na tydzień.
 - VAT sprzedaży: dania 8%, napoje 23%. VAT zakupu: żywność 5% (część 8%), napoje, opakowania i sprzęt 23%.
 
@@ -38,7 +43,7 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 | Ceny dań | od 50% do 200% ceny rynkowej (cena spoza widełek jest odrzucana) |
 | Kredyt inwestycyjny | od wzięcia lokalu (wynajętego albo kupionego), także na zakup lokalu w tej samej rundzie |
 | Pojedynczy sprzęt, mebel | od razu |
-| Kasyno | otwarte tylko na 1 rundę po zaproszeniu |
+| Kasyno | otwarte tylko na 1 rundę po zaproszeniu; zawsze – po wpisaniu z klawiatury tajnego kodu (kto zna, ten wchodzi) |
 | Rozruch nowego lokalu | w pierwszym tygodniu sprzedaży lokal ma 40% klientów, co tydzień +10 p.p., pełny popyt od 7. tygodnia sprzedaży (każdy kolejny lokal tak samo) |
 
 ## Magazyn
@@ -64,11 +69,20 @@ Prognozują z popytu w raportach poprzednich rund i z potencjału lokalu w zakł
 ## Odblokowywanie zakładek – domyślny harmonogram *(roboczo, mistrz gry może zmienić)*
 | Runda | Co się odblokowuje |
 |---|---|
-| 1 | Marka firmy (nazwa, slogan, kolor, logo), Lokale (najem, kupno, licytacja), Menu, Dostawcy (dyskonty, hurtownie), HR (pracuj.pl), Finanse (bank, biuro rachunkowe) |
-| 2 | Producent mięsa, agencja pracy, promocje, parki |
-| 3 | Agencje reklamowe (część kanałów), ubezpieczyciel |
-| 4 | Karta skumulowana, headhunter (podkupywanie), przejęcia lokali |
-| 5 | Wszystkie kanały reklamy, handel między drużynami |
+| 1 | Marka firmy (nazwa, slogan, kolor, logo), Lokale (najem, kupno, licytacja), Menu, Dostawcy (dyskonty, hurtownie), Rynek pracy (pracuj.pl), Finanse (bank, biuro rachunkowe), Urząd (bez sanepidu) |
+| 2 | Producent mięsa, agencja pracy, parki (tylko przez mapę) |
+| 3 | Promocje, udogodnienia |
+| 4 | Sanepid, ubezpieczyciel, karta skumulowana, headhunter (podkupywanie), przejęcia lokali, wyposażenie |
+| 5 | Pierwsze kanały reklamy (druk) |
+| 6 | Handel między drużynami |
+| 7 | Marketing internetowy, szkolenia |
+| 8 | Pozostałe kanały reklamy (radio, billboard) |
+| 10 | Agencja eventowa (degustacje, noc kebaba) |
+
+Ustalenia 6.11.2026: firma potrzebuje kilku tygodni na rozkręcenie (rozruch) – mówią o tym Wnioski z pierwszych rund.
+Udogodnienia dla pracowników pojawiają się co 2–3 rundy aż do rundy 14 (kilka żartobliwych, m.in. kot zakładowy).
+Falafel w menu – mała szansa na bójkę następnego dnia (żart z małym skutkiem).
+Zakładki przed swoją rundą są szare, z kłódką i napisem „od rundy N”.
 
 ## Karta wyników *(roboczo, wzory w kroku 4)*
 **Wynik tygodnia** = iloczyn pięciu wskaźników. Przy stracie wynik jest ujemny i proporcjonalny do straty (waga × wynik ekonomiczny, bez mnożenia przez wskaźniki – lepsze wskaźniki nie pogłębiają minusa; waga w `zalozenia.yaml → karta_wynikow → strata`). **Karta skumulowana** = średnia kart z rund 2..N.

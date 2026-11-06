@@ -15,7 +15,7 @@
 
 3. Materiały dla OpenCode:
 - AGENTS.md – omówienie projektu, które OpenCode czyta sam na starcie: mapa folderów, uruchomienie na nowym komputerze, polecenia, budowa silnika i zasady. Wśród zasad jest pytanie Cię o każdą zmianę w notatkach oraz commit i push po każdym zadaniu.
-- zadania/A_analiza_gracza.md – instrukcja dla Fable. Gra 3 pełne gry jako nowicjusz, „optymalizator” szukający luk i nauczyciel. Pisze raport z problemami, zmianami i nowymi funkcjami, każda pozycja z priorytetem i kosztem. Kodu nie zmienia.
+- archiwum/czesc_A/A_analiza_gracza.md – instrukcja dla Fable. Gra 3 pełne gry jako nowicjusz, „optymalizator” szukający luk i nauczyciel. Pisze raport z problemami, zmianami i nowymi funkcjami, każda pozycja z priorytetem i kosztem. Kodu nie zmienia.
 - zadania/B_kalibracja.md – instrukcja kalibracji: porównywanie par gier, które różnią się jedną decyzją, na wielu
   ziarnach. Po każdej poprawce sprawdza, czysowanych obszarów, i prowadzi dziennik, żebykolejna sesja wiedziała, gdzie skończyła poprzednia.
 - POSTEP.md – nowe sekcje A, U (ulepszenia, które zatwierdzisz po raporcie) i B.
@@ -25,13 +25,13 @@
 Polecenia do wklejenia w OpenCode. Na nowym komputerze najpierw git clone https://github.com/Tom-Wasko/Levas.git.
 
 Sesja 1 (model Fable 5.1):
-Przeczytaj AGENTS.md, a potem wykonaj zadanie z pliku zadania/A_analiza_gracza.md (A1–A3). Pracuj samodzielnie, po każdym kroku commit i push. Na końcu daj mi krótkie podsumowanie raportu.
+Przeczytaj AGENTS.md, a potem wykonaj zadanie z pliku archiwum/czesc_A/A_analiza_gracza.md (A1–A3). Pracuj samodzielnie, po każdym kroku commit i push. Na końcu daj mi krótkie podsumowanie raportu.
 
 Sesja 2 (Opus 5.5 high albo Fable 5.1; może ruszyć równolegle z sesją 1):
 Przeczytaj AGENTS.md, a potem wykonaj zadania.md. Po każdym zadaniu testy, commit i push.
 
 Po przeczytaniu raportu z części A:
-Wdróż z raportu raporty/analiza_gracza.md pozycje: [numery]. Dopisz je do POSTEP.md jako U1, U2… i rób po kolei.
+Wdróż z raportu archiwum/czesc_A/analiza_gracza.md pozycje: [numery]. Dopisz je do POSTEP.md jako U1, U2… i rób po kolei.
 
 Potem:
 Kontynuuj kalibrację od pierwszego nieodhaczonego zadania B w POSTEP.md, według zadania/B_kalibracja.md.

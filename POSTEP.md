@@ -1,358 +1,15 @@
 # Postęp
 
-Postęp prac: kroki 1–4 według [Planu implementacji](archiwum/Plan%20implementacji.md) (archiwum), kroki 5–6 według
-[Planu optymalizacji](notatki/Plan%20optymalizacji.md) (na dole). 1 commit = 1 zadanie (`F2.1: …`, `B3: …`).
+Pełna historia kroków 1–6 (F2–F4, poprawki P/Q, Z1–Z6, A1–A3, U1–U24): [archiwum/POSTEP_do_2026-11-06.md](archiwum/POSTEP_do_2026-11-06.md).
+1 commit = 1 zadanie (`F2.1: …`, `B3: …`, `UF7: …`).
 
-## Krok 2 – kopia Revasa i przebudowa pod Levas
-- [x] F2.1 Kopia `revas_gra` → `gra/` (bez kalibracji, gry przez GitHub, importu stanu i raportów), pyproject + ruff, testy przechodzą
-- [x] F2.2 Django zamiast Flaska: aplikacje `gry/` (modele Gra/Runda/Decyzja w SQLite), `api/` (widoki JSON), `panel_gracza/` (strony, zakładki JS bez zmian, komenda `graj`); CSRF w zapytaniach JS; testy API
-- [x] F2.3 Model pydantic, grosze, `WERSJA_STANU` – modele stanu w pydantic (`extra="forbid"`), kwoty jako int grosze (pola `…_gr`, silnik liczy w złotych przez właściwości zaokrąglające do grosza), widok w złotych dla zakładek (`do_slownika`), testy własności (hypothesis): zapis → odczyt, to samo ziarno = ten sam wynik; wyniki gry botów bez zmian
-- [x] F2.4 Dane w YAML ze schematami i `zrodlo` – `dane/*.yaml` (usługi, sprzęt, zasoby, dostawcy, kandydaci z parametrami losowania, katalog, boty, założenia), każdy plik/sekcja/parametr ze `zrodlo`; schematy pydantic (`silnik/schematy.py`) i odwołania między plikami: `python -m silnik.dane sprawdz`; liczby gry z kodu silnika (rynek pracy, strategie botów, dostawcy, limit stanowisk) przeniesione do danych, test pilnuje, żeby nie wróciły; wyniki gry botów bez zmian
-- [x] F2.5 Nazwane strumienie losowości (PCG64) – `silnik/losowosc.py`: `strumien(ziarno, runda, cel, *klucze)` → `Generator(PCG64)` z pełnego skrótu SHA-256 (`SeedSequence`), cele w `CELE`; testy: wartości wzorcowe, niezależność od kolejności, różne klucze = różne liczby, losowość tylko z tego modułu (napisane od zera – kodu starego Levasa nie ma na dysku)
-- [x] F2.6 Kebab zamiast klubu fitness – dane kebaba w `dane/` (8 dań z receptur z notatki „Menu i składniki”, kucharz i kasjer, sprzęt kuchni i kasy, 14 składników, 3 dostawcy jedzenia, rynek pracy, nazwy mediów i szkoleń); typy stanowisk `kuchnia`/`kasa` z nazwami i zawodami w danych (silnik bez nazw zawodów); zakładki, szablony i motywy mówią o daniach, kucharzach i kasie; dane Revasa zostały jako wzorzec `dane_revas/`, na którym przechodzą testy mechaniki; słownik nazw kod → gra w `gra/README.md`
-- [x] F2.7 Rundy tygodniowe – kalendarz rund w danych (`rundy.kalendarz`: tydzień, 52 rundy w roku, start 5.10.2026); kebab: 26 rund, 100 000 zł, etat i sprzęt 40 h, gotowy lokal na start (`stanowiska.startowe`); kwoty miesięczne z danych silnik księguje na rundę (`na_runde`), oprocentowanie roczne / rundy w roku, sezonowość według miesiąca rundy, ceny dostawców losowane co tydzień; strona gracza: nazwy tygodni w nawigatorze i wykresach, koszty utrzymania „/ tydz.”, strona startowa z danych; Revas (`dane_revas/`) bez zmian – miesiące
-- [x] F2.8 Podstawowy panel mistrza gry – `panel_mg/` pod `/mg/` (bez logowania): nowa gra (drużyny, rundy, kapitał startowy – nowa opcja gry `kapital_startowy`, boty tak/nie i wybór strategii), zakładki Decyzje (kto wysłał, zamknięcie rundy także bez decyzji wszystkich, cofnięcie, strony firm, plik gry; odświeżanie co 15 s) i Wyniki (ranking według średniej karty wyników, dochód, gotówka, zadłużenie, wykresy); `GET /api/gry/<id>/mg`; link z listy gier
-
-## Krok 3a, 3b, 4
-- [x] F3a.1 Konta – `konta/` (django-allauth): logowanie na każdej stronie, własny login (konta zakłada mistrz gry: komenda `konto`, panel Konta `/admin/`), konto Microsoft po ustawieniu `LEVAS_MS_*`; role mistrz gry (grupa `mistrz_gry`) / uczeń; drużyny `gry.Druzyna` (gra + firma + uczniowie); uczeń widzi tylko swoje gry i firmy, zarządzanie grą tylko dla mistrza gry; gra lokalna (`graj`) loguje się sama; test dostępu `test_uczen_nie_odczyta_cudzej_druzyny`
-
-- [x] F3a.2 Drużyny – skład 1–4 uczniów (uczeń w jednej drużynie gry; pilnuje tego API i panel Konta), zakładka **Drużyny** w panelu mistrza gry (dopisywanie, usuwanie, konta uczniów z losowym hasłem, nowe hasło, druk), decyzje drużyny: kto zapisał / wysłał (`Runda.autorzy`), wersja decyzji – 409 przy jednoczesnej zmianie, odświeżanie strony drużyny co 20 s (`/stan`); test `test_cztery_druzyny_i_boty_w_jednej_grze`
-
-- [x] F3a.3 Strefy i lokale, prototyp mapy miasta – mapa Lublina w danych (`dane/mapa/`: 10 stref, 38 lokali – gotowe, do urządzenia, działki, budynki instytucji); drużyna zaczyna bez lokalu i wybiera go: najem (kaucja + czynsz co tydzień) albo kupno, działka – budowa w ratach; wspólna pula lokali (konflikt w rundzie rozstrzyga kolejność rundy), kolejny lokal co 3 rundy; stanowiska tylko na miejscach w działających lokalach; czynsz i media zamiast stałego utrzymania lokalu; boty wynajmują gotowe lokale; zakładka **Lokale** (Decyzje + Wyniki) i **Mapa miasta** (izometryczna, obok menu: budynki → zakładki, lokale → najem/kupno); opcja gry `lokale` (bez – gotowy lokal jak w REVAS); testy `test_lokale.py`
-
-- [x] F3a.4 Popyt strefowy – pule klientów stref (`dane/mapa/popyt.yaml`: pula, poziom cen i wrażliwość na cenę strefy, dni tygodnia, miesiące, kalendarz miejski z 9 wydarzeniami); klienci strefy wybierają lokal (cena względem strefy, jakość, odległość, zadowolenie, wyposażenie, reklama; opcja zewnętrzna – bary spoza gry); dwa lokale w strefie dzielą klientów; obsługa dzień po dniu w każdym lokalu (`silnik/rynek/popyt.py`); prognoza strefowa w zakładce Oferta; boty planują obsadę na szczyt tygodnia; nowa zakładka **Klienci i strefy** (Decyzje: prognoza lokali i dni, wydarzenia, potencjał stref; Wyniki: klienci dzień po dniu, skąd przyszli, podział stref); szacunek klientów na kafelkach lokali; testy `test_popyt.py`
-
-- [x] F3a.5 Menu i świeżość – partie składników z terminem przydatności (`silnik/kuchnia/swiezosc.py`, `Firma.partie`): dostawa na wybrany dzień rundy, zużycie FIFO (najkrótszy termin), kosz po terminie (bułka z poniedziałku – we wtorek wieczorem), pojemność szafy chłodniczej i zamrażarki (`sprzet.yaml`: `przechowywanie`, `pojemnosc_l`; `zasoby.yaml`: `przechowywanie`, `termin_dni`, `miejsce_l`) – co się nie zmieści, przepada; mrożona pita i mrożone mięso jako zamienniki (−1★ jakości składnika); jakość dania z wag menu (`dane/mapa/menu.yaml`); danie bez składnika rano wypada z menu, połowa jego klientów bierze inne danie (`silnik/kuchnia/menu.py`); zwroty z partii; boty rozkładają dostawy na dni; zakładka **Magazyn i świeżość** (Decyzje: zajętość chłodni dzień po dniu, partie i terminy; Wyniki: dostawy/zużycie/straty dzień po dniu, kosz, dania wyłączone z menu), zamówienia na dni w zakładce Dostawcy, kolumna „Straty” w wynikach; ostrzeżenia na liście błędów; testy `test_swiezosc.py`
-
-- [x] F3a.6 Dostawcy i sprzęt – 9 dostawców z rodzajem i zasadami (`dane/dostawcy.yaml`: `dostawcy`): piekarnia (dowóz codziennie), dyskonty Biedronka / Lidl / Stokrotka (odbiór osobisty – czas właściciela, limit opakowań dziennie, gazetka z promocjami losowana co tydzień), hurtownie Makro / Selgros / Eurocash (dni dostaw, płatny dowóz poniżej progu), producent mięsa „Rożen” (minimalne zamówienie, od rundy 3); zamówienie przychodzi w zaplanowany dzień, a w dzień bez dostaw jest odrzucane (czerwony błąd) – `silnik/kuchnia/dostawcy.py`: `zasady_dostaw`, `oferta_rundy`, `gazetki`; planowanie dostaw (boty, „Zamów”) w dni dostawcy, bez dyskontów i poniżej minimum; budynki dostawców na mapie; środki trwałe i amortyzacja (`silnik/ksiegowosc/srodki_trwale.py`, `Firma.srodki_trwale`): kupiony lokal i budynek 2,5% rocznie, grunt bez amortyzacji, zakupy od 10 000 zł 20% rocznie, tańsze od razu w koszty, sprzedaż – niezamortyzowana wartość w koszty; sklepy przy wyposażeniu (IKEA, OBI, Jula, Castorama) i park handlowy na mapie; zakładki: **Dostawcy** (Decyzje: dni dostaw, gazetki, limity, plan dostaw rundy; Wyniki: dostawy i opłaty za dowóz) i nowa **Inwestycje → Środki trwałe** (Decyzje: ewidencja po decyzjach, stawki; Wyniki: ewidencja na koniec rundy, odpisy w KPiR); testy `test_zasady_dostaw.py`, `test_srodki_trwale.py`
-
-- [x] F3a.7 Czas właściciela – pula godzin na rundę (`zalozenia.yaml`: `operacje.czas_wlasciciela`, 20 h), `silnik/ludzie/czas_wlasciciela.py`; zużywa ją odbiór osobisty w dyskontach (kolejno po dniach), dzień zakupów bez wolnych godzin jest odrzucony – czerwony błąd na liście błędów (zakładka Dostawcy); nowa zakładka **Czas właściciela** (Decyzje: plan godzin rundy; Wyniki: wykorzystanie i odrzucone decyzje), podpowiedź w Dostawcach; test `test_czas_wlasciciela.py`
-
-- [x] F3a.8 Agencja pracy – `silnik/ludzie/rynek_pracy.py`, `dane/kandydaci.yaml` (`agencja`): kanały rekrutacji pracuj.pl / agencja / headhunter (gwiazdki, opłata, mnożnik kosztu rekrutacji, czas właściciela, od rundy), wspólna pula kandydatów z licytacją (wyższa pensja, remis – losowanie), limit 3 nowych na rundę, podkupienie przez headhuntera z kontrofertą, okres wypowiedzenia wg stażu (`Pracownik.odchodzi`), zwolnieni wracają do puli; nowa zakładka **Rynek pracy** (Decyzje + Wyniki) w HR, wybór kanału w oknie zatrudnienia; test `test_rynek_pracy.py`
-
-- [x] F3a.9 Banki – sześć banków z mapy (`dane/mapa/banki.yaml`, `silnik/pieniadze/banki.py`), każdy z inną najlepszą ofertą: Crédit Agricole (kredyt na start bez historii), PKO BP (kredyt inwestycyjny pod zastaw), Pekao (leasing sprzętu), ING (lokaty), mBank (tanie konto i terminal), Santander (limit w koncie); konto firmowe z terminalem (abonament + prowizja od płatności kartą), lokaty i kredyty w dowolnym banku, historia firmy, zastaw lokalu lub sprzętu i przejęcie po zaległościach, odsetki karne, leasing (sprzęt bez prawa sprzedaży do wykupu), debet ponad limit; zakładka **Finanse → Bank** w grze z lokalami (Decyzje + nowe Wyniki); boty wybierają najtańsze konto; test `test_banki.py`
-- [x] F3a.10 Harpagon – lichwiarz z mapy (`dane/mapa/harpagon.yaml`, `silnik/pieniadze/lichwiarz.py`): pożyczka „na czarno” od ręki, bez sprawdzania zdolności i poza KPiR (gotówka i spłata tylko na rachunku z `poza_ksiegami`), jedna naraz, odsetki od całego długu co rundę; po terminie rosnąca presja z komicznymi historiami (Harpagon i Mistrz Jakub ze „Skąpca”): życzenia w rundzie terminu, przypomnienia, odsetki karne, wizyty; skutki zaległości w `silnik/pieniadze/zaleglosci.py` (szkody w lokalu – koszt w KPiR, odpływ klientów, odejście pracownika do puli) do użycia później przy ZUS/US; nowa zakładka **Finanse → Harpagon** (Decyzje + Wyniki) i kantor na mapie przy dworcu; test `test_harpagon.py` (scenariusz presji krok po kroku)
-- [x] F3a.11 Księgowość JDG – `dane/podatki_2026.yaml` (schemat `PlikPodatkow`), ceny brutto → KPiR netto + rejestr VAT w `Ksiega` (`ksieguj` ze stawką, stawkami albo z reguł po opisie; sprzedaż dań 8%, napoje 23%, żywność 5%, opakowania i usługi 23%, usługi finansowe i płace bez VAT; środki trwałe – VAT naliczony, ewidencja netto; korekta VAT przy zwrotach), `silnik/ksiegowosc/rozliczenie.py` co rundę zamiast CIT: ZUS społeczny po uldze na start (26 rund), zdrowotna 4,9% z minimum, zaliczka PIT 19% narastająco, VAT z nadwyżką przenoszoną; ZUS pracodawcy 20,48%; `Firma.rozliczenie`; wyniki `rozliczenie` i `vat`, widok `podatki`; nowa zakładka **Finanse → Podatki** (Decyzje: parametry, stan rozliczeń, VAT z decyzji, stawki; Wyniki: rozliczenie rundy, zaliczka PIT narastająco, deklaracja VAT, rejestr), KPiR netto z zaliczką PIT i zdrowotną zamiast „Podatek”; test `test_ksiegowosc.py` (scenariusze co do grosza)
-- [x] F3a.12 Uzgodnienie kasy – każda operacja rachunku ma rodzaj (`RODZAJE_OPERACJI`: KPiR, korekty, podatki, inwestycje, kredyty, lokaty, kaucje, Harpagon), koszty bez wydatku (`bez_gotowki`) i VAT od inwestycji oznaczone; `silnik/ksiegowosc/uzgodnienie.py` co rundę: początek + przychody − koszty + koszty bez wydatku + VAT należny − naliczony ± operacje poza KPiR = koniec, do tego KPiR ↔ operacje „kpir” i saldo ↔ suma operacji; wynik `uzgodnienie`; zwijana sekcja „Uzgodnienie kasy z KPiR” w **Finanse → Raport**; test `test_uzgodnienie.py` (hypothesis na losowych grach botów z kredytami, lokatami, Harpagonem, lokalami, sprzedażą sprzętu i zwrotami + scenariusz ze wszystkimi rodzajami). Znalezione i naprawione błędy: `ksieguj` zaokrąglał kwotę dwa razy (grosz różnicy przy końcówce ½ gr) – teraz raz, handlowo; `Rachunek.zapisz` liczył saldo z niezaokrąglonej kwoty; zwrot zasobów – brutto zaokrąglane wg stawek; zwrot zabierający ostatnią partię wywracał grę (`KeyError` w magazynie)
-
-- [x] F3a.13 Biura rachunkowe i samodzielna księgowość – pięć biur z mapy (`dane/mapa/biura.yaml`: J.K.Ś., Pod Trybunałem, Pani Halinka, e-Księgi24.pl, Debet & Kredyt) z ryczałtem, limitem dokumentów, opłatą za dokument, minimum, kadrami (osoby w cenie, etat, zlecenie), ryzykiem błędu i OC – błąd biura bez OC kosztuje mandat (komiczne historie), z OC – zwrot; opłata liczona od liczby dokumentów rundy (`silnik/ksiegowosc/biuro.py`: `oplata`, `nalicz`, `najtansze`); **samodzielna księgowość**: po rundzie drużyna dostaje paczkę dokumentów z rachunku (faktury sprzedaży i zakupu, raporty kasy, listy płac, deklaracje ZUS, wyciągi, środki trwałe, operacje poza KPiR), w następnej rundzie księguje je do kolumn KPiR ze stawką VAT i składa deklaracje VAT, zaliczki PIT i składki zdrowotnej; silnik sprawdza: błędny zapis – wyjaśnienie, błędna deklaracja – korekta do poprawnej kwoty i mandat 200 zł, brak deklaracji – rozliczenie z urzędu i mandat 500 zł; ostatnia runda rozliczana od razu; do czasu złożenia deklaracji widok drużyny ukrywa KPiR, podatki i dochód netto rundy (także w podglądzie); boty wybierają najtańsze biuro; zakładka **Finanse → Biuro rachunkowe** (Decyzje: oferty z szacunkiem opłaty, dokumenty do zaksięgowania z podpowiedziami, podsumowanie i deklaracje; Wyniki: opłata biura albo sprawdzenie deklaracji i zapisów); test `test_biuro.py`, test uzgodnienia kasy obejmuje biura i samodzielne deklaracje (także błędne) oraz sprawdza, że dokumenty pokrywają cały rachunek rundy. Naprawione przy okazji: kredyt odnawialny uruchamiany na koniec rundy nie trafiał do dokumentów
-
-- [x] F3a.14 Panel mistrza gry – **pauza** gry (drużyny nie zmieniają ani nie wysyłają decyzji, runda się nie zamyka – także z harmonogramu; cofnięcie działa); **zamykanie rund o stałej porze**: tygodniowe terminy (`Gra.harmonogram`, `gry/harmonogram.py`), runda zamyka się w pierwszym terminie po zamknięciu poprzedniej, komenda `manage.py zamykaj_rundy` (raz albo `--petla 60`; Harmonogram zadań Windows / cron w README), termin widoczny dla drużyn na pasku i w *Wyślij decyzje*, strona drużyny odświeża się po pauzie i zmianie terminu; **wgląd mistrza gry w drużyny uczniów tylko do odczytu** (API: 403, strona: komunikat; drużynę bez uczniów i grę lokalną prowadzi nadal mistrz gry); **poziom botów** (łatwy / średni / trudny, `dane/boty.yaml: poziomy`) przy zakładaniu gry i w trakcie (od następnej rundy) – na razie zapisany bez wpływu na decyzje (zachowanie poziomów w F4.4); **eksport do arkusza**: ranking i wyniki firm w rundach (CSV, średnik, przecinek dziesiętny, BOM – Excel); migracja `0004_prowadzenie_gry`; test `test_prowadzenie.py`. Odblokowywanie zakładek – w F4.3 (jak w planie)
-
-- [x] F3a.15 Limity – `silnik/limity.py`: najwyżej 3 nowych pracowników na rundę (zatrudnienia + oferty podkupienia pracowników innych drużyn) i kolejny lokal co 3 rundy; **zapis decyzji z przekroczeniem jest odrzucony** (API 400 z opisem, strona pokazuje komunikat i wczytuje poprzednie decyzje), przyciski *Zatrudnij +* i *Złóż ofertę* sprawdzają limit od razu; lista błędów: niebieskie „wykorzystany limit nowych pracowników” i „kolejny lokal od rundy N” (czerwone – jak dotąd z przeliczenia, które nadal przycina nadmiar u botów i w starych zapisach); test `test_limity.py`. Pełna lista błędów dla nowych decyzji – w F4.2 (jak w planie)
-
-**Krok 3a zakończony.**
-
-- [x] F3b.1 Parki – `dane/zdarzenia/parki.yaml`: 14 historii w 7 parkach (12 komicznych, 2 poważne; 4 nowe parki na mapie), sceny z opcjami (koszt: godziny właściciela, gotówka, porcje jedzenia), opcja domyślna, ciąg dalszy za N rund z szansą; schematy z kontrolą grafu (każda ścieżka się kończy, brak scen nieosiągalnych); `silnik/swiat/zdarzenia.py`: od rundy 2 co rundę jedna historia dla wszystkich drużyn (kolejność losowana bez powtórzeń w cyklu), skutki – gotówka (bez VAT), mnożnik popytu, mniej godzin właściciela w kolejnych rundach, kandydat na rynku pracy tylko dla tej drużyny; boty wybierają losowo spośród opcji do 3 h; zakładka **Zdarzenia** (Decyzje: sceny i wybór reakcji, Wyniki: reakcje, skutki, „ciąg dalszy nastąpi”, trwające efekty, dziennik); lista błędów: niebieski brak wyboru, czerwony brak czasu właściciela (gra bierze opcję domyślną); test `test_zdarzenia.py`
-- [x] Zmiany 26.10 (polecenia użytkownika): kapitał startowy 40 000 zł (dane, README, notatki); sortowanie tabel
-  kliknięciem w nagłówek (rosnąco, malejąco, kolejność pierwotna; liczby w polskim zapisie, gwiazdki, puste na końcu;
-  działa też w oknach, np. baza składników) i lista „Sortuj” w ofercie lokali; testy kupna lokali dostają jawnie
-  kapitał 100 000 zł
-- [x] Magazyn bez kosztu magazynowania i zwrotów (gra z lokalami; gra bez lokali i `dane_revas/` bez zmian):
-  wynajęta chłodnia „Mroźnia u Mietka” – nadmiar ponad chłodnię/zamrażarkę lokalu przy dostawie (`swiezosc.przyjmij`,
-  `Partia.wynajem`) za 1 zł/l z VAT 23%, termin krótszy o 2 dni, nie zajmuje miejsca w lokalu; kontrola sanepidu co
-  rundę (`silnik/kuchnia/magazyn.py`, strumień „sanepid”): szansa 3% + za litry w wynajmie i złotówki przeterminowanego
-  towaru, mandat 300–3000 zł poza KPiR (nowy rodzaj operacji „kary”, w uzgodnieniu kasy i biurze rachunkowym) i −7%
-  popytu na 2 rundy, komiczne teksty kontroli w `dane/zdarzenia/magazyn.yaml`; historia „Pani Halina z banku
-  żywności” (zapas z krótkim terminem ≥ 200 zł, szansa 40%; oddanie zabiera partie – strata z powodem „bank”, +3% lub
-  +5% popytu, podziękowanie w następnej rundzie); zwroty i koszt magazynowania ukryte w zakładce Dostawcy;
-  zakładka **Świeżość**: Decyzje – nadmiar do wynajmu dzień po dniu i ryzyko kontroli, Wyniki – wynajęte partie i
-  karta kontroli; testy `test_magazyn.py`, `test_swiezosc.py`
-- [x] F3b.2 Agencje reklamowe (gra z lokalami) – `dane/mapa/reklama.yaml`: 4 agencje na mapie (drukarnia „Papier
-  Przyjmie”, „Lajk i Spółka”, „Fala Koziołka”, „Kozi Gród Events” – 2 nowe budynki), 8 kanałów (od rundy 3 część,
-  od rundy 5 wszystkie), zasięg strefa albo całe miasto (radio), Noc Kebaba tylko w strefach akademickich, komiczne
-  raporty agencji; `silnik/rynek/reklama.py`: zamówienie `kampanie: [{agencja, kanal, strefa}]` z góry (koszt × pula strefy,
-  VAT 23%), kampania trwa N rund, poszerza pulę strefy (`popyt.pule`, korzystają wszyscy) i przyciąga mieszkańców
-  strefy (`reklama_strefy` w `popyt.atrakcyjnosc`), zagłuszanie przez inne firmy z kampanią tego samego rodzaju
-  w strefie, nasycenie przy powtórkach w oknie 4 rund, wygasanie ×0,5 po końcu; reklama tradycyjna i internetowa
-  z Revasa wyłączona w grze z lokalami (zakładki ukryte, boty kupują kampanie ze strategii – `boty.yaml: kampanie`,
-  `bufor_kampanii`, `min_sila_kampanii`); prognoza popytu uwzględnia kampanie; dane rynku: kto i za ile się
-  reklamował; zakładka **Agencje reklamowe** w Marketingu (Decyzje: agencje, kanały, koszt i siła w wybranej
-  strefie, konkurencja; Wyniki: raporty agencji, efekty kampanii, kampanie na mieście z wykresem); podzakładki
-  ukryte w menu nie są pokazywane; test `test_reklama.py`
-
-- [x] F3b.3 Promocje (gra z lokalami) – `dane/mapa/promocje.yaml`: 5 rodzajów (2 za 1 i zestaw z napojem na jedno
-  danie; happy hours pn–czw, karta stałego klienta, zniżka studencka dla stref Akademickie i Politechnika – na całe
-  menu), od rundy 2, najwyżej 2 naraz, każdy rodzaj raz; ozdobna nazwa drużyny (do 40 znaków, bez wpływu na wynik),
-  po 2 komiczne teksty na rodzaj; `silnik/rynek/promocje.py`: decyzja `promocje: [{typ, nazwa, danie}]` (pełna lista,
-  bez klucza – trwają), koszt włączenia netto + VAT 23% (KPiR – pozostałe), zmiana nazwy bez kosztu, zmiana dania =
-  nowa promocja, danie zdjęte ze sprzedaży wyłącza promocję; w popycie (`popyt.podzial`) przyciąganie ×(1 +
-  przyciąganie) u objętych klientów w dniach z maski, 2 za 1 – podwójne porcje (składniki i czas kuchni); przychód
-  z rabatami, dopłaty do zestawu jako sprzedaż napojów (VAT napoju), napoje do zestawów w towarach; znużenie
-  (przyciąganie spada co rundę) i przywiązanie (karta rośnie); dane rynku: promocje na mieście; boty ze strategii
-  (`boty.yaml: promocje`, `min_obsluga_promocji` – bez wolnych mocy promocji nie włączają); zakładka **Promocje**
-  w Marketingu (Decyzje: rodzaje z liczbami, włącz/wyłącz, nazwa, danie, konkurencja; Wyniki: komiczne teksty,
-  liczby promocji, promocje na mieście); test `test_promocje.py`
-
-- [x] F3b.4 Licytacje i przejęcia lokali (gra z lokalami) – zamiast planowanych `oferty.py` i `koniec_najmu.py` jeden
-  moduł `silnik/nieruchomosci/przejecia.py`; zasady w `dane/mapa/lokale.yaml` (`licytacje_od_rundy` 4, `oferta_max` 3,
-  `przejecia_od_rundy` 4, `wypowiedzenie_rund` 4, `ulepszenia_zwrot` 0,5, `przywrocenie_koszt` 0,3). Licytacja:
-  ten sam lokal / budynek chce kilka drużyn → wygrywa najwyższa oferta względem ceny wywoławczej (pole oferty
-  w decyzji `lokal`), remis – losowanie (strumień `licytacje`), wcześniej zawsze losowanie (zamiast kolejności rundy);
-  decyzja `przejecie: {id, oferta}` – kupno budynku z ceną, który wynajmuje drużyna (KC art. 678: najemca płaci
-  czynsz nowemu właścicielowi – jego przychód z VAT), najemca kupujący swój lokal – wykup (własność, zwrot kaucji,
-  sprzęt wynajmującego jego); decyzja `wypowiedz: [{id, ulepszenia}]` – najem trwa jeszcze 4 rundy, potem
-  wyprowadzka: sprzedaż sprzętu najemcy, zwrot kaucji, pracownicy na wolne stanowiska w innych lokalach albo
-  zwolnienie z odprawą (do puli), nakłady najemcy (adaptacja, stanowiska – nowe pole `Lokal.naklady`) rozliczone
-  wg KC art. 676 (właściciel zatrzymuje i płaci 50% albo najemca płaci 30% za przywrócenie stanu), budynek staje się
-  lokalem właściciela; numery nowych stanowisk `Firma.nowy_nr` (bez kolizji po wyprowadzce); boty nie licytują,
-  po wypowiedzeniu szukają nowego lokalu; lista błędów (odrzucone decyzje, wypowiedzenie, nowy właściciel); dane
-  rynku: przetargi i właściciele; zakładka **Licytacje i przejęcia** w grupie Lokale (Decyzje: budynki na sprzedaż
-  z ofertą, własne budynki z wypowiedzeniem, najmy u innych; Wyniki: przejęcie, wyprowadzki, licytacje w mieście);
-  test `test_licytacje.py`
-
-- [x] F3b.5 Wypadki w lokalu i ubezpieczyciel (gra z lokalami) – `silnik/swiat/awarie.py`, dane `dane/zdarzenia/losowe.yaml`
-  (schemat `PlikWypadkow`): 10 historii w 2–3 scenach (8 komicznych – Gołąb Zenon, Pani Halina z drugiego piętra,
-  Najazd koziołków, Zalanie z góry, Śpiewająca frytkownica, hulajnoga, kot kierownik, ząb pana Ryszarda; 2 poważne
-  bez żartów – pożar kuchni, włamanie), rozgrywane jak eventy w parkach, ale tylko w jednej drużynie: od rundy 4
-  szansa 8% na rundę (strumień `wypadki`), naraz jeden otwarty, bez powtórek (`Firma.wypadki`); nowy skutek
-  `szkoda` (koszt w KPiR bez VAT, najwyżej 8000 zł, pole `polisa`). Ubezpieczyciel TUW „Pod Koziołkiem” (budynek
-  na mapie): polisy na lokal, sprzęt i OC (pokrycie, franszyza, składka miesięczna stała + za lokal + od majątku,
-  zwolniona z VAT), decyzja `polisy: [rodzaj]` (pełna lista, `Firma.polisy`: rodzaj → runda początku ochrony,
-  karencja 1 runda); odszkodowanie (szkoda − franszyza) × pokrycie jako przychód pozostały, gdy polisa chroniła
-  w rundzie początku wypadku; boty z polisami wg strategii (`boty.yaml` → `polisy`); wyniki rundy `ubezpieczenia`;
-  zakładka **Finanse → Ubezpieczenia** (Decyzje: kup/wypowiedz, składki; Wyniki: składki, szkody, odszkodowania,
-  historia szkód), zakładka Zdarzenia pokazuje wypadki i szkody; test `test_awarie.py`
-- [x] F3b.6 Urząd i sanepid (gra z lokalami) – `silnik/ksiegowosc/urzad.py`, dane `dane/zdarzenia/urzad.yaml` (schemat
-  `PlikUrzedu`): rejestracja w CEIDG (PKD 56.10.A, bezpłatna, tylko opis); odbiór lokalu przez sanepid w rundzie,
-  w której lokal ma zacząć działać – przy higienie bez odbioru odmowa i lokal rusza rundę później, do skutku
-  (`Firma.odbiory`, strumień `odbior`); decyzja `higiena: poziom` (`Firma.higiena`, trwa do zmiany): 4 poziomy
-  (brak / mop i grafik – domyślny / firma „Błysk-Pol” / Błysk-Pol + HACCP) z kosztem miesięcznym za działający lokal
-  (KPiR, VAT 23%) i wpływem na kontrolę sanepidu (dodatek do szansy, mnożnik części z problemów, dodatek do
-  mandatu); nowy skutek historii `kontrola` (skarga do sanepidu – `Efekt` „kontrola”, dodatek do szansy kontroli
-  przez kilka rund; dodany do historii Gołąb Zenon i Pani Halina); boty z higieną wg strategii; ratusz na mapie
-  otwiera zakładkę **Lokale → Urząd i sanepid** (Decyzje: rejestracja, lokale i odbiory, poziomy higieny, ryzyko
-  kontroli, skargi; Wyniki: koszt, odbiory, kontrola, historia kontroli), odmowa odbioru na liście błędów; test
-  `test_urzad.py`
-
-- [x] F3b.7 Kasyno (ukryte przed MG) i portfel właściciela (gra z lokalami) – `silnik/pieniadze/wlasciciel.py`
-  (`dane/zdarzenia/wlasciciel.yaml`, schemat `PlikWlasciciela`): prywatny portfel (`Firma.portfel_gr`, start
-  z oszczędności 2000 zł), decyzje `wyplata_wlasna` / `wplata_wlasna` poza KPiR (rodzaj „wlasciciel” na rachunku,
-  przycinane do gotówki firmy / portfela); kolejność: wypłata → klub → wpłata. `silnik/pieniadze/kasyno.py`
-  (`dane/zdarzenia/kasyno.yaml`, schemat `PlikKasyna`): klub „Pod Złotym Kaflem”, ul. Nocna 13 – bez budynku na
-  mapie i pozycji w menu; od rundy 4 szansa 8% na zaproszenie na następną rundę (najwyżej 2 w grze, boty nie
-  dostają, `Firma.zaproszenia`, strumień `kasyno`); decyzja `kasyno: [{gra, zaklad, stawka}]` – ruletka
-  (37 pól, kolory, parzyste, tuziny, zero) i automat „Jednoręki Zenek”, do 5 zakładów, 10–2000 zł, z portfela;
-  podgląd zdejmuje stawki bez wyniku. Mistrz gry nie widzi klubu ani portfela (`kas.ukryj` w `api/widoki.py`:
-  widok, warianty, podgląd, eksport; przegląd i CSV i tak bez nich), `LEVAS_KASYNO=0` wyłącza klub na serwerze.
-  Zakładki **Finanse → Portfel właściciela** i **Nocna 13** (ukryta poza rundą z zaproszeniem i rundą po niej;
-  Decyzje/Wyniki), komunikat z zaproszeniem na Dashboardzie; test `test_kasyno.py`
-
-- [x] F3b.8 Handel między drużynami (gra z lokalami) – `silnik/rynek/handel.py` (`dane/zdarzenia/handel.yaml`, schemat
-  `PlikHandlu`): od rundy 5 decyzja `handel_oferty` – sprzedaż innej drużynie (nie botowi) towaru z magazynu albo
-  sprzętu ze stanowiska (nie z najmu lokalu, nie w leasingu), cena brutto za całość w widełkach 50–200% wartości
-  (koszt zakupu / cena katalogowa), najwyżej 5 ofert; oferta sprawdzana po tygodniu sprzedaży (`Firma.oferty_handlu`),
-  adresat przyjmuje ją w następnej rundzie (`handel_przyjmij`, nr stanowiska na sprzęt) – transakcja na początku
-  przeliczenia, przed zakupami, jeśli sprzedawca ma towar, a kupujący pieniądze. Faktury w KPiR obu stron (towar:
-  przychód kol. 7 z VAT należnym / zakup towarów kol. 10; sprzęt: jak sprzedaż i zakup sprzętu), partie przechodzą
-  z terminem przydatności; komiczny tekst przekazania (strumień `handel`); w biurze sprzedaż towaru to faktura
-  sprzedaży. Podgląd liczy przyjęcie na kopii stanu. Zakładka **Handel z drużynami** (Decyzje/Wyniki); test
-  `test_handel.py`
-
-- [x] F3b.9 Kalendarz miejski (gra z lokalami) – `silnik/rynek/kalendarz.py` (`dane/kalendarz/kalendarz.yaml`, schemat
-  `PlikKalendarza`; kalendarz przeniesiony z `mapa/popyt.yaml`): 23 wydarzenia na 26 tygodni od 5.10 – święta
-  (Wszystkich Świętych, 11 listopada, Boże Narodzenie, Nowy Rok, Trzech Króli, Tłusty czwartek, Wielkanoc), uczelnie
-  (otrzęsiny, Andrzejki, przerwy, sesja zimowa), ferie, okazje handlowe (Black Friday, Walentynki, Dzień Kobiet)
-  i wydarzenia w mieście (Konfrontacje Teatralne, Halloween, jarmark, Mikołajki, Sylwester, pierwszy dzień wiosny),
-  każde z komiczną historią. Daty stałe 'MM-DD' albo ruchome (`wzgledem`: Wielkanoc, Black Friday, ferie – daty na
-  każdy rok, sprawdzane na lata gry); mnożniki dziennej puli stref (`popyt.wagi_dni`), zmiana tygodniowej puli stref
-  (`kalendarz.tydzien`). Zakładka **Kalendarz miejski** w grupie Klienci i strefy (Decyzje: bieżący tydzień,
-  następne 4 i przegląd wszystkich tygodni; Wyniki: miniony tydzień i klienci stref); test `test_kalendarz.py`
-
-## F4 – dopasowanie starych funkcji (bez giełdy)
-- [x] F4.1 Karta wyników dla kebabu – `silnik/wyniki/karta.py` (`kebab`, `miary_kebabu`, `cena_wzgledem_strefy`; parametry
-  `zalozenia.yaml → karta_wynikow.kebab`). W grze z lokalami 5 wskaźników Revasa dostaje składniki kebabowe z wyników
-  tygodnia: zadowolenie klientów – cena względem ceny preferowanej strefy lokalu (zamiast średniej rynku), kolejki
-  (klienci utraceni z braku rąk lub sprzętu), dania wyłączone z braku składnika, mandat sanepidu, wypadki w lokalu;
-  zadowolenie pracowników – przepracowanie (wykorzystanie czasu ponad próg); rozwój – kolejne lokale; zadłużenie –
-  dług u Harpagona z wagą 1,5. Iloczyn liczony od nowa (0 przy stracie), karta skumulowana = średnia kart (od rundy 4),
-  zadowolenie klientów nadal wpływa na popyt następnej rundy. Wyniki rundy: `karta_kebab` (miary i poprawki);
-  zakładka **Karta wyników** – tabela „Skąd Twoja karta – sprawy kebabowe” i dzielnik wyniku ekonomicznego z danych
-  (4 615 zł tygodniowo zamiast „20 000”). Kodu `ocena.py` starego Levasa nie ma na dysku – wzory z notatki
-  „Ustalenia gry”; test `test_karta.py`
-
-- [x] F4.2 Lista błędów dla nowych decyzji – `silnik/kuchnia/menu.py` (`bledy`, `koszt_porcji`): danie bez sprzętu, brak
-  kucharza (konkretne powody zamiast ogólnego „brak stanowiska”), cena poniżej kosztu składników (czerwone) i składniki
-  ponad 50% ceny (pomarańczowe); `silnik/kuchnia/swiezosc.py` (`przeterminowanie`): partie, które przy prognozie popytu
-  przeterminują się w tygodniu (FIFO, wagi dni strefy, próg 20 zł); zamówienia u dostawców ponad saldo konta. Progi
-  w `zalozenia.yaml → lista_bledow`. Brak czasu właściciela, limity, chłodnia – były już wcześniej (F3a/F3b).
-  Przycisk „Popraw” prowadzi też do nowych zakładek (Magazyn i świeżość, Zatrudnienie, Zdarzenia…); test
-  `test_lista_bledow.py`
-
-- [x] F4.3 Odblokowywanie zakładek – `silnik/harmonogram.py`: elementy harmonogramu (zakładki z
-  `katalog.yaml → rundy.harmonogram_lokali` i elementy mapy z własnym `od_rundy`: kanały rekrutacji, późniejsi
-  dostawcy, licytacje, przejęcia, promocje, kanały agencji, eventy w parkach, wypadki, handel); gra z lokalami liczy
-  się na widoku danych z tygodniami mistrza gry (`konfiguracja.odblokowanie`, tylko zmiany), wspólne dane się nie
-  zmieniają; `Gra.ustaw_odblokowanie` (tylko przyszłe elementy, nie wcześniej niż bieżący tydzień, `liczba_rund + 1`
-  = wyłączone); API: opcja `odblokowanie` przy zakładaniu gry i `POST prowadzenie {"odblokowanie": …}`; panel MG:
-  okno „Harmonogram odblokowań”; strona drużyny: „od rundy N” z harmonogramu gry; test `test_harmonogram.py`
-- [x] F4.4 Boty – poziomy (`dane/boty.yaml → poziomy`, schemat `PoziomBota`, `boty.poziom`): łatwy – proste
-  reguły (kuchnia na danie, zamówienia na cały popyt, błąd prognozy, losowy kandydat, bez kampanii i promocji);
-  średni – planer przepustowości (`_plan_firmy`/`_plan_lokalu`: kucharze każdego zawodu, sztuki sprzętu i kasjerzy
-  na popyt dzień po dniu, kolejna osoba tylko, gdy dodatkowa sprzedaż × marża pokrywa jej koszt; zamówienia
-  i udziały dni z planu; lokal z co najmniej `min_kuchnia` miejscami); trudny – korekta prognozy o wynik
-  poprzedniej rundy, wybór ceny o największej oczekiwanej marży, kampanie tylko przy nadążającej obsłudze,
-  drugi lokal (`kolejny_lokal`); narzędzie `gra/balans_botow.py`; test `test_boty.py`. Bez przejęć i licytacji
-  przez boty (pytanie 25)
-- [x] F4.5 „Co jeśli” – `silnik/co_jesli.py`: podgląd bieżącej rundy na kopii stanu dla kilku wariantów decyzji;
-  boty decydują jak zwykle, inne drużyny powtarzają decyzje z poprzedniej rundy (`POWTARZANE`: ceny, prognoza,
-  zamówienia, kampanie, reklama, promocje, polisy, higiena – bez jednorazowych), więc podgląd nie zdradza
-  roboczych decyzji rywali; API `podglad` korzysta z modułu; zakładka Analiza: opis założenia i wiersz „Towar
-  przeterminowany”; test `test_co_jesli.py` (m.in. podgląd = wynik, gdy rywal naprawdę powtarza decyzje)
-- [x] F4.6 Sprzątanie – usunięty tryb „gra bez lokali” (Revas): jedyny tryb to gra z mapą miasta (`Gra.nowa`
-  wymaga danych z mapą, stare zapisy bez lokali – czytelny błąd; tryb do odzyskania z commita `9930e14`);
-  usunięte `silnik/rynek.py` (popyt i reklama Revasa), `oczekiwany_popyt`, reklama tradycyjna/internetowa,
-  zwroty do dostawców (silnik i zakładka Dostawcy), startowe stanowiska; wspólne mnożniki jakości w
-  `silnik/kuchnia/jakosc.py`; nazwy po fitnessie: `godziny_kasy`, `pensje_rynkowe_kasy`, `liczba_kasjerow`;
-  `gra/balans_botow.py` → `gra/balans/symuluj.py` (`python -X utf8 -m balans.symuluj`); testy Revasa
-  przeniesione na dane Levasa albo usunięte (pytanie 27)
-- [x] F4.7 Zakładki – menu jak w Revasie dla nowych funkcji: Lokale (lokale, przejęcia, urząd), Menu (dawna
-  Oferta), Dostawcy ▸ Dostawcy / Magazyn i świeżość, HR, Marketing ▸ Agencje / Promocje (usunięte martwe zakładki
-  reklamy tradycyjnej i internetowej Revasa), Finanse ▸ Raport / KPiR / **VAT** (nowa: rejestr, stawki,
-  deklaracja) / Podatki (PIT i ZUS) / Bank / Harpagon / Biuro / Ubezpieczenia / Właściciel, Parki (eventy,
-  zdarzenia, wypadki), Handel; nowe wyniki w Inwestycje ▸ Stanowiska (liczba, miejsca w lokalach, obłożenie,
-  stanowiska konkurencji – `rynek.stanowiska`) i HR ▸ Szkolenia (`wyniki.szkolenia`, efekt w karcie);
-  z panelu MG usunięty wybór „bez lokali”; wszystkie zakładki sprawdzone w node na widoku prawdziwej gry
-  (pytanie 28); dosprzątanie po F4.6: z danych Levasa usunięte nieużywane parametry Revasa (`podatek_cit`,
-  `utrzymanie_klubu`, `koszt_magazynowania`, `koszt_zwrotu`), na pulpicie „PIT liniowy” zamiast CIT
-
-Plan kroków 1–4 (bez giełdy) zrealizowany.
-
-## Poprawki 27.10 (odpowiedzi w archiwum/PRACA_NOCNA.md i na czacie)
-
-Kolejność: P1 → P2 → … Po każdym: testy, ruff, `sprawdz`, migracje, POSTEP + PRACA_NOCNA, commit i push.
-
-- [x] P1 Tworzenie gier – `graj` nie startuje drugiego serwera na zajętym porcie (dwa serwery na 8765, stary
-  z nieaktualnym kodem)
-- [x] P2 Domyślne ustawienia: start pon. 1.09.2025, 18 pełnych rund (do 4.01.2026), kapitał 40 000 zł, kredyt
-  „na bieżąco”, przycisk „Zamów brakujące” w Dostawcach domyślnie wyłączony – opcja MG (nowa gra i trwająca gra);
-  wrzesień – wprowadzenie (studenci wracają w październiku)
-- [x] P3 Tutorial dla graczy: strona „Jak grać” w panelu + `INSTRUKCJA.md` + PDF
-- [x] P4 Instrukcja logowania kontem Microsoft (`gra/LOGOWANIE_MICROSOFT.md`) – pytanie 3
-- [x] P5 Właściciel jako pracownik 1★ (ręcznie, godziny z puli 20 h, bez pensji) – pytanie 4
-- [x] P6 Jedno wypowiedzenie: 2 rundy dla wszystkich – pytanie 5
-- [x] P7 Krótkie opisy dydaktyczne w zakładkach finansów (VAT, KPiR, PIT, ZUS, bank…) – pytanie 8
-- [x] P8 Lokal „co 3 rundy”: komunikat, że właściciel musi odpocząć – pytanie 11
-- [x] P9 Parki: co rundę kilka eventów (te same dla wszystkich, każdy może wziąć każdy, ta sama nagroda), każdy
-  kosztuje czas właściciela – wszystkie naraz nie zmieszczą się w 20 h – pytanie 12
-- [x] P10 Reklama: suma kampanii daje kebabowi ok. +10% … +30% popytu – pytanie 14
-- [x] P11 Wypadki: +4 pp. szansy za każdą rundę bez wypadku (reset po wypadku) – pytanie 17
-- [x] P12 Kasyno: wypłata z konta kebaba w panelu klubu + ironiczna „zasada milczenia” – pytanie 19
-- [x] P13 Handel: negocjacje na żywo w rundzie (oferta → kontroferta, maks. 3) – pytanie 20
-- [x] P14 Kalendarz wrzesień–grudzień: mecze (Motor Lublin), wpływ wydarzeń na konkretne dania, sezonowość
-  tygodniowa dopasowana do wydarzeń – pytania 21 i 27
-- [x] P15 Harmonogram: tydzień 1 przygotowawczy, MG nie przesuwa zakładek tygodnia 1 – pytanie 24
-- [x] P16 Konkurencja: ogólny obraz rywali dla wszystkich (Decyzje/Wyniki), dokładne dane – detektyw z mapy
-  (300–800 zł + 2 h, 15% wpadki) – pytanie 26
-- [x] P17 Sprzątanie: usunąć zbędne pozostałości Revasa (`dane_revas/`, martwy kod) – pytanie 27
-- [x] P18 Nowe historyjki (parki, zdarzenia) – do 15:00, po wszystkim innym – pytanie 12
-- [x] P19 (jeśli czas) bot „niemożliwy”; inaczej wpis w rzeczach na przyszłość – pytanie 25
-- [x] P20 (jeśli czas) przegląd starego Levasa (`Tom-Wasko/Levas-stary`, branch `kod`) – lista różnic – pytanie 1
-
-## Poprawki 28.10 (uwagi z testu gry, odpowiedzi na czacie)
-
-Kolejność: Q1 → Q2 → … Po każdym: testy, ruff, `sprawdz`, POSTEP, commit i push.
-
-- [x] Q1 Szybkie zmiany decyzji gubią się (np. stawka VAT w KPiR „czasem się nie wybiera”) – wyścig zapisów
-- [x] Q2 HR: większe okno składania oferty
-- [x] Q3 Dostawcy: lista zamówień rundy z usuwaniem pozycji
-- [x] Q4 Dostawcy: „Zamów brakujące” rozkłada dostawy na dni także bez prognozy dziennej (nie wszystko na 1 dzień)
-- [x] Q5 Lokale: komunikat, jak wyposażyć działkę i lokal niewyposażony; stanowiska, sprzęt i zatrudnienie już
-  w ostatniej rundzie budowy/urządzania – lokal rusza gotowy do sprzedaży
-- [x] Q6 Lokale niewyposażone tańsze (czynsz, cena, adaptacja)
-- [x] Q7 Licytacja lokali od rundy 1 (wyższa oferta wygrywa, przegrany dostaje wyjaśnienie)
-- [x] Q8 Kredyt inwestycyjny bez 4 rund historii – od wzięcia lokalu, także na zakup lokalu w tej samej rundzie
-  (kupowany lokal jako zastaw)
-- [x] Q9 Ceny dań: od 50% do 200% ceny rynkowej (procenty w YAML)
-- [x] Q10 Popyt liczony samodzielnie: bez gotowej prognozy w Menu i w Klientach i strefach
-- [x] Q11 Runda 1: nazwa firmy, wgrane logo, kolor, slogan; mapa pokazuje, kto ma który lokal
-- [x] Q12 Samouczek KPiR (kroki) przy samodzielnej księgowości
-- [x] Q13 Zakładka „Wnioski z rundy” – co nie wyszło i co zrobić, żeby się udało (zachęcająco)
-
-## Krok 5 – kalibracja, część pierwsza: B1–B5 (Plan optymalizacji, część B; instrukcja: `zadania/B_kalibracja.md`)
-
-Po każdym: testy, ruff, `sprawdz`, wpis w `raporty/kalibracja/dziennik.md`, POSTEP, commit, `git pull --rebase` i push.
-Kolejność (zmiana z 29.10.2026): B1, B2, Z1–Z7, B3 (część do pomiaru), B4, B5 (**zatwierdza autor**), potem część A,
-**STOP** (autor wybiera pozycje U), U, K, B6–B12 (każdy z dokończeniem B3 dla obszaru), B13, B14, B15.
-
-- [x] B1 Inwentarz decyzji, opcji, parametrów i zamierzonych kompromisów + hipotezy „za dobrych” strategii (`raporty/kalibracja/inwentarz.md`); uzupełnić docstring `silnik/decyzje.py` o harpagon, kasyno, detektyw, leasing, przejecie, higiena, wlasciciel_stanowisko, wypowiedz — zrobione 29.10.2026: inwentarz wszystkich decyzji z kompromisami (obszary B6–B12), 17 hipotez (H1–H17) z 9 gier botów i kodu, docstring uzupełniony, dziennik z pytaniem P1 (ZUS przy zleceniu).
-- [x] B2 Testy mechanik na zamrożonej kopii danych (`testy/dane_zamrozone/`); profilowanie silnika; wymuszanie decyzji bota; narzędzie porównań par gier `balans/warianty.py` (konteksty, 4/6/8 firm, wiele ziaren, równolegle, CSV + md, wznawianie pełnego pomiaru) z testami; szybki pomiar „punkt zero” na dzisiejszych zasadach — zrobione 29.10.2026: zamrożone dane testów mechanik (znacznik `dane_gry` dla testów zasad), `balans/odcisk.py`, `balans/warianty.py` z 28 wariantami i testami, profil (40% czasu w `linprog`), punkt zero 522 gier w 9,7 min (dominują zlecenie, mBank, e-Księgi24 i pełne polisy; dziennik).
-
-### Zmiany zasad (ustalone z autorem 29.10.2026, przed pomiarem startowym)
-
-- [x] Z1 Karta wyników: strata daje ujemny wynik działalności (proporcjonalnie; lepsze wskaźniki nie pogłębiają minusa); budynek w majątku; majątek po amortyzacji; zakup sprzętu nie pompuje rozwoju; odsetki Harpagona obniżają kartę — zrobione 29.10.2026: strata = waga × wynik ekonomiczny (`karta_wynikow → strata`), majątek do karty po amortyzacji z lokalami, budynkami i gruntem, inwestycje tylko ponad dawny szczyt majątku, odsetki Harpagona w karcie; testy, instrukcja, propozycja do notatki w `raporty/kalibracja/notatki_do_zmiany.md`.
-- [x] Z2 Majątek netto w wynikach firmy, panelu mistrza gry i eksporcie CSV (lokal po amortyzacji, lokaty i kaucje, wpłata inwestora jako dług) — zrobione 29.10.2026: `silnik/wyniki/majatek.py` (składniki w `wyniki[r][firma]["majatek_netto"]`), kolumna i wykres w panelu mistrza gry, kolumna w obu CSV; portfel właściciela tylko w pomiarach (ukryty klub).
-- [x] Z3 Debet ponad limit: blokada inwestycji i kredytów, alarm u mistrza gry, inwestor ratunkowy (gotówka za udział w przyszłych dochodach, wpłata liczona jak dług); bez odsetek karnych i zajęcia majątku — zrobione 29.10.2026: `silnik/pieniadze/inwestor.py` (alarm `w["alarm"]`, blokada w następnej rundzie, inwestor od mistrza gry przez `Gra.ustaw_inwestora` i panel, udział 30% dochodu przez 8 rund, niezwrócona wpłata jako dług); warunki w `finanse.inwestor_ratunkowy`, odsetki karne banku zostają.
-- [x] Z4 Liczba lokali na mapie zależna od liczby firm (4–8), popyt bez zmian — zrobione 29.10.2026: klucz `od_firm` w `dane/mapa/lokale.yaml` (8 firm – 38 lokali, 6–7 – 29, 4–5 – 20, wszystkie strefy), filtr `lokale.na_mapie` w ofercie, decyzjach, botach i mapie.
-- [x] Z5 Bot „jak człowiek” (prognoza z zeszłotygodniowej sprzedaży zamiast `pp.prognoza`), wersje słaba / średnia / dobra — zrobione 29.10.2026: poziomy `czlowiek_slaby/sredni/dobry` (tylko do pomiarów) prognozują z popytu w raportach i potencjału z zakładki Klienci (`boty._prognoza_czlowieka`), `warianty.py --rywale`; dobra > średnia w 8/8 par.
-- [x] Z6 Kalendarz miejski i święta do kwietnia 2026 (`dane/kalendarz/kalendarz.yaml`) — zrobione 29.10.2026: 6 domowych meczów Motoru wiosną 2026 (prawdziwy terminarz), Finał WOŚP, Popielec, semestr letni, Jarmark Wielkanocny, Wielki Piątek – 01–04.2026 ma 23 wydarzenia, tyle co jesień.
-- [x] Z7 Miejsce na pulpicie drużyny liczone jak ranking mistrza gry (karta skumulowana, `api/prezentacja.py`) — zrobione 29.10.2026: wspólna funkcja `miejsca` dla pulpitu i rankingu mistrza gry (średnia karta z rund 2…N); pytanie do autora o widok drużyny po końcu gry – w dzienniku.
-
-### Pomiar i kalibracja
-
-- [x] B3 Boty potrafią użyć każdej opcji (kupno, niewyposażony, działka, banki, dostawcy, biuro…) z zachowaniem charakteru; przed B4 – część do pomiaru i poziomy łatwy < średni < trudny — zrobione 29.10.2026 (część przed B4): poprawiona korekta prognozy trudnego, średni z prognozą ±10%, trudny otwiera drugi lokal, gdy stać – średni < trudny w 37/40 par (było 19/40), przy każdej strategii; reszta B3 to krok 0 obszarów B6–B12
-- [x] B4 Pomiar startowy: dominacje, hipotezy z B1, krzywa trudności, strategie, 4/6/8 firm, realia (`raporty/kalibracja/stan_poczatkowy.md`); tag `kalibracja-start` — zrobione 29.10.2026: 7090 gier; gra za łatwa (pierwszy plus człowieka średniego w rundzie 2 w 62% gier), dominują umowa zlecenie, drugi lokal, mBank i e-Księgi24, przy 4 firmach gra wyraźnie łatwiejsza (pytanie do autora w dzienniku)
-- [x] B5 Gospodarka i trudność (popyt, koszty poza prawem, kapitał; pierwszy plus bota „jak człowiek” średniego w rundzie 4–6) – **do zatwierdzenia przez autora; część A czeka na zatwierdzenie**
-  - Zrobione i zatwierdzone przez autora 29.10.2026: nowa mechanika rozruchu nowego lokalu (40% popytu w 1. tygodniu, +10 p.p. co tydzień), pule stref ×0,9 i zakupy botów w budżecie – pierwszy plus średniego w rundach 4–6 w 65/100 gier (było 19/100), słaby bez alarmu poza strategią agresywną (dziennik B5).
-  - Dopisek H17 (29.10.2026, wybór autora „poprawić bota agresywnego”): słaby „jak człowiek” zamawia najwyżej zeszłotygodniową sprzedaż × 1,1 dania, które traciło klientów w kolejce – alarmy słabego agresywnego 8/100 → 0/100, psucie towaru 27% → 7% przychodu, słaba < średnia w 85/100 par (dziennik H17).
-
-## Przebudowa zakładek i decyzje per lokal (polecenia autora 2.11.2026; ustalenia: `raporty/przebudowa_zakladek.md`)
-
-- [x] Z1 Interfejs bez zmian silnika: usunięty pasek podsumowania (saldo/koszty/braki/status; „Zapisał(a)” przeniesione do paska stanu); zakładka Analiza usunięta całkiem (zakładka, API `warianty`/`podglad`, `silnik/co_jesli.py`, testy, pole bazy `Runda.warianty` – migracja 0006); motywy: Klasyczny, Klasyczny – menu z boku (`motywy/bok.css`), Grafik zmian (talerze i noc usunięte); kółka „i” z dymkiem (`zakladki/dymki.js`: opis zakładki przy tytule, długie podpowiedzi zwijane do kółka przy nagłówku); kalendarz: tabela tygodnia dzień po dniu (`kalendarz.tydzien` → `dni`) i siatka miesiąca z rundami, wydarzeniami w dymkach i strzałkami; menu w nowym układzie (sekcje Twoje lokale / Miasto / Firma – na razie z dotychczasowymi zakładkami)
-- [x] Z2 Silnik per lokal: menu i ceny, zamówienia i partie, ludzie i sprzęt; przewóz towaru; boty; testy; format decyzji — zrobione 3.11.2026: `silnik/nieruchomosci/per_lokal.py` (pola lokalu `menu`, `ceny`, `wyposazenie`, `udogodnienia`, `Partia.lokal`; widok lokalu z własnym magazynem i chłodnią, `scal`, stary zapis – `utrwal`, firma = suma lokali – `synchronizuj`); decyzje `w_lokalu: {lokal: {oferta, sprzedaz, udogodnienia_kup, …}}`, `zamowienia[].lokal`, `przewozy: [{z, do, zasob, jakosc, ilosc, dzien}]` (kurs = czas właściciela + 30 zł, termin −1 dzień, `zalozenia magazyn.przewoz`); popyt i przychód po cenach lokali; lista błędów z nazwą lokalu; boty dzielą zamówienia między lokale; przejęcie budynku sprzedaje wyposażenie lokalu; testy `testy/nieruchomosci/test_per_lokal.py`.
-- [x] Z3 Zakładka Lokale z podzakładkami (Przegląd, Menu i ceny, Dostawy i magazyn, Ludzie, Sprzęt); kupno i najem lokali w Inwestycjach — zrobione 3.11.2026: kafelki lokali na górze (`zakladki/lokal_wybor.js` – wybrany lokal zostaje przy zmianie podzakładek); podzakładki złożone z dawnych zakładek jako części z kotwicą `#czesc-<klucz>` (`zakladki/lokal.js: zlozona`, dawne klucze prowadzą tam przez `ALIAS` w `index.js`); przy kilku lokalach menu, ceny, stanowiska, wyposażenie i udogodnienia idą do `w_lokalu`, zamówienia dostają `lokal`, magazyn i świeżość – lokalu, formularz przewozów (`przewozy`); Przegląd: porównanie lokali, liczby lokalu z poprzedniej rundy (`klienci.lokale[].przychod/skladniki` z silnika), braki z listy błędów, umowa, sanepid; najem i kupno – Inwestycje → Lokale.
-- [x] Z4 Auto-dostawca i Auchan — zrobione 3.11.2026: Auchan – hipermarket na mapie (Zygmuntowskie), dla wszystkich, cały asortyment, ceny = średnia pozostałych dostawców + 12% (`dostawcy.hipermarkety`, `ceny_z_rynku`), odbiór osobisty; boty go pomijają. `silnik/kuchnia/auto_dostawca.py`: decyzja `auto_dostawy: {pozycje: [{zasob, jakosc, ilosc}]}` (lokal główny / `w_lokalu`) – cały lokal na auto-dostawach, własne zamówienia do niego odrzucane; zakup od razu po cenie Auchan + prowizja 10% + abonament 120 zł/tydz.; partie `u_dostawcy` nie zajmują chłodni i nie psują się w tygodniu zakupu, reszta zostaje u dostawcy z terminem od końca tygodnia i kosztuje 0,15 zł/l/dzień (`zalozenia magazyn.auto_dostawca`); przeterminowane u dostawcy – strata bez sanepidu. Panel: Dostawy i magazyn – przełącznik lokalu, tabela zakupów z „Wpisz wg prognozy”, wyniki (zakupy, przechowanie, co zostaje); testy `testy/kuchnia/test_auto_dostawca.py`.
-- [x] Z5 Reklama z emisjami i progami zniżek — zrobione 3.11.2026: kampania = agencja × kanał × strefa × liczba emisji w rundzie (mechanizm reklamy tradycyjnej z gry ATH, za zgodą autora). `dane/mapa/reklama.yaml`: każdy kanał ma jednostkę emisji, `cena_emisji` (× pula strefy), progi `znizki` [od emisji, rabat] na wszystkie emisje i `maks_emisji`; efekt × (1 − e^(−0,265 · emisje)) (`model.tempo_emisji`, ok. 10 emisji > 90%); „trwa N rund” i osłabienie powtórek usunięte – kampania działa w rundzie emisji, potem wygasa jak dotąd; stare zapisy (bez emisji) – pełny efekt. Boty: `emisje_kampanii` 6, `przerwa_kampanii` 1 runda. Panel Agencje: pole emisji na kafelku kanału z kosztem po rabacie i siłą kampanii; testy `testy/rynek/test_reklama.py`.
-- [x] Z6 Infografiki w dymkach, instrukcja gracza (`gra/INSTRUKCJA.md`, PDF), opisy w `notebooklm\` — zrobione 3.11.2026: `panel_gracza/static/zakladki/infografiki.js` – 6 rysunków SVG w dymkach kółek „i” (świeżość/FIFO, wybór lokalu przez klientów, nasycenie reklamy i progi rabatów – z danych kanału, VAT, PIT i ZUS, auto-dostawca); INSTRUKCJA.md – nowe menu z grupami, decyzje per lokal, przewóz towaru, Auchan i auto-dostawca, reklama z emisjami, kółka „i”; PDF odświeżony (`manage.py instrukcja_pdf`); `Pulpit\Levas\notebooklm\` odtworzony z `kosz\notebooklm` i zaktualizowany (stan 3.11.2026).
-- [x] Stały link do gry hostowanej na komputerze (polecenie autora 3.11.2026) — `staly_link.bat` zapisuje w `lokalne.json` dane FTP zwykłego hostingu (np. subdomena na LH.pl bez Pythona); `hostuj.bat` wgrywa tam przez FTP z TLS przekierowanie (`.htaccess` + `index.html`) na bieżący tunel Cloudflare, a po Ctrl+C stronę „gra wyłączona”; testy `test_staly_link.py`.
-
-## Krok 6 – analiza oczami gracza (Plan optymalizacji, część A; instrukcja: `zadania/A_analiza_gracza.md`)
-
-Fable 5.1 w OpenCode, po zatwierdzeniu B5; gra na wersji po zmianach zasad Z i gospodarce z B5. Polecenia: `zadania/README.md`.
-
-Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełniona o rozruch lokalu, pule, boty „jak człowiek” do wyboru, podsumowanie po końcu gry i P1 (zlecenie – w B9); próbne gry 18 rund (4 i 6 firm, drużyna z decyzjami i bez, API i widoki wszystkich rund) bez błędów.
-
-- [x] A1 Przygotowanie: notatki, instrukcja gracza, zakładki JS i widok `v`, uruchomienie gry — zrobione 3.11.2026 (Claude Code zamiast Fable, gałąź `analiza-a`): `raporty/analiza/A1_przygotowanie.md`; osobny serwer analizy (port 8766, baza `raporty/analiza/analiza.sqlite3`), gracz przez API i zrzuty Chrome bez okna – `raporty/analiza/skrypty/gracz.py`.
-- [x] A2 Trzy pełne gry (nowicjusz, optymalizator, nauczyciel z drużynami o zaplanowanych błędach) z dziennikami w `raporty/analiza/` — zrobione 3.11.2026: `dziennik_nowicjusz.md` (18 rund przez API, 4. miejsce, −0,297), `dziennik_optymalizator.md` (18 wariantów × 3 ziarna, `skrypty/eksperymenty.py`), `dziennik_nauczyciel.md` (4 drużyny + 2 boty: konta, pauza, przelicz mimo braków, alarm i inwestor, zmiana poziomu bota, cofnięcie, CSV); logi JSON i zrzuty w `raporty/analiza/`.
-- [x] A3 Raport `raporty/analiza_gracza.md` – problemy, zmiany, nowe funkcje, „za dobre” strategie, pytania — zrobione 3.11.2026: 22 pozycje (8 problemów, 7 zmian, 7 nowych funkcji), 8 hipotez „za dobrych” strategii dla B, 6 pytań do autora
-- [x] **STOP:** autor czyta raport z A i wybiera pozycje U — 3.11.2026: wybrane wszystkie pozycje poza [18]; odpowiedzi na pytania 1–6 w `raporty/analiza_gracza.md` (sekcja 8); U robione na gałęzi `analiza-a`
-
-## Ulepszenia z analizy (zatwierdzone przez autora – dopisywane po A3 jako U1, U2…)
-
-- [x] U1 [1] Ostrzeżenie przed zakupem sprzętu/wyposażenia: „ten zakup obniży kartę tej rundy o ok. X” (decyzja autora: tylko ostrzeżenie, liczby karty bez zmian) – zrobione: `zastosuj` liczy zakupy poniżej progu amortyzacji wpisane w koszty (`inwestycje_w_koszty`), a Lista błędów (Lokale ▸ Sprzęt) pokazuje pomarańczowe ostrzeżenie z kwotą bez VAT i spadkiem karty (koszt ÷ dzielnik wyniku ekonomicznego); wzmianka w INSTRUKCJA rozdz. 3.
-- [x] U2 [2] Alarm debetu ponad limit widoczny dla ucznia: pasek na Dashboardzie + pierwsza pozycja na Liście błędów – zrobione: `inw.alarm` daje czerwoną pozycję „ALARM: debet ponad limit…” na początku listy błędów (podgląd szkicu i wyniki rundy; podgląd stosuje też wpłatę inwestora i blokadę jak przeliczenie), a Dashboard pokazuje ją jako czerwony pasek z przyciskiem do Banku.
-- [x] U3 [3] Błąd: komunikat „kanapa” po pierwszym lokalu (`silnik/decyzje.py:595`) – tylko przy próbie wzięcia kolejnego lokalu – zrobione: komunikat o odpoczynku właściciela nie trafia już na Listę błędów po wzięciu lokalu; zostaje w Inwestycje ▸ Lokale i jako błąd zapisu przy próbie wzięcia kolejnego lokalu za wcześnie (test_limity).
-- [x] U4 [4] Stare nazwy zakładek w tekstach silnika („Kadry”, „Inwestycje” w `lokale.py:233`) + test nazw zakładek – zrobione: teksty silnika i danych wskazują istniejące zakładki (Lokale ▸ Sprzęt/Ludzie/Menu i ceny, Inwestycje ▸ Lokale, Parki i zdarzenia, Rynek ▸ Klienci…), INSTRUKCJA używa „Inwestycje ▸ Lokale”, a test_nazwy_zakladek porównuje nazwy z tekstów (zakładce X, A ▸ B, stare „(Kadry)”) z tytułami z panelu.
-- [x] U5 [5] Lista błędów: grupy Do zrobienia / Uwaga / Dla informacji, łączenie pozycji jednej sprawy, licznik tylko czerwonych – zrobione: grupy Do zrobienia / Uwaga / Dla informacji (zwinięte) w ogolne.js; silnik scala dania bez sprzętu i bez kucharza w lokalu w jedną pozycję (od lista_bledow.scal_dania_od dań) i przeterminowanie w jedną linijkę z kwotą łącznie (próg na sumie); w rundzie 1 jeden komunikat o daniach spoza startowych; znaczek w menu liczył już tylko czerwone.
-- [x] U6 [6] Mandat za brak deklaracji: co zrobić zamiast (KPiR albo biuro od ok. 160 zł/tydz.), porównanie w zakładce Biuro – zrobione: komunikat o mandacie mówi, gdzie zaksięgować i złożyć deklaracje, i podaje najtańsze biuro z kwotą za rundę (biuro.najnizsza_oplata); karta „Samodzielnie” pokazuje „Bez deklaracji – mandat co rundę” obok opłaty najtańszego biura; INSTRUKCJA krok 2.
-- [x] U7 [7] Ukryty dochód przy samodzielnej księgowości: napis „dochód poznasz po złożeniu deklaracji” zamiast pustego pola – zrobione: kafel Dochód netto na Dashboardzie przy ukrytym wyniku mówi „poznasz po złożeniu deklaracji albo wybierz biuro” z przyciskiem do Księgowość ▸ Biuro rachunkowe; komunikat UKRYTE z linkiem i poprawną ścieżką; test_nazwy_zakladek sprawdza też ścieżki w panelu (poprawione stare nazwy w 5 plikach JS).
-- [x] U8 [8] Zdarzenie: opcja bez wystarczającego czasu właściciela oznaczona i ostrzeżona przed wysłaniem – zrobione: podgląd zapisuje wolne godziny przed każdą sceną; w Parkach opcja bez czasu jest wyszarzona z „wymaga X h, masz wolne Y h”, a czerwony komunikat przed wysłaniem mówi, co zrobić (po rundzie – jak dotąd „gra wybrała…”).
-- [x] U9 [9] Dashboard: wyjaśnienie rozruchu i straty w pierwszym tygodniu sprzedaży lokalu – zrobione: Dashboard ma ramkę „Rozruch nowego lokalu” (start i przyrost z popyt.yaml, odsetek klientów każdego lokalu w poprzednim i bieżącym tygodniu; w rundzie startowej – ogólnie); znika, gdy lokale mają pełny popyt.
-- [x] U10 [10] Skala (kolor + słowo) przy wskaźnikach karty wyników – zrobione: progi karta_wynikow.skala w zalozenia.yaml (kwartyle kart botów); Karta wyników ma kafle Twoich wskaźników z oceną niski/średni/dobry, kolorem i „co go podnosi”, a liczby w rankingu są barwione tak samo.
-- [x] U11 [11] Inwestor widoczny dla ucznia po wpłacie (30% zysku, ile rund zostało, ile wziął) – zrobione: v.inwestor w widoku drużyny; ramka „Inwestor ratunkowy” (wpłata, udział, ile rund zostało, ile wziął, niezwrócony dług) w Finanse ▸ Bank, a na Dashboardzie do końca umowy.
-- [x] U12 [12] Panel mistrza gry, Decyzje: kolumny wynik skumulowany i miejsce, informacja „inwestor wykorzystany” – zrobione: w tabeli Decyzje panelu /mg/ kolumny „Wynik (skum.)” i „Miejsce”, przy gotówce chip „inwestor: runda R, kwota” (dymek: udział, do kiedy, ile wziął).
-- [x] U13 [13] Wyniki: majątek netto obok wyniku i zdanie, jak liczy się ranking – zrobione: kolumna „Majątek netto” w rankingu Karty wyników (v.majatek_firm), zdanie RANKING_DLACZEGO pod rankiem ucznia i w Wynikach mistrza gry (tam majątek już był); INSTRUKCJA rozdz. 3.
-- [x] U14 [14] Menu w rundzie 1: podpis „od tygodnia 3”, jeden komunikat zamiast dwóch, objaśnienie „popytu rocznego” – zrobione: podpis przy wyszarzonym „Wybierz” („od tygodnia 3” / „limit nowych dań wyczerpany”), „Popyt roczny” → „Chętnych w strefie na tydzień ≈ N” z dymkiem; jeden komunikat w rundzie 1 był już z U5.
-- [x] U15 [15] Harpagon: kwota do oddania w złotych przy pożyczce – zrobione: w oknie pożyczki na żywo „Oddasz ok. X zł, jeśli spłacisz w terminie (na początku rundy T)” – kwota × (1 + oprocentowanie) ^ termin_rund, test zgodności z silnikiem.
-- [x] U16 [16] „Dlaczego mój wynik się zmienił?” – 1–3 zdania po rundzie z największych zmian karty – zrobione: wnioski.dlaczego – wskaźnik o największym wpływie (podstawienie przy pozostałych z poprzedniej rundy), przy wyniku ekonomicznym pozycja KPiR o największej zmianie; ramka na Dashboardzie i we Wnioskach; próg wnioski.dlaczego_min.
-- [x] U17 [17] Refleksja drużyny przy wysyłaniu decyzji (pole tekstowe, widoczne u mistrza gry i w CSV; opcja gry) – zrobione: pole „Co zmieniamy w tej rundzie i dlaczego?” w Wyślij decyzje; opcja gry refleksja (opcjonalna/wymagana/wyłączona) przy zakładaniu i w Ustawieniach gry; tabela Refleksje drużyn w panelu MG i kolumna w wyniki.csv; pole Runda.refleksje (migracja 0007).
-- [x] U18 [19] Dziennik zapisów decyzji dla mistrza gry + ostrzeżenie o jednej sesji w dwóch drużynach (eksperyment) – zrobione: dziennik w _autorzy (osoba, od–do, zapis/wysłanie, zakładka, licznik złączonych zapisów, skrót ciasteczka przeglądarki); okno „dziennik” w panelu MG i ostrzeżenie, gdy jedna przeglądarka zapisuje w dwóch drużynach (bieżąca i ostatnia runda, bez zapisów MG); sesja i IP odpadły – klucz sesji zmienia się przy logowaniu, IP w szkole wspólne.
-- [x] U19 [20] Tryb podpowiedzi na pierwsze 3 rundy, włączany przez mistrza gry (eksperyment) – zrobione: opcja gry podpowiedzi (domyślnie wyłączona; formularz nowej gry i Ustawienia gry w panelu MG); przez 3 pierwsze rundy Dashboard pokazuje 3 rady z INSTRUKCJA rozdz. 15 z linkiem do zakładki (api/prezentacja.py: PODPOWIEDZI).
-- [x] U20 [21] Kandydaci z `ROZNICE_LEVAS_STARY.md`: (4) dynamika pracowników, (7) opinie na mapie, (2) grupy klientów – koszt L, najpierw (4) – zrobione (4), (7) i (2) czekają na osobną decyzję: zadowolenie każdej osoby (z przepracowaniem), 10 ukrytych cech z żartobliwym opisem pod „i”, ostrzeżenie na liście błędów, wypowiedzenie z niezadowolenia (szansa rośnie z niezadowoleniem), boty dba_o_ludzi, panel HR, teksty; pomiar w kalibracja/dziennik.md (próg 0,87 do decyzji autora).
-- [x] U21 [22] Pomiar „zamknięcia firmy” z wypowiedzeniem najmu (wariant w `balans/warianty.py`) – zrobione: Zamknięcie się nie opłaca (0/20 par; R11 −0,65, R6 −0,97 karty); najemca nie może wypowiedzieć najmu – dziennik kalibracji U21.
-- [x] U22 (pyt. 3) Wskaźnik zadłużenia: gotówka w mianowniku – kredyt leżący na koncie nie karze karty – zrobione: gotówka w mianowniku; ekspansja na kredyt 0,18 → 0,37 karty (wskaźnik 0,42 → 0,75), gry bez długu bez zmian – dziennik kalibracji U22.
-- [x] U23 (pyt. 6) Zatrudnianie od tygodnia 1 (`dane/katalog.yaml:52`, hr_zatrudnienie) – zrobione: hr_zatrudnienie od tygodnia 1 (pracuj.pl), boty też; karta botów 0,523 → 0,528, dochód −1,1 tys. zł – dziennik kalibracji U23.
-- [x] U24 (decyzja autora 4.11, po U20) Opinie klientów na mapie (ocena lokalu z przeżyć klientów, wpływ na popyt, żartobliwe komentarze) + 8 grup klientów z koszykiem (wegetarianie przenoszą udziały) – razem, jeden pomiar balansu; projekt `raporty/projekt_U24_opinie_i_grupy_klientow.md` – zrobione 4.11: klienci.py, opinie.py, mapa i zakładka Klienci, pomiar w dzienniku kalibracji.
-
-- [x] K Kontrola po U: szybki pomiar wszystkich obszarów i celów trudności z B5; poprawka liczb B5 tylko za zgodą autora; „za dobre” strategie z A w inwentarzu – zrobione 4.11.2026: słaba bez alarmu (0/100), pierwszy plus średniej w rundach 4–6 w 51/100, dobra > średnia 74/100 (B5: 92/100); diagnoza `k_dobry`: przewaga dobrej to prognoza, drugi lokal ją zjada (bez niego 85/100). Decyzja autora 4.11: boty dalej kupują kolejne lokale – drugi lokal ma się opłacać po B6 (H21), poziomy sprawdza B14; nowe hipotezy H18–H29 w inwentarzu.
-
-## Poprawki 4.11 (uwagi autora na czacie)
-
-- [x] P1 Menu: zamiast „Chętnych w strefie na tydzień” – popyt roczny i sezonowość dania, w dymku ⓘ instrukcja liczenia
-  prognozy na tydzień krok po kroku; kolumna „Wielkość strefy” w Klientach i strefach (`widok_popytu`: `wielkosc`)
-- [x] P2 Menu i ceny bez osobnej części „Sprzedaż”: danie wybrane w menu jest w sprzedaży (silnik: danie z menu bez ceny
-  – cena preferowana, `decyzje._ceny_domyslne`), cena i rabat w kafelku dania obok prognozy; wyniki sprzedaży zostają
-- [x] P3 Parki i zdarzenia – nowy układ (autor wybrał: lista spraw + szczegóły wybranej, opcje jako kafelki, pasek czasu). Po lewej sprawy tygodnia ze stanem ✓/○/! i nazwą parku oraz „Ciąg dalszy”, po prawej opis i kafelki reakcji (czas, koszt, domyślna, wybrano, U8 brak czasu); na górze pasek: sprawy / inne zadania / wolne z 20 h; wąski ekran – jedna kolumna.
+## Zrobione (skrót)
+- Krok 2 – kopia Revasa → Levas: Django, pydantic, grosze, YAML z `zrodlo`, strumienie losowości, kebab, rundy tygodniowe, panel MG.
+- Krok 3a/3b/4 – konta i drużyny, mapa i lokale, popyt strefowy, świeżość, dostawcy, czas właściciela, rynek pracy,
+  banki, Harpagon, księgowość JDG, biura rachunkowe, parki i zdarzenia, karta wyników kebabu (bez giełdy).
+- Poprawki 27.10 (P), 28.10 (Q), przebudowa zakładek per lokal (Z1–Z6, 2–3.11), poprawki 4.11.
+- Krok 5 część 1 – kalibracja B1–B5 (29.10). Krok 6 – analiza oczami gracza A1–A3 i wdrożenie U1–U24 (3–4.11),
+  raport w `archiwum/czesc_A/`.
 
 ## Krok 5 – kalibracja, część druga: obszary B6–B15
 
@@ -366,3 +23,30 @@ Przygotowanie (29.10.2026, Claude Code): B5 zatwierdzone; instrukcja A uzupełni
 - [x] B13 Karta wyników – tylko wagi składowych (brak „nabijania”, zgodność z majątkiem netto), potem szybki pomiar wszystkich obszarów — zrobione 6.11.2026 na gałęzi `kalibracja-b6`: wagi bez zmian – ranking według karty zgodny z majątkiem netto wyraźnie, ale nie idealnie (Spearman 0,935, ten sam 1. w 81% z 80 gier mieszanych), żadna wersja wykładników ani wagi straty nie poprawia tego ponad szum; karta i majątek mają ten sam znak w 83% par (`b13_wagi`, 35 wariantów ze wszystkich obszarów – to też szybki pomiar obszarów, bez nowej dominacji). Jedyne „nabicie”: księgowość bez deklaracji (+0,01 karty, −6,6 tys. zł) – propozycja B12 u autora. Progi słów karty (U10) przeliczone po kalibracji: wynik działalności 0,2 / 0,9, ekonomiczny 0,35 / 1,4, rozwój 0,54 / 0,64. H19: nic nie rób −0,016, słaba wersja nad zerem poza agresywną (−0,04…−0,06 – do B14). H22: opis w instrukcji.
 - [ ] B14 Boty po kalibracji (poziomy wyraźnie różne, każda strategia wygrywa w jakimś kontekście; cele B5 nadal spełnione) — w toku; stan i dalsze kroki dla kolejnego agenta: `raporty/kalibracja/PRZEKAZANIE.md`
 - [ ] B15 Raport końcowy (przed/po od tagu `kalibracja-start`), `zrodlo`/`pewnosc` w YAML, propozycje zmian w notatkach, instrukcja gracza
+
+## Ufajnianie (polecenia autora 6.11.2026; gałąź `ufajnianie`, plan i przekazanie: `raporty/ufajnianie/`)
+Kolejność pracy: od najtrudniejszych. Numery UF = numery z `raporty/ufajnianie/plan.md` (w nawiasie numer poprawki autora).
+- [ ] UF0 Sprzątanie Pulpit\Levas i repo, notatki zaktualizowane, plan i przekazanie
+- [ ] UF23 (11) Redakcja kart wyników, Wniosków i widoków „Wyniki” wszystkich zakładek
+- [ ] UF22 (20) Lista zadań po prawej (z sytuacji + własne, na żywo)
+- [ ] UF21 (10) Formy zatrudnienia + przełączniki w panelu MG
+- [ ] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
+- [ ] UF19 (15) Marketing internetowy od rundy 7
+- [ ] UF18 (9) Licytacje pracowników widoczne
+- [ ] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`)
+- [ ] UF15 Nowy układ menu, Giełda „w budowie”, taśmy przy mapie
+- [ ] UF14 (18) Agencje reklamowe – nowy wygląd, siatki 3 kolumn
+- [ ] UF13 (2) Parki tylko z mapy
+- [ ] UF12 Środki trwałe → KPiR i Wnętrze
+- [ ] UF11 Ranking w Wynikach
+- [ ] UF10 (4) Zlecenie bez ZUS, student <26 bez PIT
+- [ ] UF9 (16) Nowe udogodnienia (do rundy 14, kot zakładowy)
+- [ ] UF8 (13) Falafel – bójka
+- [ ] UF7 (8) 4 słupki sezonowości w kafelku dania
+- [ ] UF6 (3) Terminy odblokowań
+- [ ] UF5 (7) Wnioski: rozruch w pierwszych tygodniach
+- [ ] UF4 (6) „Brak składnika” → Dostawy
+- [ ] UF3 (5) Jedno ⓘ pod ceną
+- [ ] UF2 (12) Kod `koziol` do kasyna
+- [ ] UF1 (14) Mapa jako ekran startowy
+- [ ] UF24 Instrukcja + PDF, kontrola botów, gra pokazowa na nowo

@@ -356,7 +356,7 @@ wpis na dole.
   bez reguły nie przechodzi). Inne testy bez zmian.
 
 ## U21 – „zarób i zamknij”: pomiar zamknięcia firmy (4.11.2026, Claude Code, Opus 5.5)
-- Pozycja [22] raportu `raporty/analiza_gracza.md`: czy opłaca się zarobić kilka rund i zamknąć firmę
+- Pozycja [22] raportu `archiwum/czesc_A/analiza_gracza.md`: czy opłaca się zarobić kilka rund i zamknąć firmę
   (karta rund bez sprzedaży ≈ 0, pyt. 2 – autor: zostaje jak jest).
 - **Najemca nie może wypowiedzieć najmu.** `wypowiedz` w decyzjach to wypowiedzenie przez nowego właściciela
   budynku po przejęciu (`silnik/nieruchomosci/przejecia.py`), nie przez gracza. Zamknięta firma płaci więc
@@ -385,13 +385,13 @@ wpis na dole.
   ale to 5.–6. miejsce. Pułapki „zarób i zamknij” w tej grze nie ma; zmiana zasad niepotrzebna.
 
 ## U22 – wskaźnik zadłużenia z gotówką w mianowniku (4.11.2026, Claude Code, Opus 5.5) – decyzja autora
-- Pytanie 3 raportu `raporty/analiza_gracza.md`, odpowiedź autora 3.11.2026: gotówka wchodzi do mianownika.
+- Pytanie 3 raportu `archiwum/czesc_A/analiza_gracza.md`, odpowiedź autora 3.11.2026: gotówka wchodzi do mianownika.
   Dotąd kredyt leżący na koncie karał tak samo jak przejedzony (A2: „nigdy nie bierz kredytu”).
 - Wzór (`silnik/wyniki/karta.py: wskaznik_zadluzenia`, `dane/zalozenia.yaml`):
   1 − dług / (majątek karty + skumulowany dochód netto + dług + gotówka), min 0. Ujemna gotówka (debet)
   nie zmniejsza mianownika – debet jest już w długu. Bez długu wskaźnik = 1, jak dotąd.
 - Pomiar: warianty A2 `ekspansja` i `ekspansja_na_kredyt` (kredyt 50 tys. zł w R1, 52 tygodnie),
-  `raporty/analiza/skrypty/eksperymenty.py`, ziarna 202–204, ten sam silnik ze starym i nowym wzorem:
+  `archiwum/czesc_A/analiza/skrypty/eksperymenty.py`, ziarna 202–204, ten sam silnik ze starym i nowym wzorem:
 
   | ziarno | ekspansja | na kredyt – przed | na kredyt – po | wskaźnik przed → po |
   |---|---|---|---|---|
@@ -399,7 +399,7 @@ wpis na dole.
   | 203 | 0,487 | 0,199 | 0,360 | 0,39 → 0,75 |
   | 204 | 0,521 | 0,184 | 0,374 | 0,42 → 0,75 |
 
-  „Przed” odtwarza liczby z A2 (`raporty/analiza/dziennik_optymalizator.md`, pkt 3). Dochód i majątek bez
+  „Przed” odtwarza liczby z A2 (`archiwum/czesc_A/analiza/dziennik_optymalizator.md`, pkt 3). Dochód i majątek bez
   zmian (wzór dotyczy tylko karty). Kara za kredyt zmalała mniej więcej o połowę; kredyt nadal kosztuje
   (odsetki, wskaźnik < 1), więc bierze się go po to, żeby na nim zarobić. Gry bez długu – bez zmian (boty
   kredytów nie biorą).
@@ -407,7 +407,7 @@ wpis na dole.
   Test: `test_wskaznik_zadluzenia` (gotówka w mianowniku, debet nie pomaga).
 
 ## U23 – zatrudnianie od tygodnia 1 (4.11.2026, Claude Code, Opus 5.5) – decyzja autora
-- Pytanie 6 raportu `raporty/analiza_gracza.md`, odpowiedź autora 3.11.2026: zatrudnienie od tygodnia 1, żeby
+- Pytanie 6 raportu `archiwum/czesc_A/analiza_gracza.md`, odpowiedź autora 3.11.2026: zatrudnienie od tygodnia 1, żeby
   pierwszy tydzień sprzedaży nie startował z rekrutacją.
 - `dane/katalog.yaml`: `hr_zatrudnienie` tydzień 2 → 1 (zakładki i lista odblokowania). Tydzień 1 jest
   przygotowawczy, więc mistrz gry nie przesunie już tego terminu w harmonogramie. W tygodniu 1 działa tylko
@@ -430,7 +430,7 @@ wpis na dole.
   Test: `test_zatrudnienie_w_tygodniu_przygotowawczym` (`testy/ludzie/test_rynek_pracy.py`, dane gry).
 
 ## U20 – zadowolenie osób, ukryte cechy i odejścia (4.11.2026, Claude Code, Opus 5.5) – decyzja autora
-- Projekt `raporty/projekt_U20_dynamika_pracownikow.md`. Decyzja autora 4.11.2026: etap 1 + ukryte cechy, które
+- Projekt `archiwum/czesc_A/projekt_U20_dynamika_pracownikow.md`. Decyzja autora 4.11.2026: etap 1 + ukryte cechy, które
   gracz wnioskuje z krótkiego żartobliwego opisu pod „i”. Odejście nie jest pewne, szansa rośnie z niezadowoleniem.
 - Zadowolenie osoby liczy wzór karty dla jednej osoby (pensja z premią ÷ preferowana, sprzęt stanowiska,
   udogodnienia lokalu, szkolenia, zlecenie) i odejmuje przepracowanie (próg i waga z kebabu karty). Wskaźnik karty
@@ -474,7 +474,7 @@ wpis na dole.
   zależy od cechy, nie od nastroju. Panel HR: opis pod „i”, zadowolenie w profilu i wynikach, tabela wypowiedzeń.
 
 ## U24 – opinie klientów i 8 grup klientów (4.11.2026, Claude Code, Opus 5.5)
-- Decyzje autora: projekt `raporty/projekt_U24_opinie_i_grupy_klientow.md` (ocena z przeżyć klientów, wpływ
+- Decyzje autora: projekt `archiwum/czesc_A/projekt_U24_opinie_i_grupy_klientow.md` (ocena z przeżyć klientów, wpływ
   na popyt + komentarze, 8 grup z koszykiem, obie mechaniki razem).
 - Zrobione:
   - `silnik/rynek/klienci.py` – grupy, koszyk (wegetarianie przenoszą popyt mięsny na bezmięsne dania koszyka,

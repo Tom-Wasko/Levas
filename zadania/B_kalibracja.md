@@ -13,7 +13,7 @@ Balans jest ważniejszy od realizmu, ale realizm nie może być rażąco złaman
 ## Od czego zacząć sesję
 1. Otwórz `POSTEP.md` i znajdź pierwsze nieodhaczone zadanie w kolejności z planu: B1, B2, Z1–Z7, B3 (część do pomiaru), B4, B5; potem – po części A i wyborze autora – U, K i B6–B15. Po B4 daj autorowi podsumowanie i od razu rób B5. Po B5 **zatrzymaj się** i poczekaj na zatwierdzenie liczb gospodarki (część A też na nie czeka). B6–B15 zaczynasz dopiero po U i K.
 2. Przeczytaj `raporty/kalibracja/dziennik.md`. To twoja pamięć między sesjami. Po każdym kroku zapisuj w nim: co zmierzono, co zmieniono, co wyszło i co dalej.
-3. Jeśli istnieje `raporty/analiza_gracza.md`, przeczytaj sekcję „za dobre strategie”. To gotowe tropy dominacji.
+3. Jeśli istnieje `archiwum/czesc_A/analiza_gracza.md`, przeczytaj sekcję „za dobre strategie”. To gotowe tropy dominacji.
 
 ## Zmiany zasad (Z1–Z7)
 To nowe mechaniki ustalone z autorem – nie pytaj o nie ponownie. Rozstrzygnięte już szczegóły: lokal w majątku netto po amortyzacji, wpłata inwestora ratunkowego jako dług (w majątku netto i w karcie). Pozostałe szczegóły widoczne dla gracza (np. teksty alarmu, warunki inwestora) zapisz w dzienniku i w podsumowaniu. Gdy zmiana zasady dotyczy notatki autora (np. Z1 a „Ustalenia gry”), propozycję tekstu zapisz w `raporty/kalibracja/notatki_do_zmiany.md`. Każda zmiana: test w `testy/`, opis w instrukcji gracza (`gra/INSTRUKCJA.md`), jeśli gracz ją zobaczy.

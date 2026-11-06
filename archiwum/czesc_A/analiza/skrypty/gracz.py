@@ -1,5 +1,5 @@
 """A2: wspólne narzędzia do grania przez API (serwer analizy na 127.0.0.1:8766, baza
-raporty/analiza/analiza.sqlite3 – ustawienia_analizy.py) i zrzutów ekranu z Chrome w tle.
+archiwum/czesc_A/analiza/analiza.sqlite3 – ustawienia_analizy.py) i zrzutów ekranu z Chrome w tle.
 
 Gracz-człowiek wysyła decyzje tak jak przeglądarka: PUT /api/gry/<id>/decyzje/<firma>,
 POST /api/gry/<id>/wyslij/<firma>. Żmudne liczby (obsada dzień po dniu, zamówienia składników)
@@ -106,7 +106,7 @@ def kalkulator(gid: str, firma: str, strategia: str, poziom: str) -> dict:
 
 
 def zrzut(gid: str, firma: str | None, zakladka: str, plik: str, wysokosc: int = 1100) -> Path:
-    """Zrzut strony drużyny albo panelu mistrza gry (firma=None) do raporty/analiza/zrzuty."""
+    """Zrzut strony drużyny albo panelu mistrza gry (firma=None) do archiwum/czesc_A/analiza/zrzuty."""
     adres = (f"{ADRES}/gra/{gid}/{quote(firma)}#{zakladka}" if firma
              else f"{ADRES}/mg/gra/{gid}")
     cel = ZRZUTY / plik

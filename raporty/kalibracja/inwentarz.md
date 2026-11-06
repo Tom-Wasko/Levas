@@ -269,7 +269,7 @@ do 40%, szkoda do 8000 zł, karencja 1 runda)
 | H16 | Dyskont z gazetką dominuje zakupy małej firmy (rabat 15–35%), a hurtownia nie zwraca się nigdy przy 1 lokalu | kod | pary: dostawcy wymuszeni |
 | H17 | Łatwy bot agresywny bankrutuje (towary 115% przychodu) – proste planowanie zamawia cały popyt i towar się psuje | gry botów | B3: czy łatwy ma być aż tak słaby; H17 (29.10.2026): słaby „jak człowiek” bez alarmu dzięki `zamowienia_ze_sprzedazy`, łatwy bez zmian |
 
-Hipotezy z raportu części A (`raporty/analiza_gracza.md`, sekcja 6, H-A1…H-A8) i z kontroli K (4.11.2026) – sprawdza
+Hipotezy z raportu części A (`archiwum/czesc_A/analiza_gracza.md`, sekcja 6, H-A1…H-A8) i z kontroli K (4.11.2026) – sprawdza
 się je w B6–B14.
 
 | nr | hipoteza | skąd | jak sprawdzić |

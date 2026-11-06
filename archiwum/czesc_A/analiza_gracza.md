@@ -3,14 +3,14 @@
 Wykonawca: Claude Code (Opus 5.5) zamiast Fable, decyzja autora z 3.11.2026. Gałąź `analiza-a`, wersja gry
 po Z1–Z7 i zatwierdzonym B5 (commit 28acb40). Kod gry bez zmian.
 
-Na czym opiera się raport (wszystko w `raporty/analiza/`):
+Na czym opiera się raport (wszystko w `archiwum/czesc_A/analiza/`):
 - **Nowicjusz**, 16 lat (`dziennik_nowicjusz.md`): 1 gra, 18 rund, 4 firmy, typowe błędy ucznia.
   13 zrzutów ekranu.
 - **Optymalizator** (`dziennik_optymalizator.md`): 18 wariantów strategii × 3 ziarna = 54 pełne gry.
   Ocena kartą skumulowaną i majątkiem netto.
 - **Nauczyciel / mistrz gry** (`dziennik_nauczyciel.md`): 4 drużyny „uczniów” z zaplanowanymi błędami
   i 2 boty. Konta uczniów, pauza, cofnięcie rundy, inwestor, eksporty. 14 zrzutów ekranu.
-- Skrypty do powtórzenia: `raporty/analiza/skrypty/` (gracz przez API jak przeglądarka; osobny serwer
+- Skrypty do powtórzenia: `archiwum/czesc_A/analiza/skrypty/` (gracz przez API jak przeglądarka; osobny serwer
   i baza).
 - Raport B4 i dziennik kalibracji przeczytałem dopiero po grach. Znanych dominacji nie powtarzam, piszę
   tylko o różnicach (sekcja 6).

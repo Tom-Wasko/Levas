@@ -21,7 +21,7 @@ Gałąź i git:
 - Po każdym zamkniętym etapie: testy, ruff, `sprawdz` (pkt 3), wpis w dzienniku, odhaczenie w `POSTEP.md`,
   commit, `git pull --rebase`, push. Pushe na tę gałąź **nie** idą na FTP (lustro FTP tylko dla main).
 - Nigdy nie commitować: `plan.txt`, `gra/db.sqlite3`, `gra/lokalne.json`, `gra/zapisy/`,
-  `raporty/analiza/serwer.log`, plików `.log` z pomiarów. Nie ruszać `pytanko.txt` ani `archiwum/pytanko.txt`
+  `archiwum/czesc_A/analiza/serwer.log`, plików `.log` z pomiarów. Nie ruszać `pytanko.txt` ani `archiwum/pytanko.txt`
   (zmiana autora – zostaje poza commitem).
 - **Hasła FTP nigdy nie zapisywać ani nie commitować** (jest w `strona/ftp.json` i `gra/lokalne.json`).
 - Nie kopiować niczego z folderu Revas (tylko referencja).

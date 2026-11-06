@@ -1,4 +1,4 @@
-[[Prawidła świata]] · [[Elementy mapy]] · `archiwum/Plan implementacji.md`
+[[Prawidła świata]] · [[Elementy mapy]] · `archiwum/plany/Plan implementacji.md`
 
 # Zdarzenia i historie
 

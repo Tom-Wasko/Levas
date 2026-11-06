@@ -1,8 +1,8 @@
-[[Plan działania]] · [[Ustalenia gry]] · [[Główny obraz]] · `archiwum/Plan implementacji.md` (archiwum)
+[[Plan działania]] · [[Ustalenia gry]] · [[Główny obraz]] · `archiwum/plany/Plan implementacji.md` (archiwum)
 
 # Plan optymalizacji – kroki 5–6
 
-Zastępuje plan implementacji (`archiwum/Plan implementacji.md`, kroki 1–4 zrobione 28.10.2026). Część B wykonuje Claude Code albo OpenCode (Opus 5.5), część A – Fable 5.1 w OpenCode. Zasady pracy w repozytorium są w `AGENTS.md`, szczegółowe instrukcje dla sesji w `zadania/`, a gotowe polecenia do wklejenia w `zadania/README.md`. Postęp (checkboxy) jest w `POSTEP.md`, a nie w tej notatce.
+Zastępuje plan implementacji (`archiwum/plany/Plan implementacji.md`, kroki 1–4 zrobione 28.10.2026). Część B wykonuje Claude Code albo OpenCode (Opus 5.5), część A – Fable 5.1 w OpenCode. Zasady pracy w repozytorium są w `AGENTS.md`, szczegółowe instrukcje dla sesji w `zadania/`, a gotowe polecenia do wklejenia w `zadania/README.md`. Postęp (checkboxy) jest w `POSTEP.md`, a nie w tej notatce.
 
 Ustalenia z autorem: 28.10.2026 (cele), 29.10.2026 (odpowiedzi na pytania z przeglądu planu, wycena lokalu w majątku netto, inwestor ratunkowy, czas pomiarów – wpisane poniżej).
 
@@ -15,7 +15,7 @@ Sesje idą **po kolei**, nie równolegle. Zmiana z 29.10.2026: najpierw pierwsza
 4. **B3 – boty**, tylko część potrzebna do pomiaru, oraz monotoniczność poziomów: łatwy < średni < trudny.
 5. **B4 – pomiar startowy** i tag w git `kalibracja-start` (punkt odniesienia „przed”). Podsumowanie dla autora, potem od razu B5.
 6. **B5 – gospodarka i trudność.** Zmienione liczby czekają na **zatwierdzenie autora**, bo od nich zależy cała reszta. **Część A czeka na to zatwierdzenie.**
-7. **Część A – analiza oczami gracza** (Fable 5.1 w OpenCode, `zadania/A_analiza_gracza.md`) na `main` po zatwierdzonym B5. Kod się nie zmienia, powstaje tylko raport z propozycjami. Raport z B4 Fable czyta dopiero po rozegraniu gier, przed pisaniem raportu.
+7. **Część A – analiza oczami gracza** (Fable 5.1 w OpenCode, `archiwum/czesc_A/A_analiza_gracza.md`) na `main` po zatwierdzonym B5. Kod się nie zmienia, powstaje tylko raport z propozycjami. Raport z B4 Fable czyta dopiero po rozegraniu gier, przed pisaniem raportu.
 8. **STOP – decyzja autora.** Autor czyta raport z A i wybiera pozycje do wdrożenia. Trafiają do `POSTEP.md` jako U1, U2…
 9. **U – wdrożenie uwag z A**, każda pozycja z testem, commitem i pushem. „Za dobre” strategie z raportu A dopisać do inwentarza B1 jako hipotezy dla B6–B12.
 10. **K – kontrola po U**: szybki pomiar wszystkich obszarów i celów trudności z B5. Jeśli U zepsuło cele trudności, poprawić liczby z B5 (**do zatwierdzenia przez autora**); nowe dominacje w obszarach zostają dla B6–B12.
@@ -34,7 +34,7 @@ Gra na wersji po B1–B5: zasady Z1–Z7 są już wdrożone, a gospodarka ma zat
   - nauczyciel jako mistrz gry, który prowadzi grę z kilkoma drużynami „uczniów” o zaplanowanych błędach (np. drużyna bez zamówień, drużyna w debecie, drużyna bez deklaracji) i sprawdza, czy panel `/mg/` pozwala te problemy zauważyć i omówić.
 
   W każdej rundzie trzeba obejrzeć to, co widzi gracz, i prowadzić dziennik wrażeń. Raport z pomiaru startowego (`raporty/kalibracja/stan_poczatkowy.md`) i dziennik kalibracji czytać dopiero po grach – żeby nie stracić spojrzenia z zewnątrz, a w raporcie nie powtarzać znalezionych już dominacji, tylko wskazać różnice.
-- **A3 – raport** `raporty/analiza_gracza.md`. Zawiera:
+- **A3 – raport** `archiwum/czesc_A/analiza_gracza.md`. Zawiera:
   - problemy (z dowodami);
   - propozycje zmian istniejących elementów;
   - nowe funkcje, na które autor mógł nie wpaść;

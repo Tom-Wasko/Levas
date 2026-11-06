@@ -1,4 +1,4 @@
-"""Lokal jako osobna jednostka (Z2 przebudowy 2.11.2026, raporty/przebudowa_zakladek.md).
+"""Lokal jako osobna jednostka (Z2 przebudowy 2.11.2026, archiwum/plany/przebudowa_zakladek.md).
 
 Osobno w każdym lokalu: menu i ceny, magazyn (partie z polem `lokal`, chłodnia lokalu), stanowiska z ludźmi
 i sprzętem, wyposażenie i udogodnienia. Wspólne dla firmy: promocje, higiena, bank, podatki, czas właściciela,

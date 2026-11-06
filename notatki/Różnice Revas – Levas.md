@@ -1,4 +1,4 @@
-[[Główny obraz]] · [[Ustalenia gry]] · `archiwum/Plan implementacji.md`
+[[Główny obraz]] · [[Ustalenia gry]] · `archiwum/plany/Plan implementacji.md`
 
 # Różnice Revas – Levas
 

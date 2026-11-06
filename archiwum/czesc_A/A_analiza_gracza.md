@@ -31,8 +31,8 @@ Jesteś jednocześnie doświadczonym projektantem gier edukacyjnych, badaczem UX
 
    Raport z pomiaru startowego (`raporty/kalibracja/stan_poczatkowy.md`) i `raporty/kalibracja/dziennik.md` czytaj **dopiero po rozegraniu wszystkich gier**, przed pisaniem raportu: najpierw świeże spojrzenie, potem porównanie. W raporcie nie powtarzaj dominacji znalezionych w B4 – wskaż tylko, gdzie widzisz je inaczej albo co B4 przeoczył.
 
-   Po każdej rundzie zapisuj w dzienniku: co widzę, co rozumiem, czego nie rozumiem, co bym zrobił, co się stało i czy wynik był dla mnie zrozumiały. Dziennik trzymaj w `raporty/analiza/dziennik_<persona>.md`. Skrypty pomocnicze trzymaj poza repozytorium albo w `raporty/analiza/skrypty/`.
-3. **A3 – raport** `raporty/analiza_gracza.md` (po polsku, dla autora, który nie jest programistą-UX-owcem). Układ:
+   Po każdej rundzie zapisuj w dzienniku: co widzę, co rozumiem, czego nie rozumiem, co bym zrobił, co się stało i czy wynik był dla mnie zrozumiały. Dziennik trzymaj w `archiwum/czesc_A/analiza/dziennik_<persona>.md`. Skrypty pomocnicze trzymaj poza repozytorium albo w `archiwum/czesc_A/analiza/skrypty/`.
+3. **A3 – raport** `archiwum/czesc_A/analiza_gracza.md` (po polsku, dla autora, który nie jest programistą-UX-owcem). Układ:
    1. **Najważniejsze 10 wniosków** – lista od najważniejszego.
    2. **Problemy.** Dotyczą zrozumiałości, informacji zwrotnej po rundzie, nawigacji i liczby zakładek, tempa (nuda, przeciążenie), sprawiedliwości (losowość, boty), frustracji i błędów. Przy błędach podaj sposób odtworzenia. Każdy problem ma dowód: zakładkę, tekst albo `plik:linia`.
    3. **Zmiany w tym, co jest.**

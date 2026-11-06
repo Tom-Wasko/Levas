@@ -1,4 +1,4 @@
-"""Auto-dostawca (Z4, przebudowa 2.11.2026, raporty/przebudowa_zakladek.md).
+"""Auto-dostawca (Z4, przebudowa 2.11.2026, archiwum/plany/przebudowa_zakladek.md).
 
 Lokal albo jest na auto-dostawach, albo zaopatruje się sam – całość naraz. Decyzja: "auto_dostawy": {"pozycje":
 [{"zasob", "jakosc", "ilosc"}]} w `w_lokalu[lokal]` (decyzja główna – lokal główny); brak klucza / None – lokal

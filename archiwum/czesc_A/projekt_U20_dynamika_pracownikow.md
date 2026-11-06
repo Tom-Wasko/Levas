@@ -1,6 +1,6 @@
 # U20 – okrojona dynamika pracowników: projekt do decyzji autora
 
-4.11.2026, Claude Code (Opus 5.5). Pozycja [21] raportu `raporty/analiza_gracza.md`, kandydat (4)
+4.11.2026, Claude Code (Opus 5.5). Pozycja [21] raportu `archiwum/czesc_A/analiza_gracza.md`, kandydat (4)
 z `dokumentacja/ROZNICE_LEVAS_STARY.md`. Kandydaci (7) opinie na mapie i (2) grupy klientów – dopiero po (4).
 
 ## Dlaczego

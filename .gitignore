@@ -9,3 +9,6 @@ gra/lokalne.json
 **/.obsidian/workspace*.json
 gra/narzedzia/
 .hypothesis/
+
+# logi (pomiary, serwery) – poza gitem
+*.log

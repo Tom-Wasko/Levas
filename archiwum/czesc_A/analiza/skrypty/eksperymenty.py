@@ -5,7 +5,7 @@ Decyzje Optimy: kalkulator (planista botów, poziom czlowiek_dobry) + zmiana z w
 Miary: karta skumulowana (średni wynik działalności rund 2–18, jak ranking), miejsce,
 majątek netto po 18. rundzie.
 
-Uruchomienie: python -X utf8 eksperymenty.py [ziarno ...]  → raporty/analiza/eksperymenty.json
+Uruchomienie: python -X utf8 eksperymenty.py [ziarno ...]  → archiwum/czesc_A/analiza/eksperymenty.json
 """
 
 from __future__ import annotations

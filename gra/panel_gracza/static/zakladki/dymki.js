@@ -1,4 +1,4 @@
-// Kółka „i” z dymkiem (przebudowa zakładek 2.11.2026, raporty/przebudowa_zakladek.md): na stronie zostają nagłówki,
+// Kółka „i” z dymkiem (przebudowa zakładek 2.11.2026, archiwum/plany/przebudowa_zakladek.md): na stronie zostają nagłówki,
 // tabele, pola i krótkie etykiety, a opisy i objaśnienia pokazują się w dymku po najechaniu (albo dotknięciu) kółka.
 
 // kółko z treścią dymka (HTML: tekst i/lub infografika SVG)

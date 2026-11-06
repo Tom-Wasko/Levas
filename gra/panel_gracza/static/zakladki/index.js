@@ -68,7 +68,7 @@ export const ALIAS = { oferta: "lokal_menu", sprzedaz: "lokal_menu", dostawcy: "
   zatrudnienie: "lokal_ludzie", szkolenia: "lokal_ludzie", udogodnienia: "lokal_ludzie",
   stanowiska: "lokal_sprzet", sprzet: "lokal_sprzet", wyposazenie: "lokal_sprzet" };
 
-// Układ menu (przebudowa 2.11.2026, raporty/przebudowa_zakladek.md): sekcje Twoje lokale / Miasto / Firma.
+// Układ menu (przebudowa 2.11.2026, archiwum/plany/przebudowa_zakladek.md): sekcje Twoje lokale / Miasto / Firma.
 // { sekcja } – nagłówek sekcji (w menu poziomym kreska), { sekcja: "" } – sama kreska.
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },

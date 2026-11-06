@@ -6,7 +6,7 @@ Gra na wersji po Z1–Z6 (commit 28acb40) – menu z grupami, decyzje per lokal,
 ## Co przeczytałem
 - `AGENTS.md`, `notatki/Plan optymalizacji.md` (część A, definicje majątku netto, alarmu, pierwszego plusa),
   `Główny obraz`, `Zarys aplikacji`, `Ustalenia gry` (karta ze stratą, debet ponad limit, inwestor, boty
-  „jak człowiek”, harmonogram odblokowań), `zadania/A_analiza_gracza.md`.
+  „jak człowiek”, harmonogram odblokowań), `archiwum/czesc_A/A_analiza_gracza.md`.
 - `gra/INSTRUKCJA.md` – 15 rozdziałów; ważne dla analizy: rozdz. 3 (karta i strata), 4–5 (tydzień 1 i 2),
   13 (rozwój: „nowy sprzęt i wyposażenie podnoszą rozwój firmy”), 14 (odblokowania), 15 (10 rad).
 - `dokumentacja/ROZNICE_LEVAS_STARY.md` – 12 kandydatów ze starej wersji; propozycja dokumentu: okrojona
@@ -18,10 +18,10 @@ Gra na wersji po Z1–Z6 (commit 28acb40) – menu z grupami, decyzje per lokal,
   szkic, wyniki rundy, lista błędów, wnioski, karta skumulowana, dashboard).
 
 ## Jak gram (A2)
-- Osobny serwer analizy na porcie 8766 z osobną bazą `raporty/analiza/analiza.sqlite3`
+- Osobny serwer analizy na porcie 8766 z osobną bazą `archiwum/czesc_A/analiza/analiza.sqlite3`
   (`skrypty/ustawienia_analizy.py`), żeby nie mieszać z grami autora.
 - Gracz przez API tak jak przeglądarka (`skrypty/gracz.py: Klient`): mistrz gry – lokalne logowanie,
   uczeń – logowanie kontem z `/konta/login/`. Decyzje: kalkulator botów „jak człowiek” jako „co by kliknął
   gracz” + zmiany persony (błędy nowicjusza, warianty optymalizatora, błędy drużyn nauczyciela).
-- Zrzuty ekranu: Chrome bez okna (`gracz.zrzut`) – `raporty/analiza/zrzuty/`.
+- Zrzuty ekranu: Chrome bez okna (`gracz.zrzut`) – `archiwum/czesc_A/analiza/zrzuty/`.
 - Optymalizator szybciej – w silniku bez API (`skrypty/eksperymenty.py`), 18 rund × 3 ziarna na wariant.
