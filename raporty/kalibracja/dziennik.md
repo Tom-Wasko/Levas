@@ -1140,3 +1140,20 @@ bezpieczeństwa to umiejętność lepszego planowania, więc poziomy z prostym p
 | karta słaba / średnia / dobra | 0,06 / 0,29 / 0,36 | 0,06 / 0,29 / 0,37 | – |
 
 Bez regresji, cele B5 nieco bliżej (lepsze zaopatrzenie średniej przesuwa jej pierwszy plus z rundy 3 na 4).
+
+**Auto-dostawy (Z4)** – wariant `dostawcy:auto` w `b8_po` (lokal główny na auto-dostawach; bot zamawia tygodniową
+ilość × zapas bez towaru, który już ma): zrównoważony −0,004 (3/6), premium −0,03 (2/6), tani −0,07 (0/6).
+Rozbicie (zrównoważony, ziarno 1000): przychód +30,4 tys. zł (+9% – bez braków i psucia przy rzadkich dostawach
+hurtowni), towary +26,7 tys. zł (+24%: Auchan, prowizja 10%), pozostałe +7,8 tys. zł (abonament, przechowanie);
+dochód netto −4,2 tys. zł. Kompromis „wygoda i pewność dostaw kontra cena” działa: dobrze prowadzone własne
+zakupy wygrywają lekko, a tani (niska marża) traci wyraźnie. Uczeń, który zamawia gorzej niż bot, na
+auto-dostawach może zyskać – po to są. Liczby bez zmian.
+
+**Poza pomiarem:** handel towarem między drużynami (`handel_*`) – boty nie handlują, to wymiana między
+graczami, do sprawdzenia w grze testowej; mrożonki jako zapas na braki (`zamiennik_dla`) – boty ich nie
+kupują, a przy zapasie 1,2 braki są małe, więc zysk byłby niewielki.
+
+**B8 zamknięte** (6.11): wdrożone zapas zamówień botów 1,2 (poziomy z prostym planowaniem 1,05); boty umieją
+dyskonty, auto-dostawy, wybór gwiazdek składników i dostawców. Liczby gry bez zmian – dominacji nie ma: każda
+strategia wygrywa na składnikach swojej jakości, zapas ma optimum, dyskont daje mniej niż godzina płacy
+minimalnej za czas właściciela (do sprawdzenia w B9), auto-dostawy są droższe od dobrych własnych zakupów.
