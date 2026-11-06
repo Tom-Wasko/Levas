@@ -1,4 +1,6 @@
 // Ludzie: zatrudnienie (obsada stanowisk w Mój lokal), zespół, udogodnienia, szkolenia.
+// UF20 (gra z lokalami): nowych ludzi zatrudnia się w Rynku pracy (od razu z lokalem i stanowiskiem), a obsada w Moim
+// lokalu przypisuje osoby już zatrudnione – z tego lokalu od razu, z innego za zgodą pracownika (decyzja `przenosiny`).
 import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast,
   wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
@@ -33,19 +35,28 @@ export const zatrudnienie = {
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
         const wl = v.decyzje.wlasciciel_stanowisko;
         if (!p && wl && wl.typ === typ && wl.nr === s.nr) return kafelWlasciciela(v, s, edycja);
+        if (!p && v.lokale) return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}</div><div class="kt srodek"><div class="awatar pusty">+</div>
+          <button class="btn jasny" data-akcja="przypisz" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Przypisz osobę →</button>
+          <button class="btn jasny maly" style="margin-top:6px" data-akcja="wlasciciel" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Stań sam (właściciel)</button>
+          <span class="podpowiedz" style="margin-top:6px">Nowa osoba: <a data-zakladka-k="rynek_pracy">Rynek pracy</a></span></div></div>`;
         if (!p) return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}</div><div class="kt srodek"><div class="awatar pusty">+</div>
           <button class="btn jasny" data-akcja="kandydaci" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Zatrudnij pracownika →</button>
           ${v.lokale ? `<button class="btn jasny maly" style="margin-top:6px" data-akcja="wlasciciel" data-t="${typ}" data-n="${s.nr}" ${edycja ? "" : "disabled"}>Stań sam (właściciel)</button>` : ""}</div></div>`;
-        const nowy = p.od_rundy === v.runda;
+        const nowy = p.od_rundy === v.runda, prz = (v.decyzje.przenosiny || []).find((x) => x.pracownik === p.id);
+        const ruch = prz ? `<span class="pigulka inf">${przenosinyMiedzyLokalami(v, prz) ? "czeka na zgodę" : "przeniesiony"}</span>` : "";
         const wyp = p.odchodzi ? `<span class="pigulka${p.odchodzi.powod === NIEZADOWOLENIE ? " nie" : ""}">wypowiedzenie do r. ${p.odchodzi.runda}</span>`
           : p.niezadowolony ? '<span class="pigulka nie">niezadowolony</span>' : "";
-        return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}${wyp}${opisOsoby(p)}</div>
+        return `<div class="kafel"><div class="kg">Stanowisko nr ${s.nr}${nowy ? '<span class="pigulka inf">nowy</span>' : ""}${ruch}${wyp}${opisOsoby(p)}</div>
           <div class="kt srodek" data-akcja="profil" data-id="${esc(p.id)}" style="cursor:pointer"><div class="awatar">${inicjaly(p.imie_nazwisko)}</div>
           <b>${esc(p.imie_nazwisko)}</b><br><span class="podpowiedz">${esc(p.zawod)} · ${UMOWY[p.umowa]}</span><br>${gw(p.gwiazdki)}<br>
-          <b class="akcent">${zl(p.pensja)}</b>${p.premia ? `<br><span class="podpowiedz">premia ${zl(p.premia)}</span>` : ""}</div></div>`;
+          <b class="akcent">${zl(p.pensja)}</b>${p.premia ? `<br><span class="podpowiedz">premia ${zl(p.premia)}</span>` : ""}</div>
+          ${prz ? `<button class="btn jasny maly" data-akcja="cofnij-przenosiny" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Cofnij przeniesienie</button>` : ""}</div>`;
       }).join("")}</div>`;
     }
-    if (v.lokale) html += `<p class="podpowiedz">Brakuje rąk do pracy? Właściciel może sam stanąć na jednym wolnym stanowisku – pracuje jak
+    if (v.lokale) html += `<p class="podpowiedz">Na wolne stanowisko przypiszesz osobę z tego lokalu (od razu) albo z innego Twojego lokalu –
+      wtedy pracownik musi się zgodzić (zależy to od jego zadowolenia, odległości i dodatku za przejście; odpowiedź po przeliczeniu rundy).
+      Nowych ludzi zatrudniasz w zakładce <a data-zakladka-k="rynek_pracy">Rynek pracy</a>.</p>
+      <p class="podpowiedz">Brakuje rąk do pracy? Właściciel może sam stanąć na jednym wolnym stanowisku – pracuje jak
       pracownik 1★, bez pensji, ale każda godzina schodzi z puli <a data-zakladka-k="czas_wlasciciela">czasu właściciela</a>.</p>`;
     return html;
   },
@@ -75,20 +86,35 @@ export const zatrudnienie = {
   akcje: {
     kandydaci: (el, c) => oknoKandydatow(c, el.dataset.t, +el.dataset.n),
     zatrudnij: (el, c) => {
-      const { t, n } = el.dataset;
-      const inne = (c.d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n));   // zastąpienie kandydata się nie liczy
+      const { k, t, n } = el.dataset;   // bez t/n (Rynek pracy) – lokal i stanowisko wybiera się w oknie
+      const inne = (c.d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n) && z.kandydat !== k);   // zastąpienie się nie liczy
       if (ponadLimitPracownikow(c.v, inne, c.d.podkup || [])) return toast(tekstLimituPracownikow(c.v));
-      return oknoZatrudnienia(c, el.dataset.k, t, +n);
+      return oknoZatrudnienia(c, k, t, t ? +n : null);
     },
     "potwierdz-zatrudnienie": async (el, c) => {
       const pensja = +document.getElementById("z-pensja").value, umowa = document.getElementById("z-umowa").value;
       if (pensja < c.kat.placa_minimalna) return toast(`Pensja nie może być niższa niż ${c.kat.placa_minimalna} PLN.`);
-      const { k, t, n } = el.dataset, kanal = document.getElementById("z-kanal")?.value;
+      const miejsce = document.getElementById("z-miejsce");
+      if (miejsce && !miejsce.value) return toast("Wybierz lokal i stanowisko dla nowej osoby.");
+      const [t, n] = miejsce ? miejsce.value.split(":") : [el.dataset.t, el.dataset.n];
+      const { k } = el.dataset, kanal = document.getElementById("z-kanal")?.value;
       zamknijOkno();
       await c.zmien((d) => {
-        d.zatrudnij = [...(d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n)), { kandydat: k, typ: t, nr: +n, pensja, umowa, ...(kanal ? { kanal } : {}) }];
+        d.zatrudnij = [...(d.zatrudnij || []).filter((z) => !(z.typ === t && z.nr === +n) && z.kandydat !== k),
+          { kandydat: k, typ: t, nr: +n, pensja, umowa, ...(kanal ? { kanal } : {}) }];
       });
     },
+    przypisz: (el, c) => oknoPrzypisania(c, el.dataset.t, +el.dataset.n),
+    "wybierz-osobe": (el, c) => {
+      const { id, t, n } = el.dataset;
+      if (el.dataset.inny !== "1") return zapiszPrzenosiny(c, { pracownik: id, typ: t, nr: +n });
+      return oknoPrzenosin(c, id, t, +n);
+    },
+    "potwierdz-przenosiny": (el, c) => {
+      const dodatek = Math.max(0, +(document.getElementById("pz-dodatek")?.value || 0));
+      return zapiszPrzenosiny(c, { pracownik: el.dataset.id, typ: el.dataset.t, nr: +el.dataset.n, ...(dodatek ? { dodatek } : {}) });
+    },
+    "cofnij-przenosiny": (el, c) => c.zmien((d) => { d.przenosiny = (d.przenosiny || []).filter((x) => x.pracownik !== el.dataset.id); }),
     wlasciciel: (el, c) => oknoWlasciciela(c, el.dataset.t, +el.dataset.n),
     "potwierdz-wlasciciela": async (el, c) => {
       const godziny = +document.getElementById("w-godziny").value;
@@ -177,6 +203,25 @@ function kanalyRekrutacji(v, k) {
     <p class="podpowiedz">Gdy kandydata chce kilka drużyn, wygrywa najwyższa pensja (remis – losowanie).</p>`;
 }
 
+// UF20: wolne stanowiska dla zawodu (bez stanowiska właściciela) – w podglądzie decyzji, więc już po przenosinach
+const typyZawodu = (kat, zawod) => TYPY.filter((t) => kat.oferty.stanowiska.typy[t].zawody.includes(zawod));
+function wolneStanowiska(v, kat, zawod) {
+  const wl = v.decyzje.wlasciciel_stanowisko, typy = typyZawodu(kat, zawod);
+  return v.stan.stanowiska.filter((s) => typy.includes(s.typ) && !s.pracownik && !(wl && wl.typ === s.typ && wl.nr === s.nr));
+}
+function wyborMiejsca(v, kat, zawod) {
+  const wolne = wolneStanowiska(v, kat, zawod), T = kat.oferty.stanowiska.typy;
+  if (!wolne.length) return `<div class="komunikat zly">Nie masz wolnego stanowiska dla zawodu „${esc(zawod)}”. Uruchom nowe w zakładce
+    Wnętrze ▸ Stanowiska i sprzęt albo zwolnij miejsce.</div><input type="hidden" id="z-miejsce" value="">`;
+  const opcja = (s) => `<option value="${s.typ}:${s.nr}">${esc(T[s.typ].nazwa)} nr ${s.nr}</option>`;
+  const lokale = [...new Set(wolne.map((s) => s.lokal))];
+  const opcje = v.lokale && lokale.length > 1
+    ? lokale.map((l) => `<optgroup label="${esc(nazwaLokalu(v, l))}">${wolne.filter((s) => s.lokal === l).map(opcja).join("")}</optgroup>`).join("")
+    : wolne.map(opcja).join("");
+  return `<label class="pole">Lokal i stanowisko${v.lokale && lokale.length === 1 ? ` (${esc(nazwaLokalu(v, lokale[0]))})` : ""}
+    <select id="z-miejsce">${opcje}</select></label>`;
+}
+
 function oknoZatrudnienia({ v, kat }, id, typ, nr) {
   const k = v.kandydaci.find((x) => x.id === id);
   okno(`Zatrudnienie: ${esc(k.imie_nazwisko)}`, `<p>${esc(k.zawod)} ${gw(k.gwiazdki)} · preferowane wynagrodzenie <b>${zl(k.pensja_preferowana)}</b>
@@ -184,10 +229,90 @@ function oknoZatrudnienia({ v, kat }, id, typ, nr) {
     <div class="dwie"><label class="pole">Wynagrodzenie brutto (min. ${licz(kat.placa_minimalna)} PLN)
       <input type="number" id="z-pensja" min="${kat.placa_minimalna}" step="10" value="${k.pensja_preferowana}"></label>
     <label class="pole">Forma zatrudnienia<select id="z-umowa"><option value="prace">Umowa o pracę (+${proc(kat.parametry.zus, 0)} ZUS pracodawcy)</option>
-      <option value="zlecenie">Umowa zlecenie${kat.parametry.zus_zlecenie ? ` (+${proc(kat.parametry.zus_zlecenie, 0)} ZUS pracodawcy)` : ""}</option></select></label></div>${kanalyRekrutacji(v, k)}
+      <option value="zlecenie">Umowa zlecenie${kat.parametry.zus_zlecenie ? ` (+${proc(kat.parametry.zus_zlecenie, 0)} ZUS pracodawcy)` : ""}</option></select></label></div>${typ ? "" : wyborMiejsca(v, kat, k.zawod)}${kanalyRekrutacji(v, k)}
     <p class="podpowiedz">Pensja wyższa od preferowanej i umowa o pracę podnoszą zadowolenie pracowników.</p>`,
     { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
-      <button class="btn pom" data-akcja="potwierdz-zatrudnienie" data-k="${esc(id)}" data-t="${typ}" data-n="${nr}">Potwierdź</button>` });
+      <button class="btn pom" data-akcja="potwierdz-zatrudnienie" data-k="${esc(id)}"${typ ? ` data-t="${typ}" data-n="${nr}"` : ""}>Potwierdź</button>` });
+}
+
+// UF20: kandydaci w Rynku pracy – zatrudnienie od razu z lokalem i stanowiskiem; niżej zatrudnienia czekające w tej rundzie
+export function kandydaciRynku({ v, kat, edycja }) {
+  const typy = kat.oferty.stanowiska.typy;
+  const czekaja = v.stan.pracownicy.filter((p) => p.od_rundy === v.runda && (v.decyzje.zatrudnij || []).some((z) => z.kandydat === p.id));
+  const gdzie = (p) => {
+    const s = v.stan.stanowiska.find((x) => x.pracownik === p.id);
+    return s ? `${v.lokale ? `${esc(nazwaLokalu(v, s.lokal))} · ` : ""}${esc(typy[s.typ]?.nazwa ?? s.typ)} nr ${s.nr}` : "–";
+  };
+  const lista = [...v.kandydaci].sort((a, b) => a.zawod.localeCompare(b.zawod) || b.zadowolenie_klientow - a.zadowolenie_klientow);
+  const w = lista.map((k) => [esc(k.imie_nazwisko) + opisOsoby(k), esc(k.zawod), gw(k.gwiazdki), zl(k.pensja_preferowana), zl(k.koszt_rekrutacji),
+    proc(k.zadowolenie_klientow, 0), proc(k.ryzyko_reklamacji, 0),
+    `<button class="btn pom maly" data-akcja="zatrudnij" data-k="${esc(k.id)}" ${edycja ? "" : "disabled"}>Zatrudnij +</button>`]);
+  return tabela("Kandydaci", ["Imię i nazwisko", "Zawód", "Doświadczenie", "Preferowane wynagrodzenie", "Bazowy koszt rekrutacji",
+    "Zadowolenie klientów", "Ryzyko reklamacji", ""], w.length ? w : [["Na rynku nie ma teraz kandydatów.", "", "", "", "", "", "", ""]], { klasy: ["l", "l"] })
+    + `<p class="podpowiedz">Przy zatrudnieniu wybierasz lokal i wolne stanowisko (${TYPY.map((t) => `${esc(typy[t].kto)}: ${typy[t].zawody.map(esc).join(", ")}`).join(" · ")}).
+      Obsadę zmienisz potem w zakładce <a data-zakladka-k="lokal_przeglad">Mój lokal</a>.</p>`
+    + (czekaja.length ? tabela("Zatrudnienia w tej rundzie", ["Osoba", "Zawód", "Lokal i stanowisko", "Pensja", "Umowa", ""],
+      czekaja.map((p) => [esc(p.imie_nazwisko), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, gdzie(p), zl(p.pensja), UMOWY[p.umowa],
+        `<button class="btn jasny maly" data-akcja="profil" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Zmień</button>
+         <button class="btn czarny maly" data-akcja="zwolnij" data-id="${esc(p.id)}" data-nowy="1" ${edycja ? "" : "disabled"}>Anuluj</button>`]),
+      { klasy: ["l", "l", "l"] }) : "");
+}
+
+// UF20: szansa zgody na przejście – jak silnik/ludzie/przenosiny.py: szansa (parametry i odległości z v.agencja.przenosiny)
+function szansaPrzejscia(v, p, z, doLokalu, dodatek) {
+  const P = v.agencja?.przenosiny, u = P?.zasady;
+  if (!u) return 1;
+  const zad = p.zadowolenie ?? P.prog, odl = P.odleglosci?.[z]?.[doLokalu] ?? 0;
+  const x = u.baza + u.za_zadowolenie * (zad - P.prog) - u.kara_za_pole * odl
+    + u.za_dodatek * (p.pensja > 0 ? Math.min(1, Math.max(0, dodatek) / p.pensja) : 0);
+  return Math.min(u.szansa_maks, Math.max(u.szansa_min, x));
+}
+// stanowisko osoby przed decyzjami (z niego liczy się przejście) i stanowisko docelowe
+const stanowiskoPrzed = (v, id) => (v.stan_przed || v.stan).stanowiska.find((s) => s.pracownik === id);
+const stanowiskoNr = (v, typ, nr) => v.stan.stanowiska.find((s) => s.typ === typ && s.nr === nr);
+function przenosinyMiedzyLokalami(v, x) {
+  const skad = stanowiskoPrzed(v, x.pracownik), cel = stanowiskoNr(v, x.typ, x.nr);
+  return !!(skad && cel && skad.lokal !== cel.lokal);
+}
+function zapiszPrzenosiny(c, x) {
+  zamknijOkno();
+  return c.zmien((d) => {
+    d.przenosiny = [...(d.przenosiny || []).filter((y) => y.pracownik !== x.pracownik && !(y.typ === x.typ && y.nr === x.nr)), x];
+  });
+}
+
+function oknoPrzypisania({ v, kat }, typ, nr) {
+  const cel = stanowiskoNr(v, typ, nr), T = kat.oferty.stanowiska.typy;
+  const osoby = v.stan.pracownicy.filter((p) => p.od_rundy !== v.runda && typyZawodu(kat, p.zawod).includes(typ));
+  const w = osoby.map((p) => {
+    const teraz = v.stan.stanowiska.find((s) => s.pracownik === p.id), skad = stanowiskoPrzed(v, p.id) || teraz;
+    const inny = !!(skad && cel && skad.lokal !== cel.lokal);
+    const przycisk = inny && p.odchodzi ? `<span class="podpowiedz">w okresie wypowiedzenia</span>`
+      : `<button class="btn pom maly" data-akcja="wybierz-osobe" data-id="${esc(p.id)}" data-t="${typ}" data-n="${nr}" data-inny="${inny ? 1 : 0}">Przypisz</button>`;
+    return [esc(p.imie_nazwisko) + opisOsoby(p), `${esc(p.zawod)} ${gw(p.gwiazdki)}`,
+      teraz ? `${v.lokale ? `${esc(nazwaLokalu(v, teraz.lokal))} · ` : ""}${esc(T[teraz.typ]?.nazwa ?? teraz.typ)} nr ${teraz.nr}` : `<span class="minus">bez stanowiska</span>`,
+      zadowolenieOsoby(p), inny ? `ok. ${proc(szansaPrzejscia(v, p, skad?.lokal, cel?.lokal, 0), 0)} bez dodatku` : "od razu", przycisk];
+  });
+  okno(`Obsada: ${esc(T[typ]?.nazwa ?? typ)} nr ${nr}${cel?.lokal && v.lokale ? ` – ${esc(nazwaLokalu(v, cel.lokal))}` : ""}`,
+    (w.length ? tabela(null, ["Osoba", "Zawód", "Pracuje teraz", "Zadowolenie", "Zgoda", ""], w, { klasy: ["l", "l", "l"] })
+      : `<div class="komunikat">Nie masz jeszcze nikogo do tej pracy.</div>`)
+    + `<p class="podpowiedz">Osoba z tego lokalu zmieni stanowisko od razu. Osoba z innego lokalu musi się zgodzić: chętniej, gdy jest zadowolona,
+      lokale są blisko na mapie i dostanie jednorazowy dodatek. Odpowiedź poznasz po przeliczeniu rundy (Rynek pracy ▸ wyniki).
+      Nowa osoba: <a data-zakladka-k="rynek_pracy">Rynek pracy</a>.</p>`, { srednie: true });
+}
+
+function oknoPrzenosin({ v }, id, typ, nr) {
+  const p = v.stan.pracownicy.find((x) => x.id === id), skad = stanowiskoPrzed(v, id), cel = stanowiskoNr(v, typ, nr);
+  const odl = v.agencja?.przenosiny?.odleglosci?.[skad?.lokal]?.[cel?.lokal];
+  const progi = [0, 0.25, 0.5, 1].map((u) => Math.round(p.pensja * u / 10) * 10);
+  okno(`Przeniesienie: ${esc(p.imie_nazwisko)}`, `<p>Z lokalu <b>${esc(nazwaLokalu(v, skad?.lokal))}</b> do <b>${esc(nazwaLokalu(v, cel?.lokal))}</b>
+      (stanowisko nr ${nr})${odl != null ? ` · odległość na mapie ok. ${licz(odl, 1)} pola` : ""} · zadowolenie ${zadowolenieOsoby(p)}</p>
+    ${tabela("Szansa zgody", ["Dodatek", "Szansa"], progi.map((x) => [zl(x), proc(szansaPrzejscia(v, p, skad?.lokal, cel?.lokal, x), 0)]), {})}
+    <label class="pole">Jednorazowy dodatek za przejście (zł, płacisz tylko po zgodzie)
+      <input type="number" id="pz-dodatek" min="0" step="50" value="0"></label>
+    <p class="podpowiedz">Jeśli pracownik się nie zgodzi, zostaje na swoim stanowisku. Wolne miejsce po nim możesz od razu obsadzić kimś innym.</p>`,
+  { srednie: true, przyciski: `<button class="btn jasny" data-akcja="zamknij-okno">Anuluj</button>
+      <button class="btn pom" data-akcja="potwierdz-przenosiny" data-id="${esc(id)}" data-t="${typ}" data-n="${nr}">Zaproponuj</button>` });
 }
 
 function oknoProfilu({ v, kat, edycja }, id) {

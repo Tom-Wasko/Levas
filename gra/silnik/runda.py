@@ -164,6 +164,7 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
     rp.po_decyzjach(dane, s, r, rynek_pracy, ksiegi, rachunki)
     for nazwa in nazwy:
         rynek_pracy[nazwa]["zatrudnieni"] = info[nazwa].get("kanaly_zatrudnienia", [])
+        rynek_pracy[nazwa]["przeniesieni"] = info[nazwa].get("przenosiny", [])   # UF20: obsada i przenosiny
         info[nazwa]["rynek_pracy"] = rynek_pracy[nazwa]
         bledy[nazwa] += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in rynek_pracy[nazwa]["uwagi"]]
         bledy[nazwa] += pr.bledy(dane, s.firmy, nazwa, r, info[nazwa]["przejecia"])

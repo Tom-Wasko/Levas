@@ -436,6 +436,20 @@ pracownicy:   # U20 (decyzja autora 4.11.2026): zadowolenie każdej osoby i odej
       szansa_maks) × mnożnik cechy. Odejście jak zwolnienie: umowa o pracę – okres wypowiedzenia, zlecenie – od razu,
       bez odprawy. Próg 0,87: osoba przy pensji preferowanej, sprzęcie 2★ i wykorzystaniu do 85% ma ok. 0,93, przy
       pełnym wykorzystaniu ok. 0,855 – założenie do kalibracji'
+  przenosiny:
+    wartosc:
+      baza: 0.7
+      za_zadowolenie: 3.0
+      kara_za_pole: 0.03
+      za_dodatek: 0.6
+      szansa_min: 0.05
+      szansa_maks: 0.98
+    pewnosc: zalozenie
+    zrodlo: 'UF20: zgoda pracownika na przejście do innego lokalu firmy (w tym samym lokalu – zawsze). Szansa = baza
+      + za_zadowolenie × (zadowolenie − próg odejść; nieznane zadowolenie = próg) − kara_za_pole × odległość lokali
+      na mapie (pola siatki; między lokalami Lublina średnio ok. 8,5, najwyżej ok. 23) + za_dodatek × min(1, dodatek
+      ÷ pensja), w granicach szansa_min…szansa_maks. Zadowolony pracownik przy średniej odległości zgadza się w ok.
+      45–70%, dodatek równy pensji podnosi szansę o 0,6. Losowanie przy przeliczeniu rundy – założenie do kalibracji'
 lista_bledow:   # gra z lokalami (F4.2): progi ostrzeżeń na liście błędów
   udzial_skladnikow:
     wartosc: 0.5

@@ -1,6 +1,8 @@
 // Rynek pracy (gra z lokalami, silnik/ludzie/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
-// i okresy wypowiedzenia. Kandydatów z puli zatrudnia się w zakładce Ludzie → Rynek pracy.
-import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
+// i okresy wypowiedzenia. UF20: tu też zatrudnia się kandydatów z puli – od razu z lokalem i stanowiskiem (hr.js: kandydaciRynku).
+import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
+import { kandydaciRynku } from "./hr.js";
+import { nazwaLokalu } from "./lokal_wybor.js";
 
 const UMOWY = { prace: "umowa o pracę", zlecenie: "umowa zlecenie" };
 const WYNIK_ZLOZONEJ = { przyjeta: "przyjęta", odrzucona: "odrzucona – pensja nie wyższa od obecnej", kontroferta: "przebita kontrofertą",
@@ -29,15 +31,16 @@ function kanalyHtml(A) {
 export const rynek_pracy = {
   tytul: "Rynek pracy", tytulPelny: "HR - rynek pracy i agencje", ikona: "rynek_pracy",
   odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
-  info: `Pula pracowników jest wspólna dla wszystkich drużyn. Kandydatów szukasz przez pracuj.pl, agencję pracy albo headhuntera
-    (zakładka <a data-zakladka-k="zatrudnienie">Zatrudnienie</a>). Tylko headhunter złoży ofertę pracownikowi innej drużyny –
-    jego szef może odpowiedzieć kontrofertą w tej samej rundzie.`,
-  decyzje({ v, edycja }) {
+  info: `Pula pracowników jest wspólna dla wszystkich drużyn. Zatrudniasz tutaj: wybierz kandydata, pensję, kanał rekrutacji
+    (pracuj.pl, agencja pracy) oraz lokal i stanowisko. Obsadę stanowisk zmienisz w zakładce Mój lokal. Tylko headhunter złoży ofertę
+    pracownikowi innej drużyny – jego szef może odpowiedzieć kontrofertą w tej samej rundzie.`,
+  decyzje(c) {
+    const { v, edycja } = c;
     const A = v.agencja, d = v.decyzje || {};
     if (!A) return `<p class="podpowiedz">Brak danych.</p>`;
     const nowi = (d.zatrudnij || []).length + (d.podkup || []).length;
     let html = `<div class="pasek ciemny"><span>Nowi pracownicy w tej rundzie: <span class="kwota">${nowi} / ${A.limit}</span>
-      (zatrudnienia i oferty podkupienia)</span></div>` + kanalyHtml(A);
+      (zatrudnienia i oferty podkupienia)</span></div>` + kandydaciRynku(c) + kanalyHtml(A);
 
     const kf = d.kontroferty || {};
     html += tabela("Oferty innych drużyn dla twoich pracowników", ["Pracownik", "Od", "Oferowana pensja", "Obecna pensja", "Twoja kontroferta", ""],
@@ -92,6 +95,7 @@ export const rynek_pracy = {
           esc(WYNIK_OTRZYMANEJ[o.wynik] || o.wynik) + (o.runda_odejscia ? ` do ${esc(nazwaFirmy(v, o.do))} w rundzie ${o.runda_odejscia}` : "")])
           : pusto(5, "Nikt nie składał ofert."), { klasy: ["l", "l", "r", "r", "l"] })
       + tabela("Odejścia i przyjścia", ["Pracownik", "Ruch", "Drużyna"], ruchy.length ? ruchy : pusto(3, "Bez zmian w zespole."), { klasy: ["l", "l", "l"] })
+      + przenosinyWyniki(v, R)
       + (R.uwagi.length ? `<div class="komunikat zly">${R.uwagi.map(esc).join("<br>")}</div>` : "");
   },
   akcje: {
@@ -123,6 +127,17 @@ export const rynek_pracy = {
     },
   },
 };
+
+// UF20: obsada i przenosiny w rundzie – przeniesieni, odmowy (brak zgody) i nieudane (np. zajęte stanowisko)
+function przenosinyWyniki(v, R) {
+  const wiersz = (x, wynik) => [esc(x.imie_nazwisko), x.z_lokalu ? esc(nazwaLokalu(v, x.z_lokalu)) : "–",
+    `${x.do_lokalu ? `${esc(nazwaLokalu(v, x.do_lokalu))} · ` : ""}nr ${x.nr}`, x.dodatek ? zl(x.dodatek) : "–", wynik];
+  const w = [...(R.przeniesieni || []).map((x) => wiersz(x, x.wynik === "przeniesiony" ? "przeniesiony"
+    : `<span class="minus">nieudane: ${esc(x.powod)}</span>`)),
+  ...(R.przenosiny || []).filter((x) => !x.zgoda).map((x) => wiersz({ ...x, dodatek: 0 }, `<span class="minus">odmowa${x.powod ? ` – ${esc(x.powod)}` : ""}</span>
+      <span class="podpowiedz">(szansa była ok. ${proc(x.szansa, 0)})</span>`))];
+  return w.length ? tabela("Obsada i przenosiny", ["Pracownik", "Skąd", "Dokąd", "Dodatek", "Wynik"], w, { klasy: ["l", "l", "l", "r", "l"] }) : "";
+}
 
 function oknoOferty({ v, kat }, id) {
   const p = v.agencja.cudzy.find((x) => x.id === id), hh = v.agencja.kanaly.headhunter;

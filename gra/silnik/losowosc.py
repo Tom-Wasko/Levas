@@ -33,6 +33,7 @@ CELE = frozenset({
     "cechy",       # ukryta cecha i opis osoby (U20): runda dołączenia do puli, id osoby
     "opinie",      # rozrzut nowych opinii i komentarze o lokalu (silnik/rynek/opinie.py): runda, firma, lokal
     "odejscia",    # wypowiedzenie z niezadowolenia (silnik/ludzie/zadowolenie.py): runda, firma, id osoby
+    "przenosiny",  # zgoda na przejście do innego lokalu (silnik/ludzie/przenosiny.py, UF20): runda, firma, id osoby
     "kolejnosc",   # kolejność firm w rundzie
     "parki",       # kolejność historii w parkach: runda = numer cyklu wszystkich historii
     "lokal",       # wybór lokalu przez bota: runda, nazwa firmy

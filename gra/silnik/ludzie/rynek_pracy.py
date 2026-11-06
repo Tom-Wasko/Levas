@@ -13,7 +13,7 @@ Dane: dane/kandydaci.yaml – agencja (kanały pracuj.pl / agencja pracy / headh
 - Okres wypowiedzenia (P6): jedna długość z danych (2 rundy) w obie strony – zwolniony pracownik na umowie o pracę
   pracuje i dostaje pensję jeszcze przez okres wypowiedzenia, potem wraca do puli (`Odejscie` z pustym `do`).
 
-Kolejność w rundzie (silnik/runda.py): `przed_decyzjami` (limit, licytacje, podkupienia) → decyzje firm
+Kolejność w rundzie (silnik/runda.py): `przed_decyzjami` (limit, licytacje, podkupienia, zgoda na przenosiny) → decyzje firm
 (`zastosuj`: kanał, koszt, czas właściciela) → `po_decyzjach` (przejścia pracowników, opłaty headhuntera).
 """
 from __future__ import annotations
@@ -22,6 +22,7 @@ from ..dane import Dane
 from ..ksiegowosc.finanse import Ksiega, Rachunek, ksieguj
 from ..losowosc import strumien
 from ..model import Firma, Odejscie, Pracownik, StanGry
+from . import przenosiny as przen
 
 HEADHUNTER = "headhunter"
 
@@ -76,12 +77,14 @@ def jako_kandydat(p: Pracownik) -> dict:
 
 def _raport() -> dict:
     return {"zatrudnieni": [], "licytacje": [], "ponad_limit": [], "oferty_zlozone": [], "oferty_otrzymane": [],
-            "odejscia": [], "przyjscia": [], "uwagi": []}
+            "odejscia": [], "przyjscia": [], "uwagi": [], "przenosiny": [], "przeniesieni": []}
 
 
-def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int, ziarno) -> tuple[dict, dict, dict]:
-    """Limit nowych, licytacje kandydatów i oferty podkupienia. Zwraca (decyzje po filtrze, rezerwacje kandydatów
-    {id: firma}, raporty firm). Wygrane kontroferty podnoszą pensje, przyjęte oferty ustawiają `odchodzi`."""
+def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int, ziarno,
+                    podglad: bool = False) -> tuple[dict, dict, dict]:
+    """Limit nowych, licytacje kandydatów, oferty podkupienia i zgoda na przenosiny do innego lokalu (UF20; w podglądzie
+    decyzji bez losowania). Zwraca (decyzje po filtrze, rezerwacje kandydatów {id: firma}, raporty firm).
+    Wygrane kontroferty podnoszą pensje, przyjęte oferty ustawiają `odchodzi`."""
     limit = ustawienia(dane)["limit_nowych"]
     placa_min = dane.z["finanse"]["placa_minimalna"]
     raport = {n: _raport() for n in s.firmy}
@@ -103,6 +106,12 @@ def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int
             if w_wypowiedzeniu:
                 d["zwolnij"] = [pid for pid in d["zwolnij"] if pid not in w_wypowiedzeniu]
                 raport[n]["uwagi"].append("Pracownik w okresie wypowiedzenia odchodzi sam – nie można go zwolnić.")
+        if d.get("przenosiny") and not podglad:
+            d["przenosiny"], raport[n]["przenosiny"] = przen.rozstrzygnij(dane, s.firmy[n], n, d["przenosiny"], runda, ziarno)
+            for x in raport[n]["przenosiny"]:
+                if not x["zgoda"]:
+                    raport[n]["uwagi"].append(f"{x['imie_nazwisko']} nie zgodził(a) się na przejście do innego lokalu"
+                                              f"{' (' + x['powod'] + ')' if x.get('powod') else ''}.")
         nowe[n] = d
 
     # licytacje: ta sama osoba z puli u kilku firm

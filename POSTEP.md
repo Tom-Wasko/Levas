@@ -31,7 +31,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [ ] UF23 (11) Redakcja kart wyników, Wniosków i widoków „Wyniki” wszystkich zakładek
 - [ ] UF22 (20) Lista zadań po prawej (z sytuacji + własne, na żywo)
 - [ ] UF21 (10) Formy zatrudnienia + przełączniki w panelu MG
-- [ ] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
+- [x] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
 - [ ] UF19 (15) Marketing internetowy od rundy 7
 - [ ] UF18 (9) Licytacje pracowników widoczne
 - [ ] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`)

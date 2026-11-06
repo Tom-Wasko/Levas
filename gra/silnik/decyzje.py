@@ -14,6 +14,7 @@ Format (słownik; brak klucza = bez zmian względem poprzedniej rundy):
     sprzet_kup:        [{"typ", "nr", "nazwa", "jakosc"}]
     sprzet_sprzedaj:   [{"typ", "nr", "nazwa"}]
     zatrudnij:         [{"kandydat", "typ", "nr", "pensja", "umowa"}]   umowa: "prace" | "zlecenie"
+    przenosiny:        [{"pracownik", "typ", "nr", "dodatek"}]          UF20: na wolne stanowisko (inny lokal – za zgodą)
                        opcjonalnie "kanal": "pracuj" | "agencja" | "headhunter" (silnik/ludzie/rynek_pracy.py)
     podkup:            [{"pracownik", "firma", "pensja", "umowa"}]   – oferta przez headhuntera
     kontroferty:       {id pracownika: pensja}              – odpowiedź na oferty innych firm (ta sama runda)
@@ -72,6 +73,7 @@ from .kuchnia import swiezosc as sw
 from .kuchnia.dostawcy import zasady_dostaw
 from .kuchnia.operacje import kasjerzy, stanowiska_uslugi
 from .ludzie import czas_wlasciciela as cw
+from .ludzie import przenosiny as przen
 from .ludzie import rynek_pracy as rp
 from .ludzie import zadowolenie as zo
 from .model import Cena, Firma, Odejscie, Pracownik, Stanowisko, WlascicielNaStanowisku, grosze
@@ -354,6 +356,8 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
         if zm.get("umowa") in ("prace", "zlecenie"):
             p.umowa = zm["umowa"]
         p.premia = float(zm.get("premia", 0) or 0)
+    if kadry_ok and d.get("przenosiny"):   # UF20: obsada i przenosiny – przed zatrudnieniami (silnik/ludzie/przenosiny.py)
+        info["przenosiny"] = przen.zastosuj(dane, firma, d["przenosiny"], ksiega, rachunek)
     for z in d.get("zatrudnij", []) if kadry_ok else []:
         dostepni = kandydaci_firmy(rp.widoczni(dane, pula, runda), firma)
         kandydat = next((k for k in dostepni if k["id"] == z["kandydat"]), None)
@@ -624,6 +628,13 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("czerwony", "dostawcy", tekst)
         for tekst in (info or {}).get("auto_dostawy", {}).get("uwagi", []):
             dodaj("czerwony", "dostawcy", tekst)
+        for x in (info or {}).get("przenosiny", []):
+            gdzie = f"stanowisko nr {x['nr']}" + (f" ({pl.nazwa(dane, x['do_lokalu'])})" if x.get("do_lokalu") else "")
+            if x["wynik"] == "nieudane":
+                dodaj("czerwony", "zatrudnienie", f"{x['imie_nazwisko']} nie przejdzie na {gdzie}: {x['powod']}.")
+            elif "szansa" in x:
+                dodaj("niebieski", "zatrudnienie", f"{x['imie_nazwisko']}: propozycja przejścia na {gdzie} – odpowiedź po"
+                      f" przeliczeniu rundy (szansa zgody ok. {round(x['szansa'] * 100)}%; pomaga dodatek i zadowolenie).")
         for w in (info or {}).get("wypowiedzenia", []):
             dodaj("niebieski", "zatrudnienie", f"{w['imie_nazwisko']} dostaje wypowiedzenie – pracuje i dostaje pensję "
                   f"do rundy {w['runda_odejscia'] - 1}, potem wraca na rynek pracy.")

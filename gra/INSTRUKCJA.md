@@ -233,6 +233,11 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
 
 - **Rynek pracy jest wspólny** dla wszystkich drużyn. Kandydatów szukasz przez pracuj.pl, agencję pracy albo
   headhuntera – tylko headhunter złoży ofertę pracownikowi innej drużyny (a jego szef może dać kontrofertę).
+- **Zatrudniasz w zakładce Rynek pracy**: wybierasz kandydata, pensję, umowę, kanał rekrutacji oraz lokal i wolne
+  stanowisko. **Obsadę** zmieniasz w Mój lokal ▸ Obsada stanowisk: na wolne stanowisko przypiszesz osobę z tego
+  samego lokalu (od razu) albo z innego Twojego lokalu. Na przejście do innego lokalu **pracownik musi się zgodzić** –
+  chętniej, gdy jest zadowolony, lokale są blisko na mapie i dostanie jednorazowy dodatek (płacisz go tylko po zgodzie).
+  Odpowiedź poznasz po przeliczeniu tygodnia (Rynek pracy ▸ wyniki); kto odmówi, zostaje na swoim miejscu.
 - Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy (przy umowie o pracę
   i przy zleceniu tyle samo). **Premia** jest jednorazowa – płacisz ją w tym tygodniu, bez ZUS, i tylko w tym
   tygodniu podnosi zadowolenie.

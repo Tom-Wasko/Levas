@@ -22,6 +22,7 @@ from silnik.kuchnia import swiezosc
 from silnik.kuchnia.dostawcy import ceny_rundy, oferta_rundy
 from silnik.kuchnia.dostawcy import info as info_dostawcy
 from silnik.ludzie import czas_wlasciciela as cw
+from silnik.ludzie import przenosiny as przen
 from silnik.ludzie import rynek_pracy as rp
 from silnik.model import Firma, do_slownika
 from silnik.nieruchomosci import per_lokal as pl
@@ -80,7 +81,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     przejecia = {"przejecie": pr.przejmij(gra.dane, stan.firmy, firma, d.get("przejecie"), r, None, ks, rach),
                  "wypowiedzenia": pr.wypowiedz(gra.dane, stan.firmy, firma, d.get("wypowiedz"), r)}
     # limit nowych i ważność ofert podkupienia (licytacje i odpowiedzi pracowników – dopiero w przeliczeniu)
-    dd, _, raport = rp.przed_decyzjami(gra.dane, stan.kopia(), {firma: d}, r, gra.konfiguracja["ziarno"])
+    dd, _, raport = rp.przed_decyzjami(gra.dane, stan.kopia(), {firma: d}, r, gra.konfiguracja["ziarno"], podglad=True)
     d, uwagi_rp = dd[firma], raport[firma]["uwagi"]
     bank_info = bk.poczatek_rundy(gra.dane, f, d, r, ks, rach)
     harpagon_info = lw.poczatek_rundy(gra.dane, f, d, r, rach)   # wizyty – dopiero w przeliczeniu
@@ -387,6 +388,10 @@ def _agencja(gra: Gra, firma: str, runda: int, f: Firma, stan, edycja: bool) -> 
             "headhunter": rp.headhunter_dostepny(dane, runda),
             "cudzy": rp.pracownicy_rynku(dane, stan, firma, runda) if rp.headhunter_dostepny(dane, runda) else [],
             "oferty_dla_mnie": rp.oferty_dla(gra.decyzje.get(runda, {}), f, firma) if edycja else [],
+            # UF20: szansa zgody na przejście do innego lokalu – panel liczy ją na żywo (wzór jak przenosiny.szansa)
+            "przenosiny": {"zasady": przen.ustawienia(dane),
+                           "prog": ((dane.z.get("pracownicy") or {}).get("odejscia") or {}).get("prog_zadowolenia", 0.0),
+                           "odleglosci": {a.id: {b.id: przen.odleglosc(dane, a.id, b.id) for b in f.lokale} for a in f.lokale}},
             "moi": [{"id": p.id, "imie_nazwisko": p.imie_nazwisko, "zawod": p.zawod, "gwiazdki": p.gwiazdki, "pensja": p.pensja,
                      "umowa": p.umowa, "staz": rp.staz(p, runda), "okres": rp.okres_wypowiedzenia(dane, p, runda),
                      "odchodzi": do_slownika(p.odchodzi) if p.odchodzi else None}

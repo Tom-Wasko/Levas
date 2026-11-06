@@ -1,6 +1,6 @@
 # Ufajnianie – plan (ustalenia z autorem 6.11.2026)
 
-Gałąź `ufajnianie` od `kalibracja-b6@9e2afb9` (decyzja autora 6.11 wieczorem: najpierw praca, scalanie do main
+Gałąź `ufajnianie` od `kalibracja-b@9e2afb9` (decyzja autora 6.11 wieczorem: najpierw praca, scalanie do main
 jutro – `SCALANIE.md`). Worktree `Pulpit\Levas\levas_ufajnianie`; w `levas_gra` druga sesja liczy B14 – nie
 zmieniać tam kodu, danych ani gałęzi. Stan pracy: `PRZEKAZANIE.md` i `POSTEP.md` (UF0–UF24).
 

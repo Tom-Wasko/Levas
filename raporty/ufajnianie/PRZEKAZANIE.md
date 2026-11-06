@@ -3,11 +3,11 @@
 Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- raporty/ufajnianie/PRZEKAZANIE.md`.
 
 ## Gdzie i jak pracujesz
-- Worktree: `C:\Users\PC\Pulpit\Levas\levas_ufajnianie`, gałąź **`ufajnianie`** (od `kalibracja-b6@9e2afb9`, czyli
+- Worktree: `C:\Users\PC\Pulpit\Levas\levas_ufajnianie`, gałąź **`ufajnianie`** (od `kalibracja-b@9e2afb9`, czyli
   main + B6–B13 + przekazanie B14). Push: `git push origin ufajnianie`. **Nie pushuj na main** – scalanie robi się
   osobno według `SCALANIE.md` (autor zlecił je na 7.11.2026, po zakończeniu pracy nocnej).
-- `C:\Users\PC\Pulpit\Levas\levas_gra` to główny checkout na gałęzi `kalibracja-b6`. Pracuje tam druga sesja
-  Claude Code („bambiczkowanie”), która liczy pomiary B14 i commituje na `kalibracja-b6`. **Nie zmieniaj tam niczego**
+- `C:\Users\PC\Pulpit\Levas\levas_gra` to główny checkout na gałęzi `kalibracja-b`. Pracuje tam druga sesja
+  Claude Code („bambiczkowanie”), która liczy pomiary B14 i commituje na `kalibracja-b`. **Nie zmieniaj tam niczego**
   (kodu, `gra/dane/`, gałęzi, katalogów `raporty/kalibracja/pomiary/`). Kontakt z nią: `ListAgents` → `SendMessage`.
 - Python: `../levas_gra/gra/.venv/Scripts/python` (wspólny venv – pakiety bez instalacji edytowalnej, więc kod
   bierze się z bieżącego katalogu). Nie wołaj gołego `python` w Bash na Windows (zawiesza się).
@@ -30,7 +30,7 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
 ## Plan i ustalenia
 - `plan.md` – wszystkie ustalenia z autorem (układ menu, decyzje do każdej poprawki) i **plan implementacji**
   (kolejność od najtrudniejszych, szczegóły techniczne każdego zadania).
-- `SCALANIE.md` – jak jutro skleić `kalibracja-b6` i `ufajnianie` do `main`.
+- `SCALANIE.md` – jak jutro skleić `kalibracja-b` i `ufajnianie` do `main`.
 
 ## Stan
 - [x] UF0 sprzątanie (Pulpit\Levas, repo), notatki, plan, przekazanie – 6.11.2026 wieczorem.
@@ -43,8 +43,7 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   - Nowe zakładki: `licytacje` (przejecia.js), `przewozy` (swiezosc.js, akcje przewozów przeniesione), `sanepid`
     (urzad.js), `zespol` (hr.js – tabela wszystkich pracowników, klik → profil), `gielda` (gielda.js, „w budowie”,
     `W_BUDOWIE` używa też mapa.js). `lokal_przeglad` z lokal.js to teraz część `stan_lokalu`.
-  - W Moim lokalu część „zatrudnienie” to `obsada` (kopia `zatrudnienie` bez wyników). **UF20** ma z niej usunąć
-    zatrudnianie (zostaje sama obsada), a zatrudnianie z przypisaniem dać do Rynku pracy.
+  - W Moim lokalu część „zatrudnienie” to `obsada` (kopia `zatrudnienie` bez wyników) – po UF20 sama obsada.
   - Udogodnienia i Szkolenia to zwykłe zakładki w Ludzie; Udogodnienia mają mały wybór lokalu (`wyborLokaluKrotki`).
   - `app.js`: zablokowane pozycje (góra, podmenu, pasek podzakładek) – kłódka, szare, „od rundy N” (dla grupy
     najwcześniejsza runda części); `odRundy` liczy też zakładki złożone.
@@ -65,7 +64,16 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
 - [x] UF11 – zakładka `ranking` (ogolne.js) w grupie Wyniki, od rundy 3. Dane: `v.ranking` z `api/prezentacja.py:
   historia_rankingu` (miejsca po każdej rundzie 2…, liczone jak `miejsca(karta_skumulowana)` – test w test_panel_mg.py).
   Tabela w Karcie wyników nazywa się teraz „Karty wszystkich zespołów”. Bez `Array.at` (node 14 w testach).
-- Następne: UF20, potem kolejno: UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF20 – silnik: decyzja `przenosiny: [{pracownik, typ, nr, dodatek}]` (`silnik/ludzie/przenosiny.py`). W tym samym
+  lokalu – od razu; do innego lokalu – zgoda losowana w `rynek_pracy.przed_decyzjami` (strumień „przenosiny”; w podglądzie
+  `podglad=True` – bez losowania, lista błędów pokazuje szansę). Wzór i parametry: `zalozenia.yaml: pracownicy.przenosiny`
+  (zadowolenie − próg odejść, odległość lokali na mapie, dodatek ÷ pensja). Kolejność w `decyzje.zastosuj`: zwolnienia →
+  zmiany → przenosiny → zatrudnienia. Raport: `wyniki.rynek_pracy.przenosiny` (odpowiedzi) i `.przeniesieni` (wykonane).
+  Panel (hr.js): w grze z lokalami pusty kafelek obsady ma „Przypisz osobę” (`oknoPrzypisania`, `oknoPrzenosin` z szansą
+  przy dodatkach 0/¼/½/1 pensji – `szansaPrzejscia` to kopia wzoru, odległości w `v.agencja.przenosiny`) i „Stań sam”;
+  zatrudnianie – `kandydaciRynku` w Rynku pracy (okno zatrudnienia bez stanowiska ma `<select id="z-miejsce">` typ:nr).
+  Gra bez lokali (stare zapisy) – po staremu. Test: `testy/ludzie/test_przenosiny.py`.
+- Następne: UF21+UF10, potem kolejno: UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 
 ## Pułapki
 - Pomiary bambiczkowania czytają dane z `levas_gra`, nie stąd – tu możesz zmieniać `gra/dane/`.
