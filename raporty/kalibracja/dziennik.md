@@ -888,3 +888,49 @@ pierwszych tygodniach.
    2 procesy, jeden pomiar naraz (przy 3 procesach zabrakło pamięci).
 4. Potem: tabela strefa × wariant (każda strefa najlepsza dla jakiejś strategii), kupno od połowy gry 18 rund,
    działka tylko w 26 rundach, licytacja, inwentarz (opis botów w sekcji `lokal`), odhaczenie B6 w POSTEP.
+
+## B7 – menu i ceny (6.11.2026, Claude Code, Opus 5.5) – w toku, gałąź `kalibracja-b6`
+
+**Pomiar `b7_cena`** (warianty `cena` 0,85/1,0/1,15/1,3, `jakosc` 1/2/3, `menu` 3/5/8; zrównoważony, tani,
+premium; 18 i 26 rund, 6 firm, 6 ziaren, 792 gry). Różnica karty wariant − baza (średnio 18 i 26 rund, wygrane
+pary z 12; w nawiasie majątek netto 18r). Baza strategii: zrównoważony cena 0,92 / 2★ / 6 dań, tani 0,78 / 1★ /
+8 dań, premium 1,08 / 3★ / 5 dań.
+
+| wariant | zrównoważony | tani | premium |
+|---|---|---|---|
+| cena 0,85 | −0,00, 5/12 (−2 tys.) | +0,04, 10/12 (+7 tys.) | −0,24, 0/12 (−27 tys.) |
+| cena 1,0 | −0,05, 1/12 (−5 tys.) | +0,12, 9/12 (+20 tys.) | −0,06, 0/12 (−7 tys.) |
+| cena 1,15 | −0,12, 0/12 (−13 tys.) | +0,16, 11/12 (+27 tys.) | +0,02, 4/12 (0) |
+| cena 1,3 | −0,17, 0/12 (−18 tys.) | +0,11, 6/12 (+22 tys.) | +0,06 ± 0,07, 9/12 (−2 tys.) |
+| jakość 1★ | −0,01, 6/12 | baza | −0,18, 0/12 (−30 tys.) |
+| jakość 2★ | baza | −0,03, 2/12 | −0,21, 0/12 (−33 tys.) |
+| jakość 3★ | **+0,25, 12/12** (+27 tys.) | −0,04, 6/12 | baza |
+| menu 3 | −0,42, 0/12 | −0,25, 0/12 | −0,37, 0/12 |
+| menu 5 | −0,18, 0/12 | −0,07, 6/12 | baza |
+| menu 8 | **+0,20, 12/12** (+26 tys.) | baza | **+0,74, 12/12** (+61 tys.) |
+
+Wyniki 26 rund są takie same co do znaku (różnice nieco większe). Alarmów brak, pierwszy plus bez zmian.
+
+Diagnoza (pary rozpisane skryptami w scratchpadzie, ziarno 1000):
+1. **Cena – zrównoważony i premium bez dominacji.** Zrównoważony ma optimum przy swojej cenie (0,85–0,92),
+   premium przy 1,15–1,3, ale bez istotnej różnicy (+0,06 ± 0,07). H18 (premium ×1,2 wyraźnie lepsze) po B6
+   (konkurencja stref) już nie zachodzi.
+2. **Cena – tani gra za tanio, bo ma za małą kuchnię.** Tani (`min_kuchnia: 1`, 2 osoby) traci 45% popytu w
+   kolejce (12,1 z 27,0 tys. klientów: „pracownicy/sprzęt”). Bot nie zatrudnia trzeciej osoby, bo przy cenie 0,78
+   dodatkowa sprzedaż × marża porcji nie pokrywa pensji (`silnik/boty.py: _plan_lokalu`). Przy cenie 1,15
+   przychód +30%, towary −13%, dochód 108 vs 42 tys. To zamierzony kompromis („przy zatkanej kuchni podwyżka ma się
+   opłacać”), a nie błąd modelu popytu. Do sprawdzenia: tani z `min_kuchnia: 2`.
+3. **Jakość – 3★ dominuje 2★, a 2★ nie różni się od 1★.** Mnożnik jakości w atrakcyjności
+   (`zalozenia.yaml: popyt.wspolczynniki_jakosci`) to 1★ 0,616, 2★ 0,654, 3★ 1,0: krok 2→3★ daje +53%
+   atrakcyjności, krok 1→2★ tylko +6%. Składniki 3★ są droższe o ok. 18% (mięso 330 → 390 zł), więc zrównoważony
+   z 3★: przychód +26%, towary +48%, dochód 119 vs 94 tys. Środkowa jakość nie ma sensu: albo 1★ (tani), albo 3★.
+   Wpływ jakości na opinie (`mapa/klienci.yaml: opinie.jakosc` 0,3 gwiazdki za gwiazdkę ponad 2) jest mały obok
+   tego mnożnika. Następna próba: łagodniejsza krzywa (2★ wyżej, 3★ niżej), pomiar `b7_jakosc`.
+4. **Menu – pełne menu (8 dań) dominuje.** Każde danie ma własną pulę klientów (`uslugi.yaml: popyt_roczny`), a
+   klient dania, którego lokal nie ma w menu, nie wybiera innego dania w tym lokalu, tylko inny lokal albo
+   „obiad w domu”. Nowe dania nie wymagają nowego sprzętu (rożen i frytownica już są), więc szersze menu to
+   prawie same nowe pule: premium 5 → 8 dań – przychód +48%, koszty +31%, jedna osoba więcej, dochód 144 vs
+   58 tys. Kompromis z inwentarza („więcej składników, psucie, czas kuchni”) prawie nie działa. Liczby w danych go
+   nie odtworzą bez sztucznych kosztów, potrzebna mechanika (zastępowalność dań albo koszt stały dania) –
+   propozycja dla autora w `notatki_do_zmiany.md`. Ranking dań bota (`silnik/boty.py: _ranking_uslug`, przychód na
+   godzinę kucharza) daje premium frytki, napój i dodatek zamiast talerza i boxa.

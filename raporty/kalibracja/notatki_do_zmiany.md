@@ -165,3 +165,28 @@ Propozycje (do wyboru):
 
 Rekomendacja: 1 z wagą 0,5 (lokal za 115 tys.: rozwój ok. 0,74 zamiast 0,80 – nadal wyraźnie wyżej niż 0,535 przy
    najmie).
+
+## B7 – szerokie menu bez kosztu (6.11.2026) → `notatki/Ustalenia gry.md` (menu i popyt); do decyzji autora
+
+Każde danie ma własną pulę klientów miasta (`uslugi.yaml: popyt_roczny`). Klient dania, którego lokal nie ma w
+menu, nie wybiera w tym lokalu innego dania, tylko inny lokal albo „obiad w domu”. Dodatkowe dania (box, talerz,
+falafel) nie wymagają nowego sprzętu, bo rożen i frytownica już stoją. Dlatego każde nowe danie to prawie same
+nowe pule klientów. Pomiar `b7_cena` (6 ziaren, 18 i 26 rund): pełne menu 8 dań wygrywa w 12/12 par u
+zrównoważonego (6 → 8 dań: karta +0,20, majątek +26 tys.) i u premium (5 → 8: karta +0,74, majątek +61 tys.;
+przychód +48%, koszty +31%). Kompromis z inwentarza („szersze menu – więcej składników, psucie i czas kuchni;
+wąskie – prostsza kuchnia”) prawie nie działa: dobry uczeń zawsze weźmie wszystko.
+
+Propozycje (do wyboru):
+1. **Zastępowalność dań** (rekomendowana): klient dania, którego nie ma w menu lokalu, z ułamkiem
+   `zastepowalnosc` (np. 0,5–0,6) bierze danie tej samej kategorii (kebab w bułce zamiast talerza). W modelu:
+   lokal bez dania uczestniczy w jego puli z atrakcyjnością × `zastepowalnosc`, a obsłużeni klienci kupują danie
+   zastępcze. Wąskie menu traci mniej klientów, szerokie zyskuje mniej, ale nadal więcej. Już dziś
+   `mapa/menu.yaml: zmiana_dania` (0,5) robi to samo dla dania z menu, którego zabrakło – byłoby to rozszerzenie
+   tej zasady na dania spoza menu.
+2. **Koszt stały dania**: każde danie w menu lokalu kosztuje tygodniowo (przygotowanie, minimalna partia,
+   resztki), np. 150–300 zł. Proste, ale sztuczne – uczeń nie zobaczy, skąd koszt.
+3. **Bez zmian**: pełne menu jako „oczywista dobra decyzja” (jak płacenie ZUS). Wtedy w botach wszystkie
+   strategie biorą 8 dań, a strategie różnią się ceną, jakością, strefą i marketingiem.
+
+Rekomendacja: 1 – zgodne z realiami (klient przychodzi „na kebaba”, a nie na konkretną pozycję) i z istniejącą
+zasadą zmiany dania. Po zgodzie: pomiar `menu` 3/5/8 jak w `b7_cena` z `zastepowalnosc` 0,4 / 0,6.
