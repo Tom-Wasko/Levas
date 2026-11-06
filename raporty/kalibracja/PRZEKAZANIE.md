@@ -1,14 +1,17 @@
-# Przekazanie pracy – kalibracja B6–B15 (stan 6.11.2026, wieczór)
+# Przekazanie pracy – kalibracja B6–B15 (stan 7.11.2026, po B14)
 
 Ten plik pozwala nowemu agentowi przejąć kalibrację bez znajomości wcześniejszych rozmów. Przeczytaj go
 w całości, potem `AGENTS.md`, `POSTEP.md` (sekcja „Krok 5” i lista B6–B15) i ostatnie sekcje
-`raporty/kalibracja/dziennik.md` (B12, B13).
+`raporty/kalibracja/dziennik.md` (B13, B14).
 
 ## 1. Gdzie jesteśmy
 
 - Repo: `C:\Users\PC\Pulpit\Levas\levas_gra`, **gałąź `kalibracja-b6`** (cała praca B6–B15 tylko tutaj).
-- B6–B13 zamknięte i wypchnięte (ostatni commit B13: `07b26e3`). W toku: **B14 – boty po kalibracji**.
-  Zostaje B14 i B15 (opis w `POSTEP.md`).
+- B6–B14 zamknięte i wypchnięte. Zostaje **B15 – raport końcowy** (opis w `POSTEP.md`).
+- Równolegle sesja „ufajnianie” (worktree `Pulpit\Levas\levas_ufajnianie`, gałąź `ufajnianie`) przebudowuje
+  Ludzi i menu i scali `kalibracja-b6` + `ufajnianie` do main na zlecenie autora (instrukcja
+  `raporty/ufajnianie/SCALANIE.md` na jej gałęzi). Każdy wynik commitować od razu; zmiany w `gra/silnik/ludzie/`,
+  `panel_gracza/static/zakladki/index.js`, `hr.js`, `rynek_pracy.js` opisywać w dzienniku (konflikty).
 - Pełny dziennik pomiarów i decyzji: `raporty/kalibracja/dziennik.md`. Propozycje czekające na autora:
   `raporty/kalibracja/notatki_do_zmiany.md`. Hipotezy H1–H29: `raporty/kalibracja/inwentarz.md`.
 - Pomiary (katalogi z `gry.csv`, `pary.csv`, `raport.md`): `raporty/kalibracja/pomiary/`.
@@ -95,50 +98,17 @@ EOF
 git pull -q --rebase --autostash origin kalibracja-b6 && git push -q origin kalibracja-b6
 ```
 
-## 4. B14 – co zrobione i co dalej
+## 4. B14 zrobione – co dalej (B15)
 
-Cel z planu: poziomy botów wyraźnie różne, każda strategia wygrywa w jakimś kontekście, cele B5 nadal spełnione.
+B14 opisane w dzienniku („## B14 – boty po kalibracji”): trudny kupuje drugi lokal od 50 tys. zł (było 60),
+poziomy 99 / 84 / 100 par, turniej strategii (`pomiary/b14_turniej`), H24 – propozycja dla `czlowiek_dobry`
+w `notatki_do_zmiany.md`, alarm słabej premium – przypadek graniczny. Kontrola trudności „jak człowiek”
+(odniesienie: `b12_trudnosc`, polecenie w dzienniku B12) – powtórzyć tylko po zmianie liczb tych poziomów
+albo gry.
 
-Stan wyjściowy (`b12_trudnosc`, wersje „jak człowiek”, rywale średni, karty bez zmian po B13):
-- dobra > średnia 87/100 par (cel ≥ 80%), słaba < średnia 99/100, karta słaba/średnia/dobra 0,10 / 0,45 / 0,52;
-- pierwszy plus średniej w rundach 4–6 tylko 43/100 (w 3: 57) – to liczby B5 (rozruch), propozycja czeka u autora;
-- alarmy słabej 1/100: premium słaba, ziarno 1018 – 4 tygodnie strat na starcie (gotówka po 1. rundzie 8 tys. zł,
-  potem 0), w rundzie 5 debet 151 zł ponad limit (`skrypty/alarm2.py premium czlowiek_slaby 1018 7`);
-- wg strategii (słaba / średnia / dobra): zrównoważony 0,19/0,54/0,65, tani 0,10/0,52/0,55, premium 0,11/0,39/0,53,
-  **agresywny −0,06/0,34/0,34** (dobra = średnia, słaba poniżej „nic nie rób” −0,016), naśladowca 0,16/0,46/0,54.
-  Słaba na minusie jest dozwolona przez cele B5 – problemem jest tylko alarm.
-
-W toku: **pomiar `pomiary/b14_poziomy`** – poziomy botów łatwy/średni/trudny/niemożliwy, 5 strategii × 20 ziaren,
-rywale średni, 400 gier (uruchomiony 6.11 wieczorem, log `pomiary/b14_poziomy.log`). Jeśli nie skończył się
-w całości – dokończyć tym samym poleceniem:
-
-```
-.venv/Scripts/python -X utf8 -m balans.warianty pelny -o $P/b14_poziomy --ziarna 20 \
-  --strategie zrownowazony,tani,premium,agresywny,nasladowca --firm 6 --rund 18 \
-  --poziom latwy,sredni,trudny,niemozliwy --rywale sredni --warianty baza --procesy 2
-```
-
-Analiza: `skrypty/poz.py $P/b14_poziomy latwy,sredni,trudny,niemozliwy` (pary niższy < wyższy wg strategii,
-alarmy, miejsca). Odniesienie z B5: łatwy < średni 83/100, średni < trudny 88/100, karty 0,10 / 0,33 / 0,67.
-
-Następne kroki B14:
-1. Wynik `b14_poziomy`. Jeśli średni < trudny słabo (< ok. 85%) – rozważyć umiejętność z B11: trudny bierze kredyt
-   na drugi lokal (kredyt + drugi lokal dawał +0,30 karty, `b11_rozwoj`); zmiana poziomu `trudny` (nie
-   `czlowiek_dobry`) z testem.
-2. Turniej strategii (wszystkie firmy na jednym poziomie, kto wygrywa wg karty w jakim kontekście):
-   `PYTHONPATH=. .venv/Scripts/python -X utf8 ../raporty/kalibracja/skrypty/turniej.py KATALOG 2 100 120
-   sredni:6:18 sredni:4:18 sredni:8:18 sredni:6:12 sredni:6:26 trudny:6:18` – zapisuje `KATALOG/gry/*.csv`
-   (strategia, strefy, karta, majątek, miejsce). Skrypt nowy, nieprzetestowany – najpierw 1 gra. Celem jest, żeby
-   każda z 5 strategii była 1. w jakimś kontekście (liczba firm, długość gry, strefa).
-3. H24 (dobra ≈ średnia przy agresywnym i tanim): diagnoza parami jak `k_dobry` (warianty `czlowiek:*`
-   w `balans/warianty.py`); **zmiany `czlowiek_dobry` tylko jako propozycja** z tabelą przed/po.
-4. Alarm słabej premium (ziarno 1018): sprawdzić, czy da się go usunąć umiejętnością bota (np. słaba nie kupuje
-   dodatków przy zerowej gotówce) – nowa umiejętność z testem; inaczej opisać jako przypadek graniczny.
-5. Po zmianach: kontrola trudności (`b14_trudnosc`) i porównanie z `b12_trudnosc` (`trud.py`).
-6. Sekcja „## B14 – …” w dzienniku, odhaczenie w `POSTEP.md`, propozycje w notatkach, commit, push.
-
-Potem **B15**: raport końcowy przed/po od tagu `kalibracja-start`, pola `zrodlo`/`pewnosc` w YAML przy każdej
-zmienionej liczbie, zebranie propozycji z `notatki_do_zmiany.md`, instrukcja gracza (`gra/INSTRUKCJA.md` + PDF).
+**B15**: raport końcowy przed/po od tagu `kalibracja-start`, pola `zrodlo`/`pewnosc` w YAML przy każdej
+zmienionej liczbie, zebranie propozycji z `notatki_do_zmiany.md`, instrukcja gracza (`gra/INSTRUKCJA.md` – zmiana
+tekstu z B13 (H22) czeka na odświeżenie PDF: `manage.py instrukcja_pdf`, osobny commit „Instrukcja: …”).
 
 ## 5. Skrypty w `raporty/kalibracja/skrypty/`
 
@@ -158,4 +128,5 @@ Uruchamiać z `gra/` z `PYTHONPATH=.`:
 W `notatki_do_zmiany.md`: waga nieruchomości (Z1), lokal niewyposażony, wykup na kredyt, szerokie menu bez kosztu
 (menu 8 dań u premium +0,53 karty), rozruch (liczba B5), promocje bez trwałego skutku / z rabatem przegrywają,
 płaca minimalna bez rotacji, szkolenie z efektem na kilka tygodni, udogodnienia bez skutku przy uczciwej płacy,
-kredyt bez celu obniża kartę (U22), mandaty skarbowe nie obniżają karty (Z1). Merge `kalibracja-b6` → main.
+kredyt bez celu obniża kartę (U22), mandaty skarbowe nie obniżają karty (Z1), „jak człowiek – dobry” kupuje
+drugi lokal jak trudny (B14). Merge `kalibracja-b6` → main.

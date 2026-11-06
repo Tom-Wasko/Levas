@@ -1488,3 +1488,71 @@ zmniejszają gotówkę i majątek netto firmy. Liczby bez zmian.
 **Szybki pomiar wszystkich obszarów** – to `b13_wagi` (35 wariantów z B6–B12 na kalibrowanych danych): bez nowej
 dominacji – wyraźnie wygrywają tylko zabiegi, które też budują majątek (menu 8 u premium – propozycja B7 czeka,
 kredyt na rozwój, drugi lokal taniego, dyskont za czas właściciela). B13 zamknięte.
+
+## B14 – boty po kalibracji (7.11.2026, gałąź `kalibracja-b6`)
+
+Cel z planu: poziomy botów wyraźnie różne, każda strategia wygrywa w jakimś kontekście, cele B5 nadal spełnione.
+
+**Poziomy łatwy / średni / trudny / niemożliwy** (`pomiary/b14_poziomy`, 5 strategii × 20 ziaren × 18 rund ×
+6 firm, rywale średni, 400 gier; analiza `skrypty/poz.py`):
+
+| para (wyższy > niższy, ta sama gra) | razem | agresywny | naśladowca | premium | tani | zrównoważony |
+|---|---|---|---|---|---|---|
+| średni > łatwy | 99/100 | 19/20 | 20/20 | 20/20 | 20/20 | 20/20 |
+| trudny > średni (przed) | 80/100 | 20/20 | 13/20 | 12/20 | 20/20 | 15/20 |
+| niemożliwy > trudny | 100/100 | 20/20 | 20/20 | 20/20 | 20/20 | 20/20 |
+
+Karta średnio: łatwy 0,09, średni 0,59, trudny 0,81, niemożliwy 1,67; miejsce 5,9 / 3,7 / 2,4 / 1,1. Alarmy:
+łatwy agresywny 12/20 (łatwy wolno bankrutować), niemożliwy agresywny 2/20 (3 lokale, przejściowy debet).
+Odniesienie B5: średni > łatwy 83%, trudny > średni 88%.
+
+**Trudny – drugi lokal wcześniej.** Prawie cała przewaga trudnego nad średnim to drugi lokal: trudny z jednym
+lokalem ≈ średni (premium −0,09, zrównoważony 0,00), z dwoma +0,06…+0,47 karty. Próg gotówki na drugi lokal
+(`kolejny_lokal.gotowka`, B3: 60 tys. zł) – pomiary `b14_trudny`, `b14_trudny2`, `b14_trudny3` (ten sam układ):
+
+| trudny … | karta | trudny > średni | zrównoważony | tani | premium | agresywny | naśladowca | alarmy |
+|---|---|---|---|---|---|---|---|---|
+| 60 tys. zł (przed) | 0,81 | 80/100 | 15 | 20 | 12 | 20 | 13 | 0 |
+| **50 tys. zł (wdrożone)** | **0,87** | **84/100** | 18 | 20 | 12 | 20 | 14 | 0 |
+| 45 tys. zł | 0,91 | 86/100 | 18 | 20 | 13 | 20 | 15 | 1 (agresywny, 3,3 tys. zł ponad limit w tygodniu zakupu) |
+| 45 tys. zł, do 3 lokali | – | – | – | 20 | 13 | 20 | – | 2 |
+| bez prób kilku cen (`mnozniki_ceny`) | – | – | 17 | – | 8 | – | 16 | 0 |
+
+Wdrożone 50 tys. zł (`dane/boty.yaml`, `trudny.kolejny_lokal`) – bez alarmów, 84/100. Próby kilku cen zostają
+(bez nich premium 8/20). Trzeci lokal niewiele daje (tani +0,09) i zbliża trudnego do niemożliwego – bez zmiany.
+Premium dalej słabo odróżnia trudnego od średniego (12/20, karta 0,70 wobec 0,64): drugi lokal premium w drogiej
+strefie zwraca się wolno. Niemożliwy (45 tys. zł, 3 lokale, przewaga popytu) nadal wyraźnie wyżej (karta 1,67).
+Zmiana dotyczy tylko poziomu `trudny` – cele trudności B5 liczone są dla „jak człowiek” z rywalami średnimi, więc
+kontrola `b14_trudnosc` jest zbędna (te same gry co `b12_trudnosc`; potwierdzone grą bazową `b14_dobry` –
+100% kart identycznych z `b12_trudnosc`).
+
+**Turniej strategii** (`pomiary/b14_turniej`, `skrypty/turniej.py`: wszystkie firmy na tym samym poziomie,
+ziarna 1000–1019; 8 firm – 5 strategii + 3 losowe powtórki):
+
+| kontekst | 1. miejsce wg karty (z 20 gier) | karta najlepszej strategii |
+|---|---|---|
+| średni, 5 firm, 10 rund | zrównoważony 9, premium 5, naśladowca 5, tani 1 | zrównoważony 0,68 |
+| średni, 5 firm, 18 rund | premium 13, zrównoważony 4, naśladowca 3 | premium 0,90 |
+| średni, 8 firm, 18 rund | zrównoważony 7, tani 7, naśladowca 3, premium 2, agresywny 1 | zrównoważony 0,52 |
+| trudny, 5 firm, 18 rund | agresywny 7, tani 6, zrównoważony 5, naśladowca 1, premium 1 | agresywny 1,06 |
+| trudny, 8 firm, 18 rund | tani 10, agresywny 7, zrównoważony 2, naśladowca 1 | tani 0,68 |
+
+Każda strategia wygrywa w jakimś kontekście: premium w długiej grze z małą konkurencją, zrównoważony w krótkiej
+i w tłoku, tani przy dużej konkurencji z dwoma lokalami, agresywny przy dwóch lokalach (poziom trudny) – przy
+jednym lokalu jego reklama się nie zwraca (karta 0,18–0,39 na średnim). Naśladowca wygrywa pojedyncze gry
+(do 5/20), ale w żadnym kontekście nie jest najlepszy – zgodnie z rolą (kopiuje lidera z opóźnieniem). Zwycięzcy
+wg strefy: zrównoważony i premium w centrum i przy dworcu, tani na Czechowie i LSM.
+
+**H24 – dobra ≈ średnia przy agresywnym** (`pomiary/b14_dobry`, „jak człowiek – dobry”, rywale średni, warianty
+jak w `k_dobry`): agresywny dobry 12/20 nad średnim (karta 0,34 / 0,34), bez drugiego lokalu 16/20, bez reklamy 9/20,
+prognoza bez poprawki o pulę 8/20 – przewaga dobrej to prognoza i reklama, drogi drugi lokal ją zjada. Tani dobry
+już 18/20 (H24 dla taniego nieaktualne po B6). Drugi lokal jak u trudnego podnosi kartę dobrej 0,52 → 0,61 przy
+86/100 (było 87) – **propozycja w `notatki_do_zmiany.md`** (liczba `czlowiek_dobry` – decyzja autora po K).
+
+**Alarm słabej premium** (ziarno 1018, `skrypty/alarm2.py premium czlowiek_slaby 1018 6`): cztery tygodnie strat
+po 2–8 tys. zł (drogi lokal premium, słaba planuje na oko), gotówka 0 od 2. rundy, w 5. rundzie debet 151 zł
+ponad limit, potem zysk. Przypadek graniczny (1/100, kara banku to naturalna informacja dla gracza) – bez zmiany
+poziomu słabego; nowa umiejętność („nie kupuje przy zerowej gotówce”) zmieniłaby cele B5 słabej.
+
+**H19:** słaba agresywna nadal poniżej „nic nie rób” (−0,06 wobec −0,016) – dozwolone przez cele B5 (słaba może
+tracić), zostaje jako przestroga przed reklamą bez planu.

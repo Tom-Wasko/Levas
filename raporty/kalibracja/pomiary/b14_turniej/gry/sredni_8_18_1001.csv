@@ -1,0 +1,9 @@
+kontekst,ziarno,firma,strategia,strefy,lokale,karta,majatek,miejsce
+sredni:8:18,1001,F0_zrownowazony,zrownowazony,stare_miasto,1,0.7892,145019.64,1
+sredni:8:18,1001,F1_nasladowca,nasladowca,centrum,1,0.5706,113445.85,3
+sredni:8:18,1001,F2_zrownowazony,zrownowazony,dworzec,1,0.5796,116073.62,2
+sredni:8:18,1001,F3_premium,premium,lsm_czuby,1,0.0078,58976.72,8
+sredni:8:18,1001,F4_nasladowca,nasladowca,centrum,1,0.4965,108637.75,4
+sredni:8:18,1001,F5_agresywny,agresywny,akademickie,1,0.2134,94376.81,7
+sredni:8:18,1001,F6_tani,tani,lsm_czuby,1,0.4963,109438.36,5
+sredni:8:18,1001,F7_tani,tani,politechnika,1,0.4686,116155.47,6

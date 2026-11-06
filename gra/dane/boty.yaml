@@ -71,7 +71,7 @@ poziomy:
     mnozniki_ceny: [0.9, 0.95, 1.05, 1.1, 1.15]
     narzut_pracy: 1.25
     obsluga_kampanii: 0.9
-    kolejny_lokal: {obsluga: 1.0, gotowka: 60000, maks_lokali: 2}   # B3: drugi lokal, gdy stać (było 0.85)
+    kolejny_lokal: {obsluga: 1.0, gotowka: 50000, maks_lokali: 2}   # B3: drugi lokal, gdy stać (było 0.85); B14: 50 tys. (było 60 – b14_trudny3)
     dba_o_ludzi: {podwyzka_maks: 1.15, zapas: 0.01}
   niemozliwy:                    # P19 (pytanie 25): dla chętnych – wyzwanie, którego zwykle nie da się wygrać
     nazwa: Niemożliwy

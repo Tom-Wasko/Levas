@@ -1,0 +1,9 @@
+kontekst,ziarno,firma,strategia,strefy,lokale,karta,majatek,miejsce
+trudny:8:18,1011,F0_agresywny,agresywny,centrum;centrum,2,0.8002,152148.98,1
+trudny:8:18,1011,F1_premium,premium,centrum,1,0.1249,69688.73,8
+trudny:8:18,1011,F2_zrownowazony,zrownowazony,czechow;stare_miasto,2,0.5548,118501.02,3
+trudny:8:18,1011,F3_tani,tani,lsm_czuby;politechnika,2,0.6106,121486.82,2
+trudny:8:18,1011,F4_premium,premium,stare_miasto;czechow,2,0.4255,98970.62,7
+trudny:8:18,1011,F5_zrownowazony,zrownowazony,akademickie,1,0.4325,104922.82,6
+trudny:8:18,1011,F6_nasladowca,nasladowca,dworzec;felin,2,0.5481,107196.73,4
+trudny:8:18,1011,F7_agresywny,agresywny,politechnika;lsm_czuby,2,0.4979,120697.65,5

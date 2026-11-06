@@ -304,3 +304,28 @@ majątku, ale nie w karcie. Odsetki Harpagona (też poza KPiR) już obniżają d
    odjąć mandaty z rundy (skarbowe za deklaracje, z błędu biura bez OC, sanepidu). KPiR i podatki bez zmian.
    Rozszerzenie Z1 – wymaga zgody.
 2. **Bez zmian:** mandat widać tylko w gotówce i majątku; karta nagradza oszczędność na księgowości.
+
+## B14 – „jak człowiek – dobry” kupuje drugi lokal jak trudny (7.11.2026) → `notatki/Plan optymalizacji` (cele trudności B5, H24); do decyzji autora
+
+Diagnoza H24 (`pomiary/b14_dobry`, rywale średni, 20 ziaren × 18 rund × 6 firm, gra bazowa = dobra
+z `b12_trudnosc`). Wariant `lokale:drugi` daje dobremu drugi lokal na warunkach trudnego (obsługa 1,0 zamiast 0,85,
+gotówka 50 tys. zł zamiast 60 tys. zł). Porównanie z „jak człowiek – średni” w tych samych grach:
+
+| strategia | karta dobrej | dobra > średnia | majątek (tys. zł) | lokale po zmianie (2 / 1) |
+|---|---|---|---|---|
+| zrównoważony | 0,65 → 0,72 | 18 → 18 / 20 | 128 → 133 | 15 / 5 |
+| tani | 0,55 → 0,80 | 18 → 20 / 20 | 121 → 145 | 15 / 5 |
+| premium | 0,53 → 0,56 | 20 → 18 / 20 | 119 → 122 | 17 / 3 |
+| agresywny | 0,34 → 0,38 | 12 → 13 / 20 | 114 → 121 | 20 / 0 |
+| naśladowca | 0,54 → 0,57 | 19 → 17 / 20 | 114 → 116 | 12 / 8 |
+| razem | 0,52 → 0,61 | 87 → 86 / 100 | +4…+24 | – |
+
+Bez alarmów. Cel B5 (dobra > średnia ≥ 80%) dalej spełniony, wyraźnie rośnie karta i majątek dobrej – drugi lokal
+(decyzja autora po K: boty kupują kolejne lokale) zaczyna się opłacać także dobrej. Agresywny dalej słabo odróżnia
+dobrą od średniej (13/20): jego przewaga to prognoza i reklama (bez reklamy 9/20, prognoza bez poprawki o pulę
+8/20), a jeden lokal daje mu 16/20 – drogi lokal i duża reklama zjadają zysk z lepszej prognozy (jak w `k_dobry`).
+Możliwości:
+1. **Dobra kupuje drugi lokal jak trudny (zalecane):** w `dane/boty.yaml` `czlowiek_dobry.kolejny_lokal:
+   {obsluga: 1.0, gotowka: 50000, maks_lokali: 2}`. Liczba poziomu `czlowiek_dobry` – wymaga zgody (decyzja po K).
+2. **Bez zmian:** dobra kupuje drugi lokal ostrożniej (karta 0,52); agresywny dobry ≈ średni zostaje jako cecha
+   strategii (H24 opisana w dzienniku B14).
