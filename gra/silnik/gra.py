@@ -45,6 +45,8 @@ class Gra:
                 "ceny_dostawcow": opcje.get("ceny_dostawcow", "dane"),
                 "kredyt_odnawialny": opcje.get("kredyt_odnawialny", "na_biezaco"),
                 "auto_zamowienia": bool(opcje.get("auto_zamowienia", False)),   # przycisk „Zamów brakujące” (MG)
+                # B11: zaproszenia do klubu także dla botów (pomiary balans.warianty – bot ze strategią `kasyno`)
+                **({"kasyno_botow": True} if opcje.get("kasyno_botow") else {}),
                 "refleksja": _refleksja(opcje.get("refleksja") or "opcjonalna"),
                 "podpowiedzi": bool(opcje.get("podpowiedzi", False)),   # U19: rady na pierwsze rundy (MG)
                 "wersja_silnika": WERSJA_SILNIKA, "wersja_danych": dane.wersja,

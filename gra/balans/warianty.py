@@ -189,6 +189,21 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
           for n in (0, 3, 6)]   # w katalogu 6 pozycji
     w += [Wariant("zdarzenia:brak", "bez udziału w eventach w parkach (zawsze opcja domyślna)",
                   decyzje=(("zdarzenia", {}),))]
+    # B11: finanse – lokata z nadwyżki, jeden kredyt, Harpagon przy braku gotówki, kasyno
+    w += [Wariant(f"lokata:{n}", f"nadwyżka ponad 30 tys. zł na lokatę {n}-tygodniową",
+                  strategia=(("lokaty", {"bufor": 30000, "rund": n, "min_kwota": 2000,
+                                         "zerwij_ponizej": 10000}),)) for n in (4, 13)]
+    w += [Wariant("kredyt:start", "kredyt na start 50 tys. zł na rok w 1. rundzie",
+                  strategia=(("kredyt", {"produkt": "start", "kwota": 50000, "rund": 52}),)),
+          Wariant("kredyt:obrotowy", "kredyt obrotowy 40 tys. zł na rok w 7. rundzie (po historii)",
+                  strategia=(("kredyt", {"produkt": "obrotowy", "kwota": 40000, "rund": 52,
+                                         "od_rundy": 7}),)),
+          Wariant("harpagon:ratunek", "pożyczka 10 tys. zł u Harpagona, gdy gotówki < 3 tys. zł",
+                  strategia=(("harpagon", {"prog": 3000, "kwota": 10000}),))]
+    w += [Wariant(f"kasyno:{n}", f"po zaproszeniu 5 × 2000 zł – {n}",
+                  strategia=(("kasyno", {"gra": g, "zaklad": z, "stawka": 2000, "zakladow": 5}),))
+          for n, g, z in (("czerwone", "ruletka", "czerwone"), ("zero", "ruletka", "zero"),
+                          ("automat", "automat", None))]
     rodzaj = {k: v.get("rodzaj") for k, v in dane.dostawcy_info.items()}
     hurt = [k for k, r in rodzaj.items() if r in ("hurtownia", "piekarnia")]
     w += [Wariant("dostawcy:bez_producenta", "hurtownie i piekarnia, bez producenta mięsa",
@@ -327,7 +342,8 @@ def rozegraj(z: Zadanie) -> dict:
     t = time.perf_counter()
     k, w = z.kontekst, z.wariant
     fs = firmy(k, z.ziarno, list(dane_domyslne().boty["strategie"]))
-    opcje = {"kapital_startowy": k.kapital} if k.kapital else {}
+    # B11: zaproszenia do klubu także dla botów – bez zakładów nic nie zmieniają
+    opcje = {"kasyno_botow": True} | ({"kapital_startowy": k.kapital} if k.kapital else {})
     poziomy = {n: k.poziom if n == BADANA else k.rywale or k.poziom for n, _ in fs}
     g = Gra.nowa("warianty", fs, k.rund, z.ziarno, poziomy=poziomy, dane=dane_ze_zmianami(k.dane),
                  **opcje)

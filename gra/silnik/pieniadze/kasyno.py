@@ -103,10 +103,12 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno: int | str, portf
     return portfel, info
 
 
-def zaproszenie(dane: Dane, f: Firma, runda: int, ziarno: int | str, liczba_rund: int) -> int | None:
-    """Na koniec rundy: czy drużyna dostaje zaproszenie na następną rundę (boty nie dostają)."""
+def zaproszenie(dane: Dane, f: Firma, runda: int, ziarno: int | str, liczba_rund: int,
+                boty: bool = False) -> int | None:
+    """Na koniec rundy: czy drużyna dostaje zaproszenie na następną rundę (boty – tylko przy `boty`: pomiary B11,
+    konfiguracja `kasyno_botow`)."""
     K = dane_kasyna(dane)
-    if not K or f.bot:
+    if not K or (f.bot and not boty):
         return None
     z, nast = K["zaproszenie"], runda + 1
     if nast < z["od_rundy"] or nast > liczba_rund or len(f.zaproszenia) >= z["maks"] or nast in f.zaproszenia:

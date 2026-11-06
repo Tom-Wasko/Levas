@@ -439,8 +439,46 @@ class PrzejecieBota(Schemat):
     ulepszenia: Literal["zatrzymaj", "przywroc"] = "zatrzymaj"
 
 
+class LokatyBota(Schemat):
+    """B11: nadwyżka gotówki ponad `bufor` na lokatę na `rund` rund (bank z najlepszą lokatą), najwyżej jedna
+    lokata w rundzie i nie mniej niż `min_kwota`; gdy gotówki jest mniej niż `zerwij_ponizej` – zrywa najnowszą."""
+    bufor: float = Field(ge=0)
+    rund: int = Field(gt=0)
+    min_kwota: float = Field(0, ge=0)
+    zerwij_ponizej: float = Field(0, ge=0)
+
+
+class KredytBota(Schemat):
+    """B11: jeden kredyt `produkt` (najtańszy bank z tym produktem) w rundzie `od_rundy` na `kwota` i `rund` rund."""
+    produkt: str
+    kwota: float = Field(gt=0)
+    rund: int = Field(gt=0)
+    od_rundy: int = Field(1, ge=1)
+
+
+class HarpagonBota(Schemat):
+    """B11: pożyczka `kwota` od Harpagona, gdy gotówki jest mniej niż `prog`; spłata całego długu, gdy po niej
+    zostaje co najmniej `prog`."""
+    prog: float
+    kwota: float = Field(gt=0)
+
+
+class KasynoBota(Schemat):
+    """B11: po zaproszeniu `zakladow` zakładów po `stawka` zł (gra, zakład ruletki) – stawki wypłatą własną z firmy,
+    w następnej rundzie wygrana ponad oszczędności właściciela wraca do firmy wpłatą własną."""
+    gra: str
+    zaklad: str | None = None
+    stawka: float = Field(gt=0)
+    zakladow: int = Field(1, ge=1)
+
+
 class Strategia(Schemat):
     nazwa: str
+    # B11: finanse (bez – bot ich nie używa)
+    lokaty: LokatyBota | None = None
+    kredyt: KredytBota | None = None
+    harpagon: HarpagonBota | None = None
+    kasyno: KasynoBota | None = None
     leasing: LeasingBota | None = None   # gra z lokalami: sprzęt w leasingu przy małej gotówce (bez – zawsze zakup)
     wykup: PrzejecieBota | None = None       # wykup własnego lokalu w najmie (bez – nie wykupuje)
     przejecie: PrzejecieBota | None = None   # kupno budynku wynajmowanego przez rywala (bez – nie kupuje)

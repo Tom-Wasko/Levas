@@ -46,6 +46,9 @@ from .model import Firma, StanGry
 from .nieruchomosci import lokale as lk
 from .nieruchomosci import per_lokal as pl
 from .pieniadze import banki as bk
+from .pieniadze import kasyno as kas
+from .pieniadze import lichwiarz as lw
+from .pieniadze import wlasciciel as wl
 from .rynek import popyt as pp
 from .rynek import promocje as pm
 from .rynek import reklama as rk
@@ -772,11 +775,43 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 break
         if brak > 0 and (k := _kredyt_bez_historii(dane, f, brak, runda, d.get("kredyty_wez", []))):
             d.setdefault("kredyty_wez", []).append(k)
+    _finanse(dane, f, st, runda, d)
     if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
         d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
     if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
         d["higiena"] = st["higiena"]
     return d
+
+
+def _finanse(dane: Dane, f: Firma, st: dict, runda: int, d: dict) -> None:
+    """B11: lokaty, kredyt, Harpagon i kasyno wg strategii (`lokaty`, `kredyt`, `harpagon`, `kasyno`; bez – nic).
+    Gotówka – ta z początku rundy (po decyzji o lokalu), bez wydatków rundy: bufor lokat musi je pokryć."""
+    if (k := st.get("kredyt")) and runda == k.get("od_rundy", 1):
+        oferty = sorted((p["oprocentowanie"], b) for b, bank in bk.banki(dane).items() for p in bank["kredyty"]
+                        if p["produkt"] == k["produkt"])
+        for _, b in oferty:
+            x = {"bank": b, "produkt": k["produkt"], "kwota": k["kwota"], "miesiecy": k["rund"]}
+            if not bk.powod_kredytu(dane, f, x, runda):
+                d.setdefault("kredyty_wez", []).append(x)
+                break
+    if (h := st.get("harpagon")) and lw.ustawienia(dane):
+        if f.harpagon is None and f.gotowka < h["prog"]:
+            d["harpagon_wez"] = h["kwota"]
+        elif f.harpagon is not None and f.gotowka - f.harpagon.dlug >= h["prog"]:
+            d["harpagon_splac"] = f.harpagon.dlug
+    if (lo := st.get("lokaty")) and f.lokale:
+        if f.gotowka < lo.get("zerwij_ponizej", 0) and f.lokaty:
+            d["lokaty_zerwij"] = [max(f.lokaty, key=lambda x: x.od_rundy).id]
+        elif (nadwyzka := f.gotowka - lo["bufor"]) >= max(lo.get("min_kwota", 0), 0.01):
+            d["lokaty_zaloz"] = [{"kwota": round(nadwyzka, 2), "miesiecy": lo["rund"],
+                                  "bank": bk.najlepsze(dane)["lokata"]}]
+    if (ka := st.get("kasyno")) and wl.dane_portfela(dane):
+        wygrana = wl.portfel(dane, f) - wl.dane_portfela(dane)["portfel"]["oszczednosci"]
+        if wygrana > 0.005:
+            d["wplata_wlasna"] = round(wygrana, 2)
+        if kas.otwarte(f, runda):
+            d["wyplata_wlasna"] = ka["stawka"] * ka.get("zakladow", 1)
+            d["kasyno"] = [{"gra": ka["gra"], "zaklad": ka.get("zaklad"), "stawka": ka["stawka"]}] * ka.get("zakladow", 1)
 
 
 def _w_budzecie(pozycje: list[dict], runda: int, ma: list[str], ile: int, budzet: list[float]) -> list[str]:

@@ -242,7 +242,8 @@ def przelicz_runde(dane: Dane, stan: StanGry, decyzje: dict[str, dict], konfigur
         bank_koniec = bk.koniec_rundy(dane, f, r, ks, rach)
         info[nazwa]["harpagon_odsetki"] = lw.koniec_rundy(dane, f, r)   # doliczone do długu, poza KPiR
         if not podglad:   # zaproszenie do klubu na następną rundę
-            info[nazwa]["zaproszenie"] = kas.zaproszenie(dane, f, r, ziarno, konfiguracja["liczba_rund"])
+            info[nazwa]["zaproszenie"] = kas.zaproszenie(dane, f, r, ziarno, konfiguracja["liczba_rund"],
+                                                         bool(konfiguracja.get("kasyno_botow")))
         if f.biuro in bo.biura(dane):   # biura z mapy albo samodzielna księgowość (silnik/ksiegowosc/biuro.py)
             info[nazwa]["biuro"] = bo.nalicz(dane, f, ks, rach, *bo._umowy(f))
         # JDG: składki właściciela, zaliczka PIT i VAT (silnik/ksiegowosc/rozliczenie.py)
