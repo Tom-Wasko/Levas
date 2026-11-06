@@ -220,7 +220,10 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
 
 - **Rynek pracy jest wspólny** dla wszystkich drużyn. Kandydatów szukasz przez pracuj.pl, agencję pracy albo
   headhuntera – tylko headhunter złoży ofertę pracownikowi innej drużyny (a jego szef może dać kontrofertę).
-- Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy.
+- Pensja w umowie jest miesięczna, gra pokazuje jej koszt na tydzień – razem z ZUS pracodawcy (przy umowie o pracę
+  i przy zleceniu tyle samo). **Premia** jest jednorazowa – płacisz ją w tym tygodniu, bez ZUS, i tylko w tym
+  tygodniu podnosi zadowolenie.
+- **Szkolenie** obejmuje całą załogę i działa w tygodniu, w którym je kupisz (cena w tabeli jest za tydzień).
 - **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3)
   i szkoleniami (od tygodnia 7). Spada przez przepracowanie (pracownik zajęty prawie cały tydzień), słaby sprzęt
   i umowę zlecenie. Gra liczy je **dla każdej osoby** – zobaczysz je w profilu pracownika i w wynikach.
