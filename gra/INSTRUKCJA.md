@@ -302,7 +302,9 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 
 ## 13. Rozwój
 
-- **Wyposażenie dla klientów** (od tygodnia 4) – stoliki i krzesła, darmowe WiFi, telewizor z meczami: podnosi zadowolenie klientów.
+- **Wyposażenie dla klientów** (od tygodnia 4) – stoliki i krzesła, darmowe WiFi, telewizor z meczami: przyciąga
+  klientów, którzy go oczekują, i poprawia opinie. Każda kolejna rzecz daje mniej niż poprzednia – komplet opłaca
+  się, gdy kuchnia ma wolne moce; przy pełnej kuchni wystarczy kilka najważniejszych.
 - **Kolejny lokal** (Inwestycje ▸ Lokale) można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
   bez litości). Nowy lokal ma własne menu, ceny, magazyn i załogę – urządzasz go od zera
   w zakładce Lokale. Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
