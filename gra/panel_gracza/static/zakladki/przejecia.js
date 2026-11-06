@@ -1,4 +1,5 @@
-// Licytacje i przejęcia: kupno budynku z najemcą, wypowiedzenia najmu, wyniki licytacji (silnik/nieruchomosci/przejecia.py).
+// Nowe lokale → Licytacje (wyniki licytacji lokali) i Przejęcia (kupno budynku z najemcą, wypowiedzenia najmu)
+// – silnik/nieruchomosci/przejecia.py.
 import { esc, nazwaFirmy, naOkres, naRunde, proc, tabela, zl } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 
@@ -53,13 +54,11 @@ function licytacjaHtml(v, kat, p) {
 }
 
 export const przejecia = {
-  tytul: "Licytacje i przejęcia", tytulPelny: "Lokale - licytacje i przejęcia", ikona: "lokale",
+  tytul: "Przejęcia", tytulPelny: "Nowe lokale – przejęcia budynków", ikona: "lokale",
   odblokowanie: (v) => !!v.przejecia && v.runda >= v.przejecia.od_rundy, ukryta: (v) => !v.przejecia,
   info: (c) => {
     const P = c.v.przejecia;
-    return `Gdy kilka drużyn chce w jednej rundzie ten sam lokal, wygrywa najwyższa oferta względem ceny wywoławczej
-      (od rundy ${P.licytacje_od_rundy} – wpisz ją w zakładce Lokale), remis rozstrzyga losowanie. Budynek wynajmowany przez inną drużynę
-      możesz kupić – najemca płaci wtedy czynsz Tobie. Właściciel może wypowiedzieć najem: najemca zostaje jeszcze
+    return `Budynek wynajmowany przez inną drużynę możesz kupić – najemca płaci wtedy czynsz Tobie. Właściciel może wypowiedzieć najem: najemca zostaje jeszcze
       ${P.wypowiedzenie_rund} rundy, potem się wyprowadza, a nakłady rozlicza się wg wyboru właściciela
       (zatrzymanie: ${proc(P.ulepszenia_zwrot, 0)} nakładów dla najemcy, przywrócenie: ${proc(P.przywrocenie_koszt, 0)} nakładów płaci najemca).`;
   },
@@ -97,10 +96,7 @@ export const przejecia = {
       ${x.przeniesieni.length ? `<p>Przeniesieni: ${x.przeniesieni.map(esc).join(", ")}.</p>` : ""}
       ${x.zwolnieni.length ? `<p>Zwolnieni (z odprawą): ${x.zwolnieni.map(esc).join(", ")}.</p>` : ""}</div></div>`;
     html += stanBudynkow(v, kat, W, null, false);
-    const przetargi = v.rynek?.przejecia?.przetargi || [];
-    html += przetargi.length ? `<div class="pasek">Licytacje w mieście</div>` + przetargi.map((x) => licytacjaHtml(v, kat, x)).join("")
-      : `<p class="podpowiedz">W tej rundzie nie było licytacji.</p>`;
-    return html || `<p class="podpowiedz">Brak licytacji i przejęć.</p>`;
+    return html || `<p class="podpowiedz">W tej rundzie nie było przejęć ani wypowiedzeń.</p>`;
   },
   akcje: {
     przejecie: (el, c) => c.zmien((d) => {
@@ -119,4 +115,23 @@ export const przejecia = {
       d.wypowiedz = wypowiedzenia(d).map((x) => x.id === el.dataset.id ? { ...x, ulepszenia: el.value } : x);
     }),
   },
+};
+
+// UF15: licytacje lokali osobno – kto, ile i za ile licytował w mieście (oferty wpisuje się w Nowe lokale → Do wynajęcia)
+function licytacjeMiasta(v, kat) {
+  const przetargi = v.rynek?.przejecia?.przetargi || [];
+  return przetargi.length ? przetargi.map((x) => licytacjaHtml(v, kat, x)).join("")
+    : `<p class="podpowiedz">W poprzedniej rundzie nikt się nie licytował – każdy chętny dostał swój lokal.</p>`;
+}
+
+export const licytacje = {
+  tytul: "Licytacje", tytulPelny: "Nowe lokale – licytacje", ikona: "lokale",
+  odblokowanie: (v) => !!v.przejecia && v.runda >= (v.przejecia.licytacje_od_rundy ?? 1), ukryta: (v) => !v.przejecia,
+  info: (c) => `Gdy kilka drużyn chce w jednej rundzie ten sam lokal, wygrywa najwyższa oferta względem ceny wywoławczej
+    (od rundy ${c.v.przejecia.licytacje_od_rundy} – wpisz ją przy lokalu w zakładce Do wynajęcia), remis rozstrzyga losowanie.`,
+  decyzje({ v, kat }) {
+    return `<div class="komunikat">Ofertę za lokal wpisujesz przy lokalu w zakładce <a data-zakladka-k="lokale">Do wynajęcia</a>.
+      Tu widać, jak poszły licytacje w poprzedniej rundzie – kto przebił i o ile.</div>` + licytacjeMiasta(v, kat);
+  },
+  wyniki({ v, kat }) { return licytacjeMiasta(v, kat); },
 };

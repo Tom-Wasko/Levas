@@ -123,7 +123,7 @@ budynki:
   rodzaj: praca
   strefa: centrum
   opis: Kandydaci do kuchni i na kasę.
-  zakladka: zatrudnienie
+  zakladka: rynek_pracy
   mapa:
     x: 6
     y: 7

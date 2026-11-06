@@ -2,6 +2,7 @@
 // Kliknięcie budynku otwiera jego zakładkę, kliknięcie lokalu – opis i najem/kupno, własnego lokalu – zakładki firmy.
 import { esc, marka, nazwaFirmy, okno, toast, zamknijOkno } from "./wspolne.js";
 import { nazwaStrefy, opisLokalu, przyciskiLokalu, wybranyLokal } from "./lokale.js";
+import { W_BUDOWIE } from "./gielda.js";
 
 const PW = 22, PH = 11;  // połowa pola siatki na ekranie (romb 44 × 22 px)
 const MARGINES = 16, NAD = 70;  // miejsce nad mapą na wysokie budynki
@@ -133,7 +134,9 @@ export const mapa = {
   decyzje(c) {
     const brak = c.v.lokale && !c.v.lokale.moje.length
       ? `<div class="komunikat">Nie masz jeszcze lokalu – kliknij wolny lokal (biały) albo działkę na mapie.</div>` : "";
-    return brak + `<div class="mapa-ramka">${rysujMape(c)}</div>${legenda(c.v)}`;
+    // UF15: nowa mapa i giełda są w przygotowaniu (dostarczy je kolega) – mapy samej nie ruszamy
+    return brak + W_BUDOWIE("Nowa mapa Lublina i giełda – w budowie. Ta mapa działa jak dotąd.")
+      + `<div class="mapa-ramka">${rysujMape(c)}</div>${legenda(c.v)}`;
   },
   akcje: {
     "mapa-budynek": (el, c) => {

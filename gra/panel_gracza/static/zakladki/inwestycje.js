@@ -24,7 +24,7 @@ export const stanowiska = {
     for (const typ of TYPY) {
       const maja = stanowiskaLokalu(v, v.stan_przed.stanowiska).filter((s) => s.typ === typ).length;
       const m = miejscaWybranego(v, typ);
-      const miejsca = m ? `<div class="podpowiedz" style="padding:8px 0">Miejsca w lokalach: zajęte ${m.zajete} z ${m.wszystkie}${m.wszystkie ? "" : " – najpierw wybierz lokal (zakładka Lokale)"}</div>` : "";
+      const miejsca = m ? `<div class="podpowiedz" style="padding:8px 0">Miejsca w lokalach: zajęte ${m.zajete} z ${m.wszystkie}${m.wszystkie ? "" : " – najpierw wybierz lokal (zakładka Nowe lokale)"}</div>` : "";
       html += `<div class="kafel"><div class="kg kg-pelny">
         ${esc(kat.oferty.stanowiska.typy[typ].nazwa)} – liczba posiadanych: <span style="font-size:22px">${maja}</span></div><div class="kt">${miejsca}
         ${Object.entries(pakiety).map(([n, c]) => `<div class="wiersz" style="align-items:center;padding:10px 0;border-bottom:1px solid var(--linia)">

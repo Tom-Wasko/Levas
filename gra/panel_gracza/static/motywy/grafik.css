@@ -26,9 +26,9 @@
 
 [data-motyw="grafik"] {
   & body, & [data-dzial] { --dzial: var(--fiolet); --dzial-ciemny: #4a3db0; --dzial-tlo: #ebe8fb; }
-  & [data-dzial="lokal"], & [data-dzial="marketing"] { --dzial: var(--roz); --dzial-ciemny: #a8264f; --dzial-tlo: #fde6ed; }
-  & [data-dzial="inwestycje"], & [data-dzial="rynek"] { --dzial: var(--blekit); --dzial-ciemny: #1d5a9c; --dzial-tlo: #e2eefa; }
-  & [data-dzial="firma"], & [data-dzial="handel"] { --dzial: var(--cytryna); --dzial-ciemny: #7a5900; --dzial-tlo: #fdf3d7; }
+  & [data-dzial="lokal_przeglad"], & [data-dzial="lokal_menu"], & [data-dzial="zaopatrzenie"], & [data-dzial="wnetrze"], & [data-dzial="marketing"] { --dzial: var(--roz); --dzial-ciemny: #a8264f; --dzial-tlo: #fde6ed; }
+  & [data-dzial="nowe_lokale"], & [data-dzial="rynek"] { --dzial: var(--blekit); --dzial-ciemny: #1d5a9c; --dzial-tlo: #e2eefa; }
+  & [data-dzial="ludzie"], & [data-dzial="handel"], & [data-dzial="urzedy"], & [data-dzial="szef"] { --dzial: var(--cytryna); --dzial-ciemny: #7a5900; --dzial-tlo: #fdf3d7; }
   & [data-dzial="finanse"], & [data-dzial="ksiegowosc"] { --dzial: var(--morski); --dzial-ciemny: #0f6b62; --dzial-tlo: #ddf3f0; }
   & body, & [data-dzial] {
     --pom: var(--dzial-ciemny); --pom-ciemny: var(--dzial-ciemny); --pom-jasny: var(--dzial-tlo); --pom-mgla: var(--dzial-tlo);

@@ -442,7 +442,7 @@ def _wyniki_firmy(dane, f: Firma, r, ks: Ksiega, rach: Rachunek, info, popyt, ob
                        "wartosc": f.wartosc_magazynu(k)})
     w["zasoby"] = zasoby
     w["zuzyte_zasoby"] = zuzyte
-    w["szkolenia"] = info.get("szkolenia", [])   # zakładka HR ▸ Szkolenia (wyniki)
+    w["szkolenia"] = info.get("szkolenia", [])   # zakładka Ludzie ▸ Szkolenia (wyniki)
 
     # karta wyników
     if r >= 2:

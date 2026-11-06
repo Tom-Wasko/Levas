@@ -93,10 +93,13 @@ async function zmien(fn) {
 }
 
 const odbl = (k) => S.v.odblokowane.includes(k);
-const odRundy = (k) => S.v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];   // gra z lokalami: harmonogram gry (MG)
+const odRundy1 = (k) => S.v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];   // gra z lokalami: harmonogram gry (MG)
+// zakładka złożona (Mój lokal, Kuchnia, …) – najwcześniejsza runda jej części
+const najwczesniej = (lista) => lista.reduce((m, r) => (r && (!m || r < m) ? r : m), null);
+const odRundy = (k) => odRundy1(k) ?? (ZAKLADKI[k]?.czesci ? najwczesniej(ZAKLADKI[k].czesci.map(odRundy1)) : null);
 function dostepna(z) { return !z.odblokowanie || (typeof z.odblokowanie === "function" ? z.odblokowanie(S.v) : odbl(z.odblokowanie)); }
 const maWyniki = (z) => !!(z && z.wyniki && S.v.wyniki && (!z.wynikiOd || S.v.runda >= z.wynikiOd) && (!z.wynikiGdy || z.wynikiGdy(S.v)));
-// Z3: dawne zakładki (oferta, dostawcy, …) są częściami podzakładek Lokali – link prowadzi do podzakładki i jej części
+// dawne zakładki (oferta, dostawcy, …) są częściami zakładek złożonych (UF15) – link prowadzi do zakładki i jej części
 const docelowa = (k) => (ALIAS[k] && ZAKLADKI[ALIAS[k]] ? ALIAS[k] : k);
 function pokazCzesc(k) {
   if (!ALIAS[k]) return;
@@ -116,6 +119,7 @@ const ctx = () => ({ get v() { return S.v; }, kat: S.kat, get d() { return S.d; 
 
 // --- rysowanie ---------------------------------------------------------------------------------
 const widocznePod = (pod) => pod.filter((k) => !ZAKLADKI[k]?.ukryta?.(S.v));
+const tytulBlokady = (k) => (odRundy(k) ? `Dostępne od rundy ${odRundy(k)}` : "Jeszcze niedostępne");
 
 function rysujMenu() {
   const czerwone = S.v.lista_bledow.filter((b) => b.poziom === "czerwony").length;
@@ -123,23 +127,26 @@ function rysujMenu() {
     .map((poz) => poz.pod ? { ...poz, pod: widocznePod(poz.pod) } : poz).filter((poz) => !poz.pod || poz.pod.length).map((poz) => {
     if (poz.sekcja !== undefined) return `<div class="sekcja ${poz.sekcja ? "" : "linia"}" data-nazwa="${esc(poz.sekcja)}"></div>`;
     const z = ZAKLADKI[poz.klucz] || {};
-    const pod = poz.pod ? `<div class="pod">${poz.pod.map((k) => `<a data-zakladka="${k}" class="${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"} ${k === S.zakladka ? "aktywna" : ""}">
-      ${ikona(IKONY[k], 18)}${ZAKLADKI[k].tytul}${!dostepna(ZAKLADKI[k]) && odRundy(k) ? `<span class="od">od rundy ${odRundy(k)}</span>` : ""}</a>`).join("")}</div>` : "";
+    const pod = poz.pod ? `<div class="pod">${poz.pod.map((k) => { const zb = !dostepna(ZAKLADKI[k]);
+      return `<a data-zakladka="${k}" class="${zb ? "zablokowana" : ""} ${k === S.zakladka ? "aktywna" : ""}"${zb ? ` title="${tytulBlokady(k)}"` : ""}>
+      ${ikona(zb ? "klodka" : IKONY[k], 18)}${ZAKLADKI[k].tytul}${zb && odRundy(k) ? `<span class="od">od rundy ${odRundy(k)}</span>` : ""}</a>`; }).join("")}</div>` : "";
     const aktywna = poz.klucz === S.zakladka || (poz.pod || []).includes(S.zakladka);
     const zablokowana = poz.pod ? !poz.pod.some((k) => dostepna(ZAKLADKI[k])) : !dostepna(z);
     const cel = poz.pod ? poz.pod.find((k) => dostepna(ZAKLADKI[k])) || poz.pod[0] : poz.klucz;
     const znaczek = poz.klucz === "lista_bledow" && czerwone && S.v.edycja ? `<span class="znaczek">${czerwone}</span>` : "";
-    const tytulOd = zablokowana && odRundy(cel) ? ` title="Dostępne od rundy ${odRundy(cel)}"` : "";
+    const od = zablokowana ? (poz.pod ? najwczesniej(poz.pod.map(odRundy)) : odRundy(poz.klucz)) : null;
+    const tytulOd = zablokowana ? ` title="${od ? `Dostępne od rundy ${od}` : "Jeszcze niedostępne"}"` : "";
     return `<div class="poz ${poz.klasa || ""}" data-dzial="${poz.klucz}"><a data-zakladka="${cel}" class="${aktywna ? "aktywna" : ""} ${zablokowana ? "zablokowana" : ""}"${tytulOd}>
-      ${ikona(poz.ikona)}${poz.tytul}${znaczek}</a>${pod}</div>`;
+      ${ikona(zablokowana ? "klodka" : poz.ikona)}${poz.tytul}${znaczek}${od ? `<span class="od-gora">od rundy ${od}</span>` : ""}</a>${pod}</div>`;
   }).join("");
 }
 
 function podzakladki() {
   const grupa = MENU.find((p) => (p.pod || []).includes(S.zakladka));
   if (!grupa) return "";
-  return `<div class="podzakladki">${widocznePod(grupa.pod).map((k) => `<a data-zakladka="${k}" data-pod="1" class="${k === S.zakladka ? "aktywna" : ""} ${dostepna(ZAKLADKI[k]) ? "" : "zablokowana"}">
-    ${ikona(IKONY[k], 16)}${ZAKLADKI[k].tytul}</a>`).join("")}</div>`;
+  return `<div class="podzakladki">${widocznePod(grupa.pod).map((k) => { const zb = !dostepna(ZAKLADKI[k]);
+    return `<a data-zakladka="${k}" data-pod="1" class="${k === S.zakladka ? "aktywna" : ""} ${zb ? "zablokowana" : ""}"${zb ? ` title="${tytulBlokady(k)}"` : ""}>
+    ${ikona(zb ? "klodka" : IKONY[k], 16)}${ZAKLADKI[k].tytul}${zb && odRundy(k) ? `<span class="od">od rundy ${odRundy(k)}</span>` : ""}</a>`; }).join("")}</div>`;
 }
 
 // drużyna kilku osób: kto ostatnio zapisał decyzje

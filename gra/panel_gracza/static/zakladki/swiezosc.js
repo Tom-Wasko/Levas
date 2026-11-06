@@ -1,7 +1,7 @@
 // Magazyn i świeżość: partie składników z terminami, pojemność chłodni i zamrażarki (silnik/kuchnia/swiezosc.py,
 // dane/zasoby.yaml, dane/sprzet.yaml) – w decyzjach plan dostaw, w wynikach dzień po dniu: dostawy, zużycie, straty.
 import { esc, gw, licz, nazwaUslugi, tabela, toast, ulamek, wykres, zl2 } from "./wspolne.js";
-import { idWybranego, mojeLokale, nazwaLokalu } from "./lokal_wybor.js";
+import { idWybranego, mojeLokale, nazwaLokalu, wieleLokali } from "./lokal_wybor.js";
 import { IG_SWIEZOSC } from "./infografiki.js";
 
 const dataKrotka = (iso) => { const [, m, d] = iso.split("-"); return `${+d}.${m}`; };
@@ -143,7 +143,7 @@ export const swiezosc = {
     w szafie chłodniczej i zamrażarce – nadmiar jedzie do wynajętej chłodni (płacisz za litr, a termin się skraca).
     Dużo towaru w wynajmie i przeterminowane jedzenie w koszu przyciągają sanepid. Mrożona pita i mrożone mięso zastępują świeże, gdy tych zabraknie,
     ale klienci to czują (−1★ jakości składnika).${IG_SWIEZOSC}`,
-  decyzje({ v, edycja }) {
+  decyzje({ v }) {
     const id = idWybranego(v);   // Z3: kilka lokali – magazyn wybranego lokalu
     const S = (id && v.swiezosc?.lokale?.[id]) || v.swiezosc;
     if (!S) return `<p class="podpowiedz">Brak danych o magazynie.</p>`;
@@ -154,8 +154,7 @@ export const swiezosc = {
       <span>Partie kończące termin w tej rundzie: <span class="kwota">${wygasa.length}</span></span></div>`
       + (S.pojemnosc.chlodnia || S.pojemnosc.zamrazarka ? "" : `<div class="komunikat">Nie masz szafy chłodniczej ani zamrażarki – kup je w zakładce Sprzęt, inaczej mięso będzie trzymane na parapecie.</div>`)
       + zajetoscHtml(S) + planWynajmuHtml(S) + ryzykoHtml(v.magazyn)
-      + (S.partie.length ? partieHtml(S, S.dni) : `<p class="podpowiedz">Magazyn${id ? " tego lokalu" : ""} jest pusty.</p>`)
-      + przewozyHtml(v, S, edycja);
+      + (S.partie.length ? partieHtml(S, S.dni) : `<p class="podpowiedz">Magazyn${id ? " tego lokalu" : ""} jest pusty.</p>`);
   },
   wyniki({ v, kat }) {
     const W = v.wyniki?.swiezosc;
@@ -163,7 +162,7 @@ export const swiezosc = {
     return `<div class="pasek ciemny"><span>Wartość strat: <span class="kwota">${zl2(W.wartosc_strat)}</span></span>
       <span>Wyrzucone partie: <span class="kwota">${W.straty.length}</span></span></div>`
       + wynikiZasoby(W) + `<div class="wykres"><canvas id="w-swiezosc"></canvas></div>` + wynikiStraty(W)
-      + wynikiPrzewozow(v, W) + wynikiMagazynu(W, v.wyniki?.magazyn, v) + wynikiMenu(W, kat);
+      + wynikiMagazynu(W, v.wyniki?.magazyn, v) + wynikiMenu(W, kat);
   },
   po({ v }, tryb) {
     const W = v.wyniki?.swiezosc;
@@ -172,6 +171,23 @@ export const swiezosc = {
       { label: "Chłodnia – zajęte litry (wieczorem)", data: W.zajetosc.map((z) => z.chlodnia) },
       { label: "Zamrażarka – zajęte litry (wieczorem)", data: W.zajetosc.map((z) => z.zamrazarka) }]);
   },
+};
+
+// UF15: przewozy towaru między lokalami – osobna podzakładka Zaopatrzenia (dawniej na dole Magazynu)
+export const przewozy = {
+  tytul: "Przewozy", tytulPelny: "Zaopatrzenie – przewozy między lokalami", ikona: "dostawcy",
+  odblokowanie: (v) => !!v.przewozy?.zasady && wieleLokali(v), ukryta: (v) => !v.lokale,
+  info: "Właściciel wozi towar sam swoim autem z jednego lokalu do drugiego – ratunek, gdy w jednym lokalu zostało mięso, a w drugim go brakuje.",
+  decyzje({ v, edycja }) {
+    const id = idWybranego(v), S = (id && v.swiezosc?.lokale?.[id]) || v.swiezosc;
+    if (!S) return `<p class="podpowiedz">Brak danych o magazynie.</p>`;
+    return przewozyHtml(v, S, edycja) || `<p class="podpowiedz">Przewozy są możliwe, gdy masz co najmniej dwa lokale.</p>`;
+  },
+  wyniki({ v }) {
+    const W = v.wyniki?.swiezosc;
+    return (W && wynikiPrzewozow(v, W)) || `<p class="podpowiedz">W poprzedniej rundzie nic nie jechało między lokalami.</p>`;
+  },
+  wynikiGdy: (v) => !!v.wyniki?.swiezosc?.przewozy?.length,
   akcje: {
     "przewoz-dodaj": (el, c) => {
       const [zasob, q] = document.getElementById("pz-towar").value.split("|");

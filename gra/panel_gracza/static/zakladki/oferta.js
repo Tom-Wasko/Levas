@@ -26,7 +26,7 @@ function jakPrognoza(u, m) {
     Wydarzenia w mieście i upodobania grup klientów strefy mogą to podbić albo obniżyć.
     <br>4. × część, którą przyciągniesz: klienci strefy dzielą się między lokale z tym daniem (Twoje i konkurencji) i bary spoza gry.
     Przy cenie i jakości jak u innych dostajesz mniej więcej równą część; niższa cena, lepsza jakość i dobre opinie – więcej. Nowy lokal na początku ma mniej klientów.
-    <br>5. Wynik wpisz w pole „Prognozowany popyt”. Z prognozy wychodzą zakupy składników (Dostawy i magazyn: „Wpisz wg prognozy”) i potrzebna obsada – za mała to utracona sprzedaż, za duża to zmarnowany towar.`;
+    <br>5. Wynik wpisz w pole „Prognozowany popyt”. Z prognozy wychodzą zakupy składników (Zaopatrzenie ▸ Dostawy: „Wpisz wg prognozy”) i potrzebna obsada – za mała to utracona sprzedaż, za duża to zmarnowany towar.`;
 }
 
 // cena, rabat i podpowiedzi przy wybranym daniu (dawniej osobna część „Sprzedaż”)

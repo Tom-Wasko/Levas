@@ -308,7 +308,7 @@ def rynek_lokali(dane: Dane, firmy: dict[str, Firma], oferty: dict[str, dict[str
         przew = (przewozy or {}).get(f, [])
         sprzedaz_lokalu = {lok: 0 for lok in lokale}
         obsluga_lokalu = {lok: {"obsluzeni": {}, "kolejka": 0, "brak": 0, "reklamacje": 0} for lok in lokale}   # U24
-        # Z3: przychód (ceny lokalu, bez promocji) i wartość zużytych składników każdego lokalu – zakładka Lokale
+        # Z3: przychód (ceny lokalu, bez promocji) i wartość zużytych składników każdego lokalu – zakładka Mój lokal
         przychod_lokalu = {lok: 0.0 for lok in lokale}
         skladniki_lokalu = {lok: 0.0 for lok in lokale}
         przych = przychod[f] = {}
@@ -546,8 +546,8 @@ def oferty_konkurencji(dane: Dane, stan, runda: int, firma: str) -> dict[str, di
 
 
 def widok_popytu(dane: Dane, stan, firma: Firma, runda: int, zadowolenie: float | None = None) -> dict:
-    """Zakładka „Klienci i strefy” (decyzje): dni rundy sprzedaży z wydarzeniami, pule stref i potencjał nowego lokalu
-    (zakładka Lokale; własne lokale – jakość ze stanowisk, bez nich zakładane 2★). Bez gotowej prognozy dla lokali
+    """Zakładka Klienci ▸ Strefy (decyzje): dni rundy sprzedaży z wydarzeniami, pule stref i potencjał nowego lokalu
+    (zakładka Nowe lokale; własne lokale – jakość ze stanowisk, bez nich zakładane 2★). Bez gotowej prognozy dla lokali
     firmy – popyt drużyna liczy sama (test gry 28.10). stan – stan na początku rundy (konkurencja)."""
     r = max(runda, 2)
     dni = dni_rundy(dane, r)

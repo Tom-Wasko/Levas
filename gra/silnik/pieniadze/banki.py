@@ -180,7 +180,7 @@ def powod_kredytu(dane: Dane, firma: Firma, d: dict, runda: int, nowy: dict | No
     if produkt["historia"] and historia(firma, runda) < u["historia_rund"]:
         return f"bank wymaga {u['historia_rund']} rund historii firmy (od otwarcia pierwszego lokalu)"
     if produkt.get("od_lokalu") and not firma.lokale and not (nowy and d.get("zastaw") == nowy["id"]):
-        return ("bank udziela go firmie z lokalem – najpierw wynajmij albo kup lokal (Inwestycje ▸ Lokale); "
+        return ("bank udziela go firmie z lokalem – najpierw wynajmij albo kup lokal (Nowe lokale ▸ Do wynajęcia); "
                 "kupowany lokal może być zastawem już w tej rundzie")
     if any(k.bank == bank["nazwa"] and k.produkt == produkt["produkt"] for k in firma.kredyty):
         return "ten kredyt jest już w spłacie – najpierw spłać poprzedni"
@@ -262,7 +262,7 @@ def kredyty_na_lokal(dane: Dane, firma: Firma, info: dict, runda: int, ksiega: K
     for d in info.pop("odlozone", []):
         powod = powod_kredytu(dane, firma, d, runda)
         if powod and not any(x["id"] == d["zastaw"] for x in zastawy(dane, firma)):
-            powod = "lokal pod zastaw nie został kupiony (Inwestycje ▸ Lokale)"
+            powod = "lokal pod zastaw nie został kupiony (Nowe lokale ▸ Do wynajęcia)"
         if powod:
             info["odrzucone"].append({"co": f"Kredyt {d.get('produkt', '')} – {d.get('bank', '')}", "powod": powod})
         else:

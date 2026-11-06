@@ -655,7 +655,7 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         if lim["pracownicy"]["nowi"] == lim["pracownicy"]["limit"]:
             dodaj("niebieski", "zatrudnienie", f"Wykorzystany limit nowych pracowników w tej rundzie "
                   f"({lim['pracownicy']['limit']}) – kolejnych przyjmiesz w następnej rundzie.")
-        # U3: „odpoczynek” po lokalu nie trafia na listę – jest w Inwestycje ▸ Lokale, a próba wzięcia kolejnego
+        # U3: „odpoczynek” po lokalu nie trafia na listę – jest w Nowe lokale ▸ Do wynajęcia, a próba wzięcia kolejnego
         # lokalu za wcześnie to błąd zapisu (limity.naruszenia)
         for tekst in (info or {}).get("odrzucone_ceny", []):
             dodaj("czerwony", "oferta", tekst)
@@ -678,10 +678,10 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
         dodaj("czerwony", "oferta", f"W tej rundzie liczba dań może wzrosnąć najwyżej o {limit} – nadmiarowe nie zostały dodane.")
     if not firma.oferta:   # bez dań w rundzie 1 runda 2 mija bez sprzedaży (nowe dania dopiero od nowe_uslugi_od_rundy)
         od = rundy["nowe_uslugi_od_rundy"]
-        dodaj("czerwony", "oferta", "Menu jest puste – wybierz dania w Lokale ▸ Menu i ceny. W rundzie 2 sprzedajesz tylko dania "
+        dodaj("czerwony", "oferta", "Menu jest puste – wybierz dania w Kuchni. W rundzie 2 sprzedajesz tylko dania "
               f"wybrane w rundzie 1, nowe można dodać od rundy {od}." if runda == 1
               else f"Menu jest puste – w tej rundzie nic nie sprzedasz. Nowe dania dodasz od rundy {od}." if runda < od
-              else "Menu jest puste – wybierz dania w Lokale ▸ Menu i ceny.")
+              else "Menu jest puste – wybierz dania w Kuchni.")
     if not firma.bank and not d.get("bank"):
         dodaj("czerwony", "finanse_bank", "Nie wybrano banku.")
     if not firma.biuro and not d.get("biuro"):

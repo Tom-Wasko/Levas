@@ -142,7 +142,7 @@ def test_puste_menu(gra_botow):
     assert not any(t.startswith("Menu jest puste") for t in _teksty(lista_bledow(dane, f, {}, r, list(f.oferta))))
     f.oferta = {}
     for runda, tekst in ((1, "W rundzie 2 sprzedajesz tylko dania wybrane w rundzie 1"), (2, "nic nie sprzedasz"),
-                         (od, "wybierz dania w Lokale ▸ Menu i ceny")):
+                         (od, "wybierz dania w Kuchni")):
         b = [b for b in lista_bledow(dane, f, {}, runda, []) if b["tekst"].startswith("Menu jest puste")]
         assert len(b) == 1 and b[0]["poziom"] == "czerwony" and b[0]["zakladka"] == "oferta" and tekst in b[0]["tekst"]
 

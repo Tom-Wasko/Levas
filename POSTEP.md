@@ -25,8 +25,9 @@ Pełna historia kroków 1–6 (F2–F4, poprawki P/Q, Z1–Z6, A1–A3, U1–U24
 - [ ] B15 Raport końcowy (przed/po od tagu `kalibracja-start`), `zrodlo`/`pewnosc` w YAML, propozycje zmian w notatkach, instrukcja gracza
 
 ## Ufajnianie (polecenia autora 6.11.2026; gałąź `ufajnianie`, plan i przekazanie: `raporty/ufajnianie/`)
-Kolejność pracy: od najtrudniejszych. Numery UF = numery z `raporty/ufajnianie/plan.md` (w nawiasie numer poprawki autora).
-- [ ] UF0 Sprzątanie Pulpit\Levas i repo, notatki zaktualizowane, plan i przekazanie
+Kolejność pracy (od najtrudniejszych): UF15 → UF12 → UF13 → UF11 → UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 →
+UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (w nawiasie numer poprawki autora).
+- [x] UF0 Sprzątanie Pulpit\Levas i repo, notatki zaktualizowane, plan i przekazanie (89db989)
 - [ ] UF23 (11) Redakcja kart wyników, Wniosków i widoków „Wyniki” wszystkich zakładek
 - [ ] UF22 (20) Lista zadań po prawej (z sytuacji + własne, na żywo)
 - [ ] UF21 (10) Formy zatrudnienia + przełączniki w panelu MG
@@ -34,7 +35,7 @@ Kolejność pracy: od najtrudniejszych. Numery UF = numery z `raporty/ufajnianie
 - [ ] UF19 (15) Marketing internetowy od rundy 7
 - [ ] UF18 (9) Licytacje pracowników widoczne
 - [ ] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`)
-- [ ] UF15 Nowy układ menu, Giełda „w budowie”, taśmy przy mapie
+- [x] UF15 Nowy układ menu (Miasto / Twój lokal / Firma / Wyniki, aliasy starych kluczy), Giełda „w budowie”, taśmy przy mapie, kłódki „od rundy N”
 - [ ] UF14 (18) Agencje reklamowe – nowy wygląd, siatki 3 kolumn
 - [ ] UF13 (2) Parki tylko z mapy
 - [ ] UF12 Środki trwałe → KPiR i Wnętrze

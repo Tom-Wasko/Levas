@@ -1,9 +1,9 @@
-// HR: zatrudnienie, udogodnienia, szkolenia.
+// Ludzie: zatrudnienie (obsada stanowisk w Mój lokal), zespół, udogodnienia, szkolenia.
 import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast,
   wykres, zamknijOkno, zl } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
 import { kolko } from "./dymki.js";
-import { idWybranego, nazwaLokalu, stanowiskaLokalu } from "./lokal_wybor.js";
+import { idWybranego, nazwaLokalu, stanowiskaLokalu, wyborLokaluKrotki } from "./lokal_wybor.js";
 
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const UMOWY = { prace: "Umowa o pracę", zlecenie: "Umowa zlecenie" };
@@ -21,14 +21,14 @@ function kosztWynagrodzen(v, kat) {
 
 export const zatrudnienie = {
   tytul: "Zatrudnienie", tytulPelny: "HR - zatrudnienie", ikona: "☺", odblokowanie: "hr_zatrudnienie",
-  info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Lokale → Sprzęt).",
+  info: "Zatrudnij pracowników potrzebnych do przygotowania i sprzedaży wybranych dań. Pracownik potrzebuje stanowiska (Wnętrze ▸ Stanowiska i sprzęt).",
   decyzje({ v, kat, edycja }) {
     let html = `<div class="pasek ciemny"><span>Koszty wynagrodzeń: <span class="kwota">${zl(kosztWynagrodzen(v, kat), true)}</span>${naOkres()} brutto (z ZUS pracodawcy; pensje w umowach – miesięczne)</span></div>`;
     if (v.nieudane_zatrudnienia?.length) html += `<div class="komunikat zly">Część kandydatów zatrudniła już inna firma – wybierz innych.</div>`;
     for (const typ of TYPY) {
       const st = stanowiskaLokalu(v, v.stan.stanowiska).filter((s) => s.typ === typ);
       html += `<div class="pasek">${esc(kat.oferty.stanowiska.typy[typ].nazwa)}${idWybranego(v) ? ` – ${esc(nazwaLokalu(v, idWybranego(v)))}` : ""}</div>`;
-      if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Lokale → Sprzęt.</p>`; continue; }
+      if (!st.length) { html += `<p class="podpowiedz">Brak stanowisk – uruchom je w zakładce Wnętrze ▸ Stanowiska i sprzęt.</p>`; continue; }
       html += `<div class="siatka waska">${st.map((s) => {
         const p = v.stan.pracownicy.find((x) => x.id === s.pracownik);
         const wl = v.decyzje.wlasciciel_stanowisko;
@@ -220,10 +220,33 @@ function oknoProfilu({ v, kat, edycja }, id) {
       <button class="btn pom" data-akcja="zapisz-profil" data-id="${esc(id)}" data-nowy="${nowy ? 1 : 0}" ${edycja ? "" : "disabled"}>Zapisz</button>` });
 }
 
+// UF15: Ludzie → Zespół – wszyscy pracownicy firmy w jednej tabeli (kliknięcie – profil: pensja, premia, zwolnienie)
+export const zespol = {
+  tytul: "Zespół", tytulPelny: "Ludzie – zespół", ikona: "zatrudnienie", odblokowanie: "hr_zatrudnienie",
+  info: "Wszyscy Twoi pracownicy: gdzie pracują, na jakiej umowie, za ile i czy są zadowoleni. Kliknij osobę, żeby zmienić pensję, dać premię albo zwolnić.",
+  decyzje({ v, kat }) {
+    const P = v.stan.pracownicy;
+    if (!P.length) return `<div class="komunikat">Nie masz jeszcze pracowników – znajdź ich w zakładce <a data-zakladka-k="rynek_pracy">Rynek pracy</a>.</div>`;
+    const st = (p) => v.stan.stanowiska.find((s) => s.pracownik === p.id);
+    const w = P.map((p) => {
+      const s = st(p);
+      const gdzie = s ? `${v.lokale ? `${esc(nazwaLokalu(v, s.lokal))} · ` : ""}${esc(kat.oferty.stanowiska.typy[s.typ]?.nazwa ?? s.typ)} nr ${s.nr}` : `<span class="minus">bez stanowiska</span>`;
+      const stanOsoby = p.odchodzi ? `<span class="pigulka${p.odchodzi.powod === NIEZADOWOLENIE ? " nie" : ""}">odchodzi w r. ${p.odchodzi.runda}</span>`
+        : p.od_rundy === v.runda ? `<span class="pigulka inf">nowy</span>` : p.niezadowolony ? `<span class="pigulka nie">niezadowolony</span>` : "";
+      return [`<a data-akcja="profil" data-id="${esc(p.id)}">${esc(p.imie_nazwisko)}</a> ${stanOsoby}`, esc(p.zawod), gw(p.gwiazdki), gdzie,
+        UMOWY[p.umowa] ?? esc(p.umowa), zl(p.pensja), p.premia ? zl(p.premia) : "–", zadowolenieOsoby(p)];
+    });
+    return `<div class="pasek ciemny"><span>Pracownicy: <span class="kwota">${licz(P.length)}</span></span>
+      <span>Koszty wynagrodzeń: <span class="kwota">${zl(kosztWynagrodzen(v, kat), true)}</span>${naOkres()} (z ZUS pracodawcy)</span></div>`
+      + tabela(null, ["Osoba", "Zawód", "Poziom", "Gdzie pracuje", "Umowa", "Pensja (mies.)", "Premia", "Zadowolenie"], w, { klasy: ["l", "l", "", "l", "l"] });
+  },
+  wyniki: (c) => zatrudnienie.wyniki(c),
+};
+
 export const udogodnienia = {
   tytul: "Udogodnienia", tytulPelny: "HR - udogodnienia", ikona: "♨", odblokowanie: "hr_udogodnienia",
   info: "Kup udogodnienia dla pracowników Twojej firmy. Podnoszą zadowolenie pracowników.",
-  decyzje(c) { return kafleUdogodnien(c, "udogodnienia", "pracowników"); },
+  decyzje(c) { return wyborLokaluKrotki(c.v) + kafleUdogodnien(c, "udogodnienia", "pracowników"); },
   wyniki({ v }) {
     const w = Object.entries(v.rynek?.udogodnienia || {}).map(([f, n]) => [esc(nazwaFirmy(v, f)), licz(n)]);
     return tabela("Posiadane udogodnienia", ["Firma", "Liczba udogodnień"], w, { klasy: ["l"] });

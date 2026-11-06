@@ -34,7 +34,28 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
 
 ## Stan
 - [x] UF0 sprzątanie (Pulpit\Levas, repo), notatki, plan, przekazanie – 6.11.2026 wieczorem.
-- Następne: UF23 (redakcja wyników), potem kolejno według listy w `POSTEP.md`.
+- [x] UF15 nowy układ menu – 6.11.2026 w nocy. Co jest gdzie:
+  - `zakladki/index.js`: `MENU` (grupy z planu), zakładki złożone przez `zlozona()` (lokal_przeglad = Mój lokal,
+    lokal_menu = Kuchnia, zaop_dostawy/zaop_magazyn/zaop_przewozy, wnetrze_sprzet/wnetrze_wyposazenie), `ALIAS` stary
+    klucz → nowa zakładka (linki „Popraw”, `#adres`, budynki mapy działają po staremu). Tytuły części grup zmienione
+    przez `Object.assign` w index.js (raport → „Wyniki finansowe”, agencje → „Ulotki i radio”, wlasciciel → „Portfel”,
+    klienci → „Strefy”).
+  - Nowe zakładki: `licytacje` (przejecia.js), `przewozy` (swiezosc.js, akcje przewozów przeniesione), `sanepid`
+    (urzad.js), `zespol` (hr.js – tabela wszystkich pracowników, klik → profil), `gielda` (gielda.js, „w budowie”,
+    `W_BUDOWIE` używa też mapa.js). `lokal_przeglad` z lokal.js to teraz część `stan_lokalu`.
+  - W Moim lokalu część „zatrudnienie” to `obsada` (kopia `zatrudnienie` bez wyników). **UF20** ma z niej usunąć
+    zatrudnianie (zostaje sama obsada), a zatrudnianie z przypisaniem dać do Rynku pracy.
+  - Udogodnienia i Szkolenia to zwykłe zakładki w Ludzie; Udogodnienia mają mały wybór lokalu (`wyborLokaluKrotki`).
+  - `app.js`: zablokowane pozycje (góra, podmenu, pasek podzakładek) – kłódka, szare, „od rundy N” (dla grupy
+    najwcześniejsza runda części); `odRundy` liczy też zakładki złożone.
+  - Kolory działów: `motywy/grafik.css` – nowe klucze grup.
+  - Teksty z nazwami zakładek („X ▸ Y”) poprawione w silniku, danych, panelu i INSTRUKCJA.md; pilnuje tego
+    `testy/aplikacja/test_nazwy_zakladek.py` (nazwy po lewej strzałki muszą być pozycjami MENU).
+  - Sprawdzanie bez przeglądarki: zrzut widoków z gry botów (`api.prezentacja.widok`) i wyrysowanie wszystkich zakładek
+    w node (kopia `static/` z `package.json {"type":"module"}`, atrapa `document`) – 358 wyrysowań bez błędów.
+    Node w systemie jest stary (v14): pliki ES trzeba kopiować do katalogu z `"type":"module"`.
+- Środki trwałe i Parki i zdarzenia nie mają już pozycji w menu, ale zakładki jeszcze istnieją (UF12, UF13 to kończą).
+- Następne: UF12, potem kolejno: UF13 → UF11 → UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 
 ## Pułapki
 - Pomiary bambiczkowania czytają dane z `levas_gra`, nie stąd – tu możesz zmieniać `gra/dane/`.

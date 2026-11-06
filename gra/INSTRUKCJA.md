@@ -32,21 +32,30 @@ mecze Motoru).
 
 | Grupa | Co w niej jest |
 |---|---|
-| Mapa miasta | Lublin z lokalami, bankiem, dostawcami, agencjami – kliknij budynek, żeby przejść do jego zakładki |
-| Wyniki | Karta wyników, Wnioski z rundy |
-| **Lokale** | kafelki Twoich lokali (wybierz jeden) i jego podzakładki: Przegląd, Menu i ceny, Dostawy i magazyn, Ludzie, Sprzęt |
-| Rynek | Klienci i strefy, Kalendarz, Konkurencja, Rynek pracy |
-| Parki i zdarzenia | cotygodniowe wydarzenia w parkach |
-| Marketing | Agencje reklamowe, Promocje |
-| Inwestycje | Lokale (najem i kupno), Licytacje i przejęcia, Środki trwałe |
-| Handel z drużynami | oferty dla innych drużyn |
-| Firma | Czas właściciela, Urząd i sanepid, Ubezpieczenia |
-| Finanse | Raport, Bank, Harpagon, Portfel właściciela |
+| Mapa miasta | Lublin z lokalami, bankiem, dostawcami, agencjami i parkami – kliknij budynek, żeby przejść do jego zakładki |
+| **Miasto** | |
+| Nowe lokale | Do wynajęcia (najem i kupno), Licytacje, Przejęcia |
+| Klienci | Strefy, Konkurencja, Kalendarz |
+| **Twój lokal** | kafelki Twoich lokali na górze – wybierz jeden |
+| Mój lokal | stan lokalu, kto stoi na którym stanowisku (obsada), sprzedaż |
+| Kuchnia | menu i ceny |
+| Zaopatrzenie | Dostawy, Magazyn i świeżość, Przewozy (przy kilku lokalach) |
+| Wnętrze | Stanowiska i sprzęt, Wyposażenie |
+| **Firma** | |
+| Ludzie | Rynek pracy (zatrudnianie), Zespół (wszyscy pracownicy), Szkolenia, Udogodnienia |
+| Marketing | Promocje, Ulotki i radio |
+| Handel | oferty dla innych drużyn |
+| Pieniądze | Wyniki finansowe, Bank, Harpagon |
 | Księgowość | Biuro rachunkowe, KPiR, VAT, PIT i ZUS |
+| Urzędy | Urząd (rejestracja, odbiory lokali), Sanepid, Ubezpieczenia |
+| Właściciel | Czas właściciela, Portfel, Giełda (w budowie) |
+| **Wyniki** | Karta wyników, Wnioski z rundy |
 
-**Każdy lokal ma swoje** menu i ceny, zamówienia i magazyn, pracowników, stanowiska, sprzęt i wyposażenie.
-Wybrany na kafelku lokal zostaje wybrany, gdy przechodzisz między podzakładkami. Wspólne dla całej firmy są:
-reklama, promocje, bank, podatki, czas właściciela, ubezpieczenia i handel.
+Zakładki, które otwierają się później, są w menu szare, z kłódką i napisem „od rundy N”.
+
+**Każdy lokal ma swoje** menu i ceny, zamówienia i magazyn, pracowników, stanowiska, sprzęt i wyposażenie –
+dlatego wybór lokalu jest w grupie „Twój lokal”. Wybrany lokal zostaje wybrany, gdy przechodzisz między zakładkami.
+Wspólne dla całej firmy są: reklama, promocje, bank, podatki, czas właściciela, ubezpieczenia i handel.
 
 > **Wskazówka.** Mapa miasta działa jak drugie menu: kliknij bank, ratusz, hurtownię albo agencję reklamową, a gra
 > otworzy właściwą zakładkę. Kliknięty lokal pokaże czynsz, cenę i strefę.
@@ -118,33 +127,33 @@ Kilka zasad, które warto znać:
 W pierwszym tygodniu nic jeszcze nie sprzedajesz. To czas, żeby urządzić firmę (Dashboard pokazuje plan rundy –
 co jeszcze zostało do zrobienia):
 
-1. **Lokal** – w zakładce **Inwestycje ▸ Lokale** albo na mapie. Wynajmujesz (kaucja = 2 czynsze, potem czynsz co tydzień)
+1. **Lokal** – w zakładce **Nowe lokale ▸ Do wynajęcia** albo na mapie. Wynajmujesz (kaucja = 2 czynsze, potem czynsz co tydzień)
    albo kupujesz. Lokal *gotowy* działa od razu, *do urządzenia* – od następnej rundy, a działkę trzeba
    zabudować. Liczy się **strefa**: Miasteczko Akademickie to studenci, Stare Miasto – turyści i wieczory,
    Dworzec – podróżni o każdej porze. Im mniej drużyn w grze, tym mniej lokali na mapie (około pięciu na
    drużynę), a klientów w mieście jest tyle samo.
-2. **Bank i biuro rachunkowe** – w zakładkach Finanse ▸ Bank i Księgowość ▸ Biuro rachunkowe. Bez banku nie ma konta,
+2. **Bank i biuro rachunkowe** – w zakładkach Pieniądze ▸ Bank i Księgowość ▸ Biuro rachunkowe. Bez banku nie ma konta,
    bez biura – księgujesz sam: co rundę wpisujesz dokumenty do KPiR i składasz deklaracje w tej samej zakładce. Kto
    deklaracji nie złoży, płaci mandat co rundę – zwykle ponad dwa razy więcej niż najtańsze biuro (karta „Samodzielnie”
    pokazuje to porównanie).
-3. **Menu** (Lokale ▸ Menu i ceny) – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,
+3. **Menu** (Kuchnia) – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,
    dodatki) dodasz od tygodnia 3. Kafelek dania pokazuje **popyt roczny** (ile porcji zjada w roku przeciętna strefa)
    i sezonowość. Prognozę na tydzień liczysz sam – krok po kroku w dymku ⓘ przy „Popyt roczny”: popyt roczny ÷ 52
-   × sezonowość × wielkość strefy (Rynek ▸ Klienci i strefy), a z tego część, którą przyciągniesz na tle konkurencji.
+   × sezonowość × wielkość strefy (Klienci ▸ Strefy), a z tego część, którą przyciągniesz na tle konkurencji.
    Wybrane danie jest od razu w sprzedaży: cenę i rabat wpisujesz w tym samym kafelku co prognozę (od tygodnia 2;
    na start cena preferowana).
-4. **Stanowiska** (Lokale ▸ Sprzęt) – kuchnia i kasa. Każdy pracownik potrzebuje swojego stanowiska, a liczbę stanowisk ogranicza
+4. **Stanowiska** (Wnętrze ▸ Stanowiska i sprzęt) – kuchnia i kasa. Każdy pracownik potrzebuje swojego stanowiska, a liczbę stanowisk ogranicza
    wielkość lokalu.
-5. **Ludzie** (Lokale ▸ Ludzie) – kucharzy i kasjerów możesz zatrudnić już w tygodniu 1, żeby w pierwszym
+5. **Ludzie** (Ludzie ▸ Rynek pracy, obsada w Mój lokal) – kucharzy i kasjerów możesz zatrudnić już w tygodniu 1, żeby w pierwszym
    tygodniu sprzedaży kuchnia była obsadzona. W tygodniu 1 działa tylko pracuj.pl (agencja pracy – od tygodnia 2).
    Pensja liczy się od tygodnia zatrudnienia, choć sprzedaż rusza dopiero w tygodniu 2.
 
 > **Wskazówka.** We wrześniu studenci jeszcze siedzą u rodziców – Miasteczko Akademickie świeci pustkami aż do
-> ostatniego weekendu miesiąca. Prawdziwy ruch zaczyna się w październiku. Kalendarz miejski (Rynek ▸
+> ostatniego weekendu miesiąca. Prawdziwy ruch zaczyna się w październiku. Kalendarz miejski (Klienci ▸
 > Kalendarz) pokazuje, co i kiedy dzieje się w mieście – także mecze Motoru na Arenie (tłum kibiców pod stadionem,
 > więcej kebabów w bułce, frytek i napojów) i to, jak wydarzenia zmieniają popyt na konkretne dania (w Wigilię
 > wygrywa falafel). Im zimniej, tym więcej kebabów, a mniej zimnych napojów.
-> W tabeli **Strefy miasta** (Rynek ▸ Klienci i strefy) słupki pokazują, jak rozkładają się klienci strefy
+> W tabeli **Strefy miasta** (Klienci ▸ Strefy) słupki pokazują, jak rozkładają się klienci strefy
 > na dni najbliższej rundy sprzedaży – najedź na słupek, a zobaczysz mnożnik popytu dnia i liczbę klientów.
 > Najciemniejszy słupek to najmocniejszy dzień: pod niego planuj obsadę.
 
@@ -154,12 +163,12 @@ Od drugiego tygodnia lokal sprzedaje. Żeby danie trafiło do klienta, potrzebuj
 
 | Potrzebujesz | Zakładka | Co trzeba wiedzieć |
 |---|---|---|
-| Sprzęt | Lokale ▸ Sprzęt | Rożen, frytownica, lodówka… kupowany na konkretne stanowisko |
-| Pracowników | Lokale ▸ Ludzie | Kucharze gotują, kasjer sprzedaje; każdy ma gwiazdki umiejętności i oczekiwaną pensję |
-| Składniki | Lokale ▸ Dostawy i magazyn | Mięso, pita, warzywa, sosy – kupione wcześniej niż sprzedane |
-| Cenę | Lokale ▸ Menu i ceny | Cena brutto dania w kafelku dania (obok prognozy); za droga – klienci idą obok, za tania – sprzedajesz ze stratą |
+| Sprzęt | Wnętrze ▸ Stanowiska i sprzęt | Rożen, frytownica, lodówka… kupowany na konkretne stanowisko |
+| Pracowników | Ludzie ▸ Rynek pracy | Kucharze gotują, kasjer sprzedaje; każdy ma gwiazdki umiejętności i oczekiwaną pensję |
+| Składniki | Zaopatrzenie ▸ Dostawy | Mięso, pita, warzywa, sosy – kupione wcześniej niż sprzedane |
+| Cenę | Kuchnia | Cena brutto dania w kafelku dania (obok prognozy); za droga – klienci idą obok, za tania – sprzedajesz ze stratą |
 
-Sanepid musi **odebrać lokal** przed pierwszą sprzedażą (zakładka Firma ▸ Urząd i sanepid) – bez porządnego
+Sanepid musi **odebrać lokal** przed pierwszą sprzedażą (zakładka Urzędy ▸ Sanepid) – bez porządnego
 sprzątania odbioru nie będzie.
 
 ## 6. Klienci – skąd się biorą
@@ -215,7 +224,7 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
   dziennie, a termin biegnie. Za mało towaru – dania wypadają z menu. Lokal na auto-dostawach nie przyjmuje Twoich
   zamówień od innych dostawców.
 
-> **Wskazówka.** Zakładka Dostawy i magazyn pokazuje zapotrzebowanie na prognozowanych klientów: ile czego potrzebujesz,
+> **Wskazówka.** Zakładka Zaopatrzenie ▸ Dostawy pokazuje zapotrzebowanie na prognozowanych klientów: ile czego potrzebujesz,
 > ile masz w magazynie i czego brakuje. Policz zamówienie tak, żeby starczyło, ale nie wyrzucać.
 
 ## 8. Ludzie
@@ -237,7 +246,7 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
 - Zwolnienie i odejście do konkurencji mają **2 rundy wypowiedzenia** (umowa o pracę) – pracownik przez ten czas
   jeszcze pracuje i dostaje pensję; odprawę płacisz od razu. Zleceniobiorca odchodzi bez wypowiedzenia.
 - **Brakuje rąk?** Właściciel może sam stanąć na jednym wolnym stanowisku (przycisk *Stań sam* w zakładce
-  Lokale ▸ Ludzie). Pracuje jak pracownik 1★ i nie bierze pensji, ale każda godzina za ladą schodzi z jego 20 godzin.
+  Mój lokal). Pracuje jak pracownik 1★ i nie bierze pensji, ale każda godzina za ladą schodzi z jego 20 godzin.
 
 ## 9. Czas właściciela
 
@@ -273,7 +282,7 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   stanowiska, sprzęt, wyposażenie), nowe kredyty, leasing i lokaty. Alarm zobaczysz jako czerwony pasek
   na Dashboardzie i pierwszą pozycję Listy błędów. Spłać debet albo poproś mistrza gry o **inwestora ratunkowego**:
   wpłaci pieniądze (najpierw spłaci debet), a przez kilka tygodni weźmie część dochodu. Dopóki wpłata nie wróci, liczy się jak dług – firma gra dalej, ale miejsca w rankingu to nie poprawia.
-  Ile inwestor wpłacił, ile już wziął i przez ile tygodni jeszcze bierze udział – zobaczysz w Finanse ▸ Bank
+  Ile inwestor wpłacił, ile już wziął i przez ile tygodni jeszcze bierze udział – zobaczysz w Pieniądze ▸ Bank
   (i na Dashboardzie do końca umowy).
 - **Środki trwałe**: kupiony lokal i drogi sprzęt płacisz od razu, ale w księdze koszt rozkłada się na lata
   (amortyzacja).
@@ -307,13 +316,13 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 - **Wyposażenie dla klientów** (od tygodnia 4) – stoliki i krzesła, darmowe WiFi, telewizor z meczami: przyciąga
   klientów, którzy go oczekują, i poprawia opinie. Każda kolejna rzecz daje mniej niż poprzednia – komplet opłaca
   się, gdy kuchnia ma wolne moce; przy pełnej kuchni wystarczy kilka najważniejszych.
-- **Kolejny lokal** (Inwestycje ▸ Lokale) można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
+- **Kolejny lokal** (Nowe lokale ▸ Do wynajęcia) można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
   bez litości). Nowy lokal ma własne menu, ceny, magazyn i załogę – urządzasz go od zera
   w zakładce Lokale. Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
 - **Handel z drużynami** (od tygodnia 5) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
   i z fakturą. Druga drużyna widzi Twoją ofertę od razu i może się targować: przyjąć, odrzucić albo dać kontrofertę –
   i tak na przemian, najwyżej 3 kontroferty. Przyjęta cena to umowa, towar przychodzi na początku następnego tygodnia.
-- **Konkurencja** (Rynek ▸ Konkurencja) – ogólny obraz rywali widzi każdy: lokale, przedział cen,
+- **Konkurencja** (Klienci ▸ Konkurencja) – ogólny obraz rywali widzi każdy: lokale, przedział cen,
   reklama i promocje, udział w klientach. Dokładne dane jednego rywala (od tygodnia 2) zbierze detektyw „Sokole Oko”
   z biura przy dworcu: 300–800 zł i 2 godziny właściciela. Raport przychodzi po tygodniu, ale w 15% przypadków
   detektyw wpada – i rywal dowiaduje się, kto go śledził.
@@ -322,8 +331,8 @@ wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 
 | Tydzień | Nowe zakładki |
 |---|---|
-| 1 | Mapa, Inwestycje ▸ Lokale, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska, Ludzie), Rynek pracy, Bank, Biuro rachunkowe, Kalendarz miejski |
-| 2 | Sprzęt w lokalu, Dostawy i magazyn (z auto-dostawcą i przewozem towaru), Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
+| 1 | Mapa, Nowe lokale ▸ Do wynajęcia, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska, Ludzie), Rynek pracy, Bank, Biuro rachunkowe, Kalendarz miejski |
+| 2 | Sprzęt w lokalu, Zaopatrzenie (dostawy z auto-dostawcą, magazyn, przewozy), Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
 | 3 | Karta wyników, Udogodnienia, Agencje reklamowe, nowe dania w menu |
 | 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali |
 | 5 | Handel z drużynami, kolejne kampanie reklamowe |

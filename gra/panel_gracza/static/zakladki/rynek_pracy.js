@@ -1,5 +1,5 @@
 // Rynek pracy (gra z lokalami, silnik/ludzie/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
-// i okresy wypowiedzenia. Kandydatów z puli zatrudnia się w zakładce HR → Zatrudnienie.
+// i okresy wypowiedzenia. Kandydatów z puli zatrudnia się w zakładce Ludzie → Rynek pracy.
 import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
 
 const UMOWY = { prace: "umowa o pracę", zlecenie: "umowa zlecenie" };

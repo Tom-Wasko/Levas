@@ -55,7 +55,7 @@ historie:
         tekst: Zapraszasz go na rozmowę o pracę
         wynik: >-
           Pan Zbyszek zjawia się na rozmowie pół godziny przed czasem i od progu poprawia ustawienie przypraw.
-          Czeka na Twoją decyzję w Lokale ▸ Ludzie – tylko u Ciebie.
+          Czeka na Twoją decyzję w Ludzie ▸ Rynek pracy – tylko u Ciebie.
         skutki:
         - typ: kandydat
           opis: Zbigniew Ławecki (kucharz) na rynku pracy – tylko dla Twojej firmy
@@ -800,7 +800,7 @@ historie:
     mateusz:
       tekst: >-
         Mateusz przychodzi do lokalu z CV wydrukowanym na papierze milimetrowym. „Umiem liczyć, szybko się uczę
-        i nie boję się wiatru”. Czeka na Twoją decyzję w Lokale ▸ Ludzie – tylko u Ciebie.
+        i nie boję się wiatru”. Czeka na Twoją decyzję w Ludzie ▸ Rynek pracy – tylko u Ciebie.
       skutki:
       - typ: kandydat
         opis: Mateusz Wiatrowski (kasjer) na rynku pracy – tylko dla Twojej firmy

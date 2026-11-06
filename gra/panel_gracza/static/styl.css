@@ -69,7 +69,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
   cursor: pointer; border-bottom: 3px solid transparent; transition: color .15s, border-color .15s; }
 .menu .poz > a:hover { color: var(--pom); }
 .menu .poz > a.aktywna { color: var(--pom); border-bottom-color: var(--pom); }
-.menu .poz > a.zablokowana { opacity: .3; pointer-events: none; }
+.menu .poz > a.zablokowana { opacity: .45; filter: grayscale(1); cursor: default; }   /* UF15: szare z kłódką i „od rundy N” */
 .menu .znaczek { position: absolute; top: 2px; right: 6px; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 9px;
   background: var(--czerwony); color: #fff; font-size: 10px; line-height: 17px; text-align: center; }
 .menu .pod { display: none; position: absolute; top: calc(100% - 2px); left: 50%; transform: translateX(-50%); background: #fff;
@@ -78,7 +78,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
 .menu .pod a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; color: var(--tekst); text-decoration: none;
   font-size: 11px; font-weight: 600; text-transform: uppercase; border-radius: 6px; cursor: pointer; }
 .menu .pod a:hover { background: var(--pom-jasny); color: var(--pom); }
-.menu .pod a.zablokowana { opacity: .35; pointer-events: none; }
+.menu .pod a.zablokowana { opacity: .5; filter: grayscale(1); cursor: default; }
 .menu .pod a .od { margin-left: auto; font-size: 9.5px; color: var(--szary); text-transform: none; }
 .menu .sekcja { width: 1px; align-self: stretch; margin: 10px 6px 14px; background: var(--linia); }
 .menu .wyslij > a { color: var(--zielony); }
@@ -110,7 +110,8 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
   background: #fff; color: var(--tekst); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; text-decoration: none; }
 .podzakladki a:hover { border-color: var(--pom); color: var(--pom); }
 .podzakladki a.aktywna { background: var(--pom); border-color: var(--pom); color: #fff; }
-.podzakladki a.zablokowana { opacity: .4; pointer-events: none; }
+.podzakladki a.zablokowana { opacity: .5; filter: grayscale(1); cursor: default; }
+.podzakladki a .od { font-size: 9.5px; color: var(--szary); }
 .info { display: flex; gap: 10px; justify-content: center; align-items: center; text-align: center; padding: 12px 24px; color: var(--szary);
   border-bottom: 1px solid var(--linia); text-transform: uppercase; font-size: 11px; font-weight: 600; letter-spacing: .02em; }
 .info .i { width: 18px; height: 18px; border: 1.5px solid var(--pom); color: var(--pom); border-radius: 50%;
@@ -453,3 +454,13 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
 .ocena.niski, .ocena-tekst.niski { color: var(--czerwony); }
 .ocena.sredni, .ocena-tekst.sredni { color: #a86a00; }
 .ocena.dobry, .ocena-tekst.dobry { color: var(--zielony); }
+
+/* UF15: „w budowie” – żółto-czarne taśmy (mapa, giełda) */
+.w-budowie { display: flex; flex-direction: column; margin: 0 0 14px; border-radius: var(--r); overflow: hidden;
+  border: 1px solid #e0b400; background: #fffbe6; }
+.w-budowie .tasma { height: 12px; background: repeating-linear-gradient(-45deg, #f5c400 0 14px, #1f1f1f 14px 28px); }
+.w-budowie .napis { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 8px 14px; color: #5a4600; font-size: 12.5px; }
+.w-budowie .napis b { text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: #1f1f1f; }
+/* UF15: zakładki przed swoją rundą – szare, z kłódką i „od rundy N” */
+.menu .klodka { display: inline-flex; vertical-align: -2px; margin-right: 2px; opacity: .8; }
+.menu .poz > a.zablokowana .od-gora { font-size: 9px; text-transform: none; font-weight: 600; color: var(--szary); }

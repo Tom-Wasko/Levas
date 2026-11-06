@@ -1,7 +1,6 @@
-// Zakładka „Lokale” (Z3, przebudowa 2.11.2026, archiwum/plany/przebudowa_zakladek.md): kafelki lokali na górze i pięć
-// podzakładek – Przegląd, Menu i ceny, Dostawy i magazyn, Ludzie, Sprzęt. Podzakładka (poza Przeglądem) składa się
-// z dawnych zakładek („części”), które działają na wybranym lokalu (lokal_wybor.js); dawne klucze zakładek prowadzą
-// tu przez ALIAS (index.js), a część ma kotwicę #czesc-<klucz>.
+// Sekcja „Twój lokal” (Z3 2.11.2026, UF15 6.11.2026): kafelki wyboru lokalu na górze i zakładki Mój lokal, Kuchnia,
+// Zaopatrzenie, Wnętrze. Każda składa się z dawnych zakładek („części”), które działają na wybranym lokalu
+// (lokal_wybor.js); dawne klucze zakładek prowadzą tu przez ALIAS (index.js), a część ma kotwicę #czesc-<klucz>.
 import { esc, licz, naOkres, naRunde, proc, tabela, zl } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 import { kolko } from "./dymki.js";
@@ -131,7 +130,7 @@ function umowa(v, kat, id) {
     ${o.wlasciciel ? w("Wynajmujący", esc(o.wlasciciel)) : ""}
     ${o.najem_do ? w("Najem do rundy", licz(o.najem_do)) : ""}
     ${w("Od rundy", licz(o.od_rundy))}${w("Działa od rundy", licz(o.dziala_od))}</div>
-    <div class="kd"><a class="podpowiedz" data-zakladka-k="lokale">Najem, kupno i nowe lokale – Inwestycje → Lokale</a></div></div>`;
+    <div class="kd"><a class="podpowiedz" data-zakladka-k="lokale">Najem, kupno i nowe lokale – Nowe lokale → Do wynajęcia</a></div></div>`;
 }
 
 function sanepid(v) {
@@ -144,18 +143,19 @@ function sanepid(v) {
     ${M ? w("Litry w wynajętej chłodni (plan)", licz(M.litry)) : ""}
     ${M ? w("Przeterminowane w poprzedniej rundzie", zl(M.przeterminowane)) : ""}
     ${w("Ostatnia kontrola", ost)}</div>
-    <div class="kd"><a class="podpowiedz" data-zakladka-k="swiezosc">Szczegóły – Dostawy i magazyn</a></div></div>`;
+    <div class="kd"><a class="podpowiedz" data-zakladka-k="sanepid">Szczegóły – Urzędy → Sanepid</a></div></div>`;
 }
 
-export const lokal_przeglad = {
-  tytul: "Przegląd", tytulPelny: "Lokale – przegląd", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
+// UF15: część „Stan lokalu” zakładki Mój lokal (kafelki wyboru lokalu rysuje zakładka złożona)
+export const stan_lokalu = {
+  tytul: "Stan lokalu", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
   info: `Wszystko o wybranym lokalu w jednym miejscu: liczby z poprzedniej rundy, braki z listy błędów, umowa i sanepid.
-    Przy kilku lokalach na górze jest też porównanie lokali. Decyzje ustawiasz w kolejnych podzakładkach.`,
+    Przy kilku lokalach na górze jest też porównanie lokali.`,
   decyzje({ v, kat }) {
     const lok = lokalWybrany(v);
-    if (!lok) return `<div class="komunikat">Nie masz jeszcze lokalu – wynajmij albo kup go w zakładce <a data-zakladka-k="lokale">Inwestycje → Lokale</a>.</div>`;
+    if (!lok) return `<div class="komunikat">Nie masz jeszcze lokalu – wynajmij albo kup go w zakładce <a data-zakladka-k="lokale">Nowe lokale → Do wynajęcia</a>.</div>`;
     const id = idWybranego(v);
-    return kafelkiLokali(v) + porownanie(v, kat)
+    return porownanie(v, kat)
       + `<div class="tabela-tytul">${esc(nazwaLokalu(v, lok.id))} – liczby</div>` + liczby(v, kat, lok.id)
       + braki(v, id) + `<div class="dwie" style="margin-top:20px">${umowa(v, kat, lok.id)}${sanepid(v)}</div>`;
   },

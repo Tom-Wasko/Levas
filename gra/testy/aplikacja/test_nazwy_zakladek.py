@@ -1,5 +1,5 @@
 """U4: nazwy zakładek w tekstach silnika i danych (komunikaty, lista błędów, wnioski, zdarzenia) istnieją w panelu
-gracza – po przebudowie menu (2.11.2026) zostały stare nazwy („Kadry”, „(Inwestycje)” przy stanowiskach)."""
+gracza – po przebudowie menu (2.11.2026) zostały stare nazwy („Kadry”, „(Inwestycje)” przy stanowiskach). UF15 (6.11.2026): nowy układ menu."""
 
 import io
 import re
@@ -67,7 +67,8 @@ def _prefiks_jest(slowa: list[str], tytuly: set[str]) -> bool:
 
 def test_nazwy_zakladek_w_tekstach_istnieja_w_menu():
     menu, wszystkie = _tytuly()
-    assert {"Lokale", "Inwestycje", "Finanse", "Księgowość"} <= menu and {"Sprzęt", "Ludzie", "Biuro rachunkowe"} <= wszystkie
+    assert {"Nowe lokale", "Mój lokal", "Zaopatrzenie", "Wnętrze", "Ludzie", "Pieniądze", "Księgowość", "Urzędy"} <= menu \
+        and {"Stanowiska i sprzęt", "Rynek pracy", "Biuro rachunkowe", "Do wynajęcia"} <= wszystkie
     zle = []
     for gdzie, t in _wszystkie_teksty():
         zle += [f"{gdzie}: {m.group(0)}" for m in STARE.finditer(t)]

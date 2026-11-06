@@ -46,7 +46,7 @@ function jakUruchomic(kat, lok) {
   const rund = lok.typ === "dzialka" ? lok.budowa_rund : kat.mapa.zasady.urzadzanie_rund;
   const kiedy = rund > 1 ? `w ostatniej rundzie ${lok.typ === "dzialka" ? "budowy" : "urządzania"} (${rund}. po wzięciu)` : "już w rundzie wzięcia";
   return `<p class="podpowiedz"><b>Jak uruchomić:</b> ${lok.typ === "dzialka" ? `budowa trwa ${rund} ${rund === 1 ? "rundę" : "rundy"} – lokal nie sprzedaje i nie płaci mediów, płacisz raty budowy. ` : `urządzanie trwa ${rund === 1 ? "1 rundę" : `${rund} rundy`}. `}`
-    + `Lokal jest pusty: ${kiedy} kup stanowiska kuchni i kasy oraz sprzęt na stanowiska (Lokale ▸ Sprzęt) i zatrudnij pracowników (Lokale ▸ Ludzie) – w pierwszej rundzie działania lokal od razu sprzedaje.</p>`;
+    + `Lokal jest pusty: ${kiedy} kup stanowiska kuchni i kasy oraz sprzęt na stanowiska (Wnętrze ▸ Stanowiska i sprzęt) i zatrudnij pracowników (Ludzie ▸ Rynek pracy) – w pierwszej rundzie działania lokal od razu sprzedaje.</p>`;
 }
 
 // przyciski Wynajmij / Kup (okno mapy i kafel oferty)
@@ -90,7 +90,7 @@ function mojeLokale(kat, moje) {
 }
 
 export const lokale = {
-  tytul: "Lokale", tytulPelny: "Lokale - najem i kupno", ikona: "lokale", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
+  tytul: "Do wynajęcia", tytulPelny: "Nowe lokale – najem i kupno", ikona: "lokale", odblokowanie: (v) => !!v.lokale, ukryta: (v) => !v.lokale,
   info: (c) => `Wybierz lokal na mapie miasta: wynajmij (kaucja ${c.kat.mapa.zasady.kaucja_miesiecy} × czynsz, potem czynsz co ${OKRES.mianownik}) albo kup.
     Lokal gotowy działa od razu, lokal do urządzenia – od następnej rundy, działkę trzeba zabudować. Stanowiska stoją w lokalach – ich liczbę ogranicza liczba miejsc.
     Kolejny lokal można wziąć co ${c.kat.mapa.zasady.nowy_lokal_co_rund} rundy.`,

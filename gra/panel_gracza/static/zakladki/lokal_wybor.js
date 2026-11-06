@@ -75,6 +75,14 @@ export function kafelkiLokali(v) {
     osobno dla każdego lokalu – kliknij kafelek, żeby przełączyć lokal. Pracownik pracuje na stanowisku jednego lokalu; szkolenia, czas właściciela i dostawcy są wspólni dla firmy.</p>` : ""}`;
 }
 
+// UF15: krótki wybór lokalu w zakładkach Firmy, które mimo to działają na jednym lokalu (Udogodnienia) – tylko przy kilku lokalach
+export function wyborLokaluKrotki(v) {
+  if (!wieleLokali(v)) return "";
+  const akt = lokalWybrany(v).id;
+  return `<div class="wybor-lokalu-krotki">Lokal: ${mojeLokale(v).map((x) => `<button class="btn maly ${x.id === akt ? "pom" : "jasny"}"
+    data-akcja="wybierz-lokal" data-id="${esc(x.id)}">${esc(opisLokalu(v, x.id)?.nazwa || x.id)}</button>`).join(" ")}</div>`;
+}
+
 export const akcjeWyboru = {
   "wybierz-lokal": (el, c) => { wybrany = el.dataset.id; c.rysuj(); },
 };

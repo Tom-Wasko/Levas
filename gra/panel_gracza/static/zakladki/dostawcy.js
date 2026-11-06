@@ -349,7 +349,7 @@ function oknoBazy({ v, kat, edycja }, dost) {
   const id = idWybranego(v);
   okno(`Dostawca „${esc(dost)}”${id ? ` – dostawa do lokalu ${esc(nazwaLokalu(v, id))}` : ""}`, tabela(null, ["Składnik", "Jakość", "Na magazynie", "Cena", ...kolumny, "Wartość"], w, { klasy: ["l"] })
     + `<p class="podpowiedz">Ceny w tym ${OKRES.miejscownik}. Ilości wpisujesz w opakowaniach (np. napój: opakowanie 24 szt.).
-      ${dni ? "Kolumny dni – dostawa rano tego dnia (tylko dni dostaw tego dostawcy); termin przydatności liczy się od dnia dostawy (Lokale ▸ Dostawy i magazyn)." : ""}
+      ${dni ? "Kolumny dni – dostawa rano tego dnia (tylko dni dostaw tego dostawcy); termin przydatności liczy się od dnia dostawy (Zaopatrzenie ▸ Dostawy)." : ""}
       ${dni && x.limit_opakowan ? ` Najwyżej ${licz(x.limit_opakowan)} opakowań składnika dziennie, każdy dzień zakupów to ${licz(x.godziny_odbioru)} h właściciela.` : ""}
       ${dni && x.minimalne_zamowienie ? ` Dostawa poniżej ${zl(x.minimalne_zamowienie)} nie zostanie zrealizowana.` : ""}
       ${dni && x.koszt_dostawy ? ` Dowóz ${zl2(x.koszt_dostawy)} za dostawę${x.darmowa_od ? `, darmowy od ${zl(x.darmowa_od)}` : ""}.` : ""}</p>`,
