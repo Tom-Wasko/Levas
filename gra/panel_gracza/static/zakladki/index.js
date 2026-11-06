@@ -4,7 +4,7 @@ import { oferta } from "./oferta.js";
 import { sprzet, stanowiska, wyposazenie } from "./inwestycje.js";
 import { szkolenia, udogodnienia, zatrudnienie, zespol } from "./hr.js";
 import { dostawcy } from "./dostawcy.js";
-import { agencje, promocje } from "./marketing.js";
+import { agencje, internet, promocje } from "./marketing.js";
 import { sprzedaz } from "./sprzedaz.js";
 import { bank, biuro, kpir, raport } from "./finanse.js";
 import { lokale } from "./lokale.js";
@@ -29,7 +29,7 @@ import { gielda } from "./gielda.js";
 
 const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, ranking, lokale, licytacje, przejecia, urzad, sanepid, klienci, kalendarz, konkurencja, oferta,
   stanowiska, sprzet, wyposazenie, zatrudnienie, zespol, rynek_pracy, udogodnienia, szkolenia, dostawcy, swiezosc, przewozy,
-  czas_wlasciciela, sprawy, agencje, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia,
+  czas_wlasciciela, sprawy, agencje, internet, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia,
   wlasciciel, gielda, kasyno, lista_bledow, wyslij };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
@@ -39,17 +39,17 @@ export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", zaop_dost
   klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", ranking: "wykres", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", zatrudnienie: "zatrudnienie", zespol: "zatrudnienie", rynek_pracy: "rynek_pracy",
   udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", przewozy: "dostawcy", czas_wlasciciela: "zegar",
-  sprawy: "zdarzenia", agencje: "tradycyjny", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir",
+  sprawy: "zdarzenia", agencje: "tradycyjny", internet: "marketing", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir",
   vat: "procent", podatki: "podatki", bank: "bank", harpagon: "harpagon", biuro: "biuro", ubezpieczenia: "tarcza", wlasciciel: "portfel",
   gielda: "wykres", kasyno: "klucz", lista_bledow: "bledy", wyslij: "wyslij" };
 
 // od której rundy zakładka jest dostępna (w menu: szara pozycja z kłódką i „od rundy N”)
-export const OD_RUNDY = { karta_wynikow: 3, ranking: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
+export const OD_RUNDY = { karta_wynikow: 3, ranking: 3, agencje: 3, internet: 7, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
   przejecia: 4, sprzet: 2, zatrudnienie: 1, zespol: 1, rynek_pracy: 1, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, vat: 2,
   sprawy: 2, ubezpieczenia: 2, handel: 5 };
 
 // zakładka → element harmonogramu gry z lokalami (silnik/harmonogram.py); tydzień z widoku zastępuje OD_RUNDY
-export const ELEMENT = { karta_wynikow: "karta_wynikow", ranking: "karta_wynikow", agencje: "reklama", promocje: "promocje", udogodnienia: "hr_udogodnienia",
+export const ELEMENT = { karta_wynikow: "karta_wynikow", ranking: "karta_wynikow", agencje: "reklama", internet: "internet", promocje: "promocje", udogodnienia: "hr_udogodnienia",
   wyposazenie: "inwestycje_wyposazenie", szkolenia: "hr_szkolenia", przejecia: "przejecia", sprzet: "inwestycje_sprzet",
   zatrudnienie: "hr_zatrudnienie", zespol: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", sprawy: "parki", handel: "handel" };
 
@@ -105,7 +105,7 @@ export const MENU = [
   { klucz: "wnetrze", tytul: "Wnętrze", ikona: "sprzet", pod: ["wnetrze_sprzet", "wnetrze_wyposazenie"] },
   { sekcja: "Firma" },
   { klucz: "ludzie", tytul: "Ludzie", ikona: "zatrudnienie", pod: ["rynek_pracy", "zespol", "szkolenia", "udogodnienia"] },
-  { klucz: "marketing", tytul: "Marketing", ikona: "marketing", pod: ["promocje", "agencje"] },
+  { klucz: "marketing", tytul: "Marketing", ikona: "marketing", pod: ["promocje", "agencje", "internet"] },
   { klucz: "handel", tytul: "Handel", ikona: "handel" },
   { klucz: "finanse", tytul: "Pieniądze", ikona: "finanse", pod: ["raport", "bank", "harpagon"] },
   { klucz: "ksiegowosc", tytul: "Księgowość", ikona: "kpir", pod: ["biuro", "kpir", "vat", "podatki"] },

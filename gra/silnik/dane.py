@@ -365,7 +365,7 @@ def sprawdz(katalog: Path | None = None) -> list[str]:
         bledy.append("kalendarz/: kalendarz miejski wymaga mapy (dane/mapa/)")
     if d.mapa:
         bledy += _sprawdz_mape(d, brak)
-        agencje = d.mapa["reklama"]["agencje"]
+        agencje = {**d.mapa["reklama"]["agencje"], **((d.mapa["reklama"].get("internet") or {}).get("agencje") or {})}
         for s, st in d.boty["strategie"].items():
             for x in st.get("kampanie", []):
                 a, _, k = x.partition("/")
@@ -432,12 +432,14 @@ def _sprawdz_mape(d: Dane, brak) -> list[str]:
         r = b["mapa"]
         poloz(co, b["strefa"], r["x"], r["y"], r["szer"], r["gl"])
     budynki = {b["id"]: b for b in m["budynki"]}
-    for a, ag in m["reklama"]["agencje"].items():
-        co = f"mapa/reklama.yaml: agencje.{a}"
+    internet = (m["reklama"].get("internet") or {}).get("agencje") or {}
+    for a, ag, zakl in [(a, ag, "agencje") for a, ag in m["reklama"]["agencje"].items()] + \
+            [(a, ag, "internet") for a, ag in internet.items()]:
+        co = f"mapa/reklama.yaml: {'internet.' if zakl == 'internet' else ''}agencje.{a}"
         if ag["budynek"] not in budynki:
             brak(ag["budynek"], co, "budynek", "mapa/budynki.yaml")
-        elif budynki[ag["budynek"]]["zakladka"] != "agencje":
-            bledy.append(f"{co}: budynek {ag['budynek']} nie prowadzi do zakładki agencje")
+        elif budynki[ag["budynek"]]["zakladka"] != zakl:
+            bledy.append(f"{co}: budynek {ag['budynek']} nie prowadzi do zakładki {zakl}")
         for k, kan in ag["kanaly"].items():
             for s in kan["strefy"] or []:
                 if s not in m["strefy"]:

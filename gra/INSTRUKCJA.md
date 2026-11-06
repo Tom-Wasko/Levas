@@ -282,9 +282,9 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
 
 - **Promocje** (od tygodnia 2) – zniżka na wybrane dania. Przyciąga klientów, ale obcina cenę: włączaj, gdy kuchnia
   ma wolne ręce. Promocji nadajesz własną, ozdobną nazwę – na wynik nie wpływa, na humor klientów owszem.
-- **Agencje reklamowe** (od tygodnia 3) – kampanie w strefach: ulotki, plakaty, posty, influencerka, billboard,
-  radio, degustacje. Kampanię zamawiasz na **jedną rundę**: wybierasz kanał, strefę i **liczbę emisji** (emisja to
-  np. paczka 250 ulotek, post na grupie albo spot w radiu).
+- **Agencje reklamowe** (od tygodnia 3) – kampanie w strefach: ulotki, plakaty, billboard, radio, degustacje,
+  Noc Kebaba. Kampanię zamawiasz na **jedną rundę**: wybierasz kanał, strefę i **liczbę emisji** (emisja to
+  np. paczka 250 ulotek, godzina degustacji albo spot w radiu).
   - **Cena emisji** zależy od kanału i strefy; od progów (np. od 4 i od 11 emisji) dostajesz **rabat na wszystkie
     emisje**.
   - **Efekt się nasyca**: 1 emisja to ok. 23% tego, co kanał może dać, 4 – ok. 65%, 10 – ponad 90%. Dalsze emisje
@@ -293,6 +293,12 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   - Kampania przyciąga więcej głodnych i podbiera klientów konkurencji. Kilka firm reklamujących się tak samo w jednej
     strefie zagłusza się nawzajem. Kampanie się sumują, ale **z sufitem**: jedna daje zwykle +4–10% popytu, kilka
     naraz ok. +10–30% – dalsze dokładanie to już głównie wydatek.
+- **Internet** (od tygodnia 7, Marketing → Internet) – agencja „Lajk i Spółka”: posty na grupach osiedlowych,
+  influencerka, własne filmiki na TikToku, wizytówka w Mapach Google, grupa „Lublin Jedzie”. Zamawia się tak samo
+  (kanał, strefa, emisje), ale **efekt rośnie przez kilka rund** (w rundzie emisji ok. 1/3, pełny po dwóch rundach –
+  posty się udostępnia, opinie przybywają) i **gaśnie wolniej** niż ulotki. Tabela „Twoja obecność w sieci” pokazuje,
+  ile kampanie już zamówione dadzą w kolejnych rundach. Opłaca się zacząć wcześnie; kampania na tydzień przed końcem
+  gry to w większości efekt, którego nie zobaczysz.
 
 ## 11. Pieniądze
 

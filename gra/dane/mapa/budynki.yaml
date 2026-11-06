@@ -298,8 +298,9 @@ budynki:
   nazwa: Agencja „Lajk i Spółka”
   rodzaj: reklama
   strefa: akademickie
-  opis: Posty na grupach osiedlowych i influencerka z TikToka (dane/mapa/reklama.yaml).
-  zakladka: agencje
+  opis: Marketing internetowy (od rundy 7) – posty, influencerka, TikTok, wizytówka w mapach, grupa „Lublin Jedzie”
+    (dane/mapa/reklama.yaml, sekcja internet).
+  zakladka: internet
   mapa:
     x: 5
     y: 5

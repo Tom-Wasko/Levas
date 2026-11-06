@@ -97,7 +97,21 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   `api/prezentacja.py: zadania_z_poprzedniej` (w widoku, zapis przy pierwszej zmianie decyzji). Style na końcu
   `styl.css`. Test: `test_api.py: test_wlasne_zadania_druzyny_przechodza_na_kolejna_runde`; panel sprawdzony w node
   na zrzucie widoków (bez przeglądarki – wygląd panelu do obejrzenia przy scalaniu).
-- Następne kolejno: UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF19 – marketing internetowy od rundy 7. Dane: `mapa/reklama.yaml` – nowa sekcja `internet` (model:
+  `narastanie` [0,35, 0,7, 1,0], `trwalosc` 0,8, `prog_wygasania`; agencja `lajk` przeniesiona z `agencje` – te same id
+  kanałów grupa_osiedlowa i influencer, teraz od rundy 7 i z mniejszym przyciąganiem – plus nowe: tiktok, mapy,
+  lublin_jedzie). Schemat `ModelInternetu`/`ReklamaInternetowa`, `PlikReklamy.internet` opcjonalne (dane zamrożone
+  testów bez tej sekcji działają po staremu – Lajk tam jest agencją tradycyjną). Silnik `rynek/reklama.py`:
+  `agencje(dane)` (obie sekcje), `internetowa`, `waga_internetu` (waga kampanii z jej wieku – „pamięć efektu” liczona
+  z historii `Firma.kampanie`, bez nowego pola w `Firma`, więc zapisy gier się nie psują), `prognoza_internetu`
+  (widok: przyciąganie na 4 rundy), uwagi zamówień internetowych w `uwagi_internet` → lista błędów, zakładka
+  `internet`. Harmonogram: element `internet` (MG może przesunąć tydzień). Panel: `marketing.js` – zakładka
+  `internet` (agencje tradycyjne filtrowane `tylko(R, false)`), menu Marketing → Promocje · Ulotki i radio · Internet;
+  budynek `agencja_lajk` prowadzi do zakładki `internet`. Boty: strategie z Lajkiem używają go od 7, premium dokłada
+  `lajk/mapy`. Testy: `testy/rynek/test_internet.py` (dane_gry). **Do kalibracji:** liczby kanałów to założenie UF19
+  (suma wag ≈ 5,6 rundy efektu, reklama tradycyjna ≈ 1,9 – przyciąganie ok. 2,5× mniejsze); przy scalaniu z
+  kalibracja-b sprawdzić, czy B10/B-pomiary nie zakładały Lajka od rundy 3.
+- Następne kolejno: UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

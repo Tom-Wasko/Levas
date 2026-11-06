@@ -11,7 +11,11 @@ opis: 'Agencje reklamowe gry z lokalami (silnik/rynek/reklama.py). Kampania to a
   rodzaju kanału: kilka drużyn w tym samym rodzaju i strefie w tej samej rundzie się zagłusza. model: zagluszanie –
   efekt × 1 / (1 + zagluszanie × (n − 1)), n – liczba firm z kampanią tego rodzaju w strefie w tej rundzie;
   wygasanie – po rundzie emisji efekt spada co rundę × wygasanie, aż będzie mniejszy niż prog_wygasania.
-  teksty – komiczne raporty agencji po rundzie ({strefa} – nazwa strefy).'
+  teksty – komiczne raporty agencji po rundzie ({strefa} – nazwa strefy). internet (UF19) – marketing
+  internetowy (zakładka Marketing → Internet, od rundy 7): te same pola kanałów, ale efekt kampanii nie kończy się
+  na rundzie emisji – w rundzie emisji i kolejnych działa część efektu z listy narastanie (posty się udostępnia,
+  opinie przybywają), potem co rundę × trwalosc (wolniej niż reklama tradycyjna), aż spadnie poniżej
+  prog_wygasania. Zagłuszanie, nasycenie emisjami i sufit – jak w reklamie tradycyjnej (model wyżej).'
 zrodlo: 'notatka „Elementy mapy” (kilka agencji, każda z własnymi kanałami: ulotki i plakaty, internet i social media,
   radio i billboardy, lokalne wydarzenia; kampanie z listy; reklama poszerza pulę i odbiera klientów konkurencji; ten
   sam kanał w tej samej strefie osłabia kampanie) i „Ustalenia gry” (runda 3 – część kanałów, runda 5 – wszystkie);
@@ -65,43 +69,6 @@ agencje:
           chyba Mruczek”. Twój kebab wygląda na nich apetyczniej niż oba koty razem.'
         - 'Klej do plakatów okazał się tak mocny, że służby miejskie w strefie {strefa} poddały się po trzech próbach.
           Plakat zostanie tam prawdopodobnie do 2031 roku. Agencja nie dolicza za to ani grosza.'
-  lajk:
-    nazwa: Agencja „Lajk i Spółka”
-    budynek: agencja_lajk
-    rodzaj: internet
-    opis: Trzech studentów, dwa ringlighty i jeden iPhone z pękniętym ekranem. Mówią o sobie „boutique social media
-      house”.
-    kanaly:
-      grupa_osiedlowa:
-        nazwa: Posty na grupach osiedlowych
-        od_rundy: 3
-        zasieg: strefa
-        emisja: post na grupie
-        cena_emisji: 35
-        znizki: [[4, 0.1], [11, 0.25]]
-        maks_emisji: 20
-        pula: 0.02
-        przyciaganie: 0.1
-        teksty:
-        - 'Post na grupie „Strefa {strefa} – Uwaga, Policja / Sprzedam / Oddam” zebrał 214 komentarzy. 180 to kłótnia
-          o to, czy kebab może mieć ananasa. Wygrałeś: wszyscy już znają nazwę lokalu.'
-        - 'Administratorka grupy osiedlowej w strefie {strefa} usunęła post jako reklamę, po czym sama zamówiła u Ciebie
-          dwa kebaby i wrzuciła zdjęcie z podpisem „Polecam, nie reklama”. Zasięg: trzy razy większy.'
-      influencer:
-        nazwa: Influencerka „Kebabowa Królowa” (TikTok)
-        od_rundy: 5
-        zasieg: strefa
-        emisja: relacja influencerki
-        cena_emisji: 120
-        znizki: [[3, 0.15], [6, 0.25]]
-        maks_emisji: 10
-        pula: 0.08
-        przyciaganie: 0.3
-        teksty:
-        - 'Kebabowa Królowa nagrała w strefie {strefa} 47 ujęć jednego gryza w zwolnionym tempie. Sos kapnął jej na
-          kamerę, co podbiło film do 300 tysięcy wyświetleń. Komentarz numer jeden: „gdzie to jest, jadę”.'
-        - 'Filmik „Oceniam kebaby w strefie {strefa} na ślepo” skończył się dla Ciebie notą 9/10 („minus punkt, bo
-          serwetki za cienkie”). Kupiłeś grubsze serwetki. Agencja chce za to osobny bonus.'
   fala_koziolka:
     nazwa: Radio i billboardy „Fala Koziołka”
     budynek: fala_koziolka
@@ -179,3 +146,96 @@ agencje:
           gdzie się je po kolokwium. Ktoś z politechniki zaproponował, żeby zrobić z tego przedmiot obieralny.'
         - 'Na otrzęsinach w strefie {strefa} starosta roku ogłosił Twój kebab „oficjalnym posiłkiem sesji”. Dziekan
           podobno nie protestował, bo dostał porcję bez cebuli.'
+
+# UF19 (plan ufajniania, 6.11.2026): marketing internetowy od rundy 7 – agencja Lajk przeniesiona z reklamy
+# tradycyjnej + nowe kanały. Liczby – założenie UF19 (do kalibracji): suma wag narastanie + ogon trwałości ≈ 5,6
+# rundy efektu (reklama tradycyjna ≈ 1,9), więc przyciąganie kanałów ok. 2,5× mniejsze niż w podobnych kanałach
+# tradycyjnych przy podobnych cenach – na całą grę wychodzi podobnie, ale z opóźnieniem i długim ogonem.
+internet:
+  model:
+    narastanie: [0.35, 0.7, 1.0]   # część efektu w rundzie emisji, rundę później, dwie rundy później
+    trwalosc: 0.8                   # potem co rundę × 0,8 (tradycyjna: × 0,5)
+    prog_wygasania: 0.1
+  agencje:
+    lajk:
+      nazwa: Agencja „Lajk i Spółka”
+      budynek: agencja_lajk
+      rodzaj: internet
+      opis: Trzech studentów, dwa ringlighty i jeden iPhone z pękniętym ekranem. Mówią o sobie „boutique social media
+        house”. Internet niczego nie zapomina – Twoje posty też nie.
+      kanaly:
+        grupa_osiedlowa:
+          nazwa: Posty na grupach osiedlowych
+          od_rundy: 7
+          zasieg: strefa
+          emisja: post na grupie
+          cena_emisji: 35
+          znizki: [[4, 0.1], [11, 0.25]]
+          maks_emisji: 20
+          pula: 0.01
+          przyciaganie: 0.05
+          teksty:
+          - 'Post na grupie „Strefa {strefa} – Uwaga, Policja / Sprzedam / Oddam” zebrał 214 komentarzy. 180 to kłótnia
+            o to, czy kebab może mieć ananasa. Wygrałeś: wszyscy już znają nazwę lokalu.'
+          - 'Administratorka grupy osiedlowej w strefie {strefa} usunęła post jako reklamę, po czym sama zamówiła u Ciebie
+            dwa kebaby i wrzuciła zdjęcie z podpisem „Polecam, nie reklama”. Zasięg: trzy razy większy.'
+        influencer:
+          nazwa: Influencerka „Kebabowa Królowa” (TikTok)
+          od_rundy: 7
+          zasieg: strefa
+          emisja: relacja influencerki
+          cena_emisji: 120
+          znizki: [[3, 0.15], [6, 0.25]]
+          maks_emisji: 10
+          pula: 0.03
+          przyciaganie: 0.12
+          teksty:
+          - 'Kebabowa Królowa nagrała w strefie {strefa} 47 ujęć jednego gryza w zwolnionym tempie. Sos kapnął jej na
+            kamerę, co podbiło film do 300 tysięcy wyświetleń. Komentarz numer jeden: „gdzie to jest, jadę”.'
+          - 'Filmik „Oceniam kebaby w strefie {strefa} na ślepo” skończył się dla Ciebie notą 9/10 („minus punkt, bo
+            serwetki za cienkie”). Kupiłeś grubsze serwetki. Agencja chce za to osobny bonus.'
+        tiktok:
+          nazwa: Własne filmiki na TikToku
+          od_rundy: 7
+          zasieg: miasto
+          emisja: filmik z kuchni
+          cena_emisji: 60
+          znizki: [[5, 0.15], [10, 0.25]]
+          maks_emisji: 15
+          pula: 0.01
+          przyciaganie: 0.04
+          teksty:
+          - 'Student z agencji nagrał, jak kucharz kroi mięso z rożna w rytm disco polo. Filmik obejrzało pół miasta,
+            a druga połowa nagrała duet. W komentarzach toczy się spór, czy to „ASMR”, czy „zwykły obiad”.'
+          - 'Seria „Sos dnia” ma już stałych widzów: ktoś z {strefa} codziennie pisze „za mało czosnku”, po czym
+            przychodzi i zamawia podwójny czosnek. Algorytm uznał to za zaangażowanie i pokazuje Was dalej.'
+        mapy:
+          nazwa: Wizytówka w Mapach Google i opinie
+          od_rundy: 7
+          zasieg: strefa
+          emisja: dzień wyróżnienia w wynikach
+          cena_emisji: 25
+          znizki: [[4, 0.15], [7, 0.3]]
+          maks_emisji: 7
+          pula: 0.0
+          przyciaganie: 0.08
+          teksty:
+          - 'Ktoś w strefie {strefa} wpisał „kebab blisko mnie” i pierwszy wyskoczył Twój lokal, ze zdjęciem z idealnym
+            światłem (agencja trzymała lampę 40 minut). Najczęstsza opinia: „wygląda jak na zdjęciu, szok”.'
+          - 'Agencja odpowiedziała grzecznie na każdą z 37 opinii w strefie {strefa}, także na tę „byłem tylko po
+            serwetki, 5/5”. Mapa pokazuje Was teraz wyżej niż pizzerię, która nie odpisuje od 2019 roku.'
+        lublin_jedzie:
+          nazwa: Grupa „Lublin Jedzie” (posty i konkursy)
+          od_rundy: 7
+          zasieg: miasto
+          emisja: post z konkursem
+          cena_emisji: 50
+          znizki: [[4, 0.1], [8, 0.2]]
+          maks_emisji: 10
+          pula: 0.02
+          przyciaganie: 0.04
+          teksty:
+          - 'Konkurs na grupie „Lublin Jedzie”: „Oznacz osobę, z którą zjesz kebaba o 3 w nocy”. Oznaczono 1 200 osób,
+            w tym prezydenta miasta (dwa razy). Nagroda – kebab XXL – czeka na odbiór.'
+          - 'Administrator grupy „Lublin Jedzie” przypiął Twój post między zdjęciem dziury w jezdni a pytaniem „czy
+            ktoś zgubił kozę?”. Koza się znalazła, a Twój lokal zyskał 300 nowych obserwujących.'

@@ -173,6 +173,7 @@ strategie:
     szkolenia: 1   # B9: drugie szkolenie nic nie daje (efekt włącznik), −0,02 karty
     kampanie:
     - lajk/influencer
+    - lajk/mapy                 # UF19: marketing internetowy od rundy 7
     - fala_koziolka/billboard
     promocje:
     # B10: zestaw +0,156 karty wobec karty stałego klienta (b10_promocje, 6/6)

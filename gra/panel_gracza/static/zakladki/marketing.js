@@ -1,9 +1,14 @@
-// Marketing: kampanie agencji reklamowych w strefach miasta i promocje.
+// Marketing: kampanie agencji reklamowych w strefach miasta (tradycyjne i – UF19 – internetowe) i promocje.
 import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
 import { igReklama } from "./infografiki.js";
 
 const RODZAJ = { druk: "druk", internet: "internet", radio_billboard: "radio i billboardy", wydarzenia: "wydarzenia" };
-const FAZA = { trwa: "trwa", wygasa: "wygasa" };
+const FAZA = { trwa: "trwa", narasta: "narasta", wygasa: "wygasa" };
+// UF19: agencje jednego rodzaju (internetowe albo tradycyjne – widok bez znacznika to same tradycyjne)
+const tylko = (R, internet) => ({ ...R, agencje: R.agencje.filter((a) => !!a.internet === internet) });
+const zamowioneW = (v, R) => (v.decyzje.kampanie || []).filter((x) => x.emisje > 0 && R.agencje.some((a) => a.id === x.agencja));
+// UF19: „35% → 70% → 100%, potem −20% co rundę”
+const profilInternetu = (mi) => `${mi.narastanie.map((x) => proc(x, 0)).join(" → ")}, potem −${proc(1 - mi.trwalosc, 0)} co rundę`;
 const wybor = {};   // wybrana strefa kanału (agencja/kanał → strefa), do przeliczenia kosztu przed zamówieniem
 
 function strefaKanalu(R, a, k) {
@@ -27,7 +32,7 @@ const kanalReklamy = (R, a, k) => R.agencje.find((x) => x.id === a)?.kanaly.find
 const takaSama = (x, a, k, strefa) => x.agencja === a && x.kanal === k && (x.strefa ?? null) === strefa;
 const emisjeWDecyzji = (v, a, k, s) => (v.decyzje.kampanie || []).find((x) => takaSama(x, a, k, s === "miasto" ? null : s))?.emisje || 0;
 
-function kanalHtml(v, R, a, k, edycja) {
+function kanalHtml(v, R, a, k, edycja, mi = null) {
   const s = strefaKanalu(R, a, k), n = emisjeWDecyzji(v, a.id, k.id, s), ef = efektEmisji(R, n), rab = rabatKanalu(k, n);
   const inni = (R.konkurencja[a.rodzaj] || {})[s] || [], dis = edycja && k.dostepny ? "" : "disabled";
   const opcje = k.strefy.map((z) => `<option value="${z}" ${z === s ? "selected" : ""}>${esc(R.strefy[z])}${R.moje_strefy.includes(z) ? " (Twój lokal)" : ""}</option>`).join("");
@@ -45,10 +50,14 @@ function kanalHtml(v, R, a, k, edycja) {
     ${n ? wiersz("Koszt (netto)", `${zl(kosztKampanii(k, s, n))}${rab ? ` <span class="plus">(−${proc(rab, 0)})</span>` : ""}`) : ""}
     ${wiersz("Siła kampanii", `${proc(ef, 0)} pełnego efektu`)}
     ${wiersz("Więcej klientów w strefie", `+${proc(k.pula * (n ? ef : 1), 1)}${n ? "" : " (przy pełnym efekcie)"}`)}
-    ${wiersz("Przyciąganie do Ciebie", `+${proc(k.przyciaganie * (n ? ef : 1), 1)}${n ? "" : " (przy pełnym efekcie)"}`)}
+    ${wiersz(mi ? "Przyciąganie do Ciebie (w szczycie)" : "Przyciąganie do Ciebie", `+${proc(k.przyciaganie * (n ? ef : 1), 1)}${n ? "" : " (przy pełnym efekcie)"}`)}
+    ${mi ? wiersz("Efekt w kolejnych rundach", profilInternetu(mi)) : ""}
     ${inni.length ? wiersz("Konkurencja w tym rodzaju (poprzednia runda)", inni.map((f) => esc(nazwaFirmy(v, f))).join(", ")) : ""}
     ${k.dostepny ? "" : `<p class="podpowiedz">Dostępne od rundy ${k.od_rundy}.</p>`}</div></div>`;
 }
+
+const raportyAgencji = (lista) => lista.filter((x) => x.tekst).map((x) => `<div class="kafel"><div class="kg">${esc(x.nazwa)} – ${esc(x.strefa_nazwa)}</div>
+      <div class="kt"><p>${esc(x.tekst)}</p></div></div>`).join("");
 
 function trwajaceHtml(v, lista, tytul) {
   if (!lista.length) return "";
@@ -69,14 +78,13 @@ export const agencje = {
     emisji, potem jeszcze przez chwilę wygasa. Kampanie się sumują, ale z sufitem: jedna daje zwykle kilka procent popytu więcej, kilka naraz –
     ok. +10% … +30%, a dalsze dokładanie już prawie nic nie zmienia.${igReklamaZ(v?.reklama)}`,
   decyzje({ v, edycja }) {
-    const R = v.reklama;
-    if (!R) return `<p class="podpowiedz">Agencje reklamowe działają w grze z lokalami.</p>`;
-    const zam = (v.decyzje.kampanie || []).filter((x) => x.emisje > 0);
+    if (!v.reklama) return `<p class="podpowiedz">Agencje reklamowe działają w grze z lokalami.</p>`;
+    const R = tylko(v.reklama, false), zam = zamowioneW(v, R);
     const koszt = zam.reduce((s, x) => { const k = kanalReklamy(R, x.agencja, x.kanal); return s + (k ? kosztKampanii(k, x.strefa || "miasto", x.emisje) : 0); }, 0);
     let html = `<div class="pasek ciemny"><span>Kampanie w tej rundzie: <span class="kwota">${zam.length}</span></span>
       <span>Emisje: <span class="kwota">${licz(zam.reduce((s, x) => s + x.emisje, 0))}</span></span>
       <span>Koszt (netto): <span class="kwota">${zl(koszt)}</span></span></div>`;
-    html += trwajaceHtml(v, R.trwajace.filter((x) => x.od_rundy < v.runda), "Twoje kampanie z poprzednich rund – jeszcze wygasają w tej rundzie");
+    html += trwajaceHtml(v, R.trwajace.filter((x) => x.od_rundy < v.runda && !x.internet), "Twoje kampanie z poprzednich rund – jeszcze wygasają w tej rundzie");
     if (R.model?.maks_przyciagania) html += `<p class="podpowiedz">Sufit reklamy: przyciąganie wszystkich Twoich kampanii w jednej strefie
       nasyca się do +${proc(R.model.maks_przyciagania, 0)} (to ok. +30% popytu), poszerzenie puli strefy – do +${proc(R.model.maks_puli, 0)}.
       Pierwsze kampanie działają prawie w pełni, każda kolejna – coraz słabiej.</p>`;
@@ -90,10 +98,9 @@ export const agencje = {
   wyniki({ v }) {
     const W = v.wyniki?.reklama_agencje;
     if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie z kampanią.</p>`;
-    const raporty = W.kampanie.filter((x) => x.tekst);
-    let html = raporty.map((x) => `<div class="kafel"><div class="kg">${esc(x.nazwa)} – ${esc(x.strefa_nazwa)}</div>
-      <div class="kt"><p>${esc(x.tekst)}</p></div></div>`).join("");
-    html += trwajaceHtml(v, W.kampanie, "Twoje kampanie w tej rundzie") || `<p class="podpowiedz">W tej rundzie nie działała żadna Twoja kampania.</p>`;
+    const kampanie = W.kampanie.filter((x) => !x.internet);
+    let html = raportyAgencji(kampanie);
+    html += trwajaceHtml(v, kampanie, "Twoje kampanie w tej rundzie") || `<p class="podpowiedz">W tej rundzie nie działała żadna Twoja kampania.</p>`;
     const L = Object.entries(W.laczne || {});
     if (L.length) html += tabela("Łączne przyciąganie w strefach (po sufocie)", ["Strefa", "Suma kampanii", "Działa naprawdę", "Uciekło przez sufit"],
       L.map(([z, x]) => [esc(v.reklama?.strefy?.[z] ?? z), `+${proc(x.suma, 1)}`, `+${proc(x.dziala, 1)}`,
@@ -120,6 +127,52 @@ export const agencje = {
       d.kampanie = n ? [...l, { agencja: a, kanal: k, strefa, emisje: n }] : l;
     }),
   },
+};
+
+// UF19: obecność w sieci – przyciąganie z już zamówionych kampanii internetowych w tej i kolejnych rundach
+function obecnoscHtml(v, R) {
+  const P = Object.entries(R.internet?.prognoza || {});
+  if (!P.length) return "";
+  const nazwa = (z) => (z === "miasto" ? "całe miasto" : esc(R.strefy[z] ?? z));
+  return tabela("Twoja obecność w sieci – przyciąganie z kampanii, które już działają (bez nowych)",
+    ["Strefa", ...[0, 1, 2, 3].map((j) => (j ? `runda ${v.runda + j}` : `ta runda (${v.runda})`))],
+    P.map(([z, l]) => [nazwa(z), ...l.map((x) => (x > 0.0005 ? `+${proc(x, 1)}` : "–"))]), { klasy: ["l"] });
+}
+
+export const internet = {
+  tytul: "Internet", tytulPelny: "Marketing – internet", ikona: "marketing",
+  odblokowanie: (v) => !!v.reklama?.internet && v.runda >= (v.harmonogram?.internet ?? 7), ukryta: (v) => !v.reklama?.internet,
+  info: ({ v } = {}) => {
+    const mi = v?.reklama?.internet?.model;
+    return `Marketing w sieci: posty na grupach, influencerka, filmiki, wizytówka w mapach. Zamawia się go jak kampanię w agencji
+    (kanał, strefa, liczba emisji w tej rundzie), ale działa inaczej niż ulotki: w rundzie emisji daje dopiero część efektu, pełny
+    przychodzi po kilku rundach (posty się udostępnia, opinie przybywają), a potem gaśnie powoli${mi ? ` (${profilInternetu(mi)})` : ""}.
+    Kto zacznie wcześniej i nie przestaje, buduje stałą obecność w sieci; kto zamówi tydzień przed końcem gry, zapłaci za efekt,
+    którego nie zobaczy. Zagłuszanie, nasycenie emisjami i wspólny sufit reklamy – jak w agencjach tradycyjnych.`;
+  },
+  decyzje({ v, edycja }) {
+    if (!v.reklama?.internet) return `<p class="podpowiedz">Marketing internetowy działa w grze z lokalami.</p>`;
+    const R = tylko(v.reklama, true), mi = R.internet.model, zam = zamowioneW(v, R);
+    const koszt = zam.reduce((s, x) => { const k = kanalReklamy(R, x.agencja, x.kanal); return s + (k ? kosztKampanii(k, x.strefa || "miasto", x.emisje) : 0); }, 0);
+    let html = `<div class="pasek ciemny"><span>Kampanie w sieci w tej rundzie: <span class="kwota">${zam.length}</span></span>
+      <span>Emisje: <span class="kwota">${licz(zam.reduce((s, x) => s + x.emisje, 0))}</span></span>
+      <span>Koszt (netto): <span class="kwota">${zl(koszt)}</span></span></div>
+      <p class="podpowiedz">Efekt kampanii w sieci w kolejnych rundach: ${profilInternetu(mi)} (aż spadnie poniżej ${proc(mi.prog_wygasania, 0)}).</p>`;
+    html += obecnoscHtml(v, R);
+    html += trwajaceHtml(v, R.trwajace.filter((x) => x.od_rundy < v.runda && x.internet), "Twoje kampanie w sieci z poprzednich rund – działają w tej rundzie");
+    for (const a of R.agencje) {
+      html += `<div class="pasek ciemny" style="margin-top:22px"><span>${esc(a.nazwa)}</span><span>${RODZAJ[a.rodzaj] || esc(a.rodzaj)}</span></div>
+        <p class="podpowiedz">${esc(a.opis)}</p>
+        <div class="siatka trojka" style="margin-top:10px">${a.kanaly.map((k) => kanalHtml(v, R, a, k, edycja, mi)).join("")}</div>`;
+    }
+    return html;
+  },
+  wyniki({ v }) {
+    const kampanie = (v.wyniki?.reklama_agencje?.kampanie || []).filter((x) => x.internet);
+    if (!kampanie.length) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie z kampanią w sieci.</p>`;
+    return raportyAgencji(kampanie) + trwajaceHtml(v, kampanie, "Twoje kampanie w sieci w tej rundzie");
+  },
+  zmiany: agencje.zmiany,
 };
 
 function listaPromocji(v) {

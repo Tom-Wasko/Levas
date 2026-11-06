@@ -74,6 +74,10 @@ def elementy(dane: Dane) -> dict[str, dict]:
         dodaj("reklama", "Agencje reklamowe – pierwsze kanały", "Marketing", [s for s in kanaly if _wez(dane, s) == pierwsze])
         dodaj("reklama_wszystkie", "Agencje reklamowe – pozostałe kanały", "Marketing",
               [s for s in kanaly if _wez(dane, s) > pierwsze])
+    internet = ((dane.mapa.get("reklama") or {}).get("internet") or {}).get("agencje") or {}
+    dodaj("internet", "Marketing internetowy", "Marketing",   # UF19
+          [("mapa", "reklama", "internet", "agencje", a, "kanaly", k, "od_rundy") for a, ag in internet.items()
+           for k in ag["kanaly"]])
     z = dane.zdarzenia or {}
     for klucz, nazwa, sciezka in (("parki", "Eventy w parkach", ("parki", "zasady")),
                                   ("wypadki", "Wypadki w lokalu", ("losowe", "zasady")),

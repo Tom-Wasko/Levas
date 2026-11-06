@@ -83,6 +83,8 @@ Prawdziwe banki, każdy specjalizuje się w czymś innym. Sześć budynków – 
 
 ## Agencje reklamowe
 - Kilka agencji, każda specjalizuje się w innych kanałach (ulotki i plakaty, internet i social media, radio i billboardy, lokalne wydarzenia).
+  - Internet i social media (agencja „Lajk i Spółka”) – osobna zakładka Marketing → Internet, od rundy 7: efekt
+    kampanii narasta przez kilka rund i gaśnie wolniej niż reklama tradycyjna (UF19, 6.11.2026).
 - Kampanie wybiera się z listy (jak w Revasie) – nie ma własnych kampanii.
 - Reklama działa podwójnie: **poszerza pulę klientów** w strefie i **odbiera klientów** konkurencji.
 - Reklamy sobie przeszkadzają: jeśli kilka drużyn używa tego samego kanału w tej samej strefie (np. wszyscy rozdają ulotki), każda z tych reklam działa słabiej.

@@ -32,7 +32,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF22 (20) Lista zadań po prawej (z sytuacji + własne drużyny, odhaczają się same, nieodhaczone przechodzą dalej)
 - [x] UF21 (10) Formy zatrudnienia (pół etatu, student, staż, B2B) + przełączniki w panelu MG (tymczasowe)
 - [x] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
-- [ ] UF19 (15) Marketing internetowy od rundy 7
+- [x] UF19 (15) Marketing internetowy od rundy 7 (Marketing → Internet; Lajk + TikTok, mapy, „Lublin Jedzie”; efekt narasta i wolno gaśnie)
 - [ ] UF18 (9) Licytacje pracowników widoczne
 - [ ] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`)
 - [x] UF15 Nowy układ menu (Miasto / Twój lokal / Firma / Wyniki, aliasy starych kluczy), Giełda „w budowie”, taśmy przy mapie, kłódki „od rundy N”

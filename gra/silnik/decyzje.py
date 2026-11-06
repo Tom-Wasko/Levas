@@ -670,6 +670,8 @@ def lista_bledow(dane: Dane, firma: Firma, d: dict, runda: int, poprzednia_ofert
             dodaj("czerwony", "zatrudnienie", tekst)
         for tekst in ((info or {}).get("kampanie") or {}).get("uwagi", []):
             dodaj("czerwony", rk.ZAKLADKA, tekst)
+        for tekst in ((info or {}).get("kampanie") or {}).get("uwagi_internet", []):
+            dodaj("czerwony", rk.ZAKLADKA_INTERNET, tekst)
         for tekst in ((info or {}).get("promocje") or {}).get("uwagi", []):
             dodaj("czerwony", pm.ZAKLADKA, tekst)
         for b in aw.bledy((info or {}).get("ubezpieczenia")):

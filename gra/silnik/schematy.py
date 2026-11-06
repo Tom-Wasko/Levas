@@ -979,9 +979,35 @@ class ModelReklamy(Schemat):
     maks_puli: float = Field(default=10.0, gt=0)           # sufit poszerzenia puli strefy przez wszystkie kampanie
 
 
+class ModelInternetu(Schemat):
+    """UF19: efekt kampanii internetowej w kolejnych rundach – narastanie (od rundy emisji), potem × trwalosc."""
+    narastanie: list[float] = Field(min_length=1)
+    trwalosc: float = Field(gt=0, lt=1)
+    prog_wygasania: float = Field(gt=0, le=1)
+
+    @field_validator("narastanie")
+    @classmethod
+    def _udzialy(cls, v: list[float]) -> list[float]:
+        if any(not 0 < x <= 1 for x in v):
+            raise ValueError("narastanie: części efektu w (0, 1]")
+        return v
+
+
+class ReklamaInternetowa(Schemat):
+    model: ModelInternetu
+    agencje: dict[str, AgencjaReklamowa] = Field(min_length=1)
+
+
 class PlikReklamy(Plik):
     model: ModelReklamy
     agencje: dict[str, AgencjaReklamowa] = Field(min_length=1)
+    internet: ReklamaInternetowa | None = None   # UF19: marketing internetowy (zakładka Marketing → Internet)
+
+    @model_validator(mode="after")
+    def _rozne_agencje(self):
+        if self.internet and set(self.agencje) & set(self.internet.agencje):
+            raise ValueError("agencja nie może być jednocześnie tradycyjna i internetowa")
+        return self
 
 
 class TypPromocji(Schemat):
