@@ -90,6 +90,14 @@ def _podwyzki(dane: Dane, f: Firma, ust: dict) -> dict:
     return zmiany
 
 
+def _pensja(dane: Dane, st: dict, kandydat: dict) -> int:
+    """B9: pensja oferowana kandydatowi – ułamek preferowanej (strategia `pensja`) albo płaca minimalna."""
+    minimum = dane.z["finanse"]["placa_minimalna"]
+    if st.get("pensja") == "minimalna":
+        return minimum
+    return max(minimum, round(kandydat["pensja_preferowana"] * (st.get("pensja") or 1.0)))
+
+
 def poziom(dane: Dane, konf: dict, nazwa: str) -> dict:
     """Ustawienia poziomu bota z konfiguracji gry (firmy[].poziom; bez niego – średni)."""
     klucz = next((f.get("poziom") for f in konf.get("firmy", []) if f["nazwa"] == nazwa), None) or DOMYSLNY_POZIOM
@@ -635,23 +643,44 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
             cele = [(KUCHNIA, nr, zawod) for nr, zawod in sorted(obsada.items())]
             cele += [(KASA, s.nr, kasjer) for s in rec if not s.pracownik]
             cele += [(KASA, f.nowy_nr(KASA) + i, kasjer) for i in range(d["stanowiska"][KASA])]
+        wl_kasa = None
+        if st.get("wlasciciel_godziny") and (kasy := [c for c in cele if c[0] == KASA]):
+            # B9: właściciel stoi na ostatnim pustym stanowisku kasy zamiast kasjera (godziny – po rekrutacji)
+            wl_kasa = kasy[-1]
+            cele.remove(wl_kasa)
         cele = cele[: rp.ustawienia(dane)["limit_nowych"]]   # agencja pracy: limit nowych, reszta w kolejnych
+        ql, kanal = st.get("jakosc_ludzi") or q, st.get("kanal")
         for typ, nr, zawod in cele:
-            kandydaci = [k for k in pula if k["zawod"] == zawod]
+            kandydaci = [k for k in pula if k["zawod"] == zawod
+                         and (kanal is None or kanal in rp.kanaly_kandydata(dane, k, runda))]
             if not kandydaci:
                 continue
             if pz.get("losowy_kandydat"):   # łatwy: pierwszy lepszy kandydat zawodu
                 najlepsi = sorted(kandydaci, key=lambda k: k["id"])
             else:
-                najlepsi = sorted(kandydaci, key=lambda k: (abs(k["gwiazdki"] - q), k["pensja_preferowana"]))[:ust["losuj_z_najlepszych_kandydatow"]]
+                najlepsi = sorted(kandydaci, key=lambda k: (abs(k["gwiazdki"] - ql), k["pensja_preferowana"]))[:ust["losuj_z_najlepszych_kandydatow"]]
             k = najlepsi[int(rng.integers(len(najlepsi)))]
             pula.remove(k)
-            d["zatrudnij"].append({"kandydat": k["id"], "typ": typ, "nr": nr, "pensja": k["pensja_preferowana"],
-                                   "umowa": "prace", "zastepca": True, "wzor": {"zawod": zawod, "gwiazdki": q}})
+            d["zatrudnij"].append({"kandydat": k["id"], "typ": typ, "nr": nr, "pensja": _pensja(dane, st, k),
+                                   "umowa": "prace", "zastepca": True, "wzor": {"zawod": zawod, "gwiazdki": ql}}
+                                  | ({"kanal": kanal} if kanal else {}))
+        if wl_kasa:   # czas właściciela: najpierw rekrutacja (najtańszy kanał zatrudnienia), reszta na kasę
+            kan = rp.kanaly(dane, runda)
+            rekrutacja = sum(kan[kanal or rp.kanaly_kandydata(dane, k, runda)[0]]["czas_wlasciciela"]
+                             for k in (next(x for x in stan.kandydaci if x["id"] == z["kandydat"])
+                                       for z in d["zatrudnij"]))
+            wolne = dane.z["operacje"]["czas_wlasciciela"] - rekrutacja
+            d["wlasciciel_stanowisko"] = {"typ": KASA, "nr": wl_kasa[1],
+                                          "godziny": max(0.0, min(st["wlasciciel_godziny"], wolne))}
     else:
         d.pop("_obsada", None)
     if pz.get("dba_o_ludzi"):   # U20: podwyżka dla niezadowolonych (łatwy ich ignoruje)
         d["zmiany"] = _podwyzki(dane, stan.firmy[nazwa], pz["dba_o_ludzi"])
+    if st.get("premia"):   # B9: premia co rundę dla każdego (bez okresu wypowiedzenia)
+        zm = d.setdefault("zmiany", {})
+        for p in stan.firmy[nazwa].pracownicy.values():
+            if not p.odchodzi:
+                zm[p.id] = {"pensja": p.pensja, "umowa": p.umowa, **zm.get(p.id, {}), "premia": st["premia"]}
 
     # zasoby na przewidywanych klientów
     if "dostawcy" in odbl:

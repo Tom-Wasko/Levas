@@ -453,6 +453,13 @@ class Strategia(Schemat):
     dostawcy: list[str] | None = None   # B8: dostawcy, u których bot zamawia (bez – wszyscy poza hipermarketem)
     dyskonty: bool = False   # B8: zakupy w dyskoncie (odbiór osobisty, czas właściciela)
     auto_dostawy: bool = False   # B8: lokal główny na auto-dostawach (Z4, silnik/kuchnia/auto_dostawca.py)
+    # B9: ludzie – pensja (ułamek preferowanej albo „minimalna”), gwiazdki zatrudnianych (bez – jak jakosc),
+    # kanał rekrutacji (bez – najtańszy), premia na osobę co rundę, godziny właściciela na pustym stanowisku kasy
+    pensja: float | Literal["minimalna"] = 1.0
+    jakosc_ludzi: int | None = Field(None, ge=1, le=3)
+    kanal: str | None = None
+    premia: float = Field(0, ge=0)
+    wlasciciel_godziny: float = Field(0, ge=0)
     uslugi: int = Field(gt=0)
     pokrycie: float = Field(gt=0)
     wyposazenie: int = Field(ge=0)

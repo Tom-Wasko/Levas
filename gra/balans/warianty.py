@@ -157,6 +157,22 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
                   strategia=(("jakosc_zasobow", q),)) for q in (1, 2, 3)]
     w += [Wariant(f"zapas:{z}", f"zapas zamówień ×{z}", strategia=(("zapas_zasobow", z),))
           for z in (1.0, 1.15, 1.3, 1.5, 2.0)]
+    # B9: ludzie – pensja, gwiazdki, kanał, premia, szkolenia, podwyżki, właściciel przy kasie
+    w += [Wariant("pensja:minimalna", "pensja minimalna", strategia=(("pensja", "minimalna"),))]
+    w += [Wariant(f"pensja:{m}", f"pensja {m:.0%} preferowanej", strategia=(("pensja", m),))
+          for m in (1.1, 1.25)]
+    w += [Wariant(f"ludzie:{q}", f"ludzie {q}★ (sprzęt i składniki wg strategii)",
+                  strategia=(("jakosc_ludzi", q),)) for q in (1, 2, 3)]
+    w += [Wariant(f"kanal:{k}", f"rekrutacja tylko przez {k}", strategia=(("kanal", k),))
+          for k in dane.rynek_pracy["agencja"]["kanaly"]]
+    w += [Wariant(f"premia:{p}", f"premia {p} zł na osobę co rundę", strategia=(("premia", p),))
+          for p in (100, 300)]
+    w += [Wariant(f"szkolenia:{n}", f"{n} szkoleń", strategia=(("szkolenia", n),))
+          for n in (0, 1, 2, 3)]
+    w += [Wariant("podwyzki:brak", "bez podwyżek dla niezadowolonych",
+                  poziom=(("dba_o_ludzi", None),))]
+    w += [Wariant(f"wlasciciel:{h}", f"właściciel {h} h na kasie zamiast kasjera",
+                  strategia=(("wlasciciel_godziny", h),)) for h in (10, 20)]
     rodzaj = {k: v.get("rodzaj") for k, v in dane.dostawcy_info.items()}
     hurt = [k for k, r in rodzaj.items() if r in ("hurtownia", "piekarnia")]
     w += [Wariant("dostawcy:bez_producenta", "hurtownie i piekarnia, bez producenta mięsa",
