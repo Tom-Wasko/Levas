@@ -1054,3 +1054,89 @@ dorównuje średniej, cel B5 jej nie dotyczy. Wczesny plus średniej dalej za wc
 
 **B7 zamknięte** (6.11): wdrożona krzywa jakości i kuchnia taniego; otwarte decyzje autora – szerokie menu bez
 kosztu i promocje bez trwałego skutku (`notatki_do_zmiany.md`), promocje wracają w B10.
+
+## B8 – zaopatrzenie
+
+**Krok 0 – boty.** Boty dostały ustawienia strategii (`silnik/schematy.py: Strategia`): `jakosc_zasobow`
+(gwiazdki składników niezależnie od jakości strategii), `zapas_zasobow`, `dostawcy` (lista dozwolonych) i
+`dyskonty` (e8b093a). Wcześniej bot w grze z lokalami w ogóle pomijał dyskonty (odbiór osobisty, limit opakowań),
+więc H16 nie dało się zmierzyć. Z `dyskonty` bot wybiera jeden dyskont, który w rundzie najwięcej oszczędza
+(ceny z gazetką), i kupuje tam dzień po dniu, najwyżej do limitu opakowań, składniki tańsze niż z dowozem
+(`silnik/kuchnia/planowanie.py: _z_dyskontu`). Odbiór kosztuje czas właściciela (`dostawcy.py: zasady_dostaw`).
+
+**Pomiar `b8_zaopatrzenie`** (6.11; 18r, 6 firm, 6 ziaren; karta wariant − baza, wygrane pary):
+
+| wariant | zrównoważony | tani | premium |
+|---|---|---|---|
+| zapas 1,0 (baza 1,05) | −0,04 (0/6) | −0,02 | +0,01 |
+| zapas 1,15 | **+0,07 (6/6)** | **+0,04 (6/6)** | +0,01 |
+| zapas 1,3 | **+0,08 (6/6)** | +0,03 (5/6) | +0,01 |
+| zapas 1,5 | +0,02 | −0,01 | −0,09 |
+| zapas 2,0 | −0,21 (0/6) | −0,15 (0/6) | −0,23 (0/6) |
+| składniki 1★ | +0,03 (5/6) | baza | −0,04 |
+| składniki 2★ | baza | −0,03 | −0,02 |
+| składniki 3★ | −0,08 (0/6) | −0,14 (0/6) | baza |
+| bez piekarni | −0,13 (0/6) | −0,08 (0/6) | −0,12 (0/6) |
+| bez producenta | −0,01 | 0,00 | −0,02 |
+| tylko Makro / Selgros / Eurocash | −0,25 / −0,28 / −0,01 | −0,12 / −0,13 / −0,05 | −0,18 / −0,15 / −0,02 |
+| dyskont | **+0,06 (6/6)** | +0,03 (5/6) | +0,02 (4/6) |
+
+Diagnoza:
+- **Zapas.** Kompromis działa w samej grze: za mały zapas to braki (zrównoważony, ziarno 1000: przy 1,3
+  przychód +29,6 tys. zł, towary +16 tys. zł – przy 1,05 bot tracił ok. 9% sprzedaży), za duży (2,0) to
+  przeterminowanie. Optimum 1,15–1,3 dla wszystkich strategii. Zły był tylko domyślny zapas botów –
+  `boty.yaml: zapas_zasobow` 1,05 → 1,2 (c3f3665; ustawienie botów, nie liczba gry).
+- **Dostawcy.** Piekarnia (codzienne dostawy pieczywa) jest potrzebna każdemu; jedna hurtownia bez piekarni i
+  producenta przegrywa – rzadkie dostawy to braki albo psucie (Eurocash dowozi 3 razy w tygodniu, dlatego traci
+  mało). Producent daje mało (mięso 307 zamiast ok. 350 zł, ale minimum 800 zł i 2 dostawy w tygodniu) –
+  zgodnie z kompromisem.
+- **Dyskont (H16).** Zysk ma dwa źródła (zrównoważony, ziarno 1000): przychód +6,1 tys. zł (codzienne dokupki
+  łatają braki przy zapasie 1,05) i koszty −4 tys. zł (towary −2,7 tys., brak opłat za dowóz −1,4 tys.).
+  Oszczędność ok. 4% towarów ogranicza limit 4 opakowań; kosztem jest czas właściciela (1,5 h dziennie z 20 h
+  w tygodniu). Ponowny pomiar przy nowym zapasie botów pokaże, ile zostaje.
+- **Składniki.** Premium najlepiej na 3★, tani na 1★, ale zrównoważony (2★) też woli 1★: przychód −1%,
+  towary −7,5% (ziarno 1000). Składniki 2★ nie wygrywają w żadnej strategii. Kuchnia zrównoważonego jest
+  pełna (kolejka), więc słabsza atrakcyjność prawie nie zmniejsza sprzedaży – jak przy promocjach w B7.
+
+**Ponowny pomiar `b8_po`** (zapas botów 1,2; 18r, 6 firm, 6 ziaren; karta wariant − baza):
+
+| wariant | zrównoważony | tani | premium |
+|---|---|---|---|
+| zapas 1,0 / 1,15 / 1,3 / 1,5 / 2,0 | −0,11 / −0,02 / −0,01 / −0,05 / −0,28 | −0,07 / −0,01 / −0,01 / −0,05 / −0,19 | −0,05 / −0,01 / −0,02 / −0,10 / −0,25 |
+| składniki 1★ / 2★ / 3★ | −0,01 (2/6) / baza / −0,06 (0/6) | baza / −0,01 / −0,10 (0/6) | −0,06 (1/6) / −0,06 (1/6) / baza |
+| bez producenta | −0,03 (1/6) | 0,00 | −0,03 (0/6) |
+| dyskont | +0,05 (6/6) | +0,03 (6/6) | +0,03 (3/6) |
+
+- Zapas 1,2 jest optimum dla wszystkich strategii, a odchylenia w obie strony kosztują.
+- Każda strategia wygrywa na składnikach swojej jakości: u zrównoważonego 2★ bije 1★ (4/6). Wcześniejsza
+  przewaga 1★ wynikała z braków przy zapasie 1,05 – kuchnia z pustym magazynem i tak nie sprzedawała więcej.
+  Krzywej jakości ani cen składników nie zmieniam.
+- Dyskont: przy pełnym zapasie zostaje sama oszczędność (zrównoważony, ziarno 1000: towary −3,9 tys. zł,
+  opłaty za dowóz −1,1 tys. zł, przychód bez zmian; dochód +3,4 tys. zł w 18 rundach). To ok. 190 zł tygodniowo
+  za ok. 10 h czasu właściciela, czyli ok. 18 zł/h – mniej niż godzina płacy minimalnej (4806 zł / 168 h ≈ 29 zł).
+  H16 („dyskont dominuje zakupy małej firmy”) potwierdza się tylko w słabej formie: dyskont się opłaca, gdy
+  właściciel nie ma lepszego zajęcia (dziś boty nie używają czasu właściciela na nic innego). Kompromis
+  „tanio przy małej skali kontra czas i limit opakowań” działa, liczby dyskontów bez zmian. Wrócić do tego w B9
+  (ludzie i czas właściciela), gdy czas zyska inne zastosowania.
+- Hurtownia przy 1 lokalu (druga część H16): tylko-hurtownia przegrywa, ale przez rzadkie dostawy, a w zestawie
+  z piekarnią i producentem hurtownie są podstawą zakupów botów – „nie zwraca się nigdy” się nie potwierdza.
+
+**Kontrola trudności `b8_trudnosc`** (6.11; po zapasie botów 1,2; jak `b7_trudnosc`, 300 gier): pierwszy plus
+średniej w rundach 4–6 43/100 (było 37), dobra > średnia 90/100 (87), słaba < średnia 89/100 (86), karta
+0,05 / 0,29 / 0,37 – ale **1 alarm** wersji słabej (agresywny, ziarno 1013: bankructwo od rundy 12; przy zapasie
+1,05 ta sama gra kończy się bez alarmu z 14,7 tys. zł). Przyczyna: proste planowanie (`czlowiek_slaby`, `latwy`)
+zamawia na prognozę popytu z zeszłego tygodnia, a po odejściu kucharza (runda 7) zamówienia skaczą co tydzień
+między ok. 2 a 14 tys. zł przy przychodzie ok. 11 tys. zł – zapas 1,2 powiększa to, co się psuje. Zapas
+bezpieczeństwa to umiejętność lepszego planowania, więc poziomy z prostym planowaniem zostają przy 1,05
+(nowe ustawienie poziomu `zapas_zasobow`, `boty.yaml`). Ponowny pomiar wersji słabej (`b8_trudnosc2`, gry
+średniej i dobrej przeniesione z `b8_trudnosc` – zmiana ich nie dotyczy):
+
+| miara | `b7_trudnosc` | `b8_trudnosc2` | cel |
+|---|---|---|---|
+| pierwszy plus średniej w rundach 4–6 | 37/100 (w 3: 63) | 43/100 (w 3: 57) | 4–6 |
+| alarmy wersji słabej | 0/100 | 0/100 | 0 |
+| dobra > średnia (pary) | 87/100 | 90/100 | ≥ 80% |
+| słaba < średnia (pary) | 86/100 | 89/100 | – |
+| karta słaba / średnia / dobra | 0,06 / 0,29 / 0,36 | 0,06 / 0,29 / 0,37 | – |
+
+Bez regresji, cele B5 nieco bliżej (lepsze zaopatrzenie średniej przesuwa jej pierwszy plus z rundy 3 na 4).

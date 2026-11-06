@@ -49,6 +49,7 @@ poziomy:
     nazwa: Łatwy
     opis: proste reguły, łatwo go przegonić
     planowanie: proste
+    zapas_zasobow: 1.05   # B8: proste planowanie bez zapasu bezpieczeństwa (przy 1,2 słaby bankrutował – b8_trudnosc)
     blad_prognozy: 0.25
     losowy_kandydat: true
     kampanie: false
@@ -89,6 +90,7 @@ poziomy:
     nazwa: Jak człowiek – słaby
     opis: patrzy tylko na zeszły tydzień, na oko; proste reguły jak łatwy
     planowanie: proste
+    zapas_zasobow: 1.05   # B8: proste planowanie bez zapasu bezpieczeństwa (przy 1,2 słaby bankrutował – b8_trudnosc)
     blad_prognozy: 0.25
     losowy_kandydat: true
     kampanie: false

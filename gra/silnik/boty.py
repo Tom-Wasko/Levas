@@ -28,12 +28,14 @@ from .dane import KASA, KUCHNIA, Dane
 from .decyzje import kandydaci_firmy
 from .ksiegowosc import biuro as bo
 from .ksiegowosc.finanse import Ksiega, Rachunek
+from .kuchnia import auto_dostawca as ad
 from .kuchnia import menu as mn
 from .kuchnia.dostawcy import ceny_rundy, z_rynku
 from .kuchnia.jakosc import mnoznik_wyposazenia
 from .kuchnia.planowanie import (
     godziny_uslugi,
     kasjerzy_potrzebni,
+    pozycje_auto_dostaw,
     stanowiska_potrzebne,
     zamowienie_zasobow,
 )
@@ -657,7 +659,7 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         ceny_d = {k: v for k, v in ceny_d.items() if not z_rynku(dane, k)   # Z4: boty nie kupują w Auchan
                   and (st.get("dostawcy") is None or k in st["dostawcy"])}
         qz = st.get("jakosc_zasobow") or q
-        zapas = st.get("zapas_zasobow") or ust["zapas_zasobow"]
+        zapas = st.get("zapas_zasobow") or pz.get("zapas_zasobow") or ust["zapas_zasobow"]
         if len(f.lokale) > 1 and prog_lok:
             # magazyn każdego lokalu osobno (Z2): zamówienie z zapasów lokalu na jego część klientów (B6: wcześniej
             # z zapasów całej firmy, dzielone potem wg prognozy – nadmiar w jednym lokalu „pokrywał” braki w drugim,
@@ -674,6 +676,22 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
         else:
             d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, qz, zapas, udzialy_dni,
                                                  dane.data_rundy(runda), bool(st.get("dyskonty")))
+        az = ad.zasady(dane)
+        if st.get("auto_dostawy") and az and runda >= az["od_rundy"] and (gl := pl.glowny(f, runda)):
+            # B8: lokal główny na auto-dostawach (całość naraz) – jego zamówienia u dostawców odpadają
+            dzial = [x.id for x in f.lokale if x.dziala_od <= runda]
+            if len(dzial) > 1 and prog_lok:
+                wg = {u: n * (plan["lokale"][gl.id]["czesc"] if plan is not None else 1.0)
+                      for u, n in prog_lok.get(gl.id, {}).items()}
+                wsz = {u: sum(n * (plan["lokale"][x]["czesc"] if plan is not None else 1.0)
+                              for x, v in prog_lok.items() for uu, n in v.items() if uu == u) for u in klienci}
+                kg = {u: k * wg.get(u, 0.0) / wsz[u] for u, k in klienci.items() if wsz.get(u)}
+            else:
+                kg = klienci
+            ceny_a = ceny_rundy(dane, konf["ziarno"], runda, konf.get("ceny_dostawcow", "dane"))
+            d["auto_dostawy"] = {"pozycje": pozycje_auto_dostaw(dane, pl.widok(f, gl.id), kg, ceny_a,
+                                                                az["dostawca"], qz, zapas)}
+            d["zamowienia"] = [z for z in d["zamowienia"] if z.get("lokal", gl.id) != gl.id]
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka): po zakupach zostaje bufor gotówki (B5: wcześniej bot
     # kupował od razu cały komplet i wpadał w debet)

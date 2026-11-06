@@ -452,6 +452,7 @@ class Strategia(Schemat):
     zapas_zasobow: float | None = Field(None, ge=1)   # B8: zapas w zamówieniach (bez – ustawienia botów)
     dostawcy: list[str] | None = None   # B8: dostawcy, u których bot zamawia (bez – wszyscy poza hipermarketem)
     dyskonty: bool = False   # B8: zakupy w dyskoncie (odbiór osobisty, czas właściciela)
+    auto_dostawy: bool = False   # B8: lokal główny na auto-dostawach (Z4, silnik/kuchnia/auto_dostawca.py)
     uslugi: int = Field(gt=0)
     pokrycie: float = Field(gt=0)
     wyposazenie: int = Field(ge=0)
@@ -515,6 +516,7 @@ class PoziomBota(Schemat):
     przewaga_popytu: float = Field(1.0, ge=1)   # niemożliwy: mnożnik atrakcyjności lokali bota (oszustwo)
     prognoza_czlowieka: PrognozaCzlowieka | None = None
     zamowienia_ze_sprzedazy: float | None = Field(None, ge=1)   # H17: limit zamówień po kolejce w kuchni
+    zapas_zasobow: float | None = Field(None, ge=1)   # B8: zapas zamówień poziomu (bez – ustawienia botów)
     tylko_pomiar: bool = False   # poziom do pomiarów (balans/), bez wyboru w panelu mistrza gry
     dba_o_ludzi: DbaOLudzi | None = None   # U20: podwyżka dla niezadowolonych (łatwy ich ignoruje)
 

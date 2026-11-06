@@ -1,5 +1,6 @@
 """B8: boty potrafią wybrać każdą opcję zaopatrzenia – gwiazdki składników niezależnie od sprzętu
-(`jakosc_zasobow`), zapas w zamówieniach (`zapas_zasobow`) i dostawców (`dostawcy`); pomiar w balans/warianty.py."""
+(`jakosc_zasobow`), zapas w zamówieniach (`zapas_zasobow`) i dostawców (`dostawcy`, `dyskonty`,
+`auto_dostawy`); pomiar w balans/warianty.py."""
 import copy
 
 import pytest
@@ -10,15 +11,20 @@ from silnik.gra import Gra
 pytestmark = pytest.mark.dane_gry
 
 
+def _dane_strategii(dane, strategia: dict):
+    """Dane gry ze strategią zrównoważoną nadpisaną ustawieniami `strategia`."""
+    dane = copy.copy(dane)
+    st = dane.boty["strategie"]
+    dane.boty = {**dane.boty, "strategie": {**st, "zrownowazony": {**st["zrownowazony"], **strategia}}}
+    return dane
+
+
 def _zamowienia(strategia: dict, rund: int = 3) -> list[dict]:
     """Zamówienia firmy A (zrównoważony z nadpisaną strategią) w rundzie `rund` tej samej gry."""
     g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5)
     for _ in range(rund - 1):
         g.przelicz(wymus=True)
-    dane = copy.copy(g.dane)
-    st = dane.boty["strategie"]
-    dane.boty = {**dane.boty, "strategie": {**st, "zrownowazony": {**st["zrownowazony"], **strategia}}}
-    return boty.decyzje_bota(dane, g.stan(rund - 1), "A", "zrownowazony", rund, g.konfiguracja)["zamowienia"]
+    return boty.decyzje_bota(_dane_strategii(g.dane, strategia), g.stan(rund - 1), "A", "zrownowazony", rund, g.konfiguracja)["zamowienia"]
 
 
 def _ilosc(zamowienia: list[dict]) -> float:
@@ -63,3 +69,20 @@ def test_bot_z_dyskontami_kupuje_w_jednym_dyskoncie_do_limitu():
         przed = sum(z["ilosc"] for z in baza if z["zasob"] == zasob)
         po = sum(z["ilosc"] for z in zam if z["zasob"] == zasob)
         assert przed - 1 <= po <= przed + 7
+
+
+def test_bot_z_auto_dostawami_nie_zamawia_do_lokalu_glownego():
+    """B8: z `auto_dostawy` lokal główny bota jest na auto-dostawach (Z4): pozycje u auto-dostawcy zamiast
+    zamówień u dostawców; przed rundą auto-dostawcy (od_rundy) – zamówienia jak zwykle."""
+    from silnik.kuchnia import auto_dostawca as ad
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5)
+    od = ad.zasady(g.dane)["od_rundy"]
+    for r in range(1, od + 2):
+        d = boty.decyzje_bota(_dane_strategii(g.dane, {"auto_dostawy": True}), g.stan(r - 1), "A", "zrownowazony",
+                              r, g.konfiguracja)
+        if r >= od:
+            assert d["auto_dostawy"]["pozycje"] and not d.get("zamowienia")
+            assert all(p["ilosc"] > 0 for p in d["auto_dostawy"]["pozycje"])
+        g.ustaw_decyzje("A", d)
+        s = g.przelicz(wymus=True)
+    assert s.wyniki[od + 1]["A"]["kpir"]["przychody"] > 0

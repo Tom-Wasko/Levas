@@ -55,6 +55,26 @@ def zamowienie_zasobow(dane: Dane, firma: Firma, klienci: dict[str, float], ceny
         pomin |= za_male
 
 
+def pozycje_auto_dostaw(dane: Dane, firma: Firma, klienci: dict[str, float], ceny_dostawcow: dict,
+                        dostawca: str, jakosc: int, zapas: float) -> list[dict]:
+    """B8: pozycje auto-dostaw (silnik/kuchnia/auto_dostawca.py) na `klienci` × zapas, bez towaru, który już
+    leży w magazynie lokalu albo u dostawcy; jakość – najbliższa niższa, jaką ma `dostawca`."""
+    oferty = najtansze({dostawca: ceny_dostawcow.get(dostawca, {})})
+    potrzeba: dict[str, float] = {}
+    for u, k in klienci.items():
+        for z, ile in dane.uslugi[u]["zasoby"].items():
+            potrzeba[z] = potrzeba.get(z, 0.0) + k * zapas * ile / dane.zasoby[z]["opakowanie"]
+    wynik = []
+    for z, p in sorted(potrzeba.items()):
+        q = _jakosc_oferty(oferty, z, jakosc)
+        if q is None:
+            continue
+        ile = math.ceil(max(0.0, p - sum(firma.magazyn.get(f"{z}|{x}", 0.0) for x in (1, 2, 3))) - 1e-9)
+        if ile > 0:
+            wynik.append({"zasob": z, "jakosc": q, "ilosc": ile})
+    return wynik
+
+
 def _jakosc_oferty(oferty: dict, zasob: str, jakosc: int) -> int | None:
     q = jakosc
     while (zasob, str(q)) not in oferty and q > 1:
