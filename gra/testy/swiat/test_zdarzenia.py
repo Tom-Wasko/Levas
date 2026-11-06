@@ -83,7 +83,7 @@ def test_brak_czasu_wlasciciela(zbyszek, monkeypatch):
     s = _runda(g, A={"zdarzenia": {"pan_zbyszek": "kebab"}})
     sc = _sceny(s, 2, "A")[0]
     assert sc["opcja"] == "idz_dalej" and sc["domyslna"]
-    assert any(b["poziom"] == "czerwony" and b["zakladka"] == "zdarzenia" for b in s.wyniki[2]["A"]["lista_bledow"])
+    assert any(b["poziom"] == "czerwony" and b["zakladka"] in ("mapa", "sprawy") for b in s.wyniki[2]["A"]["lista_bledow"])
 
 
 def test_podglad_pokazuje_wolne_godziny_i_ostrzega_przed_wyslaniem(client, zbyszek, monkeypatch):
@@ -101,7 +101,7 @@ def test_podglad_pokazuje_wolne_godziny_i_ostrzega_przed_wyslaniem(client, zbysz
     s = v["zdarzenia"]["aktywne"][0]
     kebab = next(o for o in s["opcje"] if o["id"] == "kebab")
     assert s["wolne"] == 1 < kebab["koszt"]["czas"]
-    b = next(b for b in v["lista_bledow"] if b["zakladka"] == "zdarzenia")
+    b = next(b for b in v["lista_bledow"] if b["zakladka"] in ("mapa", "sprawy"))
     assert b["poziom"] == "czerwony" and "wymaga" in b["tekst"] and "wybierz inną reakcję" in b["tekst"]
 
 
@@ -138,12 +138,12 @@ def test_widok_api(client, zbyszek):
     v = client.get(f"/api/gry/{gra}/widok/A").json()
     Z = v["zdarzenia"]
     assert [s["historia"] for s in Z["aktywne"]] == ["pan_zbyszek"] and Z["aktywne"][0]["nowa"]
-    assert any(b["poziom"] == "niebieski" and b["zakladka"] == "zdarzenia" for b in v["lista_bledow"])
+    assert any(b["poziom"] == "niebieski" and b["zakladka"] in ("mapa", "sprawy") for b in v["lista_bledow"])
     r = client.put(f"/api/gry/{gra}/decyzje/A", {**v["decyzje"], "zdarzenia": {"pan_zbyszek": "kebab"}}, content_type=JSON)
     assert r.status_code == 200
     v = client.get(f"/api/gry/{gra}/widok/A").json()
-    assert not any(b["zakladka"] == "zdarzenia" for b in v["lista_bledow"])
-    assert any(p["zakladka"] == "zdarzenia" for p in v["czas_wlasciciela"]["pozycje"])
+    assert not any(b["zakladka"] in ("mapa", "sprawy") for b in v["lista_bledow"])
+    assert any(p["zakladka"] in ("mapa", "sprawy") for p in v["czas_wlasciciela"]["pozycje"])
 
 
 pytestmark = pytest.mark.django_db

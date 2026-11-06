@@ -2,7 +2,7 @@
 // Decyzja, na którą nie starcza godzin, jest odrzucona (lista błędów).
 import { esc, licz, tabela } from "./wspolne.js";
 
-const ZAKLADKA = { dostawcy: "Dostawcy", zdarzenia: "Zdarzenia", zatrudnienie: "Zatrudnienie" };
+const ZAKLADKA = { dostawcy: "Dostawcy", mapa: "Park (mapa)", sprawy: "Mój lokal", zatrudnienie: "Zatrudnienie" };
 
 function czasHtml(C, tytul) {
   const proc = C.pula ? Math.min(100, Math.round(C.wykorzystane / C.pula * 100)) : 0;

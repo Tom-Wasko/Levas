@@ -303,7 +303,7 @@ def zastosuj(dane: Dane, firma: Firma, d: dict, runda: int, pula: list[dict], ce
     sprzet_ok, kadry_ok = "inwestycje_sprzet" in odbl, "hr_zatrudnienie" in odbl
     czas = cw.nowy(dane)   # czas właściciela: pracuj.pl, potem odbiór osobisty w dyskontach
     for e in zd.efekty_czasu(firma, runda):   # skutki eventów w parkach (np. przeziębienie)
-        czas.wez(e.wartosc, e.opis, zd.ZAKLADKA)
+        czas.wez(e.wartosc, e.opis, zd.ZAKLADKA_PARKU)
     for s in d.get("sprzet_sprzedaj", []) if sprzet_ok else []:
         st = firma.stanowisko(s["typ"], int(s["nr"]))
         if st and s["nazwa"] in st.sprzet and s["nazwa"] not in st.sprzet_wynajmujacego:

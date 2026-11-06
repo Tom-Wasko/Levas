@@ -122,7 +122,8 @@ def test_dane_mapy():
     # budynki prowadzą do istniejących zakładek panelu gracza
     zakladki = set(re.search(r"const ZAKLADKI = \{([^}]*)\}", INDEX_JS.read_text(encoding="utf-8")).group(1).replace(" ", "")
                    .replace("\n", "").split(","))
-    assert {b["zakladka"] for b in dane.mapa["budynki"] if b["zakladka"]} <= zakladki
+    # UF13: „zdarzenia” przy parku to nie zakładka – klik w park otwiera okno parku (mapa.js)
+    assert {b["zakladka"] for b in dane.mapa["budynki"] if b["zakladka"]} - {"zdarzenia"} <= zakladki
     assert "lokale" in zakladki and "mapa" in zakladki
 
 

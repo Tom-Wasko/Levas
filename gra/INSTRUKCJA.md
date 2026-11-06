@@ -32,7 +32,7 @@ mecze Motoru).
 
 | Grupa | Co w niej jest |
 |---|---|
-| Mapa miasta | Lublin z lokalami, bankiem, dostawcami, agencjami i parkami – kliknij budynek, żeby przejść do jego zakładki |
+| Mapa miasta | Lublin z lokalami, bankiem, dostawcami, agencjami i parkami – kliknij budynek, żeby przejść do jego zakładki, a park, żeby zobaczyć, co się w nim dzieje |
 | **Miasto** | |
 | Nowe lokale | Do wynajęcia (najem i kupno), Licytacje, Przejęcia |
 | Klienci | Strefy, Konkurencja, Kalendarz |
@@ -301,12 +301,15 @@ jedzenia cebularzy, pan Zbyszek z ławki, profesor przy szachownicy, wiewiórka 
 czas właściciela (zwykle 2–5 h), gotówkę albo porcje jedzenia, a skutki (pieniądze, klienci, nowy pracownik) bywają
 odłożone w czasie. **Na wszystko nie starczy czasu** – właściciel ma 20 h w tygodniu, więc wybierz to, co się opłaca.
 Jeśli kilka drużyn wybierze to samo, każda dostaje tę samą nagrodę. Bez wyboru gra wybiera reakcję domyślną
-(bez czasu właściciela). W zakładce po lewej masz listę spraw tygodnia: ✓ – wybrałeś reakcję, ○ – zostaje domyślna,
-! – na wybraną reakcję brakuje czasu. Kliknij sprawę, żeby po prawej zobaczyć opis i reakcje jako kafelki (czas, koszt);
-pasek na górze pokazuje, ile z 20 h zajmują sprawy w parkach, a ile inne zadania. Reakcja, na którą nie starcza wolnych
-godzin, jest wyszarzona z dopiskiem „wymaga 5 h, masz wolne 3 h” – zwolnij czas gdzie indziej albo wybierz inną.
+(bez czasu właściciela). Parki są **tylko na mapie**: park, w którym coś się dzieje, ma pomarańczowy znak „!”, a nad
+mapą jest lista spraw tygodnia (✓ – wybrałeś reakcję, ○ – zostaje domyślna, ! – na wybraną reakcję brakuje czasu).
+Kliknij park albo sprawę z listy – otworzy się okno parku z opisem i reakcjami jako kafelki A, B, C (czas, koszt),
+z tym, co stało się tam w poprzedniej rundzie, i z historią parku. Pasek w oknie pokazuje, ile z 20 h zajmują sprawy
+w parkach, a ile inne zadania. Reakcja, na którą nie starcza wolnych godzin, jest wyszarzona z dopiskiem „wymaga 5 h,
+masz wolne 3 h” – zwolnij czas gdzie indziej albo wybierz inną.
 
 Czasem coś przytrafia się **tylko Tobie** – w lokalu. Rożen odmawia posłuszeństwa, kot sąsiada wchodzi do kuchni.
+Takie sprawy (i bank żywności) pojawiają się w zakładce Mój lokal, w części „Sprawy w lokalu”.
 Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji). Im dłużej spokojnie, tym
 groźniej: ryzyko wypadku rośnie o 4 punkty procentowe za każdy tydzień bez wypadku (od 8% do najwyżej 40%), a po
 wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.

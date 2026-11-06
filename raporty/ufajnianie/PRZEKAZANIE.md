@@ -54,9 +54,15 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   - Sprawdzanie bez przeglądarki: zrzut widoków z gry botów (`api.prezentacja.widok`) i wyrysowanie wszystkich zakładek
     w node (kopia `static/` z `package.json {"type":"module"}`, atrapa `document`) – 358 wyrysowań bez błędów.
     Node w systemie jest stary (v14): pliki ES trzeba kopiować do katalogu z `"type":"module"`.
-- Środki trwałe i Parki i zdarzenia nie mają już pozycji w menu, ale zakładki jeszcze istnieją (UF12, UF13 to kończą).
 - [x] UF12 – zakładka Środki trwałe usunięta; `ewidencja`, `RODZAJ_ST` eksportowane z inwestycje.js, tabela i odpisy na końcu KPiR (`amortyzacja()` w finanse.js), alias `srodki_trwale → kpir`.
-- Następne: UF13, potem kolejno: → UF11 → UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF13 – zakładki Parki i zdarzenia nie ma. `zdarzenia.js`: `oknoParku(c, id)` (okno z mapy), `parkiNaMapie` (pasek
+  spraw nad mapą), `parkiZeSprawa` (znak „!” w `mapa.js: budynek`), `AKCJE_ZDARZEN` (wpięte w `mapa.akcje` i część
+  `sprawy`; po wyborze opcji w oknie okno rysuje się na nowo). Część `sprawy` („Sprawy w lokalu”: bank żywności, wypadki)
+  w Moim lokalu, ukryta, gdy nic się nie dzieje. W danych mapy `zakladka: zdarzenia` przy parkach zostaje jako znacznik
+  parku (mapy nie ruszamy). Silnik: lista błędów i czas właściciela mają `zakladka` „mapa” (park) albo „sprawy” (lokal),
+  tekst „kliknij <park> na mapie miasta”; `oczekujace` mają `park`. Alias `zdarzenia → mapa`.
+  Przypomnienie o evencie na liście zadań – w UF22.
+- Następne: UF11, potem kolejno: UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 
 ## Pułapki
 - Pomiary bambiczkowania czytają dane z `levas_gra`, nie stąd – tu możesz zmieniać `gra/dane/`.

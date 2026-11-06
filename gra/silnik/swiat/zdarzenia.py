@@ -24,7 +24,20 @@ from ..ludzie import czas_wlasciciela as cw
 from ..model import Efekt, Firma, OtwartaHistoria
 from . import awarie as aw
 
-ZAKLADKA = "zdarzenia"
+# UF13: parki są tylko na mapie (klik w park → okno parku), sprawy w lokalu – w Moim lokalu (część „sprawy”)
+ZAKLADKA_PARKU, ZAKLADKA_LOKALU = "mapa", "sprawy"
+
+
+def _zakladka(h: dict) -> str:
+    return ZAKLADKA_PARKU if h.get("park") else ZAKLADKA_LOKALU
+
+
+def _gdzie(dane: Dane, h: dict) -> str:
+    """Gdzie odpowiedzieć na sprawę – tekst do listy błędów."""
+    if not h.get("park"):
+        return "w zakładce Mój lokal"
+    nazwa = next((b["nazwa"] for b in (dane.mapa or {}).get("budynki", []) if b["id"] == h["park"]), "park")
+    return f"– kliknij {nazwa} na mapie miasta"
 
 
 def zasady(dane: Dane) -> dict:
@@ -129,17 +142,17 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
             wolne = czas.wolne
             if podglad:   # U8: zakładka wyszarza opcje, na które nie starcza godzin (po scenach wcześniejszych)
                 wpis["wolne_przed"] = wolne
-            if o["koszt"]["czas"] and not czas.wez(o["koszt"]["czas"], f"{h['tytul']}: {o['tekst']}", ZAKLADKA):
+            if o["koszt"]["czas"] and not czas.wez(o["koszt"]["czas"], f"{h['tytul']}: {o['tekst']}", _zakladka(h)):
                 domyslna = opcje[sc["domyslna"]]["tekst"]
-                wynik["bledy"].append({"poziom": "czerwony", "zakladka": ZAKLADKA, "tekst":
+                wynik["bledy"].append({"poziom": "czerwony", "zakladka": _zakladka(h), "tekst":
                                        f"„{h['tytul']}”: nie starcza czasu właściciela na „{o['tekst']}” "
                                        f"(wymaga {cw.godziny(o['koszt']['czas'])} h, wolne {cw.godziny(wolne)} h) – "
                                        + (f"wybierz inną reakcję albo zwolnij czas, inaczej gra wykona „{domyslna}”."
                                           if podglad else f"gra wybrała „{domyslna}”.")})
                 o = opcje[sc["domyslna"]]
             elif podglad and h["id"] not in wybory:   # tylko przy decyzjach (w wynikach rundy to bez sensu)
-                wynik["bledy"].append({"poziom": "niebieski", "zakladka": ZAKLADKA, "tekst":
-                                       f"„{h['tytul']}”: wybierz reakcję w zakładce Parki i zdarzenia (bez wyboru: „{o['tekst']}”)."})
+                wynik["bledy"].append({"poziom": "niebieski", "zakladka": _zakladka(h), "tekst":
+                                       f"„{h['tytul']}”: wybierz reakcję {_gdzie(dane, h)} (bez wyboru: „{o['tekst']}”)."})
             wpis.update(opcja=o["id"], opcja_tekst=o["tekst"], domyslna=o["id"] == sc["domyslna"], wynik=o["wynik"],
                         koszt=_koszt(o, kp))
             if o["koszt"]["gotowka"]:
@@ -238,6 +251,7 @@ def widok(dane: Dane, fp: Firma, runda: int, ziarno, wyniki: dict, firma: str) -
     return {"aktywne": akt, "koszt_porcji": kp, "od_rundy": zasady(dane)["od_rundy"],
             "efekty": [{"typ": e.typ, "wartosc": e.wartosc, "od_rundy": e.od_rundy, "do_rundy": e.do_rundy, "opis": e.opis}
                        for e in fp.efekty if e.do_rundy >= runda],
-            "oczekujace": [{"historia": h.historia, "tytul": hs[h.historia]["tytul"], "runda": h.runda}
+            "oczekujace": [{"historia": h.historia, "tytul": hs[h.historia]["tytul"], "runda": h.runda,
+                             "park": hs[h.historia]["park"]}
                            for h in fp.historie if h.runda > runda and h.historia in hs],
             "dziennik": dziennik}

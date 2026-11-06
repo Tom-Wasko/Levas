@@ -3,6 +3,7 @@
 import { esc, marka, nazwaFirmy, okno, toast, zamknijOkno } from "./wspolne.js";
 import { nazwaStrefy, opisLokalu, przyciskiLokalu, wybranyLokal } from "./lokale.js";
 import { W_BUDOWIE } from "./gielda.js";
+import { AKCJE_ZDARZEN, oknoParku, parkiNaMapie, parkiZeSprawa } from "./zdarzenia.js";
 
 const PW = 22, PH = 11;  // połowa pola siatki na ekranie (romb 44 × 22 px)
 const MARGINES = 16, NAD = 70;  // miejsce nad mapą na wysokie budynki
@@ -44,7 +45,7 @@ function drzewa(g, x, y, s, l) {
   return html;
 }
 
-function budynek(g, b) {
+function budynek(g, b, sprawa = false) {
   const { x, y, szer: s, gl: l } = b.mapa;
   const tytul = `<title>${esc(b.nazwa)} – ${esc(b.opis)}</title>`;
   let ksztalt;
@@ -53,6 +54,11 @@ function budynek(g, b) {
   else {
     const [kolor, h] = BUDYNKI[b.rodzaj] || ["#888", 22];
     ksztalt = bryla(g, x + 0.08, y + 0.08, s - 0.16, l - 0.16, h, kolor);
+  }
+  if (sprawa) {   // UF13: w parku coś się dzieje w tej rundzie
+    const [a, c] = g.p(x + s / 2, y + l / 2, 30);
+    ksztalt += `<circle cx="${a}" cy="${c}" r="9" fill="#e45f26" stroke="#fff" stroke-width="2"/>`
+      + `<text x="${a}" y="${c + 4}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">!</text>`;
   }
   return { klucz: x + y + s + l, html: `<g class="klik" data-akcja="mapa-budynek" data-id="${esc(b.id)}">${tytul}${ksztalt}</g>` };
 }
@@ -111,7 +117,8 @@ function rysujMape(c) {
     const [a, b] = g.p(x + szer / 2, y + gl);
     napisy += `<text x="${a}" y="${b - 4}" class="strefa-napis">${esc(s.nazwa)}</text>`;
   }
-  const obiekty = M.budynki.map((b) => budynek(g, b));
+  const sprawy = parkiZeSprawa(v);
+  const obiekty = M.budynki.map((b) => budynek(g, b, sprawy.has(b.id)));
   if (v.lokale) obiekty.push(...M.lokale.filter((l) => (l.od_rundy || 1) <= v.runda && (!v.lokale.na_mapie || v.lokale.na_mapie.includes(l.id))).map((l) => lokal(g, v, d, kat, l)));
   obiekty.sort((a, b) => a.klucz - b.klucz);
   return `<svg class="mapa-svg" viewBox="0 0 ${g.szer} ${g.wys}" role="img" aria-label="Mapa miasta">
@@ -136,11 +143,12 @@ export const mapa = {
       ? `<div class="komunikat">Nie masz jeszcze lokalu – kliknij wolny lokal (biały) albo działkę na mapie.</div>` : "";
     // UF15: nowa mapa i giełda są w przygotowaniu (dostarczy je kolega) – mapy samej nie ruszamy
     return brak + W_BUDOWIE("Nowa mapa Lublina i giełda – w budowie. Ta mapa działa jak dotąd.")
-      + `<div class="mapa-ramka">${rysujMape(c)}</div>${legenda(c.v)}`;
+      + parkiNaMapie(c.v, c.kat, c.edycja) + `<div class="mapa-ramka">${rysujMape(c)}</div>${legenda(c.v)}`;
   },
   akcje: {
     "mapa-budynek": (el, c) => {
       const b = c.kat.mapa.budynki.find((x) => x.id === el.dataset.id);
+      if (b.zakladka === "zdarzenia") return oknoParku(c, b.id);   // UF13: parki tylko z mapy
       if (!b.zakladka) return toast(`${b.nazwa}: ${b.opis}`);
       if (!c.dostepna(b.zakladka)) return toast(`${b.nazwa} – ta zakładka nie jest jeszcze dostępna w tej rundzie.`);
       c.idz(b.zakladka);
@@ -162,5 +170,6 @@ export const mapa = {
       okno(esc(lok.nazwa), html, { przyciski });
     },
     "mapa-idz": (el, c) => { zamknijOkno(); c.idz(el.dataset.z); },
+    ...AKCJE_ZDARZEN,
   },
 };

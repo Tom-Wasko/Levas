@@ -16,7 +16,7 @@ import { czas_wlasciciela } from "./czas.js";
 import { rynek_pracy } from "./rynek_pracy.js";
 import { harpagon } from "./harpagon.js";
 import { podatki, vat } from "./podatki.js";
-import { zdarzenia } from "./zdarzenia.js";
+import { sprawy } from "./zdarzenia.js";
 import { ubezpieczenia } from "./ubezpieczenia.js";
 import { sanepid, urzad } from "./urzad.js";
 import { wlasciciel } from "./wlasciciel.js";
@@ -29,7 +29,7 @@ import { gielda } from "./gielda.js";
 
 const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, lokale, licytacje, przejecia, urzad, sanepid, klienci, kalendarz, konkurencja, oferta,
   stanowiska, sprzet, wyposazenie, zatrudnienie, zespol, rynek_pracy, udogodnienia, szkolenia, dostawcy, swiezosc, przewozy,
-  czas_wlasciciela, zdarzenia, agencje, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia,
+  czas_wlasciciela, sprawy, agencje, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia,
   wlasciciel, gielda, kasyno, lista_bledow, wyslij };
 
 // nazwa ikony (zakladki/ikony.js) dla każdej zakładki
@@ -39,19 +39,19 @@ export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", zaop_dost
   klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", zatrudnienie: "zatrudnienie", zespol: "zatrudnienie", rynek_pracy: "rynek_pracy",
   udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", przewozy: "dostawcy", czas_wlasciciela: "zegar",
-  zdarzenia: "zdarzenia", agencje: "tradycyjny", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir",
+  sprawy: "zdarzenia", agencje: "tradycyjny", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir",
   vat: "procent", podatki: "podatki", bank: "bank", harpagon: "harpagon", biuro: "biuro", ubezpieczenia: "tarcza", wlasciciel: "portfel",
   gielda: "wykres", kasyno: "klucz", lista_bledow: "bledy", wyslij: "wyslij" };
 
 // od której rundy zakładka jest dostępna (w menu: szara pozycja z kłódką i „od rundy N”)
 export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
   przejecia: 4, sprzet: 2, zatrudnienie: 1, zespol: 1, rynek_pracy: 1, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, vat: 2,
-  zdarzenia: 2, ubezpieczenia: 2, handel: 5 };
+  sprawy: 2, ubezpieczenia: 2, handel: 5 };
 
 // zakładka → element harmonogramu gry z lokalami (silnik/harmonogram.py); tydzień z widoku zastępuje OD_RUNDY
 export const ELEMENT = { karta_wynikow: "karta_wynikow", agencje: "reklama", promocje: "promocje", udogodnienia: "hr_udogodnienia",
   wyposazenie: "inwestycje_wyposazenie", szkolenia: "hr_szkolenia", przejecia: "przejecia", sprzet: "inwestycje_sprzet",
-  zatrudnienie: "hr_zatrudnienie", zespol: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", zdarzenia: "parki", handel: "handel" };
+  zatrudnienie: "hr_zatrudnienie", zespol: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", sprawy: "parki", handel: "handel" };
 
 // Twój lokal: zakładki złożone z dawnych zakładek (części działają na wybranym lokalu – lokal_wybor.js; wybór lokalu tylko tu)
 const odRundyCzesci = (v, k) => v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];
@@ -59,8 +59,8 @@ const odRundyCzesci = (v, k) => v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];
 const obsada = { ...zatrudnienie, tytul: "Obsada stanowisk", tytulPelny: null, wynikiGdy: () => false };
 Object.assign(ZAKLADKI, {
   lokal_przeglad: zlozona({ tytul: "Mój lokal", tytulPelny: "Mój lokal – stan, sprzedaż i obsada", odRundy: odRundyCzesci,
-    info: "Wszystko o wybranym lokalu: liczby z poprzedniej rundy, braki, umowa, kto stoi na którym stanowisku i jak szła sprzedaż.",
-    czesci: { stan_lokalu, zatrudnienie: obsada, sprzedaz } }),
+    info: "Wszystko o wybranym lokalu: liczby z poprzedniej rundy, braki, umowa, sprawy w lokalu (bank żywności, wypadki), kto stoi na którym stanowisku i jak szła sprzedaż.",
+    czesci: { stan_lokalu, sprawy, zatrudnienie: obsada, sprzedaz } }),
   lokal_menu: zlozona({ tytul: "Kuchnia", tytulPelny: "Kuchnia – menu i ceny", odRundy: odRundyCzesci,
     info: "Dania w menu wybranego lokalu, prognoza sprzedaży i ceny. Każdy lokal może mieć inne menu i inne ceny.",
     czesci: { oferta } }),
@@ -88,10 +88,11 @@ Object.assign(klienci, { tytul: "Strefy" });
 export const ALIAS = { oferta: "lokal_menu", sprzedaz: "lokal_przeglad", zatrudnienie: "lokal_przeglad", stan_lokalu: "lokal_przeglad",
   dostawcy: "zaop_dostawy", swiezosc: "zaop_magazyn", przewozy: "zaop_przewozy",
   stanowiska: "wnetrze_sprzet", sprzet: "wnetrze_sprzet", wyposazenie: "wnetrze_wyposazenie",
-  lokal_dostawy: "zaop_dostawy", lokal_sprzet: "wnetrze_sprzet", lokal_ludzie: "zespol", srodki_trwale: "kpir" };
+  lokal_dostawy: "zaop_dostawy", lokal_sprzet: "wnetrze_sprzet", lokal_ludzie: "zespol", srodki_trwale: "kpir",
+  zdarzenia: "mapa", sprawy: "lokal_przeglad" };   // UF13: parki tylko z mapy, sprawy w lokalu – w Moim lokalu
 
 // Układ menu (UF15, raporty/ufajnianie/plan.md). { sekcja } – nagłówek sekcji (w menu poziomym kreska), { sekcja: "" } – sama kreska.
-// Bez pozycji w menu: Parki i zdarzenia (wejście z mapy, UF13), Kasyno (ukryte).
+// Bez pozycji w menu: Kasyno (ukryte). Parki – klik w park na mapie (UF13).
 export const MENU = [
   { klucz: "mapa", tytul: "Mapa miasta", ikona: "mapa", klasa: "mapa" },
   { sekcja: "Miasto" },

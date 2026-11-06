@@ -331,7 +331,7 @@ budynki:
   nazwa: Ogród Saski
   rodzaj: park
   strefa: akademickie
-  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Parki i zdarzenia).
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (kliknij park, żeby zobaczyć jego wydarzenia).
   zakladka: zdarzenia
   mapa:
     x: 2
@@ -342,7 +342,7 @@ budynki:
   nazwa: Park Ludowy
   rodzaj: park
   strefa: zygmuntowskie
-  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Parki i zdarzenia).
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (kliknij park, żeby zobaczyć jego wydarzenia).
   zakladka: zdarzenia
   mapa:
     x: 12
@@ -353,7 +353,7 @@ budynki:
   nazwa: Ogród Botaniczny UMCS
   rodzaj: park
   strefa: akademickie
-  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Parki i zdarzenia).
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (kliknij park, żeby zobaczyć jego wydarzenia).
   zakladka: zdarzenia
   mapa:
     x: 0
@@ -364,7 +364,7 @@ budynki:
   nazwa: Park Bronowicki
   rodzaj: park
   strefa: felin
-  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Parki i zdarzenia).
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (kliknij park, żeby zobaczyć jego wydarzenia).
   zakladka: zdarzenia
   mapa:
     x: 18
@@ -375,7 +375,7 @@ budynki:
   nazwa: Park Rury
   rodzaj: park
   strefa: lsm_czuby
-  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Parki i zdarzenia).
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (kliknij park, żeby zobaczyć jego wydarzenia).
   zakladka: zdarzenia
   mapa:
     x: 2
@@ -386,7 +386,7 @@ budynki:
   nazwa: Błonia pod Zamkiem
   rodzaj: park
   strefa: stare_miasto
-  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (zakładka Parki i zdarzenia).
+  opis: Park – co tydzień w jednym z parków dzieje się coś dla wszystkich drużyn (kliknij park, żeby zobaczyć jego wydarzenia).
   zakladka: zdarzenia
   mapa:
     x: 12
@@ -397,7 +397,7 @@ budynki:
   nazwa: Zalew Zemborzycki
   rodzaj: woda
   strefa: zemborzyce
-  opis: Plaża, żaglówki, wędkarze i morsy – co jakiś czas wydarzenia nad wodą (zakładka Parki i zdarzenia).
+  opis: Plaża, żaglówki, wędkarze i morsy – co jakiś czas wydarzenia nad wodą (kliknij, żeby je zobaczyć).
   zakladka: zdarzenia
   mapa:
     x: 11
