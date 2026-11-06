@@ -132,6 +132,22 @@ def test_miejsce_na_pulpicie_jak_ranking_mistrza_gry():
     assert inna   # w tej grze ranking ostatniej rundy choć raz różni się od skumulowanego
 
 
+def test_historia_rankingu_jak_ranking_mistrza_gry():
+    """UF11: zakładka Ranking – miejsca po każdej rundzie R takie jak miejsca(karta_skumulowana(R)) u mistrza gry."""
+    from api import prezentacja as pr
+    from silnik import Gra
+
+    g = Gra.nowa("UF11", [(f"Bot {k}", k) for k in ("tani", "premium", "zrownowazony")], 6, 11)
+    for _ in range(6):
+        g.przelicz(wymus=True)
+    stan = g.stan(6)
+    h = pr.historia_rankingu(g.dane, stan, 6)
+    assert h["rundy"] == [2, 3, 4, 5, 6] and len(h["etykiety"]) == 5 and h["ostatnia"]
+    for r in h["rundy"]:
+        assert h["miejsca"][r] == pr.miejsca(pr.karta_skumulowana(g, r))
+    assert pr.historia_rankingu(g.dane, stan, 1)["rundy"] == []
+
+
 def test_po_koncu_gry_druzyna_widzi_wyniki_ostatniej_rundy():
     """Decyzja autora (Z7): po końcu gry widok domyślny to podsumowanie – wyniki rundy N, bez decyzji."""
     from api import prezentacja as pr

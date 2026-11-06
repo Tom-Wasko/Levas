@@ -241,7 +241,7 @@ export const karta_wynikow = {
         <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.odblokowane.includes("karta_skumulowana") ? "" : "disabled"}>Skumulowana karta wyników</button></div>
       ${karty?.[v.firma] ? `<div class="sekcja-tytul">${skumulowana ? "Twoja skumulowana karta" : "Twoja karta"} – niski, średni czy dobry?</div>
         ${skalaKarty(v, karty[v.firma])}` : ""}
-      ${tabela("Ranking zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n), "Majątek netto"], wiersze, { klasy: ["l"] })}
+      ${tabela("Karty wszystkich zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n), "Majątek netto"], wiersze, { klasy: ["l"] })}
       <p class="podpowiedz">${RANKING_DLACZEGO} Majątek netto – stan na koniec ostatniej przeliczonej rundy.</p>
       ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>
@@ -259,6 +259,47 @@ export const karta_wynikow = {
       { label: "Wynik ekonomiczny", data: h.map((x) => x.karta.wynik_ekonomiczny) }]);
   },
   akcje: { "karta-skum": (el, c) => { skumulowana = el.dataset.s === "1"; c.idz("karta_wynikow", "wyniki"); } },
+};
+
+// UF11: ranking drużyn – miejsca jak u mistrza gry (średni wynik działalności z rund 2…), zmiana miejsca i wykres miejsc
+export const ranking = {
+  tytul: "Ranking", tytulPelny: "Ranking drużyn", ikona: "karta", wynikiOd: 3, odblokowanie: "karta_wynikow",
+  info: () => "Kto prowadzi? Miejsce liczy się ze średniego wyniku działalności z kart od rundy 2 – tak samo jak w panelu mistrza gry i na Dashboardzie.",
+  wyniki({ v }) {
+    const R = v.ranking, skum = v.karta_skumulowana || {}, teraz = v.rynek?.karta || {};
+    if (!R?.rundy?.length) return `<p class="podpowiedz">Ranking pojawi się, gdy przeliczy się runda 2.</p>`;
+    const ost = R.miejsca[R.rundy[R.rundy.length - 1]], przed = R.rundy.length > 1 ? R.miejsca[R.rundy[R.rundy.length - 2]] : null;
+    const firmy = Object.keys(ost).sort((a, b) => ost[a] - ost[b]);
+    const MEDAL = { 1: "🥇", 2: "🥈", 3: "🥉" };
+    const zmiana = (f) => {
+      if (!przed?.[f]) return "–";
+      const d = przed[f] - ost[f];
+      return d > 0 ? `<span class="plus">▲ ${d}</span>` : d < 0 ? `<span class="minus">▼ ${-d}</span>` : `<span class="szary">=</span>`;
+    };
+    const wiersze = firmy.map((f) => {
+      const ja = f === v.firma, m = marka(v, f);
+      return [`<b>${MEDAL[ost[f]] || ""} ${ost[f]}.</b>`,
+        `<span class="kropka" style="background:${esc(m.kolor)}"></span> ${ja ? "<b>" : ""}${esc(m.nazwa)}${ja ? " (Ty)</b>" : ""}`,
+        zmiana(f), wsk(skum[f]?.wynik_dzialalnosci), wsk(teraz[f]?.wynik_dzialalnosci), wsk(skum[f]?.wynik_ekonomiczny), zl(v.majatek_firm?.[f])];
+    });
+    const moje = ost[v.firma], lider = firmy[0];
+    const naglowek = moje === 1 ? `Prowadzisz! ${przed?.[v.firma] === 1 ? "Utrzymaj tempo." : "Awans na pierwsze miejsce."}`
+      : moje ? `Jesteś na ${moje}. miejscu z ${firmy.length}. Prowadzi ${esc(nazwaFirmy(v, lider))}.` : "";
+    return `${naglowek ? `<div class="komunikat ok">${naglowek}</div>` : ""}
+      ${tabela(`Ranking po: ${esc(R.ostatnia || `runda ${R.rundy[R.rundy.length - 1]}`)}`, ["Miejsce", "Drużyna", "Zmiana", "Wynik działalności (średnia)", "Ostatnia runda",
+        "Wynik ekonomiczny (średnia)", "Majątek netto"], wiersze, { klasy: ["", "l"] })}
+      <p class="podpowiedz">${RANKING_DLACZEGO} „Zmiana” – o ile miejsc w górę albo w dół od poprzedniej rundy.
+        Majątek netto – stan na koniec ostatniej przeliczonej rundy.</p>
+      ${R.rundy.length > 1 ? `<div class="sekcja-tytul" style="margin-top:20px">Miejsca w kolejnych rundach</div><div class="wykres"><canvas id="w-ranking"></canvas></div>` : ""}`;
+  },
+  po({ v }) {
+    const R = v.ranking;
+    if (!R?.rundy?.length || R.rundy.length < 2) return;
+    const firmy = Object.keys(R.miejsca[R.rundy[R.rundy.length - 1]]);
+    wykres("w-ranking", "line", R.etykiety, firmy.map((f) => ({ label: nazwaFirmy(v, f), kolor: marka(v, f).kolor,
+      data: R.rundy.map((r) => R.miejsca[r][f] ?? null), borderWidth: f === v.firma ? 4 : 2, tension: 0.2 })),
+    { scales: { y: { reverse: true, min: 1, max: firmy.length, ticks: { stepSize: 1, precision: 0 }, title: { display: true, text: "miejsce" } } } });
+  },
 };
 
 const DOKAD = { lokale: "lokale", stanowiska: "stanowiska", oferta: "oferta", finanse_bank: "bank", finanse_biuro: "biuro", hr_zatrudnienie: "zatrudnienie",

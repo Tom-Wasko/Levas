@@ -1,5 +1,5 @@
 // Rejestr zakładek i układ menu (UF15, 6.11.2026: Miasto · Twój lokal · Firma · Wyniki; każda funkcja ma decyzje i wyniki).
-import { dashboard, karta_wynikow, lista_bledow, wnioski, wyslij } from "./ogolne.js";
+import { dashboard, karta_wynikow, lista_bledow, ranking, wnioski, wyslij } from "./ogolne.js";
 import { oferta } from "./oferta.js";
 import { sprzet, stanowiska, wyposazenie } from "./inwestycje.js";
 import { szkolenia, udogodnienia, zatrudnienie, zespol } from "./hr.js";
@@ -27,7 +27,7 @@ import { konkurencja } from "./konkurencja.js";
 import { stan_lokalu, zlozona } from "./lokal.js";
 import { gielda } from "./gielda.js";
 
-const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, lokale, licytacje, przejecia, urzad, sanepid, klienci, kalendarz, konkurencja, oferta,
+const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, ranking, lokale, licytacje, przejecia, urzad, sanepid, klienci, kalendarz, konkurencja, oferta,
   stanowiska, sprzet, wyposazenie, zatrudnienie, zespol, rynek_pracy, udogodnienia, szkolenia, dostawcy, swiezosc, przewozy,
   czas_wlasciciela, sprawy, agencje, promocje, sprzedaz, handel, raport, kpir, vat, podatki, bank, harpagon, biuro, ubezpieczenia,
   wlasciciel, gielda, kasyno, lista_bledow, wyslij };
@@ -36,7 +36,7 @@ const ZAKLADKI = { dashboard, mapa, karta_wynikow, wnioski, lokale, licytacje, p
 export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", zaop_dostawy: "dostawcy", zaop_magazyn: "swiezosc", zaop_przewozy: "dostawcy",
   wnetrze_sprzet: "sprzet", wnetrze_wyposazenie: "wyposazenie", stan_lokalu: "lokale",
   dashboard: "dashboard", mapa: "mapa", wnioski: "ok", lokale: "lokale", licytacje: "lokale", przejecia: "lokale", urzad: "urzad", sanepid: "swiezosc",
-  klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
+  klienci: "klienci", kalendarz: "kalendarz", konkurencja: "analiza", karta_wynikow: "karta", ranking: "wykres", oferta: "oferta", stanowiska: "stanowiska", sprzet: "sprzet",
   wyposazenie: "wyposazenie", zatrudnienie: "zatrudnienie", zespol: "zatrudnienie", rynek_pracy: "rynek_pracy",
   udogodnienia: "udogodnienia", szkolenia: "szkolenia", dostawcy: "dostawcy", swiezosc: "swiezosc", przewozy: "dostawcy", czas_wlasciciela: "zegar",
   sprawy: "zdarzenia", agencje: "tradycyjny", promocje: "procent", sprzedaz: "sprzedaz", handel: "handel", raport: "raport", kpir: "kpir",
@@ -44,12 +44,12 @@ export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", zaop_dost
   gielda: "wykres", kasyno: "klucz", lista_bledow: "bledy", wyslij: "wyslij" };
 
 // od której rundy zakładka jest dostępna (w menu: szara pozycja z kłódką i „od rundy N”)
-export const OD_RUNDY = { karta_wynikow: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
+export const OD_RUNDY = { karta_wynikow: 3, ranking: 3, agencje: 3, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
   przejecia: 4, sprzet: 2, zatrudnienie: 1, zespol: 1, rynek_pracy: 1, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, vat: 2,
   sprawy: 2, ubezpieczenia: 2, handel: 5 };
 
 // zakładka → element harmonogramu gry z lokalami (silnik/harmonogram.py); tydzień z widoku zastępuje OD_RUNDY
-export const ELEMENT = { karta_wynikow: "karta_wynikow", agencje: "reklama", promocje: "promocje", udogodnienia: "hr_udogodnienia",
+export const ELEMENT = { karta_wynikow: "karta_wynikow", ranking: "karta_wynikow", agencje: "reklama", promocje: "promocje", udogodnienia: "hr_udogodnienia",
   wyposazenie: "inwestycje_wyposazenie", szkolenia: "hr_szkolenia", przejecia: "przejecia", sprzet: "inwestycje_sprzet",
   zatrudnienie: "hr_zatrudnienie", zespol: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", sprawy: "parki", handel: "handel" };
 
@@ -113,7 +113,7 @@ export const MENU = [
   { klucz: "szef", tytul: "Właściciel", ikona: "portfel", pod: ["czas_wlasciciela", "wlasciciel", "gielda"] },
   { klucz: "kasyno", tytul: "Nocna 13", ikona: "klucz" },   // widoczna tylko z zaproszeniem (ukryta)
   { sekcja: "" },
-  { klucz: "wyniki", tytul: "Wyniki", ikona: "karta", pod: ["karta_wynikow", "wnioski"] },
+  { klucz: "wyniki", tytul: "Wyniki", ikona: "karta", pod: ["karta_wynikow", "wnioski", "ranking"] },
   { klucz: "lista_bledow", tytul: "Lista błędów", ikona: "bledy" },
   { klucz: "wyslij", tytul: "Wyślij decyzje", ikona: "wyslij", klasa: "wyslij" },
 ];

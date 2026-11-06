@@ -62,7 +62,10 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   parku (mapy nie ruszamy). Silnik: lista błędów i czas właściciela mają `zakladka` „mapa” (park) albo „sprawy” (lokal),
   tekst „kliknij <park> na mapie miasta”; `oczekujace` mają `park`. Alias `zdarzenia → mapa`.
   Przypomnienie o evencie na liście zadań – w UF22.
-- Następne: UF11, potem kolejno: UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF11 – zakładka `ranking` (ogolne.js) w grupie Wyniki, od rundy 3. Dane: `v.ranking` z `api/prezentacja.py:
+  historia_rankingu` (miejsca po każdej rundzie 2…, liczone jak `miejsca(karta_skumulowana)` – test w test_panel_mg.py).
+  Tabela w Karcie wyników nazywa się teraz „Karty wszystkich zespołów”. Bez `Array.at` (node 14 w testach).
+- Następne: UF20, potem kolejno: UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 
 ## Pułapki
 - Pomiary bambiczkowania czytają dane z `levas_gra`, nie stąd – tu możesz zmieniać `gra/dane/`.

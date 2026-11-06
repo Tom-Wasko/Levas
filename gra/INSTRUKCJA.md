@@ -49,7 +49,7 @@ mecze Motoru).
 | Księgowość | Biuro rachunkowe, KPiR, VAT, PIT i ZUS |
 | Urzędy | Urząd (rejestracja, odbiory lokali), Sanepid, Ubezpieczenia |
 | Właściciel | Czas właściciela, Portfel, Giełda (w budowie) |
-| **Wyniki** | Karta wyników, Wnioski z rundy |
+| **Wyniki** | Karta wyników, Wnioski z rundy, Ranking |
 
 Zakładki, które otwierają się później, są w menu szare, z kłódką i napisem „od rundy N”.
 
@@ -106,6 +106,8 @@ Iloczyn działa bezlitośnie: słaby jeden składnik ciągnie w dół wszystkie 
 wszystkim niż genialnym w jednym.
 Zakładka Karta wyników przy każdym Twoim wskaźniku pisze **niski / średni / dobry** (kolorem) – w porównaniu
 z typowymi wynikami firm w grze – i podpowiada, co go podnosi.
+Zakładka **Ranking** (od rundy 3) pokazuje miejsca wszystkich drużyn: średni wynik działalności z kart od rundy 2,
+wynik ostatniej rundy, majątek netto, o ile miejsc ktoś awansował lub spadł oraz wykres miejsc w kolejnych rundach.
 
 **Tydzień ze stratą daje wynik ujemny** – tym niższy, im większa strata (proporcjonalnie do wyniku ekonomicznego,
 bez mnożenia przez pozostałe składniki). Mała strata na rozruchu kosztuje mało, duża – dużo.

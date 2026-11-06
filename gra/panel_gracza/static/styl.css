@@ -261,6 +261,8 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .tabela-tytul + .tab-wrap { border-radius: 0 0 var(--r) var(--r); border-top: 0; }
 .plus { color: var(--zielony); font-weight: 700; }
 .minus { color: var(--czerwony); font-weight: 700; }
+.szary { color: var(--szary); }
+.kropka { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
 .wyrozniony { background: var(--pom-jasny) !important; font-weight: 700; }
 
 /* pulpit */

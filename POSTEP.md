@@ -39,7 +39,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [ ] UF14 (18) Agencje reklamowe – nowy wygląd, siatki 3 kolumn
 - [x] UF13 (2) Parki tylko z mapy: znak „!” na parku, lista spraw nad mapą, okno parku (kafelki A/B/C, poprzednia runda, historia); sprawy w lokalu w Moim lokalu
 - [x] UF12 Środki trwałe → KPiR (ewidencja i odpisy), sprzedaż sprzętu w Wnętrzu z uwagą o amortyzacji; zakładka usunięta
-- [ ] UF11 Ranking w Wynikach
+- [x] UF11 Ranking w Wynikach: tabela drużyn (miejsce, zmiana, średnia i ostatnia karta, majątek) + wykres miejsc
 - [ ] UF10 (4) Zlecenie bez ZUS, student <26 bez PIT
 - [ ] UF9 (16) Nowe udogodnienia (do rundy 14, kot zakładowy)
 - [ ] UF8 (13) Falafel – bójka

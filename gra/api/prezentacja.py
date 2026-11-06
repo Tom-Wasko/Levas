@@ -150,6 +150,23 @@ def karta_skumulowana(gra: Gra, do_rundy: int) -> dict:
     return wynik
 
 
+def historia_rankingu(dane, stan, do_rundy: int) -> dict:
+    """UF11: miejsca firm po każdej rundzie 2…do_rundy – jak `miejsca(karta_skumulowana(gra, R))`, ale z jednego stanu
+    (średni wynik działalności z rund 2…R, zaokrąglony jak w karcie skumulowanej; remis – kolejność firm w grze)."""
+    rundy = [r for r in range(2, do_rundy + 1) if r in stan.wyniki]
+    sumy: dict[str, list[float]] = {}
+    miejsca_r = {}
+    for r in rundy:
+        for f in stan.firmy:
+            karta = (stan.wyniki[r].get(f) or {}).get("karta")
+            if karta:
+                sumy.setdefault(f, []).append(karta["wynik_dzialalnosci"])
+        srednie = {f: round(sum(x) / len(x), 3) for f, x in sumy.items()}
+        miejsca_r[r] = miejsca({f: {"wynik_dzialalnosci": s} for f, s in srednie.items()})
+    return {"rundy": rundy, "etykiety": [dane.skrot_rundy(r) for r in rundy], "miejsca": miejsca_r,
+            "ostatnia": dane.nazwa_rundy(rundy[-1]) if rundy else ""}
+
+
 def miejsca(skum: dict) -> dict[str, int]:
     """Miejsca firm w rankingu: średni wynik działalności z karty skumulowanej (pulpit drużyny i mistrz gry)."""
     ranking = sorted(skum, key=lambda n: -skum[n]["wynik_dzialalnosci"])
@@ -261,6 +278,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
         v["dzielnik_karty"] = dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]
         v["skala_karty"] = dane.z["karta_wynikow"].get("skala")   # U10: progi „średni” i „dobry” przy wskaźnikach
         v["majatek_firm"] = {n: _majatek_netto(x) for n, x in w.items()}   # U13: majątek netto obok wyniku w rankingu
+        v["ranking"] = historia_rankingu(dane, poprzedni, runda - 1)   # UF11: zakładka Wyniki ▸ Ranking
         v["historia"] = [{"runda": r, "miesiac": dane.nazwa_rundy(r), "skrot": dane.skrot_rundy(r), "karta": poprzedni.wyniki[r][firma].get("karta"),
                           "dochod_netto": poprzedni.wyniki[r][firma]["kpir"]["dochod_netto"],
                           "gotowka": poprzedni.wyniki[r][firma]["gotowka"]}
