@@ -161,6 +161,8 @@ def katalog_wariantow(dane: Dane) -> dict[str, Wariant]:
     hurt = [k for k, r in rodzaj.items() if r in ("hurtownia", "piekarnia")]
     w += [Wariant("dostawcy:bez_producenta", "hurtownie i piekarnia, bez producenta mięsa",
                   strategia=(("dostawcy", hurt),)),
+          Wariant("dostawcy:dyskont", "zakupy w dyskoncie (odbiór osobisty), reszta jak baza",
+                  strategia=(("dyskonty", True),)),
           Wariant("dostawcy:bez_piekarni", "bez piekarni",
                   strategia=(("dostawcy", [k for k, r in rodzaj.items() if r != "piekarnia"]),))]
     w += [Wariant(f"dostawcy:tylko_{k}", f"wszystko z jednej hurtowni {k}",

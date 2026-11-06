@@ -451,6 +451,7 @@ class Strategia(Schemat):
     jakosc_zasobow: int | None = Field(None, ge=1, le=3)   # B8: gwiazdki składników (bez – jak jakosc)
     zapas_zasobow: float | None = Field(None, ge=1)   # B8: zapas w zamówieniach (bez – ustawienia botów)
     dostawcy: list[str] | None = None   # B8: dostawcy, u których bot zamawia (bez – wszyscy poza hipermarketem)
+    dyskonty: bool = False   # B8: zakupy w dyskoncie (odbiór osobisty, czas właściciela)
     uslugi: int = Field(gt=0)
     pokrycie: float = Field(gt=0)
     wyposazenie: int = Field(ge=0)

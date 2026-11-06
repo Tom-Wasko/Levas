@@ -669,10 +669,11 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
                 kx = {u: k * wx.get(u, 0.0) / s for u, k in klienci.items()
                       if (s := sum(w.get(u, 0.0) for w in waga.values())) > 0}
                 d["zamowienia"] += [{**z, "lokal": x} for z in zamowienie_zasobow(
-                    dane, pl.widok(f, x), kx, ceny_d, qz, zapas, udzialy_dni, dane.data_rundy(runda))]
+                    dane, pl.widok(f, x), kx, ceny_d, qz, zapas, udzialy_dni, dane.data_rundy(runda),
+                    bool(st.get("dyskonty")))]
         else:
             d["zamowienia"] = zamowienie_zasobow(dane, f, klienci, ceny_d, qz, zapas, udzialy_dni,
-                                                 dane.data_rundy(runda))
+                                                 dane.data_rundy(runda), bool(st.get("dyskonty")))
 
     # inwestycje dodatkowe wg strategii (gdy jest gotówka): po zakupach zostaje bufor gotówki (B5: wcześniej bot
     # kupował od razu cały komplet i wpadał w debet)

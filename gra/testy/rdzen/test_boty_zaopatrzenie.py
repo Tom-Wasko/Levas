@@ -42,3 +42,24 @@ def test_bot_zamawia_tylko_u_wybranych_dostawcow():
 
 def test_wiekszy_zapas_to_wieksze_zamowienie():
     assert _ilosc(_zamowienia({"zapas_zasobow": 1.3})) > _ilosc(_zamowienia({"zapas_zasobow": 1.0}))
+
+
+def test_bot_z_dyskontami_kupuje_w_jednym_dyskoncie_do_limitu():
+    """B8: bot domyślnie pomija dyskonty (odbiór osobisty); z `dyskonty` kupuje w jednym – tam, gdzie oszczędza
+    najwięcej – codziennie najwyżej limit opakowań składnika, resztę u dostawców z dowozem."""
+    from silnik.kuchnia.dostawcy import info
+    g = Gra.nowa("t", [("A", "zrownowazony"), ("B", "tani")], 12, 5)
+    dane = g.dane
+    baza = _zamowienia({})
+    assert not any(info(dane, z["dostawca"])["odbior_osobisty"] for z in baza)
+    zam = _zamowienia({"dyskonty": True})
+    dysk = [z for z in zam if info(dane, z["dostawca"])["odbior_osobisty"]]
+    assert dysk and len({z["dostawca"] for z in dysk}) == 1
+    limit = info(dane, dysk[0]["dostawca"])["limit_opakowan"]
+    assert all(z["ilosc"] <= limit for z in dysk)
+    assert len({(z["zasob"], z["dzien"]) for z in dysk}) == len(dysk)   # jedna pozycja składnika dziennie
+    # dyskont zastępuje część dowozu, nie dokłada towaru ponad potrzebę (± zaokrąglenie opakowań)
+    for zasob in {z["zasob"] for z in dysk}:
+        przed = sum(z["ilosc"] for z in baza if z["zasob"] == zasob)
+        po = sum(z["ilosc"] for z in zam if z["zasob"] == zasob)
+        assert przed - 1 <= po <= przed + 7
