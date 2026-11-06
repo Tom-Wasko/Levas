@@ -1554,5 +1554,28 @@ po 2–8 tys. zł (drogi lokal premium, słaba planuje na oko), gotówka 0 od 2.
 ponad limit, potem zysk. Przypadek graniczny (1/100, kara banku to naturalna informacja dla gracza) – bez zmiany
 poziomu słabego; nowa umiejętność („nie kupuje przy zerowej gotówce”) zmieniłaby cele B5 słabej.
 
+**`balans.symuluj`** (18 rund, ziarna 7, 11, 23 – odświeżony po B14, działa bez zmian): średnia gotówka gry samych botów
+łatwy 45 tys., średni 104 tys., trudny 124 tys., niemożliwy 153 tys. zł – poziomy rosną wyraźnie.
+
 **H19:** słaba agresywna nadal poniżej „nic nie rób” (−0,06 wobec −0,016) – dozwolone przez cele B5 (słaba może
 tracić), zostaje jako przestroga przed reklamą bez planu.
+
+## B15 – raport końcowy (7.11.2026)
+
+Raport przed/po od tagu `kalibracja-start`: `raporty/kalibracja/raport.md` (cele planu, strategie, hipotezy
+H1–H29, realia, wszystkie zmiany parametrów z powodami, propozycje dla autora, instrukcja gracza).
+
+**Realia** (`skrypty/realia.py [poziom]`, ten sam skrypt na wypakowanym tagu i na gałęzi; 6 botów, ziarna 7 i 11,
+rundy 3–18): marża netto 18,8% → 21,6% (botów „jak człowiek – średni” 17,3% → 19,6%), praca 20,0% → 19,6%,
+czynsz 3,5% → 4,0%, reklama 3,6% → 1,3%, szkolenia 3,3% → 1,1%, przychód lokalu 22,7 → 22,2 tys. zł / tydz.
+Marża wyżej niż realia (kilka–kilkanaście procent) – **propozycja „B15” w `notatki_do_zmiany.md`** (liczby B5).
+
+**YAML:** `popyt.wyposazenie_nasycenie` – `pewnosc: skalibrowane` (liczba z pomiaru B10, było `zalozenie`);
+`boty.yaml` – komentarze przy `emisje_kampanii` i `przerwa_kampanii` (Z5, pomiar B10). Liczby bez zmian,
+`sprawdz` w porządku. Porównanie wszystkich liczb z tagiem: 391 zmienionych wartości w 13 plikach – każda ma
+powód w `zrodlo` albo w komentarzu (tabela 5 raportu).
+
+**Instrukcja:** liczby kalibracji widoczne w `INSTRUKCJA.md` zmieniały się tylko w B9 i B10 (PDF wtedy
+odświeżony); PDF odświeżony teraz po zmianie tekstu z B13 (H22).
+
+Kalibracja B6–B15 zamknięta. Gałąź `kalibracja-b` czeka na merge do main (sesja „ufajnianie”, na zlecenie autora).

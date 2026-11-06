@@ -329,3 +329,18 @@ Możliwości:
    {obsluga: 1.0, gotowka: 50000, maks_lokali: 2}`. Liczba poziomu `czlowiek_dobry` – wymaga zgody (decyzja po K).
 2. **Bez zmian:** dobra kupuje drugi lokal ostrożniej (karta 0,52); agresywny dobry ≈ średni zostaje jako cecha
    strategii (H24 opisana w dzienniku B14).
+
+## B15 – marża wyżej niż realia (7.11.2026) → `notatki/Plan optymalizacji` (cele B5, H1, H2); do decyzji autora
+
+Realia tym samym skryptem przed (tag `kalibracja-start`) i po B14 (gra 6 botów średnich, ziarna 7 i 11, rundy
+3–18, `raport.md`, pkt 4): marża netto 18,8% → **21,6%** (6 botów „jak człowiek – średni”: 17,3% → 19,6%), praca
+(pensje + ZUS pracodawcy) 20,0% → 19,6%, czynsz 3,5% → 4,0%, przychód lokalu 22,7 → 22,2 tys. zł / tydz.
+Realia: marża kilka–kilkanaście procent, praca 25–35%. Marża wzrosła, bo spadły błędnie wysokie koszty reklamy
+(3,6% → 1,3%, Z5 i B10) i szkoleń (3,3% → 1,1%, B9), a przychód spadł tylko o 2–4% (B5).
+
+Cele B5 dla jednej badanej firmy (karta średniej 0,45, 1. plus w rundach 3–6) są spełnione, więc to nie błąd
+kalibracji, tylko rozjazd z realiami w grze samych botów. Możliwości:
+1. **Pule stref × 0,9 jeszcze raz** (liczba B5): przychód −10%, marża ok. 13–15%; obniży też kartę badanej
+   i przesunie 1. plus średniej później. Po zgodzie – pomiar `bNN_trudnosc` i realia.
+2. **Obsada lub pensje wyżej** (U20, `kandydaci.yaml`): udział pracy bliżej 25%, uczy kosztu pracy (H2).
+3. **Bez zmian** – gra jest dla uczniów hojniejsza niż rynek; marża opisana w raporcie.

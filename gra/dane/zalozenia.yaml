@@ -59,7 +59,7 @@ popyt:
       „posiadane wyposażenie”'
   wyposazenie_nasycenie:
     wartosc: 3.0
-    pewnosc: zalozenie
+    pewnosc: skalibrowane
     zrodlo: 'B10 (6.11.2026, b10_marketing): przy liniowym wzorze opłacała się każda sztuka – komplet 6 sztuk (430%)
       dawał +31% klientów za ok. 7 tys. zł i 420 zł utrzymania na tydzień, +0,12–0,13 karty u taniego i zrównoważonego
       (6/6). Nasycenie 1 + κ · S · (1 − e^(−x/S)) zostawia nachylenie z danych ATH przy pierwszych sztukach, a komplet

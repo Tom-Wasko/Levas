@@ -11,8 +11,8 @@ ustawienia:
   bufor_gotowki: 30000
   rezerwa_po_sprzecie: 10000   # B6: gotówka po zakupie sprzętu (płace i towar tygodnia), resztę – kredyt bez historii
   bufor_kampanii: 12000
-  emisje_kampanii: 6
-  przerwa_kampanii: 1
+  emisje_kampanii: 6   # Z5; B10 (b10_marketing): 3, 6, 10 i 15 emisji dają podobną kartę
+  przerwa_kampanii: 1  # Z5; B10 (b10_marketing): bez przerwy +0,015…+0,057 karty, liczba bez zmiany
   min_obsluga_promocji: 0.9
   cena_nasladowcy_bez_danych: 0.95
   krok_ceny: 0.5

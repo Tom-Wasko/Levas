@@ -1,13 +1,13 @@
-# Przekazanie pracy – kalibracja B6–B15 (stan 7.11.2026, po B14)
+# Przekazanie pracy – kalibracja B6–B15 (stan 7.11.2026, po B15 – kalibracja zamknięta)
 
 Ten plik pozwala nowemu agentowi przejąć kalibrację bez znajomości wcześniejszych rozmów. Przeczytaj go
 w całości, potem `AGENTS.md`, `POSTEP.md` (sekcja „Krok 5” i lista B6–B15) i ostatnie sekcje
-`raporty/kalibracja/dziennik.md` (B13, B14).
+`raporty/kalibracja/dziennik.md` (B13–B15) oraz `raport.md` (raport końcowy).
 
 ## 1. Gdzie jesteśmy
 
 - Repo: `C:\Users\PC\Pulpit\Levas\levas_gra`, **gałąź `kalibracja-b`** (do 7.11.2026 `kalibracja-b6`, nazwę zmienił autor na GitHubie) (cała praca B6–B15 tylko tutaj).
-- B6–B14 zamknięte i wypchnięte. Zostaje **B15 – raport końcowy** (opis w `POSTEP.md`).
+- **B6–B15 zamknięte i wypchnięte** (raport końcowy: `raporty/kalibracja/raport.md`). Dalej tylko decyzje autora (pkt 6) i merge do main.
 - Równolegle sesja „ufajnianie” (worktree `Pulpit\Levas\levas_ufajnianie`, gałąź `ufajnianie`) przebudowuje
   Ludzi i menu i scali `kalibracja-b` + `ufajnianie` do main na zlecenie autora (instrukcja
   `raporty/ufajnianie/SCALANIE.md` na jej gałęzi). Każdy wynik commitować od razu; zmiany w `gra/silnik/ludzie/`,
@@ -98,7 +98,7 @@ EOF
 git pull -q --rebase --autostash origin kalibracja-b && git push -q origin kalibracja-b
 ```
 
-## 4. B14 zrobione – co dalej (B15)
+## 4. B14 i B15 zrobione
 
 B14 opisane w dzienniku („## B14 – boty po kalibracji”): trudny kupuje drugi lokal od 50 tys. zł (było 60),
 poziomy 99 / 84 / 100 par, turniej strategii (`pomiary/b14_turniej`), H24 – propozycja dla `czlowiek_dobry`
@@ -106,9 +106,9 @@ w `notatki_do_zmiany.md`, alarm słabej premium – przypadek graniczny. Kontrol
 (odniesienie: `b12_trudnosc`, polecenie w dzienniku B12) – powtórzyć tylko po zmianie liczb tych poziomów
 albo gry.
 
-**B15**: raport końcowy przed/po od tagu `kalibracja-start`, pola `zrodlo`/`pewnosc` w YAML przy każdej
-zmienionej liczbie, zebranie propozycji z `notatki_do_zmiany.md`, instrukcja gracza (`gra/INSTRUKCJA.md` – zmiana
-tekstu z B13 (H22) czeka na odświeżenie PDF: `manage.py instrukcja_pdf`, osobny commit „Instrukcja: …”).
+**B15** (dziennik „## B15 – raport końcowy”): `raport.md` z tabelami przed/po, realia tym samym skryptem
+(`skrypty/realia.py`), poprawki `pewnosc`/komentarzy w YAML, PDF instrukcji odświeżony. Nowe pomiary tylko po
+decyzjach autora z pkt 6 – wtedy kontrola trudności (`b12_trudnosc` jako odniesienie) i realia.
 
 ## 5. Skrypty w `raporty/kalibracja/skrypty/`
 
@@ -122,6 +122,7 @@ Uruchamiać z `gra/` z `PYTHONPATH=.`:
   innych wagach (B13; raport końcowy `wsk.py` pada na kolumnie `skladowe` – gry są dobre, zob. B13 w dzienniku).
 - `alarm.py`, `alarm2.py strategia poziom ziarno [rund]` – przebieg jednej gry badanej (gotówka, debet).
 - `ludzie.py`, `polisy.py` – zadowolenie/odejścia badanej (B9), wartość polis (B12).
+- `realia.py [poziom]` – marża i udziały kosztów w grze 6 botów (B15; działa też na wypakowanym tagu).
 
 ## 6. Czeka na decyzję autora (nie wdrażać samemu)
 
@@ -129,4 +130,4 @@ W `notatki_do_zmiany.md`: waga nieruchomości (Z1), lokal niewyposażony, wykup 
 (menu 8 dań u premium +0,53 karty), rozruch (liczba B5), promocje bez trwałego skutku / z rabatem przegrywają,
 płaca minimalna bez rotacji, szkolenie z efektem na kilka tygodni, udogodnienia bez skutku przy uczciwej płacy,
 kredyt bez celu obniża kartę (U22), mandaty skarbowe nie obniżają karty (Z1), „jak człowiek – dobry” kupuje
-drugi lokal jak trudny (B14). Merge `kalibracja-b` → main.
+drugi lokal jak trudny (B14), marża wyżej niż realia (B15). Merge `kalibracja-b` → main.
