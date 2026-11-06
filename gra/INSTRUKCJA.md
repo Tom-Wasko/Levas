@@ -110,6 +110,8 @@ Kilka zasad, które warto znać:
   więcej niż kilka dobrych tygodni). Lista błędów pokaże przed wysłaniem, o ile mniej więcej spadnie karta.
 - **Sprzedaż i odkup to nie inwestycja.** Rozwój podnoszą tylko zakupy ponad najwyższą wartość majątku, jaką
   firma już miała. Sprzedaż sprzętu obniża rozwój, a odkupienie go potem nie daje nic ekstra.
+- **Wypłaty dla siebie karta pomija.** Pieniądze wypłacone z firmy do portfela właściciela nie są kosztem, więc
+  nie obniżają wyniku działalności – zmniejszają za to gotówkę i majątek netto firmy (widać go w rankingu).
 
 ## 4. Tydzień 1 – przygotowanie lokalu (1–7 września)
 

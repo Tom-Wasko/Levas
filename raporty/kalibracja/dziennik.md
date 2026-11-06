@@ -1431,3 +1431,60 @@ Jedyny alarm: premium słaba, ziarno 1018 – 151 zł ponad limit w rundzie 5 (g
 B10, droższy komplet polis przesunął grę za granicę). Do przejrzenia w B14 razem z rezerwą gotówki poziomu słabego.
 B11 i B12 nie zmieniły kart (rywale na poziomie średnim mają polisy lokal + OC, tani – żadnych). B12 zamknięte;
 do decyzji autora – „B12 – mandaty skarbowe nie obniżają karty” w `notatki_do_zmiany.md`.
+
+## B13 – karta wyników: wagi składowych (6.11.2026, gałąź `kalibracja-b6`)
+
+Plan: wagi składowych tak, żeby karty nie dało się „nabić” jednym zabiegiem, a ranking według karty był wyraźnie,
+ale nie idealnie zgodny z majątkiem netto. Boty nie czytają karty (decyzje nie zależą od wyniku), więc kartę
+z innymi wagami można przeliczyć na zapisanych grach – bez nowych pomiarów dla każdej wersji. Badane wagi:
+wykładniki przy składnikach, wynik = we × zp^a × zk^b × roz^c × zad^d (wszystkie 1 – jak teraz), i waga straty.
+
+**Ranking** – 80 gier mieszanych (6 firm, 5 strategii + 1 losowa, poziomy łatwy/średni/trudny i człowiek
+słaby/średni/dobry pomieszane, 18 rund, ziarna 100–179):
+
+| wagi (zp, zk, roz, zad; strata) | Spearman karta ~ majątek netto | karta ~ dochód | ten sam 1. w karcie i majątku | karta śr. |
+|---|---|---|---|---|
+| **1, 1, 1, 1; 1 (teraz)** | **0,935** | 0,969 | **81%** | 0,46 |
+| 1, 1, 1, 1; 0,6 | 0,948 | 0,955 | 84% | 0,50 |
+| 1, 1, 0, 1; 1 (bez rozwoju) | 0,936 | 0,974 | 82% | 0,79 |
+| 0,5 każdy; 1 | 0,936 | 0,983 | 82% | 0,59 |
+| 2 każdy; 1 | 0,925 | 0,935 | 82% | 0,28 |
+| 0 każdy (sam dochód) | 0,927 | 1,000 | 79% | 0,76 |
+
+Każda wersja daje zgodność 0,92–0,95: „wyraźnie, ale nie idealnie” jest spełnione już teraz, a wagi zmieniają ją
+mniej niż szum. Iloczyn wskaźników w tygodniach z zyskiem wynosi średnio 0,65 (rozwój 0,61 – największy hamulec,
+zadowolenie klientów 1,07, pracowników 0,96, zadłużenie ≈ 1).
+
+**Nabijanie** – pomiar `b13_wagi` (35 wariantów ze wszystkich obszarów B6–B12, zrównoważony / tani / premium,
+poziom średni, 6 ziaren, 648 gier; zapisane też składniki karty z każdego tygodnia): karta i majątek mają ten sam
+znak w 83% par (teraz); najlepsza wersja wag (sam dochód) – 86%, wykładnik 2 przy zadowoleniu pracowników – 78%,
+bez rozwoju – 77%. Każdy wariant, który wyraźnie podnosi kartę, podnosi też majątek (menu 8 premium +0,53 karty
+/ +60 tys. zł, kredyt na drugi lokal +0,32…+0,38 / +52…+57 tys. zł, drugi lokal taniego +0,21 / +22 tys. zł,
+dyskont +0,05…+0,07 / +7 tys. zł). Jedyny „nabity” zysk: **samodzielna księgowość bez deklaracji** (+0,01 karty,
+−6,5…−6,7 tys. zł) – mandaty są poza dochodem karty, wagi tego nie naprawią (propozycja B12 już czeka u autora).
+Odwrotne rozbieżności (karta niżej, majątek wyżej) są małe i zgodne z zamysłem karty: bez szkoleń −0,01…−0,02 karty
+/ +3,1…+3,5 tys. zł, kredyt start bez celu −0,10…−0,14 (U22, propozycja B11), 6 udogodnień −0,005…−0,011.
+
+**Decyzja: wagi bez zmian.** Żadna zmiana wykładników nie poprawia jednocześnie rankingu i zgodności par, a każda
+przesuwa średnią kartę (czyli skalę słów i porównania z wcześniejszymi grami). Waga straty 0,6 dałaby +0,013
+Spearmana i mniejszą karę za jednorazowy zakup sprzętu (P1 z analizy gracza), ale U1 to decyzja autora („liczby
+karty bez zmian”) – nie proponuję, zysk jest w granicach szumu.
+
+**Skala słów karty (U10)** – percentyle z 80 gier mieszanych (rundy 3–14) po kalibracji B6–B12: wynik
+działalności p25 0,20 / p75 0,83 (ludzie) – 1,00 (boty), wynik ekonomiczny 0,36–0,38 / 1,29–1,55, rozwój 0,54 /
+0,64, zadowolenia bez zmian. Progi w `dane/zalozenia.yaml` (`karta_wynikow.skala`): wynik działalności 0,1 / 0,7 →
+0,2 / 0,9, wynik ekonomiczny 0,15 / 1,1 → 0,35 / 1,4, rozwój 0,56 / 0,67 → 0,54 / 0,64 (tylko słowo i kolor przy
+wskaźniku – wynik się nie zmienia).
+
+**H19 („nic nie rób”)** – pomiar `b13_nic` (człowiek słaby, rywale średni, 6 ziaren): firma bez lokalu od rundy 1
+ma −0,016 karty. Słaba wersja „jak człowiek” jest nad zerem u zrównoważonego (0,19), naśladowcy (0,16), taniego
+(0,10) i premium (0,11; `b12_trudnosc`, 20 ziaren), ale **słaba agresywna ma −0,04…−0,06** (17/20 gier poniżej
+zera, w `b13_nic` 4/6 gorsza od nicnierobienia). Zasady zostają (decyzja autora, pyt. 2); słaba agresywna – do B14
+(poziomy botów).
+
+**H22** – w INSTRUKCJI (rozdz. 3, zasady karty) dopisane: wypłaty dla siebie nie obniżają wyniku działalności,
+zmniejszają gotówkę i majątek netto firmy. Liczby bez zmian.
+
+**Szybki pomiar wszystkich obszarów** – to `b13_wagi` (35 wariantów z B6–B12 na kalibrowanych danych): bez nowej
+dominacji – wyraźnie wygrywają tylko zabiegi, które też budują majątek (menu 8 u premium – propozycja B7 czeka,
+kredyt na rozwój, drugi lokal taniego, dyskont za czas właściciela). B13 zamknięte.
