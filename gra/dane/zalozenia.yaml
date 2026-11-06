@@ -31,14 +31,16 @@ popyt:
       ATH i A/B/C (różnica 3%, walidacja lepsza bez niej)'
   wspolczynniki_jakosci:
     wartosc:
-      '3': 1.0
+      '3': 0.82
       '2': 0.654
-      '1': 0.616
+      '1': 0.55
     pewnosc: skalibrowane
     zrodlo: 'analiza_od_nowa.py (2026-10-18): panel 361 obserwacji – gra ATH luty–grudzień (3 firmy z botami) +
       gra A/B/C luty–marzec; wariant wybrany walidacją krzyżową (10 grup firma-miesiąc), błąd 5,4%, walidacja 6,3%;
       jakość = średnia ważona współczynników gwiazdek sprzętu i zasobów (lepsza od postaci liniowej w gwiazdkach);
-      boty: sprzęt 2★, zasoby 1,35–1,96★ co miesiąc'
+      boty: sprzęt 2★, zasoby 1,35–1,96★ co miesiąc. Kalibracja B7 (6.11.2026): było 1★ 0,616 / 2★ 0,654 /
+      3★ 1,0 – 3★ wygrywało z 2★ w 12/12 par (karta +0,25), a 2★ nie różniło się od 1★ (pomiar b7_cena); 2★ bez
+      zmian (na nim stoją pule stref B5), 1★ i 3★ tak, żeby każdy krok dawał ok. +20–25% (b7_jakosc, b7_jakosc2)'
   wagi_jakosci:
     wartosc:
       pracownicy: 0.0

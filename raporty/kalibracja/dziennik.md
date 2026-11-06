@@ -993,3 +993,26 @@ spada z ok. 0,7 do 0,4 ceny), a bot trzyma promocję całą grę, choć jej przy
 Próba (`b7_promocje2`): przyciąganie co najmniej jak obniżka ceny o rabat, plus mały efekt promocji – happy hours
 0,6 → 0,4 (−0,04 na tydzień), karta 0,05 → 0,3 (+0,04), studencka 0,55, 2 za 1 0,8 → 0,2 (−0,12); zestaw bez
 zmian. Wtedy promocja ma się opłacać przy wolnej kuchni (słabe dni, strefy studenckie), a przy pełnej nie.
+
+**Pomiar `b7_jakosc2` i wdrożenie** (6.11; krzywa 1★ 0,55 / 2★ 0,654 / 3★ 0,82 i tani z `min_kuchnia: 2`,
+18 i 26 rund, 6 ziaren, 288 gier). Karta wariant − baza, wygrane z 6, 18r (26r w nawiasie):
+
+| wariant | zrównoważony (2★, 0,92) | tani (1★, 0,78) | premium (3★, 1,08) |
+|---|---|---|---|
+| jakość 1★ | −0,13 0/6 (−0,14) | baza | −0,11 1/6 (−0,14) |
+| jakość 2★ | baza | +0,05 6/6 (+0,06) | −0,03 1/6 (−0,03) |
+| jakość 3★ | +0,05 5/6 (+0,07) | −0,02 2/6 (+0,02) | baza |
+| cena 0,85 | −0,02 (−0,02) | +0,01 (+0,00) | −0,16 (−0,19) |
+| cena 1,0 | −0,04 (−0,04) | −0,05 (−0,05) | −0,04 (−0,05) |
+| cena 1,15 | −0,12 (−0,13) | −0,05 (−0,05) | +0,01 (+0,02) |
+| cena 1,3 | −0,18 (−0,18) | −0,14 (−0,15) | +0,02 (+0,03) |
+
+Przed (b7_cena, stara krzywa): zrównoważony 3★ +0,25 (12/12), 1★ ≈ 2★. Teraz każdy krok jakości coś daje, ale
+3★ już nie dominuje (+0,05, dopiero w dłuższej grze +0,07), a ceny mają optimum przy cenach strategii (tani
+0,78–0,85, zrównoważony 0,85–0,92, premium 1,08–1,3 – płasko). Tani na 2★ zyskuje +0,05 (6/6): przy większej
+kuchni nie musi już oszczędzać na jakości – zostawiam 1★ jako charakter strategii (różnorodność rywali), do
+decyzji przy B8 (boty). Karta bazowa 18r: zrównoważony 0,57 → 0,63, tani 0,29 → 0,44, premium 0,40 → 0,26 (niższy
+mnożnik 3★; premium ma też tylko 5 dań – zob. `notatki_do_zmiany.md`, „szerokie menu”). Wdrożone:
+`zalozenia.yaml: popyt.wspolczynniki_jakosci` (1★ 0,616 → 0,55, 3★ 1,0 → 0,82, 2★ bez zmian – pule B5) i
+`boty.yaml: tani.min_kuchnia` 1 → 2. Testy bez zmian (380 zielonych – żaden nie liczył na krzywej jakości).
+Sprawdzenie trudności B5 po zmianie – pomiar `b7_trudnosc`.

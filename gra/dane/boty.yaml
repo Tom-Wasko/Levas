@@ -135,7 +135,7 @@ strategie:
     higiena: podstawowa          # gra z lokalami: poziom higieny (dane/zdarzenia/urzad.yaml)
   tani:
     nazwa: Tani Kebab Nocny
-    min_kuchnia: 1
+    min_kuchnia: 2               # B7: z jednym miejscem kolejka zjadała połowę popytu (b7_cena, b7_jakosc)
     cena: 0.78
     jakosc: 1
     uslugi: 8
