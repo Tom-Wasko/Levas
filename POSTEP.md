@@ -28,7 +28,7 @@ Pełna historia kroków 1–6 (F2–F4, poprawki P/Q, Z1–Z6, A1–A3, U1–U24
 Kolejność pracy (od najtrudniejszych): UF15 → UF12 → UF13 → UF11 → UF20 → UF21+UF10 → UF22 → UF19 → UF18 → UF17 → UF14 →
 UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (w nawiasie numer poprawki autora).
 - [x] UF0 Sprzątanie Pulpit\Levas i repo, notatki zaktualizowane, plan i przekazanie (89db989)
-- [ ] UF23 (11) Redakcja kart wyników, Wniosków i widoków „Wyniki” wszystkich zakładek
+- [x] UF23 (11) Redakcja wyników: „Tydzień w liczbach” (strzałki względem poprzedniej rundy, historia tygodnia, 3 najważniejsze sprawy), w zakładkach zdanie + kafelki + zwijane tabele
 - [x] UF22 (20) Lista zadań po prawej (z sytuacji + własne drużyny, odhaczają się same, nieodhaczone przechodzą dalej)
 - [x] UF21 (10) Formy zatrudnienia (pół etatu, student, staż, B2B) + przełączniki w panelu MG (tymczasowe)
 - [x] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
@@ -41,7 +41,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF12 Środki trwałe → KPiR (ewidencja i odpisy), sprzedaż sprzętu w Wnętrzu z uwagą o amortyzacji; zakładka usunięta
 - [x] UF11 Ranking w Wynikach: tabela drużyn (miejsce, zmiana, średnia i ostatnia karta, majątek) + wykres miejsc
 - [x] UF10 (4) Zlecenie bez ZUS pracodawcy, student <26 – forma „zlecenie ze studentem” (razem z UF21)
-- [ ] UF9 (16) Nowe udogodnienia (do rundy 14, kot zakładowy)
+- [x] UF9 (16) 10 nowych udogodnień z opisem (rundy 5–14, kot zakładowy), boty wybierają jak dotąd
 - [ ] UF8 (13) Falafel – bójka
 - [ ] UF7 (8) 4 słupki sezonowości w kafelku dania
 - [ ] UF6 (3) Terminy odblokowań

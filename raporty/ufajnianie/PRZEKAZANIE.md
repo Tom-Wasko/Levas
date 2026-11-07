@@ -136,7 +136,24 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   `styl.css`: `.siatka.trojka`, `.dash`, `.trzy` – `repeat(auto-fit, minmax(min(100%, max(240px|220px,
   (100% − 32px)/3)), 1fr))` → najwyżej 3 kolumny, 2 elementy wypełniają wiersz, na wąskim ekranie mniej; usunięte
   nadpisania `.siatka.trojka` w @media. Sprawdzone renderem (node) i zrzutem z headless Chrome (1150 px i 400 px).
-- Następne kolejno: UF23 → UF9…UF1 → UF24.
+- [x] UF23 – redakcja wyników. Silnik `silnik/wyniki/wnioski.py`: `tydzien(dane, w, wp)` – 6 liczb tygodnia
+  (klienci, odeszli, przychody, koszty, dochód netto, saldo) z wartością z poprzedniej rundy i kierunkiem „lepiej”,
+  zdania: najlepszy dzień (`klienci.dni`), najchętniej brane danie, co zjadło zysk (grupa kosztów + największa pozycja
+  KPiR, pomijana przy składnikach); `wnioski(…, wp)` chwali wzrost klientów (próg `zalozenia.yaml: wnioski.
+  wzrost_klientow`) i lepszy dochód. `api/prezentacja.py`: `v.tydzien`, wp = `poprzedni.wyniki[runda-2][firma]`.
+  Panel `wspolne.js`: `podsumowanie`, `strzalka`, `kafelkiLiczb`, `zwin`/`zwinTabela` (stan zwinięcia w module,
+  `app.js` łapie `toggle` w fazie przechwytywania), `brakWynikow`; style `.podsumowanie`, `.liczby-wynikow .lw`,
+  `.delta`, `details.szczegoly`, `.tydzien`, `.sprawy`. `ogolne.js`: `tydzienHtml` na karcie (z 3 sprawami z
+  `wnioski.do_poprawy` i odsyłaczem) i we Wnioskach (bez spraw), zdanie o wyniku działalności i miejscu; tabele
+  zespołów i „sprawy kebabowe” zwijane. Pozostałe zakładki (≈30 widoków „Wyniki”) – dwóch agentów Sonnet wg wzoru
+  `sprzedaz.js`; pomocniki dzielone z decyzjami dostały opcjonalne `zw`/`zwijane` (domyślnie po staremu).
+  Sprawdzone: render node (3 zrzuty widoków, 0 błędów), zrzuty headless (karta, sprzedaż, raport, konkurencja).
+- [x] UF9 – 10 nowych udogodnień w `dane/katalog.yaml` (piłkarzyki, kot zakładowy, prysznic, szafki, mata, puchar,
+  ekspres do herbaty, neon, akwarium, hamak; rundy 5–14), nowe pole `opis` (schemat `Udogodnienie`, kafelek w
+  `inwestycje.js: kafleUdogodnien`). Ceny tak, by boty kupowały jak dotąd: cena/procent > 37,5 (gorzej niż
+  klimatyzacja), przed rundą 9 tylko ≥ 1500 zł – sprawdzone grą 5 botów × 3 ziarna × poziom średni i trudny
+  (udogodnienia i gotówka identyczne przed/po). Test `test_dane.py: test_nowe_udogodnienia_nie_zmieniaja_wyboru_botow_uf9`.
+- Następne kolejno: UF8 → UF7 → UF6 → UF5 → UF4 → UF3 → UF2 → UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

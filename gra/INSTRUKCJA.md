@@ -76,6 +76,14 @@ przy omawianiu rundy, a na wynik gry nie ma to wpływu. Mistrz gry może ustawi�
 Po przeliczeniu rundy ramka **Dlaczego wynik się zmienił?** (Dashboard i Wnioski z rundy) w 1–3 zdaniach mówi,
 który wskaźnik karty zmienił się najbardziej i która pozycja – np. zakup sprzętu albo czynsz – zaważyła na wyniku.
 
+Na górze Karty wyników (i Wniosków z rundy) stoi **Tydzień w liczbach**: klienci obsłużeni i ci, którzy odeszli
+bez kebaba, przychody, koszty, dochód netto i saldo konta – ze strzałką ▲/▼ pokazującą zmianę od poprzedniej
+rundy (zielona – na lepsze, czerwona – na gorsze). Pod liczbami trzy zdania o tygodniu: najlepszy dzień,
+najchętniej brane danie i co najbardziej zjadło zysk, a na Karcie wyników jeszcze **3 najważniejsze sprawy** na
+następną rundę z odnośnikiem do właściwej zakładki. Widoki **Wyniki** pozostałych zakładek zaczynają się od
+1–2 zdań podsumowania i kafelków z najważniejszymi liczbami; szczegółowe tabele są zwinięte – kliknij nagłówek
+(▸), żeby je rozwinąć. Gra pamięta, które sekcje są rozwinięte.
+
 Po ostatniej rundzie gra otwiera się na **podsumowaniu** (🏁 na osi rund): wyniki ostatniego tygodnia i końcowe
 miejsce w rankingu. Wcześniejsze rundy dalej obejrzysz strzałkami.
 
@@ -263,7 +271,8 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
     ale chce ok. 25% więcej niż na etacie.
   Mistrz gry może część form wyłączyć – wtedy w oknie zatrudnienia ich nie ma.
 - **Szkolenie** obejmuje całą załogę i działa w tygodniu, w którym je kupisz (cena w tabeli jest za tydzień).
-- **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3)
+- **Zadowolenie pracowników** rośnie z płacą bliską oczekiwanej, dobrym sprzętem, udogodnieniami (od tygodnia 3;
+  co kilka tygodni dochodzą nowe – aż po kota zakładowego i hamak na zapleczu)
   i szkoleniami (od tygodnia 7). Spada przez przepracowanie (pracownik zajęty prawie cały tydzień), słaby sprzęt
   i umowę zlecenie. Gra liczy je **dla każdej osoby** – zobaczysz je w profilu pracownika i w wynikach.
 - **Niezadowoleni odchodzą.** Kto ma zadowolenie poniżej progu, dostaje ostrzeżenie na liście błędów (z powodami

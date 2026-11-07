@@ -146,6 +146,68 @@ udogodnienia:
     cena: 4000
     utrzymanie: 0
     od_rundy: 8
+  # UF9: nowe udogodnienia (rundy 5–14); cena za punkt procentu > 37,5 zł (gorsza niż klimatyzacja), przed rundą 9
+  # tylko drogie (≥ 1500 zł) – boty (wg ceny za punkt, 2–3 sztuki, do rundy 8 komplet) wybierają jak dotąd
+  - nazwa: Piłkarzyki na zapleczu
+    procent: 25
+    cena: 1600
+    utrzymanie: 0
+    od_rundy: 5
+    opis: 'Mecz do 5 bramek w przerwie. Przegrany myje frytownicę.'
+  - nazwa: Mata do jogi i hantle
+    procent: 10
+    cena: 450
+    utrzymanie: 0
+    od_rundy: 9
+    opis: 'Kręgosłup po ośmiu godzinach przy rożnie mówi dziękuję.'
+  - nazwa: Kot zakładowy
+    procent: 35
+    cena: 1500
+    utrzymanie: 150
+    od_rundy: 6
+    opis: 'Mruczek z adopcji: kuweta, drapak i karma (to utrzymanie). Na sali się nie pokazuje, na zapleczu rządzi.'
+  - nazwa: Szafki z zamkiem
+    procent: 18
+    cena: 900
+    utrzymanie: 0
+    od_rundy: 9
+    opis: 'Każdy ma swoją szafkę na kurtkę i telefon – koniec z plecakami na workach z cebulą.'
+  - nazwa: Ekspres do herbaty i zioła
+    procent: 12
+    cena: 600
+    utrzymanie: 30
+    od_rundy: 11
+    opis: 'Dla tych, co już nie mogą patrzeć na kawę z automatu.'
+  - nazwa: Puchar pracownika tygodnia
+    procent: 12
+    cena: 600
+    utrzymanie: 0
+    od_rundy: 10
+    opis: 'Złota łopatka do kebaba na półce. Kto ją dostaje, ten wybiera muzykę w kuchni.'
+  - nazwa: Prysznic dla pracowników
+    procent: 30
+    cena: 3500
+    utrzymanie: 60
+    od_rundy: 7
+    opis: 'Po zmianie przy grillu nikt nie chce wracać tramwajem pachnąc czosnkiem.'
+  - nazwa: Neon „Kocham kebab”
+    procent: 8
+    cena: 700
+    utrzymanie: 10
+    od_rundy: 12
+    opis: 'Świeci na różowo nad zmywakiem. Nikt nie wie po co, wszyscy robią sobie przy nim zdjęcia.'
+  - nazwa: Akwarium z rybkami
+    procent: 15
+    cena: 1300
+    utrzymanie: 40
+    od_rundy: 13
+    opis: 'Patrzenie na rybki uspokaja – nawet w piątek o 23:00, gdy kolejka sięga drzwi.'
+  - nazwa: Hamak na zapleczu
+    procent: 12
+    cena: 520
+    utrzymanie: 0
+    od_rundy: 14
+    opis: 'Piętnaście minut drzemki w przerwie. Budzik obowiązkowy, chrapanie zabronione.'
 wyposazenie:
   zrodlo: Inwestycje – wyposażenie r9 (gra ATH); cena = 2 × cena sprzedaży; parking i terminal – cena zakupu nieznana (sprzedaż
     0); sklep – notatka „Elementy mapy” (Leroy Merlin, IKEA, OBI, Jula, Castorama), przypisanie – założenie F3a.6

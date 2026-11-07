@@ -313,6 +313,7 @@ class Udogodnienie(Schemat):
     utrzymanie: float
     od_rundy: int = 1
     sklep: str | None = None      # gra z lokalami: sklep budowlany / meblowy na mapie (F3a.6)
+    opis: str | None = None       # UF9: krótki opis w kafelku (panel)
 
 
 class Medium(Schemat):
