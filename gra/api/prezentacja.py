@@ -52,7 +52,7 @@ from silnik.rynek import reklama as rk
 from silnik.rynek.popyt import rozruch, widok_popytu
 from silnik.swiat import awarie as aw
 from silnik.swiat import zdarzenia as zd
-from silnik.wyniki.wnioski import dlaczego, wnioski
+from silnik.wyniki.wnioski import dlaczego, tydzien, wnioski
 
 
 def _firma_slownik(f: Firma) -> dict:
@@ -289,8 +289,10 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
     if runda - 1 in poprzedni.wyniki:
         w = poprzedni.wyniki.get(runda - 1, {})
         v["wyniki"] = w.get(firma)
-        v["wnioski"] = wnioski(dane, v["wyniki"])   # zakładka „Wnioski z rundy”
+        v["wnioski"] = wnioski(dane, v["wyniki"], poprzedni.wyniki.get(runda - 2, {}).get(firma))   # „Wnioski z rundy”
         v["dlaczego"] = dlaczego(dane, v["wyniki"], poprzedni.wyniki.get(runda - 2, {}).get(firma))   # U16
+        # UF23: „Tydzień w liczbach” – liczby rundy z poprzednią (strzałki) i zdania-historie tygodnia
+        v["tydzien"] = tydzien(dane, v["wyniki"], poprzedni.wyniki.get(runda - 2, {}).get(firma))
         v["rynek"] = poprzedni.rynek.get(runda - 1)
         v["karta_skumulowana"] = karta_skumulowana(gra, runda - 1) if runda - 1 >= 2 else {}
         v["dzielnik_karty"] = dane.z["karta_wynikow"]["wynik_ekonomiczny_dzielnik"]

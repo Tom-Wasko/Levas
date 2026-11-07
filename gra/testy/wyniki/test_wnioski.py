@@ -3,7 +3,7 @@
 from pomocnicze import _gra, _lokal, _runda
 
 from silnik.dane import dane_domyslne
-from silnik.wyniki.wnioski import dlaczego, wnioski
+from silnik.wyniki.wnioski import dlaczego, tydzien, wnioski
 
 D = dane_domyslne()
 
@@ -104,3 +104,27 @@ def test_dlaczego_w_widoku_druzyny():
     _runda(g)
     _runda(g)
     assert widok(g, "A")["dlaczego"][0].startswith("Wynik działalności")
+
+
+def test_tydzien_w_liczbach_uf23():
+    assert tydzien(D, None, None) is None
+    dni = [{"dzien": "pn", "sprzedaz": 40, "utracona": 5}, {"dzien": "pt", "sprzedaz": 90, "utracona": 12},
+           {"dzien": "nd", "sprzedaz": 0, "utracona": 0}]
+    kpir = {**_w()["kpir"], "pozycje": [{"opis": "Czynsz najmu: ul. Lipowa", "pozostale": 280.0},
+                                         {"opis": "Wynagrodzenia: kucharz", "wynagrodzenia": 1200.0},
+                                         {"opis": "Sprzedaż", "przychod": 3000.0}]}
+    w = _w(sprzedaz={"kebab_box": _danie(100, 90, 90), "talerz_kebab": _danie(50, 40, 40)}, kpir=kpir,
+           klienci={"dni": dni}, gotowka=9000.0)
+    wp = _w(sprzedaz={"kebab_box": _danie(100, 100, 100)}, gotowka=8000.0)
+    t = tydzien(D, w, wp)
+    liczby = {x["klucz"]: x for x in t["liczby"]}
+    assert liczby["klienci"]["wartosc"] == 130 and liczby["klienci"]["poprzednia"] == 100
+    assert liczby["utracona"]["lepiej"] == -1 and liczby["utracona"]["wartosc"] == 20
+    assert liczby["gotowka"]["poprzednia"] == 8000.0 and liczby["dochod_netto"]["format"] == "zl"
+    zdania = " ".join(t["zdania"])
+    assert "Najlepszy dzień: piątek – 90 klientów, 12 odeszło" in zdania
+    assert "Kebab box – 90 porcji (69% sprzedaży)" in zdania
+    assert "Zysk najbardziej zjadły pensje" in zdania and "„Wynagrodzenia”" in zdania and "40 gr" in zdania
+    assert all(x["poprzednia"] is None for x in tydzien(D, w, None)["liczby"])   # pierwsza runda – bez strzałek
+    dobre = " ".join(wnioski(D, w, wp)["dobre"])
+    assert "100 → 130 (+30%)" in dobre

@@ -1,6 +1,6 @@
 // Sprzedaż: wyniki sprzedaży na tle konkurencji (tylko wyniki); ceny i rabaty wpisuje się w kafelkach dań w Menu (oferta.js),
 // tu – obsługa ich pól (cena, rabat).
-import { esc, licz, nazwaUslugi, tabela, toast, wykres, zl, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, licz, nazwaUslugi, podsumowanie, proc, toast, wykres, zl, zl2, zwinTabela } from "./wspolne.js";
 import { cenyLokalu, lokalWybrany, zapiszWLokalu } from "./lokal_wybor.js";
 
 const grosze = (x) => Math.round(x * 100) / 100;
@@ -25,14 +25,27 @@ export const sprzedaz = {
     const own = Object.entries(sp).map(([u, s]) => [esc(nazwaUslugi(kat, u)), licz(s.popyt), licz(s.sprzedaz),
       s.utracona ? `<span class="minus">${licz(s.utracona)}</span>` : "0", esc(s.przyczyna), licz(s.reklamacje), zl(s.przychod)]);
     const nag = firmy.map((f) => `${f === v.firma ? "<u>" : ""}${esc(r.firmy[f])}${f === v.firma ? "</u>" : ""}`);
-    return tabela("Zestawienie popytu na dania", ["Danie", ...nag], popyt, { klasy: ["l"] })
-      + `<div class="wykres"><canvas id="w-popyt"></canvas></div>`
-      + tabela("Sprzedaż vs utracona sprzedaż", ["Danie", "Popyt", "Sprzedaż", "Utracona sprzedaż", "Przyczyna", "Reklamacje", "Przychód"], own,
+    // UF23: podsumowanie i kafelki na górze, tabele szczegółów zwijane
+    const S = Object.values(sp), suma = (k) => S.reduce((a, s) => a + (s[k] || 0), 0);
+    const chetni = suma("popyt"), obsl = suma("sprzedaz"), utr = suma("utracona");
+    const najg = Object.entries(sp).sort((a, b) => b[1].utracona - a[1].utracona)[0];
+    const lead = !S.length ? brakWynikow("Sprzedaż pojawi się w wynikach, gdy lokal zacznie działać.") : podsumowanie([
+      `Obsłużyliście <b>${licz(obsl)}</b> z ${licz(chetni)} chętnych (${proc(chetni ? obsl / chetni : 0, 0)}).`,
+      utr >= 1 ? `Najwięcej klientów odeszło przy daniu ${esc(nazwaUslugi(kat, najg[0]))} – ${licz(najg[1].utracona)}, przyczyna: ${esc(najg[1].przyczyna || "–")}.`
+        : "Nikt nie odszedł bez kebaba – kuchnia, kasa i składniki dały radę."], utr / (chetni || 1) >= 0.1 ? "uwaga" : "ok");
+    const kafle = S.length ? kafelkiLiczb([
+      { etykieta: "Chętni", wartosc: licz(chetni) }, { etykieta: "Obsłużeni", wartosc: licz(obsl), opis: proc(chetni ? obsl / chetni : 0, 0) + " chętnych" },
+      { etykieta: "Odeszli bez kebaba", wartosc: licz(utr), ton: utr >= 1 ? "minus" : "plus" },
+      { etykieta: "Przychód ze sprzedaży", wartosc: zl(suma("przychod")) }, { etykieta: "Reklamacje", wartosc: licz(suma("reklamacje")), ton: suma("reklamacje") ? "minus" : "" }]) : "";
+    return lead + kafle
+      + `<div class="wykres"><canvas id="w-sprzedaz"></canvas></div>`
+      + zwinTabela("Sprzedaż vs utracona sprzedaż", ["Danie", "Popyt", "Sprzedaż", "Utracona sprzedaż", "Przyczyna", "Reklamacje", "Przychód"], own,
         { klasy: ["l"], stopka: ["Razem", licz(Object.values(sp).reduce((a, s) => a + s.popyt, 0)), licz(Object.values(sp).reduce((a, s) => a + s.sprzedaz, 0)),
           licz(Object.values(sp).reduce((a, s) => a + s.utracona, 0)), "", licz(Object.values(sp).reduce((a, s) => a + s.reklamacje, 0)),
-          zl(Object.values(sp).reduce((a, s) => a + s.przychod, 0))] })
-      + `<div class="wykres"><canvas id="w-sprzedaz"></canvas></div>`
-      + tabela("Ceny dań z rabatem", ["Danie", ...nag], ceny, { klasy: ["l"] });
+          zl(Object.values(sp).reduce((a, s) => a + s.przychod, 0))], otwarte: true })
+      + `<div class="wykres"><canvas id="w-popyt"></canvas></div>`
+      + zwinTabela("Zestawienie popytu na dania", ["Danie", ...nag], popyt, { klasy: ["l"] })
+      + zwinTabela("Ceny dań z rabatem", ["Danie", ...nag], ceny, { klasy: ["l"] });
   },
   po({ v, kat }, tryb) {
     if (tryb !== "wyniki") return;

@@ -42,8 +42,9 @@ def _lista(nazwy: list[str]) -> str:
     return ", ".join(nazwy)
 
 
-def wnioski(dane: Dane, w: dict | None) -> dict | None:
-    """{"dobre": [tekst], "do_poprawy": [{tytul, co, rada, zakladka}]} z wyników firmy; None – brak wyników."""
+def wnioski(dane: Dane, w: dict | None, wp: dict | None = None) -> dict | None:
+    """{"dobre": [tekst], "do_poprawy": [{tytul, co, rada, zakladka}]} z wyników firmy; None – brak wyników.
+    `wp` – wyniki poprzedniej rundy (UF23: wzrost sprzedaży i dochodu z liczbami)."""
     if not w:
         return None
     p = dane.z["wnioski"]
@@ -61,6 +62,12 @@ def wnioski(dane: Dane, w: dict | None) -> dict | None:
             dobre.append("Nikt nie odszedł z kolejki – kuchnia, kasa i składniki dały radę.")
     if netto > 0:
         dobre.append(f"Runda na plusie: {zl(netto)} dochodu netto.")
+    przed = _liczby(wp)
+    if przed.get("klienci") and klienci > przed["klienci"] * 1.05:   # UF23: wzrost względem poprzedniej rundy
+        dobre.append(f"Klientów więcej niż tydzień wcześniej: {round(przed['klienci'])} → {klienci} "
+                     f"(+{round(100 * (klienci / przed['klienci'] - 1))}%).")
+    if przed.get("dochod_netto") is not None and netto > 0 and netto > przed["dochod_netto"] + 1:
+        dobre.append(f"Dochód netto lepszy niż tydzień wcześniej o {zl(netto - przed['dochod_netto'])}.")
     ks = w.get("ksiegowosc") or {}
     if ks.get("tryb") == "deklaracja" and not ks.get("kara"):
         dobre.append("Deklaracje złożone samodzielnie i bez błędów.")
@@ -241,3 +248,58 @@ def dlaczego(dane: Dane, w: dict | None, wp: dict | None) -> list[str] | None:
         zdania.append("Przy stracie wynik działalności to sam (ujemny) wynik ekonomiczny – zadowolenie i rozwój "
                       "zaczną się liczyć, gdy firma wyjdzie na plus.")
     return zdania
+
+
+# UF23: „Tydzień w liczbach” – nagłówek karty wyników i wniosków: najważniejsze liczby rundy z poprzednią rundą
+# (strzałki w panelu) i 1–3 zdania-historie tygodnia (najlepszy dzień, najchętniej brane danie, co zjadło zysk)
+DNI = {"pn": "poniedziałek", "wt": "wtorek", "śr": "środa", "czw": "czwartek", "pt": "piątek", "sob": "sobota",
+       "nd": "niedziela"}
+KOSZTY = {"towary": "składniki", "wynagrodzenia": "pensje", "pozostale": "pozostałe koszty (czynsz, utrzymanie, reklama)"}
+
+
+def _liczby(w: dict | None) -> dict[str, float | None]:
+    if not w:
+        return {}
+    sp = (w.get("sprzedaz") or {}).values()
+    kpir = w.get("kpir") or {}
+    return {"klienci": sum(v["sprzedaz"] for v in sp), "utracona": sum(v["utracona"] for v in sp),
+            "przychody": kpir.get("przychody"), "koszty": kpir.get("koszty"),
+            "dochod_netto": kpir.get("dochod_netto"), "gotowka": w.get("gotowka")}
+
+
+def tydzien(dane: Dane, w: dict | None, wp: dict | None) -> dict | None:
+    """{"liczby": [{klucz, etykieta, wartosc, poprzednia, format, lepiej}], "zdania": [tekst]}; None – brak wyników.
+    `lepiej` 1 – więcej znaczy lepiej, −1 – mniej (utracona sprzedaż, koszty); `poprzednia` None w pierwszej rundzie."""
+    if not w:
+        return None
+    teraz, przed = _liczby(w), _liczby(wp)
+    opis = [("klienci", "Obsłużeni klienci", "liczba", 1), ("utracona", "Odeszli bez kebaba", "liczba", -1),
+            ("przychody", "Przychody", "zl", 1), ("koszty", "Koszty", "zl", -1),
+            ("dochod_netto", "Dochód netto", "zl", 1), ("gotowka", "Saldo konta", "zl", 1)]
+    liczby = [{"klucz": k, "etykieta": e, "wartosc": teraz[k], "poprzednia": przed.get(k), "format": f, "lepiej": lp}
+              for k, e, f, lp in opis if teraz.get(k) is not None]
+    zdania = []
+    dni = [d for d in ((w.get("klienci") or {}).get("dni") or []) if d.get("sprzedaz")]
+    if dni:
+        naj = max(dni, key=lambda d: d["sprzedaz"])
+        zdania.append(f"Najlepszy dzień: {DNI.get(naj['dzien'], naj['dzien'])} – {round(naj['sprzedaz'])} klientów"
+                      + (f", {round(naj['utracona'])} odeszło bez kebaba." if naj.get("utracona", 0) >= 1 else "."))
+    sprzedaz = {u: v for u, v in (w.get("sprzedaz") or {}).items() if v["sprzedaz"] > 0}
+    if sprzedaz:
+        u = max(sprzedaz, key=lambda x: sprzedaz[x]["sprzedaz"])
+        razem = sum(v["sprzedaz"] for v in sprzedaz.values())
+        zdania.append(f"Najchętniej brane: {dane.uslugi[u]['nazwa']} – {round(sprzedaz[u]['sprzedaz'])} porcji "
+                      f"({round(100 * sprzedaz[u]['sprzedaz'] / razem)}% sprzedaży).")
+    kpir = w.get("kpir") or {}
+    koszty = {k: kpir.get(k, 0) for k in KOSZTY}
+    if any(koszty.values()):
+        k = max(koszty, key=koszty.get)
+        przych = kpir.get("przychody") or 0
+        # największa pozycja KPiR – tylko gdy mówi coś więcej niż grupa („Zakup zasobu” przy składnikach nie mówi)
+        pozycje = {p: -x for p, x in _pozycje(kpir).items() if x < 0} if k != "towary" else {}
+        poz = max(pozycje, key=pozycje.get) if pozycje else None
+        zdania.append((f"Zysk najbardziej zjadły {KOSZTY[k]}: " if przych > 0 else f"Najwięcej kosztowały {KOSZTY[k]}: ")
+                      + zl(koszty[k])
+                      + (f" ({round(100 * koszty[k] / przych)} gr z każdej złotówki przychodu)" if przych > 0 else "")
+                      + (f"; największa pozycja – „{poz}”: {zl(pozycje[poz])}." if poz else "."))
+    return {"liczby": liczby, "zdania": zdania}

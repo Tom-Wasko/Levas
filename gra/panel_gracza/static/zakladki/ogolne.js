@@ -1,5 +1,5 @@
 // Pulpit, karta wyników, lista błędów, wysyłanie decyzji.
-import { esc, godzina, inicjaly, inwestorHtml, RANKING_DLACZEGO, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, godzina, kafelkiLiczb, podsumowanie, strzalka, zwinTabela, inicjaly, inwestorHtml, RANKING_DLACZEGO, termin as terminSlownie, naOkres, naRunde, OKRES, gw, KOLORY_FIRM, licz, marka, nazwaFirmy, nazwaUslugi, proc, tabela, toast, wsk, wykres, zl, zl2 } from "./wspolne.js";
 import { ikona } from "./ikony.js";
 
 const WSKAZNIKI = [["wynik_dzialalnosci", "Wynik działalności"], ["wynik_ekonomiczny", "Wynik ekonomiczny"],
@@ -38,6 +38,25 @@ function dlaczegoHtml(v) {
     <a href="#" data-zakladka-k="karta_wynikow">Karta wyników</a></div>`;
 }
 
+// UF23: „Tydzień w liczbach” (silnik/wyniki/wnioski.py: tydzien) – kafelki z porównaniem z poprzednią rundą,
+// zdania-historie tygodnia i 3 najważniejsze sprawy z wniosków (z odsyłaczem do zakładki)
+function tydzienHtml(v, tytulZakladki, { sprawy = true } = {}) {
+  const T = v.tydzien;
+  if (!T) return "";
+  const fmt = (f) => (f === "zl" ? zl : licz);
+  const kafle = T.liczby.map((x) => ({ etykieta: esc(x.etykieta), wartosc: fmt(x.format)(x.wartosc),
+    delta: strzalka(x.wartosc, x.poprzednia, { lepiej: x.lepiej, format: fmt(x.format), prog: x.format === "zl" ? 1 : 0.5 }),
+    ton: x.klucz === "dochod_netto" ? (x.wartosc >= 0 ? "plus" : "minus") : "" }));
+  const top = sprawy ? (v.wnioski?.do_poprawy || []).slice(0, 3) : [];
+  return `<section class="tydzien"><div class="tydzien-glowa"><span>Tydzień w liczbach</span><span>runda ${v.runda - 1}${
+    T.liczby.some((x) => x.poprzednia != null) ? " · strzałki: zmiana od poprzedniej rundy" : ""}</span></div>
+    ${kafelkiLiczb(kafle)}
+    ${T.zdania.length ? `<ul class="historia-tygodnia">${T.zdania.map((z) => `<li>${esc(z)}</li>`).join("")}</ul>` : ""}
+    ${top.length ? `<div class="sprawy"><b>3 najważniejsze sprawy na tę rundę</b><ol>${top.map((r) => `<li><b>${esc(r.tytul)}</b> – ${esc(r.co)}
+      <a href="#" data-zakladka-k="${esc(r.zakladka)}">${esc(tytulZakladki ? tytulZakladki(r.zakladka) : r.zakladka)} →</a></li>`).join("")}</ol></div>` : ""}
+  </section>`;
+}
+
 // składniki kebabowe karty (gra z lokalami, silnik/wyniki/karta.py → kebab): wskaźnik, miernik, jak pokazać miarę
 const SKLADNIKI_KEBABU = [
   ["zadowolenie_klientow", "kolejki", "Klienci, którzy nie doczekali się obsługi", (m) => proc(m.kolejki)],
@@ -56,7 +75,7 @@ function kartaKebabu(v) {
   const plus = (x) => x ? `<span class="${x > 0 ? "plus" : "minus"}">${x > 0 ? "+" : "−"}${wsk(Math.abs(x))}</span>` : "–";
   const wiersze = [["Zadowolenie klientów", "Cena względem ceny preferowanej w strefie lokalu", proc(K.miary.cena_wzgledem_strefy, 0), "we wzorze"]]
     .concat(SKLADNIKI_KEBABU.map(([s, k, opis, miara]) => [nazwa[s], opis, miara(K.miary), plus(K.skladniki[s]?.[k])]));
-  return tabela("Skąd Twoja karta – sprawy kebabowe", ["Wskaźnik", "Miernik", "W minionym tygodniu", "Poprawka"], wiersze,
+  return zwinTabela("Skąd Twoja karta – sprawy kebabowe", ["Wskaźnik", "Miernik", "W minionym tygodniu", "Poprawka"], wiersze,
     { klasy: ["l", "l"], sortuj: false })
     + `<p class="podpowiedz">Kolejki, braki w menu, mandaty i wypadki obniżają zadowolenie klientów. Kolejki, braki,
       reklamacje, cena i jakość trafiają też do opinii o lokalu (gwiazdki na mapie) – a od nich zależy, ilu klientów
@@ -220,7 +239,7 @@ export const wnioski = {
     const rady = W.do_poprawy.map((r) => `<div class="kafel"><div class="kg">${esc(r.tytul)}</div><div class="kt">
       <p>${esc(r.co)}</p><p><b>Co zrobić:</b> ${esc(r.rada)}</p></div>
       <div class="kd"><a class="btn jasny maly" data-zakladka-k="${esc(r.zakladka)}">Przejdź: ${esc(tytulZakladki(r.zakladka))}</a></div></div>`).join("");
-    return `${dlaczegoHtml(v)}<div class="sekcja-tytul">Runda ${v.runda - 1}: co się udało</div><ul class="wnioski-dobre">${dobre}</ul>
+    return `${tydzienHtml(v, tytulZakladki, { sprawy: false })}${dlaczegoHtml(v)}<div class="sekcja-tytul">Runda ${v.runda - 1}: co się udało</div><ul class="wnioski-dobre">${dobre}</ul>
       <div class="sekcja-tytul">Co poprawić w rundzie ${v.runda}</div>
       ${rady ? `<div class="siatka">${rady}</div><p class="podpowiedz">Nie wszystko naraz – zacznijcie od pierwszej rady.
         Każda poprawka od razu działa w tej rundzie.</p>` : `<div class="komunikat">Nic nie wymaga poprawy – tak trzymać!</div>`}`;
@@ -230,18 +249,24 @@ export const wnioski = {
 export const karta_wynikow = {
   tytul: "Karta wyników", ikona: "☷", wynikiOd: 3, odblokowanie: "karta_wynikow",
   info: () => "Karta wyników pokazuje rezultaty decyzji podjętych w poprzedniej rundzie.",
-  wyniki({ v }) {
+  wyniki({ v, tytulZakladki }) {
     const karty = skumulowana ? v.karta_skumulowana : v.rynek.karta;
+    const moja = karty?.[v.firma], hist = (v.historia || []).filter((x) => x.karta), pop = hist.length > 1 ? hist[hist.length - 2].karta : null;
+    const miejsce = moja ? Object.values(karty).filter((k) => k.wynik_dzialalnosci > moja.wynik_dzialalnosci).length + 1 : null;
+    const lead = moja ? podsumowanie([`Wynik działalności <b>${wsk(moja.wynik_dzialalnosci)}</b>${!skumulowana && pop
+      ? ` ${strzalka(moja.wynik_dzialalnosci, pop.wynik_dzialalnosci, { format: wsk, prog: 0.0005 })}` : ""} – ${miejsce === 1
+      ? "najlepszy wśród wszystkich drużyn." : `${miejsce}. miejsce na ${Object.keys(karty).length} drużyn.`}`,
+    ...(v.dlaczego || []).slice(1).map(esc)], miejsce === 1 ? "ok" : "") : "";
     const firmy = Object.keys(karty || {}).sort((a, b) => karty[b].wynik_dzialalnosci - karty[a].wynik_dzialalnosci);
     const wiersze = firmy.map((f) => [`${f === v.firma ? "<b>" : ""}${esc(nazwaFirmy(v, f))}${f === v.firma ? "</b>" : ""}`,
       ...WSKAZNIKI.map(([k]) => `<span class="ocena-tekst ${ocena(v.skala_karty, k, karty[f][k])?.[0] || ""}">${wsk(karty[f][k])}</span>`),
       zl(v.majatek_firm?.[f])]);
-    return `<div style="display:flex;gap:10px;justify-content:center">
+    return `${skumulowana ? "" : tydzienHtml(v, tytulZakladki)}${lead}<div style="display:flex;gap:10px;justify-content:center">
         <button class="btn ${skumulowana ? "jasny" : "pom"}" data-akcja="karta-skum" data-s="0">Karta wyników</button>
         <button class="btn ${skumulowana ? "pom" : "jasny"}" data-akcja="karta-skum" data-s="1" ${v.odblokowane.includes("karta_skumulowana") ? "" : "disabled"}>Skumulowana karta wyników</button></div>
       ${karty?.[v.firma] ? `<div class="sekcja-tytul">${skumulowana ? "Twoja skumulowana karta" : "Twoja karta"} – niski, średni czy dobry?</div>
         ${skalaKarty(v, karty[v.firma])}` : ""}
-      ${tabela("Karty wszystkich zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n), "Majątek netto"], wiersze, { klasy: ["l"] })}
+      ${zwinTabela("Karty wszystkich zespołów", ["Firma", ...WSKAZNIKI.map(([, n]) => n), "Majątek netto"], wiersze, { klasy: ["l"], otwarte: true })}
       <p class="podpowiedz">${RANKING_DLACZEGO} Majątek netto – stan na koniec ostatniej przeliczonej rundy.</p>
       ${kartaKebabu(v)}
       <div class="wykres"><canvas id="w-karta"></canvas></div>

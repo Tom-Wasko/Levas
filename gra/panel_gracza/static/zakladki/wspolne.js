@@ -115,6 +115,41 @@ export function tabela(tytul, naglowki, wiersze, { stopka = null, klasy = [], so
   return `${tytul ? `<div class="tabela-tytul">${tytul}</div>` : ""}<div class="tab-wrap"><table class="t"><thead><tr>${th}</tr></thead><tbody>${tr}${brak}</tbody>${tf}</table></div>`;
 }
 
+// --- UF23: redakcja wyników – zdanie-podsumowanie na górze widoku, kafelki najważniejszych liczb (ze strzałką
+// względem poprzedniej rundy), szczegóły (tabele) zwijane. Stan zwinięcia pamiętany per sekcja (app.js: toggle).
+export function podsumowanie(zdania, ton = "") {
+  const z = (Array.isArray(zdania) ? zdania : [zdania]).filter(Boolean);
+  return z.length ? `<div class="podsumowanie ${ton}">${z.join(" ")}</div>` : "";
+}
+// ▲/▼ i różnica; lepiej = 1 – więcej znaczy lepiej, −1 – mniej (koszty, straty), 0 – bez oceny (szara)
+export function strzalka(teraz, przed, { lepiej = 1, format = licz, prog = 0.5 } = {}) {
+  if (teraz == null || przed == null) return "";
+  const d = teraz - przed;
+  if (Math.abs(d) < prog) return `<span class="delta rowno" title="Tydzień wcześniej: ${format(przed)}">= bez zmian</span>`;
+  const ton = !lepiej ? "rowno" : d * lepiej > 0 ? "plus" : "minus";
+  return `<span class="delta ${ton}" title="Tydzień wcześniej: ${format(przed)}">${d > 0 ? "▲" : "▼"} ${format(Math.abs(d))}</span>`;
+}
+// kafelki: [{etykieta, wartosc (HTML), delta (HTML ze strzalka), opis, ton: "plus"|"minus"|""}]; puste pozycje pomijane
+export function kafelkiLiczb(lista) {
+  const l = lista.filter(Boolean);
+  return l.length ? `<div class="liczby-wynikow">${l.map((x) => `<div class="lw ${x.ton || ""}"><span class="etykieta">${x.etykieta}</span>
+    <b>${x.wartosc}</b>${x.delta || ""}${x.opis ? `<span class="opis">${x.opis}</span>` : ""}</div>`).join("")}</div>` : "";
+}
+const _zwiniecia = {};   // klucz sekcji → otwarta (true/false) – zmienione ręcznie przez gracza
+export function zapamietajZwiniecie(d) { if (d?.dataset?.zwin) _zwiniecia[d.dataset.zwin] = d.open; }
+export function zwin(tytul, html, { otwarte = false, klucz = null, licznik = null } = {}) {
+  const k = klucz || _tekst(tytul), o = _zwiniecia[k] ?? otwarte;
+  return `<details class="szczegoly" data-zwin="${esc(k)}" ${o ? "open" : ""}><summary>${tytul}${licznik != null
+    ? ` <span class="licznik">${licznik}</span>` : ""}</summary><div class="szczegoly-tresc">${html}</div></details>`;
+}
+// tabela szczegółów w zwijanej sekcji (tytuł tabeli staje się nagłówkiem sekcji; liczba wierszy obok)
+export function zwinTabela(tytul, naglowki, wiersze, opcje = {}) {
+  const { otwarte = false, ...reszta } = opcje;
+  return zwin(tytul, tabela(tytul, naglowki, wiersze, reszta), { otwarte, licznik: wiersze.length || null });
+}
+// „Wyniki pojawią się po pierwszej rundzie” – jednakowo we wszystkich zakładkach
+export const brakWynikow = (tekst = "Wyniki pojawią się po przeliczeniu pierwszej rundy.") => `<p class="podpowiedz">${tekst}</p>`;
+
 let _okno = null;
 export function okno(tytul, html, { male = false, srednie = false, przyciski = "" } = {}) {
   zamknijOkno();

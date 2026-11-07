@@ -1,5 +1,5 @@
 // Interfejs gry: menu, nawigacja po rundach, DECYZJE / WYNIKI, zapisywanie roboczych decyzji.
-import { esc, godzina, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zl }
+import { esc, godzina, nazwaRundy, OKRES, okno, przelaczSortowanie, skrotRundy, toast, ustawKalendarz, wyczyscWykresy, zamknijOkno, zapamietajZwiniecie, zl }
   from "./zakladki/wspolne.js";
 import ZAKLADKI, { ALIAS, ELEMENT, IKONY, MENU, OD_RUNDY } from "./zakladki/index.js";
 import { ikona } from "./zakladki/ikony.js";
@@ -343,6 +343,8 @@ document.addEventListener("keydown", (e) => {
 
 // zmiana motywu: wykresy biorą kolory z motywu, więc widok rysujemy od nowa
 document.addEventListener("motyw", () => { if (S.v) rysuj(); });
+// UF23: zwijane szczegóły wyników (wspolne.js: zwin) – pamiętaj, co gracz rozwinął albo zwinął (toggle nie bąbelkuje)
+document.addEventListener("toggle", (e) => zapamietajZwiniecie(e.target), true);
 
 window.addEventListener("hashchange", () => {
   const [h, tryb] = location.hash.slice(1).split("/");

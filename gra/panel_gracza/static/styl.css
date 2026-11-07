@@ -544,3 +544,42 @@ table.kalkulator tr.klik { cursor: pointer; }
 table.kalkulator tr.klik:hover td { background: color-mix(in srgb, var(--agencja) 8%, transparent); }
 table.kalkulator tr.tu td { font-weight: 800; color: var(--agencja); background: color-mix(in srgb, var(--agencja) 10%, transparent); }
 @media (max-width: 560px) { .agencja-glowa { flex-wrap: wrap; } .agencja-suma { width: 100%; } }
+
+/* UF23: redakcja wyników – podsumowanie, kafelki liczb ze strzałkami, zwijane szczegóły, „Tydzień w liczbach” */
+.podsumowanie { padding: 12px 16px; margin: 0 0 14px; border-radius: 9px; background: var(--karta); border: 1px solid var(--linia);
+  border-left: 4px solid var(--pom); font-size: 14px; line-height: 1.55; }
+.podsumowanie.ok { border-left-color: var(--zielony); background: var(--zielony-jasny); }
+.podsumowanie.uwaga { border-left-color: var(--zolty); background: #fff8e8; }
+.podsumowanie.zly { border-left-color: var(--czerwony); background: var(--czerwony-jasny); }
+.liczby-wynikow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0 0 16px; }
+.lw { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; background: var(--karta); border: 1px solid var(--linia);
+  border-radius: var(--r); box-shadow: var(--cien); }
+.lw .etykieta { font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--szary); }
+.lw b { font-size: 19px; font-weight: 800; color: var(--czarny); font-variant-numeric: tabular-nums; }
+.lw.plus b { color: var(--zielony); }
+.lw.minus b { color: var(--czerwony); }
+.lw .opis { font-size: 11px; color: var(--szary); }
+.delta { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.delta.plus { color: var(--zielony); }
+.delta.minus { color: var(--czerwony); }
+.delta.rowno { color: var(--szary); font-weight: 600; }
+details.szczegoly { margin: 10px 0; border: 1px solid var(--linia); border-radius: var(--r); background: var(--karta); }
+details.szczegoly > summary { cursor: pointer; padding: 9px 14px; font-weight: 700; font-size: 12.5px; color: var(--tekst);
+  list-style: none; display: flex; align-items: center; gap: 8px; }
+details.szczegoly > summary::-webkit-details-marker { display: none; }
+details.szczegoly > summary::before { content: "▸"; color: var(--pom); transition: transform .15s; }
+details.szczegoly[open] > summary::before { transform: rotate(90deg); }
+details.szczegoly > summary .licznik { font-size: 10.5px; font-weight: 700; color: var(--szary); background: var(--szary-jasny);
+  border-radius: 10px; padding: 1px 7px; }
+details.szczegoly > .szczegoly-tresc { padding: 0 12px 10px; }
+details.szczegoly .tabela-tytul { display: none; }
+.tydzien { margin: 0 0 16px; padding: 14px 16px; border-radius: var(--r); background: var(--pom-jasny); border: 1px solid var(--pom-mgla); }
+.tydzien-glowa { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; font-size: 11px;
+  font-weight: 700; text-transform: uppercase; color: var(--szary); }
+.tydzien-glowa span:first-child { font-size: 14px; color: var(--pom-ciemny); }
+.tydzien .liczby-wynikow { margin-bottom: 10px; }
+.historia-tygodnia { margin: 0 0 8px; padding-left: 20px; line-height: 1.6; }
+.sprawy { padding: 10px 14px; background: var(--karta); border-radius: 9px; border: 1px solid var(--linia); }
+.sprawy ol { margin: 6px 0 0; padding-left: 20px; line-height: 1.55; }
+.sprawy li + li { margin-top: 4px; }
+.sprawy a { white-space: nowrap; font-weight: 700; }
