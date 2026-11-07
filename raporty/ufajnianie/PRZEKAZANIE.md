@@ -118,7 +118,16 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   `zainteresowanie`; podgląd decyzji dokłada ostrzeżenia. Panel: `hr.js` `pigulkaOfert` (Rynek pracy – kandydaci
   i headhunter), Zespół – pigułka „chce go podkupić” (link do Rynku pracy), `rynek_pracy.js` wyniki – kolumny Wygrała,
   Za ile. Boty decydują dopiero w przeliczeniu, więc ich ofert znaczek nie widzi. Testy w `testy/ludzie/test_rynek_pracy.py`.
-- Następne kolejno: UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF17 – gra pokazowa. `gry/management/commands/gra_pokazowa.py`: usuwa gry o nazwie „Pokazowa”
+  (`serwisy.usun`), zakłada nową (`zaloz`: drużyna „Pokazowa” jako gracz + 4 boty strategii zrownowazony/tani/
+  premium/agresywny, poziom średni), tworzy `Druzyna` z kontami mistrzów gry i superużytkowników (albo `--konto`) –
+  stąd „Twoje gry” – i rozgrywa rundy po jednej w `serwisy.zmiana`: decyzje drużyny liczy `decyzje_bota` z
+  konfiguracją, w której drużyna ma poziom bota (`konfiguracja_bota`; drużyna nie jest botem w grze, więc
+  `przewaga_popytu` jej nie dotyczy), potem `ustaw_decyzje` + `wyslij` (z refleksją) + `przelicz()`. Domyślnie
+  zrównoważony/trudny – pomiar 4 ziaren (rywale średni): miejsca 4,1,1,1 (premium 3,1,1,3; czlowiek_dobry 4,1,3,2).
+  18 rund ≈ 9 s. Testy `testy/aplikacja/test_gra_pokazowa.py`. Komendy nie uruchamiałem na żadnej bazie poza
+  testową – autor odpala ją u siebie / na serwerze (README, Prowadzenie gry); w UF24 – na nowo po wszystkim.
+- Następne kolejno: UF14 → UF23 → UF9…UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

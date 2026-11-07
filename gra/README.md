@@ -80,6 +80,11 @@ co widzi drużyna w zakładkach), poziom można zmienić w trakcie gry (od nast�
   ```
 
   (Linux: `*/5 * * * * cd /sciezka/gra && .venv/bin/python manage.py zamykaj_rundy` w crontab),
+- **gra pokazowa** – `.venv\Scripts\python manage.py gra_pokazowa` usuwa starą grę „Pokazowa” i zakłada nową:
+  18 rund, 4 boty (poziom średni) i drużyna „Pokazowa”, za którą decyduje dobry bot (zrównoważony, trudny), cała
+  rozegrana tak jak przy zamykaniu rund (ok. 10 s). Drużyna jest przypisana do kont mistrzów gry (albo
+  `--konto LOGIN`), więc gra jest w „Twoich grach” – można obejrzeć każdą zakładkę po każdej rundzie. Opcje:
+  `--rund`, `--ziarno`, `--strategia`, `--poziom`, `--rywale`. Odtwarzać po każdej większej zmianie gry,
 - strony drużyn uczniów mistrz gry ogląda **tylko do odczytu** (decyzje zmieniają i wysyłają uczniowie);
   drużynę bez uczniów prowadzi sam,
 - *Wyniki* → eksport do arkusza: **Ranking (CSV)** i **Wyniki firm w rundach (CSV)** (średnik, przecinek

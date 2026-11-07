@@ -34,7 +34,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF20 (9) Zatrudnianie w Rynku pracy z przypisaniem, obsada w Moim lokalu, przenosiny
 - [x] UF19 (15) Marketing internetowy od rundy 7 (Marketing → Internet; Lajk + TikTok, mapy, „Lublin Jedzie”; efekt narasta i wolno gaśnie)
 - [x] UF18 (9) Licytacje pracowników widoczne (znaczek „oferty: N drużyn”, ostrzeżenie o podkupieniu, raport kto wygrał)
-- [ ] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`)
+- [x] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`: 18 rund, 4 boty + drużyna „Pokazowa” grana przez trudnego bota, przypisana mistrzom gry)
 - [x] UF15 Nowy układ menu (Miasto / Twój lokal / Firma / Wyniki, aliasy starych kluczy), Giełda „w budowie”, taśmy przy mapie, kłódki „od rundy N”
 - [ ] UF14 (18) Agencje reklamowe – nowy wygląd, siatki 3 kolumn
 - [x] UF13 (2) Parki tylko z mapy: znak „!” na parku, lista spraw nad mapą, okno parku (kafelki A/B/C, poprzednia runda, historia); sprawy w lokalu w Moim lokalu
