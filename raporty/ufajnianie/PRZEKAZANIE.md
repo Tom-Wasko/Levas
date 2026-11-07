@@ -153,7 +153,15 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   `inwestycje.js: kafleUdogodnien`). Ceny tak, by boty kupowały jak dotąd: cena/procent > 37,5 (gorzej niż
   klimatyzacja), przed rundą 9 tylko ≥ 1500 zł – sprawdzone grą 5 botów × 3 ziarna × poziom średni i trudny
   (udogodnienia i gotówka identyczne przed/po). Test `test_dane.py: test_nowe_udogodnienia_nie_zmieniaja_wyboru_botow_uf9`.
-- Następne kolejno: UF8 → UF7 → UF6 → UF5 → UF4 → UF3 → UF2 → UF1 → UF24.
+- [x] UF8 – bójka o falafel. Dane `dane/zdarzenia/falafel.yaml` (plik opcjonalny: `schematy.py: PlikFalafela`,
+  `ZDARZENIA_OPCJONALNE` – brak pliku = brak historii; zamrożona kopia testów go nie ma), moduł
+  `silnik/swiat/falafel.py`: od rundy 4 (falafel można dodać od 3), gdy `Firma.falafel_runda == runda − 1` (falafel
+  w ofercie firmy albo lokalu; zapis w `koniec_rundy` na końcu `zdarzenia.rozegraj`, nie w podglądzie – warunek ze stanu
+  sprzed decyzji, więc widok i przeliczenie widzą to samo), szansa 5% (strumień „falafel”, dopisany do `CELE`), najwyżej
+  raz na grę (`Firma.bojka_falafel`). Historia w `zdarzenia.historie()`/`aktywne()` ze `zrodlo="falafel"`, w panelu
+  jako „Nowe wydarzenie w lokalu”. Opcje: plastry (domyślna, −45 zł), degustacja (2 h, 2 porcje, +3% popytu),
+  straż miejska (1 h, −2 h w następnej rundzie, scena „protokol” – komiczny protokół). Testy `testy/swiat/test_falafel.py`.
+- Następne kolejno: UF7 → UF6 → UF5 → UF4 → UF3 → UF2 → UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

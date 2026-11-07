@@ -395,6 +395,8 @@ class Firma(Model):
     inwestor: Inwestor | None = None   # inwestor ratunkowy (silnik/pieniadze/inwestor.py)
     historie: list[OtwartaHistoria] = Field(default_factory=list)   # eventy w parkach: ciągi dalsze
     efekty: list[Efekt] = Field(default_factory=list)
+    falafel_runda: int | None = None   # UF8: ostatnia runda z falafelem w ofercie (silnik/swiat/falafel.py)
+    bojka_falafel: int | None = None   # UF8: runda bójki o falafel – najwyżej raz na grę
     wypadki: dict[str, int] = Field(default_factory=dict)   # wypadki w lokalu (silnik/swiat/awarie.py): id → runda początku
     polisy: dict[str, int] = Field(default_factory=dict)    # polisy ubezpieczyciela: rodzaj → runda początku ochrony
     higiena: str | None = None    # poziom higieny lokali (silnik/ksiegowosc/urzad.py); None – domyślny z danych

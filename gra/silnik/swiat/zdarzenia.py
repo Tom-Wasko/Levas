@@ -12,7 +12,8 @@ rundę (z szansą, strumień „zdarzenia”). Skutki: gotówka (bez VAT), mnoż
 Poza parkami: historia „bank żywności” (`dane/zdarzenia/magazyn.yaml`, silnik/kuchnia/magazyn.py) – zaczyna się tylko w tej
 drużynie, która ma w lokalu dużo jedzenia z krótkim terminem; skutek oddaj_zapas zabiera te partie z magazynu.
 Wypadki w lokalu (`dane/zdarzenia/losowe.yaml`, silnik/swiat/awarie.py) – rzadkie historie jednej drużyny; skutek szkoda
-to koszt, który może pokryć polisa ubezpieczyciela.
+to koszt, który może pokryć polisa ubezpieczyciela. Bójka o falafel (`dane/zdarzenia/falafel.yaml`, silnik/swiat/falafel.py,
+UF8) – w tygodniu po falafelu w ofercie, najwyżej raz na grę.
 """
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ from ..losowosc import strumien
 from ..ludzie import czas_wlasciciela as cw
 from ..model import Efekt, Firma, OtwartaHistoria
 from . import awarie as aw
+from . import falafel as fl
 
 # UF13: parki są tylko na mapie (klik w park → okno parku), sprawy w lokalu – w Moim lokalu (część „sprawy”)
 ZAKLADKA_PARKU, ZAKLADKA_LOKALU = "mapa", "sprawy"
@@ -49,9 +51,10 @@ def historie_parkow(dane: Dane) -> dict[str, dict]:
 
 
 def historie(dane: Dane) -> dict[str, dict]:
-    """Wszystkie historie: w parkach, bank żywności i wypadki w lokalu."""
+    """Wszystkie historie: w parkach, bank żywności, wypadki w lokalu i bójka o falafel."""
     b = mag.bank(dane)
-    return {**historie_parkow(dane), **({b["historia"]["id"]: b["historia"]} if b else {}), **aw.historie(dane)}
+    return {**historie_parkow(dane), **({b["historia"]["id"]: b["historia"]} if b else {}), **aw.historie(dane),
+            **fl.historie(dane)}
 
 
 def _tekst(dane: Dane, f: Firma, runda: int, h: dict, tekst: str) -> str:
@@ -87,7 +90,7 @@ def eventy_parku(dane: Dane, ziarno, runda: int) -> list[str]:
 
 def aktywne(dane: Dane, f: Firma, runda: int, ziarno) -> list[OtwartaHistoria]:
     """Sceny firmy w tej rundzie: event parku (gdy firma nie jest już w tej historii), bank żywności, wypadek
-    w lokalu i ciągi dalsze."""
+    w lokalu, bójka o falafel i ciągi dalsze."""
     wynik = [h for h in f.historie if h.runda <= runda]
     nowe = [OtwartaHistoria(historia=hid, scena=historie(dane)[hid]["start"], runda=runda)
             for hid in eventy_parku(dane, ziarno, runda) if all(h.historia != hid for h in f.historie)]
@@ -97,6 +100,8 @@ def aktywne(dane: Dane, f: Firma, runda: int, ziarno) -> list[OtwartaHistoria]:
         wynik.append(OtwartaHistoria(historia=b["id"], scena=b["start"], runda=runda))
     if (wid := aw.startuje(dane, f, runda, ziarno)) and all(h.historia != wid for h in f.historie):
         wynik.append(OtwartaHistoria(historia=wid, scena=historie(dane)[wid]["start"], runda=runda, zrodlo="wypadek"))
+    if (fid := fl.startuje(dane, f, runda, ziarno)) and all(h.historia != fid for h in f.historie):
+        wynik.append(OtwartaHistoria(historia=fid, scena=historie(dane)[fid]["start"], runda=runda, zrodlo=fl.ZRODLO))
     return wynik
 
 
@@ -130,6 +135,8 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
             continue
         if oh.zrodlo == "wypadek" and not podglad:
             f.wypadki.setdefault(h["id"], runda)
+        if oh.zrodlo == fl.ZRODLO and not podglad and f.bojka_falafel is None:
+            f.bojka_falafel = runda
         wpis = {"historia": h["id"], "tytul": h["tytul"], "park": h["park"], "powazna": h["powazna"], "scena": oh.scena,
                 "wypadek": oh.zrodlo == "wypadek",
                 "tekst": _tekst(dane, f, runda, h, sc["tekst"]), "opcja": None, "domyslna": False, "wynik": None,
@@ -182,6 +189,7 @@ def rozegraj(dane: Dane, f: Firma, d: dict, runda: int, ziarno, ks: Ksiega, rach
     if not podglad:
         f.historie = zostaja
         f.efekty = [e for e in f.efekty if e.do_rundy >= runda]
+        fl.koniec_rundy(dane, f, runda)
     return wynik
 
 

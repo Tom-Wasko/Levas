@@ -25,6 +25,7 @@ def test_zamrozona_kopia_pasuje_do_schematow():
 
 def test_zamrozona_kopia_ma_wszystkie_pliki_danych():
     # mapa/klienci.yaml (U24) – plik opcjonalny: bez niego grupy klientów i opinie są wyłączone, testy mechanik
-    # liczą popyt jak przed U24
-    pliki = {p.relative_to(DANE_GRY) for p in DANE_GRY.rglob("*.yaml")} - {Path("mapa/klienci.yaml")}
+    # liczą popyt jak przed U24; zdarzenia/falafel.yaml (UF8) – bez niego nie ma bójki o falafel
+    pliki = {p.relative_to(DANE_GRY) for p in DANE_GRY.rglob("*.yaml")} - {Path("mapa/klienci.yaml"),
+                                                                           Path("zdarzenia/falafel.yaml")}
     assert pliki <= {p.relative_to(DANE_ZAMROZONE) for p in DANE_ZAMROZONE.rglob("*.yaml")}

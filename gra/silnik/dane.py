@@ -22,6 +22,7 @@ from .schematy import (
     SCHEMATY_KALENDARZA,
     SCHEMATY_MAPY,
     SCHEMATY_ZDARZEN,
+    ZDARZENIA_OPCJONALNE,
     PlikBankow,
     PlikBiur,
     PlikHarpagona,
@@ -91,7 +92,8 @@ def _wczytaj_zdarzenia(katalog: Path) -> dict | None:
     if not (katalog / "parki.yaml").exists():
         return None
     return {n.removesuffix(".yaml"): s.model_validate(_wczytaj(katalog / n)).model_dump(exclude={"opis", "zrodlo"})
-            for n, s in SCHEMATY_ZDARZEN.items()}   # z domyślnymi polami
+            for n, s in SCHEMATY_ZDARZEN.items()
+            if n not in ZDARZENIA_OPCJONALNE or (katalog / n).exists()}   # z domyślnymi polami
 
 
 def _wczytaj_kalendarz(katalog: Path) -> dict | None:
@@ -270,7 +272,8 @@ def sprawdz(katalog: Path | None = None) -> list[str]:
     if zd.exists():
         for nazwa, schemat in SCHEMATY_ZDARZEN.items():
             if not (zd / nazwa).exists():
-                bledy.append(f"brak pliku dane/zdarzenia/{nazwa}")
+                if nazwa not in ZDARZENIA_OPCJONALNE:
+                    bledy.append(f"brak pliku dane/zdarzenia/{nazwa}")
                 continue
             try:
                 schemat.model_validate(_wczytaj(zd / nazwa))
@@ -514,7 +517,9 @@ def _sprawdz_zdarzenia(d: Dane, bledy: list[str], brak):
         return
     parki = {b["id"] for b in d.mapa["budynki"] if b["rodzaj"] in ("park", "woda")}
     bank = d.zdarzenia["magazyn"]["bank_zywnosci"]["historia"]
-    pliki = [("parki", h) for h in d.zdarzenia["parki"]["historie"]] + [("magazyn", bank)]         + [("losowe", h) for h in d.zdarzenia["losowe"]["historie"]]
+    pliki = [("parki", h) for h in d.zdarzenia["parki"]["historie"]] + [("magazyn", bank)]         + [("losowe", h) for h in d.zdarzenia["losowe"]["historie"]]         + ([("falafel", d.zdarzenia["falafel"]["historia"])] if "falafel" in d.zdarzenia else [])
+    if "falafel" in d.zdarzenia and d.zdarzenia["falafel"]["zasady"]["usluga"] not in d.uslugi:
+        brak(d.zdarzenia["falafel"]["zasady"]["usluga"], "zdarzenia/falafel.yaml: zasady", "usluga", "uslugi.yaml")
     gdzie: dict[str, str] = {}
     for plik, h in pliki:
         if h["id"] in gdzie:

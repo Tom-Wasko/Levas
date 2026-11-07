@@ -347,7 +347,7 @@ czas właściciela (zwykle 2–5 h), gotówkę albo porcje jedzenia, a skutki (p
 odłożone w czasie. **Na wszystko nie starczy czasu** – właściciel ma 20 h w tygodniu, więc wybierz to, co się opłaca.
 Jeśli kilka drużyn wybierze to samo, każda dostaje tę samą nagrodę. Bez wyboru gra wybiera reakcję domyślną
 (bez czasu właściciela). Parki są **tylko na mapie**: park, w którym coś się dzieje, ma pomarańczowy znak „!”, a nad
-mapą jest lista spraw tygodnia (✓ – wybrałeś reakcję, ○ – zostaje domyślna, ! – na wybraną reakcję brakuje czasu).
+mapą jest lista spraw tygodnia (✓ – reakcja wybrana, ○ – zostaje domyślna, ! – na wybraną reakcję brakuje czasu).
 Kliknij park albo sprawę z listy – otworzy się okno parku z opisem i reakcjami jako kafelki A, B, C (czas, koszt),
 z tym, co stało się tam w poprzedniej rundzie, i z historią parku. Pasek w oknie pokazuje, ile z 20 h zajmują sprawy
 w parkach, a ile inne zadania. Reakcja, na którą nie starcza wolnych godzin, jest wyszarzona z dopiskiem „wymaga 5 h,
@@ -358,6 +358,10 @@ Takie sprawy (i bank żywności) pojawiają się w zakładce Mój lokal, w czę�
 Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji). Im dłużej spokojnie, tym
 groźniej: ryzyko wypadku rośnie o 4 punkty procentowe za każdy tydzień bez wypadku (od 8% do najwyżej 40%), a po
 wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
+
+Uwaga na **falafel**. Nie wszyscy stali bywalcy kebabu są gotowi na kebab bez mięsa – w tygodniu po falafelu
+w karcie (od rundy 4) jest niewielka szansa, że ktoś przyjdzie wyrazić swoje zdanie zrolowaną gazetką promocyjną.
+Zdarza się to najwyżej raz na grę i kosztuje niewiele – plastry albo kilka godzin właściciela.
 
 ## 13. Rozwój
 

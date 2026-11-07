@@ -42,7 +42,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF11 Ranking w Wynikach: tabela drużyn (miejsce, zmiana, średnia i ostatnia karta, majątek) + wykres miejsc
 - [x] UF10 (4) Zlecenie bez ZUS pracodawcy, student <26 – forma „zlecenie ze studentem” (razem z UF21)
 - [x] UF9 (16) 10 nowych udogodnień z opisem (rundy 5–14, kot zakładowy), boty wybierają jak dotąd
-- [ ] UF8 (13) Falafel – bójka
+- [x] UF8 (13) Falafel – bójka
 - [ ] UF7 (8) 4 słupki sezonowości w kafelku dania
 - [ ] UF6 (3) Terminy odblokowań
 - [ ] UF5 (7) Wnioski: rozruch w pierwszych tygodniach

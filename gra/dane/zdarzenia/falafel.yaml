@@ -1,0 +1,58 @@
+# Bójka o falafel (UF8, silnik/swiat/falafel.py) – komiczna historia jednej drużyny w tygodniu po falafelu w ofercie
+# Sprawdzenie: python -m silnik.dane sprawdz
+opis: 'Od rundy zasady.od_rundy drużyna, która w poprzedniej rundzie miała w ofercie danie zasady.usluga, ma co rundę
+  szansę zasady.szansa, że w lokalu zacznie się historia bójki o falafel – najwyżej raz na grę. Format historii jak
+  w parki.yaml (bez pola park). Skutki małe: plastry (gotówka) albo kilka godzin właściciela mniej.'
+zrodlo: 'Pomysł autora gry (lista ufajniania, punkt 13): „jak wybierzesz do oferty falafel, to ktoś cię pobije kolejnego
+  dnia”; plan raporty/ufajnianie/plan.md (UF8): mała szansa, komiczny raport, mały skutek; liczby – założenie UF8
+  (7.11.2026): przy szansie 5% na rundę bójka trafia mniej więcej co drugą drużynę, która cały czas ma falafel w karcie'
+zasady:
+  usluga: falafel
+  od_rundy: 4        # nowe dania (w tym falafel) wchodzą do karty od rundy 3 – bójka najwcześniej tydzień później
+  szansa: 0.05       # na rundę po tygodniu z falafelem w ofercie
+historia:
+  id: bojka_o_falafel
+  tytul: Bójka o falafel
+  start: nazajutrz
+  sceny:
+    nazajutrz:
+      tekst: >-
+        Dzień po tym, jak w karcie pojawił się falafel, do lokalu wpada pan Zbyszek z Czechowa – stały klient,
+        szalik Motoru Lublin, trzydzieści lat na kebabie z baraniną. Patrzy na tablicę z menu, potem na Ciebie
+        i mówi: „Kebab bez mięsa? To jest sałatka z ambicjami”. Zanim zdążysz cokolwiek wyjaśnić, obrywasz
+        zrolowaną gazetką promocyjną prosto w czoło. Raz, drugi, trzeci – do rytmu przyśpiewki z trybun.
+      domyslna: plastry
+      opcje:
+      - id: plastry
+        tekst: Przyklejasz plaster i wracasz do rożna
+        wynik: >-
+          Plaster z dinozaurem (inne się skończyły) trzyma się na czole przez cały dzień. Klienci pytają, czy to
+          nowy element stroju firmowego. Pracownik dokupuje w aptece na Narutowicza całe pudełko – „na zapas, bo
+          falafel nadal jest w karcie”.
+        skutki:
+        - {typ: gotowka, kwota: -45, opis: 'Plastry z dinozaurem i woda utleniona po bójce o falafel'}
+      - id: degustacja
+        tekst: Sadzasz pana Zbyszka przy stoliku i stawiasz mu falafela na koszt firmy
+        koszt: {czas: 2, porcje: 2}
+        wynik: >-
+          Pan Zbyszek je pierwszego falafela z miną człowieka, który zdradza ideały. Drugiego – z miną człowieka,
+          który właśnie je zdradził i wcale nie żałuje. Na odchodne mówi „tylko nikomu na trybunach”, a wieczorem
+          wrzuca na grupę osiedla zdjęcie talerza z podpisem „no dobra, da się zjeść”.
+        skutki:
+        - {typ: popyt, mnoznik: 1.03, rund: 1, opis: 'Pan Zbyszek poleca falafel na grupie osiedla Czechów'}
+      - id: straz
+        tekst: Dzwonisz po straż miejską i spisujesz zeznania
+        koszt: {czas: 1}
+        wynik: >-
+          Strażnicy przyjeżdżają po kwadransie, oglądają gazetkę promocyjną jak dowód rzeczowy i spisują Twoje
+          zeznania. Pan Zbyszek do protokołu oświadcza, że „działał w obronie tradycji”. Trzeba będzie jeszcze
+          podjechać na komendę podpisać papiery.
+        skutki:
+        - {typ: czas, godziny: 2, rund: 1, opis: 'Podpisywanie protokołu w sprawie bójki o falafel'}
+        nastepna:
+        - {scena: protokol, za_ile_rund: 1}
+    protokol:
+      tekst: >-
+        Na komendzie dostajesz do podpisu protokół. Rubryka „Przyczyna zajścia”: falafel. Rubryka „Narzędzie”:
+        gazetka promocyjna, zrolowana, szt. 1. Rubryka „Obrażenia”: zaczerwienienie czoła, urażona duma
+        sprawcy. Dyżurny pyta półgłosem, czy falafel jest też w wersji na ostro, bo „żona ostatnio nie je mięsa”.

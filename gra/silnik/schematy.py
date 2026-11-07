@@ -1419,6 +1419,27 @@ class BankZywnosci(Schemat):
         return self
 
 
+class ZasadyFalafela(Schemat):
+    usluga: str                         # id dania z uslugi.yaml
+    od_rundy: int = Field(ge=2)          # „następnego dnia” – po tygodniu z falafelem w ofercie
+    szansa: float = Field(gt=0, le=1)
+
+
+class PlikFalafela(Plik):
+    """dane/zdarzenia/falafel.yaml (UF8, plik opcjonalny): bójka o falafel w tygodniu po falafelu w ofercie
+    (silnik/swiat/falafel.py) – najwyżej raz na grę, w lokalu jednej drużyny."""
+    zasady: ZasadyFalafela
+    historia: Historia
+
+    @model_validator(mode="after")
+    def _bez_parku(self):
+        if self.historia.park:
+            raise ValueError("bójka o falafel dzieje się w lokalu (bez pola park)")
+        _bez_skutku([self.historia], "szkoda", "wypadkach w lokalu (losowe.yaml)")
+        _bez_skutku([self.historia], "oddaj_zapas", "historii banku żywności")
+        return self
+
+
 class PlikMagazynu(Plik):
     """dane/zdarzenia/magazyn.yaml: teksty kontroli sanepidu i historia „bank żywności” (silnik/kuchnia/magazyn.py)."""
     sanepid: TekstySanepidu
@@ -1608,7 +1629,9 @@ SCHEMATY_ZDARZEN: dict[str, type[BaseModel]] = {
     "kasyno.yaml": PlikKasyna,
     "handel.yaml": PlikHandlu,
     "detektyw.yaml": PlikDetektywa,
+    "falafel.yaml": PlikFalafela,
 }
+ZDARZENIA_OPCJONALNE = {"falafel.yaml"}   # bez pliku – bez tej historii (np. zamrożona kopia danych testów)
 
 
 # --- kalendarz/kalendarz.yaml (F3b.9) ---

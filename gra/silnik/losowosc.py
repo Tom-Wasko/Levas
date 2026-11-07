@@ -22,6 +22,7 @@ Strumien = np.random.Generator   # typ strumienia losowego (adnotacje w innych m
 CELE = frozenset({
     "bot",         # decyzje bota: runda, nazwa firmy
     "wypadki",     # wypadki w lokalu (silnik/swiat/awarie.py): runda, firma
+    "falafel",     # bójka o falafel (silnik/swiat/falafel.py, UF8): runda, firma
     "biuro",       # błąd biura rachunkowego w deklaracji: runda, firma
     "dostawcy",    # ceny dostawców w trybie losowym: runda = miesiąc (0 = styczeń)
     "gazetki",     # promocje w gazetkach dyskontów: runda, dostawca
