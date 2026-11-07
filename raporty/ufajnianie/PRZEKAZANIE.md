@@ -161,7 +161,11 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   raz na grę (`Firma.bojka_falafel`). Historia w `zdarzenia.historie()`/`aktywne()` ze `zrodlo="falafel"`, w panelu
   jako „Nowe wydarzenie w lokalu”. Opcje: plastry (domyślna, −45 zł), degustacja (2 h, 2 porcje, +3% popytu),
   straż miejska (1 h, −2 h w następnej rundzie, scena „protokol” – komiczny protokół). Testy `testy/swiat/test_falafel.py`.
-- Następne kolejno: UF7 → UF6 → UF5 → UF4 → UF3 → UF2 → UF1 → UF24.
+- [x] UF7 – sezonowość w kafelku dania: `oferta.js: sezonSlupki(u, m)` – miesiąc sprzedaży (`miesiacSprzedazy`) i 3
+  kolejne (mod 12), wysokość w skali roku dania (najsłabszy miesiąc 20%, najlepszy 100%), kolor `.plus`/`.minus`/
+  `.rowno` (> 1,02 / < 0,98), etykieta z mnożnikiem i skrótem miesiąca, opis w `aria-label`/`title`. Blok `.sezon-blok`
+  pod „Popyt roczny” na całą szerokość kafelka (style na końcu `styl.css`). Zrzut 800 px – mieści się w wąskich kafelkach.
+- Następne kolejno: UF6 → UF5 → UF4 → UF3 → UF2 → UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

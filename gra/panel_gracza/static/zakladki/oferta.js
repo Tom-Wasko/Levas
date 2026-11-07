@@ -16,6 +16,20 @@ const popytOkresu = () => `popyt ${OKRES.przymiotnik.toLowerCase()}`;
 const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
 const sprzedazOtwarta = (v) => v.odblokowane.includes("sprzedaz");
 
+// UF7: sezonowość w kafelku dania – miesiąc sprzedaży i 3 kolejne jako słupki (wysokość wg mnożnika)
+export function sezonSlupki(u, m) {
+  const ms = [0, 1, 2, 3].map((i) => (m + i) % 12);
+  const mn = Math.min(...u.sezonowosc), mx = Math.max(...u.sezonowosc);
+  const wys = (s) => Math.round(mx > mn ? 20 + (80 * (s - mn)) / (mx - mn) : 60);   // rok: najsłabszy 20%, najlepszy 100%
+  const opis = ms.map((x) => `${MIESIACE[x]} × ${licz(u.sezonowosc[x], 2)}`).join(", ");
+  return `<div class="sezon" role="img" aria-label="Sezonowość: ${opis}" title="Sezonowość: ${opis}">${ms.map((x, i) => {
+    const s = u.sezonowosc[x], ton = s > 1.02 ? "plus" : s < 0.98 ? "minus" : "rowno";
+    return `<div class="sezon-k${i ? "" : " teraz"}"><span class="sezon-w">×${licz(s, 2)}</span>
+      <span class="sezon-p"><span class="sezon-s ${ton}" style="height:${wys(s)}%"></span></span>
+      <span class="sezon-m">${MIESIACE[x].slice(0, 3)}</span></div>`;
+  }).join("")}</div>`;
+}
+
 // instrukcja liczenia prognozy na rundę (silnik/rynek/popyt.py: pule i udział lokalu)
 function jakPrognoza(u, m) {
   const tyg = Math.round(u.popyt_roczny / OKRES.rund_w_roku), sez = u.sezonowosc[m];
@@ -84,7 +98,7 @@ export const oferta = {
           <div class="kg"><span>${esc(u.nazwa)}<br><span class="podpowiedz">(porcja)</span></span></div>
           <div class="kt">
             <div class="wiersz"><span>Popyt roczny ${kolko(jakPrognoza(u, m))}</span><span>${licz(u.popyt_roczny)} porcji</span></div>
-            <div class="wiersz"><span>Sezonowość (${MIESIACE[m]})</span><span>× ${licz(u.sezonowosc[m], 2)}</span></div>
+            <div class="sezon-blok"><div class="wiersz"><span>Sezonowość</span><span class="podpowiedz">teraz i 3 kolejne miesiące</span></div>${sezonSlupki(u, m)}</div>
             <div class="wiersz"><span>Preferowana cena</span><span>${zl(u.cena_preferowana)}</span></div>
             <div class="wiersz"><span>Czas przygotowania</span><span>${Math.round(u.godziny_prowadzacego * 600) / 10} min</span></div>
             <div class="wiersz"><span>Czas obsługi przy kasie</span><span>${Math.round(u.godziny_kasy * 600) / 10} min</span></div>

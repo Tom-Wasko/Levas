@@ -154,7 +154,8 @@ co jeszcze zostało do zrobienia):
    pokazuje to porównanie).
 3. **Menu** (Kuchnia) – na start trzy dania: kebab w bułce, frytki i napój. Nowe dania (rollo, box, talerz, falafel,
    dodatki) dodasz od tygodnia 3. Kafelek dania pokazuje **popyt roczny** (ile porcji zjada w roku przeciętna strefa)
-   i sezonowość. Prognozę na tydzień liczysz sam – krok po kroku w dymku ⓘ przy „Popyt roczny”: popyt roczny ÷ 52
+   i sezonowość – cztery słupki: bieżący miesiąc i trzy kolejne (zielony – powyżej przeciętnej, żółty – poniżej),
+   więc od razu widać, czy danie wchodzi w sezon, czy z niego wychodzi. Prognozę na tydzień liczysz sam – krok po kroku w dymku ⓘ przy „Popyt roczny”: popyt roczny ÷ 52
    × sezonowość × wielkość strefy (Klienci ▸ Strefy), a z tego część, którą przyciągniesz na tle konkurencji.
    Wybrane danie jest od razu w sprzedaży: cenę i rabat wpisujesz w tym samym kafelku co prognozę (od tygodnia 2;
    na start cena preferowana).
