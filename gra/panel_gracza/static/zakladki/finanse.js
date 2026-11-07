@@ -1,7 +1,7 @@
 // Finanse: raport finansowy, KPiR, bank, biuro rachunkowe.
 import { akcjeBanku, decyzjeBanku, wynikiBanku } from "./banki.js";
 import { krokiKpir, LEKCJA_BANK, LEKCJA_KPIR, LEKCJA_RAPORT } from "./lekcje.js";
-import { esc, OKRES, okno, proc, tabela, toast, wykres, zamknijOkno, zl, zl2 } from "./wspolne.js";
+import { esc, kafelkiLiczb, OKRES, okno, podsumowanie, proc, strzalka, tabela, toast, wykres, zamknijOkno, zl, zl2, zwin, zwinTabela } from "./wspolne.js";
 import { ewidencja, RODZAJ_ST } from "./inwestycje.js";
 
 const GRUPY = [
@@ -59,16 +59,26 @@ export const raport = {
     const kos = koszty(k).map(([n, x]) => [n, zl2(x)]);
     const h = v.historia || [];
     const skum = h.reduce((s, x) => s + (x.dochod_netto || 0), 0);
-    return `<div class="dwie">
+    const netto = k.dochod_netto, przedN = h.length >= 2 ? h[h.length - 2].dochod_netto : null, przedG = h.length >= 2 ? h[h.length - 2].gotowka : null;
+    const lead = podsumowanie([
+      netto >= 0 ? `W ostatnim ${OKRES.miejscownik} firma zarobiła na czysto <b>${zl2(netto)}</b> (przychody ${zl(k.przychody)}, koszty ${zl(k.koszty)}).`
+        : `W ostatnim ${OKRES.miejscownik} firma poniosła stratę <b>${zl2(-netto)}</b> – koszty (${zl(k.koszty)}) przewyższyły przychody (${zl(k.przychody)}).`,
+      `Na koncie jest ${zl(v.wyniki.gotowka)}${v.wyniki.zadluzenie > 0 ? `, a dług z kredytów to ${zl(v.wyniki.zadluzenie)}` : ", bez kredytów do spłaty"}.`], netto >= 0 ? "ok" : "zly");
+    const kafle = kafelkiLiczb([
+      { etykieta: "Przychody", wartosc: zl(k.przychody) }, { etykieta: "Koszty", wartosc: zl(k.koszty) },
+      { etykieta: "Dochód netto", wartosc: zl(netto), delta: strzalka(netto, przedN, { format: zl }), ton: netto >= 0 ? "plus" : "minus" },
+      { etykieta: "Saldo konta", wartosc: zl(v.wyniki.gotowka), delta: strzalka(v.wyniki.gotowka, przedG, { format: zl }) },
+      v.wyniki.zadluzenie > 0 && { etykieta: "Zadłużenie", wartosc: zl(v.wyniki.zadluzenie), ton: "minus" }]);
+    return lead + kafle + `<div class="wykres"><canvas id="w-wynik"></canvas></div>`
+      + zwin("Przychody i koszty", `<div class="dwie">
       <div>${tabela("Przychody", ["Pozycja", "Kwota"], przych, { klasy: ["l", "r"], stopka: ["Razem", zl2(k.przychody)] })}</div>
-      <div>${tabela("Koszty", ["Pozycja", "Kwota"], kos, { klasy: ["l", "r"], stopka: ["Razem", zl2(k.koszty)] })}</div></div>
-      ${tabela("Wynik", ["", `Ostatni ${OKRES.mianownik}`, "Wszystkie rundy"], [
+      <div>${tabela("Koszty", ["Pozycja", "Kwota"], kos, { klasy: ["l", "r"], stopka: ["Razem", zl2(k.koszty)] })}</div></div>`)
+      + zwinTabela("Wynik", ["", `Ostatni ${OKRES.mianownik}`, "Wszystkie rundy"], [
         ["Dochód do opodatkowania", zl2(k.dochod), ""], ["Podatek dochodowy", zl2(k.podatek), ""],
         ["<b>Dochód netto</b>", `<b>${zl2(k.dochod_netto)}</b>`, `<b>${zl2(skum)}</b>`],
         [`Saldo konta na koniec ${OKRES.dopelniacz}`, zl2(v.wyniki.gotowka), ""], ["Lokaty", zl2(v.wyniki.lokaty), ""],
-        ["Zadłużenie (kredyty)", zl2(v.wyniki.zadluzenie), ""]], { klasy: ["l", "r", "r"] })}
-      ${uzgodnienieHtml(v.wyniki.uzgodnienie)}
-      <div class="wykres"><canvas id="w-wynik"></canvas></div>${LEKCJA_RAPORT}`;
+        ["Zadłużenie (kredyty)", zl2(v.wyniki.zadluzenie), ""]], { klasy: ["l", "r", "r"], otwarte: true })
+      + uzgodnienieHtml(v.wyniki.uzgodnienie) + LEKCJA_RAPORT;
   },
   po({ v }) {
     const h = v.historia || [];
@@ -86,10 +96,13 @@ export const kpir = {
     const w = k.pozycje.map((p, i) => [i + 1, esc(p.opis), zl2(p.przychod), zl2(p.przychod_pozostaly), zl2(p.przychod + p.przychod_pozostaly),
       zl2(p.towary), zl2(p.wynagrodzenia), zl2(p.pozostale), zl2(p.wynagrodzenia + p.pozostale)]);
     const s = (f) => k.pozycje.reduce((a, p) => a + f(p), 0);
-    return tabela(null, ["Lp.", "Opis zdarzenia gospodarczego", "Wartość sprzedanych towarów i usług", "Pozostałe przychody", "Razem przychód",
+    const lead = podsumowanie(`W KPiR zapisano <b>${k.pozycje.length}</b> ${k.pozycje.length === 1 ? "operację" : "operacji"}: przychody ${zl(k.przychody)}, koszty ${zl(k.koszty)}, dochód do opodatkowania <b>${zl(k.dochod)}</b>.`, k.dochod >= 0 ? "" : "uwaga");
+    return lead + kafelkiLiczb([{ etykieta: "Przychody", wartosc: zl(k.przychody) }, { etykieta: "Koszty", wartosc: zl(k.koszty) },
+      { etykieta: "Dochód", wartosc: zl(k.dochod), ton: k.dochod >= 0 ? "plus" : "minus" }, { etykieta: "Dochód netto", wartosc: zl(k.dochod_netto), opis: "po podatku" }])
+      + zwinTabela("Księga przychodów i rozchodów", ["Lp.", "Opis zdarzenia gospodarczego", "Wartość sprzedanych towarów i usług", "Pozostałe przychody", "Razem przychód",
       "Zakup towarów i materiałów", "Wynagrodzenia", "Pozostałe wydatki", "Razem wydatki"], w,
       { klasy: ["", "l", "r", "r", "r", "r", "r", "r", "r"], stopka: ["", "Suma", zl2(s((p) => p.przychod)), zl2(s((p) => p.przychod_pozostaly)),
-        zl2(k.przychody), zl2(k.towary), zl2(k.wynagrodzenia), zl2(k.pozostale), zl2(k.wynagrodzenia + k.pozostale)] })
+        zl2(k.przychody), zl2(k.towary), zl2(k.wynagrodzenia), zl2(k.pozostale), zl2(k.wynagrodzenia + k.pozostale)], otwarte: true })
       + tabela(null, ["", "Kwota"], [["Dochód do opodatkowania", zl2(k.dochod)], ...(R
         ? [["Zaliczka na PIT", zl2(R.zaliczka)], ["Składka zdrowotna", zl2(R.zdrowotna)]]   // JDG – zakładka Podatki
         : [["Podatek", zl2(k.podatek)]]), ["Dochód netto", zl2(k.dochod_netto)]], { klasy: ["l", "r"] })
@@ -308,29 +321,33 @@ function wynikiKsiegowosci({ v }) {
   let html = "";
   if (B) {
     const dok = `${B.dokumenty}${B.limit == null ? " (ryczałt bez limitu)" : B.limit ? ` (w ryczałcie ${B.limit})` : ""}`;
-    html += tabela(`Faktura biura za rundę: ${esc(B.nazwa)}`, ["Pozycja", "Kwota"], [
+    html += zwinTabela(`Faktura biura za rundę: ${esc(B.nazwa)}`, ["Pozycja", "Kwota"], [
       ["Dokumenty w rundzie", dok], ["Ryczałt", zl2(B.ryczalt)], [`Dokumenty ponad ryczałt (${B.ponad})`, zl2(B.za_dokumenty)],
       ...(B.minimum ? [["Minimum", zl2(B.minimum)]] : []), ["Księgowanie", zl2(B.ksiegowanie)],
-      [`Kadry (płatne osoby: ${B.osoby_platne})`, zl2(B.kadry)], ["<b>Razem (koszt w KPiR)</b>", `<b>${zl2(B.razem)}</b>`]], { klasy: ["l", "r"] });
+      [`Kadry (płatne osoby: ${B.osoby_platne})`, zl2(B.kadry)], ["<b>Razem (koszt w KPiR)</b>", `<b>${zl2(B.razem)}</b>`]], { klasy: ["l", "r"], otwarte: true });
     html += B.blad ? `<div class="komunikat"><p>${esc(B.blad.tekst)}</p><p><b>Mandat ${zl(B.blad.kara)}</b>${B.blad.oc ? " – biuro oddało go z OC." : " – biuro nie ma OC, płacisz Ty."}</p></div>`
       : `<p class="podpowiedz">Biuro rozliczyło podatki bez błędów.</p>`;
   }
   if (K && K.tryb !== "podglad") {
     const tryb = { deklaracja: "złożone przez Ciebie", biuro: "złożone przez nowe biuro", brak: "niezłożone – rozliczenie z urzędu" }[K.tryb];
-    html += tabela(`Deklaracje za rundę ${K.za_runde} (${tryb})`, ["Deklaracja", "Zadeklarowano", "Poprawnie", "Korekta", ""],
+    html += zwinTabela(`Deklaracje za rundę ${K.za_runde} (${tryb})`, ["Deklaracja", "Zadeklarowano", "Poprawnie", "Korekta", ""],
       K.pozycje.map((p) => [esc(p.nazwa), zl2(p.zadeklarowano), zl2(p.poprawnie),
         p.korekta ? `${p.korekta > 0 ? "dopłata" : "zwrot"} ${zl2(Math.abs(p.korekta))}` : "–", p.blad ? `<span class="minus">błąd – mandat</span>` : "✓"]),
-      { klasy: ["l", "r", "r", "r", "l"], stopka: ["Mandat", "", "", "", zl(K.kara)] });
+      { klasy: ["l", "r", "r", "r", "l"], stopka: ["Mandat", "", "", "", zl(K.kara)], otwarte: true });
     const Z = K.zapisy;
     if (Z) {
       const zle = Z.dokumenty.filter((x) => !x.ok);
       html += `<p>Zapisy w KPiR: <b>${Z.dobre} z ${Z.liczba}</b> poprawnych.${zle.length ? " Błędne zapisy (same nie kosztują – liczą się deklaracje):" : ""}</p>`;
-      if (zle.length) html += tabela(null, ["Dokument", "Kwota", "Co poszło nie tak"],
+      if (zle.length) html += zwinTabela("Błędne zapisy w KPiR", ["Dokument", "Kwota", "Co poszło nie tak"],
         zle.map((x) => [`${esc(x.typ)}: ${esc(x.opis)}`, zl2(x.brutto), x.bledy.map(esc).join("<br>")]), { klasy: ["l", "r", "l"] });
     }
   }
   if (W.samodzielnie) html += `<p class="podpowiedz">Dokumenty tej rundy czekają na zaksięgowanie – przełącz tę zakładkę na „Decyzje”.</p>`;
-  return html || `<p class="podpowiedz">Brak rozliczeń w tej rundzie.</p>`;
+  if (!html) return `<p class="podpowiedz">Brak rozliczeń w tej rundzie.</p>`;
+  const kara = (B?.blad?.kara || 0) + (K && K.tryb !== "podglad" ? K.kara || 0 : 0);
+  const lead = podsumowanie([B ? `Biuro ${esc(B.nazwa)} obsłużyło ${B.dokumenty} ${B.dokumenty === 1 ? "dokument" : "dokumentów"} i wystawiło fakturę na <b>${zl2(B.razem)}</b>.` : "",
+    kara > 0 ? `Błędy w rozliczeniach kosztowały mandaty na ${zl(kara)}.` : "Rozliczenia przeszły bez mandatów."], kara > 0 ? "uwaga" : "ok");
+  return lead + html;
 }
 
 const ksiegowosc = (d) => (d.ksiegowosc = d.ksiegowosc || {});

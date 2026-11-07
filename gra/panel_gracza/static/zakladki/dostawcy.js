@@ -1,7 +1,7 @@
 // Dostawcy: zakup składników i magazyn (bez zwrotów). Zamówienie ma dzień dostawy (świeżość – zakładka
 // „Magazyn i świeżość”, silnik/kuchnia/swiezosc.py), a dostawcy mają swoje zasady (silnik/kuchnia/dostawcy.py: zasady_dostaw):
 // dni dostaw, opłata za dowóz, minimalne zamówienie, odbiór osobisty w dyskontach i gazetki.
-import { esc, OKRES, gw, licz, nazwaFirmy, okno, tabela, toast, ulamek, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, OKRES, gw, kafelkiLiczb, licz, nazwaFirmy, okno, podsumowanie, tabela, toast, ulamek, wykres, zl, zl2, zwinTabela } from "./wspolne.js";
 import { IG_AUTO } from "./infografiki.js";
 import { glownyLokal, idWybranego, lokalPartii, lokalWybrany, menuLokalu, nazwaLokalu, zapiszWLokalu } from "./lokal_wybor.js";
 
@@ -274,10 +274,16 @@ export const dostawcy = {
     const suma = (v.wyniki?.zasoby || []).reduce((s, x) => s + x.wartosc, 0);
     const firmy = Object.keys(v.rynek?.jakosc_zasobow || {});
     const jak = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => ulamek(v.rynek.jakosc_zasobow[f][q]))]);
-    return wynikiAuto(v) + planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + tabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []),
-      `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", ...(straty ? [""] : []), "", zl2(suma)] })
-      + tabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] })
-      + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`;
+    const ze = (v.wyniki?.zasoby || []).filter((x) => x.straty), n = (v.wyniki?.zasoby || []).length;
+    const lead = !n ? podsumowanie("W tej rundzie nie było składników w magazynie.") : podsumowanie([
+      `W magazynie na koniec ${OKRES.dopelniacz} leży <b>${licz(n)}</b> ${n === 1 ? "pozycja" : "pozycji"} składników wartych <b>${zl2(suma)}</b>.`,
+      ze.length ? `Straty (zepsute lub przeterminowane) dotyczą ${licz(ze.length)} pozycji.` : straty ? "Nic się nie zepsuło." : ""], ze.length ? "uwaga" : "ok");
+    const kafle = n ? kafelkiLiczb([{ etykieta: "Pozycje w magazynie", wartosc: licz(n) }, { etykieta: "Wartość magazynu", wartosc: zl2(suma) },
+      straty && { etykieta: "Pozycje ze stratami", wartosc: licz(ze.length), ton: ze.length ? "minus" : "plus" }]) : "";
+    return lead + kafle + wynikiAuto(v) + planDostaw(v.wyniki?.dostawy, "Dostawy, opłaty za dowóz i zakupy w dyskontach") + zwinTabela("Składniki", ["Składnik", "Jakość", `Magazyn na początek ${OKRES.dopelniacz}`, "Zamówione", "Wykorzystane", ...(straty ? ["Straty"] : []),
+      `Magazyn na koniec ${OKRES.dopelniacz}`, "Wartość"], z, { klasy: ["l"], stopka: ["Suma", "", "", "", "", ...(straty ? [""] : []), "", zl2(suma)], otwarte: true })
+      + `<div class="wykres"><canvas id="w-jakosc"></canvas></div>`
+      + zwinTabela("Jakość składników (zamówione opakowania)", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★"], jak, { klasy: ["l"] });
   },
   po({ v }, tryb) {
     if (tryb !== "wyniki") return;

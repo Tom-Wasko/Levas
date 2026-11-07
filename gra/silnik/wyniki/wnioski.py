@@ -63,7 +63,7 @@ def wnioski(dane: Dane, w: dict | None, wp: dict | None = None) -> dict | None:
     if netto > 0:
         dobre.append(f"Runda na plusie: {zl(netto)} dochodu netto.")
     przed = _liczby(wp)
-    if przed.get("klienci") and klienci > przed["klienci"] * 1.05:   # UF23: wzrost względem poprzedniej rundy
+    if przed.get("klienci") and klienci > przed["klienci"] * (1 + dane.z["wnioski"]["wzrost_klientow"]):   # UF23: wzrost względem poprzedniej rundy
         dobre.append(f"Klientów więcej niż tydzień wcześniej: {round(przed['klienci'])} → {klienci} "
                      f"(+{round(100 * (klienci / przed['klienci'] - 1))}%).")
     if przed.get("dochod_netto") is not None and netto > 0 and netto > przed["dochod_netto"] + 1:

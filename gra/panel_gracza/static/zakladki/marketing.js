@@ -1,5 +1,5 @@
 // Marketing: kampanie agencji reklamowych w strefach miasta (tradycyjne i – UF19 – internetowe) i promocje.
-import { esc, KOLORY, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, KOLORY, licz, nazwaFirmy, nazwaUslugi, podsumowanie, proc, tabela, wykres, zl, zwinTabela } from "./wspolne.js";
 import { igReklama } from "./infografiki.js";
 
 const RODZAJ = { druk: "druk", internet: "internet", radio_billboard: "radio i billboardy", wydarzenia: "wydarzenia" };
@@ -103,13 +103,22 @@ function agencjaHtml(v, R, a, edycja, mi = null) {
 const raportyAgencji = (lista) => lista.filter((x) => x.tekst).map((x) => `<div class="kafel"><div class="kg">${esc(x.nazwa)} – ${esc(x.strefa_nazwa)}</div>
       <div class="kt"><p>${esc(x.tekst)}</p></div></div>`).join("");
 
-function trwajaceHtml(v, lista, tytul) {
+function trwajaceHtml(v, lista, tytul, zw = false) {
   if (!lista.length) return "";
-  return tabela(tytul, ["Kampania", "Agencja", "Strefa", "Runda", "Emisje", "Faza", "Zagłuszanie", "Więcej klientów", "Przyciąganie", "Koszt"],
+  return (zw ? (t, n, w, o) => zwinTabela(t, n, w, { ...o, otwarte: true }) : tabela)(tytul, ["Kampania", "Agencja", "Strefa", "Runda", "Emisje", "Faza", "Zagłuszanie", "Więcej klientów", "Przyciąganie", "Koszt"],
     lista.map((x) => [esc(x.nazwa), esc(x.agencja_nazwa), esc(x.strefa_nazwa), x.od_rundy === x.do_rundy ? x.od_rundy : `${x.od_rundy}–${x.do_rundy}`,
       x.emisje == null ? "–" : `${licz(x.emisje)} (${proc(x.nasycenie, 0)})`, FAZA[x.faza],
       x.konkurenci ? `<span class="minus">${proc(x.zagluszanie, 0)}</span> (${x.konkurenci} konk.)` : "–",
       `+${proc(x.pula, 1)}`, `+${proc(x.przyciaganie, 1)}`, x.koszt ? zl(x.koszt) : "–"]), { klasy: ["l", "l", "l"] });
+}
+
+// UF23: podsumowanie i kafelki wyników kampanii (lista kampanii z v.wyniki.reklama_agencje.kampanie)
+function podsumowanieKampanii(lista, gdzie) {
+  if (!lista.length) return podsumowanie(`W tej rundzie nie działała żadna Twoja kampania${gdzie}.`);
+  const koszt = lista.reduce((a, x) => a + (x.koszt || 0), 0), n = lista.length, best = lista.reduce((a, x) => x.przyciaganie > a.przyciaganie ? x : a);
+  return podsumowanie(`W tej rundzie ${n === 1 ? "działała" : "działało"} <b>${licz(n)}</b> ${n === 1 ? "Twoja kampania" : "Twoich kampanii"}${gdzie}, koszt rundy to <b>${zl(koszt)}</b>. Najmocniej przyciągała „${esc(best.nazwa)}” (+${proc(best.przyciaganie, 1)}).`, "ok")
+    + kafelkiLiczb([{ etykieta: "Kampanie", wartosc: licz(n) }, { etykieta: "Koszt w tej rundzie", wartosc: zl(koszt) },
+      { etykieta: "Najsilniejsze przyciąganie", wartosc: `+${proc(best.przyciaganie, 1)}`, opis: esc(best.nazwa), ton: "plus" }]);
 }
 
 export const agencje = {
@@ -136,16 +145,16 @@ export const agencje = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.reklama_agencje;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie z kampanią.</p>`;
+    if (!W) return brakWynikow("Wyniki pojawią się po pierwszej rundzie z kampanią.");
     const kampanie = W.kampanie.filter((x) => !x.internet);
-    let html = raportyAgencji(kampanie);
-    html += trwajaceHtml(v, kampanie, "Twoje kampanie w tej rundzie") || `<p class="podpowiedz">W tej rundzie nie działała żadna Twoja kampania.</p>`;
+    let html = podsumowanieKampanii(kampanie, "") + raportyAgencji(kampanie);
+    html += trwajaceHtml(v, kampanie, "Twoje kampanie w tej rundzie", true);
     const L = Object.entries(W.laczne || {});
-    if (L.length) html += tabela("Łączne przyciąganie w strefach (po sufocie)", ["Strefa", "Suma kampanii", "Działa naprawdę", "Uciekło przez sufit"],
+    if (L.length) html += zwinTabela("Łączne przyciąganie w strefach (po sufocie)", ["Strefa", "Suma kampanii", "Działa naprawdę", "Uciekło przez sufit"],
       L.map(([z, x]) => [esc(v.reklama?.strefy?.[z] ?? z), `+${proc(x.suma, 1)}`, `+${proc(x.dziala, 1)}`,
         x.suma - x.dziala > 0.005 ? `<span class="minus">${proc(x.suma - x.dziala, 1)}</span>` : "–"]), { klasy: ["l"] });
     const k = v.rynek?.kampanie || {};
-    html += tabela("Kampanie na mieście (widać je na słupach i w radiu)", ["Firma", "Wydatki w rundzie", "Kampanie"],
+    html += zwinTabela("Kampanie na mieście (widać je na słupach i w radiu)", ["Firma", "Wydatki w rundzie", "Kampanie"],
       Object.entries(k).map(([f, x]) => [esc(nazwaFirmy(v, f)), zl(x.wydatki),
         x.kampanie.map((y) => `${esc(y.kanal)} (${esc(y.strefa ? v.reklama?.strefy?.[y.strefa] ?? y.strefa : "całe miasto")}${y.emisje ? `, ${emisji(y.emisje)}` : ""}, ${FAZA[y.faza]})`).join(", ")]),
       { klasy: ["l", "", "l"] });
@@ -208,8 +217,8 @@ export const internet = {
   },
   wyniki({ v }) {
     const kampanie = (v.wyniki?.reklama_agencje?.kampanie || []).filter((x) => x.internet);
-    if (!kampanie.length) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie z kampanią w sieci.</p>`;
-    return raportyAgencji(kampanie) + trwajaceHtml(v, kampanie, "Twoje kampanie w sieci w tej rundzie");
+    if (!kampanie.length) return brakWynikow("Wyniki pojawią się po pierwszej rundzie z kampanią w sieci.");
+    return podsumowanieKampanii(kampanie, " w sieci") + raportyAgencji(kampanie) + trwajaceHtml(v, kampanie, "Twoje kampanie w sieci w tej rundzie", true);
   },
   zmiany: agencje.zmiany,
 };
@@ -261,16 +270,21 @@ export const promocje = {
   },
   wyniki({ v, kat }) {
     const W = v.wyniki?.promocje;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie z promocją.</p>`;
-    let html = W.promocje.filter((x) => x.tekst).map((x) => `<div class="kafel"><div class="kg">${esc(x.rodzaj)} „${esc(x.nazwa)}”</div>
+    if (!W) return brakWynikow("Wyniki pojawią się po pierwszej rundzie z promocją.");
+    const np = W.promocje.length, S = (k) => W.promocje.reduce((a, x) => a + (x[k] || 0), 0);
+    let html = podsumowanie(np ? `Twoje promocje w tej rundzie: <b>${licz(np)}</b>. Objęto nimi <b>${licz(S("objeci"))}</b> porcji.`
+      : "W tej rundzie nie działała żadna Twoja promocja.", np ? "ok" : "")
+      + (np ? kafelkiLiczb([{ etykieta: "Promocje", wartosc: licz(np) }, { etykieta: "Objęte porcje", wartosc: licz(S("objeci")) },
+        { etykieta: "Rabaty", wartosc: zl(S("rabat")), ton: S("rabat") ? "minus" : "" }, { etykieta: "Porcje gratis", wartosc: licz(S("gratis")) },
+        { etykieta: "Koszt dodatków", wartosc: zl(S("koszt_dodatkow")), ton: S("koszt_dodatkow") ? "minus" : "" }]) : "");
+    html += W.promocje.filter((x) => x.tekst).map((x) => `<div class="kafel"><div class="kg">${esc(x.rodzaj)} „${esc(x.nazwa)}”</div>
       <div class="kt"><p>${esc(x.tekst)}</p></div></div>`).join("");
-    html += W.promocje.length ? tabela("Twoje promocje w tej rundzie", ["Promocja", "Nazwa", "Danie", "Rund", "Przyciąganie", "Objętych porcji", "Rabat", "Porcje gratis", "Dopłaty", "Koszt dodatków"],
+    html += W.promocje.length ? zwinTabela("Twoje promocje w tej rundzie", ["Promocja", "Nazwa", "Danie", "Rund", "Przyciąganie", "Objętych porcji", "Rabat", "Porcje gratis", "Dopłaty", "Koszt dodatków"],
       W.promocje.map((x) => [esc(x.rodzaj), `„${esc(x.nazwa)}”`, x.danie ? esc(nazwaUslugi(kat, x.danie)) : "całe menu", x.rund, `+${proc(x.przyciaganie, 0)}`,
-        licz(x.objeci), zl(x.rabat), licz(x.gratis), zl(x.doplaty), zl(x.koszt_dodatkow)]), { klasy: ["l", "l", "l"] })
-      : `<p class="podpowiedz">W tej rundzie nie działała żadna Twoja promocja.</p>`;
+        licz(x.objeci), zl(x.rabat), licz(x.gratis), zl(x.doplaty), zl(x.koszt_dodatkow)]), { klasy: ["l", "l", "l"], otwarte: true }) : "";
     if (W.wylaczone?.length) html += `<p class="podpowiedz">Wyłączone: ${W.wylaczone.map((x) => `„${esc(x.nazwa)}”`).join(", ")}.</p>`;
     const k = v.rynek?.promocje || {};
-    html += tabela("Promocje na mieście (plakaty na drzwiach lokali)", ["Firma", "Promocje"],
+    html += zwinTabela("Promocje na mieście (plakaty na drzwiach lokali)", ["Firma", "Promocje"],
       Object.entries(k).map(([f, l]) => [esc(nazwaFirmy(v, f)), l.map((y) => `${esc(y.rodzaj)} „${esc(y.nazwa)}”${y.danie ? ` – ${esc(nazwaUslugi(kat, y.danie))}` : ""}`).join(", ")]),
       { klasy: ["l", "l"] });
     return html;

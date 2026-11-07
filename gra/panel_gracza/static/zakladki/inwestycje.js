@@ -1,6 +1,6 @@
 // Inwestycje: stanowiska, sprzęt, wyposażenie dla klientów.
 import { kosztLokali, miejscaLokali } from "./lokale.js";
-import { esc, naOkres, naRunde, gw, licz, nazwaFirmy, nazwaUslugi, okno, proc, tabela, toast, wykres, zamknijOkno, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, gw, kafelkiLiczb, licz, nazwaFirmy, nazwaUslugi, okno, podsumowanie, proc, tabela, toast, wykres, zamknijOkno, zl, zwinTabela } from "./wspolne.js";
 import { decyzjaLokalu, idWybranego, listaLokalu, nazwaLokalu, opisLokalu, stanowiskaLokalu } from "./lokal_wybor.js";
 
 // Z3: miejsca na stanowiska – przy kilku lokalach tylko w wybranym lokalu
@@ -37,16 +37,23 @@ export const stanowiska = {
   },
   wyniki({ v, kat }) {
     const typy = kat.oferty.stanowiska.typy, sprzet = v.wyniki?.sprzet || [];
+    let razemSt = 0;
     const own = TYPY.map((typ) => {
       const st = stanowiskaLokalu(v, v.stan.stanowiska).filter((s) => s.typ === typ), m = miejscaWybranego(v, typ);
+      razemSt += st.length;
       const ob = sprzet.filter((s) => s.typ === typ).map((s) => s.oblozenie);
       return [esc(typy[typ].nazwa), licz(st.length), m ? `${licz(m.zajete)} z ${licz(m.wszystkie)}` : "–",
         ob.length ? proc(ob.reduce((a, x) => a + x, 0) / ob.length) : "–", ob.length ? proc(Math.max(...ob)) : "–"];
     });
     const rs = v.rynek?.stanowiska || {};
     const firmy = Object.keys(rs).map((f) => [esc(nazwaFirmy(v, f)), ...TYPY.map((t) => licz(rs[f][t] || 0))]);
-    return tabela("Twoje stanowiska", ["Rodzaj", "Liczba", "Miejsca w lokalach (zajęte)", "Średnie obłożenie sprzętu", "Najwyższe obłożenie"], own, { klasy: ["l"] })
-      + (firmy.length ? tabela("Stanowiska konkurencji", ["Firma", ...TYPY.map((t) => esc(typy[t].nazwa))], firmy, { klasy: ["l"] }) : "")
+    const obl = sprzet.map((s) => s.oblozenie), srOb = obl.length ? obl.reduce((a, x) => a + x, 0) / obl.length : null, maxOb = obl.length ? Math.max(...obl) : null;
+    const lead = podsumowanie([`Firma ma ${razemSt} ${razemSt === 1 ? "stanowisko" : razemSt >= 2 && razemSt <= 4 ? "stanowiska" : "stanowisk"}.`,
+      maxOb == null ? "" : maxOb >= 0.95 ? "Któryś sprzęt pracował niemal na pełnych obrotach – to wąskie gardło." : `Najbardziej obciążony sprzęt pracował na ${proc(maxOb)} swoich możliwości.`], maxOb >= 0.95 ? "uwaga" : "");
+    const kafle = kafelkiLiczb([{ etykieta: "Stanowiska", wartosc: licz(razemSt) }, srOb != null && { etykieta: "Średnie obłożenie sprzętu", wartosc: proc(srOb) },
+      maxOb != null && { etykieta: "Najwyższe obłożenie", wartosc: proc(maxOb), ton: maxOb >= 0.95 ? "minus" : "" }]);
+    return lead + kafle + zwinTabela("Twoje stanowiska", ["Rodzaj", "Liczba", "Miejsca w lokalach (zajęte)", "Średnie obłożenie sprzętu", "Najwyższe obłożenie"], own, { klasy: ["l"], otwarte: true })
+      + (firmy.length ? zwinTabela("Stanowiska konkurencji", ["Firma", ...TYPY.map((t) => esc(typy[t].nazwa))], firmy, { klasy: ["l"] }) : "")
       + `<p class="podpowiedz">Obłożenie blisko 100% oznacza, że sprzęt był wąskim gardłem – kolejne stanowisko (i pracownik) przyjmie więcej klientów.</p>`;
   },
   akcje: {
@@ -96,8 +103,11 @@ export const sprzet = {
     const firmy = Object.keys(v.rynek?.sprzet || {});
     const ile = firmy.map((f) => [esc(nazwaFirmy(v, f)), ...[1, 2, 3].map((q) => licz(v.rynek.sprzet[f][q])),
       licz([1, 2, 3].reduce((a, q) => a + v.rynek.sprzet[f][q], 0))]);
-    return tabela("Liczba i jakość sprzętów", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★", "Razem"], ile, { klasy: ["l"] })
-      + tabela("Obłożenie sprzętu (Twoja firma)", ["Stanowisko", "Sprzęt", "Jakość", "Obłożenie"], own, { klasy: ["l", "l"] })
+    const sp = v.wyniki?.sprzet || [], top = sp.length ? sp.reduce((a, s) => (s.oblozenie > a.oblozenie ? s : a)) : null;
+    const lead = podsumowanie(top ? [`Firma ma ${sp.length} ${sp.length === 1 ? "sprzęt" : "sprzętów"} w użyciu; najbardziej obciążony to ${esc(top.nazwa)} (${proc(top.oblozenie)}).`,
+      top.oblozenie >= 0.95 ? "Ten sprzęt nie nadążał z obsługą – warto dołożyć drugi albo lepszy." : "Żaden sprzęt nie był wąskim gardłem."] : "Firma nie ma jeszcze sprzętu, który pracował w tej rundzie.", top && top.oblozenie >= 0.95 ? "uwaga" : "");
+    return lead + zwinTabela("Obłożenie sprzętu (Twoja firma)", ["Stanowisko", "Sprzęt", "Jakość", "Obłożenie"], own, { klasy: ["l", "l"], otwarte: true })
+      + zwinTabela("Liczba i jakość sprzętów", ["Firma", "Niska ★", "Średnia ★★", "Wysoka ★★★", "Razem"], ile, { klasy: ["l"] })
       + `<p class="podpowiedz">Obłożenie = godziny pracy sprzętu / 160 h. 100% oznacza, że sprzęt nie mógł obsłużyć kolejnych klientów.</p>`;
   },
   akcje: {
@@ -174,7 +184,9 @@ export const wyposazenie = {
   decyzje(c) { return kafleUdogodnien(c, "wyposazenie", "klientów"); },
   wyniki({ v }) {
     const w = Object.entries(v.rynek?.wyposazenie || {}).map(([f, n]) => [esc(nazwaFirmy(v, f)), licz(n)]);
-    return tabela("Posiadane wyposażenie", ["Firma", "Liczba pozycji wyposażenia"], w, { klasy: ["l"] });
+    const moje = v.rynek?.wyposazenie?.[v.firma];
+    return podsumowanie(moje != null ? `Firma ma ${licz(moje)} ${moje === 1 ? "pozycję" : moje >= 2 && moje <= 4 ? "pozycje" : "pozycji"} wyposażenia dla klientów.` : "Poniżej porównanie wyposażenia firm.")
+      + zwinTabela("Posiadane wyposażenie", ["Firma", "Liczba pozycji wyposażenia"], w, { klasy: ["l"], otwarte: true });
   },
   akcje: { "kup-udog": (el, c) => przelaczUdog(el, c), "sprzedaj-udog": (el, c) => przelaczUdog(el, c) },
 };
@@ -207,7 +219,7 @@ export function kafleUdogodnien({ v, kat, edycja }, rodzaj, kogo) {
         ? `<button class="btn ${ma ? "pom" : "zielony"}" data-akcja="sprzedaj-udog" data-r="${rodzaj}" data-nazwa="${esc(p.nazwa)}" ${edycja ? "" : "disabled"}>${ma ? "Sprzedaj" : "✓ Sprzedane"}</button>`
         : `<button class="btn ${ma ? "zielony" : "czarny"}" data-akcja="kup-udog" data-r="${rodzaj}" data-nazwa="${esc(p.nazwa)}" ${edycja ? "" : "disabled"}>${ma ? "✓ Wybrano" : "Wybierz"}</button>`;
       return `<div class="kafel ${ma ? "wybrany" : ""}"><div class="kg">${esc(p.nazwa)}<span class="pigulka inf" title="% ${kogo} oczekujących">${p.procent}%</span></div>
-        <div class="kt">${p.sklep ? `<div class="wiersz"><span>Sklep</span><span>${esc(p.sklep)}</span></div>` : ""}<div class="wiersz"><span>${mial ? "Cena sprzedaży" : "Cena zakupu"}</span><span>${zl(mial ? p.cena / 2 : p.cena)}</span></div>
+        <div class="kt">${p.opis ? `<p class="podpowiedz" style="margin:0 0 8px">${esc(p.opis)}</p>` : ""}${p.sklep ? `<div class="wiersz"><span>Sklep</span><span>${esc(p.sklep)}</span></div>` : ""}<div class="wiersz"><span>${mial ? "Cena sprzedaży" : "Cena zakupu"}</span><span>${zl(mial ? p.cena / 2 : p.cena)}</span></div>
         <div class="wiersz"><span>Koszt utrzymania</span><span>${zl(naRunde(p.utrzymanie))}${naOkres()}</span></div>
         <div class="wiersz"><span>% ${kogo} oczekujących</span><span>${p.procent}%</span></div></div><div class="kd">${przycisk}</div></div>`;
     }).join("")}</div>`;

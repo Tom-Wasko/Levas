@@ -1,8 +1,8 @@
 // Ludzie: zatrudnienie (obsada stanowisk w Mój lokal), zespół, udogodnienia, szkolenia.
 // UF20 (gra z lokalami): nowych ludzi zatrudnia się w Rynku pracy (od razu z lokalem i stanowiskiem), a obsada w Moim
 // lokalu przypisuje osoby już zatrudnione – z tego lokalu od razu, z innego za zgodą pracownika (decyzja `przenosiny`).
-import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast,
-  wykres, zamknijOkno, zl } from "./wspolne.js";
+import { esc, naOkres, naRunde, OKRES, gw, inicjaly, licz, nazwaFirmy, okno, ponadLimitPracownikow, podsumowanie, kafelkiLiczb, proc, tabela, tekstLimituPracownikow, toast,
+  wykres, zamknijOkno, zl, zwinTabela } from "./wspolne.js";
 import { kafleUdogodnien, przelaczUdog } from "./inwestycje.js";
 import { kolko } from "./dymki.js";
 import { idWybranego, nazwaLokalu, stanowiskaLokalu, wyborLokaluKrotki } from "./lokal_wybor.js";
@@ -96,11 +96,18 @@ export const zatrudnienie = {
       gw(1), `nr ${wl.nr}`, proc(wl.wykorzystanie || 0), "bez pensji", "–"]);
     const odejscia = (v.wyniki?.odejscia_pracownikow || []).map((o) => [esc(o.imie_nazwisko), licz(o.zadowolenie, 2), o.powody.map(esc).join(", "),
       `runda ${o.runda_odejscia}`]);
-    return tabela("Liczba pracowników", ["Zespół", ...ZAWODY], liczba, { klasy: ["l"] })
-      + tabela("Wykorzystanie czasu pracowników", ["Zespół", ...ZAWODY], wyk, { klasy: ["l"] })
-      + tabela("Średnie wynagrodzenie pracowników", ["Zespół", ...ZAWODY], pensje, { klasy: ["l"] })
-      + tabela("Twoi pracownicy", ["Pracownik", "Zawód", "Doświadczenie", "Stanowisko", "Wykorzystanie czasu", "Wynagrodzenie", "Zadowolenie"], moi, { klasy: ["l"] })
-      + (odejscia.length ? tabela("Wypowiedzenia z niezadowolenia", ["Pracownik", "Zadowolenie", "Powody", "Odchodzi"], odejscia, { klasy: ["l"] }) : "")
+    const L = v.wyniki?.pracownicy || [], nzad = L.filter((p) => p.niezadowolony).length, sr = L.length ? L.reduce((a, p) => a + (p.wykorzystanie || 0), 0) / L.length : 0;
+    const lead = !L.length ? podsumowanie("Nie masz jeszcze zatrudnionych pracowników.") : podsumowanie([
+      `W zespole pracuje <b>${licz(L.length)}</b> ${L.length === 1 ? "osoba" : "osób"}, średnie wykorzystanie czasu to <b>${proc(sr, 0)}</b>.`,
+      nzad ? `Niezadowolonych jest ${licz(nzad)} – bez zmian mogą złożyć wypowiedzenie.` : "Nikt nie jest niezadowolony.",
+      odejscia.length ? `Z niezadowolenia odchodzi ${licz(odejscia.length)} ${odejscia.length === 1 ? "osoba" : "osób"}.` : ""], nzad || odejscia.length ? "uwaga" : "ok");
+    const kafle = L.length ? kafelkiLiczb([{ etykieta: "Pracownicy", wartosc: licz(L.length) }, { etykieta: "Średnie wykorzystanie czasu", wartosc: proc(sr, 0) },
+      { etykieta: "Niezadowoleni", wartosc: licz(nzad), ton: nzad ? "minus" : "plus" }, { etykieta: "Wypowiedzenia", wartosc: licz(odejscia.length), ton: odejscia.length ? "minus" : "" }]) : "";
+    return lead + kafle + zwinTabela("Twoi pracownicy", ["Pracownik", "Zawód", "Doświadczenie", "Stanowisko", "Wykorzystanie czasu", "Wynagrodzenie", "Zadowolenie"], moi, { klasy: ["l"], otwarte: true })
+      + (odejscia.length ? zwinTabela("Wypowiedzenia z niezadowolenia", ["Pracownik", "Zadowolenie", "Powody", "Odchodzi"], odejscia, { klasy: ["l"], otwarte: true }) : "")
+      + zwinTabela("Liczba pracowników", ["Zespół", ...ZAWODY], liczba, { klasy: ["l"] })
+      + zwinTabela("Wykorzystanie czasu pracowników", ["Zespół", ...ZAWODY], wyk, { klasy: ["l"] })
+      + zwinTabela("Średnie wynagrodzenie pracowników", ["Zespół", ...ZAWODY], pensje, { klasy: ["l"] })
       + `<p class="podpowiedz">Wykorzystanie 100% oznacza, że pracownik nie miał czasu na kolejnych klientów (możliwa utracona sprzedaż).</p>`;
   },
   akcje: {
@@ -417,7 +424,9 @@ export const udogodnienia = {
   decyzje(c) { return wyborLokaluKrotki(c.v) + kafleUdogodnien(c, "udogodnienia", "pracowników"); },
   wyniki({ v }) {
     const w = Object.entries(v.rynek?.udogodnienia || {}).map(([f, n]) => [esc(nazwaFirmy(v, f)), licz(n)]);
-    return tabela("Posiadane udogodnienia", ["Firma", "Liczba udogodnień"], w, { klasy: ["l"] });
+    const moje = v.rynek?.udogodnienia?.[v.firma];
+    return podsumowanie(moje ? `Twoja firma ma <b>${licz(moje)}</b> ${moje === 1 ? "udogodnienie" : "udogodnień"} dla pracowników.` : "Twoja firma nie ma jeszcze udogodnień dla pracowników.", moje ? "ok" : "")
+      + zwinTabela("Posiadane udogodnienia", ["Firma", "Liczba udogodnień"], w, { klasy: ["l"], otwarte: true });
   },
   akcje: {},
 };
@@ -439,10 +448,11 @@ export const szkolenia = {
     const l = v.wyniki?.szkolenia || [], k = v.wyniki?.karta;
     const w = l.map((x) => [esc(x.szkolenie), esc(x.firma), `${x.procent}%`, zl(x.koszt)]);
     const razem = l.reduce((a, x) => a + x.koszt, 0), pr = l.reduce((a, x) => a + x.procent, 0);
-    return (w.length ? tabela("Szkolenia w tej rundzie", ["Szkolenie", "Firma szkoleniowa", "% pracowników oczekujących", "Koszt"],
-      [...w, ["<b>Razem</b>", "", `<b>${pr}%</b>`, `<b>${zl(razem)}</b>`]], { klasy: ["l", "l"] })
-      : `<p class="podpowiedz">W tej rundzie nie było szkoleń.</p>`)
-      + (k ? tabela("Efekt", ["Zadowolenie pracowników (karta wyników)"], [[licz(k.zadowolenie_pracownikow, 3)]]) : "");
+    const lead = podsumowanie(w.length ? `Szkolenia w tej rundzie: <b>${licz(w.length)}</b>, koszt <b>${zl(razem)}</b>.` : "W tej rundzie nie było szkoleń.");
+    return lead + (w.length ? zwinTabela("Szkolenia w tej rundzie", ["Szkolenie", "Firma szkoleniowa", "% pracowników oczekujących", "Koszt"],
+      [...w, ["<b>Razem</b>", "", `<b>${pr}%</b>`, `<b>${zl(razem)}</b>`]], { klasy: ["l", "l"], otwarte: true })
+      : "")
+      + (k ? zwinTabela("Efekt", ["Zadowolenie pracowników (karta wyników)"], [[licz(k.zadowolenie_pracownikow, 3)]]) : "");
   },
   akcje: {
     szkolenie: (el, c) => c.zmien((d) => {

@@ -1,7 +1,7 @@
 // Kalendarz miejski (gra z lokalami, silnik/rynek/kalendarz.py, dane/kalendarz/kalendarz.yaml): święta, uczelnie, ferie,
 // okazje handlowe, mecze Motoru na Arenie i wydarzenia w Lublinie – zmiana puli klientów stref w każdym tygodniu gry
 // i popytu na konkretne dania (P14). Układ (przebudowa 2.11.2026): tabela tygodnia dzień po dniu + siatka miesiąca.
-import { esc, licz, nazwaRundy, nazwaUslugi, tabela } from "./wspolne.js";
+import { brakWynikow, esc, licz, nazwaRundy, nazwaUslugi, podsumowanie, tabela, zwinTabela } from "./wspolne.js";
 import { kolko } from "./dymki.js";
 import { nazwaStrefy } from "./lokale.js";
 
@@ -30,7 +30,7 @@ function opisWydarzenia(w, kat, rodzaje) {
 const strefyLista = (z, kat) => z.map(([s, x]) => `${esc(nazwaStrefy(kat, s))} ${zmiana(x)}`).join(", ") || "–";
 
 // tabela tygodnia: wiersz = dzień; wydarzenia z dymkiem, strefy z większą / mniejszą liczbą klientów, dania
-function tabelaTygodnia(t, kat, rodzaje, tytul) {
+function tabelaTygodnia(t, kat, rodzaje, tytul, zw = false) {
   const poNazwie = Object.fromEntries(t.wydarzenia.map((w) => [w.nazwa, w]));
   const wiersze = (t.dni || []).map((d) => {
     const dt = naDate(d.data), z = Object.entries(d.strefy).sort((a, b) => b[1] - a[1]);
@@ -41,8 +41,8 @@ function tabelaTygodnia(t, kat, rodzaje, tytul) {
     return [`<b>${DNI[dzienTyg(dt)]}</b> ${dataKrotka(d.data)}`, wyd || "–", strefyLista(z.filter(([, x]) => x > 0), kat),
       strefyLista(z.filter(([, x]) => x < 0).reverse(), kat), dania || "–"];
   });
-  return tabela(tytul, ["Dzień", "Wydarzenie", "Więcej klientów", "Mniej klientów", "Dania z większym popytem"],
-    wiersze, { klasy: ["l", "l", "l", "l", "l"], sortuj: false });
+  return (zw ? zwinTabela : tabela)(tytul, ["Dzień", "Wydarzenie", "Więcej klientów", "Mniej klientów", "Dania z większym popytem"],
+    wiersze, { klasy: ["l", "l", "l", "l", "l"], sortuj: false, ...(zw ? { otwarte: true } : {}) });
 }
 
 // --- siatka miesiąca -----------------------------------------------------------------------------------------
@@ -108,9 +108,12 @@ export const kalendarz = {
   },
   wyniki({ v, kat }) {
     const K = v.kalendarz_miasta, P = K?.poprzedni, R = v.rynek?.strefy;
-    if (!P) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie sprzedaży.</p>`;
-    return tabelaTygodnia(P, kat, K.rodzaje, `${esc(nazwaRundy(P.runda))} – miniony tydzień (${zakres(P)})`)
-      + (R ? tabela("Klienci stref w minionym tygodniu", ["Strefa", "Klienci (pula)", "Zmiana przez kalendarz"],
+    if (!P) return brakWynikow("Wyniki pojawią się po pierwszej rundzie sprzedaży.");
+    const nazwy = [...new Set(P.wydarzenia.map((w) => w.nazwa))];
+    const lead = podsumowanie(nazwy.length ? `W minionym tygodniu w mieście działo się: <b>${nazwy.map(esc).join("</b>, <b>")}</b>.`
+      : "W minionym tygodniu w mieście nie było większych wydarzeń – klienci przychodzili w zwykłym rytmie.");
+    return lead + tabelaTygodnia(P, kat, K.rodzaje, `${esc(nazwaRundy(P.runda))} – miniony tydzień (${zakres(P)})`, true)
+      + (R ? zwinTabela("Klienci stref w minionym tygodniu", ["Strefa", "Klienci (pula)", "Zmiana przez kalendarz"],
         Object.entries(R.strefy).map(([s, x]) => [esc(nazwaStrefy(kat, s)), licz(x.pula), P.strefy[s] ? zmiana(P.strefy[s]) : "–"]),
         { klasy: ["l"] }) : "");
   },

@@ -1,6 +1,6 @@
 // Klienci i strefy: popyt strefowy w grze z lokalami (silnik/rynek/popyt.py, dane/mapa/popyt.yaml) – pule klientów stref,
 // dni tygodnia, kalendarz miejski i wyniki dzień po dniu. Bez gotowej prognozy – popyt drużyna liczy sama (test gry 28.10).
-import { esc, licz, proc, tabela, wykres } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, licz, podsumowanie, proc, tabela, wykres, zwinTabela } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 import { IG_KLIENCI } from "./infografiki.js";
 
@@ -63,15 +63,14 @@ function strefyDecyzje(v, kat) {
 }
 
 function wynikiDni(k) {
-  return tabela("Klienci dzień po dniu", ["Dzień", "Data", "Popyt", "Sprzedaż", "Utracona sprzedaż"],
+  return zwinTabela("Klienci dzień po dniu", ["Dzień", "Data", "Popyt", "Sprzedaż", "Utracona sprzedaż"],
     k.dni.map((d) => [d.dzien, dataKrotka(d.data), licz(d.popyt), licz(d.sprzedaz), d.utracona ? `<span class="minus">${licz(d.utracona)}</span>` : "0"]),
-    { klasy: ["l", "l"], stopka: ["Razem", "", ...["popyt", "sprzedaz", "utracona"].map((x) => licz(k.dni.reduce((s, d) => s + d[x], 0)))] })
-    + `<div class="wykres"><canvas id="w-klienci-dni"></canvas></div>`;
+    { klasy: ["l", "l"], stopka: ["Razem", "", ...["popyt", "sprzedaz", "utracona"].map((x) => licz(k.dni.reduce((s, d) => s + d[x], 0)))], otwarte: true });
 }
 
 function wynikiLokale(k, kat, P) {
   const zGrupami = k.lokale.some((l) => l.grupy && Object.keys(l.grupy).length);
-  return tabela("Lokale – skąd przyszli klienci", ["Lokal", "Strefa", "Popyt", "Sprzedaż", "Klienci ze stref",
+  return zwinTabela("Lokale – skąd przyszli klienci", ["Lokal", "Strefa", "Popyt", "Sprzedaż", "Klienci ze stref",
     ...(zGrupami ? ["Grupy klientów"] : [])],
     k.lokale.map((l) => [esc(l.nazwa), esc(nazwaStrefy(kat, l.strefa)), licz(l.popyt), licz(l.sprzedaz),
       Object.entries(l.strefy).slice(0, 4).map(([s, n]) => `${esc(nazwaStrefy(kat, s))}: ${licz(n)}`).join(", "),
@@ -87,7 +86,7 @@ function wynikiOpinie(v, k) {
   if (!o || !Object.keys(o).length) return "";
   const nazwa = Object.fromEntries(k.lokale.map((l) => [l.id, l.nazwa]));
   const znak = (x) => x >= 0.05 ? `<span class="plus">+${gw(x)}</span>` : x <= -0.05 ? `<span class="minus">${gw(x)}</span>` : "0";
-  return tabela("Opinie klientów o Twoich lokalach", ["Lokal", "Ocena tygodnia", ...Object.values(POWODY), "Nowe opinie", "Ocena na mapie", "Mnożnik popytu"],
+  return zwinTabela("Opinie klientów o Twoich lokalach", ["Lokal", "Ocena tygodnia", ...Object.values(POWODY), "Nowe opinie", "Ocena na mapie", "Mnożnik popytu"],
     Object.entries(o).map(([id, x]) => [esc(nazwa[id] || id), `★ ${gw(x.ocena_tygodnia)}`, ...Object.keys(POWODY).map((p) => znak(x.powody[p])),
       licz(x.nowe), `★ ${gw(x.ocena)} (${licz(x.liczba)})`, `× ${licz(x.mnoznik, 2)}`]), { klasy: ["l"], sortuj: false })
     + `<p class="podpowiedz">Ocena tygodnia to ocena wyjściowa ± powody (w gwiazdkach): jakość dań, cena wobec cen w strefie, klienci odesłani
@@ -101,7 +100,7 @@ function wynikiStrefy(v, kat, R) {
     const inni = Object.entries(s.klienci).filter(([f]) => f !== v.firma).reduce((x, [, n]) => x + n, 0);
     return [esc(nazwaStrefy(kat, k)), licz(s.pula), licz(moi), s.pula ? proc(moi / s.pula) : "–", licz(inni), s.pula ? proc(1 - (moi + inni) / s.pula) : "–"];
   });
-  return tabela("Strefy – podział klientów", ["Strefa", "Klienci strefy", "Twoje lokale", "Udział", "Konkurencja", "Poza grą (inne bary, dom)"], wiersze, { klasy: ["l"] });
+  return zwinTabela("Strefy – podział klientów", ["Strefa", "Klienci strefy", "Twoje lokale", "Udział", "Konkurencja", "Poza grą (inne bary, dom)"], wiersze, { klasy: ["l"] });
 }
 
 export const klienci = {
@@ -120,9 +119,14 @@ export const klienci = {
   },
   wyniki({ v, kat }) {
     const k = v.wyniki?.klienci, R = v.rynek?.strefy;
-    if (!k || !R) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie sprzedaży.</p>`;
-    return (R.wydarzenia.length ? `<div class="pasek">Wydarzenia w mieście</div>${wydarzeniaHtml(R.wydarzenia, kat)}` : "")
-      + wynikiDni(k) + wynikiLokale(k, kat, v.popyt) + wynikiOpinie(v, k) + wynikiStrefy(v, kat, R);
+    if (!k || !R) return brakWynikow("Wyniki pojawią się po pierwszej rundzie sprzedaży.");
+    const S = (x) => k.dni.reduce((a, d) => a + d[x], 0), chetni = S("popyt"), obsl = S("sprzedaz"), utr = S("utracona");
+    const lead = podsumowanie([`W tej rundzie do Twoich lokali przyszło <b>${licz(chetni)}</b> chętnych, obsłużyliście <b>${licz(obsl)}</b> (${proc(chetni ? obsl / chetni : 0, 0)}).`,
+      utr >= 1 ? `${licz(utr)} klientów odeszło bez dania.` : "Nikt nie odszedł bez dania."], chetni && utr / chetni >= 0.1 ? "uwaga" : "ok");
+    const kafle = kafelkiLiczb([{ etykieta: "Chętni", wartosc: licz(chetni) }, { etykieta: "Obsłużeni", wartosc: licz(obsl) },
+      { etykieta: "Odeszli bez dania", wartosc: licz(utr), ton: utr >= 1 ? "minus" : "plus" }]);
+    return lead + kafle + (R.wydarzenia.length ? `<div class="pasek">Wydarzenia w mieście</div>${wydarzeniaHtml(R.wydarzenia, kat)}` : "")
+      + `<div class="wykres"><canvas id="w-klienci-dni"></canvas></div>` + wynikiDni(k) + wynikiLokale(k, kat, v.popyt) + wynikiOpinie(v, k) + wynikiStrefy(v, kat, R);
   },
   po({ v }, tryb) {
     const k = v.wyniki?.klienci;

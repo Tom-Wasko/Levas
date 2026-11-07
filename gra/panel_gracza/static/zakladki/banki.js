@@ -1,6 +1,6 @@
 // Bank w grze z lokalami (silnik/pieniadze/banki.py, dane/mapa/banki.yaml): sześć banków, konto firmowe z terminalem
 // i limitem, lokaty, kredyty (na start, inwestycyjny pod zastaw, obrotowy) i leasing sprzętu w dowolnym banku.
-import { esc, inwestorHtml, OKRES, okno, proc, tabela, toast, zamknijOkno, zl, zl2 } from "./wspolne.js";
+import { esc, inwestorHtml, kafelkiLiczb, OKRES, okno, podsumowanie, proc, tabela, toast, zamknijOkno, zl, zl2, zwinTabela } from "./wspolne.js";
 
 const PRODUKTY = { start: "na start", inwestycyjny: "inwestycyjny", obrotowy: "obrotowy" };
 const KATEGORIE = { konto: "Najtańsze konto i terminal", lokata: "Najlepsza lokata", kredyt_bez_historii: "Kredyt bez historii firmy",
@@ -128,28 +128,36 @@ export function wynikiBanku({ v }) {
   if (!w) return `<p class="podpowiedz">Brak wyników banku z poprzedniego ${OKRES.dopelniacz}.</p>`;
   const k = w.koniec || {}, o = k.oplaty || {};
   const odrzucone = [...(w.poczatek?.odrzucone || []), ...(w.leasing?.odrzucone || [])];
-  let html = tabela("Opłaty konta firmowego", ["", "Kwota"], [["Konto", zl2(o.konto)], ["Abonament terminala", zl2(o.terminal)],
-    ["Prowizja od płatności kartą", zl2(o.prowizja)]], { klasy: ["l", "r"], stopka: ["Razem", zl2((o.konto || 0) + (o.terminal || 0) + (o.prowizja || 0))] });
+  const oplaty = (o.konto || 0) + (o.terminal || 0) + (o.prowizja || 0);
+  const sumaRat = (k.raty || []).reduce((a, r) => a + (r.odsetki || 0) + (r.rata || 0), 0), rataLeas = (k.leasing || []).reduce((a, r) => a + (r.rata || 0), 0);
+  const odsLok = (k.lokaty || []).reduce((a, l) => a + (l.odsetki || 0), 0), zalegle = (k.zaleglosci || []).length > 0 || w.debet_ponad_limit > 0;
+  const czesci = [oplaty > 0 && `opłaty konta i kart ${zl2(oplaty)}`, sumaRat > 0 && `raty kredytów ${zl2(sumaRat)}`, rataLeas > 0 && `raty leasingu ${zl2(rataLeas)}`];
+  let html = podsumowanie([czesci.some(Boolean) ? `Bank pobrał od firmy: ${czesci.filter(Boolean).join(", ")}.` : "W tej rundzie bank niczego nie pobrał.",
+    odsLok > 0 ? `Zakończone lokaty przyniosły ${zl2(odsLok)} odsetek.` : "", zalegle ? "Są zaległości lub debet ponad limit – szczegóły niżej." : ""], zalegle ? "uwaga" : "")
+    + kafelkiLiczb([{ etykieta: "Opłaty konta i kart", wartosc: zl2(oplaty) }, (k.raty || []).length > 0 && { etykieta: "Raty kredytów", wartosc: zl2(sumaRat), opis: `${k.raty.length} z kredytów` },
+      (k.leasing || []).length > 0 && { etykieta: "Raty leasingu", wartosc: zl2(rataLeas) }, odsLok > 0 && { etykieta: "Odsetki z lokat", wartosc: zl2(odsLok), ton: "plus" }]);
+  html += zwinTabela("Opłaty konta firmowego", ["", "Kwota"], [["Konto", zl2(o.konto)], ["Abonament terminala", zl2(o.terminal)],
+    ["Prowizja od płatności kartą", zl2(o.prowizja)]], { klasy: ["l", "r"], stopka: ["Razem", zl2(oplaty)], otwarte: !(k.raty || []).length });
   if ((k.raty || []).length) {
-    html += tabela("Raty kredytów", ["Kredyt", "Bank", "Odsetki", "Rata kapitałowa", "Zaległość", "Zapłacona"],
-      k.raty.map((r) => [`nr ${r.kredyt}`, esc(r.bank), zl2(r.odsetki), zl2(r.rata), zl2(r.zaleglosc), tak(r.zaplacona)]), { klasy: ["l", "l"] });
+    html += zwinTabela("Raty kredytów", ["Kredyt", "Bank", "Odsetki", "Rata kapitałowa", "Zaległość", "Zapłacona"],
+      k.raty.map((r) => [`nr ${r.kredyt}`, esc(r.bank), zl2(r.odsetki), zl2(r.rata), zl2(r.zaleglosc), tak(r.zaplacona)]), { klasy: ["l", "l"], otwarte: true });
   }
   if ((k.leasing || []).length) {
-    html += tabela("Raty leasingu", ["Leasing", "Bank", "Sprzęt", "Rata", "Rat", "Zapłacona"],
+    html += zwinTabela("Raty leasingu", ["Leasing", "Bank", "Sprzęt", "Rata", "Rat", "Zapłacona"],
       k.leasing.map((r) => [`nr ${r.leasing}`, esc(r.bank), esc(r.sprzet), zl2(r.rata), r.rat, tak(r.zaplacona)]), { klasy: ["l", "l", "l"] });
   }
   if ((k.lokaty || []).length) {
-    html += tabela("Zakończone lokaty", ["Lokata", "Bank", "Kwota", "Odsetki"], k.lokaty.map((l) => [`nr ${l.lokata}`, esc(l.bank), zl2(l.kwota), zl2(l.odsetki)]), { klasy: ["l", "l"] });
+    html += zwinTabela("Zakończone lokaty", ["Lokata", "Bank", "Kwota", "Odsetki"], k.lokaty.map((l) => [`nr ${l.lokata}`, esc(l.bank), zl2(l.kwota), zl2(l.odsetki)]), { klasy: ["l", "l"] });
   }
   if ((k.przejecia || []).length) {
-    html += tabela("Przejęcia przez bank", ["Bank", "Co", "Wycena", "Dług", "Nadwyżka na konto"],
+    html += zwinTabela("Przejęcia przez bank", ["Bank", "Co", "Wycena", "Dług", "Nadwyżka na konto"],
       k.przejecia.map((p) => [esc(p.bank), esc(p.zastaw), zl2(p.wycena), zl2(p.dlug), zl2(p.nadwyzka)]), { klasy: ["l", "l"] });
   }
   if ((k.wykupy || []).length) html += `<p>Wykupiony z leasingu: ${k.wykupy.map((x) => esc(x.sprzet)).join(", ")}.</p>`;
   const nowe = [...(w.poczatek?.nowe_kredyty || []).map((id) => `kredyt nr ${id}`), ...(w.poczatek?.nowe_lokaty || []).map((id) => `lokata nr ${id}`),
     ...(w.leasing?.nowe || []).map((id) => `leasing nr ${id}`)];
   if (nowe.length) html += `<p>Nowe produkty: ${nowe.join(", ")}.</p>`;
-  if (odrzucone.length) html += tabela("Odrzucone przez bank", ["Decyzja", "Powód"], odrzucone.map((x) => [esc(x.co), esc(x.powod)]), { klasy: ["l", "l"] });
+  if (odrzucone.length) html += zwinTabela("Odrzucone przez bank", ["Decyzja", "Powód"], odrzucone.map((x) => [esc(x.co), esc(x.powod)]), { klasy: ["l", "l"] });
   const uwagi = [...(k.zaleglosci || []), ...(w.debet_ponad_limit > 0 ? [`Debet ponad limit w koncie: ${zl2(w.debet_ponad_limit)} – odsetki karne, a w następnej rundzie zablokowane inwestycje, kredyty, leasing i lokaty (spłać debet albo poproś mistrza gry o inwestora).`] : [])];
   if (uwagi.length) html += `<div class="komunikat">${uwagi.map(esc).join("<br>")}</div>`;
   return html + `<p class="podpowiedz">Historia firmy na koniec ${OKRES.dopelniacz}: ${rundy(w.historia)}.</p>`;

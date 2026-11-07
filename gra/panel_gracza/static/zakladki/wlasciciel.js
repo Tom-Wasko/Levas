@@ -1,6 +1,6 @@
 // Portfel właściciela (gra z lokalami, silnik/pieniadze/wlasciciel.py): wypłata własna z firmy i wpłata własna do firmy – poza KPiR.
 // Decyzje `wyplata_wlasna` i `wplata_wlasna` (kwoty); kolejność: wypłata → wydatki prywatne → wpłata.
-import { esc, okno, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, okno, podsumowanie, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
 
 function odrzuconeHtml(D) {
   return (D?.odrzucone || []).map((o) => `<p class="minus">${esc(o.co)}: ${esc(o.powod)}.</p>`).join("");
@@ -43,10 +43,12 @@ export const wlasciciel = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.wlasciciel;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
-    return ruchyHtml(W, "Portfel właściciela w rundzie") + odrzuconeHtml(W)
-      + `<div class="pasek ciemny"><span>W portfelu na koniec rundy: <span class="kwota">${zl2(W.portfel)}</span></span></div>`
-      + (!W.wyplata && !W.wplata ? `<p class="podpowiedz">W tej rundzie nie było wpłat ani wypłat własnych.</p>` : "");
+    if (!W) return brakWynikow();
+    const lead = podsumowanie(!W.wyplata && !W.wplata ? `W tej rundzie nie było wpłat ani wypłat własnych. W portfelu zostaje ${zl2(W.portfel)}.`
+      : [W.wyplata ? `Z firmy do portfela przeszło ${zl2(W.wyplata)}.` : "", W.wplata ? `Z portfela do firmy wpłynęło ${zl2(W.wplata)}.` : "",
+        `Na koniec rundy w portfelu jest ${zl2(W.portfel)}.`]);
+    return lead + ruchyHtml(W, "Portfel właściciela w rundzie") + odrzuconeHtml(W)
+      + `<div class="pasek ciemny"><span>W portfelu na koniec rundy: <span class="kwota">${zl2(W.portfel)}</span></span></div>`;
   },
   akcje: {
     "wl-wyplata": (el, c) => okno("Wypłata własna", `<label class="pole">Kwota<input type="number" id="wl-kwota" min="1" step="100" value="500"></label>

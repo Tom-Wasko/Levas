@@ -1,5 +1,5 @@
 // Lokale: najem albo kupno lokalu / działki na mapie miasta (gra z lokalami, dane/mapa/*.yaml).
-import { esc, licz, zamknijOkno, naOkres, naRunde, nazwaFirmy, OKRES, tabela, zl } from "./wspolne.js";
+import { esc, licz, zamknijOkno, naOkres, naRunde, nazwaFirmy, OKRES, podsumowanie, tabela, zl, zwinTabela } from "./wspolne.js";
 
 const TYPY = { gotowy: "gotowy", niewyposazony: "do urządzenia", dzialka: "działka" };
 const FORMY = { najem: "najem", kupno: "własność" };
@@ -81,12 +81,12 @@ function kafelOferty(v, kat, d, lok, edycja) {
     <div class="kt">${opisLokalu(kat, lok)}${potencjal(v, lok)}</div><div class="kd">${przyciskiLokalu(v, d, lok, edycja)}</div></div>`;
 }
 
-function mojeLokale(kat, moje) {
+function mojeLokale(kat, moje, zwijane = false) {
   if (!moje.length) return "";
-  return tabela("Twoje lokale", ["Lokal", "Strefa", "Forma", "Status", "Kuchnia", "Kasa", `Koszt${naOkres()}`],
+  return (zwijane ? zwinTabela : tabela)("Twoje lokale", ["Lokal", "Strefa", "Forma", "Status", "Kuchnia", "Kasa", `Koszt${naOkres()}`],
     moje.map((l) => [`${esc(l.nazwa)}<div class="podpowiedz">${esc(l.adres)}</div>`, esc(nazwaStrefy(kat, l.strefa)), FORMY[l.forma], status(l),
       `${l.zajete.kuchnia} / ${l.miejsca.kuchnia}`, `${l.zajete.kasa} / ${l.miejsca.kasa}`,
-      zl((l.forma === "najem" ? naRunde(l.czynsz) : 0) + (l.dziala ? naRunde(l.utrzymanie) : 0))]), { klasy: ["l", "l", "l", "l"] });
+      zl((l.forma === "najem" ? naRunde(l.czynsz) : 0) + (l.dziala ? naRunde(l.utrzymanie) : 0))]), { klasy: ["l", "l", "l", "l"], ...(zwijane ? { otwarte: true } : {}) });
 }
 
 export const lokale = {
@@ -146,8 +146,11 @@ export const lokale = {
     const decyzja = dec?.id ? `<div class="komunikat ${dec.przyjety ? "ok" : ""}">${dec.przyjety
       ? `Lokal ${esc(lokalMapy(kat, dec.id)?.nazwa ?? dec.id)} – przydzielony (${FORMY[dec.forma]}), działa od rundy ${dec.dziala_od}.`
       : `Lokal nie został przydzielony: ${esc(dec.powod)}`}</div>` : "";
-    return decyzja + (mojeLokale(kat, moje) || `<p class="podpowiedz">Firma nie miała lokalu w tej rundzie.</p>`)
-      + tabela("Zajęte lokale w mieście", ["Strefa", "Lokal", "Rodzaj", "Firma"], wiersze, { klasy: ["l", "l", "l", "l"] });
+    const dziala = moje.filter((l) => l.dziala).length, koszt = moje.reduce((a, l) => a + (l.forma === "najem" ? naRunde(l.czynsz) : 0) + (l.dziala ? naRunde(l.utrzymanie) : 0), 0);
+    const lead = podsumowanie(moje.length ? [`Firma ma ${moje.length} ${moje.length === 1 ? "lokal" : moje.length < 5 ? "lokale" : "lokali"}, w tym ${dziala} działający${dziala === 1 ? "" : "ch"}.`,
+      `Koszt lokali w tej rundzie to ${zl(koszt)}.`] : "Firma nie miała lokalu w tej rundzie.");
+    return lead + decyzja + (mojeLokale(kat, moje, true) || "")
+      + zwinTabela("Zajęte lokale w mieście", ["Strefa", "Lokal", "Rodzaj", "Firma"], wiersze, { klasy: ["l", "l", "l", "l"] });
   },
   akcje: {
     "lokal-wybierz": (el, c) => { zamknijOkno(); return c.zmien((d) => { d.lokal = el.dataset.id ? { id: el.dataset.id, forma: el.dataset.forma } : null; }); },

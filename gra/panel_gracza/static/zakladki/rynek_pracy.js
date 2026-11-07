@@ -1,6 +1,6 @@
 // Rynek pracy (gra z lokalami, silnik/ludzie/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
 // i okresy wypowiedzenia. UF20: tu też zatrudnia się kandydatów z puli – od razu z lokalem i stanowiskiem (hr.js: kandydaciRynku).
-import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
+import { brakWynikow, esc, gw, kafelkiLiczb, licz, nazwaFirmy, okno, podsumowanie, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl, zwinTabela } from "./wspolne.js";
 import { kandydaciRynku, pigulkaOfert } from "./hr.js";
 import { nazwaLokalu } from "./lokal_wybor.js";
 import { minimum, nazwaFormy, opcjeForm } from "./formy.js";
@@ -73,33 +73,39 @@ export const rynek_pracy = {
   },
   wyniki({ v }) {
     const R = v.wyniki?.rynek_pracy;
-    if (!R) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
+    if (!R) return brakWynikow("Wyniki pojawią się po pierwszej rundzie.");
     const pusto = (n, t) => [[t, ...Array(n - 1).fill("")]];
     const kanaly = v.agencja?.kanaly || {};
     const ruchy = [...R.odejscia.map((o) => [esc(o.imie_nazwisko), `<span class="minus">odejście</span>`, o.do ? esc(nazwaFirmy(v, o.do)) : "koniec wypowiedzenia – pula kandydatów"]),
       ...R.przyjscia.map((o) => [esc(o.imie_nazwisko), `przyjście (stanowisko nr ${o.stanowisko})`, esc(nazwaFirmy(v, o.od))])];
-    return tabela("Zatrudnieni w rundzie", ["Pracownik", "Kanał", "Koszt zatrudnienia", "Pensja"],
+    const nZ = R.zatrudnieni.length, wygr = R.licytacje.filter((l) => l.wygrana).length, odch = R.odejscia.length, przy = R.przyjscia.length;
+    const lead = podsumowanie([nZ ? `W tej rundzie zatrudniono <b>${licz(nZ)}</b> ${nZ === 1 ? "osobę" : "osób"}.` : "W tej rundzie nikogo nie zatrudniono.",
+      R.licytacje.length ? `Wygrano ${licz(wygr)} z ${licz(R.licytacje.length)} licytacji o kandydatów.` : "",
+      odch || przy ? `Z zespołu odeszło ${licz(odch)}, dołączyło ${licz(przy)} osób przejętych od innych drużyn.` : ""], odch > przy ? "uwaga" : "");
+    const kafle = kafelkiLiczb([{ etykieta: "Zatrudnieni", wartosc: licz(nZ) }, R.licytacje.length && { etykieta: "Wygrane licytacje", wartosc: `${licz(wygr)} / ${licz(R.licytacje.length)}` },
+      { etykieta: "Odejścia", wartosc: licz(odch), ton: odch ? "minus" : "" }, { etykieta: "Przyjścia", wartosc: licz(przy), ton: przy ? "plus" : "" }]);
+    return lead + kafle + zwinTabela("Zatrudnieni w rundzie", ["Pracownik", "Kanał", "Koszt zatrudnienia", "Pensja"],
       R.zatrudnieni.length ? R.zatrudnieni.map((z) => [esc(z.imie_nazwisko), esc(kanaly[z.kanal]?.nazwa || z.kanal), zl(z.koszt), zl(z.pensja)])
-        : pusto(4, "Nikogo nie zatrudniono."), { klasy: ["l", "l"] })
-      + tabela("Licytacje kandydatów", ["Kandydat", "Drużyn", "Twoja pensja", "Wygrała", "Za ile", "Wynik"],
+        : pusto(4, "Nikogo nie zatrudniono."), { klasy: ["l", "l"], otwarte: nZ > 0 })
+      + zwinTabela("Licytacje kandydatów", ["Kandydat", "Drużyn", "Twoja pensja", "Wygrała", "Za ile", "Wynik"],
         R.licytacje.length ? R.licytacje.map((l) => [esc(l.imie_nazwisko), l.druzyn ? licz(l.druzyn) : "–", zl(l.pensja),
           l.wygral ? esc(nazwaFirmy(v, l.wygral)) : "–", zl(l.najwyzsza),
           l.wygrana ? `wygrana${l.remis ? " (remis – losowanie)" : ""}` : `<span class="minus">przegrana${l.remis ? " (remis – losowanie)" : ""}</span>`])
           : pusto(6, "Nikt inny nie chciał twoich kandydatów."), { klasy: ["l", "", "", "l"] })
       + `<p class="podpowiedz">Pensje porównuje się w przeliczeniu na umowę o pracę (B2B ÷ 1,25, pół etatu × 2).</p>`
-      + tabela("Twoje oferty podkupienia", ["Pracownik", "Drużyna", "Pensja", "Wynik"],
+      + zwinTabela("Twoje oferty podkupienia", ["Pracownik", "Drużyna", "Pensja", "Wynik"],
         R.oferty_zlozone.length ? R.oferty_zlozone.map((o) => [esc(o.imie_nazwisko), esc(nazwaFirmy(v, o.firma)), zl(o.pensja),
           esc(WYNIK_ZLOZONEJ[o.wynik] || o.wynik) + (o.powod ? `: ${esc(o.powod)}` : "")
             + (o.runda_przejscia ? ` – przejdzie w rundzie ${o.runda_przejscia}` : "")
             + (o.wynik === "inna_firma" && o.wygral ? ` (${esc(nazwaFirmy(v, o.wygral))} za ${zl(o.najwyzsza)})` : "")
             + (o.wynik === "kontroferta" && o.najwyzsza ? ` (szef dał ${zl(o.najwyzsza)})` : "")])
           : pusto(4, "Bez ofert."), { klasy: ["l", "l", "r", "l"] })
-      + tabela("Oferty dla twoich pracowników", ["Pracownik", "Od", "Najwyższa oferta", "Kontroferta", "Wynik"],
+      + zwinTabela("Oferty dla twoich pracowników", ["Pracownik", "Od", "Najwyższa oferta", "Kontroferta", "Wynik"],
         R.oferty_otrzymane.length ? R.oferty_otrzymane.map((o) => [esc(o.imie_nazwisko), o.od.map((f) => esc(nazwaFirmy(v, f))).join(", "),
           zl(o.najwyzsza), o.kontroferta ? zl(o.kontroferta) : "–",
           esc(WYNIK_OTRZYMANEJ[o.wynik] || o.wynik) + (o.runda_odejscia ? ` do ${esc(nazwaFirmy(v, o.do))} w rundzie ${o.runda_odejscia}` : "")])
           : pusto(5, "Nikt nie składał ofert."), { klasy: ["l", "l", "r", "r", "l"] })
-      + tabela("Odejścia i przyjścia", ["Pracownik", "Ruch", "Drużyna"], ruchy.length ? ruchy : pusto(3, "Bez zmian w zespole."), { klasy: ["l", "l", "l"] })
+      + zwinTabela("Odejścia i przyjścia", ["Pracownik", "Ruch", "Drużyna"], ruchy.length ? ruchy : pusto(3, "Bez zmian w zespole."), { klasy: ["l", "l", "l"] })
       + przenosinyWyniki(v, R)
       + (R.uwagi.length ? `<div class="komunikat zly">${R.uwagi.map(esc).join("<br>")}</div>` : "");
   },

@@ -2,7 +2,7 @@
 // deklaracja) oraz Podatki (składki właściciela, zaliczka PIT liniowego). Rozliczenie co rundę, ceny w grze są brutto.
 import { UKRYTE } from "./finanse.js";
 import { LEKCJA_PIT_ZUS, LEKCJA_VAT } from "./lekcje.js";
-import { esc, nazwaUslugi, proc, tabela, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, nazwaUslugi, podsumowanie, proc, strzalka, tabela, zl, zl2, zwin, zwinTabela } from "./wspolne.js";
 import { IG_PIT, IG_VAT } from "./infografiki.js";
 
 const RODZAJ = { nalezny: "należny (sprzedaż)", naliczony: "naliczony (zakupy)" };
@@ -58,10 +58,15 @@ export const vat = {
   wyniki({ v }) {
     const W = v.wyniki?.rozliczenie;
     if (v.wyniki?.kpir?.ukryte) return UKRYTE;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
-    return tabela("Deklaracja VAT", ["Należny", "Naliczony", "Nadwyżka z poprzedniej rundy", "Saldo", "Do zapłaty", "Nadwyżka na następną rundę"],
+    if (!W) return brakWynikow();
+    const lead = podsumowanie([`VAT należny ze sprzedaży to ${zl2(W.vat_nalezny)}, naliczony z zakupów ${zl2(W.vat_naliczony)}.`,
+      W.vat_do_zaplaty > 0 ? `Do urzędu trafiło <b>${zl(W.vat_do_zaplaty)}</b>.` : `Do zapłaty nie ma nic, a nadwyżka ${zl2(W.vat_nadwyzka)} przechodzi na następną rundę.`]);
+    const kafle = kafelkiLiczb([{ etykieta: "VAT należny", wartosc: zl2(W.vat_nalezny) }, { etykieta: "VAT naliczony", wartosc: zl2(W.vat_naliczony) },
+      { etykieta: "Do zapłaty", wartosc: zl(W.vat_do_zaplaty), ton: W.vat_do_zaplaty > 0 ? "minus" : "" },
+      W.vat_nadwyzka > 0 && { etykieta: "Nadwyżka na kolejną rundę", wartosc: zl2(W.vat_nadwyzka), ton: "plus" }]);
+    return lead + kafle + zwinTabela("Deklaracja VAT", ["Należny", "Naliczony", "Nadwyżka z poprzedniej rundy", "Saldo", "Do zapłaty", "Nadwyżka na następną rundę"],
       [[zl2(W.vat_nalezny), zl2(W.vat_naliczony), zl2(W.vat_nadwyzka_poprzednia), zl2(W.vat_saldo), `<b>${zl2(W.vat_do_zaplaty)}</b>`, zl2(W.vat_nadwyzka)]])
-      + stawkiHtml(v.wyniki.vat, "VAT wg stawek") + rejestrHtml(v.wyniki.vat);
+      + zwin("VAT wg stawek", stawkiHtml(v.wyniki.vat, "VAT wg stawek")) + rejestrHtml(v.wyniki.vat);
   },
 };
 
@@ -84,16 +89,22 @@ export const podatki = {
   wyniki({ v }) {
     const W = v.wyniki?.rozliczenie;
     if (v.wyniki?.kpir?.ukryte) return UKRYTE;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
-    return tabela("Rozliczenie rundy", ["Pozycja", "Kwota"], [
+    if (!W) return brakWynikow();
+    const przed = (v.historia || []).length >= 2 ? v.historia[v.historia.length - 2].dochod_netto : null;
+    const lead = podsumowanie([`Z dochodu ${zl2(W.dochod)} zapłacono zaliczkę na PIT ${zl(W.zaliczka)} i składkę zdrowotną ${zl2(W.zdrowotna)}, po czym zostało <b>${zl2(W.dochod_netto)}</b>.`,
+      W.ulga_na_start ? "Trwa ulga na start, więc ZUS społeczny wynosi 0 zł." : `ZUS społeczny to ${zl2(W.zus_spoleczne)}.`], W.dochod_netto >= 0 ? "" : "uwaga");
+    const kafle = kafelkiLiczb([{ etykieta: "Dochód", wartosc: zl(W.dochod) }, { etykieta: "PIT", wartosc: zl(W.zaliczka) },
+      { etykieta: "Składka zdrowotna", wartosc: zl2(W.zdrowotna) }, { etykieta: "Razem do urzędu i ZUS", wartosc: zl(W.razem), ton: "minus" },
+      { etykieta: "Dochód netto", wartosc: zl(W.dochod_netto), delta: strzalka(W.dochod_netto, przed, { format: zl }), ton: W.dochod_netto >= 0 ? "plus" : "minus" }]);
+    return lead + kafle + zwinTabela("Rozliczenie rundy", ["Pozycja", "Kwota"], [
       ["Dochód z KPiR w rundzie", zl2(W.dochod)],
       [W.ulga_na_start ? "ZUS społeczny (ulga na start)" : "ZUS społeczny właściciela (koszt w KPiR)", zl2(W.zus_spoleczne)],
       [`Składka zdrowotna (${W.zdrowotna === W.zdrowotna_minimum ? "minimalna" : "od dochodu"})`, zl2(W.zdrowotna)],
       ["Zaliczka na PIT", zl2(W.zaliczka)],
       ["VAT do zapłaty", zl2(W.vat_do_zaplaty)],
       ["<b>Razem do urzędu i ZUS</b>", `<b>${zl2(W.razem)}</b>`],
-      ["Dochód netto rundy (po PIT i zdrowotnej)", zl2(W.dochod_netto)]], { klasy: ["l", "r"] })
-      + tabela("Zaliczka PIT – narastająco od początku gry", ["Dochód", "− zdrowotna odliczona", "Podstawa (zł)", `Podatek ${proc(W.stawka_pit, 0)}`, "− wpłacone wcześniej", "Zaliczka"],
+      ["Dochód netto rundy (po PIT i zdrowotnej)", zl2(W.dochod_netto)]], { klasy: ["l", "r"], otwarte: true })
+      + zwinTabela("Zaliczka PIT – narastająco od początku gry", ["Dochód", "− zdrowotna odliczona", "Podstawa (zł)", `Podatek ${proc(W.stawka_pit, 0)}`, "− wpłacone wcześniej", "Zaliczka"],
         [[zl2(W.dochod_narastajaco), zl2(W.zdrowotna_odliczona), W.podstawa, zl2(W.podatek_narastajaco),
           zl2(W.zaliczki_narastajaco - W.zaliczka), `<b>${zl2(W.zaliczka)}</b>`]])
       + (W.zaliczka === 0 && W.dochod < 0 ? `<p class="podpowiedz">Strata pomniejsza dochód narastająco, ale wpłaconych zaliczek urząd w trakcie gry

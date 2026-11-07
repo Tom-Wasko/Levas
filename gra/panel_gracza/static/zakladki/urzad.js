@@ -1,6 +1,6 @@
 // Urzędy: urząd i sanepid (gra z lokalami, silnik/ksiegowosc/urzad.py): rejestracja firmy, odbiór lokali przez sanepid i higiena.
 // Decyzja `higiena: poziom` trwa do zmiany; poziom zmienia szansę i wynik kontroli sanepidu (silnik/kuchnia/magazyn.py).
-import { esc, naOkres, proc, tabela, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, naOkres, podsumowanie, proc, tabela, zl, zl2, zwinTabela } from "./wspolne.js";
 
 const rund = (n) => `${n} ${n === 1 ? "rundę" : n < 5 ? "rundy" : "rund"}`;
 
@@ -49,8 +49,11 @@ export const urzad = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.urzad;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
-    return odbioryHtml(W.odbiory) || `<p class="podpowiedz">W tej rundzie nie było odbiorów lokali.</p>`;
+    if (!W) return brakWynikow();
+    const odb = W.odbiory || [], ok = odb.filter((o) => o.przyjety).length;
+    if (!odb.length) return `<p class="podpowiedz">W tej rundzie nie było odbiorów lokali.</p>`;
+    return podsumowanie(ok === odb.length ? `Sanepid odebrał ${ok === 1 ? "lokal" : "wszystkie lokale"} – można zaczynać sprzedaż.`
+      : `Sanepid odmówił odbioru ${odb.length - ok} z ${odb.length} lokali – te lokale ruszą później.`, ok === odb.length ? "ok" : "uwaga") + odbioryHtml(odb);
   },
 };
 
@@ -79,14 +82,21 @@ export const sanepid = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.urzad, U = v.urzad;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
+    if (!W) return brakWynikow();
     const poziom = U?.poziomy.find((p) => p.id === W.higiena);
     const razem = [["Higiena", poziom ? esc(poziom.nazwa) : "–"], ["Działające lokale", W.lokale],
       ["Koszt utrzymania czystości", `<span class="minus">${zl2(-W.koszt)}</span>`],
       ["Mandat sanepidu", W.kontrola?.mandat ? `<span class="minus">${zl2(-W.kontrola.mandat)}</span>` : "–"]];
-    return tabela("Sanepid w rundzie", ["Co", ""], razem, { klasy: ["l"], sortuj: false })
+    const kontr = W.kontrola, mandat = kontr?.mandat || 0;
+    const lead = podsumowanie([!W.lokale ? "Żaden lokal jeszcze nie działa, więc sanepid nie miał czego kontrolować."
+      : !kontr?.kontrola ? "Sanepid w tej rundzie nie przyszedł z kontrolą." : mandat ? `Kontrola sanepidu skończyła się mandatem <b>${zl(mandat)}</b>.` : "Sanepid skontrolował lokal i nie miał zastrzeżeń.",
+      W.koszt > 0 ? `Utrzymanie czystości kosztowało ${zl2(W.koszt)}.` : ""], mandat ? "zly" : "ok");
+    const kafle = kafelkiLiczb([{ etykieta: "Higiena", wartosc: poziom ? esc(poziom.nazwa) : "–" }, { etykieta: "Koszt czystości", wartosc: zl2(W.koszt) },
+      kontr && { etykieta: "Szansa kontroli", wartosc: proc(kontr.szansa) }, { etykieta: "Mandat", wartosc: mandat ? zl(mandat) : "brak", ton: mandat ? "minus" : "plus" }]);
+    return lead + kafle
+      + zwinTabela("Sanepid w rundzie", ["Co", ""], razem, { klasy: ["l"], sortuj: false })
       + kontrolaHtml(W.kontrola)
-      + (U?.kontrole.length ? tabela("Kontrole sanepidu", ["Runda", "Wynik", "Szansa", "Mandat"], U.kontrole.map((k) => [k.runda,
+      + (U?.kontrole.length ? zwinTabela("Kontrole sanepidu", ["Runda", "Wynik", "Szansa", "Mandat"], U.kontrole.map((k) => [k.runda,
         k.mandat ? "z zastrzeżeniami" : "bez zastrzeżeń", proc(k.szansa), k.mandat ? `<span class="minus">${zl2(-k.mandat)}</span>` : "–"]), { klasy: ["", "l"] }) : "")
       + (U ? `<p class="podpowiedz">Od początku gry: higiena ${zl2(U.koszt_razem)}, mandaty sanepidu ${zl2(U.mandaty_razem)} (poza KPiR).</p>` : "");
   },

@@ -1,6 +1,6 @@
 // Lichwiarz Harpagon (gra z lokalami, silnik/pieniadze/lichwiarz.py): pożyczka „na czarno” od ręki, poza KPiR.
 // Po terminie rośnie presja: przypomnienia, odsetki karne, wizyty (szkody, odpływ klientów, odejście pracownika).
-import { esc, okno, proc, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, okno, podsumowanie, proc, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
 
 const WIZYTA = { szkody: "Szkody w lokalu", klienci: "Odpływ klientów", pracownik: "Odejście pracownika" };
 
@@ -51,22 +51,26 @@ export const harpagon = {
   },
   wyniki({ v }) {
     const H = v.wyniki?.harpagon;
-    if (!H) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
+    if (!H) return brakWynikow();
     const D = H.poczatek || {}, Pr = H.presja || {}, O = H.odsetki;
     const ruchy = [];
     if (D.pozyczka) ruchy.push(["Gotówka od Harpagona (poza księgami)", `<span class="plus">${zl2(D.pozyczka)}</span>`]);
     if (D.splata) ruchy.push([D.splacona ? "Spłata – dług zamknięty" : "Spłata częściowa", `<span class="minus">${zl2(-D.splata)}</span>`]);
     if (O) ruchy.push([`Odsetki doliczone do długu (${proc(O.stopa)})`, zl2(O.odsetki)]);
-    const W = Pr.wizyta;
-    return (ruchy.length ? tabela("Harpagon w rundzie", ["Co", "Kwota"], ruchy, { klasy: ["l"] }) : "")
+    const W = Pr.wizyta, S = H.stan, po = S?.po_terminie > 0;
+    const lead = !S && !ruchy.length ? podsumowanie("Firma nie ma długu u Harpagona i w tej rundzie nie miała z nim nic do czynienia.", "ok")
+      : podsumowanie([S ? `Dług u Harpagona wynosi <b>${zl2(S.dlug)}</b>, termin spłaty to runda ${S.termin}.` : "Dług u Harpagona jest spłacony.",
+        W ? "Harpagon wysłał wizytę – skutki niżej." : po ? "Termin minął, więc presja rośnie." : ""], W || po ? "zly" : S ? "uwaga" : "ok");
+    const kafle = S || ruchy.length ? kafelkiLiczb([S && { etykieta: "Dług", wartosc: zl2(S.dlug), ton: "minus" }, O && { etykieta: "Odsetki w rundzie", wartosc: zl2(O.odsetki), opis: proc(O.stopa), ton: "minus" },
+      D.pozyczka > 0 && { etykieta: "Pożyczka", wartosc: zl2(D.pozyczka) }, D.splata > 0 && { etykieta: "Spłata", wartosc: zl2(D.splata), ton: "plus" }]) : "";
+    return lead + kafle + (ruchy.length ? tabela("Harpagon w rundzie", ["Co", "Kwota"], ruchy, { klasy: ["l"] }) : "")
       + odrzuconeHtml(D)
       + (Pr.teksty || []).map((t) => `<div class="karta"><p>${esc(t)}</p></div>`).join("")
       + (W ? `<div class="karta"><h3>Wizyta: ${esc(WIZYTA[W.rodzaj] || W.rodzaj)}</h3><p>${esc(W.tekst)}</p>
           <p class="podpowiedz">${W.rodzaj === "szkody" ? `Naprawa ${zl2(W.koszt)} – zwykły koszt w KPiR.`
             : W.rodzaj === "klienci" ? `Atrakcyjność lokali niższa o ${proc(W.odplyw, 0)} w tej rundzie.`
               : `${esc(W.pracownik)} odchodzi bez wypowiedzenia i wraca na rynek pracy; stanowisko jest wolne.`}</p></div>` : "")
-      + stanHtml(H.stan, "Dług na następną rundę")
-      + (!ruchy.length && !H.stan && !(Pr.teksty || []).length ? `<p class="podpowiedz">W tej rundzie Harpagon się nie pojawił.</p>` : "");
+      + (S ? stanHtml(S, "Dług na następną rundę") : "");
   },
   akcje: {
     "hp-wez": (el, c) => {

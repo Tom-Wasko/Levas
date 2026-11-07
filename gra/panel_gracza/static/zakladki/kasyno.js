@@ -2,7 +2,7 @@
 // Decyzja `kasyno`: lista {gra, zaklad, stawka} – stawki z portfela właściciela, wynik dopiero po zamknięciu rundy.
 // P12: przelew z firmy do portfela wprost z klubu – to zwykła decyzja `wyplata_wlasna` (silnik/pieniadze/wlasciciel.py), więc
 // na koncie firmy widać tylko „wypłatę własną właściciela”; wypłata idzie przed zakładami, można ją od razu postawić.
-import { esc, tabela, toast, zl2 } from "./wspolne.js";
+import { esc, kafelkiLiczb, podsumowanie, tabela, toast, zl2, zwinTabela } from "./wspolne.js";
 
 const ZASADA_MILCZENIA = `<div class="karta"><h3>Zasada milczenia</h3><p>Nad barem wisi oprawiona w złotą ramkę
   tabliczka: „Pierwsza zasada Nocnej 13: księgowa nie musi wiedzieć wszystkiego. Druga zasada: mistrz gry tym bardziej”.
@@ -25,14 +25,14 @@ function przelewHtml(W, d, edycja) {
       postawić jeszcze dziś. Ten sam przelew widać w zakładce Portfel właściciela.</p>` : ""}</div>`;
 }
 
-function zakladyHtml(Z, edycja) {
+function zakladyHtml(Z, edycja, zwijane = false) {
   if (!Z?.zaklady?.length) return "";
   const wiersze = Z.zaklady.map((z, i) => [esc(z.nazwa), z.zaklad_nazwa ? esc(z.zaklad_nazwa) : "–", zl2(z.stawka),
     Z.ukryte ? `<span class="podpowiedz">wynik po zamknięciu rundy</span>`
       : `<span class="${z.wyplata ? "plus" : "minus"}">${zl2(z.wyplata)}</span>`,
     edycja ? `<button class="btn jasny" data-akcja="ks-usun" data-i="${i}">Wycofaj</button>` : ""]);
-  return tabela(Z.ukryte ? "Postawione zakłady" : "Zakłady", ["Gra", "Zakład", "Stawka", "Wypłata", ""], wiersze,
-    { klasy: ["l", "l"], sortuj: false, stopka: ["Razem", "", zl2(Z.stawki), Z.ukryte ? "" : zl2(Z.wyplaty), ""] });
+  return (zwijane ? zwinTabela : tabela)(Z.ukryte ? "Postawione zakłady" : "Zakłady", ["Gra", "Zakład", "Stawka", "Wypłata", ""], wiersze,
+    { klasy: ["l", "l"], sortuj: false, stopka: ["Razem", "", zl2(Z.stawki), Z.ukryte ? "" : zl2(Z.wyplaty), ""], ...(zwijane ? { otwarte: true } : {}) });
 }
 
 function odrzuconeHtml(Z) {
@@ -75,8 +75,14 @@ export const kasyno = {
     if (!Z) return `<p class="podpowiedz">W poprzedniej rundzie nie było cię pod tym adresem.</p>`;
     const teksty = (Z.zaklady || []).map((z) => `<div class="kafel"><div class="kg">${esc(z.nazwa)}${z.zaklad_nazwa ? ` – ${esc(z.zaklad_nazwa)}` : ""}:
       ${zl2(z.stawka)}</div><div class="kt"><p>${esc(z.tekst)}</p></div></div>`).join("");
-    return zakladyHtml(Z, false) + teksty + odrzuconeHtml(Z)
-      + (Z.zaklady?.length ? `<div class="pasek ciemny"><span>Bilans wieczoru: <span class="kwota ${Z.bilans < 0 ? "minus" : "plus"}">${zl2(Z.bilans)}</span></span></div>` : "");
+    const n = Z.zaklady?.length || 0;
+    const lead = n && !Z.ukryte ? podsumowanie(`Postawiono ${n} ${n === 1 ? "zakład" : n < 5 ? "zakłady" : "zakładów"} na ${zl2(Z.stawki)}, wypłacono ${zl2(Z.wyplaty)}. ${Z.bilans < 0
+      ? `Wieczór zamknął się stratą ${zl2(-Z.bilans)}.` : Z.bilans > 0 ? `Wieczór zamknął się zyskiem ${zl2(Z.bilans)}.` : "Wyszło na zero."}`, Z.bilans < 0 ? "uwaga" : "ok")
+      : n ? podsumowanie(`Postawiono ${n} ${n === 1 ? "zakład" : n < 5 ? "zakłady" : "zakładów"} na ${zl2(Z.stawki)}. Wyniki podamy po zamknięciu rundy.`)
+        : podsumowanie("W tej rundzie nie postawiono żadnego zakładu.");
+    const kafle = n && !Z.ukryte ? kafelkiLiczb([{ etykieta: "Stawki", wartosc: zl2(Z.stawki) }, { etykieta: "Wypłaty", wartosc: zl2(Z.wyplaty) },
+      { etykieta: "Bilans", wartosc: zl2(Z.bilans), ton: Z.bilans < 0 ? "minus" : Z.bilans > 0 ? "plus" : "" }]) : "";
+    return lead + kafle + zakladyHtml(Z, false, true) + teksty + odrzuconeHtml(Z);
   },
   akcje: {
     "ks-postaw": async (el, c) => {

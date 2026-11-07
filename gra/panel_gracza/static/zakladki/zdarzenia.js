@@ -3,7 +3,7 @@
 // sprawy tylko tej drużyny (bank żywności, wypadki) są częścią „sprawy” zakładki Mój lokal.
 // te same dla wszystkich drużyn (P9: opcje po 2–5 h – czasu właściciela nie starczy na wszystko); każda drużyna wybiera reakcję (decyzja `zdarzenia: {historia: opcja}`). Do tego
 // historie jednej drużyny: bank żywności i wypadki w lokalu (silnik/swiat/awarie.py – szkody i polisy).
-import { esc, licz, okno, proc, tabela, toast, zl2 } from "./wspolne.js";
+import { esc, licz, okno, podsumowanie, proc, tabela, toast, zl2 } from "./wspolne.js";
 
 function kosztTekst(k) {
   if (!k) return "";
@@ -180,7 +180,10 @@ export const sprawy = {
   },
   wynikiGdy: (v) => lokalne(v.wyniki?.zdarzenia?.sceny).length > 0,
   wyniki({ v }) {
-    return lokalne(v.wyniki?.zdarzenia?.sceny).map(rozegranaHtml).join("") + efektyHtml(v.zdarzenia?.efekty);
+    const L = lokalne(v.wyniki?.zdarzenia?.sceny), tr = v.zdarzenia?.efekty?.length || 0;
+    return podsumowanie([`W lokalu ${L.length === 1 ? "zdarzyła się" : "zdarzyło się"} <b>${licz(L.length)}</b> ${L.length === 1 ? "sprawa" : "spraw"}: ${L.map((w) => esc(w.tytul)).join(", ")}.`,
+      tr ? `Skutki ${tr === 1 ? "jednego zdarzenia trwają" : "zdarzeń trwają"} jeszcze w kolejnych rundach.` : ""])
+      + L.map(rozegranaHtml).join("") + efektyHtml(v.zdarzenia?.efekty);
   },
   akcje: AKCJE_ZDARZEN,
 };

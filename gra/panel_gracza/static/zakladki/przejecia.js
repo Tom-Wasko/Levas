@@ -1,6 +1,6 @@
 // Nowe lokale → Licytacje (wyniki licytacji lokali) i Przejęcia (kupno budynku z najemcą, wypowiedzenia najmu)
 // – silnik/nieruchomosci/przejecia.py.
-import { esc, nazwaFirmy, naOkres, naRunde, proc, tabela, zl } from "./wspolne.js";
+import { esc, nazwaFirmy, naOkres, naRunde, podsumowanie, proc, tabela, zl, zwinTabela } from "./wspolne.js";
 import { nazwaStrefy } from "./lokale.js";
 
 const ULEPSZENIA = { zatrzymaj: "zatrzymaj ulepszenia (zapłać najemcy)", przywroc: "przywrócenie stanu (płaci najemca)" };
@@ -31,26 +31,27 @@ function budynekWlasny(P, d, b, edycja, v) {
 
 function stanBudynkow(v, kat, P, d, edycja) {
   let html = "";
+  const tab = d ? tabela : zwinTabela;   // w wynikach (bez decyzji) tabele są zwijane
   if (P.budynki.length) {
-    html += tabela("Twoje budynki z najemcami", ["Budynek", "Najemca", `Czynsz${naOkres()}`, "Nakłady najemcy", "Kupiony", "Najem"],
+    html += tab("Twoje budynki z najemcami", ["Budynek", "Najemca", `Czynsz${naOkres()}`, "Nakłady najemcy", "Kupiony", "Najem"],
       P.budynki.map((b) => [`${esc(b.nazwa)}<div class="podpowiedz">${esc(b.adres)}</div>`, esc(nazwaFirmy(v, b.najemca)),
         zl(naRunde(b.czynsz)), zl(b.naklady), `runda ${b.od_rundy} – ${zl(b.cena)}`, d ? budynekWlasny(P, d, b, edycja, v)
           : b.najem_do != null ? `wypowiedziany – do rundy ${b.najem_do}` : "trwa"]), { klasy: ["l", "l"] });
   }
   if (P.najmy.length) {
-    html += tabela("Twoje lokale w budynkach innych drużyn", ["Lokal", "Właściciel", `Czynsz${naOkres()}`, "Twoje nakłady", "Najem"],
+    html += tab("Twoje lokale w budynkach innych drużyn", ["Lokal", "Właściciel", `Czynsz${naOkres()}`, "Twoje nakłady", "Najem"],
       P.najmy.map((n) => [esc(n.nazwa), esc(nazwaFirmy(v, n.wlasciciel)), zl(naRunde(n.czynsz)), zl(n.naklady),
         n.najem_do != null ? `<span class="pigulka">wypowiedziany – ostatnia runda ${n.najem_do}</span>` : "trwa"]), { klasy: ["l", "l"] });
   }
   return html;
 }
 
-function licytacjaHtml(v, kat, p) {
-  return tabela(`${p.rodzaj === "lokal" ? "Lokal" : "Budynek z najemcą"}: ${nazwaLokalu(kat, p.id)}${p.remis ? " – remis, losowanie" : ""}`,
+function licytacjaHtml(v, kat, p, zwijane = false) {
+  return (zwijane ? zwinTabela : tabela)(`${p.rodzaj === "lokal" ? "Lokal" : "Budynek z najemcą"}: ${nazwaLokalu(kat, p.id)}${p.remis ? " – remis, losowanie" : ""}`,
     ["Firma", "Forma", "Oferta", "Cena wywoławcza", "Przebicie", "Wynik"],
     p.oferty.map((o) => [esc(nazwaFirmy(v, o.firma)), o.forma === "najem" ? "najem" : "kupno", zl(o.kwota), zl(o.wywolawcza),
       `+${proc(o.stosunek - 1, 0)}`, o.firma === p.zwyciezca ? `<span class="pigulka ok">wygrana</span>` : "przegrana"]),
-    { klasy: ["l", "l"], sortuj: false });
+    { klasy: ["l", "l"], sortuj: false, ...(zwijane ? { otwarte: p.oferty.some((o) => o.firma === v.firma) } : {}) });
 }
 
 export const przejecia = {
@@ -96,7 +97,10 @@ export const przejecia = {
       ${x.przeniesieni.length ? `<p>Przeniesieni: ${x.przeniesieni.map(esc).join(", ")}.</p>` : ""}
       ${x.zwolnieni.length ? `<p>Zwolnieni (z odprawą): ${x.zwolnieni.map(esc).join(", ")}.</p>` : ""}</div></div>`;
     html += stanBudynkow(v, kat, W, null, false);
-    return html || `<p class="podpowiedz">W tej rundzie nie było przejęć ani wypowiedzeń.</p>`;
+    if (!html) return `<p class="podpowiedz">W tej rundzie nie było przejęć ani wypowiedzeń.</p>`;
+    const zdarzenia = [p?.id && (p.przyjety ? `${p.wykup ? "wykupiono lokal" : "kupiono budynek"} ${esc(nazwaLokalu(kat, p.id))}` : "próba zakupu budynku nie powiodła się"),
+      W.wypowiedzenia.some((x) => x.przyjete) && "wypowiedziano najem", W.wyprowadzki.length && "najemca wyprowadził się z budynku"].filter(Boolean);
+    return (zdarzenia.length ? podsumowanie(`W tej rundzie: ${zdarzenia.join(", ")}.`, p?.id && !p.przyjety ? "uwaga" : "") : "") + html;
   },
   akcje: {
     przejecie: (el, c) => c.zmien((d) => {
@@ -118,9 +122,12 @@ export const przejecia = {
 };
 
 // UF15: licytacje lokali osobno – kto, ile i za ile licytował w mieście (oferty wpisuje się w Nowe lokale → Do wynajęcia)
-function licytacjeMiasta(v, kat) {
+function licytacjeMiasta(v, kat, zwijane = false) {
   const przetargi = v.rynek?.przejecia?.przetargi || [];
-  return przetargi.length ? przetargi.map((x) => licytacjaHtml(v, kat, x)).join("")
+  const moje = przetargi.filter((x) => x.oferty.some((o) => o.firma === v.firma)), wygrane = moje.filter((x) => x.zwyciezca === v.firma).length;
+  const lead = zwijane && przetargi.length ? podsumowanie(`W mieście odbyło się ${przetargi.length} ${przetargi.length === 1 ? "licytacja" : przetargi.length < 5 ? "licytacje" : "licytacji"}. `
+    + (moje.length ? `Twoja firma brała udział w ${moje.length}, a wygrała ${wygrane}.` : "Twoja firma w żadnej nie startowała."), moje.length && !wygrane ? "uwaga" : "") : "";
+  return przetargi.length ? lead + przetargi.map((x) => licytacjaHtml(v, kat, x, zwijane)).join("")
     : `<p class="podpowiedz">W poprzedniej rundzie nikt się nie licytował – każdy chętny dostał swój lokal.</p>`;
 }
 
@@ -133,5 +140,5 @@ export const licytacje = {
     return `<div class="komunikat">Ofertę za lokal wpisujesz przy lokalu w zakładce <a data-zakladka-k="lokale">Do wynajęcia</a>.
       Tu widać, jak poszły licytacje w poprzedniej rundzie – kto przebił i o ile.</div>` + licytacjeMiasta(v, kat);
   },
-  wyniki({ v, kat }) { return licytacjeMiasta(v, kat); },
+  wyniki({ v, kat }) { return licytacjeMiasta(v, kat, true); },
 };

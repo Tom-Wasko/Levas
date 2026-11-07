@@ -1,6 +1,6 @@
 // Magazyn i świeżość: partie składników z terminami, pojemność chłodni i zamrażarki (silnik/kuchnia/swiezosc.py,
 // dane/zasoby.yaml, dane/sprzet.yaml) – w decyzjach plan dostaw, w wynikach dzień po dniu: dostawy, zużycie, straty.
-import { esc, gw, licz, nazwaUslugi, tabela, toast, ulamek, wykres, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, gw, kafelkiLiczb, licz, nazwaUslugi, podsumowanie, tabela, toast, ulamek, wykres, zl2, zwinTabela } from "./wspolne.js";
 import { idWybranego, mojeLokale, nazwaLokalu, wieleLokali } from "./lokal_wybor.js";
 import { IG_SWIEZOSC } from "./infografiki.js";
 
@@ -34,9 +34,9 @@ function wynikiMagazynu(W, M, v) {
   let html = "";
   const A = M?.auto_dostawca;   // Z4: towar u auto-dostawcy
   if (A?.koszt) html += `<p class="podpowiedz">Przechowanie towaru u auto-dostawcy: ${licz(A.litrodni)} litrodni, <span class="minus">${zl2(A.koszt)}</span>.</p>`;
-  if (A?.zostaje?.length) html += tabela("Zostaje u auto-dostawcy na następny tydzień (płacisz za przechowanie)", ["Lokal", "Składnik", "Jakość", "Opakowania", "Ostatni dzień"],
+  if (A?.zostaje?.length) html += zwinTabela("Zostaje u auto-dostawcy na następny tydzień (płacisz za przechowanie)", ["Lokal", "Składnik", "Jakość", "Opakowania", "Ostatni dzień"],
     A.zostaje.map((x) => [esc(nazwaLokalu(v, x.lokal)), esc(x.zasob), gw(x.jakosc), ulamek(x.ilosc), x.termin ? dataKrotka(x.termin) : "–"]), { klasy: ["l", "l"] });
-  if (W.wynajem?.length) html += tabela("Wynajęta chłodnia – Mroźnia u Mietka", ["Dzień", "Składnik", "Jakość", "Opakowania", "Litry", "Ostatni dzień", "Koszt"],
+  if (W.wynajem?.length) html += zwinTabela("Wynajęta chłodnia – Mroźnia u Mietka", ["Dzień", "Składnik", "Jakość", "Opakowania", "Litry", "Ostatni dzień", "Koszt"],
     W.wynajem.map((x) => [dataKrotka(x.data), esc(x.zasob), gw(x.jakosc), ulamek(x.ilosc), licz(x.litry), dataKrotka(x.termin), zl2(x.koszt)]),
     { klasy: ["l", "l"], stopka: ["Razem", "", "", "", licz(M?.wynajem?.litry || 0), "", zl2(M?.wynajem?.koszt || 0)] });
   const sp = M?.sanepid;
@@ -74,14 +74,14 @@ function wynikiZasoby(W) {
     return [esc(z), ulamek(suma("dostawy")), ...x.zuzycie.map((v) => ulamek(v)), ulamek(suma("zuzycie")),
       suma("straty") ? `<span class="minus">${ulamek(suma("straty"))}</span>` : "0"];
   });
-  return tabela("Składniki dzień po dniu – zużycie (opakowania)", ["Składnik", "Dostawy", ...W.dni.map((d) => dataKrotka(d)), "Zużycie", "Straty"], wiersze, { klasy: ["l"] });
+  return zwinTabela("Składniki dzień po dniu – zużycie (opakowania)", ["Składnik", "Dostawy", ...W.dni.map((d) => dataKrotka(d)), "Zużycie", "Straty"], wiersze, { klasy: ["l"] });
 }
 
 function wynikiStraty(W) {
   if (!W.straty.length) return `<p class="podpowiedz">Nic się nie zmarnowało – sanepid byłby dumny.</p>`;
-  return tabela("Do kosza", ["Dzień", "Składnik", "Jakość", "Opakowania", "Wartość", "Powód"],
+  return zwinTabela("Do kosza", ["Dzień", "Składnik", "Jakość", "Opakowania", "Wartość", "Powód"],
     W.straty.map((s) => [dataKrotka(s.data), esc(s.zasob), gw(s.jakosc), ulamek(s.ilosc), `<span class="minus">${zl2(s.wartosc)}</span>`, POWOD[s.powod] || esc(s.powod)]),
-    { klasy: ["l", "l", "", "", "", "l"], stopka: ["Razem", "", "", "", zl2(W.wartosc_strat), ""] });
+    { klasy: ["l", "l", "", "", "", "l"], stopka: ["Razem", "", "", "", zl2(W.wartosc_strat), ""], otwarte: true });
 }
 
 function wynikiMenu(W, kat) {
@@ -89,9 +89,9 @@ function wynikiMenu(W, kat) {
   if (!z.length) return "";
   const brak = {};
   for (const x of W.wylaczone) (brak[x.danie] = brak[x.danie] || new Set()).add(x.skladnik);
-  return tabela("Dania wyłączone z menu (brak składnika rano)", ["Danie", "Brakujący składnik", "Dni bez dania", "Wzięli inne danie", "Odeszli"],
+  return zwinTabela("Dania wyłączone z menu (brak składnika rano)", ["Danie", "Brakujący składnik", "Dni bez dania", "Wzięli inne danie", "Odeszli"],
     z.map(([u, x]) => [esc(nazwaUslugi(kat, u)), [...brak[u]].map(esc).join(", "), licz(W.wylaczone.filter((w) => w.danie === u).length), licz(x.przeszli),
-      `<span class="minus">${licz(x.odeszli)}</span>`]), { klasy: ["l", "l"] })
+      `<span class="minus">${licz(x.odeszli)}</span>`]), { klasy: ["l", "l"], otwarte: true })
     + `<p class="podpowiedz">Gdy dania nie ma w menu, część klientów zamawia coś innego, reszta idzie do konkurencji.</p>`;
 }
 
@@ -131,9 +131,11 @@ function przewozyHtml(v, S, edycja) {
 function wynikiPrzewozow(v, W) {
   const P = W.przewozy || [];
   if (!P.length) return "";
-  return tabela("Przewozy towaru między lokalami", ["Dzień", "Z lokalu", "Do lokalu", "Składnik", "Zaplanowano", "Przewieziono"],
+  const brak = P.filter((x) => x.przewiezione + 1e-9 < x.ilosc).length;
+  return podsumowanie(`Zaplanowano ${licz(P.length)} ${P.length === 1 ? "przewóz" : "przewozy"} towaru między lokalami, ${brak ? `nie wszystko udało się przewieźć (${licz(brak)})` : "wszystko przewieziono"}.`, brak ? "uwaga" : "ok")
+    + zwinTabela("Przewozy towaru między lokalami", ["Dzień", "Z lokalu", "Do lokalu", "Składnik", "Zaplanowano", "Przewieziono"],
     P.map((x) => [W.dni[x.dzien] ? dataKrotka(W.dni[x.dzien]) : "–", esc(nazwaLokalu(v, x.z)), esc(nazwaLokalu(v, x.do)), esc(x.zasob), ulamek(x.ilosc),
-      x.przewiezione + 1e-9 < x.ilosc ? `<span class="minus">${ulamek(x.przewiezione)}</span>` : ulamek(x.przewiezione)]), { klasy: ["l", "l", "l", "l"] });
+      x.przewiezione + 1e-9 < x.ilosc ? `<span class="minus">${ulamek(x.przewiezione)}</span>` : ulamek(x.przewiezione)]), { klasy: ["l", "l", "l", "l"], otwarte: true });
 }
 
 export const swiezosc = {
@@ -158,9 +160,13 @@ export const swiezosc = {
   },
   wyniki({ v, kat }) {
     const W = v.wyniki?.swiezosc;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie sprzedaży.</p>`;
-    return `<div class="pasek ciemny"><span>Wartość strat: <span class="kwota">${zl2(W.wartosc_strat)}</span></span>
-      <span>Wyrzucone partie: <span class="kwota">${W.straty.length}</span></span></div>`
+    if (!W) return brakWynikow("Wyniki pojawią się po pierwszej rundzie sprzedaży.");
+    const n = W.straty.length;
+    const lead = podsumowanie(n ? `Do kosza poszło <b>${licz(n)}</b> ${n === 1 ? "partia" : "partii"} składników za <b>${zl2(W.wartosc_strat)}</b> – zamawiaj ostrożniej albo wcześniej zużywaj towar z krótkim terminem.`
+      : "Nic się nie zmarnowało – wszystkie składniki zostały zużyte w terminie.", n ? "uwaga" : "ok");
+    const kafle = kafelkiLiczb([{ etykieta: "Wartość strat", wartosc: zl2(W.wartosc_strat), ton: n ? "minus" : "plus" },
+      { etykieta: "Wyrzucone partie", wartosc: licz(n), ton: n ? "minus" : "plus" }]);
+    return lead + kafle
       + wynikiZasoby(W) + `<div class="wykres"><canvas id="w-swiezosc"></canvas></div>` + wynikiStraty(W)
       + wynikiMagazynu(W, v.wyniki?.magazyn, v) + wynikiMenu(W, kat);
   },

@@ -2,7 +2,7 @@
 // przyjęcie w następnej rundzie, faktury w KPiR obu stron. Decyzje `handel_oferty` i `handel_przyjmij`.
 // P13: negocjacje na żywo w rundzie wystawienia – adresat widzi szkic oferty od razu i odpowiada w `handel_odpowiedzi`
 // ({"<sprzedawca>/<klucz>": {kontry, przyjmij, nr, odrzuc}}), sprzedawca dopisuje `ceny` albo `przyjmij_kontre`.
-import { esc, okno, tabela, toast, zamknijOkno, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, licz, okno, podsumowanie, tabela, toast, zamknijOkno, zl2, zwinTabela } from "./wspolne.js";
 
 const proc = (x) => `${Math.round(x * 100)}%`;
 const klucz = (o, i) => o.klucz || `i${i + 1}`;
@@ -41,10 +41,11 @@ function nieudaneHtml(D) {
     .map((o) => `<p class="minus">${esc(o.co)}: ${esc(o.powod)}.</p>`).join("");
 }
 
-function transakcjeHtml(D, tytul) {
+function transakcjeHtml(D, tytul, zw = false) {
+  const tab = zw ? (t, n, w, o) => zwinTabela(t, n, w, { ...o, otwarte: true }) : tabela;
   const T = D?.transakcje || [];
   if (!T.length) return "";
-  return tabela(tytul, ["Strona", "Z kim", "Co", "Netto", "VAT", "Brutto"],
+  return tab(tytul, ["Strona", "Z kim", "Co", "Netto", "VAT", "Brutto"],
     T.map((t) => [t.strona === "sprzedaz" ? "Sprzedaż (faktura sprzedaży)" : "Zakup (faktura zakupu)", esc(t.z_kim),
       esc(t.co) + (t.nr ? ` → stanowisko ${t.nr}` : ""), zl2(t.netto), zl2(t.vat),
       `<span class="${t.strona === "sprzedaz" ? "plus" : "minus"}">${zl2(t.strona === "sprzedaz" ? t.cena : -t.cena)}</span>`]),
@@ -52,9 +53,10 @@ function transakcjeHtml(D, tytul) {
     + T.map((t) => `<div class="karta"><p>${esc(t.tekst)}</p></div>`).join("");
 }
 
-function ofertyHtml(lista, tytul, kto) {
+function ofertyHtml(lista, tytul, kto, zw = false) {
+  const tab = zw ? zwinTabela : tabela;
   if (!lista?.length) return "";
-  return tabela(tytul, [kto === "od" ? "Od" : "Dla", "Co", "Termin", "Netto", "VAT", "Brutto"],
+  return tab(tytul, [kto === "od" ? "Od" : "Dla", "Co", "Termin", "Netto", "VAT", "Brutto"],
     lista.map((o) => [esc(kto === "od" ? o.od_nazwa : o.do_nazwa), esc(o.co), o.termin ? esc(o.termin) : "–",
       zl2(o.netto), zl2(o.vat), zl2(o.cena)]), { klasy: ["l", "l", "l"] });
 }
@@ -127,14 +129,19 @@ export const handel = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.handel;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po rundzie z handlem.</p>`;
+    if (!W) return brakWynikow("Wyniki pojawią się po rundzie z handlem.");
     const puste = !W.transakcje?.length && !W.wystawione?.length && !W.odrzucone?.length && !W.nieudane?.length;
-    return transakcjeHtml(W, "Transakcje w rundzie")
-      + ofertyHtml((W.wystawione || []).filter((o) => o.uzgodniona), "Umowy z negocjacji (transakcja na początku następnej rundy)", "do")
-      + ofertyHtml((W.wystawione || []).filter((o) => !o.uzgodniona), "Oferty wystawione (do przyjęcia w następnej rundzie)", "do")
+    const T = W.transakcje || [], sprz = T.filter((t) => t.strona === "sprzedaz"), zak = T.length - sprz.length, nied = (W.odrzucone || []).length + (W.nieudane || []).length;
+    const lead = puste ? podsumowanie("W tej rundzie nie było handlu z innymi drużynami.") : podsumowanie([
+      T.length ? `Zawarto <b>${licz(T.length)}</b> ${T.length === 1 ? "transakcję" : "transakcji"} z innymi drużynami: ${licz(sprz.length)} sprzedaży i ${licz(zak)} zakupów.` : "Żadna transakcja nie doszła do skutku.",
+      nied ? `Nie udało się ${licz(nied)} ${nied === 1 ? "oferty" : "ofert"}.` : ""], nied ? "uwaga" : "ok");
+    const kafle = puste ? "" : kafelkiLiczb([{ etykieta: "Transakcje", wartosc: licz(T.length) }, { etykieta: "Sprzedaż", wartosc: zl2(sprz.reduce((a, t) => a + t.cena, 0)), ton: sprz.length ? "plus" : "" },
+      { etykieta: "Zakupy", wartosc: zl2(T.filter((t) => t.strona !== "sprzedaz").reduce((a, t) => a + t.cena, 0)), ton: zak ? "minus" : "" }, nied ? { etykieta: "Nieudane oferty", wartosc: licz(nied), ton: "minus" } : null]);
+    return lead + kafle + transakcjeHtml(W, "Transakcje w rundzie", true)
+      + ofertyHtml((W.wystawione || []).filter((o) => o.uzgodniona), "Umowy z negocjacji (transakcja na początku następnej rundy)", "do", true)
+      + ofertyHtml((W.wystawione || []).filter((o) => !o.uzgodniona), "Oferty wystawione (do przyjęcia w następnej rundzie)", "do", true)
       + ((W.odrzucone_przez_adresata || []).length ? `<p class="podpowiedz">Odrzucone przez adresata: ${W.odrzucone_przez_adresata.map((o) => esc(o.co)).join(", ")}.</p>` : "")
-      + nieudaneHtml(W)
-      + (puste ? `<p class="podpowiedz">W tej rundzie nie było handlu z innymi drużynami.</p>` : "");
+      + nieudaneHtml(W);
   },
   akcje: {
     // --- negocjacje na żywo: kupujący

@@ -1,5 +1,5 @@
 // Oferta: wybór dań (menu), prognoza popytu i cena – wybrane danie jest w sprzedaży (silnik: _ceny_domyslne).
-import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, proc, tabela, toast, wykres, zl, zl2 } from "./wspolne.js";
+import { esc, gw, licz, miesiacRundy, nazwaRundy, nazwaUslugi, OKRES, okno, podsumowanie, proc, tabela, toast, wykres, zl, zl2, zwinTabela, brakWynikow } from "./wspolne.js";
 import { kolko } from "./dymki.js";
 import { cenyLokalu, lokalWybrany, menuLokalu, nazwaLokalu, wieleLokali, zapiszWLokalu } from "./lokal_wybor.js";
 import { widelki } from "./sprzedaz.js";
@@ -109,8 +109,12 @@ export const oferta = {
     const sp = v.wyniki?.sprzedaz || {};
     const w = Object.entries(sp).map(([u, s]) => [esc(nazwaUslugi(kat, u)), licz(s.prognoza), licz(s.popyt),
       s.popyt > s.prognoza ? `<span class="plus">+${licz(s.popyt - s.prognoza)}</span>` : `<span class="minus">${licz(s.popyt - s.prognoza)}</span>`]);
-    return `${tabela("Prognozowany popyt vs popyt", ["Danie", `Prognozowany popyt (na ${OKRES.mianownik})`, "Popyt", "Różnica"], w, { klasy: ["l"] })}
-      <div class="wykres"><canvas id="w-prognoza"></canvas></div>`;
+    const S = Object.values(sp), prog = S.reduce((a, s) => a + s.prognoza, 0), pop = S.reduce((a, s) => a + s.popyt, 0);
+    const lead = !S.length ? brakWynikow("Porównanie prognozy z popytem pojawi się, gdy lokal zacznie sprzedawać.") : podsumowanie(
+      `Prognozowaliście łącznie <b>${licz(prog)}</b> porcji, a chętnych było <b>${licz(pop)}</b> – ${pop >= prog ? "popyt był wyższy lub równy prognozie" : "prognoza była zawyżona"} (różnica ${pop >= prog ? "+" : ""}${licz(pop - prog)}).`,
+      pop >= prog * 0.8 ? "ok" : "uwaga");
+    return `${lead}<div class="wykres"><canvas id="w-prognoza"></canvas></div>
+      ${zwinTabela("Prognozowany popyt vs popyt", ["Danie", `Prognozowany popyt (na ${OKRES.mianownik})`, "Popyt", "Różnica"], w, { klasy: ["l"], otwarte: true })}`;
   },
   po({ v, kat }, tryb) {
     if (tryb !== "wyniki") return;

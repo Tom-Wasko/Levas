@@ -1,6 +1,6 @@
 // Czas właściciela (gra z lokalami, silnik/ludzie/czas_wlasciciela.py): pula godzin na rundę na sprawy poza lokalem.
 // Decyzja, na którą nie starcza godzin, jest odrzucona (lista błędów).
-import { esc, licz, tabela } from "./wspolne.js";
+import { brakWynikow, esc, licz, podsumowanie, tabela } from "./wspolne.js";
 
 const ZAKLADKA = { dostawcy: "Dostawcy", mapa: "Park (mapa)", sprawy: "Mój lokal", zatrudnienie: "Zatrudnienie" };
 
@@ -31,6 +31,10 @@ export const czas_wlasciciela = {
   },
   wyniki({ v }) {
     const C = v.wyniki?.czas_wlasciciela;
-    return C ? czasHtml(C, "Czas właściciela w rundzie") : `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
+    if (!C) return brakWynikow("Wyniki pojawią się po pierwszej rundzie.");
+    const odrz = C.pozycje.filter((p) => !p.przyjete).length;
+    return podsumowanie([`Właściciel wykorzystał <b>${licz(C.wykorzystane, 1)} h</b> z ${licz(C.pula, 1)} h, wolne zostało ${licz(C.wolne, 1)} h.`,
+      odrz ? `${licz(odrz)} ${odrz === 1 ? "decyzja nie doszła" : "decyzji nie doszło"} do skutku – zabrakło godzin.` : ""], odrz ? "zly" : C.wolne <= 0 ? "uwaga" : "ok")
+      + czasHtml(C, "Czas właściciela w rundzie");
   },
 };

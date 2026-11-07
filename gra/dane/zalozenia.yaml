@@ -573,6 +573,11 @@ wnioski:   # gra z lokalami (Q13): zakładka „Wnioski z rundy” – od jakich
     pewnosc: zalozenie
     zrodlo: 'test gry 28.10: rada o prognozie popytu (Menu), gdy różni się od prawdziwego popytu dania o co najmniej
       tyle w górę albo w dół'
+  wzrost_klientow:
+    wartosc: 0.05
+    pewnosc: zalozenie
+    zrodlo: 'UF23 (7.11.2026): pochwała „klientów więcej niż tydzień wcześniej” – od takiego względnego wzrostu
+      liczby obsłużonych klientów'
   dlaczego_min:
     wartosc: 0.05
     pewnosc: zalozenie

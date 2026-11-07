@@ -1,15 +1,16 @@
 // Konkurencja (gra z lokalami, silnik/rynek/konkurencja.py, P16): ogólny obraz rywali dla wszystkich, dokładne dane – detektyw.
 // Decyzja `detektyw: firma` – zlecenie obserwacji jednego rywala w tej rundzie (koszt w zł i godziny właściciela).
-import { esc, gw, licz, nazwaFirmy, nazwaUslugi, proc, tabela, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, gw, kafelkiLiczb, licz, nazwaFirmy, nazwaUslugi, podsumowanie, proc, tabela, zl2, zwinTabela } from "./wspolne.js";
 
 const tak = (x) => x ? `<span class="plus">tak</span>` : "nie";
 const ceny = (r) => r.cena_min == null ? "–" : r.cena_min === r.cena_maks ? zl2(r.cena_min) : `${zl2(r.cena_min)} – ${zl2(r.cena_maks)}`;
 
-function przegladHtml(v, K, tytul) {
+function przegladHtml(v, K, tytul, zw = false) {
+  const tab = zw ? zwinTabela : tabela;
   if (!K.przeglad.length) return `<p class="podpowiedz">Obraz rynku pojawi się po pierwszej rundzie.</p>`;
-  return tabela(tytul, ["Drużyna", "Lokale", "Dania w menu", "Ceny dań", "Reklama", "Promocje", "Udział w klientach"],
+  return tab(tytul, ["Drużyna", "Lokale", "Dania w menu", "Ceny dań", "Reklama", "Promocje", "Udział w klientach"],
     K.przeglad.map((r) => [r.ja ? `<b>${esc(nazwaFirmy(v, r.firma))} (Wy)</b>` : esc(nazwaFirmy(v, r.firma)), r.lokale, r.dania,
-      ceny(r), tak(r.reklama), tak(r.promocje), proc(r.udzial)]), { klasy: ["l"] });
+      ceny(r), tak(r.reklama), tak(r.promocje), proc(r.udzial)]), { klasy: ["l"], otwarte: zw });
 }
 
 function raportHtml(v, kat, R) {
@@ -22,15 +23,15 @@ function raportHtml(v, kat, R) {
       <span>Dochód netto: <span class="kwota">${zl2(R.dochod_netto)}</span></span>
       ${R.zadluzenie ? `<span>Zadłużenie: <span class="kwota">${zl2(R.zadluzenie)}</span></span>` : ""}
       ${R.zadowolenie_klientow != null ? `<span>Zadowolenie klientów: <span class="kwota">${licz(R.zadowolenie_klientow, 2)}</span></span>` : ""}</div>`
-    + tabela("Menu rywala", ["Danie", "Cena", "Po rabacie", "Popyt", "Sprzedane", "Przychód", "Reklamacje"],
+    + zwinTabela("Menu rywala", ["Danie", "Cena", "Po rabacie", "Popyt", "Sprzedane", "Przychód", "Reklamacje"],
       R.menu.map((m) => [esc(nazwaUslugi(kat, m.usluga)), zl2(m.cena), zl2(m.cena_po_rabacie), licz(m.popyt), licz(m.sprzedaz),
-        zl2(m.przychod), m.reklamacje]), { klasy: ["l"] })
-    + tabela("Lokale rywala", ["Lokal", "Strefa", "Forma"], R.lokale.map((l) => [esc(l.nazwa), esc(l.strefa), esc(l.forma)]), { klasy: ["l", "l", "l"] })
-    + tabela("Załoga rywala", ["Zawód", "Gwiazdki", "Osób", "Średnia pensja"],
+        zl2(m.przychod), m.reklamacje]), { klasy: ["l"], otwarte: true })
+    + zwinTabela("Lokale rywala", ["Lokal", "Strefa", "Forma"], R.lokale.map((l) => [esc(l.nazwa), esc(l.strefa), esc(l.forma)]), { klasy: ["l", "l", "l"] })
+    + zwinTabela("Załoga rywala", ["Zawód", "Gwiazdki", "Osób", "Średnia pensja"],
       R.zaloga.map((z) => [esc(z.zawod), gw(z.gwiazdki), z.liczba, zl2(z.pensja)]), { klasy: ["l"] })
-    + (R.kampanie.length ? tabela("Kampanie reklamowe rywala", ["Kampania", "Agencja", "Strefa", "Koszt"],
+    + (R.kampanie.length ? zwinTabela("Kampanie reklamowe rywala", ["Kampania", "Agencja", "Strefa", "Koszt"],
       R.kampanie.map((k) => [esc(k.nazwa), esc(k.agencja), esc(k.strefa), zl2(k.koszt)]), { klasy: ["l", "l", "l"] }) : "")
-    + (R.promocje.length ? tabela("Promocje rywala", ["Promocja", "Rodzaj", "Danie"],
+    + (R.promocje.length ? zwinTabela("Promocje rywala", ["Promocja", "Rodzaj", "Danie"],
       R.promocje.map((p) => [esc(p.nazwa), esc(p.rodzaj), p.danie ? esc(nazwaUslugi(kat, p.danie)) : "–"]), { klasy: ["l", "l", "l"] }) : "");
 }
 
@@ -68,12 +69,16 @@ export const konkurencja = {
   },
   wyniki({ v, kat }) {
     const W = v.wyniki?.konkurencja, K = v.konkurencja;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
-    let html = wpadkiHtml(v, W.wpadki);
+    if (!W) return brakWynikow("Wyniki pojawią się po pierwszej rundzie.");
+    const P = [...(K?.przeglad || [])].sort((a, b) => b.udzial - a.udzial), ja = P.findIndex((r) => r.ja);
+    let html = ja < 0 ? "" : podsumowanie(`Twoje lokale przyciągnęły <b>${proc(P[ja].udzial)}</b> klientów miasta – ${ja === 0 ? "najwięcej spośród wszystkich drużyn" : `${ja + 1}. miejsce na ${P.length} drużyn`}.`, ja === 0 ? "ok" : "")
+      + kafelkiLiczb([{ etykieta: "Twój udział w klientach", wartosc: proc(P[ja].udzial) }, { etykieta: "Miejsce wśród drużyn", wartosc: `${ja + 1} / ${P.length}` },
+        P[ja].udzial < P[0].udzial && { etykieta: "Lider", wartosc: proc(P[0].udzial), opis: esc(nazwaFirmy(v, P[0].firma)) }]);
+    html += wpadkiHtml(v, W.wpadki);
     if (W.raport) html += raportHtml(v, kat, W.raport);
     else if (W.zlecenie && !W.zlecenie.przyjete) html += `<p class="minus">Zlecenie detektywa odrzucone: ${esc(W.zlecenie.powod)}.</p>`;
     else if (!W.wpadki.length) html += `<p class="podpowiedz">W poprzedniej rundzie nie zlecaliście obserwacji i nikt Was nie śledził (a przynajmniej nikt nie wpadł).</p>`;
-    return html + (K ? przegladHtml(v, K, "Ogólny obraz rynku w poprzedniej rundzie") : "");
+    return html + (K ? przegladHtml(v, K, "Ogólny obraz rynku w poprzedniej rundzie", true) : "");
   },
   akcje: {
     "det-zlec": (el, c) => c.zmien((d) => { d.detektyw = el.dataset.f; }),

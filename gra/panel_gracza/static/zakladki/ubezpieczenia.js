@@ -1,13 +1,13 @@
 // Ubezpieczenia (gra z lokalami, silnik/swiat/awarie.py): polisy TUW na wypadki w lokalu. Decyzja `polisy: [rodzaj]` – pełna
 // lista; polisa chroni po karencji i trwa, dopóki drużyna jej nie wypowie. Same wypadki – w Moim lokalu (część Sprawy w lokalu).
-import { esc, naOkres, proc, tabela, zl2 } from "./wspolne.js";
+import { brakWynikow, esc, kafelkiLiczb, naOkres, podsumowanie, proc, tabela, zl2, zwin, zwinTabela } from "./wspolne.js";
 
 const rund = (n) => `${n} ${n === 1 ? "runda" : n < 5 ? "rundy" : "rund"}`;
 
-function szkodyHtml(S, tytul) {
-  return S?.length ? tabela(tytul, ["Runda", "Wypadek", "Szkoda", "Koszt", "Odszkodowanie", "Uwagi"], S.map((s) => [s.runda, esc(s.tytul),
+function szkodyHtml(S, tytul, otwarte = false) {
+  return S?.length ? zwinTabela(tytul, ["Runda", "Wypadek", "Szkoda", "Koszt", "Odszkodowanie", "Uwagi"], S.map((s) => [s.runda, esc(s.tytul),
     esc(s.opis), `<span class="minus">${zl2(-s.kwota)}</span>`, s.odszkodowanie ? `<span class="plus">${zl2(s.odszkodowanie)}</span>` : "–",
-    esc(s.powod || "")]), { klasy: ["", "l", "l", "", "", "l"] }) : "";
+    esc(s.powod || "")]), { klasy: ["", "l", "l", "", "", "l"], otwarte }) : "";
 }
 
 const nazwaPolisy = (U, r) => U.oferta.find((p) => p.rodzaj === r)?.nazwa ?? r;
@@ -49,14 +49,20 @@ export const ubezpieczenia = {
   },
   wyniki({ v }) {
     const W = v.wyniki?.ubezpieczenia, U = v.ubezpieczenia;
-    if (!W) return `<p class="podpowiedz">Wyniki pojawią się po pierwszej rundzie.</p>`;
+    if (!W) return brakWynikow();
     const razem = [["Składki", `<span class="minus">${zl2(-W.skladki)}</span>`], ["Szkody z wypadków", `<span class="minus">${zl2(-W.szkody_razem)}</span>`],
       ["Odszkodowania", `<span class="plus">${zl2(W.odszkodowania)}</span>`]];
     const dawne = (U?.szkody || []).filter((s) => s.runda < v.runda - 1);
-    return tabela("Ubezpieczenia w rundzie", ["Co", "Kwota"], razem, { klasy: ["l"], sortuj: false })
-      + (W.polisy.length ? tabela("Polisy w rundzie", ["Polisa", "Chroni od rundy", "Składka"], W.polisy.map((p) => [esc(p.nazwa), p.od_rundy, zl2(p.skladka)]), { klasy: ["l"] })
+    const ns = W.szkody.length, netto = W.szkody_razem - W.odszkodowania;
+    const lead = podsumowanie([ns ? `W tej rundzie zdarzy${ns === 1 ? "ł się" : "ły się"} ${ns} ${ns === 1 ? "wypadek" : ns < 5 ? "wypadki" : "wypadków"} ze szkodami na ${zl2(W.szkody_razem)}; polisy zwróciły ${zl2(W.odszkodowania)}.`
+      : "W tej rundzie obyło się bez szkód.", W.polisy.length ? `Składki za ${W.polisy.length} ${W.polisy.length === 1 ? "polisę" : W.polisy.length < 5 ? "polisy" : "polis"} to ${zl2(W.skladki)}.`
+      : "Nie miałeś żadnej polisy, więc każda szkoda byłaby w całości na Twój koszt."], ns && netto > W.skladki ? "uwaga" : "");
+    const kafle = kafelkiLiczb([{ etykieta: "Składki", wartosc: zl2(W.skladki), ton: W.skladki ? "minus" : "" }, { etykieta: "Szkody", wartosc: zl2(W.szkody_razem), ton: W.szkody_razem ? "minus" : "plus" },
+      { etykieta: "Odszkodowania", wartosc: zl2(W.odszkodowania), ton: W.odszkodowania ? "plus" : "" }]);
+    return lead + kafle + zwinTabela("Ubezpieczenia w rundzie", ["Co", "Kwota"], razem, { klasy: ["l"], sortuj: false })
+      + (W.polisy.length ? zwinTabela("Polisy w rundzie", ["Polisa", "Chroni od rundy", "Składka"], W.polisy.map((p) => [esc(p.nazwa), p.od_rundy, zl2(p.skladka)]), { klasy: ["l"] })
         : `<p class="podpowiedz">W tej rundzie nie miałeś żadnej polisy.</p>`)
-      + (szkodyHtml(W.szkody, "Szkody w rundzie") || `<p class="podpowiedz">W poprzedniej rundzie obyło się bez szkód.</p>`)
+      + szkodyHtml(W.szkody, "Szkody w rundzie", true)
       + szkodyHtml(dawne, "Wcześniejsze szkody")
       + (U ? `<p class="podpowiedz">Od początku gry: składki ${zl2(U.skladki_razem)}, odszkodowania ${zl2(U.odszkodowania_razem)}.</p>` : "");
   },
