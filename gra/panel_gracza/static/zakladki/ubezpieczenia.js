@@ -13,7 +13,7 @@ function szkodyHtml(S, tytul, otwarte = false) {
 const nazwaPolisy = (U, r) => U.oferta.find((p) => p.rodzaj === r)?.nazwa ?? r;
 
 export const ubezpieczenia = {
-  tytul: "Ubezpieczenia", tytulPelny: "Ubezpieczenia lokalu", ikona: "tarcza", odblokowanie: (v) => !!v.ubezpieczenia, ukryta: (v) => !v.ubezpieczenia,
+  tytul: "Ubezpieczenia", tytulPelny: "Ubezpieczenia lokalu", ikona: "tarcza", odblokowanie: (v) => !!v.ubezpieczenia && v.runda >= (v.ubezpieczenia.polisy_od ?? 1), ukryta: (v) => !v.ubezpieczenia,
   info: `W lokalu zdarzają się wypadki – zwykle śmieszne, czasem poważne – i każdy kosztuje. Polisa nie zapobiegnie wypadkowi,
     ale zwraca część szkody: (koszt − franszyza) × pokrycie, jako przychód pozostały w KPiR. Chroni dopiero po karencji
     i tylko przed wypadkami, które zaczęły się, gdy już chroniła. Składka jest kosztem co rundę, dopóki polisy nie wypowiesz.

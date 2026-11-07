@@ -144,3 +144,11 @@ Liczby gry tylko w YAML. Teksty po polsku, ciekawie i krótko (styl gry: lekki h
 21. **UF2 (12)** – kod `koziol` z klawiatury otwiera kasyno (`app.js`, nasłuch klawiszy poza polami tekstowymi).
 22. **UF1 (14)** – mapa jako ekran startowy (`app.js`: domyślna zakładka, logo).
 23. **UF24** – instrukcja gracza + PDF, kontrola botów (18 rund bez błędów, kolejność trudności), gra pokazowa.
+
+## Poprawki autora z 7.11.2026 (UF25–UF30, robione przed UF24)
+24. **UF25** – lista zadań: animacja przy wysuwaniu i zwijaniu.
+25. **UF26** – lista zadań domyślnie zwinięta; klik poza nią ją zwija.
+26. **UF27** – Menu: w kafelku dania te same słupki co w Strefach miasta (zamiast słupków z UF7), na prawo od nazwy dania.
+27. **UF28** – Strefy miasta: dymek na słupku, np. „wtorek – popyt: × 1,1”.
+28. **UF29** – Strefy: bez przypominania o wydarzeniach (są w Kalendarzu).
+29. **UF30** – okno zatrudniania: „+20% ZUS” zamiast dłuższego opisu kosztów pracodawcy.

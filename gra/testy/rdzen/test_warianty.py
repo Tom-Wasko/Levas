@@ -103,8 +103,8 @@ def test_ocena_par():
 @pytest.mark.dane_gry   # poziomy „jak człowiek” są tylko w dane/
 def test_badana_jak_czlowiek_wsrod_rywali_innego_poziomu():
     """Z5: pomiar trudności – badana firma „jak człowiek”, rywale na swoim poziomie (Kontekst.rywale)."""
-    sami = wr.Kontekst(rund=4, firm=4, poziom="czlowiek_sredni")
-    wsrod = wr.Kontekst(rund=4, firm=4, poziom="czlowiek_sredni", rywale="sredni")
+    sami = wr.Kontekst(rund=5, firm=4, poziom="czlowiek_sredni")   # UF6: rywale różnią się reklamą od rundy 5
+    wsrod = wr.Kontekst(rund=5, firm=4, poziom="czlowiek_sredni", rywale="sredni")
     assert wsrod.klucz() == sami.klucz() + "/rywale_sredni"
     assert wr.rozegraj(wr.Zadanie(wsrod, 3))["karta"] != wr.rozegraj(wr.Zadanie(sami, 3))["karta"]
     assert wr.wybierz_warianty(D, [wr.BAZA]) == []

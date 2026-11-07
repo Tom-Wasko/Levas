@@ -51,8 +51,8 @@ inną drużynę można kupić (najemca płaci czynsz nowemu właścicielowi) alb
 wypowiedzieć najem – po 4 rundach najemca się wyprowadza, nakłady rozlicza się wg KC art. 676. **Wypadki
 i ubezpieczenia** (`silnik/swiat/awarie.py`, `dane/zdarzenia/losowe.yaml`): od rundy 4 w lokalu drużyny może zacząć się
 wypadek – zwykle komiczna historia w kilku scenach, która kończy się szkodą; polisy TUW „Pod Koziołkiem” (lokal,
-sprzęt, OC) po karencji zwracają część szkody. **Urząd i sanepid** (`silnik/ksiegowosc/urzad.py`, `dane/zdarzenia/urzad.yaml`):
-sanepid odbiera każdy lokal przed pierwszą rundą działania – bez sprzątania odmawia i lokal rusza później; poziom
+sprzęt, OC; do kupienia od rundy 4 – `ubezpieczyciel.od_rundy`, UF6) po karencji zwracają część szkody. **Urząd i sanepid** (`silnik/ksiegowosc/urzad.py`, `dane/zdarzenia/urzad.yaml`):
+sanepid odbiera każdy lokal przed pierwszą rundą działania (kontrole – od rundy `magazyn.sanepid.od_rundy`, UF6: 4) – bez sprzątania odmawia i lokal rusza później; poziom
 higieny kosztuje co rundę za lokal i zmienia szansę oraz wynik kontroli, a skargi z historii ściągają sanepid
 częściej. **Analiza** liczy przewidywany wynik rundy
 dla zapisanych wariantów decyzji. W treningu można cofnąć ostatnią rundę.

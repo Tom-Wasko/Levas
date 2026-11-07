@@ -228,7 +228,7 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
 - Składniki mają **termin przydatności**: bułka wytrzyma dwa dni, mięso cztery, mrożonki – miesiące. Dzień dostawy
   wybierasz przy zamówieniu.
 - Szafa chłodnicza i zamrażarka mają ograniczoną pojemność. Nadmiar jedzie do wynajętej chłodni – płacisz za litr,
-  a dużo towaru w wynajmie i jedzenie w koszu przyciągają **sanepid**.
+  a dużo towaru w wynajmie i jedzenie w koszu przyciągają **sanepid** (kontrole od tygodnia 4).
 - Do dań idą najpierw partie z **najkrótszym terminem**; po terminie – wieczorem do kosza.
 - Każdy lokal zamawia **do siebie** i ma własny magazyn. Progi darmowej dostawy i minimum producenta mięsa liczą się
   razem dla całej firmy. Towar możesz **przewieźć** do innego swojego lokalu (od tygodnia 2): kurs kosztuje 30 zł
@@ -294,10 +294,10 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
 
 ## 10. Marketing
 
-- **Promocje** (od tygodnia 2) – zniżka na wybrane dania. Przyciąga klientów, ale obcina cenę: włączaj, gdy kuchnia
+- **Promocje** (od tygodnia 3) – zniżka na wybrane dania. Przyciąga klientów, ale obcina cenę: włączaj, gdy kuchnia
   ma wolne ręce. Promocji nadajesz własną, ozdobną nazwę – na wynik nie wpływa, na humor klientów owszem.
-- **Agencje reklamowe** (od tygodnia 3) – kampanie w strefach: ulotki, plakaty, billboard, radio, degustacje,
-  Noc Kebaba. Kampanię zamawiasz na **jedną rundę**: wybierasz kanał, strefę i **liczbę emisji** (emisja to
+- **Agencje reklamowe** – kampanie w strefach: ulotki i plakaty (drukarnia, od tygodnia 5), billboard i radio
+  (od tygodnia 8), degustacje i Noc Kebaba (agencja eventowa, od tygodnia 10). Kampanię zamawiasz na **jedną rundę**: wybierasz kanał, strefę i **liczbę emisji** (emisja to
   np. paczka 250 ulotek, godzina degustacji albo spot w radiu).
   - **Cena emisji** zależy od kanału i strefy; od progów (np. od 4 i od 11 emisji) dostajesz **rabat na wszystkie
     emisje**. Każdy kanał ma swój kafelek: duża cena za emisję, pasek progów rabatu (bieżący podświetlony),
@@ -356,7 +356,7 @@ masz wolne 3 h” – zwolnij czas gdzie indziej albo wybierz inną.
 
 Czasem coś przytrafia się **tylko Tobie** – w lokalu. Rożen odmawia posłuszeństwa, kot sąsiada wchodzi do kuchni.
 Takie sprawy (i bank żywności) pojawiają się w zakładce Mój lokal, w części „Sprawy w lokalu”.
-Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji). Im dłużej spokojnie, tym
+Wypadki kosztują, a **ubezpieczenie** zwraca część szkody (po okresie karencji). Wypadki i polisy – od tygodnia 4. Im dłużej spokojnie, tym
 groźniej: ryzyko wypadku rośnie o 4 punkty procentowe za każdy tydzień bez wypadku (od 8% do najwyżej 40%), a po
 wypadku wraca do 8%. Aktualne ryzyko pokazuje zakładka Ubezpieczenia.
 
@@ -372,7 +372,7 @@ Zdarza się to najwyżej raz na grę i kosztuje niewiele – plastry albo kilka 
 - **Kolejny lokal** (Nowe lokale ▸ Do wynajęcia) można wziąć co 3 rundy – po każdej przeprowadzce właściciel musi odpocząć (gra przypomni o tym
   bez litości). Nowy lokal ma własne menu, ceny, magazyn i załogę – urządzasz go od zera
   w zakładce Lokale. Od tygodnia 4 działają też **licytacje i przejęcia** lokali.
-- **Handel z drużynami** (od tygodnia 5) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
+- **Handel z drużynami** (od tygodnia 6) – możecie sprzedawać sobie towar i sprzęt, po cenie w uczciwych widełkach
   i z fakturą. Druga drużyna widzi Twoją ofertę od razu i może się targować: przyjąć, odrzucić albo dać kontrofertę –
   i tak na przemian, najwyżej 3 kontroferty. Przyjęta cena to umowa, towar przychodzi na początku następnego tygodnia.
 - **Konkurencja** (Klienci ▸ Konkurencja) – ogólny obraz rywali widzi każdy: lokale, przedział cen,
@@ -385,11 +385,14 @@ Zdarza się to najwyżej raz na grę i kosztuje niewiele – plastry albo kilka 
 | Tydzień | Nowe zakładki |
 |---|---|
 | 1 | Mapa, Nowe lokale ▸ Do wynajęcia, Lokale (Przegląd, Menu i ceny, Sprzęt – stanowiska, Ludzie), Rynek pracy, Bank, Biuro rachunkowe, Kalendarz miejski |
-| 2 | Sprzęt w lokalu, Zaopatrzenie (dostawy z auto-dostawcą, magazyn, przewozy), Promocje, Parki, Ubezpieczenia, raporty finansowe, detektyw |
-| 3 | Karta wyników, Udogodnienia, Agencje reklamowe, nowe dania w menu |
-| 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali |
-| 5 | Handel z drużynami, kolejne kampanie reklamowe |
-| 7 | Szkolenia |
+| 2 | Sprzęt w lokalu, Zaopatrzenie (dostawy z auto-dostawcą, magazyn, przewozy), Parki, raporty finansowe, detektyw |
+| 3 | Karta wyników, Udogodnienia, Promocje, nowe dania w menu |
+| 4 | Wyposażenie, karta skumulowana, licytacje i przejęcia lokali, Ubezpieczenia (polisy), kontrole sanepidu |
+| 5 | Agencje reklamowe – drukarnia (ulotki, plakaty) |
+| 6 | Handel z drużynami |
+| 7 | Szkolenia, Marketing internetowy |
+| 8 | Radio i billboardy |
+| 10 | Agencja eventowa (degustacje, Noc Kebaba) |
 
 Mistrz gry może przesunąć te terminy (poza tygodniem 1 – tydzień przygotowawczy jest zawsze taki sam) – aktualny tydzień zawsze widać w menu przy wyszarzonej zakładce.
 

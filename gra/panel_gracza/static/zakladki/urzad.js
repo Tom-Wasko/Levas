@@ -74,7 +74,9 @@ export const sanepid = {
       + (Z ? `<div class="pasek ciemny"><span>Szansa kontroli w tej rundzie: <span class="kwota">${proc(Z.szansa)}</span></span>
           <span>W tym z problemów: <span class="kwota">${proc(Z.problem)}</span></span>
           <span>Możliwy mandat: <span class="kwota">${Z.problem > 0 ? zl2(Z.mandat) : "–"}</span></span>
-          ${D ? `<span>Higiena w tej rundzie: <span class="kwota">${zl2(D.koszt)}</span></span>` : ""}</div>` : "")
+          ${D ? `<span>Higiena w tej rundzie: <span class="kwota">${zl2(D.koszt)}</span></span>` : ""}</div>`
+        : U.kontrole_od > v.runda ? `<p class="podpowiedz">Pierwsze kontrole sanepidu – od rundy ${U.kontrole_od}. Do tego czasu
+          higiena decyduje tylko o odbiorze lokalu (i kosztuje).</p>` : "")
       + (U.skargi.length ? tabela("Skargi do sanepidu", ["Skarga", "Szansa kontroli", "Do rundy"],
         U.skargi.map((s) => [esc(s.opis), `+${proc(s.szansa, 0)}`, s.do_rundy]), { klasy: ["l"] }) : "")
       + `<p class="podpowiedz">Szansa kontroli: stała część ${proc(U.szansa_bazowa)} plus problemy – litry w wynajętej chłodni (z planu dostaw),

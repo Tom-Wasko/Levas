@@ -4,7 +4,7 @@
   chłodni (silnik/kuchnia/swiezosc.py, przyjmij) – koszt za litr nadmiaru (z VAT) księgowany na koniec rundy, termin krótszy.
 - Sanepid: co rundę szansa kontroli rośnie z litrami w wynajętej chłodni i wartością przeterminowanego towaru
   (strumień „sanepid”); kontrola z zastrzeżeniami to mandat poza KPiR (rodzaj „kary”) i mniejszy popyt w kolejnych
-  rundach (`Firma.efekty`). Teksty kontroli – `dane/zdarzenia/magazyn.yaml`, liczby – zalozenia.yaml magazyn.sanepid.
+  rundach (`Firma.efekty`); pierwsze kontrole od rundy `od_rundy` (UF6). Teksty kontroli – `dane/zdarzenia/magazyn.yaml`, liczby – zalozenia.yaml magazyn.sanepid.
   Higiena lokalu i skargi z historii (silnik/ksiegowosc/urzad.py, `modyfikatory`) zmieniają część szansy z problemów i mandat.
 - Bank żywności: historia z `dane/zdarzenia/magazyn.yaml` (silnik/swiat/zdarzenia.py), gdy w lokalu zostało dużo jedzenia
   z krótkim terminem – `zapas_do_oddania` wybiera te partie, `oddaj` zabiera je z magazynu.
@@ -29,6 +29,16 @@ def zasady_sanepidu(dane: Dane) -> dict | None:
     if not dane.zdarzenia or "magazyn" not in dane.zdarzenia:
         return None
     return (dane.z.get("magazyn") or {}).get("sanepid")
+
+
+def kontrole_od(dane: Dane) -> int | None:
+    """UF6: runda pierwszych kontroli sanepidu (magazyn.sanepid.od_rundy; None – od początku gry)."""
+    return (zasady_sanepidu(dane) or {}).get("od_rundy")
+
+
+def _bez_kontroli(dane: Dane, runda: int) -> bool:
+    od = kontrole_od(dane)
+    return zasady_sanepidu(dane) is None or (od is not None and runda < od)
 
 
 def szansa_kontroli(dane: Dane, litry: float, przeterminowane: float, mod: dict | None = None) -> dict:
@@ -72,7 +82,7 @@ def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksi
     zostaje = ad.koniec_tygodnia(dane, f, runda, dane.data_rundy(runda + 1) - timedelta(days=1))
     if prz or zostaje:
         wynik["auto_dostawca"] = {"litrodni": litrodni, "koszt": koszt_p, "zostaje": zostaje}
-    if zasady_sanepidu(dane) is None or not f.lokale:
+    if _bez_kontroli(dane, runda) or not f.lokale:
         return wynik
     z = zasady_sanepidu(dane)
     przet = round(sum(s["wartosc"] for s in raport.get("straty", []) if s["powod"] == "termin"), 2)
@@ -101,7 +111,7 @@ def koniec_rundy(dane: Dane, f: Firma, runda: int, ziarno, raport: dict, ks: Ksi
 
 def ryzyko(dane: Dane, f: Firma, runda: int, przeterminowane_poprzednio: float = 0.0, mod: dict | None = None) -> dict | None:
     """Szacunek do decyzji: wynajem z planu dostaw rundy i przeterminowany towar jak w poprzedniej rundzie."""
-    if zasady_sanepidu(dane) is None or not f.lokale:
+    if _bez_kontroli(dane, runda) or not f.lokale:
         return None
     plan = sw.plan_wynajmu(dane, f, runda)
     litry = round(sum(x["litry"] for x in plan), 1)
@@ -163,5 +173,5 @@ def dolicz_oddane(raport: dict, oddane: list[dict]) -> None:
     raport["wartosc_strat"] = round(sum(s["wartosc"] for s in raport["straty"]), 2)
 
 
-__all__ = ["bank", "dolicz_oddane", "koniec_rundy", "mandat", "oddaj", "ryzyko", "startuje", "szansa_kontroli",
+__all__ = ["bank", "dolicz_oddane", "koniec_rundy", "kontrole_od", "mandat", "oddaj", "ryzyko", "startuje", "szansa_kontroli",
            "wartosc_zapasu", "zapas_do_oddania", "zasady_sanepidu"]

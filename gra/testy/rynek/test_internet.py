@@ -92,7 +92,7 @@ def test_harmonogram_i_schemat():
     dane = _gra().dane
     el = elementy(dane)
     assert el["internet"]["tydzien"] == 7 and el["internet"]["grupa"] == "Marketing"
-    assert all("internet" not in s for s in el["reklama"]["sciezki"] + el["reklama_wszystkie"]["sciezki"])
+    assert all("internet" not in s for k, e in el.items() if k.startswith("reklama_") for s in e["sciezki"])
     R = copy.deepcopy(rk.zasady(dane))
     R["agencje"]["lajk"] = R["internet"]["agencje"]["lajk"]
     with pytest.raises(ValueError, match="jednocześnie"):

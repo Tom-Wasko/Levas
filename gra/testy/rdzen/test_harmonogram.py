@@ -84,3 +84,39 @@ def test_tydzien_przygotowawczy():
     assert g.konfiguracja["odblokowanie"] == {"handel": 2}
     w = {e["klucz"]: e for e in hm.widok(g.dane, 1)}
     assert all(w[k]["staly"] for k in pierwsze) and not w["handel"]["staly"]
+
+
+@pytest.mark.dane_gry   # terminy UF6 są w dane/
+def test_terminy_uf6_i_boty():
+    """UF6: promocje od 3, agencje 5 / 8 / 10 (każda osobno), internet 7, kontrole sanepidu i polisy od 4, handel od 6;
+    boty nie zamawiają kampanii, promocji ani polis przed terminem, a sanepid nie kontroluje przed rundą 4."""
+    from silnik.kuchnia import magazyn as mag
+    from silnik.model import Firma
+    from silnik.swiat import awarie as aw
+    el = hm.elementy(dane_domyslne())
+    tyg = {k: e["tydzien"] for k, e in el.items()}
+    assert {k: tyg[k] for k in ("promocje", "reklama_papier_przyjmie", "reklama_fala_koziolka", "reklama_kozi_grod",
+                                "internet", "sanepid", "ubezpieczenia", "handel")} == \
+        {"promocje": 3, "reklama_papier_przyjmie": 5, "reklama_fala_koziolka": 8, "reklama_kozi_grod": 10,
+         "internet": 7, "sanepid": 4, "ubezpieczenia": 4, "handel": 6}
+    assert len(el["reklama_kozi_grod"]["sciezki"]) == 2   # degustacja i noc kebaba – razem
+    g = _gra(odblokowanie={"reklama_kozi_grod": 9, "sanepid": 5})
+    assert all(k["od_rundy"] == 9 for k in g.dane.mapa["reklama"]["agencje"]["kozi_grod"]["kanaly"].values())
+    assert mag.kontrole_od(g.dane) == 5 and mag.kontrole_od(dane_domyslne()) == 4
+    # polisa przed terminem – uwaga, bez polisy
+    dane = dane_domyslne()
+    f = Firma(nazwa="X", gotowka=1000)
+    f.lokale = _gra().stan().firmy["A"].lokale
+    info = aw.ustaw(dane, f, {"polisy": ["oc"]}, 2, None, None)
+    assert f.polisy == {} and "od rundy 4" in info["uwagi"][0]
+    # boty w grze: nic przed terminem
+    g = _gra(("Z", "zrownowazony"), ("P", "premium"), ("G", "agresywny"), rund=6)
+    for _ in range(6):
+        s = g.przelicz(wymus=True)
+    for n, fb in s.firmy.items():
+        assert all(k.od_rundy >= 5 for k in fb.kampanie), n
+        assert all(p.od_rundy >= 3 for p in fb.promocje), n
+        assert all(r >= 4 for r in fb.polisy.values()), n
+        for r in (1, 2, 3):
+            assert not (s.wyniki[r][n].get("urzad") or {}).get("kontrola"), (n, r)
+    assert any(fb.polisy for fb in s.firmy.values()) and any(fb.kampanie for fb in s.firmy.values())

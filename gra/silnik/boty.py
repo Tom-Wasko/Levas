@@ -778,7 +778,8 @@ def decyzje_bota(dane: Dane, stan: StanGry, nazwa: str, strategia_klucz: str, ru
     _finanse(dane, f, st, runda, d)
     _ksiegowosc(f, st, runda, d, konf, nazwa)
     if aw.dane_wypadkow(dane):   # polisy wg strategii – od kiedy ma lokal
-        d["polisy"] = list(st.get("polisy", [])) if f.lokale else []
+        od = aw.ubezpieczyciel(dane).get("od_rundy") or runda   # UF6: polisy od rundy z danych
+        d["polisy"] = list(st.get("polisy", [])) if f.lokale and runda >= od else []
     if st.get("higiena"):   # poziom higieny lokali wg strategii (dane/zdarzenia/urzad.yaml)
         d["higiena"] = st["higiena"]
     if (h := st.get("higiena_po_odbiorze")) and f.lokale and all(x.id in f.odbiory for x in f.lokale):

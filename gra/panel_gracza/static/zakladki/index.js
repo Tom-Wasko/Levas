@@ -44,14 +44,15 @@ export const IKONY = { lokal_przeglad: "lokale", lokal_menu: "oferta", zaop_dost
   gielda: "wykres", kasyno: "klucz", lista_bledow: "bledy", wyslij: "wyslij" };
 
 // od której rundy zakładka jest dostępna (w menu: szara pozycja z kłódką i „od rundy N”)
-export const OD_RUNDY = { karta_wynikow: 3, ranking: 3, agencje: 3, internet: 7, promocje: 2, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
+export const OD_RUNDY = { karta_wynikow: 3, ranking: 3, agencje: 5, internet: 7, promocje: 3, udogodnienia: 3, wyposazenie: 4, szkolenia: 7,
   przejecia: 4, sprzet: 2, zatrudnienie: 1, zespol: 1, rynek_pracy: 1, dostawcy: 2, swiezosc: 2, sprzedaz: 2, raport: 2, kpir: 2, vat: 2,
-  sprawy: 2, ubezpieczenia: 2, handel: 5 };
+  sprawy: 2, ubezpieczenia: 4, handel: 6 };
 
 // zakładka → element harmonogramu gry z lokalami (silnik/harmonogram.py); tydzień z widoku zastępuje OD_RUNDY
 export const ELEMENT = { karta_wynikow: "karta_wynikow", ranking: "karta_wynikow", agencje: "reklama", internet: "internet", promocje: "promocje", udogodnienia: "hr_udogodnienia",
   wyposazenie: "inwestycje_wyposazenie", szkolenia: "hr_szkolenia", przejecia: "przejecia", sprzet: "inwestycje_sprzet",
-  zatrudnienie: "hr_zatrudnienie", zespol: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", sprawy: "parki", handel: "handel" };
+  zatrudnienie: "hr_zatrudnienie", zespol: "hr_zatrudnienie", dostawcy: "dostawcy", sprzedaz: "sprzedaz", sprawy: "parki", handel: "handel",
+  ubezpieczenia: "ubezpieczenia" };
 
 // Twój lokal: zakładki złożone z dawnych zakładek (części działają na wybranym lokalu – lokal_wybor.js; wybór lokalu tylko tu)
 const odRundyCzesci = (v, k) => v.harmonogram?.[ELEMENT[k]] ?? OD_RUNDY[k];

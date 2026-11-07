@@ -7,7 +7,7 @@ zrodlo: >-
   Notatki „Prawidła świata” (handel między drużynami: towar, sprzęt i lokale po uzgodnionej cenie, z fakturą, w KPiR)
   i „Ustalenia gry” (odblokowanie w rundzie 5). Widełki, limit ofert i teksty – założenia gry (do potwierdzenia).
 handel:
-  od_rundy: 5
+  od_rundy: 6
   maks_ofert: 5          # ofert wystawionych przez drużynę w jednej rundzie
   cena_min: 0.5          # cena brutto od 50% wartości (towar – koszt zakupu, sprzęt – cena katalogowa nowego)
   cena_maks: 2.0         # do 200% wartości

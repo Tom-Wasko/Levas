@@ -22,6 +22,7 @@ ubezpieczyciel:
   nazwa: TUW „Pod Koziołkiem”
   budynek: ubezpieczyciel
   karencja_rund: 1     # polisa kupiona w rundzie r chroni od rundy r + 1
+  od_rundy: 4          # UF6: polisy można kupić od tygodnia 4 (razem z pierwszymi wypadkami)
   polisy:
     lokal:
       nazwa: Polisa na lokal

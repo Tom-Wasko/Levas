@@ -124,6 +124,7 @@ def widok(dane: Dane, f: Firma, runda: int, info: dict | None, wyniki: dict, fir
             "skargi": [{"opis": e.opis, "szansa": e.wartosc, "do_rundy": e.do_rundy} for e in skargi(f, runda)],
             "ryzyko": mag.ryzyko(dane, f, runda, przeterminowane, modyfikatory(dane, f, runda)),
             "szansa_bazowa": z["szansa_bazowa"] if z else None,
+            "kontrole_od": mag.kontrole_od(dane),   # UF6: pierwsze kontrole sanepidu
             "decyzja": info,
             "kontrole": [{"runda": r, **x["kontrola"]} for r, x in rap if (x.get("kontrola") or {}).get("kontrola")],
             "koszt_razem": round(sum(x["koszt"] for _, x in rap), 2),

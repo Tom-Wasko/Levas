@@ -388,6 +388,7 @@ magazyn:   # gra z lokalami (zmiana 26.10): bez kosztu magazynowania i zwrotów 
       mandat_max: 3000
       popyt_po_mandacie: 0.93
       rund_spadku: 2
+      od_rundy: 4    # UF6: pierwsze kontrole od tygodnia 4 (higiena i odbiory lokali – od 1)
     pewnosc: zalozenie
     zrodlo: 'odpowiedź użytkownika 26.10 (kontrole sanepidu zamiast kosztu magazynowania): co rundę szansa kontroli =
       bazowa + za litr w wynajętej chłodni + za zł przeterminowanego towaru (najwyżej szansa_max); kontrola kończy

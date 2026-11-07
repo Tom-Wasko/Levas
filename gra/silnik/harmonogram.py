@@ -2,7 +2,7 @@
 
 Element harmonogramu to zakładka (katalog.yaml: rundy.harmonogram_lokali.zakladki) albo element mapy z własnym
 terminem w danych: kanały rekrutacji, późniejsi dostawcy, licytacje i przejęcia lokali, promocje, kanały agencji
-reklamowych, eventy w parkach, wypadki, handel między drużynami, detektyw (bez klubu z kasynem – mistrz gry o nim nie wie,
+reklamowych (każda agencja osobno), eventy w parkach, wypadki, handel między drużynami, detektyw (bez klubu z kasynem – mistrz gry o nim nie wie,
 silnik/pieniadze/kasyno.py). Mistrz gry może zmienić
 tydzień każdego elementu (konfiguracja gry: `odblokowanie` – {element: tydzień}, tylko zmiany względem danych) – poza
 tygodniem 1 (P15): to tydzień przygotowawczy, jego zakładek nie da się przesunąć ani przenieść niczego do niego.
@@ -67,18 +67,18 @@ def elementy(dane: Dane) -> dict[str, dict]:
         dodaj(f"dostawcy_{rodzaj}", ", ".join(ds), "Dostawcy", [("dostawcy_info", d, "od_rundy") for d in ds])
     if dane.mapa.get("promocje"):
         dodaj("promocje", "Promocje", "Marketing", [("mapa", "promocje", "od_rundy")])
-    kanaly = [("mapa", "reklama", "agencje", a, "kanaly", k, "od_rundy")
-              for a, ag in ((dane.mapa.get("reklama") or {}).get("agencje") or {}).items() for k in ag["kanaly"]]
-    if kanaly:
-        pierwsze = min(_wez(dane, s) for s in kanaly)
-        dodaj("reklama", "Agencje reklamowe – pierwsze kanały", "Marketing", [s for s in kanaly if _wez(dane, s) == pierwsze])
-        dodaj("reklama_wszystkie", "Agencje reklamowe – pozostałe kanały", "Marketing",
-              [s for s in kanaly if _wez(dane, s) > pierwsze])
+    for a, ag in ((dane.mapa.get("reklama") or {}).get("agencje") or {}).items():   # UF6: każda agencja osobno
+        dodaj(f"reklama_{a}", ag["nazwa"], "Marketing",
+              [("mapa", "reklama", "agencje", a, "kanaly", k, "od_rundy") for k in ag["kanaly"]])
     internet = ((dane.mapa.get("reklama") or {}).get("internet") or {}).get("agencje") or {}
     dodaj("internet", "Marketing internetowy", "Marketing",   # UF19
           [("mapa", "reklama", "internet", "agencje", a, "kanaly", k, "od_rundy") for a, ag in internet.items()
            for k in ag["kanaly"]])
+    if (dane.z.get("magazyn") or {}).get("sanepid", {}).get("od_rundy") is not None:   # UF6
+        dodaj("sanepid", "Kontrole sanepidu", "Urzędy", [("z", "magazyn", "sanepid", "od_rundy")])
     z = dane.zdarzenia or {}
+    if ((z.get("losowe") or {}).get("ubezpieczyciel") or {}).get("od_rundy") is not None:   # UF6
+        dodaj("ubezpieczenia", "Ubezpieczenia (polisy)", "Urzędy", [("zdarzenia", "losowe", "ubezpieczyciel", "od_rundy")])
     for klucz, nazwa, sciezka in (("parki", "Eventy w parkach", ("parki", "zasady")),
                                   ("wypadki", "Wypadki w lokalu", ("losowe", "zasady")),
                                   ("handel", "Handel między drużynami", ("handel", "handel")),

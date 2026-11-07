@@ -1368,6 +1368,7 @@ class Ubezpieczyciel(Schemat):
     nazwa: str
     budynek: str | None                    # id z mapa/budynki.yaml
     karencja_rund: int = Field(ge=0)
+    od_rundy: int | None = Field(default=None, ge=1)   # UF6: od której rundy można kupić polisę (None – od 1)
     polisy: dict[str, Polisa] = Field(min_length=1)
 
     @model_validator(mode="after")

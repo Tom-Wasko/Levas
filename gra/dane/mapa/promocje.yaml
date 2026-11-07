@@ -8,7 +8,7 @@ opis: 'Promocje w grze z lokalami (F3b.3; notatka „Prawidła świata”: promo
   (znużenie albo przywiązanie), w granicach przyciaganie_min–przyciaganie_max. koszt_startu – zł netto przy włączeniu
   (plakaty, karty), VAT 23%. Najwyżej `limit_aktywnych` promocji naraz, każdy rodzaj raz.'
 zrodlo: 'Założenia projektowe Levasa (roboczo, do kalibracji w kroku 5); teksty – własne.'
-od_rundy: 2
+od_rundy: 3
 limit_aktywnych: 2
 nazwa_max: 40
 typy:

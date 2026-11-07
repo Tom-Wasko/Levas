@@ -165,7 +165,22 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   kolejne (mod 12), wysokość w skali roku dania (najsłabszy miesiąc 20%, najlepszy 100%), kolor `.plus`/`.minus`/
   `.rowno` (> 1,02 / < 0,98), etykieta z mnożnikiem i skrótem miesiąca, opis w `aria-label`/`title`. Blok `.sezon-blok`
   pod „Popyt roczny” na całą szerokość kafelka (style na końcu `styl.css`). Zrzut 800 px – mieści się w wąskich kafelkach.
-- Następne kolejno: UF6 → UF5 → UF4 → UF3 → UF2 → UF1 → UF24.
+- [x] UF6 – terminy odblokowań: dane – `mapa/promocje.yaml` 3, `mapa/reklama.yaml` drukarnia 5, Fala Koziołka 8,
+  Kozi Gród Events 10 (internet bez zmian 7), `zdarzenia/handel.yaml` 6, `zalozenia.yaml magazyn.sanepid.od_rundy: 4`
+  (nowe, opcjonalne – zamrożone dane go nie mają), `zdarzenia/losowe.yaml ubezpieczyciel.od_rundy: 4` (schemat
+  `Ubezpieczyciel.od_rundy`, opcjonalne). Harmonogram MG: zamiast „reklama”/„reklama_wszystkie” – element na agencję
+  `reklama_<agencja>` (oba kanały agencji razem), nowe elementy `sanepid` („Kontrole sanepidu”) i `ubezpieczenia`;
+  panel dostaje zbiorczy `harmonogram.reklama` = najwcześniejsza agencja (`api/prezentacja.py: _harmonogram`).
+  „Sanepid 4” = pierwsze kontrole (`magazyn.kontrole_od`, `koniec_rundy`/`ryzyko` bez kontroli wcześniej); higiena
+  i odbiory lokali działają od 1, bo bez higieny nie ma odbioru – zakładka Sanepid zostaje otwarta i pisze, od kiedy
+  kontrole. Polisy przed terminem – uwaga i bez zmian (`awarie.ustaw`), boty wysyłają polisy dopiero od terminu
+  (kampanie i promocje sprawdzały już terminy). Panel: `OD_RUNDY` agencje 5, promocje 3, ubezpieczenia 4, handel 6;
+  zakładka Ubezpieczenia od `polisy_od`. Test `test_terminy_uf6_i_boty`; `test_warianty` (rywale innego poziomu)
+  na 5 rund – w 4 rundach boty średnie i „jak człowiek” nie różnią się już niczym (reklama od 5).
+- Następne kolejno: UF5 → UF4 → UF3 → UF2 → UF1 → UF25–UF30 → UF24.
+- Nowe poprawki autora (7.11.2026) – UF25–UF30 w plan.md: animacja listy zadań, lista domyślnie zwinięta i zwija się
+  po kliknięciu obok, słupki ze Stref w kafelku dania w Menu (obok nazwy), dymek „wtorek – popyt: × 1,1” w Strefach,
+  bez przypomnień o wydarzeniach w Strefach, „+20% ZUS” w oknie zatrudniania.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

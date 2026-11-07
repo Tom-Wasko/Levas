@@ -8,7 +8,8 @@ powtarza (`Firma.wypadki`: id → runda początku). Ok. 80% historii jest komicz
 
 Skutek `szkoda`: koszt w KPiR (pozostałe, bez VAT; najwyżej `zasady.max_strata`). Gdy firma ma polisę rodzaju
 `polisa` i ochrona trwała już w rundzie początku wypadku, ubezpieczyciel zwraca (szkoda − franszyza) × pokrycie jako
-przychód pozostały. Polisy – decyzja `polisy: [rodzaj, ...]` (pełna lista; bez klucza – bez zmian), trwają, dopóki
+przychód pozostały. Polisy – decyzja `polisy: [rodzaj, ...]` (pełna lista; bez klucza – bez zmian; od rundy
+`ubezpieczyciel.od_rundy` – UF6), trwają, dopóki
 drużyna ich nie wypowie (`Firma.polisy`: rodzaj → runda początku ochrony, po `karencja_rund`). Składka co rundę od
 zakupu: stala + za_lokal × liczba lokali + od_majatku × majątek (kwoty miesięczne, ubezpieczenia – zwolnione z VAT).
 """
@@ -93,7 +94,10 @@ def ustaw(dane: Dane, f: Firma, d: dict, runda: int, ks: Ksiega, rach: Rachunek)
     if not dane_wypadkow(dane):
         return info
     U = ubezpieczyciel(dane)
-    if "polisy" in d:
+    if "polisy" in d and runda < (U.get("od_rundy") or runda):   # UF6: polisy od rundy z danych
+        if d.get("polisy"):
+            info["uwagi"].append(f"{U['nazwa']}: polisy można kupić od rundy {U['od_rundy']}.")
+    elif "polisy" in d:
         nowe: dict[str, int] = {}
         for rodzaj in d.get("polisy") or []:
             if rodzaj not in U["polisy"]:
@@ -159,6 +163,7 @@ def widok(dane: Dane, f: Firma, runda: int, info: dict | None, wyniki: dict, fir
     rap = [(r, x) for r, x in rap if x]
     z = zasady(dane)
     return {"nazwa": U["nazwa"], "karencja_rund": U["karencja_rund"], "od_rundy": z["od_rundy"],
+            "polisy_od": U.get("od_rundy"),   # UF6
             "max_strata": z["max_strata"],
             "ryzyko": {"szansa": round(szansa_wypadku(dane, f, runda), 4), "bazowa": z["szansa"],
                        "przyrost": z.get("przyrost", 0.0), "maks": z.get("szansa_max", 1.0),

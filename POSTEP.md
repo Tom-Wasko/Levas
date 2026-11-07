@@ -44,10 +44,16 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF9 (16) 10 nowych udogodnień z opisem (rundy 5–14, kot zakładowy), boty wybierają jak dotąd
 - [x] UF8 (13) Falafel – bójka
 - [x] UF7 (8) 4 słupki sezonowości w kafelku dania
-- [ ] UF6 (3) Terminy odblokowań
+- [x] UF6 (3) Terminy odblokowań: promocje 3, agencje 5 / 8 / 10 (każda osobno w harmonogramie MG), kontrole sanepidu i polisy 4, handel 6
 - [ ] UF5 (7) Wnioski: rozruch w pierwszych tygodniach
 - [ ] UF4 (6) „Brak składnika” → Dostawy
 - [ ] UF3 (5) Jedno ⓘ pod ceną
 - [ ] UF2 (12) Kod `koziol` do kasyna
 - [ ] UF1 (14) Mapa jako ekran startowy
+- [ ] UF25 Lista zadań: animacja wysuwania i zwijania
+- [ ] UF26 Lista zadań domyślnie zwinięta, zwija się po kliknięciu obok
+- [ ] UF27 Menu: słupki ze Stref miasta przy nazwie dania
+- [ ] UF28 Strefy miasta: dymek „wtorek – popyt: × 1,1” na słupku
+- [ ] UF29 Strefy: bez przypomnień o wydarzeniach (są w Kalendarzu)
+- [ ] UF30 Okno zatrudniania: „+20% ZUS”
 - [ ] UF24 Instrukcja + PDF, kontrola botów, gra pokazowa na nowo

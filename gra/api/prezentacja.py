@@ -121,6 +121,14 @@ def stan_po_szkicu(gra: Gra, firma: str):
     return stan, f, ks, info, bledy
 
 
+def _harmonogram(dane: Dane, runda: int) -> dict[str, int]:
+    """Tydzień elementów harmonogramu dla panelu; „reklama” – pierwsza agencja reklamowa (UF6: zakładka „Agencje reklamowe”)."""
+    h = {x["klucz"]: x["tydzien"] for x in hm.widok(dane, runda)}
+    if agencje := [t for k, t in h.items() if k.startswith("reklama_")]:
+        h["reklama"] = min(agencje)
+    return h
+
+
 def kalendarz(dane: Dane, liczba_rund: int) -> dict:
     """Nazwy rund dla strony: okres („tydzień”/„miesiąc” w przypadkach), nazwy i skróty rund 1…liczba_rund."""
     rundy = range(1, liczba_rund + 1)
@@ -247,7 +255,7 @@ def widok(gra: Gra, firma: str, runda: int | None = None) -> dict:
          "podpowiedzi": podpowiedzi(gra, runda) if edycja else [],
          "firma": firma, "runda": runda, "miesiac": dane.nazwa_rundy(runda), "edycja": edycja, "koniec": koniec,
          "odblokowane": sorted(dane.odblokowane(runda)),
-         "harmonogram": {x["klucz"]: x["tydzien"] for x in hm.widok(dane, runda)}}   # z lokalami: tydzień elementu
+         "harmonogram": _harmonogram(dane, runda)}   # z lokalami: tydzień elementu
 
     if edycja:
         stan, f, ks, info, bledy = stan_po_szkicu(gra, firma)

@@ -40,7 +40,7 @@ agencje:
     kanaly:
       ulotki:
         nazwa: Ulotki za wycieraczki
-        od_rundy: 3
+        od_rundy: 5
         zasieg: strefa
         emisja: paczka 250 ulotek
         cena_emisji: 45
@@ -56,7 +56,7 @@ agencje:
           literówką”. Paradoksalnie ludzie robili zdjęcia i wysyłali znajomym. Pan Zdzisław twierdzi, że to celowe.'
       plakaty:
         nazwa: Plakaty na słupach ogłoszeniowych
-        od_rundy: 3
+        od_rundy: 5
         zasieg: strefa
         emisja: 10 plakatów na słupach
         cena_emisji: 55
@@ -78,7 +78,7 @@ agencje:
     kanaly:
       billboard:
         nazwa: Billboard przy rondzie
-        od_rundy: 5
+        od_rundy: 8
         zasieg: strefa
         emisja: dzień na billboardzie
         cena_emisji: 70
@@ -93,7 +93,7 @@ agencje:
           i wysłała Ci fakturę za „pakiet street-art”. Fakturę grzecznie odrzuciłeś.'
       radio:
         nazwa: Spot w radiu „Fala Koziołka”
-        od_rundy: 5
+        od_rundy: 8
         zasieg: miasto
         emisja: spot w radiu
         cena_emisji: 70   # B10: przy 180 zł radio przegrywało z każdym kanałem (−0,04 karty, b10_kanaly); przy 70 zł ≈ inne kanały
@@ -115,7 +115,7 @@ agencje:
     kanaly:
       degustacja:
         nazwa: Degustacja na festynie osiedlowym
-        od_rundy: 3
+        od_rundy: 10
         zasieg: strefa
         emisja: godzina degustacji
         cena_emisji: 80   # B10: przy 110 zł 1,5× drożej na efekt niż druk
@@ -130,7 +130,7 @@ agencje:
           Dzieci uznały, że skoro Koziołek je, to musi być dobre. Kolejka ustawiła się do końca festynu.'
       noc_kebaba:
         nazwa: Noc Kebaba na otrzęsinach
-        od_rundy: 5
+        od_rundy: 10
         zasieg: strefa
         strefy:
         - akademickie
