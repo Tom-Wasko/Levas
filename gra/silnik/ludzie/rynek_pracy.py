@@ -6,6 +6,9 @@ Dane: dane/kandydaci.yaml – agencja (kanały pracuj.pl / agencja pracy / headh
   idzie najtańszym (w złotych) kanałem, na który starcza czasu właściciela.
 - Najwyżej `limit_nowych` nowych pracowników na rundę (zatrudnienia + oferty podkupienia).
 - Licytacja: kilka firm zatrudnia tę samą osobę w tej samej rundzie → wygrywa wyższa pensja, przy remisie losowanie.
+  UF18: licytacje są widoczne – przy kandydacie panel pokazuje, ile innych drużyn złożyło już ofertę (bez kwot,
+  `zainteresowanie`), szef pracownika dostaje ostrzeżenie o próbie podkupienia (`ostrzezenia`), a po rundzie
+  raport mówi, kto wygrał i za ile.
 - Podkupienie (tylko przez headhuntera): oferta dla pracownika innej firmy; obecny pracodawca może złożyć kontrofertę
   w tej samej rundzie. Pracownik przyjmuje najlepszą ofertę, jeśli jest wyższa od jego pensji i od kontroferty;
   wygrana kontroferta podnosi mu pensję. Umowa zlecenie – przejście od razu, umowa o pracę – po okresie
@@ -136,12 +139,13 @@ def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int
             continue
         for p, n in lista:
             raport[n]["licytacje"].append({"kandydat": kid, "imie_nazwisko": pula[kid]["imie_nazwisko"], "pensja": p,
-                                           "najwyzsza": najwyzsza, "wygrana": n == wygral, "remis": len(najlepsi) > 1})
+                                           "najwyzsza": najwyzsza, "wygrana": n == wygral, "remis": len(najlepsi) > 1,
+                                           "wygral": wygral, "druzyn": len({m for _, m in lista})})   # UF18
             if n != wygral:
                 # przegrana licytacja: bot (zastepca) zatrudni kogoś podobnego, gracz – nikogo
                 nowe[n]["zatrudnij"] = [z for z in nowe[n]["zatrudnij"] if z.get("kandydat") != kid or z.get("zastepca")]
                 raport[n]["uwagi"].append(f"{pula[kid]['imie_nazwisko']}: licytację wygrała inna firma "
-                                          f"(najwyższa pensja {najwyzsza:.0f} zł).")
+                                          f"({_nazwa(s.firmy, wygral)}, pensja {najwyzsza:.0f} zł).")
 
     # podkupienia
     hh = headhunter_dostepny(dane, runda)
@@ -190,7 +194,10 @@ def przed_decyzjami(dane: Dane, s: StanGry, decyzje: dict[str, dict], runda: int
                 **{k: v for k, v in o.items() if k != "od"},
                 "wynik": "przyjeta" if wygrana else "kontroferta" if wynik_pr == "kontroferta"
                 else "inna_firma" if przyjeta else "odrzucona",
-                "runda_przejscia": runda + okres if wygrana else None})
+                "runda_przejscia": runda + okres if wygrana else None,
+                # UF18: kto wygrał i za ile (kontroferta – kwota szefa)
+                "wygral": best["od"] if przyjeta else firma if wynik_pr == "kontroferta" else None,
+                "najwyzsza": najwyzsza if przyjeta else kontra if wynik_pr == "kontroferta" else None})
     return nowe, rezerwacje, raport
 
 
@@ -254,6 +261,46 @@ def oferty_dla(gra_decyzje: dict[str, dict], firma: Firma, nazwa: str) -> list[d
             if p and not p.odchodzi:
                 wynik.append({"pracownik": p.id, "imie_nazwisko": p.imie_nazwisko, "od": od, "pensja": float(o.get("pensja") or 0),
                               "umowa": o.get("umowa", "prace"), "obecna_pensja": p.pensja})
+    return wynik
+
+
+def zainteresowanie(gra_decyzje: dict[str, dict], nazwa: str) -> dict:
+    """UF18: ile innych drużyn złożyło w zapisanych decyzjach tej rundy ofertę dla kandydata z puli i dla pracownika
+    innej firmy – bez kwot: {"kandydaci": {id: liczba drużyn}, "pracownicy": {id: liczba drużyn}}."""
+    kto: dict[str, dict[str, set]] = {"kandydaci": {}, "pracownicy": {}}
+    for od, d in gra_decyzje.items():
+        if od == nazwa or od.startswith("_"):
+            continue
+        for z in d.get("zatrudnij") or []:
+            if z.get("kandydat"):
+                kto["kandydaci"].setdefault(z["kandydat"], set()).add(od)
+        for o in d.get("podkup") or []:
+            if o.get("pracownik") and o.get("firma") != od:
+                kto["pracownicy"].setdefault(o["pracownik"], set()).add(od)
+    return {r: {i: len(f) for i, f in sorted(m.items())} for r, m in kto.items()}
+
+
+def _nazwa(firmy: dict[str, Firma], n: str) -> str:
+    return (firmy[n].nazwa_wyswietlana or n) if n in firmy else n
+
+
+def ostrzezenia(oferty: list[dict], kontroferty: dict | None, firmy: dict[str, Firma] | None = None) -> list[dict]:
+    """UF18: lista błędów – próba podkupienia moich pracowników (oferty z `oferty_dla`). Bez kontroferty albo
+    z niższą – pomarańczowe, z kontrofertą nie niższą od najwyższej oferty – niebieskie."""
+    kf, wynik = kontroferty or {}, []
+    for pid in dict.fromkeys(o["pracownik"] for o in oferty):
+        moje = [o for o in oferty if o["pracownik"] == pid]
+        naj, k = max(o["pensja"] for o in moje), float(kf.get(pid) or 0)
+        kto = ", ".join(sorted({_nazwa(firmy or {}, o["od"]) for o in moje}))
+        if naj <= moje[0]["obecna_pensja"]:
+            continue   # oferta nie wyższa od pensji – pracownik i tak zostanie
+        if k >= naj:
+            wynik.append({"poziom": "niebieski", "zakladka": "rynek_pracy",
+                          "tekst": f"{moje[0]['imie_nazwisko']}: Twoja kontroferta ({k:.0f} zł) przebija ofertę drużyny {kto}."})
+        else:
+            wynik.append({"poziom": "pomaranczowy", "zakladka": "rynek_pracy",
+                          "tekst": f"{moje[0]['imie_nazwisko']} dostał(a) ofertę pracy od drużyny {kto} ({naj:.0f} zł, "
+                                   f"teraz {moje[0]['obecna_pensja']:.0f} zł) – bez kontroferty odejdzie."})
     return wynik
 
 

@@ -108,6 +108,7 @@ def stan_po_szkicu(gra: Gra, firma: str):
     bledy += lista_bledow(gra.dane, f, d, r, poprzednia_oferta, gra.konfiguracja.get("kredyt_odnawialny", "na_biezaco"),
                           lokal, info)
     bledy += [{"poziom": "czerwony", "zakladka": "rynek_pracy", "tekst": t} for t in uwagi_rp]
+    bledy += rp.ostrzezenia(rp.oferty_dla(gra.decyzje.get(r, {}), f, firma), d.get("kontroferty"), stan.firmy)   # UF18
     # odrzucone kredyty, lokaty i leasing (zaległości i debet – dopiero w przeliczeniu)
     odrzucone = (bank_info or {}).get("odrzucone", []) + info["leasing"]["odrzucone"]
     bledy += [{"poziom": "czerwony", "zakladka": "finanse_bank", "tekst": f"{o['co']}: {o['powod']}."} for o in odrzucone]
@@ -404,6 +405,8 @@ def _agencja(gra: Gra, firma: str, runda: int, f: Firma, stan, edycja: bool) -> 
             "headhunter": rp.headhunter_dostepny(dane, runda),
             "cudzy": rp.pracownicy_rynku(dane, stan, firma, runda) if rp.headhunter_dostepny(dane, runda) else [],
             "oferty_dla_mnie": rp.oferty_dla(gra.decyzje.get(runda, {}), f, firma) if edycja else [],
+            # UF18: ile innych drużyn złożyło już ofertę (kandydaci z puli, pracownicy innych drużyn) – bez kwot
+            "zainteresowanie": rp.zainteresowanie(gra.decyzje.get(runda, {}), firma) if edycja else {"kandydaci": {}, "pracownicy": {}},
             # UF20: szansa zgody na przejście do innego lokalu – panel liczy ją na żywo (wzór jak przenosiny.szansa)
             "przenosiny": {"zasady": przen.ustawienia(dane),
                            "prog": ((dane.z.get("pracownicy") or {}).get("odejscia") or {}).get("prog_zadowolenia", 0.0),

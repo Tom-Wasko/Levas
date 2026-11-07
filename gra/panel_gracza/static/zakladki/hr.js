@@ -11,6 +11,20 @@ import { forma, kosztMiesieczny, minimum, nazwaFormy, oczekiwana, opcjeForm, opi
 const TYPY = ["kuchnia", "kasa"];  // nazwy i zawody typów: kat.oferty.stanowiska.typy (katalog.yaml)
 const NIEZADOWOLENIE = "niezadowolenie";   // silnik/ludzie/zadowolenie.py: powód wypowiedzenia (U20)
 
+// UF18: „oferty: 2 drużyny” – ile innych drużyn złożyło już ofertę dla tej osoby (bez kwot; silnik: rynek_pracy.zainteresowanie)
+const druzyn = (n) => `${n} ${n === 1 ? "drużyna" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? "drużyny" : "drużyn"}`;
+export function pigulkaOfert(v, rodzaj, id) {
+  const n = v.agencja?.zainteresowanie?.[rodzaj]?.[id];
+  return n ? ` <span class="pigulka nie" title="Tyle innych drużyn chce już zatrudnić tę osobę w tej rundzie – wygra wyższa pensja">oferty: ${druzyn(n)}</span>` : "";
+}
+// UF18: próba podkupienia mojego pracownika (oferty innych drużyn zapisane w tej rundzie)
+function pigulkaPodkupienia(v, p) {
+  const o = (v.agencja?.oferty_dla_mnie || []).filter((x) => x.pracownik === p.id && x.pensja > x.obecna_pensja);
+  if (!o.length) return "";
+  const kto = [...new Set(o.map((x) => nazwaFirmy(v, x.od)))].map(esc).join(", ");
+  return ` <a class="pigulka nie" data-zakladka-k="rynek_pracy" title="Złóż kontrofertę w zakładce Rynek pracy">chce go podkupić: ${kto}</a>`;
+}
+
 // U20: krótki żartobliwy opis osoby pod „i” – z niego gracz zgaduje ukrytą cechę
 const opisOsoby = (o) => kolko(esc(o.opis || ""));
 const zadowolenieOsoby = (p) => p.zadowolenie == null ? "–"
@@ -271,7 +285,7 @@ export function kandydaciRynku({ v, kat, edycja }) {
     return s ? `${v.lokale ? `${esc(nazwaLokalu(v, s.lokal))} · ` : ""}${esc(typy[s.typ]?.nazwa ?? s.typ)} nr ${s.nr}` : "–";
   };
   const lista = [...v.kandydaci].sort((a, b) => a.zawod.localeCompare(b.zawod) || b.zadowolenie_klientow - a.zadowolenie_klientow);
-  const w = lista.map((k) => [esc(k.imie_nazwisko) + pigulkaStudenta(k) + opisOsoby(k), esc(k.zawod), gw(k.gwiazdki), zl(k.pensja_preferowana), zl(k.koszt_rekrutacji),
+  const w = lista.map((k) => [esc(k.imie_nazwisko) + pigulkaStudenta(k) + pigulkaOfert(v, "kandydaci", k.id) + opisOsoby(k), esc(k.zawod), gw(k.gwiazdki), zl(k.pensja_preferowana), zl(k.koszt_rekrutacji),
     proc(k.zadowolenie_klientow, 0), proc(k.ryzyko_reklamacji, 0),
     `<button class="btn pom maly" data-akcja="zatrudnij" data-k="${esc(k.id)}" ${edycja ? "" : "disabled"}>Zatrudnij +</button>`]);
   return tabela("Kandydaci", ["Imię i nazwisko", "Zawód", "Doświadczenie", "Preferowane wynagrodzenie", "Bazowy koszt rekrutacji",
@@ -387,7 +401,7 @@ export const zespol = {
       const gdzie = s ? `${v.lokale ? `${esc(nazwaLokalu(v, s.lokal))} · ` : ""}${esc(kat.oferty.stanowiska.typy[s.typ]?.nazwa ?? s.typ)} nr ${s.nr}` : `<span class="minus">bez stanowiska</span>`;
       const stanOsoby = p.odchodzi ? `<span class="pigulka${p.odchodzi.powod === NIEZADOWOLENIE ? " nie" : ""}">odchodzi w r. ${p.odchodzi.runda}</span>`
         : p.od_rundy === v.runda ? `<span class="pigulka inf">nowy</span>` : p.niezadowolony ? `<span class="pigulka nie">niezadowolony</span>` : "";
-      return [`<a data-akcja="profil" data-id="${esc(p.id)}">${esc(p.imie_nazwisko)}</a> ${stanOsoby}`, esc(p.zawod), gw(p.gwiazdki), gdzie,
+      return [`<a data-akcja="profil" data-id="${esc(p.id)}">${esc(p.imie_nazwisko)}</a> ${stanOsoby}${p.odchodzi ? "" : pigulkaPodkupienia(v, p)}`, esc(p.zawod), gw(p.gwiazdki), gdzie,
         nazwaFormy(kat, p.umowa) + pigulkaStudenta(p), zl(p.pensja), p.premia ? zl(p.premia) : "–", zadowolenieOsoby(p)];
     });
     return `<div class="pasek ciemny"><span>Pracownicy: <span class="kwota">${licz(P.length)}</span></span>

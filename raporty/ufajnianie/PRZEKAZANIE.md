@@ -111,7 +111,14 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   `lajk/mapy`. Testy: `testy/rynek/test_internet.py` (dane_gry). **Do kalibracji:** liczby kanałów to założenie UF19
   (suma wag ≈ 5,6 rundy efektu, reklama tradycyjna ≈ 1,9 – przyciąganie ok. 2,5× mniejsze); przy scalaniu z
   kalibracja-b sprawdzić, czy B10/B-pomiary nie zakładały Lajka od rundy 3.
-- Następne kolejno: UF18 → UF17 → UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF18 – licytacje pracowników widoczne. Silnik `ludzie/rynek_pracy.py`: `zainteresowanie(decyzje_gry, nazwa)`
+  (liczba innych drużyn z ofertą dla kandydata / pracownika innej drużyny, z zapisanych decyzji, bez kwot),
+  `ostrzezenia(oferty_dla, kontroferty, firmy)` (lista błędów: pomarańczowe bez kontroferty, niebieskie gdy kontroferta
+  przebija), raport licytacji z `wygral`/`druzyn`, oferty złożone z `wygral`/`najwyzsza`. API `_agencja`:
+  `zainteresowanie`; podgląd decyzji dokłada ostrzeżenia. Panel: `hr.js` `pigulkaOfert` (Rynek pracy – kandydaci
+  i headhunter), Zespół – pigułka „chce go podkupić” (link do Rynku pracy), `rynek_pracy.js` wyniki – kolumny Wygrała,
+  Za ile. Boty decydują dopiero w przeliczeniu, więc ich ofert znaczek nie widzi. Testy w `testy/ludzie/test_rynek_pracy.py`.
+- Następne kolejno: UF17 → UF14 → UF23 → UF9…UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 

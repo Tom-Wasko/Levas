@@ -1,7 +1,7 @@
 // Rynek pracy (gra z lokalami, silnik/ludzie/rynek_pracy.py): kanały rekrutacji, podkupienia przez headhuntera, kontroferty
 // i okresy wypowiedzenia. UF20: tu też zatrudnia się kandydatów z puli – od razu z lokalem i stanowiskiem (hr.js: kandydaciRynku).
 import { esc, gw, licz, nazwaFirmy, okno, ponadLimitPracownikow, proc, tabela, tekstLimituPracownikow, toast, zamknijOkno, zl } from "./wspolne.js";
-import { kandydaciRynku } from "./hr.js";
+import { kandydaciRynku, pigulkaOfert } from "./hr.js";
 import { nazwaLokalu } from "./lokal_wybor.js";
 import { minimum, nazwaFormy, opcjeForm } from "./formy.js";
 
@@ -63,7 +63,7 @@ export const rynek_pracy = {
     }
     const moje = Object.fromEntries((d.podkup || []).map((o) => [o.pracownik, o]));
     html += tabela("Headhunter – pracownicy innych drużyn", ["Pracownik", "Drużyna", "Zawód", "Pensja", "Umowa", "Okres wypowiedzenia", "Twoja oferta"],
-      A.cudzy.length ? A.cudzy.map((p) => [esc(p.imie_nazwisko), esc(nazwaFirmy(v, p.firma)), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, zl(p.pensja),
+      A.cudzy.length ? A.cudzy.map((p) => [esc(p.imie_nazwisko) + pigulkaOfert(v, "pracownicy", p.id), esc(nazwaFirmy(v, p.firma)), `${esc(p.zawod)} ${gw(p.gwiazdki)}`, zl(p.pensja),
         UMOWA(kat, p.umowa), p.okres ? rundy(p.okres) : "od razu",
         p.odchodzi ? `<span class="podpowiedz">w okresie wypowiedzenia</span>`
           : moje[p.id] ? `${zl(moje[p.id].pensja)} <button class="btn jasny maly" data-akcja="wycofaj-oferte" data-id="${esc(p.id)}" ${edycja ? "" : "disabled"}>Wycofaj</button>`
@@ -81,14 +81,18 @@ export const rynek_pracy = {
     return tabela("Zatrudnieni w rundzie", ["Pracownik", "Kanał", "Koszt zatrudnienia", "Pensja"],
       R.zatrudnieni.length ? R.zatrudnieni.map((z) => [esc(z.imie_nazwisko), esc(kanaly[z.kanal]?.nazwa || z.kanal), zl(z.koszt), zl(z.pensja)])
         : pusto(4, "Nikogo nie zatrudniono."), { klasy: ["l", "l"] })
-      + tabela("Licytacje kandydatów", ["Kandydat", "Twoja pensja", "Najwyższa", "Wynik"],
-        R.licytacje.length ? R.licytacje.map((l) => [esc(l.imie_nazwisko), zl(l.pensja), zl(l.najwyzsza),
+      + tabela("Licytacje kandydatów", ["Kandydat", "Drużyn", "Twoja pensja", "Wygrała", "Za ile", "Wynik"],
+        R.licytacje.length ? R.licytacje.map((l) => [esc(l.imie_nazwisko), l.druzyn ? licz(l.druzyn) : "–", zl(l.pensja),
+          l.wygral ? esc(nazwaFirmy(v, l.wygral)) : "–", zl(l.najwyzsza),
           l.wygrana ? `wygrana${l.remis ? " (remis – losowanie)" : ""}` : `<span class="minus">przegrana${l.remis ? " (remis – losowanie)" : ""}</span>`])
-          : pusto(4, "Nikt inny nie chciał twoich kandydatów."), { klasy: ["l"] })
+          : pusto(6, "Nikt inny nie chciał twoich kandydatów."), { klasy: ["l", "", "", "l"] })
+      + `<p class="podpowiedz">Pensje porównuje się w przeliczeniu na umowę o pracę (B2B ÷ 1,25, pół etatu × 2).</p>`
       + tabela("Twoje oferty podkupienia", ["Pracownik", "Drużyna", "Pensja", "Wynik"],
         R.oferty_zlozone.length ? R.oferty_zlozone.map((o) => [esc(o.imie_nazwisko), esc(nazwaFirmy(v, o.firma)), zl(o.pensja),
           esc(WYNIK_ZLOZONEJ[o.wynik] || o.wynik) + (o.powod ? `: ${esc(o.powod)}` : "")
-            + (o.runda_przejscia ? ` – przejdzie w rundzie ${o.runda_przejscia}` : "")])
+            + (o.runda_przejscia ? ` – przejdzie w rundzie ${o.runda_przejscia}` : "")
+            + (o.wynik === "inna_firma" && o.wygral ? ` (${esc(nazwaFirmy(v, o.wygral))} za ${zl(o.najwyzsza)})` : "")
+            + (o.wynik === "kontroferta" && o.najwyzsza ? ` (szef dał ${zl(o.najwyzsza)})` : "")])
           : pusto(4, "Bez ofert."), { klasy: ["l", "l", "r", "l"] })
       + tabela("Oferty dla twoich pracowników", ["Pracownik", "Od", "Najwyższa oferta", "Kontroferta", "Wynik"],
         R.oferty_otrzymane.length ? R.oferty_otrzymane.map((o) => [esc(o.imie_nazwisko), o.od.map((f) => esc(nazwaFirmy(v, f))).join(", "),

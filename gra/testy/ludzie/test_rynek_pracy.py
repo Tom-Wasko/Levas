@@ -174,3 +174,43 @@ def test_wlasciciel_na_stanowisku_jako_pracownik_1_gwiazdka():
     assert list(s2.firmy["A"].pracownicy) == [k1["id"]] and s2.firmy["A"].wlasciciel_na is None
     assert not b["wlasciciel_stanowisko"]["przyjete"]
     assert any("Właściciel nie stanie" in t for t in _bledy(s2, 2, "B", "zatrudnienie"))
+
+
+def test_licytacje_widoczne_liczba_ofert_bez_kwot():
+    """UF18: przy kandydacie widać, ile innych drużyn złożyło ofertę – bez kwot i bez własnej oferty."""
+    decyzje = {"A": {"zatrudnij": [{"kandydat": "k1", "pensja": 5000}], "podkup": [{"pracownik": "p9", "firma": "C"}]},
+               "B": {"zatrudnij": [{"kandydat": "k1", "pensja": 6000}, {"kandydat": "k2"}],
+                     "podkup": [{"pracownik": "p9", "firma": "C", "pensja": 7000}]},
+               "C": {"podkup": [{"pracownik": "p1", "firma": "C"}]},   # „podkupienie” własnego – nie liczy się
+               "_mg": {"zatrudnij": [{"kandydat": "k1"}]}}
+    z = rp.zainteresowanie(decyzje, "A")
+    assert z == {"kandydaci": {"k1": 1, "k2": 1}, "pracownicy": {"p9": 1}}
+    assert rp.zainteresowanie(decyzje, "C")["kandydaci"] == {"k1": 2, "k2": 1}
+    assert "5000" not in str(z) and "6000" not in str(z)
+
+
+def test_ostrzezenie_o_probie_podkupienia():
+    oferty = [{"pracownik": "p1", "imie_nazwisko": "Ala Kot", "od": "B", "pensja": 5200, "obecna_pensja": 5000},
+              {"pracownik": "p1", "imie_nazwisko": "Ala Kot", "od": "C", "pensja": 5400, "obecna_pensja": 5000},
+              {"pracownik": "p2", "imie_nazwisko": "Ola Pies", "od": "B", "pensja": 4000, "obecna_pensja": 5000}]
+    w = rp.ostrzezenia(oferty, {})
+    assert [(b["poziom"], b["zakladka"]) for b in w] == [("pomaranczowy", "rynek_pracy")]   # p2: oferta niższa – bez alarmu
+    assert "Ala Kot" in w[0]["tekst"] and "B, C" in w[0]["tekst"] and "5400" in w[0]["tekst"]
+    assert rp.ostrzezenia(oferty, {"p1": 5300})[0]["poziom"] == "pomaranczowy"   # kontroferta za niska
+    assert rp.ostrzezenia(oferty, {"p1": 5400})[0]["poziom"] == "niebieski"
+
+
+def test_raport_licytacji_kto_wygral_i_za_ile():
+    g, s = _start()
+    k = _kandydat(s, 3)
+    s = _runda(g, A={"zatrudnij": [_z(k, 1, pensja=5000)]}, B={"zatrudnij": [_z(k, 1, pensja=6000)]})
+    for n in "AB":
+        lic = s.wyniki[2][n]["rynek_pracy"]["licytacje"][0]
+        assert (lic["wygral"], lic["najwyzsza"], lic["druzyn"]) == ("B", 6000, 2)
+    assert any("(B, pensja 6000 zł)" in t for t in _bledy(s, 2, "A", "rynek_pracy"))
+    g, s, pid = _podkupienie(kontroferta=5300)
+    o = s.wyniki[4]["B"]["rynek_pracy"]["oferty_zlozone"][0]
+    assert (o["wynik"], o["wygral"], o["najwyzsza"]) == ("kontroferta", "A", 5300)
+    g, s, pid = _podkupienie()
+    o = s.wyniki[4]["B"]["rynek_pracy"]["oferty_zlozone"][0]
+    assert (o["wynik"], o["wygral"], o["najwyzsza"]) == ("przyjeta", "B", 5200)

@@ -239,6 +239,10 @@ widoczna w wynikach Menu i cen, bolesna dla zadowolenia klientów i dla opinii o
 
 - **Rynek pracy jest wspólny** dla wszystkich drużyn. Kandydatów szukasz przez pracuj.pl, agencję pracy albo
   headhuntera – tylko headhunter złoży ofertę pracownikowi innej drużyny (a jego szef może dać kontrofertę).
+- **Licytacje są widoczne.** Gdy inne drużyny zapisały już ofertę dla tego samego kandydata, przy jego nazwisku
+  widać znaczek „oferty: 2 drużyny” (bez kwot). Wygrywa wyższa pensja (B2B i pół etatu w przeliczeniu na pełny etat),
+  przy remisie losowanie. Gdy ktoś chce podkupić Twojego pracownika, zobaczysz to w Zespole („chce go podkupić”)
+  i na liście błędów – kontrofertę złożysz w Rynku pracy. Po tygodniu raport mówi, kto wygrał i za ile.
 - **Zatrudniasz w zakładce Rynek pracy**: wybierasz kandydata, pensję, umowę, kanał rekrutacji oraz lokal i wolne
   stanowisko. **Obsadę** zmieniasz w Mój lokal ▸ Obsada stanowisk: na wolne stanowisko przypiszesz osobę z tego
   samego lokalu (od razu) albo z innego Twojego lokalu. Na przejście do innego lokalu **pracownik musi się zgodzić** –

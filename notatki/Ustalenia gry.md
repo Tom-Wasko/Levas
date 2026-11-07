@@ -57,7 +57,7 @@ Wszystkie ustalone parametry w jednym miejscu. Wartości oznaczone *(roboczo)* z
 - Zleceniobiorca odchodzi od razu.
 - Kontroferta obecnego pracodawcy: w tej samej rundzie, przed decyzją pracownika.
 - Wypowiedzenie najmu przez nowego właściciela budynku: 4 rundy (KC art. 673, 678); rozliczenie ulepszeń wg KC art. 676.
-- Licytacja: wygrywa najwyższa oferta w rundzie; przy remisie decyduje losowanie. Licytacja lokali działa od rundy 1; przegrana drużyna widzi obie oferty i wyjaśnienie, co zrobić następnym razem.
+- Licytacja: wygrywa najwyższa oferta w rundzie; przy remisie decyduje losowanie. Licytacje pracowników są widoczne (UF18, 7.11.2026): przy kandydacie liczba drużyn z ofertą (bez kwot), ostrzeżenie o próbie podkupienia, po rundzie raport – kto wygrał i za ile. Licytacja lokali działa od rundy 1; przegrana drużyna widzi obie oferty i wyjaśnienie, co zrobić następnym razem.
 
 ## Finanse – debet ponad limit
 - **Debet ponad limit konta** – alarm u mistrza gry; w następnej rundzie blokada inwestycji (lokal, stanowiska, sprzęt, udogodnienia, wyposażenie), nowych kredytów, leasingu i lokat. Odsetki karne banku zostają, innych kar nie ma.
