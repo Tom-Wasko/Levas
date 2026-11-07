@@ -1,8 +1,15 @@
 // Marketing: kampanie agencji reklamowych w strefach miasta (tradycyjne i – UF19 – internetowe) i promocje.
-import { esc, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
+import { esc, KOLORY, licz, nazwaFirmy, nazwaUslugi, proc, tabela, wykres, zl } from "./wspolne.js";
 import { igReklama } from "./infografiki.js";
 
 const RODZAJ = { druk: "druk", internet: "internet", radio_billboard: "radio i billboardy", wydarzenia: "wydarzenia" };
+// UF14: kolor agencji (znak i pasek karty) według rodzaju; znak – inicjały nazwy z cudzysłowu („Papier Przyjmie” → PP)
+const KOLOR = { druk: KOLORY[2], radio_billboard: KOLORY[1], wydarzenia: KOLORY[3], internet: KOLORY[6] };
+const znakAgencji = (nazwa) => {
+  const w = (nazwa.match(/„([^”]+)”/)?.[1] || nazwa).split(/\s+/).filter((x) => x.length > 1);
+  return esc((w.length > 1 ? w[0][0] + w[1][0] : (w[0] || "?").slice(0, 2)).toUpperCase());
+};
+const odmiana = (n, [jeden, kilka, wiele]) => (n === 1 ? jeden : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? kilka : wiele);
 const FAZA = { trwa: "trwa", narasta: "narasta", wygasa: "wygasa" };
 // UF19: agencje jednego rodzaju (internetowe albo tradycyjne – widok bez znacznika to same tradycyjne)
 const tylko = (R, internet) => ({ ...R, agencje: R.agencje.filter((a) => !!a.internet === internet) });
@@ -22,7 +29,7 @@ function strefaKanalu(R, a, k) {
 const rabatKanalu = (k, n) => k.znizki.reduce((r, [od, x]) => (n >= od ? Math.max(r, x) : r), 0);
 const efektEmisji = (R, n) => (n > 0 ? 1 - Math.exp(-R.model.tempo_emisji * n) : 0);
 const kosztKampanii = (k, s, n) => n * k.ceny[s] * (1 - rabatKanalu(k, n));
-const emisji = (n) => `${n} ${n === 1 ? "emisja" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? "emisje" : "emisji"}`;
+const emisji = (n) => `${n} ${odmiana(n, ["emisja", "emisje", "emisji"])}`;
 // infografika z danych pierwszego kanału (przykład w dymku); bez danych – wartości domyślne
 const igReklamaZ = (R) => {
   const k = R?.agencje?.[0]?.kanaly?.[0];
@@ -32,21 +39,45 @@ const kanalReklamy = (R, a, k) => R.agencje.find((x) => x.id === a)?.kanaly.find
 const takaSama = (x, a, k, strefa) => x.agencja === a && x.kanal === k && (x.strefa ?? null) === strefa;
 const emisjeWDecyzji = (v, a, k, s) => (v.decyzje.kampanie || []).find((x) => takaSama(x, a, k, s === "miasto" ? null : s))?.emisje || 0;
 
+// UF14: progi rabatu jako pasek („1–3: cena pełna · 4–10: −15% · 11–20: −30%”), bieżący próg podświetlony
+function progiHtml(k, n) {
+  const p = [...(k.znizki[0]?.[0] > 1 ? [[1, 0]] : []), ...k.znizki].filter(([od]) => od <= k.maks_emisji);
+  const tu = p.reduce((j, [od], i) => (n >= od ? i : j), -1);
+  return `<div class="progi">${p.map(([od, x], i) => {
+    const doo = i + 1 < p.length ? p[i + 1][0] - 1 : k.maks_emisji;
+    return `<span class="${i === tu ? "tu" : ""}">${od === doo ? od : `${od}–${doo}`}<b>${x ? `−${proc(x, 0)}` : "cena pełna"}</b></span>`;
+  }).join("")}</div>`;
+}
+
+// UF14: kalkulator emisji – koszt i siła kampanii przy 1 emisji, na progach rabatów, przy maksimum i przy wybranej liczbie;
+// klik w wiersz ustawia tę liczbę emisji
+function kalkulatorHtml(R, a, k, s, n, mozna) {
+  const l = [...new Set([1, ...k.znizki.map(([od]) => od), k.maks_emisji, ...(n ? [n] : [])])]
+    .filter((x) => x >= 1 && x <= k.maks_emisji).sort((x, y) => x - y);
+  const dane = (x) => (mozna ? `data-akcja="kampania-ustaw" data-a="${a.id}" data-k="${k.id}" data-s="${s}" data-n="${x}" title="Ustaw ${emisji(x)}"` : "");
+  return `<table class="kalkulator"><thead><tr><th>Emisje</th><th>Za emisję</th><th>Koszt</th><th>Siła</th></tr></thead>
+    <tbody>${l.map((x) => `<tr class="${x === n ? "tu" : ""} ${mozna ? "klik" : ""}" ${dane(x)}><td>${x}</td>
+      <td>${zl(k.ceny[s] * (1 - rabatKanalu(k, x)))}</td><td>${zl(kosztKampanii(k, s, x))}</td><td>${proc(efektEmisji(R, x), 0)}</td></tr>`).join("")}</tbody></table>`;
+}
+
 function kanalHtml(v, R, a, k, edycja, mi = null) {
   const s = strefaKanalu(R, a, k), n = emisjeWDecyzji(v, a.id, k.id, s), ef = efektEmisji(R, n), rab = rabatKanalu(k, n);
-  const inni = (R.konkurencja[a.rodzaj] || {})[s] || [], dis = edycja && k.dostepny ? "" : "disabled";
+  const inni = (R.konkurencja[a.rodzaj] || {})[s] || [], mozna = edycja && k.dostepny, dis = mozna ? "" : "disabled";
   const opcje = k.strefy.map((z) => `<option value="${z}" ${z === s ? "selected" : ""}>${esc(R.strefy[z])}${R.moje_strefy.includes(z) ? " (Twój lokal)" : ""}</option>`).join("");
   const wiersz = (x, y) => `<div class="wiersz"><span>${x}</span><span>${y}</span></div>`;
-  const progi = k.znizki.length ? k.znizki.map(([od, x]) => `od ${od}: −${proc(x, 0)}`).join(", ") : "brak";
-  return `<div class="kafel ${n ? "wybrany" : ""} ${k.dostepny ? "" : "niedostepny"}"><div class="kg">${esc(k.nazwa)}
+  const krok = (d, znak, ok) => `<button class="btn jasny maly" data-akcja="kampania-ustaw" data-a="${a.id}" data-k="${k.id}" data-s="${s}"
+      data-n="${n + d}" ${mozna && ok ? "" : "disabled"} title="${d > 0 ? "Jedna emisja więcej" : "Jedna emisja mniej"}">${znak}</button>`;
+  return `<div class="kafel kanal ${n ? "wybrany" : ""} ${k.dostepny ? "" : "niedostepny"}"><div class="kg">${esc(k.nazwa)}
       <span class="pigulka inf">${k.zasieg === "miasto" ? "całe miasto" : "strefa"}</span></div><div class="kt">
-    ${k.zasieg === "miasto" ? "" : `<label class="pole">Strefa<select data-zmiana="kampania-strefa" data-k="${a.id}/${k.id}" ${dis}>${opcje}</select></label>`}
-    ${wiersz("Emisja", esc(k.emisja))}
-    ${wiersz("Cena emisji (netto)", zl(k.ceny[s]))}
-    ${wiersz("Rabaty za liczbę emisji", progi)}
-    <label class="pole">Emisje w tej rundzie (0 – bez kampanii, najwyżej ${k.maks_emisji})
-      <input type="number" class="krotkie" min="0" max="${k.maks_emisji}" step="1" value="${n}" data-zmiana="kampania-emisje"
-        data-a="${a.id}" data-k="${k.id}" data-s="${s}" ${dis}></label>
+    <div class="kanal-cena"><b>${zl(k.ceny[s] * (1 - rab))}</b><span>za emisję (netto)${rab ? `, z rabatem −${proc(rab, 0)}` : ""} · ${esc(k.emisja)}</span></div>
+    ${k.zasieg === "miasto" ? `<div class="wiersz"><span>Zasięg</span><span>całe miasto</span></div>`
+    : `<label class="pole">Zasięg – strefa<select data-zmiana="kampania-strefa" data-k="${a.id}/${k.id}" ${dis}>${opcje}</select></label>`}
+    <div class="podpis-progow">Rabat za liczbę emisji w rundzie</div>${progiHtml(k, n)}
+    <label class="pole">Emisje w tej rundzie (0 – bez kampanii, najwyżej ${k.maks_emisji})</label>
+    <div class="krokomierz">${krok(-1, "−", n > 0)}<input type="number" class="krotkie" min="0" max="${k.maks_emisji}" step="1" value="${n}"
+        data-zmiana="kampania-emisje" data-a="${a.id}" data-k="${k.id}" data-s="${s}" ${dis} aria-label="Emisje – ${esc(k.nazwa)}">${krok(1, "+", n < k.maks_emisji)}
+      ${n ? `<span class="koszt">${zl(kosztKampanii(k, s, n))}</span>` : ""}</div>
+    ${kalkulatorHtml(R, a, k, s, n, mozna)}
     ${n ? wiersz("Koszt (netto)", `${zl(kosztKampanii(k, s, n))}${rab ? ` <span class="plus">(−${proc(rab, 0)})</span>` : ""}`) : ""}
     ${wiersz("Siła kampanii", `${proc(ef, 0)} pełnego efektu`)}
     ${wiersz("Więcej klientów w strefie", `+${proc(k.pula * (n ? ef : 1), 1)}${n ? "" : " (przy pełnym efekcie)"}`)}
@@ -54,6 +85,19 @@ function kanalHtml(v, R, a, k, edycja, mi = null) {
     ${mi ? wiersz("Efekt w kolejnych rundach", profilInternetu(mi)) : ""}
     ${inni.length ? wiersz("Konkurencja w tym rodzaju (poprzednia runda)", inni.map((f) => esc(nazwaFirmy(v, f))).join(", ")) : ""}
     ${k.dostepny ? "" : `<p class="podpowiedz">Dostępne od rundy ${k.od_rundy}.</p>`}</div></div>`;
+}
+
+// UF14: karta agencji – znak w kolorze agencji, opis, zamówione kampanie i koszt; w środku kafelki kanałów
+function agencjaHtml(v, R, a, edycja, mi = null) {
+  const zam = zamowioneW(v, { agencje: [a] });
+  const koszt = zam.reduce((s, x) => { const k = a.kanaly.find((y) => y.id === x.kanal); return s + (k ? kosztKampanii(k, x.strefa || "miasto", x.emisje) : 0); }, 0);
+  return `<section class="agencja" style="--agencja:${KOLOR[a.rodzaj] || "var(--pom)"}">
+    <div class="agencja-glowa"><span class="agencja-znak" aria-hidden="true">${znakAgencji(a.nazwa)}</span>
+      <div class="agencja-opis"><b>${esc(a.nazwa)}</b> <span class="pigulka">${RODZAJ[a.rodzaj] || esc(a.rodzaj)}</span>
+        <p>${esc(a.opis)}</p></div>
+      <div class="agencja-suma">${zam.length ? `${zam.length} ${odmiana(zam.length, ["kampania", "kampanie", "kampanii"])} · <b>${zl(koszt)}</b>`
+    : `${a.kanaly.length} ${odmiana(a.kanaly.length, ["kanał", "kanały", "kanałów"])}`}</div></div>
+    <div class="siatka trojka">${a.kanaly.map((k) => kanalHtml(v, R, a, k, edycja, mi)).join("")}</div></section>`;
 }
 
 const raportyAgencji = (lista) => lista.filter((x) => x.tekst).map((x) => `<div class="kafel"><div class="kg">${esc(x.nazwa)} – ${esc(x.strefa_nazwa)}</div>
@@ -88,12 +132,7 @@ export const agencje = {
     if (R.model?.maks_przyciagania) html += `<p class="podpowiedz">Sufit reklamy: przyciąganie wszystkich Twoich kampanii w jednej strefie
       nasyca się do +${proc(R.model.maks_przyciagania, 0)} (to ok. +30% popytu), poszerzenie puli strefy – do +${proc(R.model.maks_puli, 0)}.
       Pierwsze kampanie działają prawie w pełni, każda kolejna – coraz słabiej.</p>`;
-    for (const a of R.agencje) {
-      html += `<div class="pasek ciemny" style="margin-top:22px"><span>${esc(a.nazwa)}</span><span>${RODZAJ[a.rodzaj] || esc(a.rodzaj)}</span></div>
-        <p class="podpowiedz">${esc(a.opis)}</p>
-        <div class="siatka trojka" style="margin-top:10px">${a.kanaly.map((k) => kanalHtml(v, R, a, k, edycja)).join("")}</div>`;
-    }
-    return html;
+    return html + R.agencje.map((a) => agencjaHtml(v, R, a, edycja)).join("");
   },
   wyniki({ v }) {
     const W = v.wyniki?.reklama_agencje;
@@ -120,14 +159,19 @@ export const agencje = {
   },
   zmiany: {
     "kampania-strefa": (el, c) => { wybor[el.dataset.k] = el.value; c.rysuj(); },
-    "kampania-emisje": (el, c) => c.zmien((d) => {
-      const { a, k, s } = el.dataset, strefa = s === "miasto" ? null : s;
-      const kan = kanalReklamy(c.v.reklama, a, k), n = Math.max(0, Math.min(kan?.maks_emisji ?? 0, Math.round(+el.value || 0)));
-      const l = (d.kampanie || []).filter((x) => !takaSama(x, a, k, strefa));
-      d.kampanie = n ? [...l, { agencja: a, kanal: k, strefa, emisje: n }] : l;
-    }),
+    "kampania-emisje": (el, c) => ustawEmisje(el, c, el.value),
   },
+  akcje: { "kampania-ustaw": (el, c) => ustawEmisje(el, c, el.dataset.n) },   // UF14: −/+ i wiersz kalkulatora
 };
+
+function ustawEmisje(el, c, ile) {
+  return c.zmien((d) => {
+    const { a, k, s } = el.dataset, strefa = s === "miasto" ? null : s;
+    const kan = kanalReklamy(c.v.reklama, a, k), n = Math.max(0, Math.min(kan?.maks_emisji ?? 0, Math.round(+ile || 0)));
+    const l = (d.kampanie || []).filter((x) => !takaSama(x, a, k, strefa));
+    d.kampanie = n ? [...l, { agencja: a, kanal: k, strefa, emisje: n }] : l;
+  });
+}
 
 // UF19: obecność w sieci – przyciąganie z już zamówionych kampanii internetowych w tej i kolejnych rundach
 function obecnoscHtml(v, R) {
@@ -160,12 +204,7 @@ export const internet = {
       <p class="podpowiedz">Efekt kampanii w sieci w kolejnych rundach: ${profilInternetu(mi)} (aż spadnie poniżej ${proc(mi.prog_wygasania, 0)}).</p>`;
     html += obecnoscHtml(v, R);
     html += trwajaceHtml(v, R.trwajace.filter((x) => x.od_rundy < v.runda && x.internet), "Twoje kampanie w sieci z poprzednich rund – działają w tej rundzie");
-    for (const a of R.agencje) {
-      html += `<div class="pasek ciemny" style="margin-top:22px"><span>${esc(a.nazwa)}</span><span>${RODZAJ[a.rodzaj] || esc(a.rodzaj)}</span></div>
-        <p class="podpowiedz">${esc(a.opis)}</p>
-        <div class="siatka trojka" style="margin-top:10px">${a.kanaly.map((k) => kanalHtml(v, R, a, k, edycja, mi)).join("")}</div>`;
-    }
-    return html;
+    return html + R.agencje.map((a) => agencjaHtml(v, R, a, edycja, mi)).join("");
   },
   wyniki({ v }) {
     const kampanie = (v.wyniki?.reklama_agencje?.kampanie || []).filter((x) => x.internet);

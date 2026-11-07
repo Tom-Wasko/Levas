@@ -36,7 +36,7 @@ UF23 → UF9…UF1 → UF24. Numery UF = numery z `raporty/ufajnianie/plan.md` (
 - [x] UF18 (9) Licytacje pracowników widoczne (znaczek „oferty: N drużyn”, ostrzeżenie o podkupieniu, raport kto wygrał)
 - [x] UF17 (19) Gra pokazowa (`manage.py gra_pokazowa`: 18 rund, 4 boty + drużyna „Pokazowa” grana przez trudnego bota, przypisana mistrzom gry)
 - [x] UF15 Nowy układ menu (Miasto / Twój lokal / Firma / Wyniki, aliasy starych kluczy), Giełda „w budowie”, taśmy przy mapie, kłódki „od rundy N”
-- [ ] UF14 (18) Agencje reklamowe – nowy wygląd, siatki 3 kolumn
+- [x] UF14 (18) Agencje reklamowe – nowy wygląd (karty agencji, kafelki kanałów z progami i kalkulatorem), siatki 3 kolumn → auto-fit
 - [x] UF13 (2) Parki tylko z mapy: znak „!” na parku, lista spraw nad mapą, okno parku (kafelki A/B/C, poprzednia runda, historia); sprawy w lokalu w Moim lokalu
 - [x] UF12 Środki trwałe → KPiR (ewidencja i odpisy), sprzedaż sprzętu w Wnętrzu z uwagą o amortyzacji; zakładka usunięta
 - [x] UF11 Ranking w Wynikach: tabela drużyn (miejsce, zmiana, średnia i ostatnia karta, majątek) + wykres miejsc

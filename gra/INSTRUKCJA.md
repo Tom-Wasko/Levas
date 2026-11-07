@@ -290,7 +290,9 @@ Zakładka **Czas właściciela** pokazuje, na co poszły godziny.
   Noc Kebaba. Kampanię zamawiasz na **jedną rundę**: wybierasz kanał, strefę i **liczbę emisji** (emisja to
   np. paczka 250 ulotek, godzina degustacji albo spot w radiu).
   - **Cena emisji** zależy od kanału i strefy; od progów (np. od 4 i od 11 emisji) dostajesz **rabat na wszystkie
-    emisje**.
+    emisje**. Każdy kanał ma swój kafelek: duża cena za emisję, pasek progów rabatu (bieżący podświetlony),
+    przyciski **− / +** i **kalkulator** – tabelka „ile emisji → koszt i siła kampanii”; klik w wiersz ustawia tę
+    liczbę emisji.
   - **Efekt się nasyca**: 1 emisja to ok. 23% tego, co kanał może dać, 4 – ok. 65%, 10 – ponad 90%. Dalsze emisje
     kosztują, a prawie nic nie dodają.
   - Kampania działa w rundzie emisji, a potem jeszcze przez chwilę **wygasa**. Chcesz efekt dłużej – zamów znowu.

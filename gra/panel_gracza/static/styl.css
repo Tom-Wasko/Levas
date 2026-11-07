@@ -145,7 +145,8 @@ h1, h2, h3 { font-weight: 700; letter-spacing: .01em; }
 /* siatki kart */
 .siatka { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 16px; }
 .siatka.waska { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
-.siatka.trojka { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* UF14: „3 kolumny, a 2 rzeczy w wierszu” – auto-fit: najwyżej 3 kolumny, puste się zwijają, na wąskim ekranie mniej */
+.siatka.trojka { grid-template-columns: repeat(auto-fit, minmax(min(100%, max(240px, calc((100% - 32px) / 3))), 1fr)); }
 .kafel { background: #fff; border-radius: var(--r); border: 1px solid var(--linia); box-shadow: 0 1px 2px rgba(0,0,0,.03);
   display: flex; flex-direction: column; transition: box-shadow .15s, transform .15s, border-color .15s; }
 .kafel:hover { box-shadow: var(--cien); }
@@ -266,7 +267,7 @@ table.t tfoot td { font-weight: 800; background: var(--pom-jasny); border-top: 2
 .wyrozniony { background: var(--pom-jasny) !important; font-weight: 700; }
 
 /* pulpit */
-.dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, max(220px, calc((100% - 32px) / 3))), 1fr)); gap: 16px; }
 .dash .kafel .kt { text-align: center; display: grid; place-items: center; min-height: 112px; font-weight: 800; font-size: 25px; color: var(--czarny); }
 .dash .kafel .kg .ikona { color: var(--pom); }
 .dash .maly-tekst { font-size: 12.5px; font-weight: 700; color: var(--tekst); }
@@ -322,7 +323,7 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
 .wykres { background: #fff; border-radius: var(--r); border: 1px solid var(--linia); padding: 16px; margin-top: 18px; }
 .wykres canvas { max-height: 320px; }
 .dwie { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.trzy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.trzy { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, max(220px, calc((100% - 32px) / 3))), 1fr)); gap: 16px; }
 .podpowiedz { color: var(--szary); font-size: 11px; text-transform: none; font-weight: 500; }
 /* U24: opinie klientów przy lokalu */
 .opinie blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid #e0c060; font-size: 13px; }
@@ -373,7 +374,6 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
 
 @media (max-width: 900px) {
   .dash, .dwie, .trzy { grid-template-columns: 1fr; }
-  .siatka.trojka { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .karta-glowa { grid-template-columns: 1fr; justify-items: center; }
   .przelacznik { justify-self: center; }
   .naglowek::before { width: 100%; background: var(--pom); }
@@ -384,7 +384,6 @@ details.grupa-bledow > .blad { text-transform: none; letter-spacing: normal; fon
   html[data-motyw] body .menu { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; }
   html[data-motyw] body .menu .poz > a { white-space: nowrap; }
   html[data-motyw] body .menu .poz:hover .pod { display: none; }
-  .siatka.trojka { grid-template-columns: 1fr; }
   .scena { padding: 14px 8px 40px; }
   .tresc { padding: 16px 14px 22px; }
 }
@@ -510,3 +509,38 @@ a.zad-pole { cursor: pointer; }
 .zad-pusto { font-size: 11.5px; opacity: .65; margin: 4px 0; }
 @media (max-width: 700px) { .zadania:not(.zwiniete) { left: 16px; right: 16px; width: auto; top: auto; bottom: 16px; max-height: 60vh; } }
 @media print { .zadania { display: none; } }
+
+/* UF14: agencje reklamowe – karta agencji ze znakiem w jej kolorze, kanały jako kafelki z kalkulatorem emisji */
+.agencja { --agencja: var(--pom); margin-top: 22px; border: 1px solid var(--linia); border-top: 4px solid var(--agencja);
+  border-radius: var(--r); background: color-mix(in srgb, var(--agencja) 4%, var(--karta)); padding: 14px 16px 16px; }
+.agencja-glowa { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+.agencja-znak { flex: none; width: 46px; height: 46px; border-radius: 12px; background: var(--agencja); color: #fff;
+  display: grid; place-items: center; font-weight: 800; font-size: 16px; letter-spacing: .5px; box-shadow: var(--cien); }
+.agencja-opis { flex: 1; min-width: 0; }
+.agencja-opis b { font-size: 15px; color: var(--czarny); }
+.agencja-opis .pigulka { background: color-mix(in srgb, var(--agencja) 14%, #fff); color: var(--agencja); margin-left: 6px; }
+.agencja-opis p { margin: 4px 0 0; color: var(--szary); font-size: 12px; }
+.agencja-suma { flex: none; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--szary); white-space: nowrap; }
+.agencja-suma b { color: var(--agencja); font-size: 14px; }
+.kanal .kg { border-bottom-color: color-mix(in srgb, var(--agencja) 25%, var(--linia)); }
+.kanal-cena { display: flex; flex-direction: column; margin-bottom: 8px; }
+.kanal-cena b { font-size: 22px; font-weight: 800; color: var(--agencja); font-variant-numeric: tabular-nums; }
+.kanal-cena span { font-size: 11px; color: var(--szary); }
+.podpis-progow { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--szary); margin-top: 8px; }
+.progi { display: flex; gap: 3px; margin: 4px 0 10px; }
+.progi span { flex: 1; text-align: center; font-size: 10px; padding: 4px 2px; border-radius: 6px; background: var(--szary-jasny); color: var(--szary); }
+.progi span b { display: block; font-size: 11px; color: var(--tekst); }
+.progi span.tu { background: var(--agencja); color: #fff; }
+.progi span.tu b { color: #fff; }
+.krokomierz { display: flex; align-items: center; gap: 6px; margin: 2px 0 10px; }
+.krokomierz .btn { min-width: 32px; font-size: 14px; padding: 4px 8px; }
+.krokomierz input { text-align: center; width: 64px; }
+.krokomierz .koszt { margin-left: auto; font-weight: 800; color: var(--agencja); }
+table.kalkulator { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+table.kalkulator th { font-size: 9.5px; text-transform: uppercase; color: var(--szary); font-weight: 700; padding: 3px 4px; text-align: right; }
+table.kalkulator td { padding: 3px 4px; border-top: 1px solid var(--linia); text-align: right; }
+table.kalkulator th:first-child, table.kalkulator td:first-child { text-align: left; }
+table.kalkulator tr.klik { cursor: pointer; }
+table.kalkulator tr.klik:hover td { background: color-mix(in srgb, var(--agencja) 8%, transparent); }
+table.kalkulator tr.tu td { font-weight: 800; color: var(--agencja); background: color-mix(in srgb, var(--agencja) 10%, transparent); }
+@media (max-width: 560px) { .agencja-glowa { flex-wrap: wrap; } .agencja-suma { width: 100%; } }

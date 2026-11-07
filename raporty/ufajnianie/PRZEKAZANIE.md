@@ -127,7 +127,16 @@ Aktualizowane po każdym zadaniu. Ostatnia aktualizacja: patrz `git log -1 -- ra
   zrównoważony/trudny – pomiar 4 ziaren (rywale średni): miejsca 4,1,1,1 (premium 3,1,1,3; czlowiek_dobry 4,1,3,2).
   18 rund ≈ 9 s. Testy `testy/aplikacja/test_gra_pokazowa.py`. Komendy nie uruchamiałem na żadnej bazie poza
   testową – autor odpala ją u siebie / na serwerze (README, Prowadzenie gry); w UF24 – na nowo po wszystkim.
-- Następne kolejno: UF14 → UF23 → UF9…UF1 → UF24.
+- [x] UF14 – nowy wygląd agencji reklamowych (tylko panel, bez zmian silnika i danych). `marketing.js`:
+  `agencjaHtml` (karta `section.agencja` z `--agencja` = kolor rodzaju z `KOLORY`, znak z inicjałów nazwy w „…”,
+  podsumowanie zamówionych kampanii i kosztu; ta sama karta w zakładkach agencje i internet), `kanalHtml` (duża cena za
+  emisję z rabatem, zasięg, `progiHtml` – pasek progów z podświetlonym bieżącym, krokomierz −/+ wokół starego pola
+  `kampania-emisje`, `kalkulatorHtml` – wiersze 1 / progi / maks / bieżąca liczba, klik ustawia emisje). Nowa akcja
+  `kampania-ustaw` (wspólne `ustawEmisje` z polem liczby; zakładka internet dzieli `zmiany`/`akcje` z agencjami).
+  `styl.css`: `.siatka.trojka`, `.dash`, `.trzy` – `repeat(auto-fit, minmax(min(100%, max(240px|220px,
+  (100% − 32px)/3)), 1fr))` → najwyżej 3 kolumny, 2 elementy wypełniają wiersz, na wąskim ekranie mniej; usunięte
+  nadpisania `.siatka.trojka` w @media. Sprawdzone renderem (node) i zrzutem z headless Chrome (1150 px i 400 px).
+- Następne kolejno: UF23 → UF9…UF1 → UF24.
 - Bambiczkowanie (6.11, w nocy): B15 skończone i wypchnięte na `kalibracja-b` (9f54765, c028931); ta sesja już tam
   nie commituje – gałąź gotowa do scalenia wg SCALANIE.md, gdy autor zleci.
 
